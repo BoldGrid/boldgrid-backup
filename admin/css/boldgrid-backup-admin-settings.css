@@ -1,0 +1,23 @@
+/* Do not auto-format this or other CSS files. */
+#schedule-dow-table {
+	border: 0px;
+	text-align: left;
+	width: 600px;
+}
+
+#schedule-tod-table {
+	border: 0px;
+	text-align: left;
+}
+
+#notification-settings-table td {
+	height: 22px;
+}
+
+#no-backup-days {
+	color: #f95b26;
+}
+
+#boldgrid-settings-submit {
+	margin-top: 20px;
+}
