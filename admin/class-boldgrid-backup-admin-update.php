@@ -237,7 +237,6 @@ class Boldgrid_Backup_Admin_Update {
 			$transient->name = $version_data->result->data->title;
 			$transient->requires = $version_data->result->data->requires_wp_version;
 			$transient->tested = $version_data->result->data->tested_wp_version;
-			// $transient->downloaded = $version_data->result->data->downloads;
 			$transient->last_updated = $version_data->result->data->release_date;
 			$transient->download_link = $configs['asset_server'] .
 				 $configs['ajax_calls']['get_asset'] . '?id=' . $version_data->result->data->asset_id .
@@ -248,15 +247,6 @@ class Boldgrid_Backup_Admin_Update {
 			$version_data->result->data->compatibility, true ) ) ) {
 				$transient->compatibility = $version_data->result->data->compatibility;
 			}
-
-			/*
-			 * Not currently showing ratings.
-			 * if ( false === ( empty( $version_data->result->data->rating ) ||
-			 * empty( $version_data->result->data->num_ratings ) ) ) {
-			 * $transient->rating = ( float ) $version_data->result->data->rating;
-			 * $transient->num_ratings = ( int ) $version_data->result->data->num_ratings;
-			 * }
-			 */
 
 			$transient->added = '2016-05-05';
 
@@ -278,7 +268,6 @@ class Boldgrid_Backup_Admin_Update {
 			$transient->slug = $this->plugin_name;
 			$transient->version = $version_data->result->data->version;
 			$transient->new_version = $version_data->result->data->version;
-			// $transient->active_installs = true;
 		} else {
 			// For plugins.php and update-core.php pages.
 			$obj = new stdClass();

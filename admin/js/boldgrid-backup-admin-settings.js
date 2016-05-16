@@ -4,13 +4,15 @@
  * @summary JavaScript for the settings page.
  *
  * @since 1.0
+ *
+ * @param $ The jQuery object.
  */
 ( function( $ ) {
 	'use strict';
 
 	// General Variables.
-	var self = {};
-	var $scheduleDow, $noBackupDays;
+	var self = {},
+		$scheduleDow, $noBackupDays;
 
 	// Define a context selector for schedule-dow.
 	$scheduleDow = $( '.schedule-dow' );

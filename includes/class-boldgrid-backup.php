@@ -145,7 +145,6 @@ class Boldgrid_Backup {
 		$plugin_admin = new Boldgrid_Backup_Admin( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 
 		// Instantiate the admin core.
 		$plugin_admin_core = new Boldgrid_Backup_Admin_Core();

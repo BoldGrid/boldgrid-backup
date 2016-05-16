@@ -17,6 +17,11 @@
 <h2>Backup Archives</h2>
 <?php
 
+// Create URL for backup now.
+$backup_url = get_admin_url( null, 'admin.php?page=boldgrid-backup&backup_now=1' );
+
+$backup_url = wp_nonce_url( $backup_url, 'boldgrid-backup-backup', 'backup_auth' );
+
 // Print the list of archive files.
 if ( false === empty( $archives ) ) {
 	?>
@@ -33,11 +38,6 @@ if ( false === empty( $archives ) ) {
 	<tbody id='backup-archive-list-body'>
 <?php
 foreach ( $archives as $key => $archive ) {
-	// Create URL for restoring from an archive file.
-	$backup_url = get_admin_url( null, 'admin.php?page=boldgrid-backup&backup_now=1' );
-
-	$backup_url = wp_nonce_url( $backup_url, 'boldgrid-backup-backup', 'backup_auth' );
-
 	// Create URL for restoring from an archive file.
 	$restore_url = get_admin_url( null,
 		'admin.php?page=boldgrid-backup&restore_now=1&archive_key=' . $key . '&archive_filename=' .
@@ -91,7 +91,6 @@ foreach ( $archives as $key => $archive ) {
 <p>There are no files created.</p>
 <?php
 }
-
 ?>
 <p>
 	<a class='button' href='<?php echo $backup_url; ?>'>Backup Site Now</a>

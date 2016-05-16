@@ -34,7 +34,7 @@ if ( false === defined( 'BOLDGRID_BACKUP_VERSION' ) ) {
 	define( 'BOLDGRID_BACKUP_VERSION', '1.0' );
 }
 
-// Define boldgrid-seo path.
+// Define boldgrid-backup path.
 if ( false === defined( 'BOLDGRID_BACKUP_PATH' ) ) {
 	define( 'BOLDGRID_BACKUP_PATH', dirname( __FILE__ ) );
 }

@@ -1,3 +1,13 @@
+/**
+ * BoldGrid Backup admin home page.
+ *
+ * @summary JavaScript for the BoldGrid Backup admin home page.
+ *
+ * @since 1.0
+ *
+ * @param $ The jQuery object.
+ */
+
 ( function( $ ) {
 	'use strict';
 
@@ -5,8 +15,8 @@
 	var self = {};
 
 	/*
-	 * This script is passed "downloadNonce" containing a nonce for file
-	 * downloads.
+	 * This script is passed "downloadNonce" (via wp_localize_script() in
+	 * "class-boldgrid-backup-admin-core.php") containing a nonce for file downloads.
 	 */
 
 	// Onload event listener.
@@ -23,6 +33,8 @@
 
 	/**
 	 * Download a selected backup archive file.
+	 *
+	 * @since 1.0
 	 */
 	self.downloadArchive = function() {
 		// Declare variables.

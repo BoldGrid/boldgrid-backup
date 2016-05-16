@@ -305,7 +305,7 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return string The path to the user home directory.
 	 */
 	public function get_home_directory() {
-		// If gome directory was already set, then return it.
+		// If home directory was already set, then return it.
 		if ( false === empty( $this->home_dir ) ) {
 			return $this->home_dir;
 		}
@@ -376,16 +376,20 @@ class Boldgrid_Backup_Admin_Core {
 
 		// If the backup directory does not exist, then attempt to create it.
 		if ( false === $backup_directory_exists ) {
-			$backup_directory_created = mkdir( $backup_directory_path, 0700 );
+			$backup_directory_created = mkdir( $backup_directory_path, 0700, true );
 
 			// If mkdir failed, then abort.
 			if ( false === $backup_directory_created ) {
+				error_log( __METHOD__ . ': Could not create directory "' . $backup_directory_path . '"!' );
+
 				return false;
 			}
 		}
 
 		// Check if the backup directory is writable, abort if not.
 		if ( false === is_writable( $backup_directory_path ) ) {
+			error_log( __METHOD__ . ': Could not create directory "' . $backup_directory_path . '"!' );
+
 			return false;
 		}
 
@@ -1254,21 +1258,12 @@ class Boldgrid_Backup_Admin_Core {
 		$db_dump_filepath = $this->backup_directory . '/' . DB_NAME . '.' . date( 'Ymd-His' ) .
 			 '.sql';
 
-		// If gzip is available, then add ".gz" to the file extension.
-		if ( true === $this->gzip_available ) {
-			$db_dump_filepath .= '.gz';
-		}
-
 		// Save the file path.
 		$this->db_dump_filepath = $db_dump_filepath;
 
 		// Backup the database with mysqldump.
 		$command = 'mysqldump --defaults-file=' . $defaults_filepath .
 			 ' --dump-date --tz-utc --databases ' . DB_NAME;
-
-		if ( true === $this->gzip_available ) {
-			$command .= ' | gzip -c';
-		}
 
 		$command .= ' > ' . $db_dump_filepath;
 
@@ -1362,6 +1357,7 @@ class Boldgrid_Backup_Admin_Core {
 		// Include the custom RecursiveFilterIterator class file.
 		require_once dirname( __FILE__ ) . '/class-boldgrid-backup-admin-recursivefilteriterator.php';
 
+		// @todo Change to list_file( $folder = '', $levels = 100 ) via $wp_filesystem.
 		// Create a RecursiveDirectoryIterator object.
 		$iterator = new RecursiveDirectoryIterator( $dirpath, FilesystemIterator::SKIP_DOTS );
 
@@ -1871,6 +1867,8 @@ class Boldgrid_Backup_Admin_Core {
 	 * @since 1.0
 	 * @access private
 	 *
+	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
+	 *
 	 * @return array An array of archive file information.
 	 */
 	private function restore_archive_file() {
@@ -1972,7 +1970,27 @@ class Boldgrid_Backup_Admin_Core {
 			// Prevent this script from dying.
 			ignore_user_abort( true );
 
-			// @todo: Write restoration code here.
+			// Connect to the WordPress Filesystem API.
+			global $wp_filesystem;
+
+			// Unzip the backup archive file to ABSPATH.
+			// @todo Finish restoration code below.
+			//$result = unzip_file( $filepath, ABSPATH );
+
+			// Check for error.
+			if ( true !== $result ) {
+				error_log( __METHOD__ . ': Could not extract "' . $filepath . '" into "' . ABSPATH . '"!' );
+
+				$restore_ok = false;
+			}
+
+			// Restore database.
+			if ( true === $restore_ok ) {
+				// Locate the database dump file (boldgrid-backup-*.sql).
+
+				// Restore the database.
+
+			}
 		}
 
 		// Display notice of deletion status.
@@ -2023,6 +2041,10 @@ class Boldgrid_Backup_Admin_Core {
 			$info['mail_success'] = $this->send_notification( $subject, $body );
 		}
 
+		// Update status.
+		$info['restore_ok'] = $restore_ok;
+
+		// Return info array.
 		return $info;
 	}
 
