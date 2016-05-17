@@ -91,15 +91,6 @@ class Boldgrid_Backup_Admin_Core {
 	private $mysqldump_available = null;
 
 	/**
-	 * Is gzip available?
-	 *
-	 * @since 1.0
-	 * @access private
-	 * @var bool
-	 */
-	private $gzip_available = null;
-
-	/**
 	 * Available execution functions.
 	 *
 	 * @since 1.0
@@ -107,15 +98,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * @var array
 	 */
 	private $available_exec_functions = array();
-
-	/**
-	 * The WordPress version, if running.
-	 *
-	 * @since 1.0
-	 * @access private
-	 * @var string
-	 */
-	private $wp_version = '';
 
 	/**
 	 * Is WP-CRON enabled?
@@ -154,6 +136,46 @@ class Boldgrid_Backup_Admin_Core {
 	private $db_dump_filepath = '';
 
 	/**
+	 * Base directory for the get_filelist method.
+	 *
+	 * @since 1.0
+	 * @access private
+	 * @var string
+	 */
+	private $filelist_basedir = null;
+
+	/**
+	 * The filelist filter array.
+	 *
+	 * @since 1.0
+	 * @access private
+	 * @var array
+	 */
+	private $filelist_filter = array(
+		'.htaccess',
+		'index.php',
+		'license.txt',
+		'readme.html',
+		'readme.txt',
+		'wp-activate.php',
+		'wp-admin',
+		'wp-blog-header.php',
+		'wp-comments-post.php',
+		'wp-config.php',
+		'wp-content',
+		'wp-cron.php',
+		'wp-includes',
+		'wp-links-opml.php',
+		'wp-load.php',
+		'wp-login.php',
+		'wp-mail.php',
+		'wp-settings.php',
+		'wp-signup.php',
+		'wp-trackback.php',
+		'xmlrpc.php',
+	);
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.0
@@ -187,20 +209,19 @@ class Boldgrid_Backup_Admin_Core {
 			return $this->is_windows;
 		}
 
-		// Check if using Windows or Linux.
-		$is_windows = ( 'win' === strtolower( substr( PHP_OS, 0, 3 ) ) );
-
-		// Set as a class property.
-		$this->is_windows = $is_windows;
+		// Check if using Windows or Linux, and set as a class property.
+		$this->is_windows = ( 'win' === strtolower( substr( PHP_OS, 0, 3 ) ) );
 
 		// Return result.
-		return $is_windows;
+		return $this->is_windows;
 	}
 
 	/**
 	 * Perform functionality tests.
 	 *
 	 * @since 1.0
+	 *
+	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
 	 * @return bool
 	 */
@@ -210,11 +231,11 @@ class Boldgrid_Backup_Admin_Core {
 			return $this->is_functional;
 		}
 
-		// Configure a constant "EOL" for reporting.
-		$this->configure_eol();
+		// Connect to the WordPress Filesystem API.
+		global $wp_filesystem;
 
 		// Is the WordPress installation root directory writable?
-		$this->is_abspath_writable = is_writable( ABSPATH );
+		$this->is_abspath_writable = $wp_filesystem->is_writable( ABSPATH );
 
 		// If not writable, then mark as not functional.
 		if ( true !== $this->is_abspath_writable ) {
@@ -231,24 +252,18 @@ class Boldgrid_Backup_Admin_Core {
 			$this->is_functional = false;
 		}
 
-		// Test for crontab and wp-cron.
-		if ( true !== $this->is_crontab_available() && true !== $this->wp_cron_enabled() ) {
+		// Test for crontab. For now, don't check if wp-cron is enabled.
+		if ( true !== $this->is_crontab_available() ) {
 			$this->is_functional = false;
 		}
 
-		// Test for mysqldump.
+		// Test for mysqldump. For now, don't use wpbd.
 		if ( true !== $this->is_mysqldump_available() ) {
 			$this->is_functional = false;
 		}
 
-		// Test for gzip.
-		$this->is_gzip_available();
-
 		// Test for PHP safe mode.
 		$this->is_php_safemode();
-
-		// If WordPress is running, then set the version.
-		$this->set_wp_version();
 
 		// Save result, if not previously saved.
 		if ( null === $this->is_functional ) {
@@ -268,33 +283,6 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		return $this->is_functional;
-	}
-
-	/**
-	 * Configure EOL.
-	 *
-	 * @since 1.0
-	 * @access private
-	 *
-	 * @return null
-	 */
-	private function configure_eol() {
-		// If constant is already defined, then abort.
-		if ( true === defined( 'EOL' ) ) {
-			return;
-		}
-
-		// Determine value.
-		if ( 'cli' !== php_sapi_name() ) {
-			$eol = '<br />' . PHP_EOL;
-		} else {
-			$eol = PHP_EOL;
-		}
-
-		// Define the constant.
-		define( 'EOL', $eol );
-
-		return;
 	}
 
 	/**
@@ -362,9 +350,14 @@ class Boldgrid_Backup_Admin_Core {
 	 * @since 1.0
 	 * @access private
 	 *
+	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
+	 *
 	 * @return bool
 	 */
 	private function configure_backup_directory() {
+		// Connect to the WordPress Filesystem API.
+		global $wp_filesystem;
+
 		// Get the user home directory.
 		$home_dir = $this->get_home_directory();
 
@@ -372,11 +365,11 @@ class Boldgrid_Backup_Admin_Core {
 		$backup_directory_path = $home_dir . '/boldgrid_backup';
 
 		// Check if the backup directory exists.
-		$backup_directory_exists = is_dir( $backup_directory_path );
+		$backup_directory_exists = $wp_filesystem->is_dir( $backup_directory_path );
 
 		// If the backup directory does not exist, then attempt to create it.
 		if ( false === $backup_directory_exists ) {
-			$backup_directory_created = mkdir( $backup_directory_path, 0700, true );
+			$backup_directory_created = $wp_filesystem->mkdir( $backup_directory_path, 0700 );
 
 			// If mkdir failed, then abort.
 			if ( false === $backup_directory_created ) {
@@ -387,7 +380,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Check if the backup directory is writable, abort if not.
-		if ( false === is_writable( $backup_directory_path ) ) {
+		if ( false === $wp_filesystem->is_writable( $backup_directory_path ) ) {
 			error_log( __METHOD__ . ': Could not create directory "' . $backup_directory_path . '"!' );
 
 			return false;
@@ -757,30 +750,6 @@ class Boldgrid_Backup_Admin_Core {
 
 		return $this->mysqldump_available;
 	}
-	/**
-	 * Is gzip available?
-	 *
-	 * @since 1.0
-	 *
-	 * @return bool
-	 */
-	public function is_gzip_available() {
-		// If this test was already completed, then just return the result.
-		if ( null !== $this->gzip_available ) {
-			return $this->gzip_available;
-		}
-
-		// Create the test command.
-		$command = 'gzip -V';
-
-		// Test to see if the gzip command is available.
-		$output = $this->execute_command( $command, null, $success );
-
-		// Set class property.
-		$this->gzip_available = ( $success || (bool) $output );
-
-		return $this->gzip_available;
-	}
 
 	/**
 	 * Is crontab available?
@@ -830,35 +799,6 @@ class Boldgrid_Backup_Admin_Core {
 	}
 
 	/**
-	 * Set the wp_verison, if WordPress is running.
-	 *
-	 * @since 1.0
-	 * @access private
-	 *
-	 * @global string $wp_version The WordPress version string.
-	 *
-	 * @return bool
-	 */
-	private function set_wp_version() {
-		// If WordPress is not running, then fail.
-		if ( false === defined( 'WPINC' ) ) {
-			return false;
-		}
-
-		// Get the WordPress version.
-		global $wp_version;
-
-		// If the WordPress version is in the global, then record it as WordPress is running.
-		if ( false === empty( $wp_version ) ) {
-			$this->wp_version = $wp_version;
-
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
 	 * Is WP-CRON enabled?
 	 *
 	 * @since 1.0
@@ -891,13 +831,49 @@ class Boldgrid_Backup_Admin_Core {
 	}
 
 	/**
+	 * Get the WordPress total file size.
+	 *
+	 * @since 1.0
+	 * @access private
+	 *
+	 * @return int The total size for the WordPress file system, in bytes.
+	 */
+	private function get_wp_size() {
+		// Get the filtered file list.
+		$filelist = $this->get_filtered_filelist( ABSPATH );
+
+		// If nothing was found, then return 0.
+		if ( true === empty( $filelist ) ) {
+			return 0;
+		}
+
+		// Initialize total_size.
+		$size = 0;
+
+		// Add up the file sizes.
+		foreach ( $filelist as $fileinfo ) {
+			// Add the file size to the total.
+			$size += $fileinfo[2];
+		}
+
+		// return the result.
+		return $size;
+
+	}
+
+	/**
 	 * Disk space report.
 	 *
 	 * @since 1.0
 	 *
+	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
+	 *
 	 * @return array An array containing disk space (total, used, available, WordPress directory).
 	 */
 	public function get_disk_space() {
+		// Connect to the WordPress Filesystem API.
+		global $wp_filesystem;
+
 		// Get the HOME environment variable.
 		$env_home = getenv( 'HOME' );
 
@@ -908,8 +884,8 @@ class Boldgrid_Backup_Admin_Core {
 		$home_dir = rtrim( $home_dir, DIRECTORY_SEPARATOR );
 
 		// If the home directory is not defined, not a directory or not writable, then return 0.00.
-		if ( true === empty( $home_dir ) || false === is_dir( $home_dir ) ||
-			 false === is_writable( $home_dir ) ) {
+		if ( true === empty( $home_dir ) || false === $wp_filesystem->is_dir( $home_dir ) ||
+			 false === $wp_filesystem->is_writable( $home_dir ) ) {
 			$return = array(
 				0.00,
 				0.00,
@@ -924,27 +900,8 @@ class Boldgrid_Backup_Admin_Core {
 		$disk_free_space = disk_free_space( $home_dir );
 		$disk_used_space = $disk_total_space - $disk_free_space;
 
-		// Initialize $wp_root_size.
-		$wp_root_size = 0;
-
-		// Get the size of the WordPress installation root directory (ABSPATH).
-		if ( true === $this->is_windows() ) {
-			/*
-			 * Windows.
-			 * @link https://msdn.microsoft.com/en-us/library/z9ty6h50%28v=vs.84%29.aspx
-			 * @link https://msdn.microsoft.com/en-us/library/f1xtf7ta%28v=vs.84%29.aspx
-			 * @link https://msdn.microsoft.com/en-us/library/aa243182%28v=vs.60%29.aspx
-			 */
-			$obj = new COM( 'scripting.filesystemobject' );
-			if ( is_object( $obj ) ) {
-				$wp_root_size = $obj->getfolder( ABSPATH )->size;
-				unset( $obj );
-			}
-		} else {
-			// Linux.
-			$command = 'du -sb ' . ABSPATH . ' | cut -f1';
-			$wp_root_size = trim( $this->execute_command( $command ) );
-		}
+		// Get the size of the filtered WordPress installation root directory (ABSPATH).
+		$wp_root_size = $this->get_wp_size();
 
 		// Create the return array.
 		$return = array(
@@ -977,7 +934,7 @@ class Boldgrid_Backup_Admin_Core {
 		global $wpdb;
 
 		// Build query.
-		$query = $wpdb->prepare( "SELECT SUM(`data_length` + `index_length`) FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA`='%s';", DB_NAME );
+		$query = $wpdb->prepare( "SELECT SUM(`data_length` + `index_length`) FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA`='%s' GROUP BY `TABLE_SCHEMA`;", DB_NAME );
 
 		// Check query.
 		if ( true === empty( $query ) ) {
@@ -1039,154 +996,6 @@ class Boldgrid_Backup_Admin_Core {
 	}
 
 	/**
-	 * Functionality test report.
-	 *
-	 * Perform tests/checks for backup functionality, and provide a report.
-	 *
-	 * @since 1.0
-	 *
-	 * @global wpdb $wpdb The WordPress database class object.
-	 *
-	 * @return null
-	 */
-	public function functionality_report() {
-		// Perform functionality tests.
-		$this->run_functionality_tests();
-
-		// Set column size.
-		$column_size = 30;
-
-		// Create report.
-		$report = 'BoldGrid Backup - Functionality test report:' . EOL;
-
-		// Is the WordPress installation root directory writable?
-		$report .= str_pad( 'WordPress directory writable? ', $column_size ) .
-			 ( true === $this->is_abspath_writable ? 'Yes' : 'No' ) . EOL;
-
-		// Does the backup directory exist and writable?
-		$report .= str_pad( 'Backup directory exists? ', $column_size ) .
-			 ( true === empty( $this->backup_directory ) ? 'No' : 'Yes' ) . EOL;
-
-		// Check for available compressors.
-		$report .= 'Available compressors:' . EOL;
-
-		$report .= str_pad( 'PHP ZipArchive? ', $column_size ) .
-			 ( true === $this->is_compressor_available( 'php_zip' ) ? 'Yes' : 'No' ) . EOL;
-
-		$report .= str_pad( 'PHP Bzip2? ', $column_size ) .
-			 ( true === $this->is_compressor_available( 'php_bz2' ) ? 'Yes' : 'No' ) . EOL;
-
-		$report .= str_pad( 'PHP Zlib? ', $column_size ) .
-			 ( true === $this->is_compressor_available( 'php_zlib' ) ? 'Yes' : 'No' ) . EOL;
-
-		$report .= str_pad( 'PHP LZF? ', $column_size ) .
-			 ( true === $this->is_compressor_available( 'php_lzf' ) ? 'Yes' : 'No' ) . EOL;
-
-		$report .= str_pad( 'System TAR? ', $column_size ) .
-			 ( true === $this->is_compressor_available( 'system_tar' ) ? 'Yes' : 'No' ) . EOL;
-
-		$report .= str_pad( 'System ZIP? ', $column_size ) .
-			 ( true === $this->is_compressor_available( 'system_zip' ) ? 'Yes' : 'No' ) . EOL;
-
-		// Is PHP in safe mode?
-		$report .= str_pad( 'PHP in safe mode? ', $column_size ) .
-			 ( true === $this->is_php_safemode ? 'Yes' : 'No' ) . EOL;
-
-		// Is the system mysqldump available?
-		$report .= str_pad( 'System mysqldump available? ', $column_size ) .
-			 ( true === $this->mysqldump_available ? 'Yes' : 'No' ) . EOL;
-
-		// Is the system crontab available?
-		$report .= str_pad( 'System crontab available? ', $column_size ) .
-			 ( true === $this->is_crontab_available ? 'Yes' : 'No' ) . EOL;
-
-		// Get the WordPress version.
-		$report .= str_pad( 'WordPress version: ', $column_size ) . $this->wp_version . EOL;
-
-		// Is WP-CRON enabled?
-		$report .= str_pad( 'Is WP-CRON enabled? ', $column_size ) .
-			 ( $this->wp_cron_enabled ? 'Yes' : 'No' ) . EOL;
-
-		// Report if functionality test passed or not.
-		$report .= str_pad( 'Functionality test status: ', $column_size ) .
-			 ( $this->is_functional ? 'PASS' : 'FAIL' ) . EOL;
-
-		// Get disk space information array.
-		$disk_space = $this->get_disk_space();
-
-		$report .= str_pad( 'Disk total space: ', $column_size ) .
-			 $this->bytes_to_human( $disk_space[0] ) . EOL;
-
-		$report .= str_pad( 'Disk used space: ', $column_size ) .
-			 $this->bytes_to_human( $disk_space[1] ) . EOL;
-
-		$report .= str_pad( 'Disk free space: ', $column_size ) .
-			 $this->bytes_to_human( $disk_space[2] ) . EOL;
-
-		$report .= str_pad( 'WordPress directory size: ', $column_size ) .
-			 $this->bytes_to_human( $disk_space[3] ) . EOL;
-
-		// Connect to the WordPress database via $wpdb.
-		global $wpdb;
-
-		// Get the database size.
-		$db_size = $this->get_database_size();
-
-		$report .= str_pad( 'Database size: ', $column_size ) . $this->bytes_to_human( $db_size ) .
-			 EOL;
-
-		// Get the WordPress database charset.
-		$report .= str_pad( 'WordPress database charset: ', $column_size ) . $wpdb->charset . EOL;
-
-		// Get the WordPress database collate.
-		$report .= str_pad( 'WordPress database collate: ', $column_size ) . $wpdb->collate . EOL;
-
-		// Get archive info.
-		$archive_info = $this->archive_files( false );
-
-		if ( false === empty( $archive_info['error'] ) ) {
-			$report .= str_pad( 'Compressor error: ', $column_size ) . $archive_info['error'] . EOL;
-
-			if ( false === empty( $archive_info['error_code'] ) ) {
-				$report .= str_pad( 'Compressor error code: ', $column_size ) .
-					 $archive_info['error_code'] . EOL;
-
-				if ( false === empty( $archive_info['error_message'] ) ) {
-					$report .= str_pad( 'Compressor error message: ', $column_size ) .
-						 $archive_info['error_message'] . EOL;
-				}
-			}
-		}
-
-		// Include archive statistics.
-		if ( false === empty( $archive_info['total_size'] ) ) {
-			$report .= str_pad( 'Backup archive size: ', $column_size ) .
-				$this->bytes_to_human( $archive_info['total_size'] ) . EOL;
-
-			// Calculate possible disk free space after a backup, using the entire WP directory size.
-			$disk_free_post = $disk_space[2] - $archive_info['total_size'] - $db_size;
-		} else {
-			// Calculate possible disk free space after a backup, using the entire WP directory size.
-			$disk_free_post = $disk_space[2] - $disk_space[3] - $db_size;
-		}
-
-		if ( $disk_free_post > 0 ) {
-			$report .= str_pad( 'Estimated free space after backup: ', $column_size )
-			. $this->bytes_to_human( $disk_free_post ) . EOL;
-		} else {
-			$report .= 'THERE IS NOT ENOUGH SPACE TO PERFORM A BACKUP!' . EOL;
-		}
-
-		// End of testing.
-		$report .= 'End of functionality test report.' . EOL;
-
-		// Print report.
-		echo  __( $report );
-
-		return;
-	}
-
-	/**
 	 * Add menu items.
 	 *
 	 * @since 1.0
@@ -1224,14 +1033,14 @@ class Boldgrid_Backup_Admin_Core {
 	 * @since 1.0
 	 * @access private
 	 *
-	 * @return bool
+	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
+	 *
+	 * @return bool Status of the operation.
 	 */
 	private function backup_database() {
 		// Check if functional.
 		if ( true !== $this->run_functionality_tests() ) {
-			return array(
-				'error' => 'Functionality tests fail.',
-			);
+			return false;
 		}
 
 		// If mysqldump is not available, then fail.
@@ -1239,20 +1048,21 @@ class Boldgrid_Backup_Admin_Core {
 			return false;
 		}
 
+		// Connect to the WordPress Filesystem API.
+		global $wp_filesystem;
+
 		// Create a mysql defaults file.
 		$defaults_filepath = $this->backup_directory . '/mysqldump.cnf';
 
 		$defaults_file_data = '[client]' . PHP_EOL . 'host=' . DB_HOST . PHP_EOL . 'user=' . DB_USER .
 			 PHP_EOL . 'password=' . DB_PASSWORD . PHP_EOL;
 
-		file_put_contents( $defaults_filepath, $defaults_file_data );
+		$status = $wp_filesystem->put_contents( $defaults_filepath, $defaults_file_data, 0600 );
 
 		// Check if the defaults file was written.
-		if ( false === file_exists( $defaults_filepath ) ) {
+		if ( true !== $status || false === $wp_filesystem->exists( $defaults_filepath ) ) {
 			return false;
 		}
-
-		chmod( $defaults_filepath, 0600 );
 
 		// Create a file path for the dump file.
 		$db_dump_filepath = $this->backup_directory . '/' . DB_NAME . '.' . date( 'Ymd-His' ) .
@@ -1272,25 +1082,26 @@ class Boldgrid_Backup_Admin_Core {
 		( ( $max_execution_time = ini_get( 'max_execution_time' ) ) > 300 ? $max_execution_time : 300 ) );
 
 		// Execute the command.
-		$status = $this->execute_command( $command );
+		$output = $this->execute_command( $command, null, $status );
+
+		// Check command status.
+		if ( false === $output || true !== $status ) {
+			return false;
+		}
 
 		// Remove the defaults file.
-		unlink( $defaults_filepath );
+		$wp_filesystem->delete( $defaults_filepath, false, 'f' );
 
 		// Check if the dump file was written.
-		if ( false === file_exists( $db_dump_filepath ) ) {
+		if ( false === $wp_filesystem->exists( $db_dump_filepath ) ) {
 			return false;
 		}
 
 		// Limit file permissions to the dump file.
-		chmod( $db_dump_filepath, 0600 );
+		$wp_filesystem->chmod( $db_dump_filepath, 0600 );
 
-		// Return the status.
-		if ( false !== $status ) {
-			$status = true;
-		}
-
-		return $status;
+		// Return success.
+		return true;
 	}
 	/**
 	 * Translate a ZipArchive error code into a human-readable message.
@@ -1338,58 +1149,132 @@ class Boldgrid_Backup_Admin_Core {
 	}
 
 	/**
-	 * Get a recursive file list of the WordPress installation root directory.
+	 * Get a single-dimension filelist array from a directory path.
 	 *
 	 * @since 1.0
 	 * @access private
 	 *
-	 * @param string $dirpath A directory path, defaults to ABSPATH.
-	 * @return array An array of absolute file paths, relative paths, and file sizes.
+	 * @param string $dirpath A directory path.
+	 * @return array A single-dimension filelist array for use in this class.
 	 */
-	private function get_filelist( $dirpath = ABSPATH ) {
-		// Initialize $files.
-		$files = array();
+	private function get_filelist( $dirpath ) {
+		// Connect to the WordPress Filesystem API.
+		global $wp_filesystem;
+
+		// Validate input.
+		if ( true === empty( $dirpath ) || true !== $wp_filesystem->is_readable( $dirpath ) ) {
+			return array();
+		}
+
+		// Remove any training slash in dirpath.
+		$dirpath = untrailingslashit( $dirpath );
+
+		// Mark the base directory, if not set (the first run).
+		if ( true === empty( $this->filelist_basedir ) ) {
+			$this->filelist_basedir = $dirpath;
+		}
+
+		// Get the non-recursive directory listing for the specified path.
+		$dirlist = $wp_filesystem->dirlist( $dirpath, true, false );
+
+		// Sort the dirlist array by filename.
+		uasort( $dirlist,
+			function ( $a, $b ) {
+				if ( $a['name'] < $b['name'] ) {
+					return - 1;
+				}
+
+				if ( $a['name'] > $b['name'] ) {
+					return 1;
+				}
+
+				return 0;
+			}
+		);
 
 		// Initialize $filelist.
 		$filelist = array();
 
-		// Identify the plugin files to add.
-		// Include the custom RecursiveFilterIterator class file.
-		require_once dirname( __FILE__ ) . '/class-boldgrid-backup-admin-recursivefilteriterator.php';
+		// Perform conversion.
+		foreach ( $dirlist as $fileinfo ) {
+			// If item is a directory, then recurse, merge, and continue.
+			if ( 'd' === $fileinfo['type'] ) {
+				$filelist_add = $this->get_filelist( $dirpath . '/' . $fileinfo['name'] );
 
-		// @todo Change to list_file( $folder = '', $levels = 100 ) via $wp_filesystem.
-		// Create a RecursiveDirectoryIterator object.
-		$iterator = new RecursiveDirectoryIterator( $dirpath, FilesystemIterator::SKIP_DOTS );
+				$filelist = array_merge( $filelist, $filelist_add );
 
-		// Create a RecursiveFilterIterator object; uses an array mask.
-		$iterator_filter = new Boldgrid_Backup_Admin_RecursiveFilterIterator( $iterator );
-
-		$files = new RecursiveIteratorIterator( $iterator_filter );
-
-		// Build an array of filenames and relative paths.
-		foreach ( $files as $file ) {
-			// Only add files.
-			if ( true === $file->isDir() ) {
 				continue;
 			}
 
-			// The real path.
-			$filepath = $file->getRealPath();
+			// Get the file path.
+			$filepath = $dirpath . '/' . $fileinfo['name'];
 
 			// The relative path inside the ZIP file.
-			$relative_path = substr( $filepath, strlen( $dirpath ) );
+			$relative_path = substr( $filepath, strlen( $this->filelist_basedir ) + 1 );
 
-			// Get the file size.
-			$filesize = $file->getSize();
-
-			// Add current file to archive.
+			// For files, add to the filelist array.
 			$filelist[] = array(
 				$filepath,
 				$relative_path,
-				$filesize,
+				$fileinfo['size'],
 			);
 		}
 
+		// Return the array.
+		return $filelist;
+	}
+
+	/**
+	 * Get a recursive file list of the WordPress installation root directory.
+	 *
+	 * This is a recursive function, which uses the class property filelist_basedir.
+	 *
+	 * @since 1.0
+	 * @access private
+	 *
+	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
+	 *
+	 * @param string $dirpath A directory path, defaults to ABSPATH.
+	 * @return array An array of absolute file paths, relative paths, and file sizes.
+	 */
+	private function get_filtered_filelist( $dirpath = ABSPATH ) {
+		// Connect to the WordPress Filesystem API.
+		global $wp_filesystem;
+
+		// Validate input.
+		if ( true === empty( $dirpath ) || true !== $wp_filesystem->is_readable( $dirpath ) ) {
+			return array();
+		}
+
+		// Get the recursive directory listing for the specified path.
+		$filelist = $this->get_filelist( $dirpath );
+
+		// If no files were found, then return an empty array.
+		if ( true === empty( $filelist ) ) {
+			return array();
+		}
+
+		// Initialize $new_filelist.
+		$new_filelist = array();
+
+		// Filter the filelist array.
+		foreach ( $filelist as $fileinfo ) {
+			foreach ( $this->filelist_filter as $pattern ) {
+				if ( 0 === strpos( $fileinfo[1], $pattern ) ) {
+					$new_filelist[] = $fileinfo;
+
+					break;
+				}
+			}
+		}
+
+		// Replace filelist.
+		$filelist = $new_filelist;
+
+		// Clear filelist_basedir.
+		$this->filelist_basedir = null;
+
+		// Return the filelist array.
 		return $filelist;
 	}
 
@@ -1404,8 +1289,10 @@ class Boldgrid_Backup_Admin_Core {
 	private function create_site_id() {
 		// Get the siteurl.
 		if ( is_multisite() ) {
+			// Use the siteurl from blog id 1.
 			$siteurl = get_site_url( 1 );
 		} else {
+			// Get the current siteurl.
 			$siteurl = get_site_url();
 		}
 
@@ -1451,6 +1338,8 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @since 1.0
 	 * @access private
+	 *
+	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
 	 * @param bool $save A switch to save the archive file. Default is FALSE.
 	 * @param bool $dryrun An optional switch to perform a dry run test.
@@ -1504,7 +1393,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Get the file list.
-		$filelist = $this->get_filelist( ABSPATH );
+		$filelist = $this->get_filtered_filelist( ABSPATH );
 
 		// Initialize total_size.
 		$info['total_size'] = 0;
@@ -1519,15 +1408,19 @@ class Boldgrid_Backup_Admin_Core {
 			return $info;
 		}
 
+		// Connect to the WordPress Filesystem API.
+		global $wp_filesystem;
+
 		// Add the database dump file to the file list.
 		$db_relative_path = substr( $this->db_dump_filepath, strlen( $this->backup_directory ) + 1 );
 
 		$db_file_array = array(
 			$this->db_dump_filepath,
 			$db_relative_path,
-			filesize( $this->db_dump_filepath ),
+			$wp_filesystem->size( $this->db_dump_filepath ),
 		);
 
+		// Prepend the $db_file_array element to the beginning of the $filelist array.
 		array_unshift( $filelist, $db_file_array );
 
 		// Set the PHP timeout limit to at least 300 seconds.
@@ -1580,7 +1473,7 @@ class Boldgrid_Backup_Admin_Core {
 						'error' => 'Cannot save ZIP archive file "' . $info['filepath'] . '".',
 					);
 				} else {
-					if ( false === file_exists( $info['filepath'] ) ) {
+					if ( false === $wp_filesystem->exists( $info['filepath'] ) ) {
 						return array(
 							'error' => 'The archive file "' . $info['filepath'] .
 								 '" was not written.',
@@ -1618,11 +1511,14 @@ class Boldgrid_Backup_Admin_Core {
 
 		if ( true !== $dryrun ) {
 			// Modify the archive file permissions to help protect from public access.
-			chmod( $info['filepath'], 0600 );
+			$wp_filesystem->chmod( $info['filepath'], 0600 );
 
 			// Add some statistics to the return.
-			$info['filesize'] = filesize( $info['filepath'] );
+			$info['filesize'] = $wp_filesystem->size( $info['filepath'] );
 		}
+
+		// Delete the temporary database dump file.
+		$wp_filesystem->delete( $this->db_dump_filepath, false, 'f' );
 
 		// Stop timer.
 		$time_stop = microtime( true );
@@ -1680,12 +1576,14 @@ class Boldgrid_Backup_Admin_Core {
 	 * @since 1.0
 	 * @access private
 	 *
+	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
+	 *
 	 * @param string $download_filename A filename to match to get info.
 	 * @return array An array containing file path, filename, data, and size of archive files.
 	 */
 	private function get_archive_list( $download_filename = null ) {
-		// Initialize $archives array.
-		$archives = array();
+		// Connect to the WordPress Filesystem API.
+		global $wp_filesystem;
 
 		// Initialize $archive_files array.
 		$archive_files = array();
@@ -1693,47 +1591,65 @@ class Boldgrid_Backup_Admin_Core {
 		// Ensure the backup directory is configured.
 		$backup_dir_configured = $this->configure_backup_directory();
 
-		// If the backup directory is configured, then find archives.
-		if ( true === $backup_dir_configured ) {
-			// Find all backups.
-			$archive_files = glob( $this->backup_directory . '/boldgrid-backup-*.*' );
+		// If the backup directory is not configured, then return an empty array.
+		if ( true !== $backup_dir_configured ) {
+			return array();
 		}
 
-		// Build an array of archive information.
-		foreach ( $archive_files as $key => $filepath ) {
-			// Get the filename.
-			$filename = substr( $filepath, strlen( $this->backup_directory ) + 1 );
+		// Find all backups.
+		$dirlist = $wp_filesystem->dirlist( $this->backup_directory, false, false );
 
-			// Skip if not the matching filename.
-			if ( false === empty( $download_filename ) && $download_filename !== $filename ) {
-				continue;
+		// If no files were found, then return an empty array.
+		if ( true === empty( $dirlist ) ) {
+			return array();
+		}
+
+		// Sort the dirlist array by "lastmodunix".
+		uasort( $dirlist,
+			function ( $a, $b ) {
+				if ( $a['lastmodunix'] < $b['lastmodunix'] ) {
+					return - 1;
+				}
+
+				if ( $a['lastmodunix'] > $b['lastmodunix'] ) {
+					return 1;
+				}
+
+				return 0;
 			}
+		);
 
-			// Get file modification time.
-			$mtime = filemtime( $filepath );
+		// Initialize $index.
+		$index = -1;
 
-			if ( false !== $mtime ) {
-				$mtime = date( 'n/j/Y h:i A', $mtime );
-			} else {
-				$mtime = 'UNKNOWN';
-			}
+		// Filter the array.
+		foreach ( $dirlist as $fileinfo ) {
+			if ( 1 === preg_match( '/^boldgrid-backup-.*\.(zip|tar\.gz|b2z|zlib|lzf)$/', $fileinfo['name'] )
+			) {
+				// Increment the index.
+				$index++;
 
-			// Add to array.
-			$archives[ $key ] = array(
-				'filepath' => $filepath,
-				'filename' => $filename,
-				'filedate' => $mtime,
-				'filesize' => filesize( $filepath ),
-			);
+				// If looking for one match, skip an iteration if not the matching filename.
+				if ( false === empty( $download_filename ) && $download_filename !== $fileinfo['name'] ) {
+					continue;
+				}
 
-			// If looking for info on one file and we found the match, then break the loop.
-			if ( false === empty( $download_filename ) ) {
-				break;
+				$archive_files[ $index ] = array(
+					'filepath' => $this->backup_directory . '/' . $fileinfo['name'],
+					'filename' => $fileinfo['name'],
+					'filedate' => date_i18n( 'n/j/Y g:i A', $fileinfo['lastmodunix'] ),
+					'filesize' => $fileinfo['size'],
+				);
+
+				// If looking for info on one file and we found the match, then break the loop.
+				if ( false === empty( $download_filename ) ) {
+					break;
+				}
 			}
 		}
 
 		// Return the array.
-		return $archives;
+		return $archive_files;
 	}
 
 	/**
@@ -1741,6 +1657,8 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @since 1.0
 	 * @access private
+	 *
+	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
 	 * @return bool Whether or not the archive file was deleted.
 	 */
@@ -1774,49 +1692,56 @@ class Boldgrid_Backup_Admin_Core {
 		if ( false === empty( $_GET['archive_filename'] ) ) {
 			$archive_filename = $_GET['archive_filename'];
 		} else {
-			$delete_ok = false;
-
+			// Fail with a notice.
 			add_action( 'admin_footer', array(
 				$this,
 				'notice_invalid_filename',
 			) );
+
+			return false;
+		}
+
+		// If there are errors, then abort.
+		if ( false === $delete_ok ) {
+			return false;
 		}
 
 		// Get archive list.
-		if ( true === $delete_ok ) {
-			$archives = $this->get_archive_list( $archive_filename );
-		}
+		$archives = $this->get_archive_list( $archive_filename );
 
 		// If no files were found, then show a notice.
-		if ( true === $delete_ok && true === empty( $archives ) ) {
-			$delete_ok = false;
-
+		if ( true === empty( $archives ) ) {
+			// Fail with a notice.
 			add_action( 'admin_footer', array(
 				$this,
 				'notice_no_archives',
 			) );
+
+			return false;
 		}
 
 		// Locate the filename by key number.
-		if ( true === $delete_ok ) {
-			$filename = ( false === empty( $archives[ $archive_key ]['filename'] ) ? $archives[ $archive_key ]['filename'] : null );
-		}
+		$filename = ( false === empty( $archives[ $archive_key ]['filename'] ) ? $archives[ $archive_key ]['filename'] : null );
 
 		// Verify specified filename.
-		if ( true === $delete_ok && $archive_filename !== $filename ) {
-			$delete_ok = false;
-
+		if ( $archive_filename !== $filename ) {
+			// Fail with a notice.
 			add_action( 'admin_footer', array(
 				$this,
 				'notice_not_found',
 			) );
+
+			return false;
 		}
 
 		// Get the file path to delete.
 		$filepath = ( false === empty( $archives[ $archive_key ]['filepath'] ) ? $archives[ $archive_key ]['filepath'] : null );
 
+		// Connect to the WordPress Filesystem API.
+		global $wp_filesystem;
+
 		// Delete the specified archive file.
-		if ( true === $delete_ok && true !== unlink( $filepath ) ) {
+		if ( true !== $wp_filesystem->delete( $filepath, false, 'f' ) ) {
 			$delete_ok = false;
 		}
 
@@ -1949,9 +1874,12 @@ class Boldgrid_Backup_Admin_Core {
 		// Get the file path to delete.
 		$filepath = ( false === empty( $archives[ $archive_key ]['filepath'] ) ? $archives[ $archive_key ]['filepath'] : null );
 
+		// Connect to the WordPress Filesystem API.
+		global $wp_filesystem;
+
 		// Get the archive file size.
-		if ( false === empty( $filepath ) && true === file_exists( $filepath ) ) {
-			$filesize = filesize( $filepath );
+		if ( false === empty( $filepath ) && true === $wp_filesystem->exists( $filepath ) ) {
+			$filesize = $wp_filesystem->size( $filepath );
 		} else {
 			$filesize = 0;
 		}
@@ -1970,9 +1898,6 @@ class Boldgrid_Backup_Admin_Core {
 			// Prevent this script from dying.
 			ignore_user_abort( true );
 
-			// Connect to the WordPress Filesystem API.
-			global $wp_filesystem;
-
 			// Unzip the backup archive file to ABSPATH.
 			// @todo Finish restoration code below.
 			//$result = unzip_file( $filepath, ABSPATH );
@@ -1986,10 +1911,7 @@ class Boldgrid_Backup_Admin_Core {
 
 			// Restore database.
 			if ( true === $restore_ok ) {
-				// Locate the database dump file (boldgrid-backup-*.sql).
-
 				// Restore the database.
-
 			}
 		}
 
@@ -2070,11 +1992,15 @@ class Boldgrid_Backup_Admin_Core {
 			), BOLDGRID_BACKUP_VERSION, false
 		);
 
+		// Get the current wp_filesystem access method.
+		$access_type = get_filesystem_method();
+
 		// Create a nonce for file downloads via AJAX.
 		$download_nonce = wp_create_nonce( 'archive_download' );
 
 		// Add localized data to the JS script.
 		wp_localize_script( 'boldgrid-backup-admin-home', 'downloadNonce', $download_nonce );
+		wp_localize_script( 'boldgrid-backup-admin-home', 'accessType', $access_type );
 
 		// Enqueue JS for the home page.
 		wp_enqueue_script( 'boldgrid-backup-admin-home' );
@@ -2116,9 +2042,10 @@ class Boldgrid_Backup_Admin_Core {
 	/**
 	 * Callback function for downloading an archive file via AJAX.
 	 *
-	 * @since 1.0
+	 * This callback function should only be called if the WP_Filesystem method is "direct", or
+	 * a message should be displayed with the path to download using an alternate method.
 	 *
-	 * @return null
+	 * @since 1.0
 	 */
 	public function download_archive_file_callback() {
 		// Verify nonce, or die.
@@ -2137,6 +2064,15 @@ class Boldgrid_Backup_Admin_Core {
 			$download_filename = sanitize_text_field( wp_unslash( $_POST['download_filename'] ) );
 		} else {
 			echo 'INVALID DOWNLOAD FILENAME';
+			wp_die();
+		}
+
+		// Get the current wp_filesystem access method.
+		$access_type = get_filesystem_method();
+
+		// Check WP_Filesystem method; ensure it is "direct".
+		if ( 'direct' !== $access_type ) {
+			echo 'WP_Filesystem method is not "direct"';
 			wp_die();
 		}
 
@@ -2173,14 +2109,11 @@ class Boldgrid_Backup_Admin_Core {
 			ob_end_flush();
 		}
 
-		// Send the file.
+		// Send the file.  Not finding a replacement in $wp_filesystem.
 		readfile( $filepath );
 
 		// Exit.
 		wp_die();
-
-		// Return added to satisfy phpcs.
-		return;
 	}
 
 	/**
@@ -2188,9 +2121,37 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @since 1.0
 	 *
+	 * @global string $wp_version The WordPress version string.
+	 * @global wpdb $wpdb The WordPress database class object.
+	 *
 	 * @return null
 	 */
 	public function page_backup_test() {
+		// Perform functionality tests.
+		$this->run_functionality_tests();
+
+		// Get the WordPress version.
+		global $wp_version;
+
+		// Connect to the WordPress database via $wpdb.
+		global $wpdb;
+
+		// Get disk space information array.
+		$disk_space = $this->get_disk_space();
+
+		// Get the database size.
+		$db_size = $this->get_database_size();
+
+		// Get the database character set.
+		$db_charset = $wpdb->charset;
+
+		// Get the database collation.
+		$db_collate = $wpdb->collate;
+
+		// Get archive info.
+		$archive_info = $this->archive_files( false );
+
+		// Load template view.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-test.php';
 
 		return;
@@ -2273,6 +2234,8 @@ class Boldgrid_Backup_Admin_Core {
 	 * @since 1.0
 	 * @access private
 	 *
+	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
+	 *
 	 * @param string $entry A cron entry.
 	 * @return bool Success.
 	 */
@@ -2328,25 +2291,26 @@ class Boldgrid_Backup_Admin_Core {
 			// Save the temp crontab to file.
 			$temp_crontab_path = $this->backup_directory . '/crontab.' . microtime( true ) . '.tmp';
 
-			file_put_contents( $temp_crontab_path, $crontab );
+			// Connect to the WordPress Filesystem API.
+			global $wp_filesystem;
+
+			$wp_filesystem->put_contents( $temp_crontab_path, $crontab, 0600 );
 
 			// Check if the defaults file was written.
-			if ( false === file_exists( $temp_crontab_path ) ) {
+			if ( false === $wp_filesystem->exists( $temp_crontab_path ) ) {
 				return false;
 			}
-
-			chmod( $temp_crontab_path, 0600 );
 
 			// Write crontab.
 			$command = 'crontab ' . $temp_crontab_path;
 
-			$crontab = $this->execute_command( $command );
+			$crontab = $this->execute_command( $command, null, $success );
 
 			// Remove temp crontab file.
-			unlink( $temp_crontab_path );
+			$wp_filesystem->delete( $temp_crontab_path, false, 'f' );
 
 			// Check for failure.
-			if ( false === $crontab ) {
+			if ( false === $crontab || true !== $success ) {
 				return false;
 			}
 		} else {
@@ -2362,6 +2326,8 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @since 1.0
 	 * @access private
+	 *
+	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
 	 * @return bool Success.
 	 */
@@ -2391,7 +2357,12 @@ class Boldgrid_Backup_Admin_Core {
 			// Read crontab.
 			$command = 'crontab -l';
 
-			$crontab = $this->execute_command( $command );
+			$crontab = $this->execute_command( $command, null, $success );
+
+			// If the command to retrieve crontab failed, then abort.
+			if ( true !== $success ) {
+				return false;
+			}
 
 			// If no entries exist, then return success.
 			if ( false === strpos( $crontab, $pattern ) ) {
@@ -2413,22 +2384,24 @@ class Boldgrid_Backup_Admin_Core {
 			// Save the temp crontab to file.
 			$temp_crontab_path = $this->backup_directory . '/crontab.' . microtime( true ) . '.tmp';
 
-			file_put_contents( $temp_crontab_path, $crontab );
+			// Connect to the WordPress Filesystem API.
+			global $wp_filesystem;
+
+			// Save a temporary file for crontab.
+			$wp_filesystem->put_contents( $temp_crontab_path, $crontab, 0600 );
 
 			// Check if the defaults file was written.
-			if ( false === file_exists( $temp_crontab_path ) ) {
+			if ( false === $wp_filesystem->exists( $temp_crontab_path ) ) {
 				return false;
 			}
-
-			chmod( $temp_crontab_path, 0600 );
 
 			// Write crontab.
 			$command = 'crontab ' . $temp_crontab_path;
 
-			$crontab = $this->execute_command( $command );
+			$crontab = $this->execute_command( $command, null, $success );
 
 			// Remove temp crontab file.
-			unlink( $temp_crontab_path );
+			$wp_filesystem->delete( $temp_crontab_path, false, 'f' );
 		} else {
 			// Use wp-cron.
 			// @todo Write wp-cron code here.
@@ -2580,8 +2553,6 @@ class Boldgrid_Backup_Admin_Core {
 							'notice_settings_error',
 						)
 					);
-				} else {
-					// Update cron jobs.
 				}
 			} else {
 				// Interrupted by a previous error.

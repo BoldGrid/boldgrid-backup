@@ -15,8 +15,8 @@
 	var self = {};
 
 	/*
-	 * This script is passed "downloadNonce" (via wp_localize_script() in
-	 * "class-boldgrid-backup-admin-core.php") containing a nonce for file downloads.
+	 * This script is passed "downloadNonce" and "accessType" (via wp_localize_script() in
+	 * "class-boldgrid-backup-admin-core.php").
 	 */
 
 	// Onload event listener.
@@ -38,13 +38,26 @@
 	 */
 	self.downloadArchive = function() {
 		// Declare variables.
-		var downloadKey, downloadFilename, data, form, $formDom, $this = $( this );
+		var downloadKey, downloadFilename, downloadFilepath, data, form, $formDom, $this = $( this );
 
 		// Get the backup archive file key.
 		downloadKey = $this.data( 'key' );
 
 		// Get the backup archive filename.
 		downloadFilename = $this.data( 'filename' );
+
+		// Get the backup archive file path.
+		downloadFilepath = $this.data( 'filepath' );
+
+		// If the wp_filesystem method is not "direct", then show a message and return.
+		if ( 'direct' !== accessType ) {
+			alert( "Wordpress filesystem access method is not direct; it is set to '" + accessType +
+				"'.\n\nYou can download the archive file using another method, such as FTP.\n\n" +
+				"The backup archive file path is: " + downloadFilepath
+			);
+
+			return false;
+		}
 
 		// Generate a data array for the download request.
 		data = {

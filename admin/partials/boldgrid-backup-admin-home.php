@@ -60,7 +60,7 @@ foreach ( $archives as $key => $archive ) {
 		<td class='backup-archive-list-download'><a
 			id='backup-archive-download-<?php echo $key; ?>'
 			class='button backup-archive-list-download-button' href='#'
-			data-key='<?php echo $key ?>'
+			data-key='<?php echo $key ?>' data-filepath='<?php echo $archive['filepath']; ?>'
 			data-filename='<?php echo $archive['filename']; ?>'>Download</a></td>
 		<td class='backup-archive-list-restore'><a class='button'
 			href='<?php echo $restore_url; ?>'> Restore</a></td>
