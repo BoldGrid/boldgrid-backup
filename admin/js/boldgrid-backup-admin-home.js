@@ -15,8 +15,8 @@
 	var self = {};
 
 	/*
-	 * This script is passed "downloadNonce" and "accessType" (via wp_localize_script() in
-	 * "class-boldgrid-backup-admin-core.php").
+	 * This script is passed "downloadNonce", "accessType", "restoreConfirmText",
+	 * "deleteConfirmText" (via wp_localize_script() in "class-boldgrid-backup-admin-core.php").
 	 */
 
 	// Onload event listener.
@@ -112,9 +112,7 @@
 		ArchiveFilename = $this.data( 'filename' );
 
 		// Ask for confirmation.
-		confirmResponse = confirm(
-			'Please confirm the restoration of this WordPress installation from the archive file "'
-			+ ArchiveFilename + '".' );
+		confirmResponse = confirm( restoreConfirmText + ' "' + ArchiveFilename + '".' );
 
 		// Handle response.
 		if ( true === confirmResponse ) {
@@ -137,8 +135,7 @@
 		ArchiveFilename = $this.data( 'filename' );
 
 		// Ask for confirmation.
-		confirmResponse = confirm(
-			'Please confirm the deletion the archive file "' + ArchiveFilename + '".' );
+		confirmResponse = confirm( deleteConfirmText + ' "' + ArchiveFilename + '".' );
 
 		// Handle response.
 		if ( true === confirmResponse ) {

@@ -1999,9 +1999,17 @@ class Boldgrid_Backup_Admin_Core {
 		// Create a nonce for file downloads via AJAX.
 		$download_nonce = wp_create_nonce( 'archive_download' );
 
+		// Create text for the restoration confirmation.
+		$restore_confirm_text = __( 'Please confirm the restoration of this WordPress installation from the archive file' );
+
+		// Create text for the deletion confirmation.
+		$delete_confirm_text = __( 'Please confirm the deletion the archive file' );
+
 		// Add localized data to the JS script.
 		wp_localize_script( 'boldgrid-backup-admin-home', 'downloadNonce', $download_nonce );
 		wp_localize_script( 'boldgrid-backup-admin-home', 'accessType', $access_type );
+		wp_localize_script( 'boldgrid-backup-admin-home', 'restoreConfirmText', $restore_confirm_text );
+		wp_localize_script( 'boldgrid-backup-admin-home', 'deleteConfirmText', $delete_confirm_text );
 
 		// Enqueue JS for the home page.
 		wp_enqueue_script( 'boldgrid-backup-admin-home' );
