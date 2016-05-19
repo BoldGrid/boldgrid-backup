@@ -22,14 +22,26 @@
 	// Onload event listener.
 	$( function() {
 		// Declare variables.
-		var $downloadButtons;
+		var $downloadButtons, $restoreButtons, $deleteButtons;
 
 		// Create a context selectors for the download buttons.
-		$downloadButtons = $( '.backup-archive-list-download-button' );
+		$downloadButtons = $( '.action-download' );
+
+		// Create a context selectors for the restore buttons.
+		$restoreButtons = $( '.action-restore' );
+
+		// Create a context selectors for the delete buttons.
+		$deleteButtons = $( '.action-delete' );
 
 		// On click action for download buttons.
 		$downloadButtons.on( 'click', self.downloadArchive );
-	} );
+
+		// On click action for restore buttons.
+		$restoreButtons.on( 'click', self.restoreArchiveConfirm );
+
+		// On click action for delete buttons.
+		$deleteButtons.on( 'click', self.deleteArchiveConfirm );
+} );
 
 	/**
 	 * Download a selected backup archive file.
@@ -86,5 +98,54 @@
 		// Return false so the page does not reload.
 		return false;
 	};
+
+	/**
+	 * Confirm to restore a selected backup archive file.
+	 *
+	 * @since 1.0
+	 */
+	self.restoreArchiveConfirm = function() {
+		// Declare variables.
+		var confirmResponse, ArchiveFilename, $this = $( this );
+
+		// Get the backup archive filename.
+		ArchiveFilename = $this.data( 'filename' );
+
+		// Ask for confirmation.
+		confirmResponse = confirm(
+			'Please confirm the restoration of this WordPress installation from the archive file "'
+			+ ArchiveFilename + '".' );
+
+		// Handle response.
+		if ( true === confirmResponse ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Confirm to delete a selected backup archive file.
+	 *
+	 * @since 1.0
+	 */
+	self.deleteArchiveConfirm = function() {
+		// Declare variables.
+		var confirmResponse, ArchiveFilename, $this = $( this );
+
+		// Get the backup archive filename.
+		ArchiveFilename = $this.data( 'filename' );
+
+		// Ask for confirmation.
+		confirmResponse = confirm(
+			'Please confirm the deletion the archive file "' + ArchiveFilename + '".' );
+
+		// Handle response.
+		if ( true === confirmResponse ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 } )( jQuery );

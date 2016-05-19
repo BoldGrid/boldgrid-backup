@@ -59,13 +59,15 @@ foreach ( $archives as $key => $archive ) {
 		<td class='backup-archive-list-date'><?php echo $archive['filedate']; ?></td>
 		<td class='backup-archive-list-download'><a
 			id='backup-archive-download-<?php echo $key; ?>'
-			class='button backup-archive-list-download-button' href='#'
+			class='button action-download' href='#'
 			data-key='<?php echo $key ?>' data-filepath='<?php echo $archive['filepath']; ?>'
 			data-filename='<?php echo $archive['filename']; ?>'>Download</a></td>
-		<td class='backup-archive-list-restore'><a class='button'
-			href='<?php echo $restore_url; ?>'> Restore</a></td>
-		<td class='backup-archive-list-restore'><a class='button'
-			href='<?php echo $delete_url; ?>'> Delete</a></td>
+		<td class='backup-archive-list-restore'><a class='button action-restore'
+			href='<?php echo $restore_url; ?>' data-filename='<?php echo $archive['filename']; ?>'>
+			Restore</a></td>
+		<td class='backup-archive-list-delete'><a class='button action-delete'
+			href='<?php echo $delete_url; ?>' data-filename='<?php echo $archive['filename']; ?>'>
+			Delete</a></td>
 		</tr>
 <?php
 }

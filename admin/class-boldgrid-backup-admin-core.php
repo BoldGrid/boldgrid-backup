@@ -1901,10 +1901,11 @@ class Boldgrid_Backup_Admin_Core {
 			// Unzip the backup archive file to ABSPATH.
 			// @todo Finish restoration code below.
 			//$result = unzip_file( $filepath, ABSPATH );
+			$result = true;
 
 			// Check for error.
 			if ( true !== $result ) {
-				error_log( __METHOD__ . ': Could not extract "' . $filepath . '" into "' . ABSPATH . '"!' );
+				error_log( __METHOD__ . ': Could not extract "' . $filepath . '" into "' . ABSPATH . '".' );
 
 				$restore_ok = false;
 			}
