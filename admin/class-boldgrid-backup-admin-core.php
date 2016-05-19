@@ -836,6 +836,8 @@ class Boldgrid_Backup_Admin_Core {
 	 * @since 1.0
 	 * @access private
 	 *
+	 * @see get_filtered_filelist
+	 *
 	 * @return int The total size for the WordPress file system, in bytes.
 	 */
 	private function get_wp_size() {
@@ -853,10 +855,11 @@ class Boldgrid_Backup_Admin_Core {
 		// Add up the file sizes.
 		foreach ( $filelist as $fileinfo ) {
 			// Add the file size to the total.
+			// get_filelist() returns fileinfo array with index 2 for filesize.
 			$size += $fileinfo[2];
 		}
 
-		// return the result.
+		// Return the result.
 		return $size;
 
 	}
@@ -925,16 +928,14 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return int The total size of the database (in bytes).
 	 */
 	public function get_database_size() {
-		// If the database name constant is not defined, then fail.
-		if ( false === defined( 'DB_NAME' ) ) {
-			return 0;
-		}
-
 		// Connect to the WordPress database via $wpdb.
 		global $wpdb;
 
 		// Build query.
-		$query = $wpdb->prepare( "SELECT SUM(`data_length` + `index_length`) FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA`='%s' GROUP BY `TABLE_SCHEMA`;", DB_NAME );
+		$query = $wpdb->prepare(
+			'SELECT SUM(`data_length` + `index_length`) FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA`=%s AND `TABLE_NAME` LIKE %s GROUP BY `TABLE_SCHEMA`;',
+			DB_NAME, $wpdb->get_blog_prefix( is_multisite() ) . '%'
+		);
 
 		// Check query.
 		if ( true === empty( $query ) ) {
@@ -1034,6 +1035,7 @@ class Boldgrid_Backup_Admin_Core {
 	 * @access private
 	 *
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
+	 * @global wpdb $wpdb The WordPress database class object.
 	 *
 	 * @return bool Status of the operation.
 	 */
@@ -1071,11 +1073,36 @@ class Boldgrid_Backup_Admin_Core {
 		// Save the file path.
 		$this->db_dump_filepath = $db_dump_filepath;
 
-		// Backup the database with mysqldump.
-		$command = 'mysqldump --defaults-file=' . $defaults_filepath .
-			 ' --dump-date --tz-utc --databases ' . DB_NAME;
+		// Connect to the WordPress database via $wpdb.
+		global $wpdb;
 
-		$command .= ' > ' . $db_dump_filepath;
+		// Build a mysql query to get all of the table names.
+		$query = $wpdb->prepare(
+			'SELECT `TABLE_NAME` FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA`=%s AND `TABLE_NAME` LIKE %s ORDER BY `TABLE_NAME`;',
+			DB_NAME, $wpdb->get_blog_prefix( is_multisite() ) . '%'
+		);
+
+		// Check query.
+		if ( true === empty( $query ) ) {
+			return 0;
+		}
+
+		// Get the result.
+		$tables = $wpdb->get_results( $query, ARRAY_N );
+
+		// If there was an error or nothing returned, then fail.
+		if ( empty( $tables ) ) {
+			return 0;
+		}
+
+		// Build a command to backup the database with mysqldump.
+		$command = 'mysqldump --defaults-file=' . $defaults_filepath .
+			 ' --dump-date --opt --tz-utc --result-file=' . $db_dump_filepath . ' ' . DB_NAME;
+
+		// Insert the table names from the query results (one row per result (index 0)).
+		foreach ( $tables as $table ) {
+			$command .= ' ' . $table[0];
+		}
 
 		// Set the PHP timeout limit to at least 300 seconds.
 		set_time_limit(
@@ -1232,6 +1259,7 @@ class Boldgrid_Backup_Admin_Core {
 	 * @since 1.0
 	 * @access private
 	 *
+	 * @see get_filelist
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
 	 * @param string $dirpath A directory path, defaults to ABSPATH.
