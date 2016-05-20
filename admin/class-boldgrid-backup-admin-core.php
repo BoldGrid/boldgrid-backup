@@ -13,82 +13,46 @@
  */
 
 /**
- * BoldGrid Backup Admin Core class.
+ * BoldGrid Backup admin core class.
  *
  * @since 1.0
  */
 class Boldgrid_Backup_Admin_Core {
 	/**
-	 * Is the WordPress installation root directory (ABSPATH) writable?
+	 * The settings class object.
 	 *
 	 * @since 1.0
-	 * @access private
-	 * @var bool
+	 * @access public
+	 * @var Boldgrid_Backup_Admin_Settings
 	 */
-	private $is_abspath_writable = null;
+	public $settings;
 
 	/**
-	 * User home directory.
+	 * The configuration class object.
 	 *
 	 * @since 1.0
-	 * @access private
-	 * @var string
+	 * @access public
+	 * @var Boldgrid_Backup_Admin_Config
 	 */
-	private $home_dir;
+	public $config;
 
 	/**
-	 * Backup directory.
+	 * The functionality test class object.
 	 *
 	 * @since 1.0
-	 * @access private
-	 * @var string
+	 * @access public
+	 * @var Boldgrid_Backup_Admin_Test
 	 */
-	private $backup_directory;
+	public $test;
 
 	/**
-	 * Is running Windows?
+	 * The admin notice class object.
 	 *
 	 * @since 1.0
-	 * @access private
-	 * @var bool
+	 * @access public
+	 * @var Boldgrid_Backup_Admin_Notice
 	 */
-	private $is_windows = null;
-
-	/**
-	 * Available compressors.
-	 *
-	 * @since 1.0
-	 * @access private
-	 * @var array
-	 */
-	private $available_compressors = array();
-
-	/**
-	 * Is PHP in safe mode?
-	 *
-	 * @since 1.0
-	 * @access private
-	 * @var bool
-	 */
-	private $is_php_safemode = null;
-
-	/**
-	 * Is crontab available?
-	 *
-	 * @since 1.0
-	 * @access private
-	 * @var bool
-	 */
-	private $is_crontab_available = null;
-
-	/**
-	 * Is mysqldump available?
-	 *
-	 * @since 1.0
-	 * @access private
-	 * @var bool
-	 */
-	private $mysqldump_available = null;
+	public $notice;
 
 	/**
 	 * Available execution functions.
@@ -97,34 +61,7 @@ class Boldgrid_Backup_Admin_Core {
 	 * @access private
 	 * @var array
 	 */
-	private $available_exec_functions = array();
-
-	/**
-	 * Is WP-CRON enabled?
-	 *
-	 * @since 1.0
-	 * @access private
-	 * @var bool
-	 */
-	private $wp_cron_enabled = null;
-
-	/**
-	 * Functionality tests completed?
-	 *
-	 * @since 1.0
-	 * @access private
-	 * @var bool
-	 */
-	private $functionality_tested = false;
-
-	/**
-	 * Is functional?
-	 *
-	 * @since 1.0
-	 * @access private
-	 * @var bool
-	 */
-	private $is_functional = null;
+	private $available_exec_functions = null;
 
 	/**
 	 * Database backup file path.
@@ -181,304 +118,14 @@ class Boldgrid_Backup_Admin_Core {
 	 * @since 1.0
 	 */
 	public function __construct() {
-		// Add nav menu items.
-		add_action( 'admin_menu', array(
-			$this,
-			'add_menu_items',
-		), 1002 );
+		// Instantiate Boldgrid_Backup_Admin_Settings.
+		$this->settings = new Boldgrid_Backup_Admin_Settings( $this );
 
-		// Handle callback for archive file download buttons.
-		add_action( 'wp_ajax_download_archive_file',
-			array(
-				$this,
-				'download_archive_file_callback',
-			)
-		);
-	}
+		// Instantiate Boldgrid_Backup_Admin_Config.
+		$this->config = new Boldgrid_Backup_Admin_Config( $this );
 
-	/**
-	 * Check if using Windows.
-	 *
-	 * @since 1.0
-	 *
-	 * @return bool TRUE is using Windows.
-	 */
-	public function is_windows() {
-		// If was already checked, then return result from the class property.
-		if ( null !== $this->is_windows ) {
-			return $this->is_windows;
-		}
-
-		// Check if using Windows or Linux, and set as a class property.
-		$this->is_windows = ( 'win' === strtolower( substr( PHP_OS, 0, 3 ) ) );
-
-		// Return result.
-		return $this->is_windows;
-	}
-
-	/**
-	 * Perform functionality tests.
-	 *
-	 * @since 1.0
-	 *
-	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
-	 *
-	 * @return bool
-	 */
-	public function run_functionality_tests() {
-		// If functionality tests were already performed, then just return status.
-		if ( true === $this->functionality_tested && null !== $this->is_functional ) {
-			return $this->is_functional;
-		}
-
-		// Connect to the WordPress Filesystem API.
-		global $wp_filesystem;
-
-		// Is the WordPress installation root directory writable?
-		$this->is_abspath_writable = $wp_filesystem->is_writable( ABSPATH );
-
-		// If not writable, then mark as not functional.
-		if ( true !== $this->is_abspath_writable ) {
-			$this->is_functional = false;
-		}
-
-		// Configure the backup directory path, or mark as not functional.
-		if ( true !== $this->configure_backup_directory() ) {
-			$this->is_functional = false;
-		}
-
-		// Test for available compressors, and add them to the array, or mark as not functional.
-		if ( true !== $this->configure_compressors() ) {
-			$this->is_functional = false;
-		}
-
-		// Test for crontab. For now, don't check if wp-cron is enabled.
-		if ( true !== $this->is_crontab_available() ) {
-			$this->is_functional = false;
-		}
-
-		// Test for mysqldump. For now, don't use wpbd.
-		if ( true !== $this->is_mysqldump_available() ) {
-			$this->is_functional = false;
-		}
-
-		// Test for PHP safe mode.
-		$this->is_php_safemode();
-
-		// Save result, if not previously saved.
-		if ( null === $this->is_functional ) {
-			$this->is_functional = true;
-		}
-
-		// Mark as completed.
-		$this->functionality_tested = true;
-
-		// If test failed, then display a notice.
-		if ( true !== $this->is_functional ) {
-			// Display an error notice.
-			add_action( 'admin_footer', array(
-				$this,
-				'notice_functionality_fail',
-			) );
-		}
-
-		return $this->is_functional;
-	}
-
-	/**
-	 * Get the user home directory.
-	 *
-	 * @since 1.0
-	 *
-	 * @return string The path to the user home directory.
-	 */
-	public function get_home_directory() {
-		// If home directory was already set, then return it.
-		if ( false === empty( $this->home_dir ) ) {
-			return $this->home_dir;
-		}
-
-		// For Windows and Linux.
-		if ( true === $this->is_windows() ) {
-			// Windows.
-			$home_drive = ( false === empty( $_SERVER['HOMEDRIVE'] ) ? $_SERVER['HOMEDRIVE'] : null );
-			$home_path = ( false === empty( $_SERVER['HOMEPATH'] ) ? $_SERVER['HOMEPATH'] : null );
-
-			if ( false === ( empty( $home_drive ) || empty( $home_path ) ) ) {
-				$home_dir = $home_drive . $home_path;
-			}
-
-			// If still unknown, then try getenv USERPROFILE.
-			if ( true === empty( $home_dir ) ) {
-				$home_dir = getenv( 'USERPROFILE' );
-			}
-		} else {
-			// Linux.
-			$home_dir = getenv( 'HOME' );
-
-			if ( true === empty( $home_dir ) ) {
-				$home_dir = ( false === empty( $_SERVER['HOME'] ) ? $_SERVER['HOME'] : null );
-			}
-		}
-
-		// If still unknown, then try posix_getpwuid and posix_getuid.
-		if ( true === empty( $home_dir ) && function_exists( 'posix_getuid' ) &&
-			 function_exists( 'posix_getpwuid' ) ) {
-			$user = posix_getpwuid( posix_getuid() );
-
-			$home_dir = ( false === empty( $user['dir'] ) ? $user['dir'] : null );
-		}
-
-		// Could not find the user home directory, so use the WordPress root directory.
-		if ( true === empty( $home_dir ) ) {
-			$home_dir = ABSPATH;
-		}
-
-		// Use rtrim the $home_dir to strip any trailing slashes.
-		$home_dir = rtrim( $home_dir, '\\/' );
-
-		// Record the home directory.
-		$this->home_dir = $home_dir;
-
-		// Return the directory path.
-		return $home_dir;
-	}
-
-	/**
-	 * Configure backup directory path.
-	 *
-	 * @since 1.0
-	 * @access private
-	 *
-	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
-	 *
-	 * @return bool
-	 */
-	private function configure_backup_directory() {
-		// Connect to the WordPress Filesystem API.
-		global $wp_filesystem;
-
-		// Get the user home directory.
-		$home_dir = $this->get_home_directory();
-
-		// Define the backup directory name.
-		$backup_directory_path = $home_dir . '/boldgrid_backup';
-
-		// Check if the backup directory exists.
-		$backup_directory_exists = $wp_filesystem->is_dir( $backup_directory_path );
-
-		// If the backup directory does not exist, then attempt to create it.
-		if ( false === $backup_directory_exists ) {
-			$backup_directory_created = $wp_filesystem->mkdir( $backup_directory_path, 0700 );
-
-			// If mkdir failed, then abort.
-			if ( false === $backup_directory_created ) {
-				error_log( __METHOD__ . ': Could not create directory "' . $backup_directory_path . '"!' );
-
-				return false;
-			}
-		}
-
-		// Check if the backup directory is writable, abort if not.
-		if ( false === $wp_filesystem->is_writable( $backup_directory_path ) ) {
-			error_log( __METHOD__ . ': Could not create directory "' . $backup_directory_path . '"!' );
-
-			return false;
-		}
-
-		// Record the backup directory path.
-		$this->backup_directory = $backup_directory_path;
-
-		return true;
-	}
-
-	/**
-	 * Add an archive compressor to the available list.
-	 *
-	 * @since 1.0
-	 * @access private
-	 *
-	 * @param string $compressor A name of a compressor.
-	 * @return null
-	 */
-	private function add_compressor( $compressor = null ) {
-		if ( false === empty( $compressor ) ) {
-			$this->available_compressors[] = $compressor;
-		}
-
-		return;
-	}
-
-	/**
-	 * Is a specific archive compressor available?
-	 *
-	 * @since 1.0
-	 * @access private
-	 *
-	 * @param string $compressor A string to identify a compressor.
-	 * @return bool
-	 */
-	private function is_compressor_available( $compressor = null ) {
-		// If input parameter is empty, then fail.
-		if ( true === empty( $compressor ) ) {
-			return false;
-		}
-
-		// Check the array to see if the specified compressor is available.
-		$is_available = in_array( $compressor, $this->available_compressors, true );
-
-		return $is_available;
-	}
-
-	/**
-	 * Test for available archive compressors, and add them to the array in a preferred order.
-	 *
-	 * @since 1.0
-	 * @access private
-	 *
-	 * @return bool
-	 */
-	private function configure_compressors() {
-		// Initialize $is_available.
-		$is_available = false;
-
-		// PHP zip (ZipArchive).
-		if ( extension_loaded( 'zip' ) && class_exists( 'ZipArchive' ) ) {
-			$this->add_compressor( 'php_zip' );
-			$is_available = true;
-		}
-
-		// PHP bz2 (Bzip2).
-		if ( extension_loaded( 'bz2' ) && function_exists( 'bzcompress' ) ) {
-			$this->add_compressor( 'php_bz2' );
-			$is_available = true;
-		}
-
-		// PHP zlib (Zlib).
-		if ( extension_loaded( 'zlib' ) && function_exists( 'gzwrite' ) ) {
-			$this->add_compressor( 'php_zlib' );
-			$is_available = true;
-		}
-
-		// PHP lzf (LZF).
-		if ( function_exists( 'lzf_compress' ) ) {
-			$this->add_compressor( 'php_lzf' );
-			$is_available = true;
-		}
-
-		// System tar.
-		if ( file_exists( '/bin/tar' ) && is_executable( '/bin/tar' ) ) {
-			$this->add_compressor( 'system_tar' );
-			$is_available = true;
-		}
-
-		// System zip.
-		if ( file_exists( '/usr/bin/zip' ) && is_executable( '/usr/bin/zip' ) ) {
-			$this->add_compressor( 'system_zip' );
-			$is_available = true;
-		}
-
-		return $is_available;
+		// Instantiate Boldgrid_Backup_Admin_Test.
+		$this->test = new Boldgrid_Backup_Admin_Test( $this );
 	}
 
 	/**
@@ -490,14 +137,12 @@ class Boldgrid_Backup_Admin_Core {
 	 */
 	public function get_execution_functions() {
 		// If the array already has elements, then return the array.
-		if ( false === empty( $this->available_exec_functions ) ) {
+		if ( null !== $this->available_exec_functions ) {
 			return $this->available_exec_functions;
 		}
 
 		// If PHP is in safe mode, then return an empty array.
-		$safe_mode = ini_get( 'safe_mode' );
-
-		if ( false === empty( $safe_mode ) ) {
+		if ( true === $this->test->is_php_safemode() ) {
 			return array();
 		}
 
@@ -531,14 +176,13 @@ class Boldgrid_Backup_Admin_Core {
 	 * Execute a system command using an array of execution functions.
 	 *
 	 * @since 1.0
-	 * @access private
 	 *
 	 * @param string $command A command string to be executed.
 	 * @param array  $available_exec_functions An array of available execution functions.
 	 * @param bool   $success or failure of the operation, passed back to the caller.
 	 * @return string|bool Returns the command output or FALSE on error.
 	 */
-	private function execute_command( $command, $available_exec_functions = array(), &$success = false ) {
+	public function execute_command( $command, $available_exec_functions = array(), &$success = false ) {
 		// If no command was passed, then fail.
 		if ( true === empty( $command ) ) {
 			return false;
@@ -550,7 +194,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Disable stderr.
-		if ( false === $this->is_windows() && false === strpos( $command, '2>/dev/null' ) ) {
+		if ( false === $this->test->is_windows() && false === strpos( $command, '2>/dev/null' ) ) {
 			$command .= ' 2>/dev/null';
 		}
 
@@ -725,278 +369,6 @@ class Boldgrid_Backup_Admin_Core {
 	}
 
 	/**
-	 * Is mysqldump available?
-	 *
-	 * Once the success is determined, the result is stored in a class property.
-	 *
-	 * @since 1.0
-	 *
-	 * @return bool
-	 */
-	public function is_mysqldump_available() {
-		// If this test was already completed, then just return the result.
-		if ( null !== $this->mysqldump_available ) {
-			return $this->mysqldump_available;
-		}
-
-		// Create the test command.
-		$command = 'mysqldump -V';
-
-		// Test to see if the mysqldump command is available.
-		$output = $this->execute_command( $command, null, $success );
-
-		// Set class property.
-		$this->mysqldump_available = ( $success || (bool) $output );
-
-		return $this->mysqldump_available;
-	}
-
-	/**
-	 * Is crontab available?
-	 *
-	 * Once the success is determined, the result is stored in a class property.
-	 *
-	 * @since 1.0
-	 *
-	 * @return bool
-	 */
-	public function is_crontab_available() {
-		// If this test was already completed, then just return the result.
-		if ( null !== $this->is_crontab_available ) {
-			return $this->is_crontab_available;
-		}
-
-		// Create the test command.
-		$command = 'crontab -l';
-
-		// Test to see if the crontab command is available.
-		$output = $this->execute_command( $command, null, $success );
-
-		// Set class property.
-		$this->is_crontab_available = ( $success || (bool) $output );
-
-		return $this->is_crontab_available;
-	}
-
-	/**
-	 * Is PHP running in safe mode?
-	 *
-	 * @since 1.0
-	 *
-	 * @return bool
-	 */
-	public function is_php_safemode() {
-		// If this test was already completed, then just return the result.
-		if ( null !== $this->is_php_safemode ) {
-			return $this->is_php_safemode;
-		}
-
-		// Check if PHP is in safe mode.
-		$this->is_php_safemode = (bool) ini_get( 'safe_mode' );
-
-		// Return result.
-		return $this->is_php_safemode;
-	}
-
-	/**
-	 * Is WP-CRON enabled?
-	 *
-	 * @since 1.0
-	 *
-	 * @return bool
-	 */
-	public function wp_cron_enabled() {
-		// If this test was already completed, then just return the result.
-		if ( null !== $this->wp_cron_enabled ) {
-			return $this->wp_cron_enabled;
-		}
-
-		// Get the WP-CRON array.
-		$wp_cron_array = array();
-
-		if ( true === function_exists( '_get_cron_array' ) ) {
-			$wp_cron_array = _get_cron_array();
-		}
-
-		// Check for the DISABLE_WP_CRON constant and value.
-		$disable_wp_cron = false;
-
-		if ( true === defined( 'DISABLE_WP_CRON' ) ) {
-			$disable_wp_cron = DISABLE_WP_CRON;
-		}
-
-		$this->wp_cron_enabled = ( false === empty( $wp_cron_array ) && false === $disable_wp_cron );
-
-		return $this->wp_cron_enabled;
-	}
-
-	/**
-	 * Get the WordPress total file size.
-	 *
-	 * @since 1.0
-	 * @access private
-	 *
-	 * @see get_filtered_filelist
-	 *
-	 * @return int The total size for the WordPress file system, in bytes.
-	 */
-	private function get_wp_size() {
-		// Get the filtered file list.
-		$filelist = $this->get_filtered_filelist( ABSPATH );
-
-		// If nothing was found, then return 0.
-		if ( true === empty( $filelist ) ) {
-			return 0;
-		}
-
-		// Initialize total_size.
-		$size = 0;
-
-		// Add up the file sizes.
-		foreach ( $filelist as $fileinfo ) {
-			// Add the file size to the total.
-			// get_filelist() returns fileinfo array with index 2 for filesize.
-			$size += $fileinfo[2];
-		}
-
-		// Return the result.
-		return $size;
-
-	}
-
-	/**
-	 * Disk space report.
-	 *
-	 * @since 1.0
-	 *
-	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
-	 *
-	 * @return array An array containing disk space (total, used, available, WordPress directory).
-	 */
-	public function get_disk_space() {
-		// Connect to the WordPress Filesystem API.
-		global $wp_filesystem;
-
-		// Get the HOME environment variable.
-		$env_home = getenv( 'HOME' );
-
-		// Locate the home directory by environment variable or use parent of ABSPATH.
-		$home_dir = ( false === empty( $env_home ) ? $env_home : dirname( ABSPATH ) );
-
-		// Trim any trailing slash (or backslash in Windows).
-		$home_dir = rtrim( $home_dir, DIRECTORY_SEPARATOR );
-
-		// If the home directory is not defined, not a directory or not writable, then return 0.00.
-		if ( true === empty( $home_dir ) || false === $wp_filesystem->is_dir( $home_dir ) ||
-			 false === $wp_filesystem->is_writable( $home_dir ) ) {
-			$return = array(
-				0.00,
-				0.00,
-				0.00,
-			);
-
-			return $return;
-		}
-
-		// Get filesystem disk space information.
-		$disk_total_space = disk_total_space( $home_dir );
-		$disk_free_space = disk_free_space( $home_dir );
-		$disk_used_space = $disk_total_space - $disk_free_space;
-
-		// Get the size of the filtered WordPress installation root directory (ABSPATH).
-		$wp_root_size = $this->get_wp_size();
-
-		// Create the return array.
-		$return = array(
-			$disk_total_space,
-			$disk_used_space,
-			$disk_free_space,
-			$wp_root_size,
-		);
-
-		// Return the disk information array.
-		return $return;
-	}
-
-	/**
-	 * Get database size.
-	 *
-	 * @since 1.0
-	 *
-	 * @global wpdb $wpdb The WordPress database class object.
-	 *
-	 * @return int The total size of the database (in bytes).
-	 */
-	public function get_database_size() {
-		// Connect to the WordPress database via $wpdb.
-		global $wpdb;
-
-		// Build query.
-		$query = $wpdb->prepare(
-			'SELECT SUM(`data_length` + `index_length`) FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA`=%s AND `TABLE_NAME` LIKE %s GROUP BY `TABLE_SCHEMA`;',
-			DB_NAME, $wpdb->get_blog_prefix( is_multisite() ) . '%'
-		);
-
-		// Check query.
-		if ( true === empty( $query ) ) {
-			return 0;
-		}
-
-		// Get the result.
-		$result = $wpdb->get_row( $query, ARRAY_N );
-
-		// If there was an error or nothing returned, then fail.
-		if ( empty( $result ) ) {
-			return 0;
-		}
-
-		// Return result.
-		return $result[0];
-	}
-
-	/**
-	 * Convert bytes to a human-readable measure.
-	 *
-	 * @since 1.0
-	 *
-	 * @param int $bytes Number of bytes.
-	 * @param int $decimals Number of decimal places.
-	 * @return string
-	 */
-	public function bytes_to_human( $bytes = 0, $decimals = 2 ) {
-		// If $bytes is not a number, then fail.
-		if ( false === is_numeric( $bytes ) ) {
-			return 'INVALID';
-		}
-
-		// Ensure the $decimals is an integer.
-		$decimals = (int) $decimals;
-
-		$type = array(
-			'B',
-			'KB',
-			'MB',
-			'GB',
-			'TB',
-			'PB',
-			'EB',
-			'ZB',
-			'YB',
-		);
-
-		$index = 0;
-
-		while ( $bytes >= 1024 ) {
-			$bytes /= 1024;
-			$index ++;
-		}
-
-		$return = number_format( $bytes, $decimals, '.', '' ) . ' ' . $type[ $index ];
-
-		return $return;
-	}
-
-	/**
 	 * Add menu items.
 	 *
 	 * @since 1.0
@@ -1013,7 +385,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		add_submenu_page( 'boldgrid-backup', 'Backup Settings', 'Backup Settings', 'administrator',
 			'boldgrid-backup-settings', array(
-			$this,
+			$this->settings,
 			'page_backup_settings',
 			)
 		);
@@ -1041,20 +413,37 @@ class Boldgrid_Backup_Admin_Core {
 	 */
 	private function backup_database() {
 		// Check if functional.
-		if ( true !== $this->run_functionality_tests() ) {
+		if ( true !== $this->test->run_functionality_tests() ) {
+			// Display an error notice, if not already on the test page.
+			if ( false === isset( $_GET['page'] ) || 'boldgrid-backup-test' !== $_GET['page'] ) {
+				do_action( 'boldgrid_backup_notice',
+					'Functionality test has failed.  You can go to <a href="' .
+					admin_url( 'admin.php?page=boldgrid-backup-test' ) .
+					'">Functionality Test</a> to view a report.',
+					'notice notice-error is-dismissible'
+	 			);
+			}
+
 			return false;
 		}
 
 		// If mysqldump is not available, then fail.
-		if ( true !== $this->mysqldump_available ) {
+		if ( true !== $this->test->is_mysqldump_available() ) {
 			return false;
 		}
+
+		// Get the backup directory path.
+		$backup_directory = $this->config->get_backup_directory();
 
 		// Connect to the WordPress Filesystem API.
 		global $wp_filesystem;
 
+		// Check if the backup directory is writable.
+		if ( true !== $wp_filesystem->is_writable( $backup_directory ) ) {
+			return false;
+		}
 		// Create a mysql defaults file.
-		$defaults_filepath = $this->backup_directory . '/mysqldump.cnf';
+		$defaults_filepath = $backup_directory . '/mysqldump.cnf';
 
 		$defaults_file_data = '[client]' . PHP_EOL . 'host=' . DB_HOST . PHP_EOL . 'user=' . DB_USER .
 			 PHP_EOL . 'password=' . DB_PASSWORD . PHP_EOL;
@@ -1067,7 +456,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Create a file path for the dump file.
-		$db_dump_filepath = $this->backup_directory . '/' . DB_NAME . '.' . date( 'Ymd-His' ) .
+		$db_dump_filepath = $backup_directory . '/' . DB_NAME . '.' . date( 'Ymd-His' ) .
 			 '.sql';
 
 		// Save the file path.
@@ -1130,61 +519,16 @@ class Boldgrid_Backup_Admin_Core {
 		// Return success.
 		return true;
 	}
-	/**
-	 * Translate a ZipArchive error code into a human-readable message.
-	 *
-	 * @since 1.0
-	 *
-	 * @param int $error_code An error code from a ZipArchive constant.
-	 * @return string An error message.
-	 */
-	public function translate_zip_error( $error_code = null ) {
-		switch ( $error_code ) {
-			case ZipArchive::ER_EXISTS :
-				$message = 'File already exists.';
-				break;
-			case ZipArchive::ER_INCONS :
-				$message = 'Zip archive inconsistent.';
-				break;
-			case ZipArchive::ER_INVAL :
-				$message = 'Invalid argument.';
-				break;
-			case ZipArchive::ER_MEMORY :
-				$message = 'Malloc failure.';
-				break;
-			case ZipArchive::ER_NOENT :
-				$message = 'No such file.';
-				break;
-			case ZipArchive::ER_NOZIP :
-				$message = 'Not a zip archive.';
-				break;
-			case ZipArchive::ER_OPEN :
-				$message = 'Cannot open file.';
-				break;
-			case ZipArchive::ER_READ :
-				$message = 'Read error.';
-				break;
-			case ZipArchive::ER_SEEK :
-				$message = 'Seek error.';
-				break;
-			default :
-				$message = 'No error code was passed.';
-				break;
-		}
-
-		return $message;
-	}
 
 	/**
 	 * Get a single-dimension filelist array from a directory path.
 	 *
 	 * @since 1.0
-	 * @access private
 	 *
 	 * @param string $dirpath A directory path.
 	 * @return array A single-dimension filelist array for use in this class.
 	 */
-	private function get_filelist( $dirpath ) {
+	public function get_filelist( $dirpath ) {
 		// Connect to the WordPress Filesystem API.
 		global $wp_filesystem;
 
@@ -1257,7 +601,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * This is a recursive function, which uses the class property filelist_basedir.
 	 *
 	 * @since 1.0
-	 * @access private
 	 *
 	 * @see get_filelist
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
@@ -1265,7 +608,7 @@ class Boldgrid_Backup_Admin_Core {
 	 * @param string $dirpath A directory path, defaults to ABSPATH.
 	 * @return array An array of absolute file paths, relative paths, and file sizes.
 	 */
-	private function get_filtered_filelist( $dirpath = ABSPATH ) {
+	public function get_filtered_filelist( $dirpath = ABSPATH ) {
 		// Connect to the WordPress Filesystem API.
 		global $wp_filesystem;
 
@@ -1307,47 +650,31 @@ class Boldgrid_Backup_Admin_Core {
 	}
 
 	/**
-	 * Create a site identifier.
-	 *
-	 * @since 1.0
-	 * @access private
-	 *
-	 * @return string The site identifier.
-	 */
-	private function create_site_id() {
-		// Get the siteurl.
-		if ( is_multisite() ) {
-			// Use the siteurl from blog id 1.
-			$siteurl = get_site_url( 1 );
-		} else {
-			// Get the current siteurl.
-			$siteurl = get_site_url();
-		}
-
-		// Make an identifier.
-		$site_id = explode( '/', $siteurl );
-		unset( $site_id[0] );
-		unset( $site_id[1] );
-		$site_id = implode( '_', $site_id );
-
-		return $site_id;
-	}
-
-	/**
 	 * Generate an new archive file path.
 	 *
 	 * @since 1.0
 	 * @access private
 	 *
 	 * @param string $extension An optional file extension.
-	 * @return string An archive file path.
+	 * @return string|bool An archive file path, or FALSE on error.
 	 */
 	private function generate_archive_path( $extension = null ) {
 		// Create a site identifier.
-		$site_id = $this->create_site_id();
+		$site_id = Boldgrid_Backup_Admin_Utility::create_site_id();
+
+		// Get the backup directory path.
+		$backup_directory = $this->config->get_backup_directory();
+
+		// Connect to the WordPress Filesystem API.
+		global $wp_filesystem;
+
+		// Check if the backup directory is writable.
+		if ( true !== $wp_filesystem->is_writable( $backup_directory ) ) {
+			return false;
+		}
 
 		// Create a file path with no extension (added later).
-		$filepath = $this->backup_directory . '/boldgrid-backup-' . $site_id . '-' .
+		$filepath = $backup_directory . '/boldgrid-backup-' . $site_id . '-' .
 			 date( 'Ymd-His' );
 
 		// If specified, add an extension.
@@ -1375,7 +702,18 @@ class Boldgrid_Backup_Admin_Core {
 	 */
 	private function archive_files( $save = false, $dryrun = false ) {
 		// Check if functional.
-		if ( true !== $this->run_functionality_tests() ) {
+		if ( true !== $this->test->run_functionality_tests() ) {
+			// Display an error notice, if not already on the test page.
+			if ( false === isset( $_GET['page'] ) || 'boldgrid-backup-test' !== $_GET['page'] ) {
+				// Display an error notice.
+				do_action( 'boldgrid_backup_notice',
+					'Functionality test has failed.  You can go to <a href="' .
+					 admin_url( 'admin.php?page=boldgrid-backup-test' ) .
+					 '">Functionality Test</a> to view a report.',
+					'notice notice-error is-dismissible'
+				);
+			}
+
 			return array(
 				'error' => 'Functionality tests fail.',
 			);
@@ -1389,8 +727,11 @@ class Boldgrid_Backup_Admin_Core {
 			'save' => $save,
 		);
 
+		// Get available compressors.
+		$available_compressors = $this->config->get_available_compressors();
+
 		// Determine which compressor to use (first available).
-		foreach ( $this->available_compressors as $available_compressor ) {
+		foreach ( $available_compressors as $available_compressor ) {
 			$info['compressor'] = $available_compressor;
 			break;
 		}
@@ -1436,11 +777,19 @@ class Boldgrid_Backup_Admin_Core {
 			return $info;
 		}
 
+		// Get the backup directory path.
+		$backup_directory = $this->config->get_backup_directory();
+
 		// Connect to the WordPress Filesystem API.
 		global $wp_filesystem;
 
+		// Check if the backup directory is writable.
+		if ( true !== $wp_filesystem->is_writable( $backup_directory ) ) {
+			return false;
+		}
+
 		// Add the database dump file to the file list.
-		$db_relative_path = substr( $this->db_dump_filepath, strlen( $this->backup_directory ) + 1 );
+		$db_relative_path = substr( $this->db_dump_filepath, strlen( $backup_directory ) + 1 );
 
 		$db_file_array = array(
 			$this->db_dump_filepath,
@@ -1473,7 +822,7 @@ class Boldgrid_Backup_Admin_Core {
 						return array(
 							'error' => 'Cannot create ZIP archive file "' . $info['filepath'] . '".',
 							'error_code' => $status,
-							'error_message' => $this->translate_zip_error( $status ),
+							'error_message' => Boldgrid_Backup_Admin_Utility::translate_zip_error( $status ),
 						);
 					}
 				}
@@ -1555,40 +904,44 @@ class Boldgrid_Backup_Admin_Core {
 		$info['duration'] = number_format( ( $time_stop - $time_start ), 4, '.', '' );
 
 		// Get settings.
-		$settings = $this->get_settings();
+		$settings = $this->settings->get_settings();
 
 		// If enabled, send email notification for backup completed.
 		if ( false === empty( $settings['notifications']['backup'] ) && true !== $dryrun ) {
 			// Create a site identifier.
-			$site_id = $this->create_site_id();
+			$site_id = Boldgrid_Backup_Admin_Utility::create_site_id();
 
 			// Create subject.
-			$subject = 'Backup completed for ' . $site_id;
+			$subject = __( 'Backup completed for ' ) . $site_id;
 
 			// Create message.
-			$body = "Hello,\n\n";
+			$body = __( "Hello,\n\n" );
 
-			$body .= 'A backup archive has been created for ' . $site_id . ".\n\n";
+			$body .= __( 'A backup archive has been created for ' ) . $site_id . ".\n\n";
 
-			$body .= "Backup details:\n";
+			$body .= __( "Backup details:\n" );
 
-			$body .= 'Duration: ' . $info['duration'] . " seconds\n";
+			$body .= __( 'Duration: ' . $info['duration'] . " seconds\n" );
 
-			$body .= 'Total size: ' . $this->bytes_to_human( $info['total_size'] ) . "\n";
+			$body .= __( 'Total size: ' ) .
+			Boldgrid_Backup_Admin_Utility::bytes_to_human( $info['total_size'] ) . "\n";
 
-			$body .= 'Archive file path: ' . $info['filepath'] . "\n";
+			$body .= __( 'Archive file path: ' ) . $info['filepath'] . "\n";
 
-			$body .= 'Archive file size: ' . $this->bytes_to_human( $info['filesize'] ) . "\n";
+			$body .= __( 'Archive file size: ' ) .
+			Boldgrid_Backup_Admin_Utility::bytes_to_human( $info['filesize'] ) . "\n";
 
-			$body .= 'Compressor used: ' . $info['compressor'] . "\n\n";
+			$body .= __( 'Compressor used: ' ) . $info['compressor'] . "\n\n";
 
 			if ( defined( 'DOING_CRON' ) ) {
-				$body .= "The backup request was made via WP-CRON (WordPress task scheduler).\n\n";
+				$body .= __( "The backup request was made via WP-CRON (WordPress task scheduler).\n\n" );
 			}
 
-			$body .= "You can manage notifications in your WordPress admin panel, under BoldGrid Backup Settings.\n\n";
+			$body .= __(
+				"You can manage notifications in your WordPress admin panel, under BoldGrid Backup Settings.\n\n"
+			);
 
-			$body .= "Best regards,\n\nThe BoldGrid Backup plugin\n\n";
+			$body .= __( "Best regards,\n\nThe BoldGrid Backup plugin\n\n" );
 
 			// Send the notification.
 			$info['mail_success'] = $this->send_notification( $subject, $body );
@@ -1616,16 +969,16 @@ class Boldgrid_Backup_Admin_Core {
 		// Initialize $archive_files array.
 		$archive_files = array();
 
-		// Ensure the backup directory is configured.
-		$backup_dir_configured = $this->configure_backup_directory();
+		// Get the backup directory.
+		$backup_directory = $this->config->get_backup_directory();
 
 		// If the backup directory is not configured, then return an empty array.
-		if ( true !== $backup_dir_configured ) {
+		if ( false === $backup_directory ) {
 			return array();
 		}
 
 		// Find all backups.
-		$dirlist = $wp_filesystem->dirlist( $this->backup_directory, false, false );
+		$dirlist = $wp_filesystem->dirlist( $backup_directory, false, false );
 
 		// If no files were found, then return an empty array.
 		if ( true === empty( $dirlist ) ) {
@@ -1663,7 +1016,7 @@ class Boldgrid_Backup_Admin_Core {
 				}
 
 				$archive_files[ $index ] = array(
-					'filepath' => $this->backup_directory . '/' . $fileinfo['name'],
+					'filepath' => $backup_directory . '/' . $fileinfo['name'],
 					'filename' => $fileinfo['name'],
 					'filedate' => date_i18n( 'n/j/Y g:i A', $fileinfo['lastmodunix'] ),
 					'filesize' => $fileinfo['size'],
@@ -1708,10 +1061,10 @@ class Boldgrid_Backup_Admin_Core {
 		} else {
 			$delete_ok = false;
 
-			add_action( 'admin_footer', array(
-				$this,
-				'notice_archive_key',
-			) );
+			do_action( 'boldgrid_backup_notice',
+				'Invalid key for the selected archive file.',
+				'notice notice-error is-dismissible'
+			);
 
 			$archive_key = null;
 		}
@@ -1721,10 +1074,10 @@ class Boldgrid_Backup_Admin_Core {
 			$archive_filename = $_GET['archive_filename'];
 		} else {
 			// Fail with a notice.
-			add_action( 'admin_footer', array(
-				$this,
-				'notice_invalid_filename',
-			) );
+			do_action( 'boldgrid_backup_notice',
+				'Invalid filename for the selected archive file.',
+				'notice notice-error is-dismissible'
+			);
 
 			return false;
 		}
@@ -1740,10 +1093,10 @@ class Boldgrid_Backup_Admin_Core {
 		// If no files were found, then show a notice.
 		if ( true === empty( $archives ) ) {
 			// Fail with a notice.
-			add_action( 'admin_footer', array(
-				$this,
-				'notice_no_archives',
-			) );
+			do_action( 'boldgrid_backup_notice',
+				'No archive files were found.',
+				'notice notice-error is-dismissible'
+			);
 
 			return false;
 		}
@@ -1754,10 +1107,10 @@ class Boldgrid_Backup_Admin_Core {
 		// Verify specified filename.
 		if ( $archive_filename !== $filename ) {
 			// Fail with a notice.
-			add_action( 'admin_footer', array(
-				$this,
-				'notice_not_found',
-			) );
+			do_action( 'boldgrid_backup_notice',
+				'The selected archive file was not found.',
+				'notice notice-error is-dismissible'
+			);
 
 			return false;
 		}
@@ -1775,10 +1128,10 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Display notice of deletion status.
 		if ( false === $delete_ok ) {
-			add_action( 'admin_footer', array(
-				$this,
-				'notice_delete_error',
-			) );
+			do_action( 'boldgrid_backup_notice',
+				'Error deleting the selected archive file.',
+				'notice notice-error is-dismissible'
+			);
 		}
 
 		// Return deletion status.
@@ -1834,7 +1187,15 @@ class Boldgrid_Backup_Admin_Core {
 		check_admin_referer( 'boldgrid-backup-restore', 'restore_auth' );
 
 		// Check if functional.
-		if ( true !== $this->run_functionality_tests() ) {
+		if ( true !== $this->test->run_functionality_tests() ) {
+			// Display an error notice.
+			do_action( 'boldgrid_backup_notice',
+				'Functionality test has failed.  You can go to <a href="' .
+				 admin_url( 'admin.php?page=boldgrid-backup-test' ) .
+				 '">Functionality Test</a> to view a report.',
+				'notice notice-error is-dismissible'
+			);
+
 			return array(
 				'error' => 'Functionality tests fail.',
 			);
@@ -1851,10 +1212,10 @@ class Boldgrid_Backup_Admin_Core {
 		} else {
 			$restore_ok = false;
 
-			add_action( 'admin_footer', array(
-				$this,
-				'notice_archive_key',
-			) );
+			do_action( 'boldgrid_backup_notice',
+				'Invalid key for the selected archive file.',
+				'notice notice-error is-dismissible'
+			);
 		}
 
 		// Validate archive_filename.
@@ -1863,10 +1224,10 @@ class Boldgrid_Backup_Admin_Core {
 		} else {
 			$restore_ok = false;
 
-			add_action( 'admin_footer', array(
-				$this,
-				'notice_invalid_filename',
-			) );
+			do_action( 'boldgrid_backup_notice',
+				'Invalid filename for the selected archive file.',
+				'notice notice-error is-dismissible'
+			);
 		}
 
 		// Get archive list.
@@ -1878,10 +1239,10 @@ class Boldgrid_Backup_Admin_Core {
 		if ( true === $restore_ok && true === empty( $archives ) ) {
 			$restore_ok = false;
 
-			add_action( 'admin_footer', array(
-				$this,
-				'notice_no_archives',
-			) );
+			do_action( 'boldgrid_backup_notice',
+				'No archive files were found.',
+				'notice notice-error is-dismissible'
+			);
 		}
 
 		// Locate the filename by key number.
@@ -1893,10 +1254,10 @@ class Boldgrid_Backup_Admin_Core {
 		if ( true === $restore_ok && $archive_filename !== $filename ) {
 			$restore_ok = false;
 
-			add_action( 'admin_footer', array(
-				$this,
-				'notice_not_found',
-			) );
+			do_action( 'boldgrid_backup_notice',
+				'The selected archive file was not found.',
+				'notice notice-error is-dismissible'
+			);
 		}
 
 		// Get the file path to delete.
@@ -1946,47 +1307,50 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Display notice of deletion status.
 		if ( false === $restore_ok ) {
-			add_action( 'admin_footer', array(
-				$this,
-				'notice_restore_error',
-			) );
+			do_action( 'boldgrid_backup_notice',
+				'Error restoring the selected archive file.',
+				'notice notice-error is-dismissible'
+			);
 		}
 
 		// Get settings.
-		$settings = $this->get_settings();
+		$settings = $this->settings->get_settings();
 
 		// If enabled, send email notification for restoration completed.
 		if ( false === empty( $settings['notifications']['restore'] ) ) {
 			// Create a site identifier.
-			$site_id = $this->create_site_id();
+			$site_id = Boldgrid_Backup_Admin_Utility::create_site_id();
 
 			// Create subject.
-			$subject = 'Restoration completed for ' . $site_id;
+			$subject = __( 'Restoration completed for ' ) . $site_id;
 
 			// Create message.
-			$body = "Hello,\n\n";
+			$body = __( "Hello,\n\n" );
 
 			if ( true === $restore_ok ) {
-				$body .= 'A backup archive has been restored';
+				$body .= __( 'A backup archive has been restored' );
 			} else {
-				$body .= 'An error occurred when attempting to restore a backup archive';
+				$body .= __( 'An error occurred when attempting to restore a backup archive' );
 			}
 
-			$body .= ' for ' . $site_id . ".\n\n";
+			$body .= __( ' for ' ) . $site_id . ".\n\n";
 
-			$body .= "Restoration details:\n";
+			$body .= __( "Restoration details:\n" );
 
-			$body .= 'Archive file path: ' . $info['filepath'] . "\n";
+			$body .= __( 'Archive file path: ' ) . $info['filepath'] . "\n";
 
-			$body .= 'Archive file size: ' . $this->bytes_to_human( $info['filesize'] ) . "\n";
+			$body .= __( 'Archive file size: ' ) .
+			Boldgrid_Backup_Admin_Utility::bytes_to_human( $info['filesize'] ) . "\n";
 
 			if ( defined( 'DOING_CRON' ) ) {
-				$body .= "The restoration request was made via WP-CRON.\n\n";
+				$body .= __( "The restoration request was made via WP-CRON.\n\n" );
 			}
 
-			$body .= "You can manage notifications in your WordPress admin panel, under BoldGrid Backup Settings.\n\n";
+			$body .= __(
+				"You can manage notifications in your WordPress admin panel, under BoldGrid Backup Settings.\n\n"
+			);
 
-			$body .= "Best regards,\n\nThe BoldGrid Backup plugin\n\n";
+			$body .= __( "Best regards,\n\nThe BoldGrid Backup plugin\n\n" );
 
 			// Send the notification.
 			$info['mail_success'] = $this->send_notification( $subject, $body );
@@ -2028,7 +1392,9 @@ class Boldgrid_Backup_Admin_Core {
 		$download_nonce = wp_create_nonce( 'archive_download' );
 
 		// Create text for the restoration confirmation.
-		$restore_confirm_text = __( 'Please confirm the restoration of this WordPress installation from the archive file' );
+		$restore_confirm_text = __(
+			'Please confirm the restoration of this WordPress installation from the archive file'
+		);
 
 		// Create text for the deletion confirmation.
 		$delete_confirm_text = __( 'Please confirm the deletion the archive file' );
@@ -2066,11 +1432,11 @@ class Boldgrid_Backup_Admin_Core {
 		// If a backup operation is requested, then make a backup now.
 		if ( false === empty( $_GET['backup_now'] ) ) {
 			$this->backup_now();
-		}
-
-		// If a restoration operation is requested, then restore from a backup archive now.
-		if ( false === empty( $_GET['restore_now'] ) ) {
-			$this->restore_archive_file();
+		} else {
+			// If a restoration operation is requested, then restore from a backup archive now.
+			if ( false === empty( $_GET['restore_now'] ) ) {
+				$this->restore_archive_file();
+			}
 		}
 
 		return;
@@ -2092,7 +1458,7 @@ class Boldgrid_Backup_Admin_Core {
 		if ( true === is_numeric( $_POST['download_key'] ) ) {
 			$download_key = sanitize_text_field( wp_unslash( $_POST['download_key'] ) );
 		} else {
-			echo 'INVALID DOWNLOAD KEY';
+			echo __( 'INVALID DOWNLOAD KEY' );
 			wp_die();
 		}
 
@@ -2100,7 +1466,7 @@ class Boldgrid_Backup_Admin_Core {
 		if ( false === empty( $_POST['download_filename'] ) ) {
 			$download_filename = sanitize_text_field( wp_unslash( $_POST['download_filename'] ) );
 		} else {
-			echo 'INVALID DOWNLOAD FILENAME';
+			echo __( 'INVALID DOWNLOAD FILENAME' );
 			wp_die();
 		}
 
@@ -2109,7 +1475,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Check WP_Filesystem method; ensure it is "direct".
 		if ( 'direct' !== $access_type ) {
-			echo 'WP_Filesystem method is not "direct"';
+			echo __( 'WP_Filesystem method is not "direct"' );
 			wp_die();
 		}
 
@@ -2118,7 +1484,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// If no files were found, then abort.
 		if ( true === empty( $archives ) ) {
-			echo 'NO BACKUP ARCHIVES FOUND';
+			echo __( 'NO BACKUP ARCHIVES FOUND' );
 			wp_die();
 		}
 
@@ -2127,7 +1493,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Verify filename.
 		if ( $download_filename !== $filename ) {
-			echo 'FILE NOT FOUND';
+			echo __( 'FILE NOT FOUND' );
 			wp_die();
 		}
 
@@ -2165,7 +1531,12 @@ class Boldgrid_Backup_Admin_Core {
 	 */
 	public function page_backup_test() {
 		// Perform functionality tests.
-		$this->run_functionality_tests();
+		if ( true !== $this->test->run_functionality_tests() ) {
+			// Display an error notice.
+			do_action( 'boldgrid_backup_notice', 'Functionality test has failed.',
+				'notice notice-error is-dismissible'
+			);
+		}
 
 		// Get the WordPress version.
 		global $wp_version;
@@ -2174,10 +1545,10 @@ class Boldgrid_Backup_Admin_Core {
 		global $wpdb;
 
 		// Get disk space information array.
-		$disk_space = $this->get_disk_space();
+		$disk_space = $this->test->get_disk_space();
 
 		// Get the database size.
-		$db_size = $this->get_database_size();
+		$db_size = $this->test->get_database_size();
 
 		// Get the database character set.
 		$db_charset = $wpdb->charset;
@@ -2188,540 +1559,11 @@ class Boldgrid_Backup_Admin_Core {
 		// Get archive info.
 		$archive_info = $this->archive_files( false );
 
+		// Get the backup directory path.
+		$backup_directory = $this->config->get_backup_directory();
+
 		// Load template view.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-test.php';
-
-		return;
-	}
-
-	/**
-	 * Get settings using defaults.
-	 *
-	 * @since 1.0
-	 * @access private
-	 *
-	 * @return array An array of settings.
-	 */
-	private function get_settings() {
-		// Get settings.
-		$settings = get_option( 'boldgrid_backup_settings' );
-
-		// Parse settings.
-		if ( false === empty( $settings['schedule'] ) ) {
-			// Update schedule format.
-			// Days of the week.
-			$settings['schedule']['dow_sunday'] = ( false ===
-				 empty( $settings['schedule']['dow_sunday'] ) ? 1 : 0 );
-			$settings['schedule']['dow_monday'] = ( false ===
-				 empty( $settings['schedule']['dow_monday'] ) ? 1 : 0 );
-			$settings['schedule']['dow_tuesday'] = ( false ===
-				 empty( $settings['schedule']['dow_tuesday'] ) ? 1 : 0 );
-			$settings['schedule']['dow_wednesday'] = ( false ===
-				 empty( $settings['schedule']['dow_wednesday'] ) ? 1 : 0 );
-			$settings['schedule']['dow_thursday'] = ( false ===
-				 empty( $settings['schedule']['dow_thursday'] ) ? 1 : 0 );
-			$settings['schedule']['dow_friday'] = ( false ===
-				 empty( $settings['schedule']['dow_friday'] ) ? 1 : 0 );
-			$settings['schedule']['dow_saturday'] = ( false ===
-				 empty( $settings['schedule']['dow_saturday'] ) ? 1 : 0 );
-
-			// Time of day.
-			$settings['schedule']['tod_h'] = ( false === empty( $settings['schedule']['tod_h'] ) ? $settings['schedule']['tod_h'] : mt_rand( 1, 5 ) );
-			$settings['schedule']['tod_m'] = ( false === empty( $settings['schedule']['tod_m'] ) ? $settings['schedule']['tod_m'] : mt_rand( 1, 59 ) );
-			$settings['schedule']['tod_a'] = ( false === empty( $settings['schedule']['tod_a'] ) ? $settings['schedule']['tod_a'] : 'AM' );
-
-			// Other settings.
-			$settings['notifications']['backup'] = ( false ===
-				 isset( $settings['notifications']['backup'] ) || false ===
-				 empty( $settings['notifications']['backup'] ) ? 1 : 0 );
-			$settings['notifications']['restore'] = ( false ===
-				 isset( $settings['notifications']['restore'] ) || false ===
-				 empty( $settings['notifications']['restore'] ) ? 1 : 0 );
-			$settings['auto_rollback'] = ( false === isset( $settings['auto_rollback'] ) ||
-				 false === empty( $settings['auto_rollback'] ) ? 1 : 0 );
-		} else {
-			// Define defaults.
-			// Days of the week.
-			$settings['schedule']['dow_sunday'] = 0;
-			$settings['schedule']['dow_monday'] = 0;
-			$settings['schedule']['dow_tuesday'] = 0;
-			$settings['schedule']['dow_wednesday'] = 0;
-			$settings['schedule']['dow_thursday'] = 0;
-			$settings['schedule']['dow_friday'] = 0;
-			$settings['schedule']['dow_saturday'] = 0;
-
-			// Time of day.
-			$settings['schedule']['tod_h'] = mt_rand( 1, 5 );
-			$settings['schedule']['tod_m'] = mt_rand( 1, 59 );
-			$settings['schedule']['tod_a'] = 'AM';
-
-			// Other settings.
-			$settings['notifications']['backup'] = 1;
-			$settings['notifications']['restore'] = 1;
-			$settings['auto_rollback'] = 1;
-		}
-
-		// Return the settings array.
-		return $settings;
-	}
-
-	/**
-	 * Update or add an entry to the system user crontab or wp-cron.
-	 *
-	 * @since 1.0
-	 * @access private
-	 *
-	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
-	 *
-	 * @param string $entry A cron entry.
-	 * @return bool Success.
-	 */
-	private function update_cron( $entry ) {
-		// If no entry was passed, then abort.
-		if ( true === empty( $entry ) ) {
-			return false;
-		}
-
-		// Check if crontab is available.
-		$is_crontab_available = $this->is_crontab_available();
-
-		// Check if wp-cron is available.
-		$is_wpcron_available = $this->wp_cron_enabled();
-
-		// If crontab or wp-cron is not available, then abort.
-		if ( true !== $is_crontab_available && true !== $is_wpcron_available ) {
-			return false;
-		}
-
-		// Check if the backup directory is configured.
-		if ( true !== $this->configure_backup_directory() ) {
-			return false;
-		}
-
-		// Use either crontab or wp-cron.
-		if ( true === $is_crontab_available ) {
-			// Use crontab.
-			// Read crontab.
-			$command = 'crontab -l';
-
-			$crontab = $this->execute_command( $command );
-
-			// Check for failure.
-			if ( false === $crontab ) {
-				return false;
-			}
-
-			// Add entry to crontab to the end, if it does not already exist.
-			if ( false === strpos( $crontab, $entry ) ) {
-				$crontab .= "\n" . $entry . "\n";
-			}
-
-			// Strip extra line breaks.
-			$crontab = str_replace( "\n\n", "\n", $crontab );
-
-			// Trim the crontab.
-			$crontab = trim( $crontab );
-
-			// Add a line break at the end of the file.
-			$crontab .= "\n";
-
-			// Save the temp crontab to file.
-			$temp_crontab_path = $this->backup_directory . '/crontab.' . microtime( true ) . '.tmp';
-
-			// Connect to the WordPress Filesystem API.
-			global $wp_filesystem;
-
-			$wp_filesystem->put_contents( $temp_crontab_path, $crontab, 0600 );
-
-			// Check if the defaults file was written.
-			if ( false === $wp_filesystem->exists( $temp_crontab_path ) ) {
-				return false;
-			}
-
-			// Write crontab.
-			$command = 'crontab ' . $temp_crontab_path;
-
-			$crontab = $this->execute_command( $command, null, $success );
-
-			// Remove temp crontab file.
-			$wp_filesystem->delete( $temp_crontab_path, false, 'f' );
-
-			// Check for failure.
-			if ( false === $crontab || true !== $success ) {
-				return false;
-			}
-		} else {
-			// Use wp-cron.
-			// @todo Write wp-cron code here.
-		}
-
-		return true;
-	}
-
-	/**
-	 * Delete boldgrid-backup cron entries from the system user crontab or wp-cron.
-	 *
-	 * @since 1.0
-	 * @access private
-	 *
-	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
-	 *
-	 * @return bool Success.
-	 */
-	private function delete_cron_entries() {
-		// Check if crontab is available.
-		$is_crontab_available = $this->is_crontab_available();
-
-		// Check if wp-cron is available.
-		$is_wpcron_available = $this->wp_cron_enabled();
-
-		// If crontab or wp-cron is not available, then abort.
-		if ( true !== $is_crontab_available && true !== $is_wpcron_available ) {
-			return false;
-		}
-
-		// Check if the backup directory is configured.
-		if ( true !== $this->configure_backup_directory() ) {
-			return false;
-		}
-
-		// Set a search pattern to match for our cron jobs.
-		$pattern = 'boldgrid-backup-cron.php';
-
-		// Use either crontab or wp-cron.
-		if ( true === $is_crontab_available ) {
-			// Use crontab.
-			// Read crontab.
-			$command = 'crontab -l';
-
-			$crontab = $this->execute_command( $command, null, $success );
-
-			// If the command to retrieve crontab failed, then abort.
-			if ( true !== $success ) {
-				return false;
-			}
-
-			// If no entries exist, then return success.
-			if ( false === strpos( $crontab, $pattern ) ) {
-				return true;
-			}
-
-			// Remove lines matching the pattern.
-			$crontab_exploded = explode( "\n", $crontab );
-
-			$crontab = '';
-
-			foreach ( $crontab_exploded as $line ) {
-				if ( false === strpos( $line, $pattern ) ) {
-					$line = trim( $line );
-					$crontab .= $line . "\n";
-				}
-			}
-
-			// Save the temp crontab to file.
-			$temp_crontab_path = $this->backup_directory . '/crontab.' . microtime( true ) . '.tmp';
-
-			// Connect to the WordPress Filesystem API.
-			global $wp_filesystem;
-
-			// Save a temporary file for crontab.
-			$wp_filesystem->put_contents( $temp_crontab_path, $crontab, 0600 );
-
-			// Check if the defaults file was written.
-			if ( false === $wp_filesystem->exists( $temp_crontab_path ) ) {
-				return false;
-			}
-
-			// Write crontab.
-			$command = 'crontab ' . $temp_crontab_path;
-
-			$crontab = $this->execute_command( $command, null, $success );
-
-			// Remove temp crontab file.
-			$wp_filesystem->delete( $temp_crontab_path, false, 'f' );
-		} else {
-			// Use wp-cron.
-			// @todo Write wp-cron code here.
-		}
-
-		return true;
-	}
-
-	/**
-	 * Update settings.
-	 *
-	 * @since 1.0
-	 * @access private
-	 *
-	 * @return bool Update success.
-	 */
-	private function update_settings() {
-		// Verify nonce.
-		check_admin_referer( 'boldgrid-backup-settings', 'settings_auth' );
-
-		// Check for settings update.
-		if ( false === empty( $_POST['save_time'] ) ) {
-			// Get settings.
-			$settings = $this->get_settings();
-
-			// Initialize $update_error.
-			$update_error = false;
-
-			// Initialize $days_scheduled.
-			$days_scheduled = array();
-
-			// Validate input for schedule.
-			$indices = array(
-				'dow_sunday',
-				'dow_monday',
-				'dow_tuesday',
-				'dow_wednesday',
-				'dow_thursday',
-				'dow_friday',
-				'dow_saturday',
-				'tod_h',
-				'tod_m',
-				'tod_a',
-			);
-
-			foreach ( $indices as $index ) {
-				// Determine input type.
-				if ( 0 === strpos( $index, 'dow_' ) ) {
-					$type = 'day';
-				} elseif ( 'tod_h' === $index ) {
-					$type = 'h';
-				} elseif ( 'tod_m' === $index ) {
-					$type = 'm';
-				} elseif ( 'tod_a' === $index ) {
-					$type = 'a';
-				} else {
-					// Unknown type.
-					$type = '?';
-				}
-
-				if ( false === empty( $_POST[ $index ] ) ) {
-					// Validate by type.
-					switch ( $type ) {
-						case 'day' :
-							// Convert to integer.
-							$_POST[ $index ] = (int) $_POST[ $index ];
-
-							// If day was scheduled, then track it.
-							if ( 1 === $_POST[ $index ] ) {
-								$days_scheduled[] = date( 'w', strtotime( str_replace( 'dow_', '', $index ) ) );
-							}
-
-							break;
-						case 'h' :
-							if ( $_POST[ $index ] < 1 || $_POST[ $index ] > 12 ) {
-								// Error in input.
-								$update_error = true;
-								break 2;
-							}
-
-							// Convert to integer.
-							$_POST[ $index ] = (int) $_POST[ $index ];
-
-							break;
-						case 'm' :
-							if ( $_POST[ $index ] < 0 || $_POST[ $index ] > 59 ) {
-								// Error in input.
-								$update_error = true;
-								break 2;
-							}
-
-							// Convert to integer.
-							$_POST[ $index ] = (int) $_POST[ $index ];
-
-							// Pad left with 0.
-							$_POST[ $index ] = str_pad( $_POST[ $index ], 2, '0', STR_PAD_LEFT );
-
-							break;
-						case 'a' :
-							if ( 'AM' !== $_POST[ $index ] && 'PM' !== $_POST[ $index ] ) {
-								// Error in input; unknown type.
-								$update_error = true;
-								break 2;
-							}
-
-							break;
-						default :
-							// Error in input; unknown type.
-							$update_error = true;
-							break 2;
-					}
-
-					// Update the setting value provided.
-					$settings['schedule'][ $index ] = $_POST[ $index ];
-				} elseif ( 'day' === $type ) {
-					// Unassigned days.
-					$settings['schedule'][ $index ] = 0;
-				} else {
-					// Error in input.
-					$update_error = true;
-
-					break;
-				}
-			}
-
-			// Validate input for other settings.
-			$settings['notifications']['backup'] = ( ( true === isset( $_POST['notify_backup'] ) &&
-				 '1' === $_POST['notify_backup'] ) ? 1 : 0 );
-
-			$settings['notifications']['restore'] = ( ( true === isset( $_POST['notify_restore'] ) &&
-				 '1' === $_POST['notify_restore'] ) ? 1 : 0 );
-
-			$settings['auto_rollback'] = ( ( false === isset( $_POST['auto_rollback'] ) ||
-				 '1' === $_POST['auto_rollback'] ) ? 1 : 0 );
-
-			// If no errors, then save the settings.
-			if ( false === $update_error ) {
-				// Record the update time.
-				$settings['updated'] = time();
-
-				// Attempt to update WP option.
-				if ( true !== update_option( 'boldgrid_backup_settings', $settings ) ) {
-					// Failure.
-					$update_error = true;
-
-					add_action( 'admin_footer',
-						array(
-							$this,
-							'notice_settings_error',
-						)
-					);
-				}
-			} else {
-				// Interrupted by a previous error.
-				add_action( 'admin_footer',
-					array(
-						$this,
-						'notice_settings_error',
-					)
-				);
-			}
-		}
-
-		// Delete existing backup cron jobs.
-		$cron_status = $this->delete_cron_entries();
-
-		// If delete cron failed, then show a notice.
-		if ( true !== $cron_status ) {
-			$update_error = true;
-
-			add_action( 'admin_footer', array(
-				$this,
-				'notice_cron_error',
-			) );
-		}
-
-		// Update cron, if there are days selected.
-		if ( false === empty( $days_scheduled ) ) {
-			// Build cron job line in crontab format.
-			$entry = date( 'i H',
-				strtotime(
-					$settings['schedule']['tod_h'] . ':' . $settings['schedule']['tod_m'] . ' ' .
-						 $settings['schedule']['tod_a']
-				)
-			) . ' * * ';
-
-			$days_scheduled_list = '';
-
-			foreach ( $days_scheduled as $day ) {
-				$days_scheduled_list .= $day . ',';
-			}
-
-			$days_scheduled_list = rtrim( $days_scheduled_list, ',' );
-
-			$entry .= $days_scheduled_list . ' curl -sk ' . plugin_dir_url( __FILE__ ) .
-				 'boldgrid-backup-cron.php';
-
-			if ( false === $this->is_windows() ) {
-				$entry .= ' > /dev/null 2>&1';
-			}
-
-			// Update cron.
-			$cron_status = $this->update_cron( $entry );
-
-			// If update cron failed, then show a notice.
-			if ( true !== $cron_status ) {
-				$update_error = true;
-
-				add_action( 'admin_footer', array(
-					$this,
-					'notice_cron_error',
-				) );
-			}
-		}
-
-		// If there was no error, then show success notice.
-		if ( false === $update_error ) {
-			// Success.
-			add_action( 'admin_footer', array(
-				$this,
-				'notice_settings_saved',
-			) );
-		}
-
-		// Return success.
-		return ! $update_error;
-	}
-
-	/**
-	 * Menu callback to display the Backup schedule page.
-	 *
-	 * @since 1.0
-	 *
-	 * @return null
-	 */
-	public function page_backup_settings() {
-		// Display warning on resource usage and backups.
-		add_action( 'admin_footer', array(
-			$this,
-			'notice_settings_warning',
-		) );
-
-		// Get BoldGrid reseller settings.
-		$boldgrid_reseller = get_option( 'boldgrid_reseller' );
-
-		// If not part of a reseller, then show the unofficial host notice.
-		if ( true === empty( $boldgrid_reseller ) ) {
-			add_action( 'admin_footer', array(
-				$this,
-				'notice_backup_warning',
-			) );
-		}
-
-		// Check for settings update.
-		if ( false === empty( $_POST['save_time'] ) ) {
-			// Verify nonce.
-			check_admin_referer( 'boldgrid-backup-settings', 'settings_auth' );
-
-			$this->update_settings();
-		}
-
-		// Enqueue CSS for the settings page.
-		wp_enqueue_style( 'boldgrid-backup-admin-settings',
-			plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-settings.css', array(),
-			BOLDGRID_BACKUP_VERSION, 'all'
-		);
-
-		// Register the JS for the settings page.
-		wp_register_script( 'boldgrid-backup-admin-settings',
-			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-settings.js',
-			array(
-				'jquery',
-			), BOLDGRID_BACKUP_VERSION, false
-		);
-
-		// Enqueue JS for the settings page.
-		wp_enqueue_script( 'boldgrid-backup-admin-settings' );
-
-		// Get settings.
-		$settings = $this->get_settings();
-
-		// Include the page template.
-		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-settings.php';
 
 		return;
 	}
@@ -2783,218 +1625,15 @@ class Boldgrid_Backup_Admin_Core {
 	}
 
 	/**
-	 * Admin notice for functionality test failure.
+	 * Admin notice template.
 	 *
 	 * @since 1.0
 	 *
+	 * @param string $message A message to display in the admin notice.
 	 * @return null
 	 */
-	public function notice_functionality_fail() {
-		$class = 'notice notice-error is-dismissible';
-		$message = __(
-			'Functionality test has failed.  You can go to <a href="' .
-				 admin_url( 'admin.php?page=boldgrid-backup-test' ) .
-				 '">Functionality Test</a> to view a report.', 'boldgrid-backup'
-		);
-
-		printf( '<div class="%1$s"><p>%2$s</p></div>', $class, $message );
-
-		return;
-	}
-
-	/**
-	 * Admin notice for invalid archive key.
-	 *
-	 * @since 1.0
-	 *
-	 * @return null
-	 */
-	public function notice_archive_key() {
-		$class = 'notice notice-error is-dismissible';
-		$message = __( 'Invalid key for the selected archive file.', 'boldgrid-backup' );
-
-		printf( '<div class="%1$s"><p>%2$s</p></div>', $class, $message );
-
-		return;
-	}
-
-	/**
-	 * Admin notice for invalid archive filename.
-	 *
-	 * @since 1.0
-	 *
-	 * @return null
-	 */
-	public function notice_invalid_filename() {
-		$class = 'notice notice-error is-dismissible';
-		$message = __( 'Invalid filename for the selected archive file.', 'boldgrid-backup' );
-
-		printf( '<div class="%1$s"><p>%2$s</p></div>', $class, $message );
-
-		return;
-	}
-
-	/**
-	 * Admin notice for no archive files found.
-	 *
-	 * @since 1.0
-	 *
-	 * @return null
-	 */
-	public function notice_no_archives() {
-		$class = 'notice notice-error is-dismissible';
-		$message = __( 'No archive files were found.', 'boldgrid-backup' );
-
-		printf( '<div class="%1$s"><p>%2$s</p></div>', $class, $message );
-
-		return;
-	}
-
-	/**
-	 * Admin notice for archive file not found.
-	 *
-	 * @since 1.0
-	 *
-	 * @return null
-	 */
-	public function notice_not_found() {
-		$class = 'notice notice-error is-dismissible';
-		$message = __( 'The selected archive file was not found.', 'boldgrid-backup' );
-
-		printf( '<div class="%1$s"><p>%2$s</p></div>', $class, $message );
-
-		return;
-	}
-
-	/**
-	 * Admin notice for deletion errors.
-	 *
-	 * @since 1.0
-	 *
-	 * @return null
-	 */
-	public function notice_delete_error() {
-		$class = 'notice notice-error is-dismissible';
-		$message = __( 'Error deleting the selected archive file.', 'boldgrid-backup' );
-
-		printf( '<div class="%1$s"><p>%2$s</p></div>', $class, $message );
-
-		return;
-	}
-
-	/**
-	 * Admin notice for restoration errors.
-	 *
-	 * @since 1.0
-	 *
-	 * @return null
-	 */
-	public function notice_restore_error() {
-		$class = 'notice notice-error is-dismissible';
-		$message = __( 'Error restoring the selected archive file.', 'boldgrid-backup' );
-
-		printf( '<div class="%1$s"><p>%2$s</p></div>', $class, $message );
-
-		return;
-	}
-
-	/**
-	 * Admin notice for settings warning.
-	 *
-	 * @since 1.0
-	 *
-	 * @return null
-	 */
-	public function notice_settings_warning() {
-		$class = 'notice notice-warning is-dismissible';
-		$message = __(
-			'Warning: Making backups uses resources. When the system is backing up, it will slow down your site for visitors. Furthermore, when the database itself is being copied, your site must “pause” temporarily to preserve data integrity. For most sites, the pause is typically a few seconds and is not noticed by visitors. Large sites take longer though. Please keep the number of backups you have stored and how often you make those backups to a minimum.',
-			'boldgrid-backup'
-		);
-
-		printf( '<div class="%1$s"><p>%2$s</p></div>', $class, $message );
-
-		return;
-	}
-
-	/**
-	 * Admin notice for backup warning for unofficial hosts.
-	 *
-	 * @since 1.0
-	 *
-	 * @return null
-	 */
-	public function notice_backup_warning() {
-		$class = 'notice notice-warning is-dismissible';
-		$message = __(
-			'Please note that your web hosting provider may have a policy against these types of backups. Please verify with your provider or choose a BoldGrid Official Host.'
-		);
-
-		printf( '<div class="%1$s"><p>%2$s</p></div>', $class, $message );
-
-		return;
-	}
-
-	/**
-	 * Admin notice for failed to get settings.
-	 *
-	 * @since 1.0
-	 *
-	 * @return null
-	 */
-	public function notice_settings_retrieval() {
-		$class = 'notice notice-error is-dismissible';
-		$message = __( 'Failed to get settings.  Please try again.', 'boldgrid-backup' );
-
-		printf( '<div class="%1$s"><p>%2$s</p></div>', $class, $message );
-
-		return;
-	}
-
-	/**
-	 * Admin notice for successful saved settings.
-	 *
-	 * @since 1.0
-	 *
-	 * @return null
-	 */
-	public function notice_settings_saved() {
-		$class = 'updated settings-error notice is-dismissible';
-		$message = __( 'Settings saved.', 'boldgrid-backup' );
-
-		printf( '<div class="%1$s"><p>%2$s</p></div>', $class, $message );
-
-		return;
-	}
-
-	/**
-	 * Admin notice for failed saved settings.
-	 *
-	 * @since 1.0
-	 *
-	 * @return null
-	 */
-	public function notice_settings_error() {
-		$class = 'notice notice-error is-dismissible';
-		$message = __( 'Invalid settings submitted.  Please try again.', 'boldgrid-backup' );
-
-		printf( '<div class="%1$s"><p>%2$s</p></div>', $class, $message );
-
-		return;
-	}
-
-	/**
-	 * Admin notice for failed cron modification.
-	 *
-	 * @since 1.0
-	 *
-	 * @return null
-	 */
-	public function notice_cron_error() {
-		$class = 'notice notice-error is-dismissible';
-		$message = __( 'An error occurred when modifying cron jobs.  Please try again.',
-			'boldgrid-backup'
-		);
+	public function notice_template( $message, $class = 'notice notice-error is-dismissible' ) {
+		$message = __( $message, 'boldgrid-backup' );
 
 		printf( '<div class="%1$s"><p>%2$s</p></div>', $class, $message );
 

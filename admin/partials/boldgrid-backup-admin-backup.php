@@ -35,8 +35,8 @@ if ( false === empty( $archive_info ) ) {
 		// Successful backup.
 		?>
 <p>File Path: <?php echo $archive_info['filepath']; ?></p>
-<p>File Size: <?php echo $this->bytes_to_human( $archive_info['filesize'] ); ?></p>
-<p>Total size: <?php echo $this->bytes_to_human( $archive_info['total_size'] ); ?></p>
+<p>File Size: <?php echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['filesize'] ); ?></p>
+<p>Total size: <?php echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] ); ?></p>
 <p>Compressor: <?php echo $archive_info['compressor']; ?></p>
 <?php
 if ( true === isset( $archive_info['duration'] ) ) {
@@ -49,7 +49,7 @@ if ( true === isset( $archive_info['duration'] ) ) {
 		?>
 <p>This was a dry run test.</p>
 <p>File Path: <?php echo $archive_info['filepath']; ?></p>
-<p>Total size: <?php echo $this->bytes_to_human( $archive_info['total_size'] ); ?></p>
+<p>Total size: <?php echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] ); ?></p>
 <p>Compressor: <?php echo $archive_info['compressor']; ?></p>
 <p>Duration: <?php echo $archive_info['duration'] . ' seconds'; ?></p>
 <?php

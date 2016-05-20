@@ -55,7 +55,7 @@ foreach ( $archives as $key => $archive ) {
 	?>
 	<tr>
 		<td class='backup-archive-list-path'><?php echo $archive['filename']; ?></td>
-		<td class='backup-archive-list-size'><?php echo $this->bytes_to_human( $archive['filesize'] ); ?></td>
+		<td class='backup-archive-list-size'><?php echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive['filesize'] ); ?></td>
 		<td class='backup-archive-list-date'><?php echo $archive['filedate']; ?></td>
 		<td class='backup-archive-list-download'><a
 			id='backup-archive-download-<?php echo $key; ?>'
@@ -83,7 +83,7 @@ foreach ( $archives as $key => $archive ) {
 		</tr>
 		<tr>
 			<td class='backup-archive-summary-metric'>Total Size:</td>
-			<td class='backup-archive-summary-value'><?php echo $this->bytes_to_human( $archives_size );?></td>
+			<td class='backup-archive-summary-value'><?php echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archives_size );?></td>
 		</tr>
 	</tbody>
 </table>

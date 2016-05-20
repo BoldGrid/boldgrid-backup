@@ -105,9 +105,29 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin.php';
 
 		/**
+		 * Include a utility class.
+		 */
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-utility.php';
+
+		/**
+		 * The class responsible for the configuration of the plugin.
+		 */
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-config.php';
+
+		/**
+		 * The class responsible for the functionality test for the plugin.
+		 */
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-test.php';
+
+		/**
 		 * The class responsible for the core backup functionality in the admin area.
 		 */
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-core.php';
+
+		/**
+		 * The class responsible for the backup settings in the admin area.
+		 */
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-settings.php';
 
 		/**
 		 * The class responsible for the plugin update functionality in the admin area.
@@ -148,6 +168,21 @@ class Boldgrid_Backup {
 
 		// Instantiate the admin core.
 		$plugin_admin_core = new Boldgrid_Backup_Admin_Core();
+
+		// Add nav menu items.
+		$this->loader->add_action( 'admin_menu', $plugin_admin_core,
+			'add_menu_items', 1002
+		);
+
+		// Add a custom action for admin notices.
+		$this->loader->add_action( 'boldgrid_backup_notice', $plugin_admin_core, 'notice_template',
+			10, 2
+		);
+
+		// Add a custom action to handle AJAX callback for archive file download buttons.
+		$this->loader->add_action( 'wp_ajax_download_archive_file', $plugin_admin_core,
+			'download_archive_file_callback'
+		);
 
 		// Instantiate a Boldgrid_Backup_Admin class object.
 		$plugin_admin_update = new Boldgrid_Backup_Admin_Update( $this->get_plugin_name(),
