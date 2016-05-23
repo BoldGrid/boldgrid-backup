@@ -1399,11 +1399,16 @@ class Boldgrid_Backup_Admin_Core {
 		// Create text for the deletion confirmation.
 		$delete_confirm_text = __( 'Please confirm the deletion the archive file' );
 
-		// Add localized data to the JS script.
-		wp_localize_script( 'boldgrid-backup-admin-home', 'downloadNonce', $download_nonce );
-		wp_localize_script( 'boldgrid-backup-admin-home', 'accessType', $access_type );
-		wp_localize_script( 'boldgrid-backup-admin-home', 'restoreConfirmText', $restore_confirm_text );
-		wp_localize_script( 'boldgrid-backup-admin-home', 'deleteConfirmText', $delete_confirm_text );
+		// Create an array of data to pass to JS.
+		$localize_script_data = array(
+			'downloadNonce' => $download_nonce,
+			'accessType' => $access_type,
+			'restoreConfirmText' => $restore_confirm_text,
+			'deleteConfirmText' => $delete_confirm_text,
+		);
+
+		// Add localize script data to the JS script.
+		wp_localize_script( 'boldgrid-backup-admin-home', 'localizeScriptData', $localize_script_data );
 
 		// Enqueue JS for the home page.
 		wp_enqueue_script( 'boldgrid-backup-admin-home' );

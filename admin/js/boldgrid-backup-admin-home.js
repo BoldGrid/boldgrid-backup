@@ -15,8 +15,8 @@
 	var self = {};
 
 	/*
-	 * This script is passed "downloadNonce", "accessType", "restoreConfirmText",
-	 * "deleteConfirmText" (via wp_localize_script() in "class-boldgrid-backup-admin-core.php").
+	 * This script is passed "localizeScriptData" {"downloadNonce", "accessType", "restoreConfirmText",
+	 * "deleteConfirmText"} (via wp_localize_script() in "class-boldgrid-backup-admin-core.php").
 	 */
 
 	// Onload event listener.
@@ -62,8 +62,9 @@
 		downloadFilepath = $this.data( 'filepath' );
 
 		// If the wp_filesystem method is not "direct", then show a message and return.
-		if ( 'direct' !== accessType ) {
-			alert( "Wordpress filesystem access method is not direct; it is set to '" + accessType +
+		if ( 'direct' !== localizeScriptData.accessType ) {
+			alert( "Wordpress filesystem access method is not direct; it is set to '" +
+				localizeScriptData.accessType +
 				"'.\n\nYou can download the archive file using another method, such as FTP.\n\n" +
 				"The backup archive file path is: " + downloadFilepath
 			);
@@ -76,7 +77,7 @@
 		    'action' : 'download_archive_file',
 		    'download_key' : downloadKey,
 		    'download_filename' : downloadFilename,
-		    'wpnonce' : downloadNonce
+		    'wpnonce' : localizeScriptData.downloadNonce
 		};
 
 		// Create a hidden form to request the download.
@@ -112,7 +113,7 @@
 		ArchiveFilename = $this.data( 'filename' );
 
 		// Ask for confirmation.
-		confirmResponse = confirm( restoreConfirmText + ' "' + ArchiveFilename + '".' );
+		confirmResponse = confirm( localizeScriptData.restoreConfirmText + ' "' + ArchiveFilename + '".' );
 
 		// Handle response.
 		if ( true === confirmResponse ) {
@@ -135,7 +136,7 @@
 		ArchiveFilename = $this.data( 'filename' );
 
 		// Ask for confirmation.
-		confirmResponse = confirm( deleteConfirmText + ' "' + ArchiveFilename + '".' );
+		confirmResponse = confirm( localizeScriptData.deleteConfirmText + ' "' + ArchiveFilename + '".' );
 
 		// Handle response.
 		if ( true === confirmResponse ) {
