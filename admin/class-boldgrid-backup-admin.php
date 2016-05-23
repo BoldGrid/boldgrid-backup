@@ -42,12 +42,24 @@ class Boldgrid_Backup_Admin {
 	 * Initialize the class and set its properties.
 	 *
 	 * @since 1.0
+	 *
+	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
+	 *
 	 * @param string $plugin_name The name of this plugin.
 	 * @param string $version The version of this plugin.
 	 */
 	public function __construct( $plugin_name, $version ) {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
+
+		// Connect to the WordPress Filesystem API.
+		global $wp_filesystem;
+
+		// Ensure the WP_Filesystem was initialized.
+		if ( true === empty( $wp_filesystem ) ) {
+			require_once ABSPATH . '/wp-admin/includes/file.php';
+			WP_Filesystem();
+		}
 	}
 
 	/**
