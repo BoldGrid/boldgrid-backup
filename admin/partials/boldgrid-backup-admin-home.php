@@ -94,7 +94,8 @@ foreach ( $archives as $key => $archive ) {
 <?php
 }
 ?>
-<p>
-	<a class='button' href='<?php echo $backup_url; ?>'>Backup Site Now</a>
+<p id='backup-site-now-section'>
+	<a id='backup-site-now' class='button' href='<?php echo $backup_url; ?>'>Backup Site Now</a>
+	<span class='spinner'></span>
 </p>
 </div>

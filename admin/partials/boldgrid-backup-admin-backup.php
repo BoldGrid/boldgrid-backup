@@ -85,3 +85,4 @@ if ( true === isset( $archive_info['error_code'] ) ) {
 }
 
 ?>
+<div id='end-backup'></div>

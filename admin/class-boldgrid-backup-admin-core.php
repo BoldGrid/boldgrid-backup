@@ -1018,7 +1018,9 @@ class Boldgrid_Backup_Admin_Core {
 				$archive_files[ $index ] = array(
 					'filepath' => $backup_directory . '/' . $fileinfo['name'],
 					'filename' => $fileinfo['name'],
-					'filedate' => date_i18n( 'n/j/Y g:i A', $fileinfo['lastmodunix'] ),
+					'filedate' => get_date_from_gmt(
+						date( 'Y-m-d H:i:s', $fileinfo['lastmodunix'] ), 'n/j/Y g:i A'
+					),
 					'filesize' => $fileinfo['size'],
 				);
 

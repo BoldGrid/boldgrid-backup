@@ -22,16 +22,19 @@
 	// Onload event listener.
 	$( function() {
 		// Declare variables.
-		var $downloadButtons, $restoreButtons, $deleteButtons;
+		var $downloadButtons, $restoreButtons, $deleteButtons, $backupSiteButton, $endBackup;
 
-		// Create a context selectors for the download buttons.
+		// Create a context selector for the download buttons.
 		$downloadButtons = $( '.action-download' );
 
-		// Create a context selectors for the restore buttons.
+		// Create a context selector for the restore buttons.
 		$restoreButtons = $( '.action-restore' );
 
-		// Create a context selectors for the delete buttons.
+		// Create a context selector for the delete buttons.
 		$deleteButtons = $( '.action-delete' );
+
+		// Create a context selector for the Backup Site Now button.
+		$backupSiteButton = $( '#backup-site-now' );
 
 		// On click action for download buttons.
 		$downloadButtons.on( 'click', self.downloadArchive );
@@ -41,6 +44,9 @@
 
 		// On click action for delete buttons.
 		$deleteButtons.on( 'click', self.deleteArchiveConfirm );
+
+		// On click action for the Backup Site Now button; show spinner.
+		$backupSiteButton.on( 'click', self.showBackupSpinner );
 } );
 
 	/**
@@ -144,6 +150,22 @@
 		} else {
 			return false;
 		}
+	}
+
+	/**
+	 * Show the spinner next to the Backup Site Now button.
+	 *
+	 * @since 1.0
+	 */
+	self.showBackupSpinner = function() {
+		// Declare variables.
+		var $this = $( this );
+
+		// Disable the Backup Site Now button.
+		$this.css( 'pointer-events', 'none' );
+
+		// Show the spinner.
+		$('#backup-site-now-section .spinner').addClass( 'is-active' );
 	}
 
 } )( jQuery );

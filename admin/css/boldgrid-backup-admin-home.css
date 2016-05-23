@@ -7,3 +7,7 @@
 	border: 0px;
 	text-align: left;
 }
+
+#backup-site-now-section .spinner {
+	float: none !important;
+}
