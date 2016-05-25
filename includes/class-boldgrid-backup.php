@@ -179,6 +179,11 @@ class Boldgrid_Backup {
 			10, 2
 		);
 
+		// Add a custom action to handle AJAX callback for creating a backup archive file.
+		$this->loader->add_action( 'wp_ajax_boldgrid_backup_now', $plugin_admin_core,
+			'boldgrid_backup_now_callback'
+		);
+
 		// Add a custom action to handle AJAX callback for archive file download buttons.
 		$this->loader->add_action( 'wp_ajax_download_archive_file', $plugin_admin_core,
 			'download_archive_file_callback'

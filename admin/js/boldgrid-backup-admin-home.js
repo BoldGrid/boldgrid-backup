@@ -16,7 +16,8 @@
 
 	/*
 	 * This script is passed "localizeScriptData" {"downloadNonce", "accessType", "restoreConfirmText",
-	 * "deleteConfirmText"} (via wp_localize_script() in "class-boldgrid-backup-admin-core.php").
+	 * "deleteConfirmText", "backupUrl"}
+	 * (via wp_localize_script() in "class-boldgrid-backup-admin-core.php").
 	 */
 
 	// Onload event listener.
@@ -45,8 +46,8 @@
 		// On click action for delete buttons.
 		$deleteButtons.on( 'click', self.deleteArchiveConfirm );
 
-		// On click action for the Backup Site Now button; show spinner.
-		$backupSiteButton.on( 'click', self.showBackupSpinner );
+		// On click action for the Backup Site Now button.
+		$backupSiteButton.on( 'click', self.backupNow );
 } );
 
 	/**
@@ -153,19 +154,72 @@
 	}
 
 	/**
-	 * Show the spinner next to the Backup Site Now button.
+	 * Perform a backup now.
 	 *
 	 * @since 1.0
 	 */
-	self.showBackupSpinner = function() {
+	self.backupNow = function() {
 		// Declare variables.
-		var $this = $( this );
+		var $this, $backupSiteSection, $backupSiteResults, backupNonce, wpHttpReferer,
+			errorCallback, data, markup;
 
-		// Disable the Backup Site Now button.
+		// Assign the current jQuery object.
+		$this = $( this );
+
+        // Disable the Backup Site Now link button.
+        $this.prop( 'disabled', true );
+
+        // Disable the Backup Site Now link button.
 		$this.css( 'pointer-events', 'none' );
 
+		// Create a context selector for the Backup Site Now results.
+		$backupSiteSection = $('#backup-site-now-section');
+
+		// Create a context selector for the Backup Site Now results.
+		$backupSiteResults = $( '#backup-site-now-results' );
+
 		// Show the spinner.
-		$('#backup-site-now-section .spinner').addClass( 'is-active' );
+		$backupSiteSection.find('.spinner').addClass( 'is-active' );
+
+		// Get the wpnonce and referer values.
+		backupNonce = $backupSiteSection.find( '#backup_auth' ).val();
+
+		wpHttpReferer = $backupSiteSection.find( '[name="_wp_http_referer"]' ).val();
+
+		// Create an error callback function.
+		errorCallback = function() {
+			// Show error message.
+			markup = '<div class="notice notice-error"><p>There was an error processing your request.  Please reload the page and try again.</p></div>';
+
+			$backupSiteResults.html( markup );
+		}
+
+		// Generate the data array.
+		data = {
+			'action' : 'boldgrid_backup_now',
+			'backup_auth' : backupNonce,
+			'_wp_http_referer' : wpHttpReferer
+		};
+
+		// Make the call.
+		$.ajax( {
+			url : ajaxurl,
+			data : data,
+			type : 'post',
+			dataType : 'text',
+			success : function( response ) {
+				// Insert markup.
+				$backupSiteResults.html( response );
+			},
+			error : errorCallback,
+			complete : function() {
+				// Hide the spinner.
+				$backupSiteSection.find('.spinner').removeClass( 'is-active' );
+			}
+		} );
+
+		// Return false so the page does not reload.
+		return false;
 	}
 
 } )( jQuery );

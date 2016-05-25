@@ -34,29 +34,41 @@ if ( false === empty( $archive_info ) ) {
 	if ( false === empty( $archive_info['filesize'] ) ) {
 		// Successful backup.
 		?>
-<p>File Path: <?php echo $archive_info['filepath']; ?></p>
-<p>File Size: <?php echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['filesize'] ); ?></p>
-<p>Total size: <?php echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] ); ?></p>
-<p>Compressor: <?php echo $archive_info['compressor']; ?></p>
+<div class="notice notice-success">
+	<p>File Path: <?php echo $archive_info['filepath']; ?></p>
+	<p>File Size: <?php echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['filesize'] ); ?></p>
+	<p>Total size: <?php echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] ); ?></p>
+	<p>Compressor: <?php echo $archive_info['compressor']; ?></p>
 <?php
 if ( true === isset( $archive_info['duration'] ) ) {
 	?>
-<p>Duration: <?php echo $archive_info['duration'] . ' seconds'; ?></p>
+	<p>Duration: <?php echo $archive_info['duration'] . ' seconds'; ?></p>
 <?php
 }
+?>
+</div>
+<?php
 	} elseif ( false === empty( $archive_info['dryrun'] ) ) {
 		// Dry run test.
 		?>
-<p>This was a dry run test.</p>
-<p>File Path: <?php echo $archive_info['filepath']; ?></p>
-<p>Total size: <?php echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] ); ?></p>
-<p>Compressor: <?php echo $archive_info['compressor']; ?></p>
-<p>Duration: <?php echo $archive_info['duration'] . ' seconds'; ?></p>
+<div class="notice notice-info"><p>This was a dry run test.</p></div>
+<div class="notice notice-success">
+	<p>File Path: <?php echo $archive_info['filepath']; ?></p>
+	<p>Total size: <?php echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] ); ?></p>
+	<p>Compressor: <?php echo $archive_info['compressor']; ?></p>
+<?php
+if ( true === isset( $archive_info['duration'] ) ) {
+	?>
+	<p>Duration: <?php echo $archive_info['duration'] . ' seconds'; ?></p>
+<?php
+}
+?>
+</div>
 <?php
 	} elseif ( false === empty( $archive_info['error'] ) ) {
 		// Error creating backup.
 		?>
-<p>There was an error creating a backup archive file.</p>
+<div class="notice notice-error"><p>There was an error creating a backup archive file.</p></div>
 <p>Error: <?php echo $archive_info['error']; ?></p>
 <?php
 if ( true === isset( $archive_info['error_code'] ) ) {
@@ -79,7 +91,7 @@ if ( true === isset( $archive_info['error_code'] ) ) {
 	} else {
 		// Unknown error.
 		?>
-<p>There was an unknown error creating a backup archive file.</p>
+<div class="notice notice-error"><p>There was an unknown error creating a backup archive file.</p></div>
 <?php
 	}
 }

@@ -17,11 +17,6 @@
 <h2>Backup Archives</h2>
 <?php
 
-// Create URL for backup now.
-$backup_url = get_admin_url( null, 'admin.php?page=boldgrid-backup&backup_now=1' );
-
-$backup_url = wp_nonce_url( $backup_url, 'boldgrid-backup-backup', 'backup_auth' );
-
 // Print the list of archive files.
 if ( false === empty( $archives ) ) {
 	?>
@@ -90,12 +85,18 @@ foreach ( $archives as $key => $archive ) {
 <?php
 } else {
 	?>
-<p>There are no files created.</p>
+<p>There are no archive files created.</p>
 <?php
 }
 ?>
-<p id='backup-site-now-section'>
-	<a id='backup-site-now' class='button' href='<?php echo $backup_url; ?>'>Backup Site Now</a>
-	<span class='spinner'></span>
-</p>
+<div id='backup-site-now-section'>
+	<form action='#' id='backup-site-now-form' method='POST'>
+		<?php wp_nonce_field( 'boldgrid_backup_now', 'backup_auth' ); ?>
+		<p>
+			<a id='backup-site-now' class='button'>Backup Site Now</a>
+			<span class='spinner'></span>
+		</p>
+	</form>
+</div>
+<div id='backup-site-now-results'></div>
 </div>

@@ -602,7 +602,7 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @since 1.0
 	 *
-	 * @see get_filelist
+	 * @see Boldgrid_Backup_Admin_Core::get_filelist()
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
 	 * @param string $dirpath A directory path, defaults to ABSPATH.
@@ -1146,27 +1146,15 @@ class Boldgrid_Backup_Admin_Core {
 	 * @since 1.0
 	 * @access private
 	 *
-	 * @return bool Whether or not the backup process was successful.
+	 * @see Boldgrid_Backup_Admin_Core::archive_files()
+	 *
+	 * @return array Archive information.
 	 */
 	private function backup_now() {
-		// If a restoration was not requested, then abort.
-		if ( true === empty( $_GET['backup_now'] ) ) {
-			return false;
-		}
-
-		// Verify nonce, or die.
-		check_admin_referer( 'boldgrid-backup-backup', 'backup_auth' );
-
 		// Perform the backup operation.
 		$archive_info = $this->archive_files( true );
 
-		// Display results, using the backup page template.
-		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup.php';
-
-		// Return status.
-		$status = ( false === empty( $archive_info['error'] ) );
-
-		return $status;
+		return $archive_info;
 	}
 
 	/**
@@ -1416,12 +1404,16 @@ class Boldgrid_Backup_Admin_Core {
 		// Create text for the deletion confirmation.
 		$delete_confirm_text = __( 'Please confirm the deletion the archive file' );
 
+		// Create URL for backup now.
+		$backup_url = get_admin_url( null, 'admin.php?page=boldgrid-backup&backup_now=1' );
+
 		// Create an array of data to pass to JS.
 		$localize_script_data = array(
 			'downloadNonce' => $download_nonce,
 			'accessType' => $access_type,
 			'restoreConfirmText' => $restore_confirm_text,
 			'deleteConfirmText' => $delete_confirm_text,
+			'backupUrl' => $backup_url,
 		);
 
 		// Add localize script data to the JS script.
@@ -1451,17 +1443,36 @@ class Boldgrid_Backup_Admin_Core {
 		// Include the home page template.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-home.php';
 
-		// If a backup operation is requested, then make a backup now.
-		if ( false === empty( $_GET['backup_now'] ) ) {
-			$this->backup_now();
-		} else {
-			// If a restoration operation is requested, then restore from a backup archive now.
-			if ( false === empty( $_GET['restore_now'] ) ) {
-				$this->restore_archive_file();
-			}
+		// If a restoration operation is requested, then restore from a backup archive now.
+		if ( false === empty( $_GET['restore_now'] ) ) {
+			$this->restore_archive_file();
 		}
 
 		return;
+	}
+
+	/**
+	 * Callback function for creating a backup archive file now via AJAX.
+	 *
+	 * @since 1.0
+	 *
+	 * @see Boldgrid_Backup_Admin_Core::backup_now()
+	 */
+	public function boldgrid_backup_now_callback() {
+		// Verify nonce.
+		if ( false === isset( $_POST['backup_auth'] ) ||
+			1 !== check_ajax_referer( 'boldgrid_backup_now', 'backup_auth', false ) ) {
+				wp_die( '<div class="error"><p>Security violation (invalid nonce).</p></div>' );
+		}
+
+		// Perform the backup operation.
+		$archive_info = $this->backup_now();
+
+		// Generate markup, using the backup page template.
+		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup.php';
+
+		// End nicely.
+		wp_die();
 	}
 
 	/**
@@ -1590,7 +1601,7 @@ class Boldgrid_Backup_Admin_Core {
 			$disk_space = $this->test->get_disk_space( false );
 
 			$disk_space[3] = $archive_info['total_size'];
-		}else{
+		} else {
 			$disk_space = $this->test->get_disk_space();
 		}
 
@@ -1662,6 +1673,7 @@ class Boldgrid_Backup_Admin_Core {
 	 * @since 1.0
 	 *
 	 * @param string $message A message to display in the admin notice.
+	 * @param string $class The class string for the div.
 	 * @return null
 	 */
 	public function notice_template( $message, $class = 'notice notice-error is-dismissible' ) {
