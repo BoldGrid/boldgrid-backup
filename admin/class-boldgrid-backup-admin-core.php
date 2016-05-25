@@ -1373,6 +1373,21 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return null
 	 */
 	public function page_backup_home() {
+		// Run the functionality tests.
+		$is_functional = $this->test->get_is_functional();
+
+		// If tests fail, then show an admin notice and abort.
+		if ( false === $is_functional ) {
+			do_action( 'boldgrid_backup_notice',
+				'Functionality test has failed.  You can go to <a href="' .
+				admin_url( 'admin.php?page=boldgrid-backup-test' ) .
+				'">Functionality Test</a> to view a report.',
+				'notice notice-error is-dismissible'
+			);
+
+			return;
+		}
+
 		// Enqueue CSS for the home page.
 		wp_enqueue_style( 'boldgrid-backup-admin-home',
 			plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-home.css', array(),
@@ -1538,21 +1553,23 @@ class Boldgrid_Backup_Admin_Core {
 	 */
 	public function page_backup_test() {
 		// Perform functionality tests.
-		if ( true !== $this->test->run_functionality_tests() ) {
+		$is_functional = $this->test->run_functionality_tests();
+
+		if ( false === $is_functional ) {
 			// Display an error notice.
 			do_action( 'boldgrid_backup_notice', 'Functionality test has failed.',
 				'notice notice-error is-dismissible'
 			);
 		}
 
+		// Get the backup directory path.
+		$backup_directory = $this->config->get_backup_directory();
+
 		// Get the WordPress version.
 		global $wp_version;
 
 		// Connect to the WordPress database via $wpdb.
 		global $wpdb;
-
-		// Get disk space information array.
-		$disk_space = $this->test->get_disk_space();
 
 		// Get the database size.
 		$db_size = $this->test->get_database_size();
@@ -1563,11 +1580,19 @@ class Boldgrid_Backup_Admin_Core {
 		// Get the database collation.
 		$db_collate = $wpdb->collate;
 
-		// Get archive info.
-		$archive_info = $this->archive_files( false );
+		// Get archive info, if plugin is functional.
+		if ( true === $is_functional ) {
+			$archive_info = $this->archive_files( false );
+		}
 
-		// Get the backup directory path.
-		$backup_directory = $this->config->get_backup_directory();
+		// Get disk space information array.
+		if ( false === empty( $archive_info['total_size'] ) ) {
+			$disk_space = $this->test->get_disk_space( false );
+
+			$disk_space[3] = $archive_info['total_size'];
+		}else{
+			$disk_space = $this->test->get_disk_space();
+		}
 
 		// Load template view.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-test.php';

@@ -146,11 +146,32 @@ class Boldgrid_Backup_Admin_Config {
 		// Get the user home directory.
 		$home_dir = $this->get_home_directory();
 
+		// Check if home directory is writable.
+		$home_dir_writable = $wp_filesystem->is_writable( $home_dir );
+
+		// If home directory is not writable, then log and abort.
+		if( false === $home_dir_writable ){
+			// Get the mode of the directory.
+			$home_dir_mode = $wp_filesystem->getchmod( $home_dir );
+
+			// Create error message.
+			$errormsg = 'Home directory "' . $home_dir . '" (' . $home_dir_mode . ') is not writable.';
+
+			// Log.
+			error_log( __METHOD__ . ': ' . $errormsg );
+
+			// Trigger an admin notice.
+			do_action( 'boldgrid_backup_notice', $errormsg, 'notice notice-error is-dismissible' );
+
+			// Abort.
+			return false;
+		}
+
 		// Define the backup directory name.
 		$backup_directory_path = $home_dir . '/boldgrid_backup';
 
 		// Check if the backup directory exists.
-		$backup_directory_exists = $wp_filesystem->is_dir( $backup_directory_path );
+		$backup_directory_exists = $wp_filesystem->exists( $backup_directory_path );
 
 		// If the backup directory does not exist, then attempt to create it.
 		if ( false === $backup_directory_exists ) {
@@ -158,16 +179,63 @@ class Boldgrid_Backup_Admin_Config {
 
 			// If mkdir failed, then abort.
 			if ( false === $backup_directory_created ) {
-				error_log( __METHOD__ . ': Could not create directory "' . $backup_directory_path . '"!' );
+				// Log.
+				error_log( __METHOD__ . ': ' );
 
+				// Create error message.
+				$errormsg = 'Could not create directory "' . $backup_directory_path . '".';
+
+				// Log.
+				error_log( __METHOD__ . ': ' . $errormsg );
+
+				// Trigger an admin notice.
+				do_action( 'boldgrid_backup_notice', $errormsg, 'notice notice-error is-dismissible' );
+
+				// Abort.
 				return false;
 			}
 		}
 
+		// Check if the backup directory is a directory.
+		$backup_directory_isdir = $wp_filesystem->is_dir( $backup_directory_path );
+
+		// If the backup directory does not exist, then attempt to create it.
+		if ( false === $backup_directory_isdir ) {
+			// Log.
+			error_log( __METHOD__ . ': ' );
+
+			// Create error message.
+			$errormsg = 'Backup directory "' . $backup_directory_path . '" is not a directory.';
+
+			// Log.
+			error_log( __METHOD__ . ': ' . $errormsg );
+
+			// Trigger an admin notice.
+			do_action( 'boldgrid_backup_notice', $errormsg, 'notice notice-error is-dismissible' );
+
+			// Abort.
+			return false;
+		}
+
 		// Check if the backup directory is writable, abort if not.
 		if ( false === $wp_filesystem->is_writable( $backup_directory_path ) ) {
-			error_log( __METHOD__ . ': Could not create directory "' . $backup_directory_path . '"!' );
+			// Get the mode of the directory.
+			$backup_directory_mode = $wp_filesystem->getchmod( $backup_directory_path );
 
+			// Log.
+			error_log( __METHOD__ . ': ' );
+
+			// Create error message.
+			$errormsg = 'Backup directory "' . $backup_directory_path . '" ('
+				. $backup_directory_mode . ') is not writable.';
+
+			// Log.
+			error_log( __METHOD__ . ': ' . $errormsg );
+
+			// Trigger an admin notice.
+			do_action( 'boldgrid_backup_notice', $errormsg, 'notice notice-error is-dismissible' );
+
+			// Abort.
 			return false;
 		}
 

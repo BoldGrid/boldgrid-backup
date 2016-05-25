@@ -531,6 +531,21 @@ class Boldgrid_Backup_Admin_Settings {
 	 * @return null
 	 */
 	public function page_backup_settings() {
+		// Run the functionality tests.
+		$is_functional = $this->core->test->get_is_functional();
+
+		// If tests fail, then show an admin notice and abort.
+		if ( false === $is_functional ) {
+			do_action( 'boldgrid_backup_notice',
+				'Functionality test has failed.  You can go to <a href="' .
+				admin_url( 'admin.php?page=boldgrid-backup-test' ) .
+				'">Functionality Test</a> to view a report.',
+				'notice notice-error is-dismissible'
+			);
+
+			return;
+		}
+
 		// Display warning on resource usage and backups.
 		do_action( 'boldgrid_backup_notice',
 			'Warning: Making backups uses resources. When the system is backing up, it will slow down your site for visitors. Furthermore, when the database itself is being copied, your site must “pause” temporarily to preserve data integrity. For most sites, the pause is typically a few seconds and is not noticed by visitors. Large sites take longer though. Please keep the number of backups you have stored and how often you make those backups to a minimum.',

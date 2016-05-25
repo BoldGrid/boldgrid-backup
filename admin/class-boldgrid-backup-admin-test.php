@@ -311,9 +311,10 @@ class Boldgrid_Backup_Admin_Test {
 	 *
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
+	 * @param bool $get_wp_size Whether of not to include the size of the WordPress directory.
 	 * @return array An array containing disk space (total, used, available, WordPress directory).
 	 */
-	public function get_disk_space() {
+	public function get_disk_space( $get_wp_size = true ) {
 		// Connect to the WordPress Filesystem API.
 		global $wp_filesystem;
 
@@ -335,8 +336,13 @@ class Boldgrid_Backup_Admin_Test {
 			$disk_free_space = disk_free_space( $home_dir );
 			$disk_used_space = $disk_total_space - $disk_free_space;
 
+			// Initialize $wp_root_size.
+			$wp_root_size = false;
+
 			// Get the size of the filtered WordPress installation root directory (ABSPATH).
-			$wp_root_size = $this->get_wp_size();
+			if ( true === $get_wp_size ) {
+				$wp_root_size = $this->get_wp_size();
+			}
 
 			// Return the disk information array.
 			return array(
@@ -355,9 +361,17 @@ class Boldgrid_Backup_Admin_Test {
 	 *
 	 * @see get_filtered_filelist
 	 *
-	 * @return int The total size for the WordPress file system, in bytes.
+	 * @return int|bool The total size for the WordPress file system in bytes, or FALSE on error.
 	 */
 	private function get_wp_size() {
+		// Perform functionality tests.
+		$is_functional = $this->run_functionality_tests();
+
+		// If plugin is not functional, then return FALSE.
+		if ( false === $is_functional ) {
+			return false;
+		}
+
 		// Get the filtered file list.
 		$filelist = $this->core->get_filtered_filelist( ABSPATH );
 
