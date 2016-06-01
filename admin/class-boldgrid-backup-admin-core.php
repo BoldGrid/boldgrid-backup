@@ -602,7 +602,7 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @since 1.0
 	 *
-	 * @see Boldgrid_Backup_Admin_Core::get_filelist()
+	 * @see Boldgrid_Backup_Admin_Core::get_filelist().
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
 	 * @param string $dirpath A directory path, defaults to ABSPATH.
@@ -692,15 +692,15 @@ class Boldgrid_Backup_Admin_Core {
 	 * Create an archive file containing the WordPress files.
 	 *
 	 * @since 1.0
-	 * @access private
 	 *
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
+	 * @see Boldgrid_Backup_Admin_Core::backup_database().
 	 *
 	 * @param bool $save A switch to save the archive file. Default is FALSE.
 	 * @param bool $dryrun An optional switch to perform a dry run test.
 	 * @return array An array of archive file information.
 	 */
-	private function archive_files( $save = false, $dryrun = false ) {
+	public function archive_files( $save = false, $dryrun = false ) {
 		// Check if functional.
 		if ( true !== $this->test->run_functionality_tests() ) {
 			// Display an error notice, if not already on the test page.
@@ -721,6 +721,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Initialize return array and add "compressor" and "save" keys.
 		$info = array(
+			'mode' => 'backup',
 			'dryrun' => $dryrun,
 			'compressor' => null,
 			'filesize' => 0,
@@ -886,16 +887,16 @@ class Boldgrid_Backup_Admin_Core {
 				break;
 		}
 
-		if ( true !== $dryrun ) {
+		if ( true === $save && true !== $dryrun ) {
 			// Modify the archive file permissions to help protect from public access.
 			$wp_filesystem->chmod( $info['filepath'], 0600 );
 
 			// Add some statistics to the return.
 			$info['filesize'] = $wp_filesystem->size( $info['filepath'] );
-		}
 
-		// Delete the temporary database dump file.
-		$wp_filesystem->delete( $this->db_dump_filepath, false, 'f' );
+			// Delete the temporary database dump file.
+			$wp_filesystem->delete( $this->db_dump_filepath, false, 'f' );
+		}
 
 		// Stop timer.
 		$time_stop = microtime( true );
@@ -934,7 +935,7 @@ class Boldgrid_Backup_Admin_Core {
 			$body .= __( 'Compressor used: ' ) . $info['compressor'] . "\n\n";
 
 			if ( defined( 'DOING_CRON' ) ) {
-				$body .= __( "The backup request was made via WP-CRON (WordPress task scheduler).\n\n" );
+				$body .= __( "The backup request was made via CRON (task scheduler).\n\n" );
 			}
 
 			$body .= __(
@@ -1138,23 +1139,6 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Return deletion status.
 		return $delete_ok;
-	}
-
-	/**
-	 * Backup and create an archive file.
-	 *
-	 * @since 1.0
-	 * @access private
-	 *
-	 * @see Boldgrid_Backup_Admin_Core::archive_files()
-	 *
-	 * @return array Archive information.
-	 */
-	private function backup_now() {
-		// Perform the backup operation.
-		$archive_info = $this->archive_files( true );
-
-		return $archive_info;
 	}
 
 	/**
@@ -1456,7 +1440,7 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @since 1.0
 	 *
-	 * @see Boldgrid_Backup_Admin_Core::backup_now()
+	 * @see Boldgrid_Backup_Admin_Core::archive_files()
 	 */
 	public function boldgrid_backup_now_callback() {
 		// Verify nonce.
@@ -1466,7 +1450,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Perform the backup operation.
-		$archive_info = $this->backup_now();
+		$archive_info = $this->archive_files( true );
 
 		// Generate markup, using the backup page template.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup.php';
@@ -1682,5 +1666,96 @@ class Boldgrid_Backup_Admin_Core {
 		printf( '<div class="%1$s"><p>%2$s</p></div>', $class, $message );
 
 		return;
+	}
+
+	/**
+	 * Print cron report.
+	 *
+	 * @since 1.0
+	 *
+	 * @param array $archive_info An array of archive file information.
+	 */
+	public function print_cron_report( $archive_info ) {
+		// Validate mode.
+		if ( true === empty( $archive_info['mode'] ) ) {
+			die( __( 'Error: A mode was not specified.' ) . PHP_EOL );
+		}
+
+		$valid_modes = array(
+			'backup',
+			'restore',
+		);
+
+		if ( false === in_array( $archive_info['mode'], $valid_modes, true ) ) {
+			die( __( 'Error: Invalid mode "' . $archive_info['mode'] . '".' ) . PHP_EOL );
+		}
+
+		// Create action name.
+		switch ( $archive_info['mode'] ) {
+			case 'backup' :
+				$action_name = 'creating';
+				break;
+
+			case 'restore' :
+				$action_name = 'restoring';
+				break;
+
+			default :
+				$action_name = 'handling';
+				break;
+		}
+
+		// Print report.
+		if ( false === empty( $archive_info['error'] ) ) {
+			// Error.
+			echo __( 'There was an error ' . $action_name . 'backup archive file.' ) . PHP_EOL;
+			echo __( 'Error: ' . $archive_info['error'] ) . PHP_EOL;
+			echo __( 'Error Details: ' );
+
+			if ( true === isset( $archive_info['error_message'] ) ) {
+				echo __( $archive_info['error_message'] );
+			} else {
+				echo __( 'Unknown' );
+			}
+
+			echo ' (';
+
+			if ( true === isset( $archive_info['error_code'] ) ) {
+				echo $archive_info['error_code'];
+			} else {
+				echo '?';
+			}
+
+			echo')' . PHP_EOL;
+		} elseif ( false === empty( $archive_info['filesize'] ) || false === empty( $archive_info['dryrun'] ) ) {
+			// Dry run.
+			if ( false === empty( $archive_info['filepath'] ) ) {
+				echo __( 'File Path: ' ) . $archive_info['filepath'] . PHP_EOL;
+			}
+
+			if ( false === empty( $archive_info['filesize'] ) ) {
+				echo __( 'File Size: ' ) .
+				Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['filesize'] ) .
+				PHP_EOL;
+			}
+
+			if ( false === empty( $archive_info['total_size'] ) ) {
+				echo __( 'Total size: ' ) .
+					Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] ) .
+					PHP_EOL;
+			}
+
+			if ( false === empty( $archive_info['compressor'] ) ) {
+				echo __( 'Compressor: ' ) . $archive_info['compressor'] . PHP_EOL;
+			}
+
+			if ( true === isset( $archive_info['duration'] ) ) {
+				echo __( 'Duration: ' . $archive_info['duration'] . ' seconds' ) . PHP_EOL;
+			}
+		} else {
+			// Unknown error.
+			echo __( 'There was an unknown error ' . $action_name . ' a backup archive file.' ) .
+			PHP_EOL;
+		}
 	}
 }

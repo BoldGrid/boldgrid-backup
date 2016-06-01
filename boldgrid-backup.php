@@ -63,7 +63,7 @@ register_deactivation_hook( __FILE__, 'deactivate_boldgrid_backup' );
 /**
  * The core plugin class that is used to define internationalization and admin-specific hooks.
  */
-if ( is_admin() ) {
+if ( true === is_admin() || ( true === defined( 'DOING_CRON' ) && DOING_CRON ) ) {
 	require BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup.php';
 }
 
@@ -81,7 +81,7 @@ function run_boldgrid_backup() {
 	$plugin->run();
 }
 
-// Load the plugin only if on a wp-admin page.
-if ( true === is_admin() ) {
+// Load the plugin only if on a wp-admin page or when DOING_CRON.
+if ( true === is_admin() || ( true === defined( 'DOING_CRON' ) && DOING_CRON ) ) {
 	run_boldgrid_backup();
 }

@@ -41,7 +41,7 @@ if ( false === empty( $archive_info ) ) {
 	<p>Compressor: <?php echo $archive_info['compressor']; ?></p>
 <?php
 if ( true === isset( $archive_info['duration'] ) ) {
-	?>
+?>
 	<p>Duration: <?php echo $archive_info['duration'] . ' seconds'; ?></p>
 <?php
 }
@@ -50,7 +50,7 @@ if ( true === isset( $archive_info['duration'] ) ) {
 <?php
 	} elseif ( false === empty( $archive_info['dryrun'] ) ) {
 		// Dry run test.
-		?>
+?>
 <div class="notice notice-info"><p>This was a dry run test.</p></div>
 <div class="notice notice-success">
 	<p>File Path: <?php echo $archive_info['filepath']; ?></p>
@@ -58,7 +58,7 @@ if ( true === isset( $archive_info['duration'] ) ) {
 	<p>Compressor: <?php echo $archive_info['compressor']; ?></p>
 <?php
 if ( true === isset( $archive_info['duration'] ) ) {
-	?>
+?>
 	<p>Duration: <?php echo $archive_info['duration'] . ' seconds'; ?></p>
 <?php
 }
@@ -70,27 +70,23 @@ if ( true === isset( $archive_info['duration'] ) ) {
 		?>
 <div class="notice notice-error"><p>There was an error creating a backup archive file.</p></div>
 <p>Error: <?php echo $archive_info['error']; ?></p>
-<?php
-if ( true === isset( $archive_info['error_code'] ) ) {
-	?>
 <p>Error Details: <?php
 if ( true === isset( $archive_info['error_message'] ) ) {
 	echo $archive_info['error_message'];
 } else {
 	echo 'Unknown';
 }
-	?> (<?php
+?> (<?php
 if ( true === isset( $archive_info['error_code'] ) ) {
 	echo $archive_info['error_code'];
 } else {
 	echo '?';
 }
-	?>)</p>
+?>)</p>
 <?php
-}
 	} else {
 		// Unknown error.
-		?>
+?>
 <div class="notice notice-error"><p>There was an unknown error creating a backup archive file.</p></div>
 <?php
 	}

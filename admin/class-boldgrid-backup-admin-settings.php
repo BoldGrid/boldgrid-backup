@@ -489,8 +489,8 @@ class Boldgrid_Backup_Admin_Settings {
 
 			$days_scheduled_list = rtrim( $days_scheduled_list, ',' );
 
-			$entry .= $days_scheduled_list . ' curl -sk ' . plugin_dir_url( __FILE__ ) .
-			'boldgrid-backup-cron.php';
+			$entry .= $days_scheduled_list . ' php -qf "' . dirname( dirname( __FILE__ ) ) .
+			'/boldgrid-backup-cron.php" mode=backup HTTP_HOST=' . $_SERVER['HTTP_HOST'];
 
 			if ( false === $this->core->test->is_windows() ) {
 				$entry .= ' > /dev/null 2>&1';
