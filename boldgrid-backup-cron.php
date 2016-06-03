@@ -87,7 +87,7 @@ switch ( $input['mode'] ) {
 	case 'backup' :
 		echo __( 'Starting backup operation' );
 
-		if( true === $dry_run ) {
+		if ( true === $dry_run ) {
 			echo __( ' (dry-run)' );
 		}
 
@@ -101,14 +101,19 @@ switch ( $input['mode'] ) {
 	case 'restore' :
 		echo __( 'Starting restoration operation' );
 
-		if( true === $dry_run ) {
+		if ( true === $dry_run ) {
 			echo __( ' (dry-run)' );
 		}
 
 		echo '...';
 
-		// @todo Finish restoration process and call it here.
-		$archive_info = null;
+		// Set GET variables.
+		$_GET['restore_now'] = 1;
+		$_GET['archive_key'] = ( false === empty( $input['archive_key'] ) ? $input['archive_key'] : null );
+		$_GET['archive_filename'] = ( false === empty( $input['archive_filename'] ) ? $input['archive_filename'] : null );
+
+		// Call the restore function.
+		$archive_info = $boldgrid_backup_core->restore_archive_file();
 
 		echo __( 'Done.' ) . PHP_EOL;
 		break;
@@ -116,6 +121,11 @@ switch ( $input['mode'] ) {
 	default :
 		die( __( 'Error: An unknown error occurred.' ) );
 		break;
+}
+
+// Check return for mode.
+if ( true === empty( $archive_info['mode'] ) ) {
+	$archive_info['mode'] = $input['mode'];
 }
 
 // Print report.
