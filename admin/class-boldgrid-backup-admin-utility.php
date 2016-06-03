@@ -136,4 +136,57 @@ class Boldgrid_Backup_Admin_Utility {
 
 		return $message;
 	}
+
+	/**
+	 * Make a directory or file writable, if exists.
+	 *
+	 * @since 1.0
+	 *
+	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
+	 *
+	 * @static
+	 *
+	 * @param string $filepath A path to a directory or file.
+	 * @return bool Success.
+	 */
+	public static function make_writable( $filepath ) {
+		// Validate file path string.
+		$filepath = realpath( $filepath );
+
+		if ( true === empty( $filepath ) ) {
+			return true;
+		}
+
+		// Connect to the WordPress Filesystem API.
+		global $wp_filesystem;
+
+		// If path exists and is not writable, then make writable.
+		if ( true === $wp_filesystem->exists( $filepath ) ) {
+			if ( false === $wp_filesystem->is_writable( $filepath ) ) {
+				if ( true === $wp_filesystem->is_dir( $filepath ) ) {
+					// Is a directory.
+					if ( false === $wp_filesystem->chmod( $filepath, 0755 ) ) {
+						// Error chmod 755 a directory.
+						error_log(
+							__METHOD__ . ': Error using chmod 0755 on directory "' . $filepath . '".'
+						);
+
+						return false;
+					}
+				} else {
+					// Is a file.
+					if ( false === $wp_filesystem->chmod( $filepath, 0644 ) ) {
+						// Error chmod 644 a file.
+						error_log(
+							__METHOD__ . ': Error using chmod 0644 on file "' . $filepath . '".'
+						);
+
+						return false;
+					}
+				}
+			}
+		}
+
+		return true;
+	}
 }

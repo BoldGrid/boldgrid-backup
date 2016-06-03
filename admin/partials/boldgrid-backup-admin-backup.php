@@ -13,7 +13,13 @@
 
 ?>
 
+<?php
+if ( true === empty( $_GET['restore_now'] ) ) {
+?>
 <h2>Backup Results</h2>
+<?php
+}
+?>
 
 <?php
 
@@ -31,32 +37,48 @@
  *        }
  */
 if ( false === empty( $archive_info ) ) {
-	if ( false === empty( $archive_info['filesize'] ) ) {
-		// Successful backup.
-		?>
-<div class="notice notice-success">
-	<p>File Path: <?php echo $archive_info['filepath']; ?></p>
-	<p>File Size: <?php echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['filesize'] ); ?></p>
-	<p>Total size: <?php echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] ); ?></p>
-	<p>Compressor: <?php echo $archive_info['compressor']; ?></p>
-<?php
-if ( true === isset( $archive_info['duration'] ) ) {
-?>
-	<p>Duration: <?php echo $archive_info['duration'] . ' seconds'; ?></p>
-<?php
-}
-?>
-</div>
-<?php
-	} elseif ( false === empty( $archive_info['dryrun'] ) ) {
-		// Dry run test.
+	if ( false === empty( $archive_info['dryrun'] ) ) {
 ?>
 <div class="notice notice-info"><p>This was a dry run test.</p></div>
+<?php
+	}
+
+	if ( true === empty( $archive_info['error'] ) ) {
+		// Successful backup.
+?>
 <div class="notice notice-success">
+	<p><?php
+	if ( false === empty( $_GET['restore_now'] ) ) {
+		echo 'The selected archive file has been successfully restored.';
+	} else {
+		echo 'A backup archive file has been created successfully.';
+	}
+?></p>
+<?php
+if ( false === empty( $archive_info['filepath'] ) ) {
+?>
 	<p>File Path: <?php echo $archive_info['filepath']; ?></p>
+<?php
+}
+
+if ( false === empty( $archive_info['filesize'] ) ) {
+?>
+	<p>File Size: <?php echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['filesize'] ); ?></p>
+<?php
+}
+
+if ( false === empty( $archive_info['total_size'] ) ) {
+?>
 	<p>Total size: <?php echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] ); ?></p>
+<?php
+}
+
+if ( false === empty( $archive_info['compressor'] ) ) {
+?>
 	<p>Compressor: <?php echo $archive_info['compressor']; ?></p>
 <?php
+}
+
 if ( true === isset( $archive_info['duration'] ) ) {
 ?>
 	<p>Duration: <?php echo $archive_info['duration'] . ' seconds'; ?></p>
@@ -65,10 +87,23 @@ if ( true === isset( $archive_info['duration'] ) ) {
 ?>
 </div>
 <?php
-	} elseif ( false === empty( $archive_info['error'] ) ) {
+	} else {
 		// Error creating backup.
 		?>
-<div class="notice notice-error"><p>There was an error creating a backup archive file.</p></div>
+<div class="notice notice-error"><p><?php
+if ( false === empty( $_GET['restore_now'] ) ) {
+	echo __( 'There was an error restoring the selected backup archive file.' );
+} else {
+	echo __( 'There was an error creating a backup archive file.' );
+}
+?></p></div>
+<?php
+if ( false === empty( $archive_info['filepath'] ) ) {
+?>
+	<p>File Path: <?php echo $archive_info['filepath']; ?></p>
+<?php
+}
+?>
 <p>Error: <?php echo $archive_info['error']; ?></p>
 <p>Error Details: <?php
 if ( true === isset( $archive_info['error_message'] ) ) {
@@ -83,11 +118,6 @@ if ( true === isset( $archive_info['error_code'] ) ) {
 	echo '?';
 }
 ?>)</p>
-<?php
-	} else {
-		// Unknown error.
-?>
-<div class="notice notice-error"><p>There was an unknown error creating a backup archive file.</p></div>
 <?php
 	}
 }

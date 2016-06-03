@@ -414,15 +414,13 @@ class Boldgrid_Backup_Admin_Core {
 	private function backup_database() {
 		// Check if functional.
 		if ( true !== $this->test->run_functionality_tests() ) {
-			// Display an error notice, if not already on the test page.
-			if ( false === isset( $_GET['page'] ) || 'boldgrid-backup-test' !== $_GET['page'] ) {
-				do_action( 'boldgrid_backup_notice',
-					'Functionality test has failed.  You can go to <a href="' .
-					admin_url( 'admin.php?page=boldgrid-backup-test' ) .
-					'">Functionality Test</a> to view a report.',
-					'notice notice-error is-dismissible'
-	 			);
-			}
+			// Display an error notice.
+			do_action( 'boldgrid_backup_notice',
+				'Functionality test has failed.  You can go to <a href="' .
+				admin_url( 'admin.php?page=boldgrid-backup-test' ) .
+				'">Functionality Test</a> to view a report.',
+				'notice notice-error is-dismissible'
+			);
 
 			return false;
 		}
@@ -442,6 +440,7 @@ class Boldgrid_Backup_Admin_Core {
 		if ( true !== $wp_filesystem->is_writable( $backup_directory ) ) {
 			return false;
 		}
+
 		// Create a mysql defaults file.
 		$defaults_filepath = $backup_directory . '/mysqldump.cnf';
 
@@ -495,18 +494,19 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Set the PHP timeout limit to at least 300 seconds.
 		set_time_limit(
-		( ( $max_execution_time = ini_get( 'max_execution_time' ) ) > 300 ? $max_execution_time : 300 ) );
+			( ( $max_execution_time = ini_get( 'max_execution_time' ) ) > 300 ? $max_execution_time : 300 )
+		);
 
 		// Execute the command.
 		$output = $this->execute_command( $command, null, $status );
+
+		// Remove the defaults file.
+		$wp_filesystem->delete( $defaults_filepath, false, 'f' );
 
 		// Check command status.
 		if ( false === $output || true !== $status ) {
 			return false;
 		}
-
-		// Remove the defaults file.
-		$wp_filesystem->delete( $defaults_filepath, false, 'f' );
 
 		// Check if the dump file was written.
 		if ( false === $wp_filesystem->exists( $db_dump_filepath ) ) {
@@ -515,6 +515,101 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Limit file permissions to the dump file.
 		$wp_filesystem->chmod( $db_dump_filepath, 0600 );
+
+		// Return success.
+		return true;
+	}
+
+	/**
+	 * Restore the WordPress database from a dump file.
+	 *
+	 * @since 1.0
+	 * @access private
+	 *
+	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
+	 * @global wpdb $wpdb The WordPress database class object.
+	 *
+	 * @param string $db_dump_filepath FIle path to the mysql dump file.
+	 * @return bool Status of the operation.
+	 */
+	private function restore_database( $db_dump_filepath ) {
+		// Check input.
+		if ( true === empty( $db_dump_filepath ) ) {
+			return false;
+		}
+
+		// Check if functional.
+		if ( true !== $this->test->run_functionality_tests() ) {
+			// Display an error notice.
+			do_action( 'boldgrid_backup_notice',
+				'Functionality test has failed.  You can go to <a href="' .
+				admin_url( 'admin.php?page=boldgrid-backup-test' ) .
+				'">Functionality Test</a> to view a report.',
+				'notice notice-error is-dismissible'
+			);
+
+			return false;
+		}
+
+		// If mysqldump is not available, then fail.
+		if ( true !== $this->test->is_mysqldump_available() ) {
+			return false;
+		}
+
+		// Get the backup directory path.
+		$backup_directory = $this->config->get_backup_directory();
+
+		// Connect to the WordPress Filesystem API.
+		global $wp_filesystem;
+
+		// Check if the dump file is readable.
+		if ( true !== $wp_filesystem->is_readable( $backup_directory ) ) {
+			return false;
+		}
+
+		// Check if the backup directory is writable.
+		if ( true !== $wp_filesystem->is_writable( $backup_directory ) ) {
+			return false;
+		}
+
+		// Create a mysql defaults file.
+		$defaults_filepath = $backup_directory . '/mysqldump.cnf';
+
+		$defaults_file_data = '[client]' . PHP_EOL . 'host=' . DB_HOST . PHP_EOL . 'user=' . DB_USER .
+			 PHP_EOL . 'password=' . DB_PASSWORD . PHP_EOL;
+
+		$status = $wp_filesystem->put_contents( $defaults_filepath, $defaults_file_data, 0600 );
+
+		// Check if the defaults file was written.
+		if ( true !== $status || false === $wp_filesystem->exists( $defaults_filepath ) ) {
+			return false;
+		}
+
+		// Save the file path.
+		$this->db_dump_filepath = $db_dump_filepath;
+
+		// Build a command to restore the database with mysqldump.
+		$command = 'mysql --defaults-file=' . $defaults_filepath . ' --force --one-database ' .
+		DB_NAME . ' < ' . $db_dump_filepath;
+
+		// Set the PHP timeout limit to at least 300 seconds.
+		set_time_limit(
+			( ( $max_execution_time = ini_get( 'max_execution_time' ) ) > 300 ? $max_execution_time : 300 )
+		);
+
+		// Execute the command.
+		$output = $this->execute_command( $command, null, $status );
+
+		// Remove the defaults file.
+		$wp_filesystem->delete( $defaults_filepath, false, 'f' );
+
+		// Check command status.
+		if ( false === $output || true !== $status ) {
+			return false;
+		}
+
+		// Delete the dump file.
+		$wp_filesystem->delete( $db_dump_filepath, false, 'f' );
 
 		// Return success.
 		return true;
@@ -1001,12 +1096,19 @@ class Boldgrid_Backup_Admin_Core {
 			}
 		);
 
+		// Create a site identifier.
+		$site_id = Boldgrid_Backup_Admin_Utility::create_site_id();
+
 		// Initialize $index.
 		$index = -1;
 
 		// Filter the array.
 		foreach ( $dirlist as $fileinfo ) {
-			if ( 1 === preg_match( '/^boldgrid-backup-.*\.(zip|tar\.gz|b2z|zlib|lzf)$/', $fileinfo['name'] )
+			if (
+				1 === preg_match(
+					'/^boldgrid-backup-' . $site_id . '-.*\.(zip|tar\.gz|b2z|zlib|lzf)$/',
+					$fileinfo['name']
+				)
 			) {
 				// Increment the index.
 				$index++;
@@ -1142,33 +1244,91 @@ class Boldgrid_Backup_Admin_Core {
 	}
 
 	/**
-	 * Restore from a specified archive file.
+	 * Get the newest database dump file path from a restored archive.
 	 *
 	 * @since 1.0
 	 * @access private
 	 *
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
+	 * @return string File path to the database dump file.
+	 */
+	private function get_dump_file() {
+		// Connect to the WordPress Filesystem API.
+		global $wp_filesystem;
+
+		// Initialize $db_dump_filepath.
+		$db_dump_filepath = '';
+
+		// Find all backups.
+		$dirlist = $wp_filesystem->dirlist( ABSPATH, false, false );
+
+		// If no files were found, then return an empty array.
+		if ( true === empty( $dirlist ) ) {
+			return '';
+		}
+
+		// Sort the dirlist array by "name" descending.
+		uasort( $dirlist,
+			function ( $a, $b ) {
+				if ( $a['name'] < $b['name'] ) {
+					return 1;
+				}
+
+				if ( $a['name'] > $b['name'] ) {
+					return - 1;
+				}
+
+				return 0;
+			}
+		);
+
+		// Find the first occurrence.
+		foreach ( $dirlist as $fileinfo ) {
+			if ( 1 === preg_match( '/' . DB_NAME . '\.[\d]+-[\d]+\.sql$/',$fileinfo['name'] ) ) {
+				$db_dump_filepath = ABSPATH . $fileinfo['name'];
+				break;
+			}
+		}
+
+		// Return the array.
+		return $db_dump_filepath;
+	}
+
+	/**
+	 * Restore from a specified archive file.
+	 *
+	 * @since 1.0
+	 *
+	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
+	 *
 	 * @return array An array of archive file information.
 	 */
-	private function restore_archive_file() {
+	public function restore_archive_file() {
+		// Check if DOING_CRON.
+		$doing_cron = ( true === defined( 'DOING_CRON' ) && DOING_CRON );
+
 		// If a restoration was not requested, then abort.
 		if ( true === empty( $_GET['restore_now'] ) ) {
 			return false;
 		}
 
-		// Verify nonce, or die.
-		check_admin_referer( 'boldgrid-backup-restore', 'restore_auth' );
+		// If not DOING_CRON and not run from CLI, then verify nonce, or die.
+		if ( false === $doing_cron && 'cli' !== php_sapi_name() ) {
+			check_admin_referer( 'boldgrid-backup-restore', 'restore_auth' );
+		}
 
 		// Check if functional.
 		if ( true !== $this->test->run_functionality_tests() ) {
-			// Display an error notice.
-			do_action( 'boldgrid_backup_notice',
-				'Functionality test has failed.  You can go to <a href="' .
-				 admin_url( 'admin.php?page=boldgrid-backup-test' ) .
-				 '">Functionality Test</a> to view a report.',
-				'notice notice-error is-dismissible'
-			);
+			// Display an error notice, if not DOING_CRON.
+			if ( false === $doing_cron ) {
+				do_action( 'boldgrid_backup_notice',
+					'Functionality test has failed.  You can go to <a href="' .
+					 admin_url( 'admin.php?page=boldgrid-backup-test' ) .
+					 '">Functionality Test</a> to view a report.',
+					'notice notice-error is-dismissible'
+				);
+			}
 
 			return array(
 				'error' => 'Functionality tests fail.',
@@ -1186,10 +1346,17 @@ class Boldgrid_Backup_Admin_Core {
 		} else {
 			$restore_ok = false;
 
-			do_action( 'boldgrid_backup_notice',
-				'Invalid key for the selected archive file.',
-				'notice notice-error is-dismissible'
-			);
+			// Display an error notice, if not DOING_CRON.
+			if ( false === $doing_cron ) {
+				do_action( 'boldgrid_backup_notice',
+					'Invalid key for the selected archive file.',
+					'notice notice-error is-dismissible'
+				);
+			} else {
+				return array(
+					'error' => 'Invalid key for the selected archive file.',
+				);
+			}
 		}
 
 		// Validate archive_filename.
@@ -1198,10 +1365,17 @@ class Boldgrid_Backup_Admin_Core {
 		} else {
 			$restore_ok = false;
 
-			do_action( 'boldgrid_backup_notice',
-				'Invalid filename for the selected archive file.',
-				'notice notice-error is-dismissible'
-			);
+			// Display an error notice, if not DOING_CRON.
+			if ( false === $doing_cron ) {
+				do_action( 'boldgrid_backup_notice',
+					'Invalid filename for the selected archive file.',
+					'notice notice-error is-dismissible'
+				);
+			} else {
+				return array(
+					'error' => 'Invalid filename for the selected archive file.',
+				);
+			}
 		}
 
 		// Get archive list.
@@ -1213,10 +1387,17 @@ class Boldgrid_Backup_Admin_Core {
 		if ( true === $restore_ok && true === empty( $archives ) ) {
 			$restore_ok = false;
 
-			do_action( 'boldgrid_backup_notice',
-				'No archive files were found.',
-				'notice notice-error is-dismissible'
-			);
+			// Display an error notice, if not DOING_CRON.
+			if ( false === $doing_cron ) {
+				do_action( 'boldgrid_backup_notice',
+					'No archive files were found.',
+					'notice notice-error is-dismissible'
+				);
+			} else {
+				return array(
+					'error' => 'No archive files were found.',
+				);
+			}
 		}
 
 		// Locate the filename by key number.
@@ -1228,10 +1409,17 @@ class Boldgrid_Backup_Admin_Core {
 		if ( true === $restore_ok && $archive_filename !== $filename ) {
 			$restore_ok = false;
 
-			do_action( 'boldgrid_backup_notice',
-				'The selected archive file was not found.',
-				'notice notice-error is-dismissible'
-			);
+			// Display an error notice, if not DOING_CRON.
+			if ( false === $doing_cron ) {
+				do_action( 'boldgrid_backup_notice',
+					'The selected archive file was not found.',
+					'notice notice-error is-dismissible'
+				);
+			} else {
+				return array(
+					'error' => 'The selected archive file was not found.',
+				);
+			}
 		}
 
 		// Get the file path to delete.
@@ -1245,10 +1433,13 @@ class Boldgrid_Backup_Admin_Core {
 			$filesize = $wp_filesystem->size( $filepath );
 		} else {
 			$filesize = 0;
+
+			$restore_ok = false;
 		}
 
 		// Populate $info.
 		$info = array(
+			'mode' => 'restore',
 			'filename' => $archive_filename,
 			'filepath' => $filepath,
 			'filesize' => $filesize,
@@ -1261,26 +1452,66 @@ class Boldgrid_Backup_Admin_Core {
 			// Prevent this script from dying.
 			ignore_user_abort( true );
 
-			// Unzip the backup archive file to ABSPATH.
-			// @todo Finish restoration code below.
-			//$result = unzip_file( $filepath, ABSPATH );
-			$result = true;
+			// Set the PHP timeout limit to at least 300 seconds.
+			set_time_limit( ( ( $max_execution_time = ini_get( 'max_execution_time' ) ) > 300 ? $max_execution_time : 300 ) );
 
-			// Check for error.
-			if ( true !== $result ) {
-				error_log( __METHOD__ . ': Could not extract "' . $filepath . '" into "' . ABSPATH . '".' );
+			// Check the ZIP file for consistency.
+			$zip = new ZipArchive;
+
+			$status = $zip->open( $filepath, ZipArchive::CHECKCONS );
+
+			if ( true !== $status ) {
+				$info['error'] = 'Cannot unzip archive file "' . $filepath . '".  Error code: ' .
+				$status . ' (' . Boldgrid_Backup_Admin_Utility::translate_zip_error( $status ) .
+				') ';
 
 				$restore_ok = false;
+			} else {
+				// Set the WordPress root directory path, with no trailing slash.
+				$wp_root = untrailingslashit( ABSPATH );
+
+				// Ensure that all targets are writable.
+				for ( $i = 0; $i < $zip->numFiles; $i++ ) {
+					// Get the entry name.
+					$name = $zip->getNameIndex( $i );
+
+					// If path exists and is not writable, then make writable.
+					if ( false === Boldgrid_Backup_Admin_Utility::make_writable( ABSPATH . $name ) ) {
+						$restore_ok = false;
+
+						break;
+					}
+
+					// Extract the file.
+					if ( true !== $zip->extractTo( $wp_root, array( $name ) ) ) {
+						// Error extracting.
+						error_log( __METHOD__ .
+							': Error extracting "' . ABSPATH . $name . '" from archive file "' .
+							$filepath . '".'
+						);
+
+						$restore_ok = false;
+
+						break;
+					}
+				}
 			}
+
+			// Close the ZIP file.
+			$zip->close();
 
 			// Restore database.
 			if ( true === $restore_ok ) {
+				// Get the database dump file path.
+				$db_dump_filepath = $this->get_dump_file();
+
 				// Restore the database.
+				$restore_ok = $this->restore_database( $db_dump_filepath );
 			}
 		}
 
 		// Display notice of deletion status.
-		if ( false === $restore_ok ) {
+		if ( false === $restore_ok && false === $doing_cron ) {
 			do_action( 'boldgrid_backup_notice',
 				'Error restoring the selected archive file.',
 				'notice notice-error is-dismissible'
@@ -1305,6 +1536,10 @@ class Boldgrid_Backup_Admin_Core {
 				$body .= __( 'A backup archive has been restored' );
 			} else {
 				$body .= __( 'An error occurred when attempting to restore a backup archive' );
+
+				if ( false === empty( $wp_errors ) ) {
+					$body .= $wp_errors;
+				}
 			}
 
 			$body .= __( ' for ' ) . $site_id . ".\n\n";
@@ -1429,7 +1664,10 @@ class Boldgrid_Backup_Admin_Core {
 
 		// If a restoration operation is requested, then restore from a backup archive now.
 		if ( false === empty( $_GET['restore_now'] ) ) {
-			$this->restore_archive_file();
+			$archive_info = $this->restore_archive_file();
+
+			// Generate markup, using the restore page template.
+			include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup.php';
 		}
 
 		return;
@@ -1710,23 +1948,16 @@ class Boldgrid_Backup_Admin_Core {
 			// Error.
 			echo __( 'There was an error ' . $action_name . 'backup archive file.' ) . PHP_EOL;
 			echo __( 'Error: ' . $archive_info['error'] ) . PHP_EOL;
-			echo __( 'Error Details: ' );
 
 			if ( true === isset( $archive_info['error_message'] ) ) {
-				echo __( $archive_info['error_message'] );
-			} else {
-				echo __( 'Unknown' );
+				echo __( 'Error Message: ' . $archive_info['error_message'] );
 			}
-
-			echo ' (';
 
 			if ( true === isset( $archive_info['error_code'] ) ) {
-				echo $archive_info['error_code'];
-			} else {
-				echo '?';
+				echo ' (' . $archive_info['error_code'] . ')';
 			}
 
-			echo')' . PHP_EOL;
+			echo PHP_EOL;
 		} elseif ( false === empty( $archive_info['filesize'] ) || false === empty( $archive_info['dryrun'] ) ) {
 			// Dry run.
 			if ( false === empty( $archive_info['filepath'] ) ) {
