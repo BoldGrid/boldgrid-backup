@@ -92,14 +92,14 @@ class Boldgrid_Backup_Admin_Update {
 					array(
 						$this,
 						'custom_plugins_transient_update',
-					), 10, 1
+					), 10
 				);
 
 				add_filter( 'plugins_api',
 					array(
 						$this,
 						'custom_plugins_transient_update',
-					), 10, 1
+					), 10
 				);
 
 				// Force WP to check for updates, don't rely on cache / transients.

@@ -193,6 +193,21 @@ class Boldgrid_Backup {
 		$plugin_admin_update = new Boldgrid_Backup_Admin_Update( $this->get_plugin_name(),
 		$this->get_version() );
 
+		// Add an action to perform an auto-backup before an auto-update occurs.
+		$this->loader->add_action( 'pre_auto_update', $plugin_admin_core,
+			'boldgrid_backup_now_auto'
+		);
+
+		// Add an action to display an admin notice on the WordPress Updates page.
+		$this->loader->add_action( 'core_upgrade_preamble', $plugin_admin_core,
+			'backup_notice'
+		);
+
+		// Add an action to display an admin notice on the WordPress Plugins page.
+		$this->loader->add_action( 'pre_current_active_plugins', $plugin_admin_core,
+			'backup_notice'
+		);
+
 		return;
 	}
 

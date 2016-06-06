@@ -289,16 +289,16 @@ class Boldgrid_Backup_Admin_Core {
 					$handle = proc_open( $command, $descriptorspec, $pipes );
 
 					if ( false !== is_resource( $handle ) ) {
-						// Close unused pipe[0].
+						// Close unused pipes[0].
 						fclose( $pipes[0] );
 
-						// Read output from pipe[1].
+						// Read output from pipes[1].
 						$output = stream_get_contents( $pipes[1] );
 
-						// Close pipe[1].
+						// Close pipes[1].
 						fclose( $pipes[1] );
 
-						// Close unused pipe[0].
+						// Close unused pipes[0].
 						fclose( $pipes[2] );
 
 						// Close the process handle and get the return status.
@@ -1042,6 +1042,9 @@ class Boldgrid_Backup_Admin_Core {
 			// Send the notification.
 			$info['mail_success'] = $this->send_notification( $subject, $body );
 		}
+
+		// Update WP option for "boldgrid_backup_last_backup".
+		update_option( 'boldgrid_backup_last_backup', time(), false );
 
 		// Return the array of archive information.
 		return $info;
@@ -1988,5 +1991,122 @@ class Boldgrid_Backup_Admin_Core {
 			echo __( 'There was an unknown error ' . $action_name . ' a backup archive file.' ) .
 			PHP_EOL;
 		}
+	}
+
+	/**
+	 * Show an admin notice on the WordPress Updates page.
+	 *
+	 * @since 1.0
+	 */
+	public function backup_notice() {
+		// Get archive list.
+		$archives = $this->get_archive_list();
+
+		// Get the archive count.
+		$archive_count = count( $archives );
+
+		// Initialize $listing.
+		$listing = 'None';
+
+		// Initialize $download_button.
+		$download_button = '';
+
+		// Get the most recent archive listing.
+		if ( $archive_count > 0 ) {
+			$key = $archive_count - 1;
+
+			$archive = $archives[ $key ];
+
+			$listing = $archive['filename'] . ' ' .
+			Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive['filesize'] ) . ' ' .
+			$archive['filedate'];
+
+			$download_button = "<a id='backup-archive-download-<?php echo $key; ?>'
+			class='button action-download' href='#'
+			data-key='" . $key . "' data-filepath='" . $archive['filepath'] . "'
+			data-filename='" . $archive['filename'] . "'>Download</a>";
+		}
+
+		// Enqueue CSS for the home page.
+		wp_enqueue_style( 'boldgrid-backup-admin-home',
+			plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-home.css', array(),
+			BOLDGRID_BACKUP_VERSION, 'all'
+		);
+
+		// Register the JS for the home page.
+		wp_register_script( 'boldgrid-backup-admin-home',
+			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-home.js',
+			array(
+				'jquery',
+			), BOLDGRID_BACKUP_VERSION, false
+		);
+
+		// Get the current wp_filesystem access method.
+		$access_type = get_filesystem_method();
+
+		// Create a nonce for file downloads via AJAX.
+		$download_nonce = wp_create_nonce( 'archive_download' );
+
+		// Create URL for backup now.
+		$backup_url = get_admin_url( null, 'admin.php?page=boldgrid-backup&backup_now=1' );
+
+		// Create an array of data to pass to JS.
+		$localize_script_data = array(
+			'downloadNonce' => $download_nonce,
+			'accessType' => $access_type,
+			'backupUrl' => $backup_url,
+		);
+
+		// Add localize script data to the JS script.
+		wp_localize_script( 'boldgrid-backup-admin-home', 'localizeScriptData', $localize_script_data );
+
+		// Enqueue JS for the home page.
+		wp_enqueue_script( 'boldgrid-backup-admin-home' );
+
+		// Create admin notice text.
+		$notice_text = 'BoldGrid Backup last created backup archive:<p>' . $listing . ' ' .
+		$download_button . "</p>
+		<p>It is recommended to backup your site before performing updates.</p>
+		<div id='backup-site-now-section'>
+		<form action='#' id='backup-site-now-form' method='POST'>
+				". wp_nonce_field( 'boldgrid_backup_now', 'backup_auth' ) ."
+				<p>
+					<a id='backup-site-now' class='button'>Backup Site Now</a>
+					<span class='spinner'></span>
+				</p>
+			</form>
+		</div>
+		<div id='backup-site-now-results'></div>
+		</div>
+";
+
+		// Show admin notice.
+		do_action( 'boldgrid_backup_notice', $notice_text, 'notice notice-warning is-dismissible' );
+	}
+
+	/**
+	 * Creating a backup archive file now, before an auto-update occurs.
+	 *
+	 * @since 1.0
+	 *
+	 * @link https://developer.wordpress.org/reference/hooks/pre_auto_update/
+	 * @see Boldgrid_Backup_Admin_Core::archive_files()
+	 *
+	 * @param string $type The type of update being checked: 'core', 'theme', 'plugin', or 'translation'.
+	 * @return null
+	 */
+	public function boldgrid_backup_now_auto( $type ) {
+		// Get the last backup time (unix seconds).
+		$last_backup_time = get_option( 'boldgrid_backup_last_backup' );
+
+		// If the last backup was done in the last hour, then abort.
+		if ( false !== $last_backup_time && ( time() - $last_backup_time ) <= HOUR_IN_SECONDS ) {
+			return;
+		}
+
+		// Perform the backup operation.
+		$archive_info = $this->archive_files( true );
+
+		return;
 	}
 }
