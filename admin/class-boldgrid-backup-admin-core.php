@@ -894,6 +894,9 @@ class Boldgrid_Backup_Admin_Core {
 			);
 		}
 
+		// Enforce retention setting.
+		$this->enforce_retention();
+
 		// Prevent this script from dying.
 		ignore_user_abort( true );
 
@@ -1100,6 +1103,9 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Update WP option for "boldgrid_backup_last_backup".
 		update_option( 'boldgrid_backup_last_backup', time(), false );
+
+		// Enforce retention setting.
+		$this->enforce_retention();
 
 		// Return the array of archive information.
 		return $info;
@@ -2169,6 +2175,57 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Perform the backup operation.
 		$archive_info = $this->archive_files( true );
+
+		return;
+	}
+
+	/**
+	 * Enforce backup archive retention setting.
+	 *
+	 * @since 1.0
+	 *
+	 * @see Boldgrid_Backup_Admin_Settings::get_settings()
+	 *
+	 * @return null
+	 */
+	public function enforce_retention() {
+		// Get backup settings.
+		$settings = $this->settings->get_settings();
+
+		// Get archive list.
+		$archives = $this->get_archive_list();
+
+		// Get the archives file count.
+		$archives_count = count( $archives );
+
+		// If the archive count is not beyond the set retention count, then return.
+		if ( $archives_count <= $settings['retention_count'] ) {
+			return;
+		}
+
+		// Connect to the WordPress Filesystem API.
+		global $wp_filesystem;
+
+		// Initialize $counter.
+		$counter = 0;
+
+		// Delete old backups.
+		while ( $archives_count > $settings['retention_count'] ) {
+			// Get the file path to delete.
+			$filepath = ( false === empty( $archives[ $counter ]['filepath'] ) ? $archives[ $counter ]['filepath'] : null );
+
+			// Delete the specified archive file.
+			if ( null === $filepath || true !== $wp_filesystem->delete( $filepath, false, 'f' ) ) {
+				// Something went wrong.
+				break;
+			}
+
+			// Decrease the archive count.
+			$archives_count --;
+
+			// Increment the counter.
+			$counter ++;
+		}
 
 		return;
 	}

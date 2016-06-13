@@ -48,7 +48,11 @@ class Boldgrid_Backup_Admin_Settings {
 	 */
 	public function get_settings() {
 		// Get settings.
-		$settings = get_option( 'boldgrid_backup_settings' );
+		if ( true === is_multisite() ) {
+			$settings = get_site_option( 'boldgrid_backup_settings' );
+		} else {
+			$settings = get_option( 'boldgrid_backup_settings' );
+		}
 
 		// Parse settings.
 		if ( false === empty( $settings['schedule'] ) ) {
@@ -102,6 +106,7 @@ class Boldgrid_Backup_Admin_Settings {
 			$settings['schedule']['tod_a'] = 'AM';
 
 			// Other settings.
+			$settings['retention_count'] = 5;
 			$settings['notifications']['backup'] = 1;
 			$settings['notifications']['restore'] = 1;
 			$settings['auto_backup'] = 1;
@@ -428,6 +433,9 @@ class Boldgrid_Backup_Admin_Settings {
 			}
 
 			// Validate input for other settings.
+			$settings['retention_count'] = ( true === isset( $_POST['retention_count'] ) ?
+				intval( $_POST['retention_count'] ) : 5 );
+
 			$settings['notifications']['backup'] = ( ( true === isset( $_POST['notify_backup'] ) &&
 				'1' === $_POST['notify_backup'] ) ? 1 : 0 );
 
@@ -446,7 +454,13 @@ class Boldgrid_Backup_Admin_Settings {
 				$settings['updated'] = time();
 
 				// Attempt to update WP option.
-				if ( true !== update_option( 'boldgrid_backup_settings', $settings ) ) {
+				if ( true === is_multisite() ) {
+					$update_status = update_site_option( 'boldgrid_backup_settings', $settings );
+				} else {
+					$update_status = update_option( 'boldgrid_backup_settings', $settings );
+				}
+
+				if ( true !== $update_status ) {
 					// Failure.
 					$update_error = true;
 

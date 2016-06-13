@@ -87,6 +87,32 @@ if ( true === empty( $settings ) ) {
 				<p>* <?php echo __( 'Backup will not occur if no days are selected.' ); ?></p>
 			</div>
 		</div>
+		<h3><?php echo __( 'Retention' ); ?></h3>
+		<div class='retention-settings'>
+			<table id='retention-settings-table'>
+				<tbody>
+					<tr>
+						<td><?php echo __( 'Number of backup archives to retain' ); ?></td>
+						<td><select id='retention-count' name='retention_count'>
+							<?php
+							for ( $x = 1; $x <= 10; $x ++ ) {
+								?>
+								<option value='<?php echo $x; ?>'
+									<?php
+									if ( ( true === isset( $settings['retention_count'] ) &&
+									 $x === $settings['retention_count'] ) || ( false ===
+									 isset( $settings['retention_count'] ) && 5 === $x ) ) {
+										echo ' selected';
+									}
+								?>><?php echo $x; ?></option>
+								<?php
+							}
+							?>
+							</select></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 		<h3><?php echo __( 'Notifications' ); ?></h3>
 		<div class='notification-settings'>
 			<table id='notification-settings-table'>
@@ -185,8 +211,8 @@ if ( true === empty( $settings ) ) {
 					 1 === $settings['auto_backup'] ) {
 					echo ' checked';
 				}
-				?> /> <?php echo __( 'Enabled' ); ?> &nbsp; <input id='auto-backup-disabled'
-				type='radio' name='auto_backup' value='0'
+				?> /> <?php echo __( 'Enabled' ); ?> &nbsp; <input
+				id='auto-backup-disabled' type='radio' name='auto_backup' value='0'
 				<?php
 				if ( true === isset( $settings['auto_backup'] ) && 0 === $settings['auto_backup'] ) {
 					echo ' checked';
@@ -203,8 +229,9 @@ if ( true === empty( $settings ) ) {
 					 1 === $settings['auto_rollback'] ) {
 					echo ' checked';
 				}
-				?> /> <?php echo __( 'Enabled' ); ?> &nbsp; <input id='auto-rollback-disabled'
-				type='radio' name='auto_rollback' value='0'
+				?> /> <?php echo __( 'Enabled' ); ?> &nbsp; <input
+				id='auto-rollback-disabled' type='radio' name='auto_rollback'
+				value='0'
 				<?php
 				if ( true === isset( $settings['auto_rollback'] ) && 0 === $settings['auto_rollback'] ) {
 					echo ' checked';
@@ -214,7 +241,8 @@ if ( true === empty( $settings ) ) {
 		<div id='boldgrid-settings-submit-div'>
 			<p>
 				<input id='boldgrid-settings-submit' class='button button-primary'
-					type='submit' name='submit' value='<?php echo __( 'Save Changes' ); ?>' />
+					type='submit' name='submit'
+					value='<?php echo __( 'Save Changes' ); ?>' />
 			</p>
 		</div>
 	</form>
