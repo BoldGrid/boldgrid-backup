@@ -81,6 +81,8 @@ class Boldgrid_Backup_Admin_Settings {
 			$settings['notifications']['restore'] = ( false ===
 				isset( $settings['notifications']['restore'] ) || false ===
 				empty( $settings['notifications']['restore'] ) ? 1 : 0 );
+			$settings['auto_backup'] = ( false === isset( $settings['auto_backup'] ) ||
+				false === empty( $settings['auto_backup'] ) ? 1 : 0 );
 			$settings['auto_rollback'] = ( false === isset( $settings['auto_rollback'] ) ||
 				false === empty( $settings['auto_rollback'] ) ? 1 : 0 );
 		} else {
@@ -102,6 +104,7 @@ class Boldgrid_Backup_Admin_Settings {
 			// Other settings.
 			$settings['notifications']['backup'] = 1;
 			$settings['notifications']['restore'] = 1;
+			$settings['auto_backup'] = 1;
 			$settings['auto_rollback'] = 1;
 		}
 
@@ -430,6 +433,9 @@ class Boldgrid_Backup_Admin_Settings {
 
 			$settings['notifications']['restore'] = ( ( true === isset( $_POST['notify_restore'] ) &&
 				'1' === $_POST['notify_restore'] ) ? 1 : 0 );
+
+			$settings['auto_backup'] = ( ( false === isset( $_POST['auto_backup'] ) ||
+				'1' === $_POST['auto_backup'] ) ? 1 : 0 );
 
 			$settings['auto_rollback'] = ( ( false === isset( $_POST['auto_rollback'] ) ||
 				'1' === $_POST['auto_rollback'] ) ? 1 : 0 );

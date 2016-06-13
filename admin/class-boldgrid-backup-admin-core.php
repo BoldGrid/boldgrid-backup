@@ -2151,6 +2151,14 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return null
 	 */
 	public function boldgrid_backup_now_auto( $type ) {
+		// Get backup settings.
+		$settings = $this->settings->get_settings();
+
+		// Abort if auto-backup is not enabled.
+		if ( true === empty( $settings['auto_backup'] ) ) {
+			return;
+		}
+
 		// Get the last backup time (unix seconds).
 		$last_backup_time = get_option( 'boldgrid_backup_last_backup' );
 

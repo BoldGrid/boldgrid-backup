@@ -175,6 +175,24 @@ if ( true === empty( $settings ) ) {
 				</tbody>
 			</table>
 		</div>
+		<h2><?php echo __( 'Pre-Update Actions' ); ?></h2>
+		<h3><?php echo __( 'Auto Backup' ); ?></h3>
+		<p>
+			<input id='auto-backup-enabled' type='radio' name='auto_backup'
+				value='1'
+				<?php
+				if ( false === isset( $settings['auto_backup'] ) ||
+					 1 === $settings['auto_backup'] ) {
+					echo ' checked';
+				}
+				?> /> <?php echo __( 'Enabled' ); ?> &nbsp; <input id='auto-backup-disabled'
+				type='radio' name='auto_backup' value='0'
+				<?php
+				if ( true === isset( $settings['auto_backup'] ) && 0 === $settings['auto_backup'] ) {
+					echo ' checked';
+				}
+				?> /> <?php echo __( 'Disabled' ); ?>
+		</p>
 		<h2><?php echo __( 'Post-Update Actions' ); ?></h2>
 		<h3><?php echo __( 'Auto Rollback' ); ?></h3>
 		<p>
