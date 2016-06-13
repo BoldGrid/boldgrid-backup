@@ -1900,6 +1900,9 @@ class Boldgrid_Backup_Admin_Core {
 	/**
 	 * Send a notification email to the admin email address.
 	 *
+	 * @since 1.0
+	 * @access private
+	 *
 	 * @param string $subject The email subject.
 	 * @param string $body The email body.
 	 *
@@ -2183,12 +2186,13 @@ class Boldgrid_Backup_Admin_Core {
 	 * Enforce backup archive retention setting.
 	 *
 	 * @since 1.0
+	 * @access private
 	 *
 	 * @see Boldgrid_Backup_Admin_Settings::get_settings()
 	 *
 	 * @return null
 	 */
-	public function enforce_retention() {
+	private function enforce_retention() {
 		// Get backup settings.
 		$settings = $this->settings->get_settings();
 
