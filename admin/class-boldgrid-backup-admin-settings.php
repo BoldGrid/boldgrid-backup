@@ -366,13 +366,12 @@ class Boldgrid_Backup_Admin_Settings {
 	 * Delete boldgrid-backup cron entries from the system user crontab or wp-cron.
 	 *
 	 * @since 1.0
-	 * @access private
 	 *
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
 	 * @return bool Success.
 	 */
-	private function delete_cron_entries() {
+	public function delete_cron_entries() {
 		// Check if crontab is available.
 		$is_crontab_available = $this->core->test->is_crontab_available();
 
@@ -612,6 +611,9 @@ class Boldgrid_Backup_Admin_Settings {
 						'Invalid settings submitted.  Please try again.',
 						'notice notice-error is-dismissible'
 					);
+				} else {
+					// Delete existing backup cron jobs, and add the new cron entry.
+					$cron_status = $this->add_cron_entry();
 				}
 			} else {
 				// Interrupted by a previous error.
@@ -622,9 +624,6 @@ class Boldgrid_Backup_Admin_Settings {
 			}
 		}
 
-		// Delete existing backup cron jobs.
-		$cron_status = $this->delete_cron_entries();
-
 		// If delete cron failed, then show a notice.
 		if ( true !== $cron_status ) {
 			$update_error = true;
@@ -633,45 +632,6 @@ class Boldgrid_Backup_Admin_Settings {
 				'An error occurred when modifying cron jobs.  Please try again.',
 				'notice notice-error is-dismissible'
 			);
-		}
-
-		// Update cron, if there are days selected.
-		if ( false === empty( $days_scheduled ) ) {
-			// Build cron job line in crontab format.
-			$entry = date( 'i G',
-				strtotime(
-					$settings['schedule']['tod_h'] . ':' . $settings['schedule']['tod_m'] . ' ' .
-					$settings['schedule']['tod_a']
-				)
-			) . ' * * ';
-
-			$days_scheduled_list = '';
-
-			foreach ( $days_scheduled as $day ) {
-				$days_scheduled_list .= $day . ',';
-			}
-
-			$days_scheduled_list = rtrim( $days_scheduled_list, ',' );
-
-			$entry .= $days_scheduled_list . ' php -qf "' . dirname( dirname( __FILE__ ) ) .
-			'/boldgrid-backup-cron.php" mode=backup HTTP_HOST=' . $_SERVER['HTTP_HOST'];
-
-			if ( false === $this->core->test->is_windows() ) {
-				$entry .= ' > /dev/null 2>&1';
-			}
-
-			// Update cron.
-			$cron_status = $this->update_cron( $entry );
-
-			// If update cron failed, then show a notice.
-			if ( true !== $cron_status ) {
-				$update_error = true;
-
-				do_action( 'boldgrid_backup_notice',
-					'An error occurred when modifying cron jobs.  Please try again.',
-					'notice notice-error is-dismissible'
-				);
-			}
 		}
 
 		// If there was no error, then show success notice.
@@ -685,6 +645,72 @@ class Boldgrid_Backup_Admin_Settings {
 
 		// Return success.
 		return ! $update_error;
+	}
+
+	/**
+	 * Add cron entry for backups from stored settings.
+	 *
+	 * @since 1.0
+	 *
+	 * @return bool Success.
+	 */
+	public function add_cron_entry() {
+		// Get settings.
+		$settings = $this->get_settings();
+
+		// Delete existing backup cron jobs.
+		$cron_status = $this->delete_cron_entries();
+
+		// Initialize $days_scheduled_list.
+		$days_scheduled_list = '';
+
+		// Create an array of days index names.
+		$days = array(
+			'dow_sunday' => 0,
+			'dow_monday' => 1,
+			'dow_tuesday' => 2,
+			'dow_wednesday' => 3,
+			'dow_thursday' => 4,
+			'dow_friday' => 5,
+			'dow_saturday' => 6,
+		);
+
+		// Add scheduled days to the list.
+		foreach ( $days as $index => $int ) {
+			if ( true === isset( $settings['schedule'][ $index ] ) &&
+			1 === $settings['schedule'][ $index ] ) {
+				$days_scheduled_list .= $int . ',';
+			}
+		}
+
+		// If no days are scheduled, then abort.
+		if ( true === empty( $days_scheduled_list ) ) {
+			return true;
+		}
+
+		// Strip trailing comma.
+		$days_scheduled_list = rtrim( $days_scheduled_list, ',' );
+
+		// Build cron job line in crontab format.
+		$entry = date( 'i G',
+			strtotime(
+				$settings['schedule']['tod_h'] . ':' . $settings['schedule']['tod_m'] . ' ' .
+				$settings['schedule']['tod_a']
+			)
+		) . ' * * ';
+
+		$entry .= $days_scheduled_list . ' php -qf "' . dirname( dirname( __FILE__ ) ) .
+		'/boldgrid-backup-cron.php" mode=backup HTTP_HOST=' . $_SERVER['HTTP_HOST'];
+
+		// If not Windows, then also silence the cron job.
+		if ( false === $this->core->test->is_windows() ) {
+			$entry .= ' > /dev/null 2>&1';
+		}
+
+		// Update cron.
+		$status = $this->update_cron( $entry );
+
+		return $status;
 	}
 
 	/**

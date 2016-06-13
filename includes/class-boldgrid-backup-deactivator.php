@@ -27,5 +27,10 @@ class Boldgrid_Backup_Deactivator {
 	 * @since 1.0
 	 */
 	public static function deactivate() {
+		// Instantiate the admin core.
+		$plugin_admin_core = new Boldgrid_Backup_Admin_Core();
+
+		// Delete cron jobs for backup tasks.
+		$plugin_admin_core->settings->delete_cron_entries();
 	}
 }
