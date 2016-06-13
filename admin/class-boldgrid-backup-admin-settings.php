@@ -113,8 +113,152 @@ class Boldgrid_Backup_Admin_Settings {
 			$settings['auto_rollback'] = 1;
 		}
 
+		// Check cron for schedule.
+		$cron_schedule = $this->read_cron_entry();
+
+		// If a cron schedule was found, then merge the settings.
+		if ( false === empty( $cron_schedule ) ) {
+			$settings['schedule'] = array_merge( $settings['schedule'], $cron_schedule );
+		}
+
 		// Return the settings array.
 		return $settings;
+	}
+
+	/**
+	 * Read an entry from the system user crontab or wp-cron.
+	 *
+	 * @since 1.0
+	 * @access private
+	 *
+	 * @return array An array containing the backup schedule.
+	 */
+	private function read_cron_entry() {
+		// Check if crontab is available.
+		$is_crontab_available = $this->core->test->is_crontab_available();
+
+		// Check if wp-cron is available.
+		$is_wpcron_available = $this->core->test->wp_cron_enabled();
+
+		// If crontab or wp-cron is not available, then return an empty array.
+		if ( true !== $is_crontab_available && true !== $is_wpcron_available ) {
+			return array();
+		}
+
+		// Initialize $schedule.
+		$schedule = array(
+			'dow_sunday' => 0,
+			'dow_monday' => 0,
+			'dow_tuesday' => 0,
+			'dow_wednesday' => 0,
+			'dow_thursday' => 0,
+			'dow_friday' => 0,
+			'dow_saturday' => 0,
+			'tod_h' => null,
+			'tod_m' => null,
+			'tod_a' => null,
+		);
+
+		// Set a search pattern to match for our cron jobs.
+		$pattern = 'boldgrid-backup-cron.php';
+
+		// Use either crontab or wp-cron.
+		if ( true === $is_crontab_available ) {
+			// Use crontab.
+			// Read crontab.
+			$command = 'crontab -l';
+
+			$crontab = $this->core->execute_command( $command, null, $success );
+
+			// If the command to retrieve crontab failed, then return an empty array.
+			if ( true !== $success ) {
+				return array();
+			}
+
+			// If no entries exist, then return an empty array.
+			if ( false === strpos( $crontab, $pattern ) ) {
+				return array();
+			}
+
+			// Explode the crontab into an array.
+			$crontab_exploded = explode( "\n", $crontab );
+
+			// Initialize $entry.
+			$entry = '';
+
+			foreach ( $crontab_exploded as $line ) {
+				if ( false !== strpos( $line, $pattern ) ) {
+					// Found a matching entry.
+					$entry = trim( $line );
+
+					break;
+				}
+			}
+
+			// If a match was found, then get the schedule.
+			if ( false === empty( $entry ) ) {
+				// Parse cron schedule.
+				preg_match_all( '/([0-9*]+)(,([0-9*])+)*? /', $entry, $matches );
+
+				// Minute.
+				if ( true === isset( $matches[1][0] ) && true === is_numeric( $matches[1][0] ) ) {
+					$schedule['tod_m'] = intval( $matches[1][0] );
+				} else {
+					return array();
+				}
+
+				// Hour.
+				if ( true === isset( $matches[1][1] ) && true === is_numeric( $matches[1][1] ) ) {
+					$schedule['tod_h'] = intval( $matches[1][1] );
+				} else {
+					return array();
+				}
+
+				// Convert from 24H to 12H time format.
+				$unix_time = strtotime( $schedule['tod_h'] . ':' . $schedule['tod_m'] );
+
+				$schedule['tod_h'] = intval( date( 'g', $unix_time ) );
+				$schedule['tod_a'] = date( 'A', $unix_time );
+
+				// Days of the week.
+				if ( true === isset( $matches[0][4] ) ) {
+					$days = explode( ',', $matches[0][4] );
+
+					foreach ( $days as $day ) {
+						switch ( $day ) {
+							case 0 :
+								$schedule['dow_sunday'] = 1;
+								break;
+							case 1 :
+								$schedule['dow_monday'] = 1;
+								break;
+							case 2 :
+								$schedule['dow_tuesday'] = 1;
+								break;
+							case 3 :
+								$schedule['dow_wednesday'] = 1;
+								break;
+							case 4 :
+								$schedule['dow_thursday'] = 1;
+								break;
+							case 5 :
+								$schedule['dow_friday'] = 1;
+								break;
+							case 6 :
+								$schedule['dow_saturday'] = 1;
+								break;
+							default :
+								break;
+						}
+					}
+				}
+			}
+		} else {
+			// Use wp-cron.
+			// @todo Write wp-cron code here.
+		}
+
+		return $schedule;
 	}
 
 	/**
