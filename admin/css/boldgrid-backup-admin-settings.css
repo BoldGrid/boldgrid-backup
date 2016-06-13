@@ -20,3 +20,9 @@
 #boldgrid-settings-submit {
 	margin-top: 20px;
 }
+
+.dashicons-editor-help {
+	display: inline-block;
+	position: relative;
+	cursor: help;
+}

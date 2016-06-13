@@ -21,12 +21,11 @@ if ( true === empty( $settings ) ) {
 ?>
 <div class='wrap'>
 	<h1><?php echo __( 'BoldGrid Backup and Restore Settings' ); ?></h1>
-	<h2><?php echo __( 'Backup Schedule' ); ?></h2>
 	<p><?php echo __( 'The BoldGrid Backup and Restore system allows you to upgrade your themes and plugins without being afraid it will do something you cannot easily undo. We preform a “Preflight Check” to see if the needed support is available on your web hosting account.' ); ?></p>
 	<form id='schedule-form' method='post'>
 	<?php wp_nonce_field( 'boldgrid-backup-settings', 'settings_auth' ); ?>
 		<input type='hidden' name='save_time' value='<?php echo time(); ?>' />
-		<h3><?php echo __( 'Days of the Week' ); ?></h3>
+		<h2><?php echo __( 'Days of the Week' ); ?></h2>
 		<div class='schedule-dow'>
 			<table id='schedule-dow-table'>
 				<tbody>
@@ -87,62 +86,7 @@ if ( true === empty( $settings ) ) {
 				<p>* <?php echo __( 'Backup will not occur if no days are selected.' ); ?></p>
 			</div>
 		</div>
-		<h3><?php echo __( 'Retention' ); ?></h3>
-		<div class='retention-settings'>
-			<table id='retention-settings-table'>
-				<tbody>
-					<tr>
-						<td><?php echo __( 'Number of backup archives to retain' ); ?></td>
-						<td><select id='retention-count' name='retention_count'>
-							<?php
-							for ( $x = 1; $x <= 10; $x ++ ) {
-								?>
-								<option value='<?php echo $x; ?>'
-									<?php
-									if ( ( true === isset( $settings['retention_count'] ) &&
-									 $x === $settings['retention_count'] ) || ( false ===
-									 isset( $settings['retention_count'] ) && 5 === $x ) ) {
-										echo ' selected';
-									}
-								?>><?php echo $x; ?></option>
-								<?php
-							}
-							?>
-							</select></td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-		<h3><?php echo __( 'Notifications' ); ?></h3>
-		<div class='notification-settings'>
-			<table id='notification-settings-table'>
-				<tbody>
-					<tr>
-						<td><?php echo __( 'Send an email when a backup completes' ); ?></td>
-						<td><input id='notification-backup' type='checkbox'
-							name='notify_backup' value='1'
-							<?php
-							if ( false === isset( $settings['notifications']['backup'] ) ||
-								 0 !== $settings['notifications']['backup'] ) {
-								echo ' checked';
-							}
-							?> /></td>
-					</tr>
-					<tr>
-						<td><?php echo __( 'Send an email when a restoration is performed' ); ?></td>
-						<td><input id='notification-restore' type='checkbox'
-							name='notify_restore' value='1'
-							<?php
-							if ( false === isset( $settings['notifications']['restore'] ) ||
-								 0 !== $settings['notifications']['restore'] ) {
-								echo ' checked';
-							}
-							?> /></td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-		<h3><?php echo __( 'Time of Day' ); ?></h3>
+		<h2><?php echo __( 'Time of Day' ); ?></h2>
 		<div class='schedule-tod'>
 			<table id='schedule-tod-table'>
 				<tbody>
@@ -201,8 +145,36 @@ if ( true === empty( $settings ) ) {
 				</tbody>
 			</table>
 		</div>
-		<h2><?php echo __( 'Pre-Update Actions' ); ?></h2>
-		<h3><?php echo __( 'Auto Backup' ); ?></h3>
+		<h2><?php echo __( 'Retention' ); ?></h2>
+		<div class='retention-settings'>
+			<table id='retention-settings-table'>
+				<tbody>
+					<tr>
+						<td><?php echo __( 'Number of backup archives to retain' ); ?></td>
+						<td><select id='retention-count' name='retention_count'>
+							<?php
+							for ( $x = 1; $x <= 10; $x ++ ) {
+								?>
+								<option value='<?php echo $x; ?>'
+									<?php
+									if ( ( true === isset( $settings['retention_count'] ) &&
+									 $x === $settings['retention_count'] ) || ( false ===
+									 isset( $settings['retention_count'] ) && 5 === $x ) ) {
+										echo ' selected';
+									}
+								?>><?php echo $x; ?></option>
+								<?php
+							}
+							?>
+							</select></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<h2><?php echo __( 'Auto Backup Before Updates' ); ?>
+		 <span class='dashicons dashicons-editor-help' title='<?php
+				echo __( 'Automatically perform a backup before WordPress updates.' );
+		?>'></span></h2>
 		<p>
 			<input id='auto-backup-enabled' type='radio' name='auto_backup'
 				value='1'
@@ -219,8 +191,12 @@ if ( true === empty( $settings ) ) {
 				}
 				?> /> <?php echo __( 'Disabled' ); ?>
 		</p>
-		<h2><?php echo __( 'Post-Update Actions' ); ?></h2>
-		<h3><?php echo __( 'Auto Rollback' ); ?></h3>
+		<h2><?php echo __( 'Auto Rollback' ); ?>
+		 <span class='dashicons dashicons-editor-help' title='<?php
+				echo __(
+					'If something goes wrong while peforming WordPress updates, automatically restore the site using a backup made before updating WordPress.'
+				);
+		?>'></span></h2>
 		<p>
 			<input id='auto-rollback-enabled' type='radio' name='auto_rollback'
 				value='1'
@@ -238,6 +214,35 @@ if ( true === empty( $settings ) ) {
 				}
 				?> /> <?php echo __( 'Disabled' ); ?>
 		</p>
+		<h2><?php echo __( 'Notifications' ); ?></h2>
+		<div class='notification-settings'>
+			<table id='notification-settings-table'>
+				<tbody>
+					<tr>
+						<td><?php echo __( 'Send an email when a backup completes' ); ?></td>
+						<td><input id='notification-backup' type='checkbox'
+							name='notify_backup' value='1'
+							<?php
+							if ( false === isset( $settings['notifications']['backup'] ) ||
+								 0 !== $settings['notifications']['backup'] ) {
+								echo ' checked';
+							}
+							?> /></td>
+					</tr>
+					<tr>
+						<td><?php echo __( 'Send an email when a restoration is performed' ); ?></td>
+						<td><input id='notification-restore' type='checkbox'
+							name='notify_restore' value='1'
+							<?php
+							if ( false === isset( $settings['notifications']['restore'] ) ||
+								 0 !== $settings['notifications']['restore'] ) {
+								echo ' checked';
+							}
+							?> /></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 		<div id='boldgrid-settings-submit-div'>
 			<p>
 				<input id='boldgrid-settings-submit' class='button button-primary'
