@@ -1061,7 +1061,7 @@ class Boldgrid_Backup_Admin_Core {
 		$settings = $this->settings->get_settings();
 
 		// If enabled, send email notification for backup completed.
-		if ( false === empty( $settings['notifications']['backup'] ) && true !== $dryrun ) {
+		if ( false === empty( $settings['notifications']['backup'] ) ) {
 			// Create a site identifier.
 			$site_id = Boldgrid_Backup_Admin_Utility::create_site_id();
 
@@ -1070,6 +1070,10 @@ class Boldgrid_Backup_Admin_Core {
 
 			// Create message.
 			$body = __( "Hello,\n\n" );
+
+			if ( true !== $dryrun ) {
+				$body .= __( 'THIS OPERATION WAS A DRY-RUN TEST.' );
+			}
 
 			$body .= __( 'A backup archive has been created for ' ) . $site_id . ".\n\n";
 
@@ -1101,11 +1105,18 @@ class Boldgrid_Backup_Admin_Core {
 			$info['mail_success'] = $this->send_notification( $subject, $body );
 		}
 
-		// Update WP option for "boldgrid_backup_last_backup".
-		update_option( 'boldgrid_backup_last_backup', time(), false );
+		// If not a dry-run test, update the last backup option and enforce retention.
+		if ( true !== $dryrun ) {
+			// Update WP option for "boldgrid_backup_last_backup".
+			if ( true === is_multisite() ) {
+				update_site_option( 'boldgrid_backup_last_backup', time() );
+			} else {
+				update_option( 'boldgrid_backup_last_backup', time(), false );
+			}
 
-		// Enforce retention setting.
-		$this->enforce_retention();
+			// Enforce retention setting.
+			$this->enforce_retention();
+		}
 
 		// Return the array of archive information.
 		return $info;
@@ -1115,14 +1126,13 @@ class Boldgrid_Backup_Admin_Core {
 	 * Get information for the list of archive file(s).
 	 *
 	 * @since 1.0
-	 * @access private
 	 *
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
 	 * @param string $download_filename A filename to match to get info.
 	 * @return array An array containing file path, filename, data, and size of archive files.
 	 */
-	private function get_archive_list( $download_filename = null ) {
+	public function get_archive_list( $download_filename = null ) {
 		// Connect to the WordPress Filesystem API.
 		global $wp_filesystem;
 
@@ -1182,6 +1192,8 @@ class Boldgrid_Backup_Admin_Core {
 					continue;
 				}
 
+				// Create the return array.
+				// @todo Should we use the data and time from the filename, or rely on lastmodunix?
 				$archive_files[ $index ] = array(
 					'filepath' => $backup_directory . '/' . $fileinfo['name'],
 					'filename' => $fileinfo['name'],
@@ -1189,6 +1201,7 @@ class Boldgrid_Backup_Admin_Core {
 						date( 'Y-m-d H:i:s', $fileinfo['lastmodunix'] ), 'n/j/Y g:i A'
 					),
 					'filesize' => $fileinfo['size'],
+					'lastmodunix' => $fileinfo['lastmodunix'],
 				);
 
 				// If looking for info on one file and we found the match, then break the loop.
@@ -1366,9 +1379,10 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
+	 * @param bool $dryrun An optional switch to perform a dry run test.
 	 * @return array An array of archive file information.
 	 */
-	public function restore_archive_file() {
+	public function restore_archive_file( $dryrun = false ) {
 		// Check if DOING_CRON.
 		$doing_cron = ( true === defined( 'DOING_CRON' ) && DOING_CRON );
 
@@ -1486,7 +1500,7 @@ class Boldgrid_Backup_Admin_Core {
 			}
 		}
 
-		// Get the file path to delete.
+		// Get the file path to restore.
 		$filepath = ( false === empty( $archives[ $archive_key ]['filepath'] ) ? $archives[ $archive_key ]['filepath'] : null );
 
 		// Connect to the WordPress Filesystem API.
@@ -1504,6 +1518,7 @@ class Boldgrid_Backup_Admin_Core {
 		// Populate $info.
 		$info = array(
 			'mode' => 'restore',
+			'dryrun' => $dryrun,
 			'filename' => $archive_filename,
 			'filepath' => $filepath,
 			'filesize' => $filesize,
@@ -1530,7 +1545,7 @@ class Boldgrid_Backup_Admin_Core {
 				') ';
 
 				$restore_ok = false;
-			} else {
+			} elseif ( true !== $dryrun ) {
 				// Set the WordPress root directory path, with no trailing slash.
 				$wp_root = untrailingslashit( ABSPATH );
 
@@ -1565,7 +1580,7 @@ class Boldgrid_Backup_Admin_Core {
 			$zip->close();
 
 			// Restore database.
-			if ( true === $restore_ok ) {
+			if ( true !== $dryrun && true === $restore_ok ) {
 				// Get the database dump file path.
 				$db_dump_filepath = $this->get_dump_file();
 
@@ -1579,6 +1594,10 @@ class Boldgrid_Backup_Admin_Core {
 			do_action( 'boldgrid_backup_notice',
 				'Error restoring the selected archive file.',
 				'notice notice-error is-dismissible'
+			);
+		} else {
+			return array(
+				'error' => 'Error restoring the selected archive file.',
 			);
 		}
 
@@ -1595,6 +1614,10 @@ class Boldgrid_Backup_Admin_Core {
 
 			// Create message.
 			$body = __( "Hello,\n\n" );
+
+			if ( true !== $dryrun ) {
+				$body .= __( 'THIS OPERATION WAS A DRY-RUN TEST.' );
+			}
 
 			if ( true === $restore_ok ) {
 				$body .= __( 'A backup archive has been restored' );
@@ -1756,6 +1779,15 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Generate markup, using the backup page template.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup.php';
+
+		// If updating WordPress, then queue a restoration cron job via WP option.
+		if ( true === isset( $_POST['is_updating'] ) && 'true' === $_POST['is_updating'] ) {
+			if ( true === is_multisite() ) {
+				update_site_option( 'boldgrid_backup_pending_rollback', $archive_info );
+			} else {
+				update_option( 'boldgrid_backup_pending_rollback', $archive_info );
+			}
+		}
 
 		// End nicely.
 		wp_die();
@@ -2063,6 +2095,18 @@ class Boldgrid_Backup_Admin_Core {
 	 * @since 1.0
 	 */
 	public function backup_notice() {
+		// Get pending rollback information.
+		if ( true === is_multisite() ) {
+			$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
+		} else {
+			$pending_rollback = get_option( 'boldgrid_backup_pending_rollback' );
+		}
+
+		// If there is a pending rollback, then abort.
+		if ( false === empty( $pending_rollback ) ) {
+			return;
+		}
+
 		// Get archive list.
 		$archives = $this->get_archive_list();
 
@@ -2135,17 +2179,111 @@ class Boldgrid_Backup_Admin_Core {
 		<form action='#' id='backup-site-now-form' method='POST'>
 				". wp_nonce_field( 'boldgrid_backup_now', 'backup_auth' ) ."
 				<p>
-					<a id='backup-site-now' class='button'>Backup Site Now</a>
+					<a id='backup-site-now' class='button' data-updating='true'>Backup Site Now</a>
 					<span class='spinner'></span>
 				</p>
 			</form>
 		</div>
 		<div id='backup-site-now-results'></div>
-		</div>
 ";
 
 		// Show admin notice.
 		do_action( 'boldgrid_backup_notice', $notice_text, 'notice notice-warning is-dismissible' );
+	}
+
+	/**
+	 * Show an admin notice if there is a pending rollback.
+	 *
+	 * @since 1.0
+	 *
+	 * @return null
+	 */
+	public function rollback_notice() {
+		// Get pending rollback information.
+		if ( true === is_multisite() ) {
+			$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
+		} else {
+			$pending_rollback = get_option( 'boldgrid_backup_pending_rollback' );
+		}
+
+		// If there is not pending rollback, then abort.
+		if ( true === empty( $pending_rollback ) || false === isset( $pending_rollback['deadline'] ) ) {
+			return;
+		}
+
+		// Register the JS for the rollback notice.
+		wp_register_script( 'boldgrid-backup-admin-rollback',
+			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-rollback.js',
+			array(
+				'jquery',
+			), BOLDGRID_BACKUP_VERSION, false
+		);
+
+		// Convert deadline to ISO 8601 format.
+		$deadline = date( 'c', $pending_rollback['deadline'] );
+
+		// Create an array of data to pass to JS.
+		$localize_script_data = array(
+			'rolloutDeadline' => $deadline,
+		);
+
+		// Add localize script data to the JS script.
+		wp_localize_script( 'boldgrid-backup-admin-rollback', 'localizeScriptData', $localize_script_data );
+
+		// Enqueue JS for the rollback notice.
+		wp_enqueue_script( 'boldgrid-backup-admin-rollback' );
+
+		// Create notice text.
+		$notice_text = "<div id='cancel-rollback-section'>
+		There is a pending automatic rollback using the most recent backup archive." .
+		"<p>If you do not want to rollback, then please cancel the action before the countdown timer elapses.</p>
+		<p>Countdown: <span id='rollback-countdown-timer'></span></p>
+		<form action='#' id='cancel-rollback-form' method='POST'>
+		" . wp_nonce_field( 'boldgrid_rollback_notice', 'cancel_rollback_auth', true, false ) . "
+		<p>
+		<a id='cancel-rollback-button' class='button'>Cancel Rollback</a>
+		<span class='spinner'></span>
+		</p>
+		</form>
+		</div>
+		<div id='cancel-rollback-results'></div>
+";
+
+		// Display notice.
+		do_action( 'boldgrid_backup_notice', $notice_text, 'notice notice-warning' );
+
+		return;
+	}
+
+	/**
+	 * Callback function for canceling a pending rollback.
+	 *
+	 * @since 1.0
+	 */
+	public function boldgrid_cancel_rollback_callback() {
+		// Verify nonce, or die with an error message.
+		if ( false === isset( $_POST['cancel_rollback_auth'] ) ||
+			1 !== check_ajax_referer( 'boldgrid_rollback_notice', 'cancel_rollback_auth', false ) ) {
+			wp_die(
+				'<div class="error"><p>Security violation (invalid nonce).</p></div>'
+			);
+		}
+
+		// Remove any cron jobs for restore actions.
+		$this->settings->delete_cron_entries( 'restore' );
+
+		// Remove WP option boldgrid_backup_pending_rollback.
+		if ( true === is_multisite() ) {
+			delete_site_option( 'boldgrid_backup_pending_rollback' );
+		} else {
+			delete_option( 'boldgrid_backup_pending_rollback' );
+		}
+
+		// Echo a success message.
+		echo '<p>Automatic rollback has been canceled.</p>';
+
+		// End nicely.
+		wp_die();
 	}
 
 	/**

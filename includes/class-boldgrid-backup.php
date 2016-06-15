@@ -198,6 +198,16 @@ class Boldgrid_Backup {
 			'boldgrid_backup_now_auto'
 		);
 
+		// Add an action to display an admin notice for a pending rollback.
+		$this->loader->add_action( 'admin_footer', $plugin_admin_core,
+			'rollback_notice'
+		);
+
+		// Add a custom action to handle AJAX callback for canceling a pending rollback.
+		$this->loader->add_action( 'wp_ajax_boldgrid_cancel_rollback', $plugin_admin_core,
+			'boldgrid_cancel_rollback_callback'
+		);
+
 		// Add an action to display an admin notice on the WordPress Updates page.
 		$this->loader->add_action( 'core_upgrade_preamble', $plugin_admin_core,
 			'backup_notice'
@@ -206,6 +216,14 @@ class Boldgrid_Backup {
 		// Add an action to display an admin notice on the WordPress Plugins page.
 		$this->loader->add_action( 'pre_current_active_plugins', $plugin_admin_core,
 			'backup_notice'
+		);
+
+		// Instantiate the admin settings.
+		$plugin_admin_settings = new Boldgrid_Backup_Admin_Settings( $plugin_admin_core );
+
+		// Add an action to add a cron job to restore after WordPress Updates, unless canceled.
+		$this->loader->add_action( 'upgrader_process_complete', $plugin_admin_settings,
+			'add_restore_cron'
 		);
 
 		return;

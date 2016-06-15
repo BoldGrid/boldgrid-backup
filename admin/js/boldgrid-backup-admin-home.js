@@ -23,7 +23,8 @@
 	// Onload event listener.
 	$( function() {
 		// Declare variables.
-		var $downloadButtons, $restoreButtons, $deleteButtons, $backupSiteButton, $endBackup;
+		var $downloadButtons, $restoreButtons, $deleteButtons, $backupSiteButton,
+			$endBackup;
 
 		// Create a context selector for the download buttons.
 		$downloadButtons = $( '.action-download' );
@@ -48,7 +49,7 @@
 
 		// On click action for the Backup Site Now button.
 		$backupSiteButton.on( 'click', self.backupNow );
-} );
+	} );
 
 	/**
 	 * Download a selected backup archive file.
@@ -160,7 +161,7 @@
 	 */
 	self.backupNow = function() {
 		// Declare variables.
-		var $this, $backupSiteSection, $backupSiteResults, backupNonce, wpHttpReferer,
+		var $this, $backupSiteSection, $backupSiteResults, backupNonce, wpHttpReferer, isUpdating,
 			errorCallback, data, markup;
 
 		// Assign the current jQuery object.
@@ -172,7 +173,7 @@
         // Disable the Backup Site Now link button.
 		$this.css( 'pointer-events', 'none' );
 
-		// Create a context selector for the Backup Site Now results.
+		// Create a context selector for the Backup Site Now section.
 		$backupSiteSection = $('#backup-site-now-section');
 
 		// Create a context selector for the Backup Site Now results.
@@ -186,6 +187,9 @@
 
 		wpHttpReferer = $backupSiteSection.find( '[name="_wp_http_referer"]' ).val();
 
+		// Get the backup archive file key.
+		isUpdating = $this.data( 'updating' );
+
 		// Create an error callback function.
 		errorCallback = function() {
 			// Show error message.
@@ -198,7 +202,8 @@
 		data = {
 			'action' : 'boldgrid_backup_now',
 			'backup_auth' : backupNonce,
-			'_wp_http_referer' : wpHttpReferer
+			'_wp_http_referer' : wpHttpReferer,
+			'is_updating' : isUpdating,
 		};
 
 		// Make the call.

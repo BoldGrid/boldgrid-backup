@@ -131,9 +131,15 @@ class Boldgrid_Backup_Admin_Settings {
 	 * @since 1.0
 	 * @access private
 	 *
+	 * @param string $mode The mode of the cron job; either "backup" or "restore".
 	 * @return array An array containing the backup schedule.
 	 */
-	private function read_cron_entry() {
+	private function read_cron_entry( $mode = 'backup' ) {
+		// Validate mode.
+		if ( 'backup' !== $mode && 'restore' !== $mode ) {
+			return array();
+		}
+
 		// Check if crontab is available.
 		$is_crontab_available = $this->core->test->is_crontab_available();
 
@@ -160,7 +166,7 @@ class Boldgrid_Backup_Admin_Settings {
 		);
 
 		// Set a search pattern to match for our cron jobs.
-		$pattern = 'boldgrid-backup-cron.php';
+		$pattern = 'boldgrid-backup-cron.php" mode=' . $mode;
 
 		// Use either crontab or wp-cron.
 		if ( true === $is_crontab_available ) {
@@ -369,9 +375,11 @@ class Boldgrid_Backup_Admin_Settings {
 	 *
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
+	 * @param string $mode If "restore" is specified, then only the restore cron jobs are removed,
+	 * else all backup and restore cron jobs will be removed.
 	 * @return bool Success.
 	 */
-	public function delete_cron_entries() {
+	public function delete_cron_entries( $mode = '' ) {
 		// Check if crontab is available.
 		$is_crontab_available = $this->core->test->is_crontab_available();
 
@@ -390,6 +398,11 @@ class Boldgrid_Backup_Admin_Settings {
 
 		// Set a search pattern to match for our cron jobs.
 		$pattern = 'boldgrid-backup-cron.php';
+
+		// If the mode "restore" is specified, then only target the restore cron job entries.
+		if ( 'restore' === $mode ) {
+			$pattern .= '" mode=restore';
+		}
 
 		// Use either crontab or wp-cron.
 		if ( true === $is_crontab_available ) {
@@ -711,6 +724,118 @@ class Boldgrid_Backup_Admin_Settings {
 		$status = $this->update_cron( $entry );
 
 		return $status;
+	}
+
+	/**
+	 * Add a cron job to restore (rollback) using the last backup.
+	 *
+	 * @since 1.0
+	 *
+	 * @link https://developer.wordpress.org/reference/hooks/upgrader_process_complete/
+	 * @see Boldgrid_Backup_Admin_Core::get_archive_list()
+	 *
+	 * @return null
+	 */
+	public function add_restore_cron() {
+		// Get settings.
+		$settings = $this->get_settings();
+
+		// If auto-rollback is not enabled, then abort.
+		if ( 1 !== $settings['auto_rollback'] ) {
+			return;
+		}
+
+		// Determine if multisite.
+		$is_multisite = is_multisite();
+
+		// If a backup was not made prior to an update (from an update page), then abort.
+		if ( true === $is_multisite ) {
+			$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
+		} else {
+			$pending_rollback = get_option( 'boldgrid_backup_pending_rollback' );
+		}
+
+		if ( true === empty( $pending_rollback ) ) {
+			return;
+		}
+
+		// Get the unix time for 5 minutes ago.
+		$time_5_minutes_ago = strtotime( 'NOW - 5 MINUTES' );
+
+		// If the boldgrid_backup_last_backup time is too old, then abort.
+		if ( true === $is_multisite ) {
+			$last_backup_time = get_site_option( 'boldgrid_backup_last_backup' );
+		} else {
+			$last_backup_time = get_option( 'boldgrid_backup_last_backup' );
+		}
+
+		if ( $last_backup_time < $time_5_minutes_ago ) {
+			return;
+		}
+
+		// Get archive list.
+		$archives = $this->core->get_archive_list();
+
+		// Get the archive count.
+		$archive_count = count( $archives );
+
+		// If there are no archives, then abort.
+		if ( $archive_count <= 0 ) {
+			return;
+		}
+
+		// Use the last key to get info on the most recent archive.
+		$archive_key = $archive_count - 1;
+
+		$archive = $archives[ $archive_key ];
+
+		$archive_filename = $archive['filename'];
+
+		// If the backup file is too old, then abort.
+		if ( $archive['lastmodunix'] < $time_5_minutes_ago ) {
+			return;
+		}
+
+		// Remove existing restore cron jobs.
+		$this->delete_cron_entries( 'restore' );
+
+		// Get the unix time for 5 minutes from now.
+		$time_5_minutes_later = strtotime( 'NOW + 5 MINUTES' );
+
+		// Build cron job line in crontab format.
+		$entry = date( 'i G', $time_5_minutes_later ) . ' * * ' . date( 'w' );
+
+		$entry .= ' php -qf "' . dirname( dirname( __FILE__ ) ) .
+		'/boldgrid-backup-cron.php" mode=restore HTTP_HOST=' . $_SERVER['HTTP_HOST'];
+
+		$entry .= ' archive_key=' . $archive_key . ' archive_filename=' . $archive_filename;
+
+		// If not Windows, then also silence the cron job.
+		if ( false === $this->core->test->is_windows() ) {
+			$entry .= ' > /dev/null 2>&1';
+		}
+
+		// Update cron.
+		$status = $this->update_cron( $entry );
+
+		// If cron job was added, then update the boldgrid_backup_pending_rollback option with time.
+		if ( true === $status ) {
+			if ( true === $is_multisite ) {
+				$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
+
+				$pending_rollback['deadline'] = $time_5_minutes_later;
+
+				update_site_option( 'boldgrid_backup_pending_rollback', $pending_rollback );
+			} else {
+				$pending_rollback = get_option( 'boldgrid_backup_pending_rollback' );
+
+				$pending_rollback['deadline'] = $time_5_minutes_later;
+
+				update_option( 'boldgrid_backup_pending_rollback', $pending_rollback );
+			}
+		}
+
+		return;
 	}
 
 	/**

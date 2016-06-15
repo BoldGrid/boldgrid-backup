@@ -14,5 +14,20 @@ if ( false === defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 }
 
 // Delete BoldGrid Backup WordPress options.
-delete_option( 'boldgrid_backup_settings' );
-delete_option( 'boldgrid_backup_last_backup' );
+$delete_options = array(
+	'boldgrid_backup_settings',
+	'boldgrid_backup_last_backup',
+	'boldgrid_backup_pending_rollback',
+);
+
+$is_mutlisite = is_multisite();
+
+if ( true === $is_multisite ) {
+	foreach ( $delete_options as $option ) {
+		delete_site_option( $option );
+	}
+} else {
+	foreach ( $delete_options as $option ) {
+		delete_option( $option );
+	}
+}

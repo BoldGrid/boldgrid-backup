@@ -113,13 +113,13 @@ switch ( $input['mode'] ) {
 		$_GET['archive_filename'] = ( false === empty( $input['archive_filename'] ) ? $input['archive_filename'] : null );
 
 		// Call the restore function.
-		$archive_info = $boldgrid_backup_core->restore_archive_file();
+		$archive_info = $boldgrid_backup_core->restore_archive_file( $dry_run );
 
 		echo __( 'Done.' ) . PHP_EOL;
 		break;
 
 	default :
-		die( __( 'Error: An unknown error occurred.' ) );
+		die( __( 'Error: Invalid mode "' . $input['mode'] . '" was specified.' ) );
 		break;
 }
 
