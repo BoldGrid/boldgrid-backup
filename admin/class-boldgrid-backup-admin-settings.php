@@ -113,8 +113,10 @@ class Boldgrid_Backup_Admin_Settings {
 			$settings['auto_rollback'] = 1;
 		}
 
-		// Check cron for schedule.
-		$cron_schedule = $this->read_cron_entry();
+		// If not updating the settings, then check cron for schedule.
+		if ( false === isset( $_POST['save_time'] ) ) {
+			$cron_schedule = $this->read_cron_entry();
+		}
 
 		// If a cron schedule was found, then merge the settings.
 		if ( false === empty( $cron_schedule ) ) {
@@ -166,7 +168,7 @@ class Boldgrid_Backup_Admin_Settings {
 		);
 
 		// Set a search pattern to match for our cron jobs.
-		$pattern = 'boldgrid-backup-cron.php" mode=' . $mode;
+		$pattern = dirname( dirname( __FILE__ ) ) . '/boldgrid-backup-cron.php" mode=' . $mode;
 
 		// Use either crontab or wp-cron.
 		if ( true === $is_crontab_available ) {
@@ -397,7 +399,7 @@ class Boldgrid_Backup_Admin_Settings {
 		}
 
 		// Set a search pattern to match for our cron jobs.
-		$pattern = 'boldgrid-backup-cron.php';
+		$pattern = dirname( dirname( __FILE__ ) ) . '/boldgrid-backup-cron.php';
 
 		// If the mode "restore" is specified, then only target the restore cron job entries.
 		if ( 'restore' === $mode ) {
@@ -879,7 +881,7 @@ class Boldgrid_Backup_Admin_Settings {
 		}
 
 		// Check for settings update.
-		if ( false === empty( $_POST['save_time'] ) ) {
+		if ( true === isset( $_POST['save_time'] ) ) {
 			// Verify nonce.
 			check_admin_referer( 'boldgrid-backup-settings', 'settings_auth' );
 
