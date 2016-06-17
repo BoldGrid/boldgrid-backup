@@ -14,6 +14,20 @@
 ?>
 <div class='wrap'>
 <h1>BoldGrid Backup</h1>
+<hr />
+<h2>Backup Archive Summary</h2>
+<table id='backup-archive-summary-table'>
+	<tbody id='backup-archive-list-header'>
+		<tr>
+			<td class='backup-archive-summary-metric'>Archive Count:</td>
+			<td class='backup-archive-summary-value'><?php echo $archives_count; ?></td>
+		</tr>
+		<tr>
+			<td class='backup-archive-summary-metric'>Total Size:</td>
+			<td class='backup-archive-summary-value'><?php echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archives_size );?></td>
+		</tr>
+	</tbody>
+</table>
 <h2>Backup Archives</h2>
 <?php
 
@@ -28,6 +42,9 @@ if ( false === empty( $archives ) ) {
 			<th class='backup-archive-list-date'>Date</th>
 			<th class='backup-archive-list-download'></th>
 			<th class='backup-archive-list-restore'></th>
+		</tr>
+		<tr>
+			<th colspan="6"><hr /></th>
 		</tr>
 	</thead>
 	<tbody id='backup-archive-list-body'>
@@ -69,19 +86,6 @@ foreach ( $archives as $key => $archive ) {
 	?>
 	</tbody>
 </table>
-<h2>Backup Archive Summary</h2>
-<table id='backup-archive-summary-table'>
-	<tbody id='backup-archive-list-header'>
-		<tr>
-			<td class='backup-archive-summary-metric'>Archive Count:</td>
-			<td class='backup-archive-summary-value'><?php echo $archives_count; ?></td>
-		</tr>
-		<tr>
-			<td class='backup-archive-summary-metric'>Total Size:</td>
-			<td class='backup-archive-summary-value'><?php echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archives_size );?></td>
-		</tr>
-	</tbody>
-</table>
 <?php
 } else {
 	?>
@@ -93,7 +97,7 @@ foreach ( $archives as $key => $archive ) {
 	<form action='#' id='backup-site-now-form' method='POST'>
 		<?php wp_nonce_field( 'boldgrid_backup_now', 'backup_auth' ); ?>
 		<p>
-			<a id='backup-site-now' class='button'>Backup Site Now</a>
+			<a id='backup-site-now' class='button button-primary'>Backup Site Now</a>
 			<span class='spinner'></span>
 		</p>
 	</form>
