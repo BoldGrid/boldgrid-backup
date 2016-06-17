@@ -115,6 +115,9 @@ switch ( $input['mode'] ) {
 		// Call the restore function.
 		$archive_info = $boldgrid_backup_core->restore_archive_file( $dry_run );
 
+		// Remove existing restore cron jobs.
+		$boldgrid_backup_core->settings->delete_cron_entries( 'restore' );
+
 		echo __( 'Done.' ) . PHP_EOL;
 		break;
 

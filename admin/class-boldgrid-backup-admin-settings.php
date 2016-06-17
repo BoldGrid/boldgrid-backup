@@ -761,8 +761,8 @@ class Boldgrid_Backup_Admin_Settings {
 			return;
 		}
 
-		// Get the unix time for 5 minutes ago.
-		$time_5_minutes_ago = strtotime( 'NOW - 5 MINUTES' );
+		// Get the unix time for 15 minutes ago.
+		$time_15_minutes_ago = strtotime( 'NOW - 15 MINUTES' );
 
 		// If the boldgrid_backup_last_backup time is too old, then abort.
 		if ( true === $is_multisite ) {
@@ -771,7 +771,7 @@ class Boldgrid_Backup_Admin_Settings {
 			$last_backup_time = get_option( 'boldgrid_backup_last_backup' );
 		}
 
-		if ( $last_backup_time < $time_5_minutes_ago ) {
+		if ( $last_backup_time < $time_15_minutes_ago ) {
 			return;
 		}
 
@@ -794,7 +794,7 @@ class Boldgrid_Backup_Admin_Settings {
 		$archive_filename = $archive['filename'];
 
 		// If the backup file is too old, then abort.
-		if ( $archive['lastmodunix'] < $time_5_minutes_ago ) {
+		if ( $archive['lastmodunix'] < $time_15_minutes_ago ) {
 			return;
 		}
 
@@ -802,10 +802,18 @@ class Boldgrid_Backup_Admin_Settings {
 		$this->delete_cron_entries( 'restore' );
 
 		// Get the unix time for 5 minutes from now.
-		$time_5_minutes_later = strtotime( 'NOW + 5 MINUTES' );
+		$time_5_minutes_later = strtotime( date( 'H:i' ) . ' + 5 MINUTES' );
+
+		// Get the system's localized current hour.
+		$hour = $this->core->execute_command( 'date +%H' );
+
+		// Validate hour; use system hour, or the date code for hour ("G").
+		if ( true === empty( $hour ) ) {
+			$hour = 'G';
+		}
 
 		// Build cron job line in crontab format.
-		$entry = date( 'i G', $time_5_minutes_later ) . ' * * ' . date( 'w' );
+		$entry = date( 'i ' . $hour, $time_5_minutes_later ) . ' * * ' . date( 'w' );
 
 		$entry .= ' php -qf "' . dirname( dirname( __FILE__ ) ) .
 		'/boldgrid-backup-cron.php" mode=restore HTTP_HOST=' . $_SERVER['HTTP_HOST'];

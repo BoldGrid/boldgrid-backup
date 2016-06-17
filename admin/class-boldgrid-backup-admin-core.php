@@ -1010,6 +1010,9 @@ class Boldgrid_Backup_Admin_Core {
 								 '" was not written.',
 						);
 					}
+
+					// Get file size.
+					$info['lastmodunix'] = $wp_filesystem->mtime( $info['filepath'] );
 				}
 
 				break;
@@ -2102,8 +2105,12 @@ class Boldgrid_Backup_Admin_Core {
 			$pending_rollback = get_option( 'boldgrid_backup_pending_rollback' );
 		}
 
+		// Get the unix time for 15 minutes ago.
+		$time_15_minutes_ago = strtotime( 'NOW - 15 MINUTES' );
+
 		// If there is a pending rollback, then abort.
-		if ( false === empty( $pending_rollback ) ) {
+		if ( false === empty( $pending_rollback['lastmodunix'] ) &&
+			$pending_rollback['lastmodunix'] > $time_15_minutes_ago ) {
 			return;
 		}
 
@@ -2207,7 +2214,18 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// If there is not pending rollback, then abort.
-		if ( true === empty( $pending_rollback ) || false === isset( $pending_rollback['deadline'] ) ) {
+		if ( true === empty( $pending_rollback ) ) {
+			return;
+		}
+
+		// If a backup was just made, but pending an update, then display a notice and return.
+		if ( false === isset( $pending_rollback['deadline'] ) ) {
+			$notice_text = 'A recent backup was made.  ' .
+				'Once updates are completed, there will be a pending automatic rollback.  ' .
+			'If there are no issues, then you may cancel the rollback operation.';
+
+			do_action( 'boldgrid_backup_notice', $notice_text, 'notice notice-warning' );
+
 			return;
 		}
 
