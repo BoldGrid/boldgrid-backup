@@ -790,8 +790,8 @@ class Boldgrid_Backup_Admin_Settings {
 			return;
 		}
 
-		// Use the last key to get info on the most recent archive.
-		$archive_key = $archive_count - 1;
+		// Use the first key to get info on the most recent archive.
+		$archive_key = 0;
 
 		$archive = $archives[ $archive_key ];
 

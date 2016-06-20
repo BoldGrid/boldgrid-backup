@@ -20,20 +20,15 @@
 	<tbody id='backup-archive-list-header'>
 		<tr>
 			<td class='backup-archive-summary-metric'>Archive Count:</td>
-			<td class='backup-archive-summary-value'><?php echo $archives_count; ?></td>
+			<td class='backup-archive-summary-value' id='archives-count'><?php echo $archives_count; ?></td>
 		</tr>
 		<tr>
 			<td class='backup-archive-summary-metric'>Total Size:</td>
-			<td class='backup-archive-summary-value'><?php echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archives_size );?></td>
+			<td class='backup-archive-summary-value' id='archives-size'><?php echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archives_size );?></td>
 		</tr>
 	</tbody>
 </table>
 <h2>Backup Archives</h2>
-<?php
-
-// Print the list of archive files.
-if ( false === empty( $archives ) ) {
-	?>
 <table id='backup-archive-list-table'>
 	<thead id='backup-archive-list-header'>
 		<tr>
@@ -49,6 +44,9 @@ if ( false === empty( $archives ) ) {
 	</thead>
 	<tbody id='backup-archive-list-body'>
 <?php
+
+// Print the list of archive files.
+if ( false === empty( $archives ) ) {
 foreach ( $archives as $key => $archive ) {
 	// Create URL for restoring from an archive file.
 	$restore_url = get_admin_url( null,
@@ -83,16 +81,10 @@ foreach ( $archives as $key => $archive ) {
 		</tr>
 <?php
 }
-	?>
-	</tbody>
-</table>
-<?php
-} else {
-	?>
-<p>There are no archive files created.</p>
-<?php
 }
 ?>
+	</tbody>
+</table>
 <div id='backup-site-now-section'>
 	<form action='#' id='backup-site-now-form' method='POST'>
 		<?php wp_nonce_field( 'boldgrid_backup_now', 'backup_auth' ); ?>

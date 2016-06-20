@@ -1014,7 +1014,7 @@ class Boldgrid_Backup_Admin_Core {
 						);
 					}
 
-					// Get file size.
+					// Get file modification time.
 					$info['lastmodunix'] = $wp_filesystem->mtime( $info['filepath'] );
 				}
 
@@ -1075,17 +1075,17 @@ class Boldgrid_Backup_Admin_Core {
 			$subject = __( 'Backup completed for ' ) . $site_id;
 
 			// Create message.
-			$body = __( "Hello,\n\n" );
+			$body = __( 'Hello,' ) . "\n\n";
 
-			if ( true !== $dryrun ) {
-				$body .= __( 'THIS OPERATION WAS A DRY-RUN TEST.' );
+			if ( true === $dryrun ) {
+				$body .= __( 'THIS OPERATION WAS A DRY-RUN TEST.' ) . "\n\n";
 			}
 
 			$body .= __( 'A backup archive has been created for ' ) . $site_id . ".\n\n";
 
-			$body .= __( "Backup details:\n" );
+			$body .= __( 'Backup details:' ) . "\n";
 
-			$body .= __( 'Duration: ' . $info['duration'] . " seconds\n" );
+			$body .= __( 'Duration: ' . $info['duration'] . ' seconds' ) . "\n";
 
 			$body .= __( 'Total size: ' ) .
 			Boldgrid_Backup_Admin_Utility::bytes_to_human( $info['total_size'] ) . "\n";
@@ -1098,14 +1098,16 @@ class Boldgrid_Backup_Admin_Core {
 			$body .= __( 'Compressor used: ' ) . $info['compressor'] . "\n\n";
 
 			if ( defined( 'DOING_CRON' ) ) {
-				$body .= __( "The backup request was made via CRON (task scheduler).\n\n" );
+				$body .= __( 'The backup request was made via CRON (task scheduler).' ) . "\n\n";
 			}
 
 			$body .= __(
-				"You can manage notifications in your WordPress admin panel, under BoldGrid Backup Settings.\n\n"
-			);
+				'You can manage notifications in your WordPress admin panel, under BoldGrid Backup Settings.'
+			) . "\n\n";
 
-			$body .= __( "Best regards,\n\nThe BoldGrid Backup plugin\n\n" );
+			$body .= __( 'Best regards,' ) . "\n\n";
+
+			$body .= __( 'The BoldGrid Backup plugin' ) . "\n\n";
 
 			// Send the notification.
 			$info['mail_success'] = $this->send_notification( $subject, $body );
@@ -1129,7 +1131,7 @@ class Boldgrid_Backup_Admin_Core {
 	}
 
 	/**
-	 * Get information for the list of archive file(s).
+	 * Get information for the list of archive file(s) (in descending order by date modified).
 	 *
 	 * @since 1.0
 	 *
@@ -1161,15 +1163,15 @@ class Boldgrid_Backup_Admin_Core {
 			return array();
 		}
 
-		// Sort the dirlist array by "lastmodunix".
+		// Sort the dirlist array by "lastmodunix" descending.
 		uasort( $dirlist,
 			function ( $a, $b ) {
 				if ( $a['lastmodunix'] < $b['lastmodunix'] ) {
-					return - 1;
+					return 1;
 				}
 
 				if ( $a['lastmodunix'] > $b['lastmodunix'] ) {
-					return 1;
+					return - 1;
 				}
 
 				return 0;
@@ -1670,10 +1672,10 @@ class Boldgrid_Backup_Admin_Core {
 			$subject = __( 'Restoration completed for ' ) . $site_id;
 
 			// Create message.
-			$body = __( "Hello,\n\n" );
+			$body = __( 'Hello,' ) . "\n\n";
 
-			if ( true !== $dryrun ) {
-				$body .= __( 'THIS OPERATION WAS A DRY-RUN TEST.' );
+			if ( true === $dryrun ) {
+				$body .= __( 'THIS OPERATION WAS A DRY-RUN TEST.' ) . "\n\n";
 			}
 
 			if ( true === $restore_ok ) {
@@ -1696,14 +1698,16 @@ class Boldgrid_Backup_Admin_Core {
 			Boldgrid_Backup_Admin_Utility::bytes_to_human( $info['filesize'] ) . "\n";
 
 			if ( defined( 'DOING_CRON' ) ) {
-				$body .= __( "The restoration request was made via WP-CRON.\n\n" );
+				$body .= __( 'The restoration request was made via WP-CRON.' ) . "\n\n";
 			}
 
 			$body .= __(
-				"You can manage notifications in your WordPress admin panel, under BoldGrid Backup Settings.\n\n"
-			);
+				'You can manage notifications in your WordPress admin panel, under BoldGrid Backup Settings.'
+			) . "\n\n";
 
-			$body .= __( "Best regards,\n\nThe BoldGrid Backup plugin\n\n" );
+			$body .= __( 'Best regards,' ) . "\n\n";
+
+			$body .= __( 'The BoldGrid Backup plugin' ) . "\n\n";
 
 			// Send the notification.
 			$info['mail_success'] = $this->send_notification( $subject, $body );
@@ -1829,11 +1833,30 @@ class Boldgrid_Backup_Admin_Core {
 		// Verify nonce.
 		if ( false === isset( $_POST['backup_auth'] ) ||
 			1 !== check_ajax_referer( 'boldgrid_backup_now', 'backup_auth', false ) ) {
-				wp_die( '<div class="error"><p>Security violation (invalid nonce).</p></div>' );
+				wp_die(
+					'<div class="error"><p>' . __( 'Security violation (invalid nonce).' ) .
+					'</p></div>'
+				);
 		}
 
 		// Perform the backup operation.
 		$archive_info = $this->archive_files( true );
+
+		// Get archive list.
+		$archives = $this->get_archive_list();
+
+		// Get the archives file count.
+		$archives_count = count( $archives );
+
+		// Get the total size for all archives.
+		$archives_size = 0;
+
+		foreach ( $archives as $archive ) {
+			$archives_size += $archive['filesize'];
+		}
+
+		// Make the archives total size human-readable.
+		$archives_size = Boldgrid_Backup_Admin_Utility::bytes_to_human( $archives_size );
 
 		// Generate markup, using the backup page template.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup.php';
@@ -2183,7 +2206,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Get the most recent archive listing.
 		if ( $archive_count > 0 ) {
-			$key = $archive_count - 1;
+			$key = 0;
 
 			$archive = $archives[ $key ];
 
@@ -2241,7 +2264,7 @@ class Boldgrid_Backup_Admin_Core {
 		<form action='#' id='backup-site-now-form' method='POST'>
 				". wp_nonce_field( 'boldgrid_backup_now', 'backup_auth' ) ."
 				<p>
-					<a id='backup-site-now' class='button' data-updating='true'>Backup Site Now</a>
+					<a id='backup-site-now' class='button button-primary' data-updating='true'>Backup Site Now</a>
 					<span class='spinner'></span>
 				</p>
 			</form>
@@ -2275,9 +2298,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// If a backup was just made, but pending an update, then display a notice and return.
 		if ( false === isset( $pending_rollback['deadline'] ) ) {
-			$notice_text = 'A recent backup was made.  ' .
-				'Once updates are completed, there will be a pending automatic rollback.  ' .
-			'If there are no issues, then you may cancel the rollback operation.';
+			$notice_text = 'A recent backup was made.  Once updates are completed, there will be a pending automatic rollback.  If there are no issues, then you may cancel the rollback operation.';
 
 			do_action( 'boldgrid_backup_notice', $notice_text, 'notice notice-warning' );
 
@@ -2414,7 +2435,7 @@ class Boldgrid_Backup_Admin_Core {
 		$archives_count = count( $archives );
 
 		// If the archive count is not beyond the set retention count, then return.
-		if ( $archives_count <= $settings['retention_count'] ) {
+		if ( true === empty( $settings['retention_count'] ) || $archives_count <= $settings['retention_count'] ) {
 			return;
 		}
 
@@ -2422,7 +2443,7 @@ class Boldgrid_Backup_Admin_Core {
 		global $wp_filesystem;
 
 		// Initialize $counter.
-		$counter = 0;
+		$counter = $archives_count - 1;
 
 		// Delete old backups.
 		while ( $archives_count > $settings['retention_count'] ) {
@@ -2439,7 +2460,7 @@ class Boldgrid_Backup_Admin_Core {
 			$archives_count --;
 
 			// Increment the counter.
-			$counter ++;
+			$counter --;
 		}
 
 		return;

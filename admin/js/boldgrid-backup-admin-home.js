@@ -58,7 +58,8 @@
 	 */
 	self.downloadArchive = function() {
 		// Declare variables.
-		var downloadKey, downloadFilename, downloadFilepath, data, form, $formDom, $this = $( this );
+		var downloadKey, downloadFilename, downloadFilepath, data, form, $formDom,
+			$this = $( this );
 
 		// Get the backup archive file key.
 		downloadKey = $this.data( 'key' );
@@ -213,6 +214,28 @@
 			success : function( response ) {
 				// Insert markup.
 				$backupSiteResults.html( response );
+
+				// Update the archives count.
+				$( '#archives-count' ).html( $( '#archives-new-count' ) );
+
+				// Update the archives total size.
+				$( '#archives-size' ).html( $( '#archives-new-size' ) );
+
+				// Replace the old list with the new.
+				$( '#backup-archive-list-body' ).html( $( '#archive-list-new tr' ) );
+
+				// Remove the hidden new list.
+				$( '#archive-list-new' ).remove();
+
+				// Rebind the click events, to the updated list.
+				// On click action for download buttons.
+				$( '.action-download' ).on( 'click', self.downloadArchive );
+
+				// On click action for restore buttons.
+				$( '.action-restore' ).on( 'click', self.restoreArchiveConfirm );
+
+				// On click action for delete buttons.
+				$( '.action-delete' ).on( 'click', self.deleteArchiveConfirm );
 			},
 			error : errorCallback,
 			complete : function() {

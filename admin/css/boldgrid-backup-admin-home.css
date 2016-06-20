@@ -8,6 +8,10 @@
 	padding-right: 30px;
 }
 
+#backup-archive-list-body tr:hover {
+	background-color: #E3E3E3;
+}
+
 #backup-archive-list-table .backup-archive-list-download,
 #backup-archive-list-table .backup-archive-list-restore,
 #backup-archive-list-table .backup-archive-list-delete {
