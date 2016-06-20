@@ -16,7 +16,7 @@
 
 	/*
 	 * This script is passed "localizeScriptData" {"downloadNonce", "accessType", "restoreConfirmText",
-	 * "deleteConfirmText", "backupUrl"}
+	 * "deleteConfirmText", "backupUrl", "errorText"}
 	 * (via wp_localize_script() in "class-boldgrid-backup-admin-core.php").
 	 */
 
@@ -168,10 +168,7 @@
 		$this = $( this );
 
         // Disable the Backup Site Now link button.
-        $this.prop( 'disabled', true );
-
-        // Disable the Backup Site Now link button.
-		$this.css( 'pointer-events', 'none' );
+		$this.attr( 'disabled', 'disabled' ).css( 'pointer-events', 'none' );
 
 		// Create a context selector for the Backup Site Now section.
 		$backupSiteSection = $('#backup-site-now-section');
@@ -193,7 +190,8 @@
 		// Create an error callback function.
 		errorCallback = function() {
 			// Show error message.
-			markup = '<div class="notice notice-error"><p>There was an error processing your request.  Please reload the page and try again.</p></div>';
+			markup = '<div class="notice notice-error"><p>' + localizeScriptData.errorText +
+				'</p></div>';
 
 			$backupSiteResults.html( markup );
 		}

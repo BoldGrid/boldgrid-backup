@@ -1646,7 +1646,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Display notice of deletion status.
 		if ( false === $restore_ok ) {
-			if( false === $doing_cron ) {
+			if ( false === $doing_cron ) {
 				do_action( 'boldgrid_backup_notice',
 					'Could not restore database.',
 					'notice notice-error is-dismissible'
@@ -1777,6 +1777,7 @@ class Boldgrid_Backup_Admin_Core {
 			'restoreConfirmText' => $restore_confirm_text,
 			'deleteConfirmText' => $delete_confirm_text,
 			'backupUrl' => $backup_url,
+			'errorText' => __( 'There was an error processing your request.  Please reload the page and try again.' ),
 		);
 
 		// Add localize script data to the JS script.
