@@ -590,6 +590,12 @@ class Boldgrid_Backup_Admin_Core {
 	private function restore_database( $db_dump_filepath ) {
 		// Check input.
 		if ( true === empty( $db_dump_filepath ) ) {
+			// Display an error notice.
+			do_action( 'boldgrid_backup_notice',
+				'The database dump file path was not specified.',
+				'notice notice-error is-dismissible'
+			);
+
 			return false;
 		}
 
@@ -622,6 +628,12 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Check if the defaults file was written.
 		if ( true !== $status || false === $wp_filesystem->exists( $defaults_filepath ) ) {
+			// Display an error notice.
+			do_action( 'boldgrid_backup_notice',
+				'Error restoring database; Could not create a temporary mysql defaults file.',
+				'notice notice-error is-dismissible'
+			);
+
 			return false;
 		}
 
@@ -645,6 +657,12 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Check command status.
 		if ( true !== $status ) {
+			// Display an error notice.
+			do_action( 'boldgrid_backup_notice',
+				'The mysql command was not successful.',
+				'notice notice-error is-dismissible'
+			);
+
 			return false;
 		}
 
@@ -1501,6 +1519,18 @@ class Boldgrid_Backup_Admin_Core {
 			$filesize = 0;
 
 			$restore_ok = false;
+
+			// Display an error notice, if not DOING_CRON.
+			if ( false === $doing_cron ) {
+				do_action( 'boldgrid_backup_notice',
+					'The selected archive file is empty.',
+					'notice notice-error is-dismissible'
+				);
+			} else {
+				return array(
+					'error' => 'The selected archive file was not found.',
+				);
+			}
 		}
 
 		// Populate $info.
@@ -1533,6 +1563,17 @@ class Boldgrid_Backup_Admin_Core {
 				') ';
 
 				$restore_ok = false;
+				// Display an error notice, if not DOING_CRON.
+				if ( false === $doing_cron ) {
+					do_action( 'boldgrid_backup_notice',
+						$info['error'],
+						'notice notice-error is-dismissible'
+					);
+				} else {
+					return array(
+						'error' => $info['error'],
+					);
+				}
 			} elseif ( true !== $dryrun ) {
 				// Set the WordPress root directory path, with no trailing slash.
 				$wp_root = untrailingslashit( ABSPATH );
@@ -1546,18 +1587,44 @@ class Boldgrid_Backup_Admin_Core {
 					if ( false === Boldgrid_Backup_Admin_Utility::make_writable( ABSPATH . $name ) ) {
 						$restore_ok = false;
 
+						// Display an error notice, if not DOING_CRON.
+						if ( false === $doing_cron ) {
+							do_action( 'boldgrid_backup_notice',
+								'The file "' . $name . '" is not writable.',
+								'notice notice-error is-dismissible'
+							);
+						} else {
+							return array(
+								'error' => 'The file "' . $name . '" is not writable.',
+							);
+						}
+
 						break;
 					}
 
 					// Extract the file.
 					if ( true !== $zip->extractTo( $wp_root, array( $name ) ) ) {
 						// Error extracting.
+						$info['error'] = 'Error extracting "' . ABSPATH . $name .
+							'" from archive file "' . $filepath . '".';
+
 						error_log( __METHOD__ .
-							': Error extracting "' . ABSPATH . $name . '" from archive file "' .
-							$filepath . '".'
+							': ' . $info['error']
 						);
 
 						$restore_ok = false;
+
+						// Display an error notice, if not DOING_CRON.
+						if ( false === $doing_cron ) {
+							do_action( 'boldgrid_backup_notice',
+								$info['error'],
+								'notice notice-error is-dismissible'
+							);
+						} else {
+							return array(
+								'error' => $info['error'],
+							);
+						}
 
 						break;
 					}
@@ -1578,15 +1645,17 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Display notice of deletion status.
-		if ( false === $restore_ok && false === $doing_cron ) {
-			do_action( 'boldgrid_backup_notice',
-				'Error restoring the selected archive file.',
-				'notice notice-error is-dismissible'
-			);
-		} else {
-			return array(
-				'error' => 'Error restoring the selected archive file.',
-			);
+		if ( false === $restore_ok ) {
+			if( false === $doing_cron ) {
+				do_action( 'boldgrid_backup_notice',
+					'Could not restore database.',
+					'notice notice-error is-dismissible'
+				);
+			} else {
+				return array(
+					'error' => 'Could not restore database.',
+				);
+			}
 		}
 
 		// Get settings.

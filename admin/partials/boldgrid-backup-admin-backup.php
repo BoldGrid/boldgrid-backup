@@ -96,7 +96,7 @@ if ( false === empty( $_GET['restore_now'] ) ) {
 } else {
 	echo __( 'There was an error creating a backup archive file.' );
 }
-?></p></div>
+?></p>
 <?php
 if ( false === empty( $archive_info['filepath'] ) ) {
 ?>
@@ -105,19 +105,18 @@ if ( false === empty( $archive_info['filepath'] ) ) {
 }
 ?>
 <p>Error: <?php echo $archive_info['error']; ?></p>
-<p>Error Details: <?php
+<?php
 if ( true === isset( $archive_info['error_message'] ) ) {
-	echo $archive_info['error_message'];
-} else {
-	echo 'Unknown';
+	echo '<p>Error Details: ' . $archive_info['error_message'];
+
+	if ( true === isset( $archive_info['error_code'] ) ) {
+		echo ' (' . $archive_info['error_code'] . ')';
+	}
+
+	echo '</p>';
 }
-?> (<?php
-if ( true === isset( $archive_info['error_code'] ) ) {
-	echo $archive_info['error_code'];
-} else {
-	echo '?';
-}
-?>)</p>
+?>
+</div>
 <?php
 	}
 }
