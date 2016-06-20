@@ -606,26 +606,11 @@ class Boldgrid_Backup_Admin_Core {
 			return false;
 		}
 
-		// If mysqldump is not available, then fail.
-		if ( true !== $this->test->is_mysqldump_available() ) {
-			return false;
-		}
-
 		// Get the backup directory path.
 		$backup_directory = $this->config->get_backup_directory();
 
 		// Connect to the WordPress Filesystem API.
 		global $wp_filesystem;
-
-		// Check if the dump file is readable.
-		if ( true !== $wp_filesystem->is_readable( $backup_directory ) ) {
-			return false;
-		}
-
-		// Check if the backup directory is writable.
-		if ( true !== $wp_filesystem->is_writable( $backup_directory ) ) {
-			return false;
-		}
 
 		// Create a mysql defaults file.
 		$defaults_filepath = $backup_directory . '/mysqldump.cnf';
@@ -659,7 +644,7 @@ class Boldgrid_Backup_Admin_Core {
 		$wp_filesystem->delete( $defaults_filepath, false, 'f' );
 
 		// Check command status.
-		if ( false === $output || true !== $status ) {
+		if ( true !== $status ) {
 			return false;
 		}
 
