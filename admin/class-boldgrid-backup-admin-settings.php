@@ -399,11 +399,13 @@ class Boldgrid_Backup_Admin_Settings {
 		}
 
 		// Set a search pattern to match for our cron jobs.
-		$pattern = dirname( dirname( __FILE__ ) ) . '/boldgrid-backup-cron.php';
+		$pattern = dirname( dirname( __FILE__ ) ) . '/boldgrid-backup-cron.php" mode=';
 
-		// If the mode "restore" is specified, then only target the restore cron job entries.
+		// Target the cron job entries for the current mode (backup|restore).
 		if ( 'restore' === $mode ) {
-			$pattern .= '" mode=restore';
+			$pattern .= 'restore';
+		} else {
+			$pattern .= 'backup';
 		}
 
 		// Use either crontab or wp-cron.
@@ -666,6 +668,8 @@ class Boldgrid_Backup_Admin_Settings {
 	 * Add cron entry for backups from stored settings.
 	 *
 	 * @since 1.0
+	 *
+	 * @see Boldgrid_Backup_Admin_Settings::update_cron().
 	 *
 	 * @return bool Success.
 	 */
