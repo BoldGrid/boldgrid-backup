@@ -153,13 +153,15 @@ if ( true === empty( $settings ) ) {
 						<td><?php echo __( 'Number of backup archives to retain' ); ?></td>
 						<td><select id='retention-count' name='retention_count'>
 							<?php
+							$is_retention_set = ( true === isset( $settings['retention_count'] ) );
+
 							for ( $x = 1; $x <= 10; $x ++ ) {
 								?>
 								<option value='<?php echo $x; ?>'
 									<?php
-									if ( ( true === isset( $settings['retention_count'] ) &&
-									 $x === $settings['retention_count'] ) || ( false ===
-									 isset( $settings['retention_count'] ) && 5 === $x ) ) {
+									// If set, select the number, or use 5 as a default.
+									if ( ( $is_retention_set && $x === $settings['retention_count'] ) ||
+									( false === $is_retention_set && 5 === $x ) ) {
 										echo ' selected';
 									}
 								?>><?php echo $x; ?></option>
