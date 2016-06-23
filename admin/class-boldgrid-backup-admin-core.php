@@ -872,6 +872,9 @@ class Boldgrid_Backup_Admin_Core {
 			);
 		}
 
+		// Close any PHP session, so that another session can open during the backup operation.
+		session_write_close();
+
 		// Initialize return array and add "compressor" and "save" keys.
 		$info = array(
 			'mode' => 'backup',
@@ -1464,6 +1467,9 @@ class Boldgrid_Backup_Admin_Core {
 			}
 		}
 
+		// Close any PHP session, so that another session can open during this restore operation.
+		session_write_close();
+
 		// Get archive list.
 		if ( true === $restore_ok ) {
 			$archives = $this->get_archive_list( $archive_filename );
@@ -1943,6 +1949,9 @@ class Boldgrid_Backup_Admin_Core {
 		if ( 0 !== ob_get_level() ) {
 			ob_end_flush();
 		}
+
+		// Close any PHP session, so another session can open during the download.
+		session_write_close();
 
 		// Send the file.  Not finding a replacement in $wp_filesystem.
 		readfile( $filepath );
