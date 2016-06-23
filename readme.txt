@@ -20,6 +20,9 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 
 == Changelog ==
 
+= 1.0.1 In progress =
+* Testing:		JIRA WPB-2046	Tested on WordPress 4.5.3.
+
 = 1.0 =
 * Initial public release.
 
