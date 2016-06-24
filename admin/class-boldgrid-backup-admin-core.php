@@ -180,9 +180,10 @@ class Boldgrid_Backup_Admin_Core {
 	 * @param string $command A command string to be executed.
 	 * @param array  $available_exec_functions An array of available execution functions.
 	 * @param bool   $success or failure of the operation, passed back to the caller.
+	 * @param int    $return_var If present, the return_var, passed back to the caller.
 	 * @return string|bool Returns the command output or FALSE on error.
 	 */
-	public function execute_command( $command, $available_exec_functions = array(), &$success = false ) {
+	public function execute_command( $command, $available_exec_functions = array(), &$success = false, &$return_var = 0 ) {
 		// If no command was passed, then fail.
 		if ( true === empty( $command ) ) {
 			return false;

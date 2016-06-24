@@ -21,6 +21,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 == Changelog ==
 
 = 1.0.1 In progress =
+* Bug fix:		JIRA WPB-2054	Test for crontab now works when crontab is empty.
 * Bug fix:		JIRA WPB-2051	Now closing PHP session on backup, download, and restore, so that other PHP requests from the client may load.
 * Testing:		JIRA WPB-2046	Tested on WordPress 4.5.3.
 

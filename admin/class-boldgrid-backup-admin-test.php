@@ -150,10 +150,10 @@ class Boldgrid_Backup_Admin_Test {
 		$command = 'crontab -l';
 
 		// Test to see if the crontab command is available.
-		$output = $this->core->execute_command( $command, null, $success );
+		$output = $this->core->execute_command( $command, null, $success, $return_var );
 
 		// Set class property.
-		$this->is_crontab_available = ( $success || (bool) $output );
+		$this->is_crontab_available = ( $success || (bool) $output || 1 === $return_var );
 
 		return $this->is_crontab_available;
 	}
