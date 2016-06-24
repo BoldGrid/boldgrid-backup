@@ -383,4 +383,67 @@ class Boldgrid_Backup_Admin_Update {
 		// Return the configuration array.
 		return $configs;
 	}
+
+	/**
+	 * Action to add a filter to check if this plugin should be auto-updated.
+	 *
+	 * @since 1.0.1
+	 */
+	public function wp_update_this_plugin () {
+		// Add filters to modify plugin update transient information.
+		add_filter( 'pre_set_site_transient_update_plugins',
+			array (
+				$this,
+				'custom_plugins_transient_update'
+			)
+		);
+
+		add_filter( 'plugins_api',
+			array (
+				$this,
+				'custom_plugins_transient_update'
+			)
+		);
+
+		add_filter( 'site_transient_update_plugins',
+			array (
+				$this,
+				'site_transient_update_plugins'
+			)
+		);
+
+		add_filter( 'auto_update_plugin',
+			array (
+				$this,
+				'auto_update_this_plugin'
+			), 10, 2
+		);
+
+		add_filter( 'auto_update_plugins',
+			array (
+				$this,
+				'auto_update_this_plugin'
+			), 10, 2
+		);
+
+		// Have WordPress check for plugin updates.
+		wp_maybe_auto_update();
+	}
+
+	/**
+	 * Filter to check if this plugin should be auto-updated.
+	 *
+	 * @since 1.0.1
+	 *
+	 * @param bool $update Whether or not this plugin is set to update.
+	 * @param object $item The plugin transient object.
+	 * @return bool Whether or not to update this plugin.
+	 */
+	public function auto_update_this_plugin ( $update, $item ) {
+		if ( isset( $item->slug['boldgrid-backup'] ) && isset( $item->autoupdate ) ) {
+			return true;
+		} else {
+			return $update;
+		}
+	}
 }

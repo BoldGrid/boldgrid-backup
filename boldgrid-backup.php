@@ -67,6 +67,30 @@ if ( true === is_admin() || ( true === defined( 'DOING_CRON' ) && DOING_CRON ) )
 	require BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup.php';
 }
 
+// If DOING_CRON, then check if this plugin should be auto-updated.
+if ( true === defined( 'DOING_CRON' ) && DOING_CRON ){
+	// Ensure required definitions for pluggable.
+	if ( false === defined( 'AUTH_COOKIE' ) ) {
+		define( 'AUTH_COOKIE', null );
+	}
+
+	if ( false === defined( 'LOGGED_IN_COOKIE' ) ) {
+		define( 'LOGGED_IN_COOKIE', null );
+	}
+
+	// Load the pluggable class, if needed.
+	require_once ABSPATH . 'wp-includes/pluggable.php';
+
+	// Include the update class.
+	require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-update.php';
+
+	// Instantiate the update class.
+	$plugin_update = new Boldgrid_Backup_Admin_Update();
+
+	// Check and update plugins.
+	$plugin_update->wp_update_this_plugin();
+}
+
 /**
  * Begins execution of the plugin.
  *
