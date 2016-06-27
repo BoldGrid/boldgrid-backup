@@ -2317,14 +2317,10 @@ class Boldgrid_Backup_Admin_Core {
 
 		// If the deadline has passed, then remove the pending rollback information and cron.
 		if ( $pending_rollback['deadline'] <= time() ) {
-			if ( true === is_multisite() ) {
-				delete_site_option( 'boldgrid_backup_pending_rollback' );
-			} else {
-				delete_option( 'boldgrid_backup_pending_rollback' );
-			}
+			// Clear rollback information.
+			$this->cancel_rollback();
 
-			// Remove any cron jobs for restore actions.
-			$this->settings->delete_cron_entries( 'restore' );
+			return;
 		}
 
 		// Register the JS for the rollback notice.
@@ -2385,6 +2381,22 @@ class Boldgrid_Backup_Admin_Core {
 			);
 		}
 
+		// Clear rollback information.
+		$this->cancel_rollback();
+
+		// Echo a success message.
+		echo '<p>Automatic rollback has been canceled.</p>';
+
+		// End nicely.
+		wp_die();
+	}
+
+	/**
+	 * Cancel rollback.
+	 *
+	 * @since 1.0.1
+	 */
+	public function cancel_rollback() {
 		// Remove any cron jobs for restore actions.
 		$this->settings->delete_cron_entries( 'restore' );
 
@@ -2394,12 +2406,6 @@ class Boldgrid_Backup_Admin_Core {
 		} else {
 			delete_option( 'boldgrid_backup_pending_rollback' );
 		}
-
-		// Echo a success message.
-		echo '<p>Automatic rollback has been canceled.</p>';
-
-		// End nicely.
-		wp_die();
 	}
 
 	/**
