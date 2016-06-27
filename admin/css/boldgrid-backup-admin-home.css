@@ -18,6 +18,7 @@
 	padding-right: 0;
 }
 
-#backup-site-now-section .spinner {
+#backup-site-now-section .spinner,
+#restore-now-section .spinner {
 	float: none !important;
 }

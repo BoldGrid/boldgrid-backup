@@ -36,6 +36,9 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 	$( function() {
 		// On click action for the Cancel Rollback button.
 		$( '#cancel-rollback-button' ).on( 'click', self.cancelRollback );
+
+		// On click action for restore buttons.
+		$( '.action-restore' ).on( 'click', self.restoreArchiveConfirm );
 	} );
 
 	/**
@@ -90,6 +93,9 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			type : 'post',
 			dataType : 'text',
 			success : function( response ) {
+				// Remove the restore now section.
+				$('#restore-now-section').empty();
+
 				// Insert markup in the results section.
 				$cancelRollbackResults.html( response );
 
@@ -106,6 +112,36 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		// Return false so the page does not reload.
 		return false;
 	};
+
+	/**
+	 * Confirm to restore a selected backup archive file.
+	 *
+	 * @since 1.0.1
+	 */
+	self.restoreArchiveConfirm = function() {
+		// Declare variables.
+		var confirmResponse, ArchiveFilename,
+			$this = $( this );
+
+		// Get the backup archive filename.
+		ArchiveFilename = $this.data( 'filename' );
+
+		// Ask for confirmation.
+		confirmResponse = confirm( localizeScriptData.restoreConfirmText + ' "' + ArchiveFilename + '".' );
+
+		// Handle response.
+		if ( true === confirmResponse ) {
+	        // Disable the restore Site Now link button.
+			$this.attr( 'disabled', 'disabled' ).css( 'pointer-events', 'none' );
+
+			// Show the spinner.
+			$('#restore-now-section').find('.spinner').addClass( 'is-active' );
+
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 	/**
 	 * Namespace BOLDGRID.BACKUP.RollbackTimer.
