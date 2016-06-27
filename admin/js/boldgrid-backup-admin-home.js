@@ -22,33 +22,17 @@
 
 	// Onload event listener.
 	$( function() {
-		// Declare variables.
-		var $downloadButtons, $restoreButtons, $deleteButtons, $backupSiteButton,
-			$endBackup;
-
-		// Create a context selector for the download buttons.
-		$downloadButtons = $( '.action-download' );
-
-		// Create a context selector for the restore buttons.
-		$restoreButtons = $( '.action-restore' );
-
-		// Create a context selector for the delete buttons.
-		$deleteButtons = $( '.action-delete' );
-
-		// Create a context selector for the Backup Site Now button.
-		$backupSiteButton = $( '#backup-site-now' );
-
 		// On click action for download buttons.
-		$downloadButtons.on( 'click', self.downloadArchive );
+		$( '.action-download' ).on( 'click', self.downloadArchive );
 
 		// On click action for restore buttons.
-		$restoreButtons.on( 'click', self.restoreArchiveConfirm );
+		$( '.action-restore' ).off( 'click' ).on( 'click', self.restoreArchiveConfirm );
 
 		// On click action for delete buttons.
-		$deleteButtons.on( 'click', self.deleteArchiveConfirm );
+		$( '.action-delete' ).on( 'click', self.deleteArchiveConfirm );
 
 		// On click action for the Backup Site Now button.
-		$backupSiteButton.on( 'click', self.backupNow );
+		$( '#backup-site-now' ).on( 'click', self.backupNow );
 	} );
 
 	/**

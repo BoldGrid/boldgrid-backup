@@ -38,7 +38,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		$( '#cancel-rollback-button' ).on( 'click', self.cancelRollback );
 
 		// On click action for restore buttons.
-		$( '.action-restore' ).on( 'click', self.restoreArchiveConfirm );
+		$( '.action-restore' ).off( 'click' ).on( 'click', self.restoreArchiveConfirm );
 	} );
 
 	/**
