@@ -2315,6 +2315,18 @@ class Boldgrid_Backup_Admin_Core {
 			return;
 		}
 
+		// If the deadline has passed, then remove the pending rollback information and cron.
+		if ( $pending_rollback['deadline'] <= time() ) {
+			if ( true === is_multisite() ) {
+				delete_site_option( 'boldgrid_backup_pending_rollback' );
+			} else {
+				delete_option( 'boldgrid_backup_pending_rollback' );
+			}
+
+			// Remove any cron jobs for restore actions.
+			$this->settings->delete_cron_entries( 'restore' );
+		}
+
 		// Register the JS for the rollback notice.
 		wp_register_script( 'boldgrid-backup-admin-rollback',
 			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-rollback.js',
