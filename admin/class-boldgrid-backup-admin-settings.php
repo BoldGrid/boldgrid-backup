@@ -767,6 +767,19 @@ class Boldgrid_Backup_Admin_Settings {
 	}
 
 	/**
+	 * Delete the boldgrid_backup_pending_rollback option.
+	 *
+	 * @since 1.0.1
+	 */
+	public function delete_rollback_option() {
+		if ( true === is_multisite() ) {
+			delete_site_option( 'boldgrid_backup_pending_rollback' );
+		} else {
+			delete_option( 'boldgrid_backup_pending_rollback' );
+		}
+	}
+
+	/**
 	 * Add a cron job to restore (rollback) using the last backup.
 	 *
 	 * @since 1.0
@@ -782,6 +795,8 @@ class Boldgrid_Backup_Admin_Settings {
 
 		// If auto-rollback is not enabled, then abort.
 		if ( 1 !== $settings['auto_rollback'] ) {
+			$this->delete_rollback_option();
+
 			return;
 		}
 
@@ -810,6 +825,8 @@ class Boldgrid_Backup_Admin_Settings {
 		}
 
 		if ( $last_backup_time < $time_15_minutes_ago ) {
+			$this->delete_rollback_option();
+
 			return;
 		}
 
@@ -821,6 +838,8 @@ class Boldgrid_Backup_Admin_Settings {
 
 		// If there are no archives, then abort.
 		if ( $archive_count <= 0 ) {
+			$this->delete_rollback_option();
+
 			return;
 		}
 
@@ -833,6 +852,8 @@ class Boldgrid_Backup_Admin_Settings {
 
 		// If the backup file is too old, then abort.
 		if ( $archive['lastmodunix'] < $time_15_minutes_ago ) {
+			$this->delete_rollback_option();
+
 			return;
 		}
 
@@ -840,18 +861,37 @@ class Boldgrid_Backup_Admin_Settings {
 		$this->delete_cron_entries( 'restore' );
 
 		// Get the unix time for 5 minutes from now.
-		$time_5_minutes_later = strtotime( date( 'H:i' ) . ' + 5 MINUTES' );
+		$time_5_minutes_later = strtotime( '+5 MINUTES' );
 
-		// Get the system's localized current hour.
-		$hour = $this->core->execute_command( 'date +%H' );
+		// Get the system's localized current time (HH:MM:SS), 5 minutes in the future.
+		$system_time = $this->core->execute_command(
+			'date "+%H|%M|%S|%a %d %b %Y %I:%M:00 %p %Z" -d "+5 minutes"'
+		);
+
+		// Split the time into hour, minute, and second.
+		if ( false === empty( $system_time ) ) {
+			list( $hour, $minute, $second, $system_time_iso ) = explode( '|', $system_time );
+		}
 
 		// Validate hour; use system hour, or the date code for hour ("G").
-		if ( true === empty( $hour ) ) {
+		if ( false === isset( $hour ) ) {
 			$hour = 'G';
 		}
 
+		// Validate hour; use system hour, or the date code for minute ("i").
+		if ( false === isset( $minute ) ) {
+			$minute = 'i';
+		}
+
+		// Mark the deadline.
+		if ( false === empty( $system_time_iso ) ) {
+			$deadline = strtotime( $system_time_iso );
+		} else {
+			$deadline = $time_5_minutes_later;
+		}
+
 		// Build cron job line in crontab format.
-		$entry = date( 'i ' . $hour, $time_5_minutes_later ) . ' * * ' . date( 'w' );
+		$entry = date( $minute . ' ' . $hour, $deadline ) . ' * * ' . date( 'w' );
 
 		$entry .= ' php -qf "' . dirname( dirname( __FILE__ ) ) .
 		'/boldgrid-backup-cron.php" mode=restore HTTP_HOST=' . $_SERVER['HTTP_HOST'];
@@ -871,13 +911,13 @@ class Boldgrid_Backup_Admin_Settings {
 			if ( true === $is_multisite ) {
 				$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
 
-				$pending_rollback['deadline'] = $time_5_minutes_later;
+				$pending_rollback['deadline'] = $deadline;
 
 				update_site_option( 'boldgrid_backup_pending_rollback', $pending_rollback );
 			} else {
 				$pending_rollback = get_option( 'boldgrid_backup_pending_rollback' );
 
-				$pending_rollback['deadline'] = $time_5_minutes_later;
+				$pending_rollback['deadline'] = $deadline;
 
 				update_option( 'boldgrid_backup_pending_rollback', $pending_rollback );
 			}

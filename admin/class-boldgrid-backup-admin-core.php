@@ -2315,17 +2315,14 @@ class Boldgrid_Backup_Admin_Core {
 			'Please confirm the restoration of this WordPress installation from the archive file'
 		);
 
-		// Convert deadline to ISO 8601 format.
-		$deadline = date( 'c', $pending_rollback['deadline'] );
-
 		// Create an array of data to pass to JS.
 		$localize_script_data = array(
 			'restoreConfirmText' => $restore_confirm_text,
 		);
 
-		// If a deadline is set, then include the timestamp.
-		if ( true === isset( $pending_rollback['deadline'] ) ) {
-			$localize_script_data['rolloutDeadline'] = $deadline;
+		// If a deadline is not empty, then include the time (in ISO 8601 format).
+		if ( false === empty( $pending_rollback['deadline'] ) ) {
+			$localize_script_data['rolloutDeadline'] = date( 'c', $pending_rollback['deadline'] );
 		}
 
 		// Add localize script data to the JS script.
@@ -2335,7 +2332,7 @@ class Boldgrid_Backup_Admin_Core {
 		wp_enqueue_script( 'boldgrid-backup-admin-rollback' );
 
 		// If a backup was just made, but pending an update, then display a notice and return.
-		if ( false === isset( $pending_rollback['deadline'] ) ) {
+		if ( true === empty( $pending_rollback['deadline'] ) ) {
 			$notice_markup = "<div id='cancel-rollback-section'>
 		A recent backup was made.
 		Once updates are completed, there will be a pending automatic rollback.
@@ -2348,7 +2345,9 @@ class Boldgrid_Backup_Admin_Core {
 		<span class='spinner'></span>
 		</p>
 		</form>
-		</div>";
+		</div>
+		<div id='cancel-rollback-results'></div>
+";
 
 			do_action( 'boldgrid_backup_notice', $notice_markup, 'notice notice-warning' );
 
