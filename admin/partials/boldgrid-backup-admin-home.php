@@ -62,7 +62,7 @@ foreach ( $archives as $key => $archive ) {
 
 	$delete_url = wp_nonce_url( $delete_url, 'boldgrid-backup-delete', 'delete_auth' );
 
-	?>
+?>
 	<tr>
 		<td class='backup-archive-list-path'><?php echo $archive['filename']; ?></td>
 		<td class='backup-archive-list-size'><?php echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive['filesize'] ); ?></td>
@@ -81,6 +81,12 @@ foreach ( $archives as $key => $archive ) {
 		</tr>
 <?php
 }
+} else {
+?>
+	<tr>
+		<td colspan='3'>There are no archives for this site in the backup directory.</td>
+	</tr>
+<?php
 }
 ?>
 	</tbody>
