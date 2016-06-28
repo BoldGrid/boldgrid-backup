@@ -245,6 +245,12 @@ if ( true === empty( $settings ) ) {
 				</tbody>
 			</table>
 		</div>
+		<h2><?php echo __( 'Backup Directory' ); ?></h2>
+		<div class='backup-directory'>
+			<?php echo __( 'Directory to store backup archives' ); ?>:
+			<input id='backup-directory-path' type='text' size='50' name='backup_directory'
+			value='<?php echo $backup_directory;?>'>
+		</div>
 		<div id='boldgrid-settings-submit-div'>
 			<p>
 				<input id='boldgrid-settings-submit' class='button button-primary'

@@ -608,6 +608,26 @@ class Boldgrid_Backup_Admin_Settings {
 			$settings['auto_rollback'] = ( ( false === isset( $_POST['auto_rollback'] ) ||
 				'1' === $_POST['auto_rollback'] ) ? 1 : 0 );
 
+			// Get the current backup directory path.
+			$backup_directory = $this->core->config->get_backup_directory();
+
+			// Save backup directory, if changed.
+			if ( false === empty( $_POST['backup_directory'] ) &&
+			$_POST['backup_directory'] !== $backup_directory ) {
+				// Sanitize.
+				$backup_directory = trim( $_POST['backup_directory'] );
+
+				// Set the directory.
+				$is_directory_set = $this->core->config->set_backup_directory( $backup_directory );
+
+				// If the backup directory was configured, then save the new setting.
+				if ( true === $is_directory_set ) {
+					$settings['backup_directory'] = $backup_directory;
+				} else {
+					$update_error = true;
+				}
+			}
+
 			// If no errors, then save the settings.
 			if ( false === $update_error ) {
 				// Record the update time.
@@ -642,7 +662,7 @@ class Boldgrid_Backup_Admin_Settings {
 		}
 
 		// If delete cron failed, then show a notice.
-		if ( true !== $cron_status ) {
+		if ( true === isset( $cron_status ) && true !== $cron_status ) {
 			$update_error = true;
 
 			do_action( 'boldgrid_backup_notice',
@@ -919,6 +939,9 @@ class Boldgrid_Backup_Admin_Settings {
 
 		// Get settings.
 		$settings = $this->get_settings();
+
+		// Get the backup directory path.
+		$backup_directory = $this->core->config->get_backup_directory();
 
 		// Include the page template.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-settings.php';

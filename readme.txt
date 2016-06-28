@@ -21,6 +21,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 == Changelog ==
 
 = 1.0.1 In progress =
+* New feature:	JIRA WPB-2063	Added setting for backup directory.
 * New feature:	JIRA WPB-2064	Cancel auto-rollback if a restoration is performed.
 * New feature:	JIRA WPB-2060	Added Rollback Site Now button in the rollback notice.
 * Bug fix:		JIRA WPB-2057	Rollback information is now removed after timer reaches 0:00.

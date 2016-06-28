@@ -130,45 +130,77 @@ class Boldgrid_Backup_Admin_Config {
 	 *
 	 * @since 1.0
 	 *
-	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
-	 *
 	 * @return string|bool The backup directory path, or FALSE on error.
 	 */
 	public function get_backup_directory() {
-		// If home directory was already set, then return it.
-		if ( false === empty( $this->backup_directory ) ) {
-			return $this->backup_directory;
+		// If home directory is not set, then set it.
+		if ( true === empty( $this->backup_directory ) ) {
+			// Initialize $backup_directory.
+			$backup_directory = '';
+
+			// Get settings.
+			$settings = $this->core->settings->get_settings();
+
+			// If the backup directory was saved in the settings, then use it.
+			if ( false === empty( $settings['backup_directory'] ) ) {
+				$backup_directory = $settings['backup_directory'];
+			}
+
+			$is_directory_set = $this->set_backup_directory( $backup_directory );
+
+			// The backup directory could not be set.
+			if ( false === $is_directory_set ) {
+				return false;
+			}
 		}
 
+		// Backup directory was set, so return the path.
+		return $this->backup_directory;
+	}
+
+	/**
+	 * Set backup directory.
+	 *
+	 * @since 1.0.1
+	 *
+	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
+	 *
+	 * @param string $backup_directory
+	 * @return bool
+	 */
+	public function set_backup_directory( $backup_directory_path = '' ) {
 		// Connect to the WordPress Filesystem API.
 		global $wp_filesystem;
 
-		// Get the user home directory.
-		$home_dir = $this->get_home_directory();
+		// If a backup directory was not specified, then use the default.
+		if ( true === empty( $backup_directory_path ) ) {
+			// Get the user home directory.
+			$home_dir = $this->get_home_directory();
 
-		// Check if home directory is writable.
-		$home_dir_writable = $wp_filesystem->is_writable( $home_dir );
+			// Check if home directory is writable.
+			$home_dir_writable = $wp_filesystem->is_writable( $home_dir );
 
-		// If home directory is not writable, then log and abort.
-		if( false === $home_dir_writable ){
-			// Get the mode of the directory.
-			$home_dir_mode = $wp_filesystem->getchmod( $home_dir );
+			// If home directory is not writable, then log and abort.
+			if( false === $home_dir_writable ){
+				// Get the mode of the directory.
+				$home_dir_mode = $wp_filesystem->getchmod( $home_dir );
 
-			// Create error message.
-			$errormsg = 'Home directory "' . $home_dir . '" (' . $home_dir_mode . ') is not writable.';
+				// Create error message.
+				$errormsg = 'Home directory "' . $home_dir . '" (' . $home_dir_mode . ') is not writable.';
 
-			// Log.
-			error_log( __METHOD__ . ': ' . $errormsg );
+				// Log.
+				error_log( __METHOD__ . ': ' . $errormsg );
 
-			// Trigger an admin notice.
-			do_action( 'boldgrid_backup_notice', $errormsg, 'notice notice-error is-dismissible' );
+				// Trigger an admin notice.
+				do_action( 'boldgrid_backup_notice', $errormsg, 'notice notice-error is-dismissible' );
 
-			// Abort.
-			return false;
+				// Abort.
+				return false;
+			}
+
+			// Define the backup directory name, using the default.
+			$backup_directory_path = $home_dir . '/boldgrid_backup';
 		}
-
-		// Define the backup directory name.
-		$backup_directory_path = $home_dir . '/boldgrid_backup';
 
 		// Check if the backup directory exists.
 		$backup_directory_exists = $wp_filesystem->exists( $backup_directory_path );
@@ -179,9 +211,6 @@ class Boldgrid_Backup_Admin_Config {
 
 			// If mkdir failed, then abort.
 			if ( false === $backup_directory_created ) {
-				// Log.
-				error_log( __METHOD__ . ': ' );
-
 				// Create error message.
 				$errormsg = 'Could not create directory "' . $backup_directory_path . '".';
 
@@ -201,9 +230,6 @@ class Boldgrid_Backup_Admin_Config {
 
 		// If the backup directory does not exist, then attempt to create it.
 		if ( false === $backup_directory_isdir ) {
-			// Log.
-			error_log( __METHOD__ . ': ' );
-
 			// Create error message.
 			$errormsg = 'Backup directory "' . $backup_directory_path . '" is not a directory.';
 
@@ -222,9 +248,6 @@ class Boldgrid_Backup_Admin_Config {
 			// Get the mode of the directory.
 			$backup_directory_mode = $wp_filesystem->getchmod( $backup_directory_path );
 
-			// Log.
-			error_log( __METHOD__ . ': ' );
-
 			// Create error message.
 			$errormsg = 'Backup directory "' . $backup_directory_path . '" ('
 				. $backup_directory_mode . ') is not writable.';
@@ -242,7 +265,8 @@ class Boldgrid_Backup_Admin_Config {
 		// Record the backup directory path.
 		$this->backup_directory = $backup_directory_path;
 
-		return $this->backup_directory;
+		// Return success.
+		return true;
 	}
 
 	/**
