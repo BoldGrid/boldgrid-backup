@@ -21,6 +21,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 == Changelog ==
 
 = 1.0.1 In progress =
+* Redesign:		JIRA WPB-2053	Formatted the Functionality Test page.
 * Bug fix:		JIRA WPB-2052	Provided message for empty archive list.
 * New feature:	JIRA WPB-2062	Added setting for notification email address.
 * New feature:	JIRA WPB-2063	Added setting for backup directory.

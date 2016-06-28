@@ -2017,6 +2017,12 @@ class Boldgrid_Backup_Admin_Core {
 			$disk_space = $this->test->get_disk_space();
 		}
 
+		// Enqueue CSS for the test page.
+		wp_enqueue_style( 'boldgrid-backup-admin-test',
+			plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-test.css', array(),
+			BOLDGRID_BACKUP_VERSION, 'all'
+		);
+
 		// Load template view.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-test.php';
 
