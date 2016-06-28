@@ -78,13 +78,20 @@ class Boldgrid_Backup_Admin_Settings {
 			$settings['schedule']['tod_m'] = ( false === empty( $settings['schedule']['tod_m'] ) ? $settings['schedule']['tod_m'] : mt_rand( 1, 59 ) );
 			$settings['schedule']['tod_a'] = ( false === empty( $settings['schedule']['tod_a'] ) ? $settings['schedule']['tod_a'] : 'AM' );
 
-			// Other settings.
+			// Notification settings.
 			$settings['notifications']['backup'] = ( false ===
 				isset( $settings['notifications']['backup'] ) || false ===
 				empty( $settings['notifications']['backup'] ) ? 1 : 0 );
 			$settings['notifications']['restore'] = ( false ===
 				isset( $settings['notifications']['restore'] ) || false ===
 				empty( $settings['notifications']['restore'] ) ? 1 : 0 );
+
+			// Notification email address.
+			if ( true === empty( $settings['notification_email'] ) ) {
+				$settings['notification_email'] = $this->core->config->get_admin_email();
+			}
+
+			// Other settings.
 			$settings['auto_backup'] = ( false === isset( $settings['auto_backup'] ) ||
 				false === empty( $settings['auto_backup'] ) ? 1 : 0 );
 			$settings['auto_rollback'] = ( false === isset( $settings['auto_rollback'] ) ||
@@ -107,6 +114,7 @@ class Boldgrid_Backup_Admin_Settings {
 
 			// Other settings.
 			$settings['retention_count'] = 5;
+			$settings['notification_email'] = $this->core->config->get_admin_email();
 			$settings['notifications']['backup'] = 1;
 			$settings['notifications']['restore'] = 1;
 			$settings['auto_backup'] = 1;
@@ -608,12 +616,18 @@ class Boldgrid_Backup_Admin_Settings {
 			$settings['auto_rollback'] = ( ( false === isset( $_POST['auto_rollback'] ) ||
 				'1' === $_POST['auto_rollback'] ) ? 1 : 0 );
 
+			// Update notification email address, if changed.
+			if ( true === isset( $settings['notification_email'] ) &&
+			sanitize_email( $_POST['notification_email'] ) !== $settings['notification_email'] ) {
+				$settings['notification_email'] = sanitize_email( $_POST['notification_email'] );
+			}
+
 			// Get the current backup directory path.
 			$backup_directory = $this->core->config->get_backup_directory();
 
 			// Save backup directory, if changed.
 			if ( false === empty( $_POST['backup_directory'] ) &&
-			$_POST['backup_directory'] !== $backup_directory ) {
+			trim( $_POST['backup_directory'] ) !== $backup_directory ) {
 				// Sanitize.
 				$backup_directory = trim( $_POST['backup_directory'] );
 

@@ -2040,33 +2040,10 @@ class Boldgrid_Backup_Admin_Core {
 			return false;
 		}
 
-		// Initialize $admin_email.
-		$admin_email = null;
+		// Get settings, for the notification email address.
+		$settings = $this->settings->get_settings();
 
-		// Get the site email address.
-		// Try get_bloginfo.
-		if ( true === function_exists( 'get_bloginfo' ) ) {
-			$admin_email = get_bloginfo( 'admin_email' );
-		}
-
-		// If the email address is still needed, then try wp_get_current_user.
-		if ( true === empty( $admin_email ) && true === function_exists( 'wp_get_current_user' ) ) {
-			// Get the current user information.
-			$current_user = wp_get_current_user();
-
-			// Check if user information was retrieved, abort if not.
-			if ( false === $current_user ) {
-				return false;
-			}
-
-			// Get the current user email address.
-			$admin_email = $current_user->user_email;
-		}
-
-		// If there is no email address found, then abort.
-		if ( true === empty( $admin_email ) ) {
-			return false;
-		}
+		$admin_email = $settings['notification_email'];
 
 		// Get the site title.
 		$site_title = get_bloginfo( 'name' );

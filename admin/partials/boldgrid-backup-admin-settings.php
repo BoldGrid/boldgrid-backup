@@ -221,6 +221,11 @@ if ( true === empty( $settings ) ) {
 			<table id='notification-settings-table'>
 				<tbody>
 					<tr>
+						<td><?php echo __( 'Notification email address' ); ?></td>
+						<td><input id='notification-email' type='text' size='40'
+						name='notification_email' value='<?php echo $settings['notification_email']; ?>'></td>
+					</tr>
+					<tr>
 						<td><?php echo __( 'Send an email when a backup completes' ); ?></td>
 						<td><input id='notification-backup' type='checkbox'
 							name='notify_backup' value='1'

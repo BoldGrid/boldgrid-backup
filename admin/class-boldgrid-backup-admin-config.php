@@ -165,7 +165,7 @@ class Boldgrid_Backup_Admin_Config {
 	 *
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
-	 * @param string $backup_directory
+	 * @param string $backup_directory_path The backup directory path to be set/configured.
 	 * @return bool
 	 */
 	public function set_backup_directory( $backup_directory_path = '' ) {
@@ -181,7 +181,7 @@ class Boldgrid_Backup_Admin_Config {
 			$home_dir_writable = $wp_filesystem->is_writable( $home_dir );
 
 			// If home directory is not writable, then log and abort.
-			if( false === $home_dir_writable ){
+			if ( false === $home_dir_writable ) {
 				// Get the mode of the directory.
 				$home_dir_mode = $wp_filesystem->getchmod( $home_dir );
 
@@ -267,6 +267,46 @@ class Boldgrid_Backup_Admin_Config {
 
 		// Return success.
 		return true;
+	}
+
+	/**
+	 * Get the WordPress admin email address.
+	 *
+	 * @since 1.0.1
+	 *
+	 * @return string|bool The admin email address, or FALSE on error.
+	 */
+	public function get_admin_email() {
+		// Initialize $admin_email.
+		$admin_email = null;
+
+		// Get the site email address.
+		// Try get_bloginfo.
+		if ( true === function_exists( 'get_bloginfo' ) ) {
+			$admin_email = get_bloginfo( 'admin_email' );
+		}
+
+		// If the email address is still needed, then try wp_get_current_user.
+		if ( true === empty( $admin_email ) && true === function_exists( 'wp_get_current_user' ) ) {
+			// Get the current user information.
+			$current_user = wp_get_current_user();
+
+			// Check if user information was retrieved, abort if not.
+			if ( false === $current_user ) {
+				return false;
+			}
+
+			// Get the current user email address.
+			$admin_email = $current_user->user_email;
+		}
+
+		// If there is no email address found, then abort.
+		if ( true === empty( $admin_email ) ) {
+			return false;
+		}
+
+		// Return the admin email address.
+		return $admin_email;
 	}
 
 	/**
