@@ -113,6 +113,15 @@ class Boldgrid_Backup_Admin_Core {
 	);
 
 	/**
+	 * A unique identifier for backups of this WordPress installation.
+	 *
+	 * @since 1.0.1
+	 * @access private
+	 * @var string
+	 */
+	private $backup_identifier = null;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.0
@@ -126,6 +135,69 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Instantiate Boldgrid_Backup_Admin_Test.
 		$this->test = new Boldgrid_Backup_Admin_Test( $this );
+
+		// Ensure there is a backup identifier.
+		$this->get_backup_identifier();
+	}
+
+	/**
+	 * Get the unique identifier for backups of this WordPress installation.
+	 *
+	 * @since 1.0.1
+	 *
+	 * @return string A unique identifier for backups.
+	 */
+	public function get_backup_identifier() {
+		// If the id was already stored, then return it.
+		if ( false === empty( $this->backup_identifier ) ) {
+			return $this->backup_identifier;
+		}
+
+		// Determine if multisite.
+		$is_multisite = is_multisite();
+
+		// Check wp_options for the id.
+		if ( true === $is_multisite ) {
+			$backup_identifier = get_site_option( 'boldgrid_backup_id' );
+		} else {
+			$backup_identifier = get_option( 'boldgrid_backup_id' );
+		}
+
+		// If the id was already stored in WP options, then save and return it.
+		if ( false === empty( $backup_identifier ) ) {
+			$this->backup_identifier = $backup_identifier;
+
+			return $backup_identifier;
+		}
+
+		// Generate a new backup id.
+		$admin_email = $this->config->get_admin_email();
+
+		$unique_string = site_url() . ' <' . $admin_email . '>';
+
+		$backup_identifier = hash( 'crc32', hash( 'sha512', $unique_string ) );
+
+		// If something went wrong with hashing, then just use a random string to make the id.
+		if ( true === empty( $backup_identifier ) ) {
+			$random_string = '';
+
+			for ( $i = 0; $i <= 32; $i ++ ) {
+				$random_string .= chr( mt_rand( 40, 126 ) );
+			}
+
+			$backup_identifier = hash( 'crc32', $random_string );
+		}
+
+		// Save and return the id.
+		$this->backup_identifier = $backup_identifier;
+
+		if ( true === $is_multisite ) {
+			update_site_option( 'boldgrid_backup_id', $backup_identifier );
+		} else {
+			update_option( 'boldgrid_backup_id', $backup_identifier );
+		}
+
+		return $backup_identifier;
 	}
 
 	/**
@@ -813,9 +885,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return string|bool An archive file path, or FALSE on error.
 	 */
 	private function generate_archive_path( $extension = null ) {
-		// Create a site identifier.
-		$site_id = Boldgrid_Backup_Admin_Utility::create_site_id();
-
 		// Get the backup directory path.
 		$backup_directory = $this->config->get_backup_directory();
 
@@ -827,9 +896,15 @@ class Boldgrid_Backup_Admin_Core {
 			return false;
 		}
 
+		// Get backup identifier.
+		$backup_identifier = $this->get_backup_identifier();
+
+		// Create a site identifier.
+		$site_id = Boldgrid_Backup_Admin_Utility::create_site_id();
+
 		// Create a file path with no extension (added later).
-		$filepath = $backup_directory . '/boldgrid-backup-' . $site_id . '-' .
-			 date( 'Ymd-His' );
+		$filepath = $backup_directory . '/boldgrid-backup-' . $site_id . '-' . $backup_identifier .
+			'-' . date( 'Ymd-His' );
 
 		// If specified, add an extension.
 		if ( false === empty( $extension ) ) {
@@ -1182,6 +1257,9 @@ class Boldgrid_Backup_Admin_Core {
 			}
 		);
 
+		// Get backup identifier.
+		$backup_identifier = $this->get_backup_identifier();
+
 		// Create a site identifier.
 		$site_id = Boldgrid_Backup_Admin_Utility::create_site_id();
 
@@ -1192,7 +1270,8 @@ class Boldgrid_Backup_Admin_Core {
 		foreach ( $dirlist as $fileinfo ) {
 			if (
 				1 === preg_match(
-					'/^boldgrid-backup-' . $site_id . '-.*\.(zip|tar\.gz|b2z|zlib|lzf)$/',
+					'/^boldgrid-backup-(' . $site_id . '|.*?-' . $backup_identifier .
+					')-.*\.(zip|tar\.gz|b2z|zlib|lzf)$/',
 					$fileinfo['name']
 				)
 			) {
