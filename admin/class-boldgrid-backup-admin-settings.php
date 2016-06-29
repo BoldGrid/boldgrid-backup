@@ -412,6 +412,9 @@ class Boldgrid_Backup_Admin_Settings {
 		// Target the cron job entries for the current mode (backup|restore).
 		if ( 'restore' === $mode ) {
 			$pattern .= 'restore';
+
+			// Also delete any rollback information.
+			$this->delete_rollback_option();
 		} else {
 			$pattern .= 'backup';
 		}
@@ -909,14 +912,10 @@ class Boldgrid_Backup_Admin_Settings {
 		// If cron job was added, then update the boldgrid_backup_pending_rollback option with time.
 		if ( true === $status ) {
 			if ( true === $is_multisite ) {
-				$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
-
 				$pending_rollback['deadline'] = $deadline;
 
 				update_site_option( 'boldgrid_backup_pending_rollback', $pending_rollback );
 			} else {
-				$pending_rollback = get_option( 'boldgrid_backup_pending_rollback' );
-
 				$pending_rollback['deadline'] = $deadline;
 
 				update_option( 'boldgrid_backup_pending_rollback', $pending_rollback );
