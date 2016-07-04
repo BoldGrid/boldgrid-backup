@@ -14,11 +14,6 @@
 // Welcome.
 echo '== BoldGrid Backup Cron Job ==' . PHP_EOL;
 
-// If not called from command-line or system cron, abort.
-if ( 'cli' !== php_sapi_name() ) {
-	die( 'Error: This utility must be run from the command-line.' . PHP_EOL );
-}
-
 // Check for input variables.
 if ( true === empty( $argv ) ) {
 	die( 'Error: No parameters were passed.  A mode is required.' . PHP_EOL );
