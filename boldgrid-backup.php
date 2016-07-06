@@ -31,7 +31,7 @@ if ( false === defined( 'WPINC' ) ) {
 
 // Define version.
 if ( false === defined( 'BOLDGRID_BACKUP_VERSION' ) ) {
-	define( 'BOLDGRID_BACKUP_VERSION', '1.0' );
+	define( 'BOLDGRID_BACKUP_VERSION', '1.0.1' );
 }
 
 // Define boldgrid-backup path.

@@ -20,7 +20,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 
 == Changelog ==
 
-= 1.0.1 In progress =
+= 1.0.1 =
 * Bug fix:	JIRA WPB-2079	Removed PHP SAPI check in cron script.
 * New feature:	JIRA WPB-2061	Made it possible to change siteurl and retain matched archives (backups made as of this update).
 * Bug fix:		JIRA WPB-2056	Restoration cron did not always complete.
