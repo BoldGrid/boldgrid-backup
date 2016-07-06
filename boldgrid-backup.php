@@ -8,7 +8,7 @@
  * that starts the plugin.
  *
  * @link http://www.boldgrid.com
- * @since 1.0
+ * @since 1.0.1
  * @package Boldgrid_Backup
  *
  *          @wordpress-plugin
