@@ -2370,8 +2370,23 @@ class Boldgrid_Backup_Admin_Core {
 			$pending_rollback = get_option( 'boldgrid_backup_pending_rollback' );
 		}
 
-		// If there is not pending rollback, then abort.
-		if ( true === empty( $pending_rollback ) ) {
+		// If there is not a pending rollback, then abort.
+		if ( true === empty( $pending_rollback['deadline'] ) ) {
+			return;
+		}
+
+		// Get archive list.
+		$archives = $this->get_archive_list();
+
+		// Get the archive count.
+		$archive_count = count( $archives );
+
+		// If the deadline has passed or no backup archives to restore, then remove the pending
+		// rollback information and cron.
+		if ( $pending_rollback['deadline'] <= time() || 0 === $archive_count ) {
+			// Clear rollback information.
+			$this->cancel_rollback();
+
 			return;
 		}
 
@@ -2399,54 +2414,14 @@ class Boldgrid_Backup_Admin_Core {
 			'restoreConfirmText' => $restore_confirm_text,
 		);
 
-		// If a deadline is not empty, then include the time (in ISO 8601 format).
-		if ( false === empty( $pending_rollback['deadline'] ) ) {
-			$localize_script_data['rolloutDeadline'] = date( 'c', $pending_rollback['deadline'] );
-		}
+		// Include the time (in ISO 8601 format).
+		$localize_script_data['rolloutDeadline'] = date( 'c', $pending_rollback['deadline'] );
 
 		// Add localize script data to the JS script.
 		wp_localize_script( 'boldgrid-backup-admin-rollback', 'localizeScriptData', $localize_script_data );
 
 		// Enqueue JS for the rollback notice.
 		wp_enqueue_script( 'boldgrid-backup-admin-rollback' );
-
-		// If a backup was just made, but pending an update, then display a notice and return.
-		if ( true === empty( $pending_rollback['deadline'] ) ) {
-			$notice_markup = "<div id='cancel-rollback-section'>
-		A recent backup was made.
-		Once updates are completed, there will be a pending automatic rollback.
-		If there are no issues, then you may cancel the rollback operation.
-		To cancel the pending rollback now, please click the cancel button below.
-		<form action='#' id='cancel-rollback-form' method='POST'>
-		" . wp_nonce_field( 'boldgrid_rollback_notice', 'cancel_rollback_auth', true, false ) . "
-		<p>
-		<a id='cancel-rollback-button' class='button'>Cancel Rollback</a>
-		<span class='spinner'></span>
-		</p>
-		</form>
-		</div>
-		<div id='cancel-rollback-results'></div>
-";
-
-			do_action( 'boldgrid_backup_notice', $notice_markup, 'notice notice-warning' );
-
-			return;
-		}
-
-		// Get archive list.
-		$archives = $this->get_archive_list();
-
-		// Get the archive count.
-		$archive_count = count( $archives );
-
-		// If the deadline has passed or no backup archives to restore, then remove the pending
-		// rollback information and cron.
-		if ( $pending_rollback['deadline'] <= time() || 0 === $archive_count ) {
-			// Clear rollback information.
-			$this->cancel_rollback();
-
-			return;
-		}
 
 		// Get the most recent archive listing.
 		$key = 0;
@@ -2459,7 +2434,9 @@ class Boldgrid_Backup_Admin_Core {
 			'&archive_filename=' . $archive['filename']
 		);
 
+		// Create variables for the notice template.
 		$restore_url = wp_nonce_url( $restore_url, 'boldgrid-backup-restore', 'restore_auth' );
+		$restore_filename = $archive['filename'];
 
 		// Create notice markup.
 		$notice_markup = "<div id='cancel-rollback-section'>
