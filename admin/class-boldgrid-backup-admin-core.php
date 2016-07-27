@@ -2502,11 +2502,7 @@ class Boldgrid_Backup_Admin_Core {
 		$this->settings->delete_cron_entries( 'restore' );
 
 		// Remove WP option boldgrid_backup_pending_rollback.
-		if ( true === is_multisite() ) {
-			delete_site_option( 'boldgrid_backup_pending_rollback' );
-		} else {
-			delete_option( 'boldgrid_backup_pending_rollback' );
-		}
+		$this->settings->delete_rollback_option();
 	}
 
 	/**

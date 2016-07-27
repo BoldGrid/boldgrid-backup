@@ -318,11 +318,6 @@ class Boldgrid_Backup_Admin_Settings {
 
 			$crontab = $this->core->execute_command( $command );
 
-			// Check for failure.
-			if ( false === $crontab ) {
-				return false;
-			}
-
 			// Add entry to crontab to the end, if it does not already exist.
 			if ( false === strpos( $crontab, $entry ) ) {
 				$crontab .= "\n" . $entry . "\n";
@@ -412,9 +407,6 @@ class Boldgrid_Backup_Admin_Settings {
 		// Target the cron job entries for the current mode (backup|restore).
 		if ( 'restore' === $mode ) {
 			$pattern .= 'restore';
-
-			// Also delete any rollback information.
-			$this->delete_rollback_option();
 		} else {
 			$pattern .= 'backup';
 		}
