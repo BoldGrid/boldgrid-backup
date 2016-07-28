@@ -936,8 +936,6 @@ class Boldgrid_Backup_Admin_Settings {
 				'">Functionality Test</a> to view a report.',
 				'notice notice-error is-dismissible'
 			);
-
-			return;
 		}
 
 		// Display warning on resource usage and backups.
@@ -971,22 +969,21 @@ class Boldgrid_Backup_Admin_Settings {
 			BOLDGRID_BACKUP_VERSION, 'all'
 		);
 
-		// Register the JS for the settings page.
-		wp_register_script( 'boldgrid-backup-admin-settings',
+		// Enqueue the JS for the settings page.
+		wp_enqueue_script( 'boldgrid-backup-admin-settings',
 			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-settings.js',
 			array(
 				'jquery',
 			), BOLDGRID_BACKUP_VERSION, false
 		);
 
-		// Enqueue JS for the settings page.
-		wp_enqueue_script( 'boldgrid-backup-admin-settings' );
-
 		// Get settings.
 		$settings = $this->get_settings();
 
-		// Get the backup directory path.
-		$backup_directory = $this->core->config->get_backup_directory();
+		// If the directory path is not in the settings, then add it for the form.
+		if ( true === empty( $settings['backup_directory'] ) ) {
+			$settings['backup_directory'] = $this->core->config->get_backup_directory();
+		}
 
 		// Include the page template.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-settings.php';
