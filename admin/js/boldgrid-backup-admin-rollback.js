@@ -120,14 +120,14 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 	 */
 	self.restoreArchiveConfirm = function() {
 		// Declare variables.
-		var confirmResponse, ArchiveFilename,
+		var confirmResponse, archiveFilename,
 			$this = $( this );
 
 		// Get the backup archive filename.
-		ArchiveFilename = $this.data( 'filename' );
+		archiveFilename = $this.data( 'filename' );
 
 		// Ask for confirmation.
-		confirmResponse = confirm( localizeScriptData.restoreConfirmText + ' "' + ArchiveFilename + '".' );
+		confirmResponse = confirm( localizeScriptData.restoreConfirmText + ' "' + archiveFilename + '".' );
 
 		// Handle response.
 		if ( true === confirmResponse ) {

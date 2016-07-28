@@ -2434,17 +2434,48 @@ class Boldgrid_Backup_Admin_Core {
 			'&archive_filename=' . $archive['filename']
 		);
 
-		// Create variables for the notice template.
-		$restore_url = wp_nonce_url( $restore_url, 'boldgrid-backup-restore', 'restore_auth' );
-		$restore_filename = $archive['filename'];
+		// Create an array of arguments for the notice template.
+		$args['restore_url'] = wp_nonce_url(
+			$restore_url, 'boldgrid-backup-restore', 'restore_auth'
+		);
+
+		$args['restore_filename'] = $archive['filename'];
+
+		$args['cancel_nonce_field'] = wp_nonce_field(
+			'boldgrid_rollback_notice', 'cancel_rollback_auth', true, false
+		);
 
 		// Create notice markup.
+		$notice_markup = $this->get_rollback_markup( $args );
+
+		// Display notice.
+		do_action( 'boldgrid_backup_notice', $notice_markup, 'notice notice-warning' );
+
+		return;
+	}
+
+	/**
+	 * Generate markup for the rollback notice.
+	 *
+	 * @since 1.2
+	 * @access private
+	 *
+	 * @param array $args {
+	 * 		An array of arguments.
+	 *
+	 * 		@type string $cancel_nonce_field A WordPress nonce for the Cancel Rollback button form.
+	 * 		@type string $restore_url URL used to perform the restoration.
+	 * 		@type string $restore_filename Filename of the backup archive to be restored.
+	 * }
+	 * @return string The resulting markup.
+	 */
+	private function get_rollback_markup( $args ) {
 		$notice_markup = "<div id='cancel-rollback-section'>
 		There is a pending automatic rollback using the most recent backup archive.
 		<p>If you do not want to rollback, then you must cancel the action before the countdown timer elapses.</p>
 		<p>Countdown: <span id='rollback-countdown-timer'></span></p>
 		<form action='#' id='cancel-rollback-form' method='POST'>
-		" . wp_nonce_field( 'boldgrid_rollback_notice', 'cancel_rollback_auth', true, false ) . "
+		" . $args['cancel_nonce_field'] . "
 		<p>
 		<a id='cancel-rollback-button' class='button'>Cancel Rollback</a>
 		<span class='spinner'></span>
@@ -2454,18 +2485,15 @@ class Boldgrid_Backup_Admin_Core {
 		<div id='restore-now-section'>
 		<p>You can click the button below to rollback your site now.</p>
 		<p>
-		<a class='button action-restore' href='" . $restore_url . "' data-filename='" .
-		$archive['filename'] . "'>Rollback Site Now</a>
+		<a class='button action-restore' href='" . $args['restore_url'] . "' data-filename='" .
+				$args['restore_filename'] . "'>Rollback Site Now</a>
 		<span class='spinner'></span>
 		</p>
 		</div>
 		<div id='cancel-rollback-results'></div>
 ";
 
-		// Display notice.
-		do_action( 'boldgrid_backup_notice', $notice_markup, 'notice notice-warning' );
-
-		return;
+		return $notice_markup;
 	}
 
 	/**
