@@ -12,6 +12,8 @@
 <div class='functionality-test-section wrap'>
 <h1><?php echo __( 'BoldGrid Backup' ); ?></h1>
 <h2><?php echo __( 'Functionality Test Report' ); ?></h2>
+<p><?php echo __( 'Home directory: ' ) . $home_dir . ' (' . $home_dir_mode . ')'; ?></p>
+<p><?php echo __( 'Home directory writable? ' . ( true === $home_dir_writable ? 'Yes' : 'No' ) ); ?></p>
 <p><?php echo __( 'WordPress directory writable? ' . ( true === $this->test->get_is_abspath_writable() ? 'Yes' : 'No' ) ); ?></p>
 <p><?php echo __( 'Backup directory exists? ' . ( true === empty( $backup_directory ) ? 'No' : 'Yes' ) ); ?></p>
 <p><?php echo __( 'PHP ZipArchive available? ' . ( true === $this->config->is_compressor_available( 'php_zip' ) ? 'Yes' : 'No' ) ); ?></p>

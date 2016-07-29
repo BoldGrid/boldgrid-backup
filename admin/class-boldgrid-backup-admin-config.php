@@ -126,6 +126,26 @@ class Boldgrid_Backup_Admin_Config {
 	}
 
 	/**
+	 * Get the mode (last 3 characters of the octal number) of the home directory.
+	 *
+	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
+	 *
+	 * @return string The mode of the home directory.
+	 */
+	public function get_home_mode() {
+		// Get the user home directory.
+		$home_dir = $this->get_home_directory();
+
+		// Connect to the WordPress Filesystem API.
+		global $wp_filesystem;
+
+		// Get the mode of the directory.
+		$home_dir_mode = $wp_filesystem->getchmod( $home_dir );
+
+		return $home_dir_mode;
+	}
+
+	/**
 	 * Get and return the backup directory path.
 	 *
 	 * @since 1.0
@@ -169,38 +189,25 @@ class Boldgrid_Backup_Admin_Config {
 	 * @return bool
 	 */
 	public function set_backup_directory( $backup_directory_path = '' ) {
-		// Connect to the WordPress Filesystem API.
-		global $wp_filesystem;
-
 		// If a backup directory was not specified, then use the default.
 		if ( true === empty( $backup_directory_path ) ) {
 			// Get the user home directory.
 			$home_dir = $this->get_home_directory();
 
 			// Check if home directory is writable.
-			$home_dir_writable = $wp_filesystem->is_writable( $home_dir );
+			$home_dir_writable = $this->core->test->is_homedir_writable();
 
-			// If home directory is not writable, then log and abort.
+			// If home directory is not writable, then abort.
 			if ( false === $home_dir_writable ) {
-				// Get the mode of the directory.
-				$home_dir_mode = $wp_filesystem->getchmod( $home_dir );
-
-				// Create error message.
-				$errormsg = 'Home directory "' . $home_dir . '" (' . $home_dir_mode . ') is not writable.';
-
-				// Log.
-				error_log( __METHOD__ . ': ' . $errormsg );
-
-				// Trigger an admin notice.
-				do_action( 'boldgrid_backup_notice', $errormsg, 'notice notice-error is-dismissible' );
-
-				// Abort.
 				return false;
 			}
 
 			// Define the backup directory name, using the default.
 			$backup_directory_path = $home_dir . '/boldgrid_backup';
 		}
+
+		// Connect to the WordPress Filesystem API.
+		global $wp_filesystem;
 
 		// Check if the backup directory exists.
 		$backup_directory_exists = $wp_filesystem->exists( $backup_directory_path );
@@ -209,13 +216,10 @@ class Boldgrid_Backup_Admin_Config {
 		if ( false === $backup_directory_exists ) {
 			$backup_directory_created = $wp_filesystem->mkdir( $backup_directory_path, 0700 );
 
-			// If mkdir failed, then abort.
+			// If mkdir failed, then notify and abort.
 			if ( false === $backup_directory_created ) {
 				// Create error message.
 				$errormsg = 'Could not create directory "' . $backup_directory_path . '".';
-
-				// Log.
-				error_log( __METHOD__ . ': ' . $errormsg );
 
 				// Trigger an admin notice.
 				do_action( 'boldgrid_backup_notice', $errormsg, 'notice notice-error is-dismissible' );
@@ -228,13 +232,10 @@ class Boldgrid_Backup_Admin_Config {
 		// Check if the backup directory is a directory.
 		$backup_directory_isdir = $wp_filesystem->is_dir( $backup_directory_path );
 
-		// If the backup directory does not exist, then attempt to create it.
+		// If the backup directory is not a directory, then notify and abort.
 		if ( false === $backup_directory_isdir ) {
 			// Create error message.
 			$errormsg = 'Backup directory "' . $backup_directory_path . '" is not a directory.';
-
-			// Log.
-			error_log( __METHOD__ . ': ' . $errormsg );
 
 			// Trigger an admin notice.
 			do_action( 'boldgrid_backup_notice', $errormsg, 'notice notice-error is-dismissible' );
@@ -243,7 +244,7 @@ class Boldgrid_Backup_Admin_Config {
 			return false;
 		}
 
-		// Check if the backup directory is writable, abort if not.
+		// If the backup directory is not writable, then notify and abort.
 		if ( false === $wp_filesystem->is_writable( $backup_directory_path ) ) {
 			// Get the mode of the directory.
 			$backup_directory_mode = $wp_filesystem->getchmod( $backup_directory_path );
@@ -251,9 +252,6 @@ class Boldgrid_Backup_Admin_Config {
 			// Create error message.
 			$errormsg = 'Backup directory "' . $backup_directory_path . '" ('
 				. $backup_directory_mode . ') is not writable.';
-
-			// Log.
-			error_log( __METHOD__ . ': ' . $errormsg );
 
 			// Trigger an admin notice.
 			do_action( 'boldgrid_backup_notice', $errormsg, 'notice notice-error is-dismissible' );

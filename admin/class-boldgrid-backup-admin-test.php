@@ -37,6 +37,15 @@ class Boldgrid_Backup_Admin_Test {
 	private $is_windows = null;
 
 	/**
+	 * Is the home directory writable?
+	 *
+	 * @since 1.2
+	 * @access private
+	 * @var bool
+	 */
+	private $is_homedir_writable = null;
+
+	/**
 	 * Is the WordPress installation root directory (ABSPATH) writable?
 	 *
 	 * @since 1.0
@@ -453,6 +462,33 @@ class Boldgrid_Backup_Admin_Test {
 
 		// Return the result.
 		return $this->is_abspath_writable;
+	}
+
+	/**
+	 * Get and return a boolean for whether or not the home directory is writable.
+	 *
+	 * @since 1.2
+	 *
+	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
+	 *
+	 * @return bool
+	 */
+	public function is_homedir_writable() {
+		if ( null !== $this->is_homedir_writable ) {
+			return $this->is_homedir_writable;
+		}
+
+		// Get the user home directory.
+		$home_dir = $this->core->config->get_home_directory();
+
+		// Connect to the WordPress Filesystem API.
+		global $wp_filesystem;
+
+		// Check if home directory is writable.
+		$this->is_homedir_writable = $wp_filesystem->is_writable( $home_dir );
+
+		// Return the result.
+		return $this->is_homedir_writable;
 	}
 
 	/**

@@ -2064,6 +2064,15 @@ class Boldgrid_Backup_Admin_Core {
 			);
 		}
 
+		// Get the user home directory.
+		$home_dir = $this->config->get_home_directory();
+
+		// Get the mode of the directory.
+		$home_dir_mode = $this->config->get_home_mode();
+
+		// Check if home directory is writable.
+		$home_dir_writable = $this->test->is_homedir_writable();
+
 		// Get the backup directory path.
 		$backup_directory = $this->config->get_backup_directory();
 
