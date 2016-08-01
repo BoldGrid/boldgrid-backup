@@ -120,6 +120,11 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-test.php';
 
 		/**
+		 * The class responsible for the admin notices for the plugin.
+		 */
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-notice.php';
+
+		/**
 		 * The class responsible for the core backup functionality in the admin area.
 		 */
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-core.php';
@@ -175,8 +180,8 @@ class Boldgrid_Backup {
 		);
 
 		// Add a custom action for admin notices.
-		$this->loader->add_action( 'boldgrid_backup_notice', $plugin_admin_core, 'notice_template',
-			10, 2
+		$this->loader->add_action( 'boldgrid_backup_notice', $plugin_admin_core->notice,
+			'boldgrid_backup_notice', 10, 2
 		);
 
 		// Add a custom action to handle AJAX callback for creating a backup archive file.
@@ -199,7 +204,7 @@ class Boldgrid_Backup {
 		);
 
 		// Add an action to display an admin notice for a pending rollback.
-		$this->loader->add_action( 'admin_footer', $plugin_admin_core,
+		$this->loader->add_action( 'admin_notices', $plugin_admin_core,
 			'rollback_notice'
 		);
 
@@ -218,11 +223,8 @@ class Boldgrid_Backup {
 			'backup_notice'
 		);
 
-		// Instantiate the admin settings.
-		$plugin_admin_settings = new Boldgrid_Backup_Admin_Settings( $plugin_admin_core );
-
 		// Add an action to add a cron job to restore after WordPress Updates, unless canceled.
-		$this->loader->add_action( 'upgrader_process_complete', $plugin_admin_settings,
+		$this->loader->add_action( 'upgrader_process_complete', $plugin_admin_core->settings,
 			'add_restore_cron'
 		);
 

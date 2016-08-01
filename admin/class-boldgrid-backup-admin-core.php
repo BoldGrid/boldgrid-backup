@@ -136,6 +136,9 @@ class Boldgrid_Backup_Admin_Core {
 		// Instantiate Boldgrid_Backup_Admin_Test.
 		$this->test = new Boldgrid_Backup_Admin_Test( $this );
 
+		// Instantiate Boldgrid_Backup_Admin_Notice.
+		$this->notice = new Boldgrid_Backup_Admin_Notice( $this );
+
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
 	}
@@ -2154,23 +2157,6 @@ class Boldgrid_Backup_Admin_Core {
 	}
 
 	/**
-	 * Admin notice template.
-	 *
-	 * @since 1.0
-	 *
-	 * @param string $message A message to display in the admin notice.
-	 * @param string $class The class string for the div.
-	 * @return null
-	 */
-	public function notice_template( $message, $class = 'notice notice-error is-dismissible' ) {
-		$message = __( $message, 'boldgrid-backup' );
-
-		printf( '<div class="%1$s"><p>%2$s</p></div>', $class, $message );
-
-		return;
-	}
-
-	/**
 	 * Print cron report.
 	 *
 	 * @since 1.0
@@ -2369,9 +2355,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return null
 	 */
 	public function rollback_notice() {
-		// Clear the cache.
-		wp_cache_flush();
-
 		// Get pending rollback information.
 		if ( true === is_multisite() ) {
 			$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );

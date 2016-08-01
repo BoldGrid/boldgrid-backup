@@ -32,7 +32,7 @@ class Boldgrid_Backup_Admin_Settings {
 	 *
 	 * @since 1.0
 	 *
-	 * @param Boldgrid_Backup_Admin_Config $core Config class object.
+	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
 	 */
 	public function __construct( $core ) {
 		// Save the Boldgrid_Backup_Admin_Core object as a class property.
