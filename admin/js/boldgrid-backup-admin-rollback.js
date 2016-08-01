@@ -58,7 +58,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
         $this.attr( 'disabled', 'disabled' ).css( 'pointer-events', 'none' );
 
 		// Create a context selector for the cancel rollback section.
-		$cancelRollbackSection = $('#cancel-rollback-section');
+		$cancelRollbackSection = $( '#cancel-rollback-section' );
 
 		// Create a context selector for the cancel rollback results.
 		$cancelRollbackResults = $( '#cancel-rollback-results' );
@@ -188,14 +188,17 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		/**
 		 * Initialize a countdown timer, updating a DOM id.
 		 *
+		 * Uses BOLDGRID.BACKUP.RollbackTimer.deadline for the end time/deadline.
+		 *
 		 * @since 1.0
 		 *
 		 * @see getTimeRemaining().
+		 * @see updateDeadline().
 		 *
 		 * @param string id A DOM id.
 		 * @param string endTime A data/time parsed with Date.parse().
 		 */
-		initializeClock : function( id, endTime ) {
+		initializeClock : function( id ) {
 			// Define variables.
 			var clock, interval, totalSeconds,
 				self = this;
@@ -205,7 +208,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 
 			// Use an interval of 1 second to update the clock.
 			interval = setInterval( function() {
-				totalSeconds = self.getTimeRemaining( endTime );
+				totalSeconds = self.getTimeRemaining( BOLDGRID.BACKUP.RollbackTimer.deadline );
 
 				// Update the clock display.
 				clock.innerHTML = totalSeconds.minutes + ':' + totalSeconds.seconds;
@@ -222,6 +225,23 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		},
 
 		/**
+		 * If updating something, then update the timer deadline.
+		 *
+		 * @since 1.2
+		 */
+		updateDeadline : function() {
+			// Declare variables.
+			var $RollbackDeadline;
+
+			// Check for the deadline in the source (when completing updates in the admin section).
+			$RollbackDeadline = $( 'iframe' ).contents().find( '#rollback-deadline' );
+
+			if ( $RollbackDeadline.length ) {
+				BOLDGRID.BACKUP.RollbackTimer.deadline = $RollbackDeadline.text();
+			}
+		},
+
+		/**
 		 * If the rollback countdown timer is needed, then initialize the clock.
 		 *
 		 * @since 1.0
@@ -230,11 +250,20 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		 */
 		init : function() {
 			if ( localizeScriptData.rolloutDeadline ) {
-				this.initializeClock( 'rollback-countdown-timer', localizeScriptData.rolloutDeadline );
-			}
-		}
+				// Set the end time/deadline.
+				BOLDGRID.BACKUP.RollbackTimer.deadline = localizeScriptData.rolloutDeadline;
 
+				// Initialize the clock.
+				this.initializeClock( 'rollback-countdown-timer' );
+			}
+
+			// When the update progress iframe loads, check for a new deadline.
+			$( 'iframe' ).on( 'load', this.updateDeadline );
+		}
 	};
+
+	// Initialize the deadline.
+	BOLDGRID.BACKUP.RollbackTimer.deadline = '';
 
 	// Initialize the rollback timer.
 	BOLDGRID.BACKUP.RollbackTimer.init();

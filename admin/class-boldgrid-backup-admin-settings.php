@@ -809,22 +809,6 @@ class Boldgrid_Backup_Admin_Settings {
 			return;
 		}
 
-		// Get the unix time for 15 minutes ago.
-		$time_15_minutes_ago = strtotime( 'NOW - 15 MINUTES' );
-
-		// If the boldgrid_backup_last_backup time is too old, then abort.
-		if ( true === $is_multisite ) {
-			$last_backup_time = get_site_option( 'boldgrid_backup_last_backup' );
-		} else {
-			$last_backup_time = get_option( 'boldgrid_backup_last_backup' );
-		}
-
-		if ( $last_backup_time < $time_15_minutes_ago ) {
-			$this->delete_rollback_option();
-
-			return;
-		}
-
 		// Get archive list.
 		$archives = $this->core->get_archive_list();
 
@@ -844,13 +828,6 @@ class Boldgrid_Backup_Admin_Settings {
 		$archive = $archives[ $archive_key ];
 
 		$archive_filename = $archive['filename'];
-
-		// If the backup file is too old, then abort.
-		if ( $archive['lastmodunix'] < $time_15_minutes_ago ) {
-			$this->delete_rollback_option();
-
-			return;
-		}
 
 		// Remove existing restore cron jobs.
 		$this->delete_cron_entries( 'restore' );
@@ -903,13 +880,11 @@ class Boldgrid_Backup_Admin_Settings {
 
 		// If cron job was added, then update the boldgrid_backup_pending_rollback option with time.
 		if ( true === $status ) {
-			if ( true === $is_multisite ) {
-				$pending_rollback['deadline'] = $deadline;
+			$pending_rollback['deadline'] = $deadline;
 
+			if ( true === $is_multisite ) {
 				update_site_option( 'boldgrid_backup_pending_rollback', $pending_rollback );
 			} else {
-				$pending_rollback['deadline'] = $deadline;
-
 				update_option( 'boldgrid_backup_pending_rollback', $pending_rollback );
 			}
 		}

@@ -2261,12 +2261,8 @@ class Boldgrid_Backup_Admin_Core {
 			$pending_rollback = get_option( 'boldgrid_backup_pending_rollback' );
 		}
 
-		// Get the unix time for 15 minutes ago.
-		$time_15_minutes_ago = strtotime( 'NOW - 15 MINUTES' );
-
 		// If there is a pending rollback, then abort.
-		if ( false === empty( $pending_rollback['lastmodunix'] ) &&
-			$pending_rollback['lastmodunix'] > $time_15_minutes_ago ) {
+		if ( false === empty( $pending_rollback['lastmodunix'] ) ) {
 			return;
 		}
 
@@ -2363,15 +2359,11 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return null
 	 */
 	public function rollback_notice() {
-		// Get pending rollback information.
-		if ( true === is_multisite() ) {
-			$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
-		} else {
-			$pending_rollback = get_option( 'boldgrid_backup_pending_rollback' );
-		}
+		// Get pending rollback deadline.
+		$deadline = $this->get_rollback_deadline();
 
 		// If there is not a pending rollback, then abort.
-		if ( true === empty( $pending_rollback['deadline'] ) ) {
+		if ( true === empty( $deadline ) ) {
 			return;
 		}
 
@@ -2383,7 +2375,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// If the deadline has passed or no backup archives to restore, then remove the pending
 		// rollback information and cron.
-		if ( $pending_rollback['deadline'] <= time() || 0 === $archive_count ) {
+		if ( $deadline <= time() || 0 === $archive_count ) {
 			// Clear rollback information.
 			$this->cancel_rollback();
 
@@ -2415,7 +2407,7 @@ class Boldgrid_Backup_Admin_Core {
 		);
 
 		// Include the time (in ISO 8601 format).
-		$localize_script_data['rolloutDeadline'] = date( 'c', $pending_rollback['deadline'] );
+		$localize_script_data['rolloutDeadline'] = date( 'c', $deadline );
 
 		// Add localize script data to the JS script.
 		wp_localize_script( 'boldgrid-backup-admin-rollback', 'localizeScriptData', $localize_script_data );
@@ -2617,5 +2609,63 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		return;
+	}
+
+	/**
+	 * Get the pending rollback deadline (in unix seconds).
+	 *
+	 * @since 1.2
+	 *
+	 * @return int The pending rollback deadline in unix seconds, or zero if not present.
+	 */
+	public function get_rollback_deadline() {
+		// Get pending rollback information.
+		if ( true === is_multisite() ) {
+			$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
+		} else {
+			$pending_rollback = get_option( 'boldgrid_backup_pending_rollback' );
+		}
+
+		// Return pending rollback deadline, or 0 if not present.
+		if ( true === empty( $pending_rollback['deadline'] ) ) {
+			return 0;
+		} else {
+			return $pending_rollback['deadline'];
+		}
+	}
+
+	/**
+	 * Callback function for the hook "upgrader_process_complete".
+	 *
+	 * @since 1.2
+	 *
+	 * @link https://developer.wordpress.org/reference/hooks/upgrader_process_complete/
+	 *
+	 * @return null
+	 */
+	public function upgrader_process_complete() {
+		// Add/update restoration cron job.
+		$this->settings->add_restore_cron();
+
+		// If not on an admin page, then abort.
+		if ( false === is_admin() ) {
+			return;
+		}
+
+		// Get pending rollback deadline.
+		$deadline = $this->get_rollback_deadline();
+
+		// If there is not a pending rollback, then abort.
+		if ( true === empty( $deadline ) ) {
+			return;
+		}
+
+		// Get the ISO time (in ISO 8601 format).
+		$iso_time = date( 'c', $deadline );
+
+		// Print a hidden div with the time, so that JavaScript can read it.
+?>
+<div id='rollback-deadline'><?php echo $iso_time; ?></div>
+<?php
 	}
 }

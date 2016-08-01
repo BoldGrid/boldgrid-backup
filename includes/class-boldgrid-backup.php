@@ -224,8 +224,8 @@ class Boldgrid_Backup {
 		);
 
 		// Add an action to add a cron job to restore after WordPress Updates, unless canceled.
-		$this->loader->add_action( 'upgrader_process_complete', $plugin_admin_core->settings,
-			'add_restore_cron'
+		$this->loader->add_action( 'upgrader_process_complete', $plugin_admin_core,
+			'upgrader_process_complete'
 		);
 
 		return;
