@@ -156,7 +156,7 @@ if ( false === empty( $archive_info['filepath'] ) ) {
 <?php
 }
 ?>
-<p>Error: <?php echo $archive_info['error']; ?></p>
+<p><?php echo $archive_info['error']; ?></p>
 <?php
 if ( true === isset( $archive_info['error_message'] ) ) {
 	echo '<p>Error Details: ' . $archive_info['error_message'];

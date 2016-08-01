@@ -205,6 +205,9 @@
 				// Update the archives total size.
 				$( '#archives-size' ).html( $( '#archives-new-size' ) );
 
+				// Empty the current archive list.
+				$( '#backup-archive-list-body' ).empty();
+
 				// Replace the old list with the new.
 				$( '#backup-archive-list-body' ).html( $( '#archive-list-new tr' ) );
 

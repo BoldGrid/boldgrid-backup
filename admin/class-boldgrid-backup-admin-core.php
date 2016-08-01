@@ -1477,6 +1477,9 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return array An array of archive file information.
 	 */
 	public function restore_archive_file( $dryrun = false ) {
+		// Initialize $error.
+		$error = array();
+
 		// Check if DOING_CRON.
 		$doing_cron = ( true === defined( 'DOING_CRON' ) && DOING_CRON );
 
@@ -1520,10 +1523,7 @@ class Boldgrid_Backup_Admin_Core {
 
 			// Display an error notice, if not DOING_CRON.
 			if ( false === $doing_cron ) {
-				do_action( 'boldgrid_backup_notice',
-					'Invalid key for the selected archive file.',
-					'notice notice-error is-dismissible'
-				);
+				$error[] =  'Invalid key for the selected archive file.';
 			} else {
 				return array(
 					'error' => 'Invalid key for the selected archive file.',
@@ -1539,10 +1539,7 @@ class Boldgrid_Backup_Admin_Core {
 
 			// Display an error notice, if not DOING_CRON.
 			if ( false === $doing_cron ) {
-				do_action( 'boldgrid_backup_notice',
-					'Invalid filename for the selected archive file.',
-					'notice notice-error is-dismissible'
-				);
+				$error[] = 'Invalid filename for the selected archive file.';
 			} else {
 				return array(
 					'error' => 'Invalid filename for the selected archive file.',
@@ -1567,10 +1564,7 @@ class Boldgrid_Backup_Admin_Core {
 
 			// Display an error notice, if not DOING_CRON.
 			if ( false === $doing_cron ) {
-				do_action( 'boldgrid_backup_notice',
-					'No archive files were found.',
-					'notice notice-error is-dismissible'
-				);
+				$error[] = 'No archive files were found.';
 			} else {
 				return array(
 					'error' => 'No archive files were found.',
@@ -1589,15 +1583,28 @@ class Boldgrid_Backup_Admin_Core {
 
 			// Display an error notice, if not DOING_CRON.
 			if ( false === $doing_cron ) {
-				do_action( 'boldgrid_backup_notice',
-					'The selected archive file was not found.',
-					'notice notice-error is-dismissible'
-				);
+				$error[] = 'The selected archive file was not found.';
 			} else {
 				return array(
 					'error' => 'The selected archive file was not found.',
 				);
 			}
+		}
+
+		if ( true !== $restore_ok || count( $error ) > 0 ) {
+			// Initialize $errors.
+			$errors = '';
+
+			foreach( $error as $err ) {
+				$errors .= $err . '<br />' . PHP_EOL;
+			}
+
+			$message = 'The requested restoration failed.<br />' . PHP_EOL . $errors;
+
+			return array(
+				'error' => $message,
+
+			);
 		}
 
 		// Get the file path to restore.
@@ -1620,11 +1627,12 @@ class Boldgrid_Backup_Admin_Core {
 					'The selected archive file is empty.',
 					'notice notice-error is-dismissible'
 				);
-			} else {
-				return array(
-					'error' => 'The selected archive file was not found.',
-				);
 			}
+
+			// Abort.
+			return array(
+				'error' => 'The selected archive file was not found.',
+			);
 		}
 
 		// Populate $info.
