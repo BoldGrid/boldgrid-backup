@@ -1143,7 +1143,7 @@ class Boldgrid_Backup_Admin_Core {
 		$time_stop = microtime( true );
 
 		// Calculate duration.
-		$info['duration'] = number_format( ( $time_stop - $time_start ), 4, '.', '' );
+		$info['duration'] = number_format( ( $time_stop - $time_start ), 2, '.', '' );
 
 		// Get settings.
 		$settings = $this->settings->get_settings();
