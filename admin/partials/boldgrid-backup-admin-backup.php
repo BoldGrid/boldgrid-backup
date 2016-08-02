@@ -16,7 +16,7 @@
 <?php
 if ( true === empty( $_GET['restore_now'] ) ) {
 ?>
-<h2>Backup Results</h2>
+<h2><?php echo __( 'Backup Results' ); ?></h2>
 <?php
 }
 ?>
@@ -39,7 +39,7 @@ if ( true === empty( $_GET['restore_now'] ) ) {
 if ( false === empty( $archive_info ) ) {
 	if ( false === empty( $archive_info['dryrun'] ) ) {
 ?>
-<div class="notice notice-info"><p>This was a dry run test.</p></div>
+<div class="notice notice-info"><p><?php echo __( 'This was a dry run test.' ); ?></p></div>
 <?php
 	}
 
@@ -49,9 +49,9 @@ if ( false === empty( $archive_info ) ) {
 <div class="notice notice-success">
 	<p><?php
 	if ( false === empty( $_GET['restore_now'] ) ) {
-		echo 'The selected archive file has been successfully restored.';
+		echo __( 'The selected archive file has been successfully restored.' );
 	} else {
-		echo 'A backup archive file has been created successfully.';
+		echo __( 'A backup archive file has been created successfully.' );
 	}
 ?></p>
 <?php
@@ -60,32 +60,34 @@ $filename = '';
 if ( false === empty( $archive_info['filepath'] ) ) {
 	$filename = basename( $archive_info['filepath'] );
 ?>
-	<p>File Path: <?php echo $archive_info['filepath']; ?></p>
+	<p><?php echo __( 'File Path' ); ?>: <?php echo $archive_info['filepath']; ?></p>
 <?php
 }
 
 if ( false === empty( $archive_info['filesize'] ) ) {
 ?>
-	<p>File Size: <?php echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['filesize'] ); ?></p>
+	<p><?php echo __( 'File Size' ); ?>: <?php
+echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['filesize'] );
+?></p>
 <?php
 }
 
 if ( false === empty( $archive_info['total_size'] ) ) {
 	$size = Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] );
 ?>
-	<p>Total size: <?php echo $size; ?></p>
+	<p><?php echo __( 'Total size' ); ?>: <?php echo $size; ?></p>
 <?php
 }
 
 if ( false === empty( $archive_info['compressor'] ) ) {
 ?>
-	<p>Compressor: <?php echo $archive_info['compressor']; ?></p>
+	<p><?php echo __( 'Compressor' ); ?>: <?php echo $archive_info['compressor']; ?></p>
 <?php
 }
 
 if ( true === isset( $archive_info['duration'] ) ) {
 ?>
-	<p>Duration: <?php echo $archive_info['duration'] . ' seconds'; ?></p>
+	<p><?php echo __( 'Duration' ); ?>: <?php echo $archive_info['duration'] . __( ' seconds' ); ?></p>
 <?php
 }
 ?>
@@ -120,13 +122,13 @@ foreach ( $archives as $key => $archive ) {
 			id='backup-archive-download-<?php echo $key; ?>'
 			class='button action-download' href='#'
 			data-key='<?php echo $key ?>' data-filepath='<?php echo $archive['filepath']; ?>'
-			data-filename='<?php echo $archive['filename']; ?>'>Download</a></td>
+			data-filename='<?php echo $archive['filename']; ?>'><?php echo __( 'Download' ); ?></a></td>
 		<td class='backup-archive-list-restore'><a class='button action-restore'
 			href='<?php echo $restore_url; ?>' data-filename='<?php echo $archive['filename']; ?>'>
-			Restore</a></td>
+			<?php echo __( 'Restore' ); ?></a></td>
 		<td class='backup-archive-list-delete'><a class='button action-delete'
 			href='<?php echo $delete_url; ?>' data-filename='<?php echo $archive['filename']; ?>'>
-			Delete</a></td>
+			<?php echo __( 'Delete' ); ?></a></td>
 	</tr>
 <?php
 }
@@ -152,14 +154,14 @@ if ( false === empty( $_GET['restore_now'] ) ) {
 <?php
 if ( false === empty( $archive_info['filepath'] ) ) {
 ?>
-	<p>File Path: <?php echo $archive_info['filepath']; ?></p>
+	<p><?php echo __( 'File Path' ); ?>: <?php echo $archive_info['filepath']; ?></p>
 <?php
 }
 ?>
 <p><?php echo $archive_info['error']; ?></p>
 <?php
 if ( true === isset( $archive_info['error_message'] ) ) {
-	echo '<p>Error Details: ' . $archive_info['error_message'];
+	echo '<p>' . __( 'Error Details: ' . $archive_info['error_message'] );
 
 	if ( true === isset( $archive_info['error_code'] ) ) {
 		echo ' (' . $archive_info['error_code'] . ')';

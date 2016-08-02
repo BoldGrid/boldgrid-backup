@@ -134,7 +134,7 @@ class Boldgrid_Backup_Admin_Utility {
 				break;
 		}
 
-		return $message;
+		return __( $message );
 	}
 
 	/**

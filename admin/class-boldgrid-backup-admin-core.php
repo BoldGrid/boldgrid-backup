@@ -1506,7 +1506,7 @@ class Boldgrid_Backup_Admin_Core {
 			}
 
 			return array(
-				'error' => 'Functionality tests fail.',
+				'error' => __( 'Functionality tests fail.' ),
 			);
 		}
 
@@ -1523,10 +1523,10 @@ class Boldgrid_Backup_Admin_Core {
 
 			// Display an error notice, if not DOING_CRON.
 			if ( false === $doing_cron ) {
-				$error[] =  'Invalid key for the selected archive file.';
+				$error[] =  __( 'Invalid key for the selected archive file.' );
 			} else {
 				return array(
-					'error' => 'Invalid key for the selected archive file.',
+					'error' => __( 'Invalid key for the selected archive file.' ),
 				);
 			}
 		}
@@ -1539,10 +1539,10 @@ class Boldgrid_Backup_Admin_Core {
 
 			// Display an error notice, if not DOING_CRON.
 			if ( false === $doing_cron ) {
-				$error[] = 'Invalid filename for the selected archive file.';
+				$error[] = __( 'Invalid filename for the selected archive file.' );
 			} else {
 				return array(
-					'error' => 'Invalid filename for the selected archive file.',
+					'error' => __( 'Invalid filename for the selected archive file.' ),
 				);
 			}
 		}
@@ -1564,10 +1564,10 @@ class Boldgrid_Backup_Admin_Core {
 
 			// Display an error notice, if not DOING_CRON.
 			if ( false === $doing_cron ) {
-				$error[] = 'No archive files were found.';
+				$error[] = __( 'No archive files were found.' );
 			} else {
 				return array(
-					'error' => 'No archive files were found.',
+					'error' => __( 'No archive files were found.' ),
 				);
 			}
 		}
@@ -1583,23 +1583,24 @@ class Boldgrid_Backup_Admin_Core {
 
 			// Display an error notice, if not DOING_CRON.
 			if ( false === $doing_cron ) {
-				$error[] = 'The selected archive file was not found.';
+				$error[] = __( 'The selected archive file was not found.' );
 			} else {
 				return array(
-					'error' => 'The selected archive file was not found.',
+					'error' => __( 'The selected archive file was not found.' ),
 				);
 			}
 		}
 
+		// If there are errors, then create a message from the combined errors found.
 		if ( true !== $restore_ok || count( $error ) > 0 ) {
-			// Initialize $errors.
+			// Initialize $errors string.
 			$errors = '';
 
 			foreach( $error as $err ) {
 				$errors .= $err . '<br />' . PHP_EOL;
 			}
 
-			$message = 'The requested restoration failed.<br />' . PHP_EOL . $errors;
+			$message = __( 'The requested restoration failed.' ) . '<br />' . PHP_EOL . $errors;
 
 			return array(
 				'error' => $message,
@@ -1631,7 +1632,7 @@ class Boldgrid_Backup_Admin_Core {
 
 			// Abort.
 			return array(
-				'error' => 'The selected archive file was not found.',
+				'error' => __( 'The selected archive file was not found.' ),
 			);
 		}
 
@@ -1660,8 +1661,9 @@ class Boldgrid_Backup_Admin_Core {
 			$status = $zip->open( $filepath, ZipArchive::CHECKCONS );
 
 			if ( true !== $status ) {
-				$info['error'] = 'Cannot unzip archive file "' . $filepath . '".  Error code: ' .
-				$status . ' (' . Boldgrid_Backup_Admin_Utility::translate_zip_error( $status ) .
+				$info['error'] = __( 'Cannot unzip archive file "' ) . $filepath .
+				__( '". Error code: ' ) . $status . ' (' .
+				Boldgrid_Backup_Admin_Utility::translate_zip_error( $status ) .
 				') ';
 
 				$restore_ok = false;
@@ -1697,7 +1699,7 @@ class Boldgrid_Backup_Admin_Core {
 							);
 						} else {
 							return array(
-								'error' => 'The file "' . $name . '" is not writable.',
+								'error' => __( 'The file' ) . ' "' . $name . '" ' . __( 'is not writable.' ),
 							);
 						}
 
@@ -1707,8 +1709,8 @@ class Boldgrid_Backup_Admin_Core {
 					// Extract the file.
 					if ( true !== $zip->extractTo( $wp_root, array( $name ) ) ) {
 						// Error extracting.
-						$info['error'] = 'Error extracting "' . ABSPATH . $name .
-							'" from archive file "' . $filepath . '".';
+						$info['error'] = __( 'Error extracting' ) . ' "' . ABSPATH . $name .
+							'" ' . __( 'from archive file' ) . ' "' . $filepath . '".';
 
 						error_log( __METHOD__ .
 							': ' . $info['error']
@@ -1755,7 +1757,7 @@ class Boldgrid_Backup_Admin_Core {
 				);
 			} else {
 				return array(
-					'error' => 'Could not restore database.',
+					'error' => __( 'Could not restore database.' ),
 				);
 			}
 		}
