@@ -19,27 +19,6 @@
  */
 class Boldgrid_Backup_Admin_Notice {
 	/**
-	 * The core class object.
-	 *
-	 * @since 1.2
-	 * @access private
-	 * @var Boldgrid_Backup_Admin_Core
-	 */
-	private $core;
-
-	/**
-	 * Constructor.
-	 *
-	 * @since 1.2
-	 *
-	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
-	 */
-	public function __construct( $core ) {
-		// Save the Boldgrid_Backup_Admin_Core object as a class property.
-		$this->core = $core;
-	}
-
-	/**
 	 * Print an admin notice.
 	 *
 	 * @since 1.2

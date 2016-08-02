@@ -55,6 +55,15 @@ class Boldgrid_Backup_Admin_Core {
 	public $notice;
 
 	/**
+	 * The admin cron class object.
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @var Boldgrid_Backup_Admin_Cron
+	 */
+	public $cron;
+
+	/**
 	 * Available execution functions.
 	 *
 	 * @since 1.0
@@ -137,7 +146,10 @@ class Boldgrid_Backup_Admin_Core {
 		$this->test = new Boldgrid_Backup_Admin_Test( $this );
 
 		// Instantiate Boldgrid_Backup_Admin_Notice.
-		$this->notice = new Boldgrid_Backup_Admin_Notice( $this );
+		$this->notice = new Boldgrid_Backup_Admin_Notice();
+
+		// Instantiate Boldgrid_Backup_Admin_Cron.
+		$this->cron = new Boldgrid_Backup_Admin_Cron( $this );
 
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
@@ -2284,140 +2296,6 @@ class Boldgrid_Backup_Admin_Core {
 	}
 
 	/**
-	 * Print cron report.
-	 *
-	 * @since 1.0
-	 *
-	 * @param array $archive_info An array of archive file information.
-	 */
-	public function print_cron_report( $archive_info ) {
-		// Validate mode.
-		if ( true === empty( $archive_info['mode'] ) ) {
-			esc_html_e( 'Error: A mode was not specified.', 'boldgrid-backup' );
-			wp_die();
-		}
-
-		$valid_modes = array(
-			'backup',
-			'restore',
-		);
-
-		if ( false === in_array( $archive_info['mode'], $valid_modes, true ) ) {
-			printf(
-				esc_html__( 'Error: Invalid mode "%s".', 'boldgrid-backup' ),
-				$archive_info['mode']
-			);
-			wp_die();
-		}
-
-		// Create action name.
-		switch ( $archive_info['mode'] ) {
-			case 'backup' :
-				$action_name = 'creating';
-				break;
-
-			case 'restore' :
-				$action_name = 'restoring';
-				break;
-
-			default :
-				$action_name = 'handling';
-				break;
-		}
-
-		// Print report.
-		if ( false === empty( $archive_info['error'] ) ) {
-			// Error.
-			printf(
-				esc_html__( 'There was an error $s backup archive file.', 'boldgrid-backup' ),
-				$action_name
-			);
-
-			echo PHP_EOL;
-
-			printf(
-				esc_html__( 'Error: %s', 'boldgrid-backup' ),
-				$archive_info['error']
-			);
-
-			echo PHP_EOL;
-
-			if ( true === isset( $archive_info['error_message'] ) ) {
-				printf(
-					esc_html__( 'Error Message: %s', 'boldgrid-backup' ),
-					$archive_info['error_message']
-				);
-			}
-
-			if ( true === isset( $archive_info['error_code'] ) ) {
-				printf(
-					' (%s)',
-					$archive_info['error_code']
-				);
-			}
-
-			echo PHP_EOL;
-		} elseif ( false === empty( $archive_info['filesize'] ) || false === empty( $archive_info['dryrun'] ) ) {
-			// Dry run.
-			if ( false === empty( $archive_info['filepath'] ) ) {
-				printf(
-					esc_html__( 'File Path: %s', 'boldgrid-backup' ),
-					$archive_info['filepath']
-				);
-
-				echo PHP_EOL;
-			}
-
-			if ( false === empty( $archive_info['filesize'] ) ) {
-				printf(
-					esc_html__( 'File Size: %s', 'boldgrid-backup' ),
-					Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['filesize'] )
-				);
-
-				echo PHP_EOL;
-			}
-
-			if ( false === empty( $archive_info['total_size'] ) ) {
-				printf(
-					esc_html__( 'Total size: %s', 'boldgrid-backup' ),
-					Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] )
-				);
-
-				echo PHP_EOL;
-			}
-
-			if ( false === empty( $archive_info['compressor'] ) ) {
-				printf(
-					esc_html__( 'Compressor: %s', 'boldgrid-backup' ),
-					$archive_info['compressor']
-				);
-
-				echo PHP_EOL;
-			}
-
-			if ( true === isset( $archive_info['duration'] ) ) {
-				printf(
-					esc_html__( 'Duration: %s seconds', 'boldgrid-backup' ),
-					$archive_info['duration']
-				);
-
-				echo PHP_EOL;
-			}
-		} else {
-			// Unknown error.
-			printf(
-				esc_html__(
-					'There was an unknown error %s a backup archive file.',
-					'boldgrid-backup'
-				),
-				$action_name
-			);
-
-			echo PHP_EOL;
-		}
-	}
-
-	/**
 	 * Show an admin notice on the WordPress Updates page.
 	 *
 	 * @since 1.0
@@ -2709,10 +2587,14 @@ class Boldgrid_Backup_Admin_Core {
 	 * Cancel rollback.
 	 *
 	 * @since 1.0.1
+	 *
+	 * @see Boldgrid_Backup_Admin_Cron::delete_cron_entries().
+	 * @see Boldgrid_Backup_Admin_Settings::delete_rollback_option().
+	 *
 	 */
 	public function cancel_rollback() {
 		// Remove any cron jobs for restore actions.
-		$this->settings->delete_cron_entries( 'restore' );
+		$this->cron->delete_cron_entries( 'restore' );
 
 		// Remove WP option boldgrid_backup_pending_rollback.
 		$this->settings->delete_rollback_option();
@@ -2833,12 +2715,11 @@ class Boldgrid_Backup_Admin_Core {
 	 * @since 1.2
 	 *
 	 * @link https://developer.wordpress.org/reference/hooks/upgrader_process_complete/
-	 *
-	 * @return null
+	 * @see Boldgrid_Backup_Admin_Cron::update_cron().
 	 */
 	public function upgrader_process_complete() {
 		// Add/update restoration cron job.
-		$this->settings->add_restore_cron();
+		$this->cron->add_restore_cron();
 
 		// If not on an admin page, then abort.
 		if ( false === is_admin() ) {

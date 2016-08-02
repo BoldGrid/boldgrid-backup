@@ -31,6 +31,6 @@ class Boldgrid_Backup_Deactivator {
 		$plugin_admin_core = new Boldgrid_Backup_Admin_Core();
 
 		// Delete cron jobs for backup tasks.
-		$plugin_admin_core->settings->delete_cron_entries();
+		$plugin_admin_core->cron->delete_cron_entries();
 	}
 }

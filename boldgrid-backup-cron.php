@@ -115,7 +115,7 @@ switch ( $input['mode'] ) {
 
 		if ( true === empty( $pending_rollback ) ) {
 			// Remove existing restore cron jobs.
-			$boldgrid_backup_core->settings->delete_cron_entries( 'restore' );
+			$boldgrid_backup_core->cron->delete_cron_entries( 'restore' );
 
 			die(
 				esc_html__(
@@ -132,7 +132,7 @@ switch ( $input['mode'] ) {
 			$boldgrid_backup_core->settings->delete_rollback_option();
 
 			// Remove existing restore cron jobs.
-			$boldgrid_backup_core->settings->delete_cron_entries( 'restore' );
+			$boldgrid_backup_core->cron->delete_cron_entries( 'restore' );
 
 			die(
 				esc_html__(
@@ -159,7 +159,7 @@ switch ( $input['mode'] ) {
 		$archive_info = $boldgrid_backup_core->restore_archive_file( $dry_run );
 
 		// Remove existing restore cron jobs.
-		$boldgrid_backup_core->settings->delete_cron_entries( 'restore' );
+		$boldgrid_backup_core->cron->delete_cron_entries( 'restore' );
 
 		esc_html_e( 'Done.', 'boldgrid-backup' );
 
@@ -183,7 +183,7 @@ if ( true === empty( $archive_info['mode'] ) ) {
 }
 
 // Print report.
-$boldgrid_backup_core->print_cron_report( $archive_info );
+$boldgrid_backup_core->cron->print_cron_report( $archive_info );
 
 esc_html_e( 'Operation complete.', 'boldgrid-backup' );
 
