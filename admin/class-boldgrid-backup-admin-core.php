@@ -1618,9 +1618,6 @@ class Boldgrid_Backup_Admin_Core {
 		// Close any PHP session, so that another session can open during this restore operation.
 		session_write_close();
 
-		// Clear rollback information and restoration cron jobs that may be present.
-		$this->cancel_rollback();
-
 		// Get archive list.
 		if ( true === $restore_ok ) {
 			$archives = $this->get_archive_list( $archive_filename );
@@ -1850,6 +1847,9 @@ class Boldgrid_Backup_Admin_Core {
 					'error' => esc_html__( 'Could not restore database.', 'boldgrid-backup' ),
 				);
 			}
+		} else {
+			// Clear rollback information and restoration cron jobs that may be present.
+			$this->cancel_rollback();
 		}
 
 		// Get settings.
