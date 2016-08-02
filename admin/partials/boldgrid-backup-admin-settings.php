@@ -20,12 +20,17 @@ if ( true === empty( $settings ) ) {
 }
 ?>
 <div class='wrap'>
-	<h1><?php echo __( 'BoldGrid Backup and Restore Settings' ); ?></h1>
-	<p><?php echo __( 'The BoldGrid Backup and Restore system allows you to upgrade your themes and plugins without being afraid it will do something you cannot easily undo. We preform a “Preflight Check” to see if the needed support is available on your web hosting account.' ); ?></p>
+	<h1><?php esc_html_e( 'BoldGrid Backup and Restore Settings', 'boldgrid-backup' ); ?></h1>
+	<p><?php
+	esc_html_e(
+		'The BoldGrid Backup and Restore system allows you to upgrade your themes and plugins without being afraid it will do something you cannot easily undo. We preform a “Preflight Check” to see if the needed support is available on your web hosting account.',
+		'boldgrid-backup'
+	);
+	?></p>
 	<form id='schedule-form' method='post'>
 	<?php wp_nonce_field( 'boldgrid-backup-settings', 'settings_auth' ); ?>
 		<input type='hidden' name='save_time' value='<?php echo time(); ?>' />
-		<h2><?php echo __( 'Days of the Week' ); ?></h2>
+		<h2><?php esc_html_e( 'Days of the Week', 'boldgrid-backup' ); ?></h2>
 		<div class='schedule-dow'>
 			<table id='schedule-dow-table'>
 				<tbody>
@@ -36,57 +41,59 @@ if ( true === empty( $settings ) ) {
 							if ( false === empty( $settings['schedule']['dow_sunday'] ) ) {
 								echo ' checked';
 							}
-							?> /><?php echo __( 'Sunday' ); ?></td>
+							?> /><?php esc_html_e( 'Sunday', 'boldgrid-backup' ); ?></td>
 						<td class='schedule-dow'><input id='dow-monday' type='checkbox'
 							name='dow_monday' value='1'
 							<?php
 							if ( false === empty( $settings['schedule']['dow_monday'] ) ) {
 								echo ' checked';
 							}
-							?> /><?php echo __( 'Monday' ); ?></td>
+							?> /><?php esc_html_e( 'Monday', 'boldgrid-backup' ); ?></td>
 						<td class='schedule-dow'><input id='dow-tuesday' type='checkbox'
 							name='dow_tuesday' value='1'
 							<?php
 							if ( false === empty( $settings['schedule']['dow_tuesday'] ) ) {
 								echo ' checked';
 							}
-							?> /><?php echo __( 'Tuesday' ); ?></td>
+							?> /><?php esc_html_e( 'Tuesday', 'boldgrid-backup' ); ?></td>
 						<td class='schedule-dow'><input id='dow-wednesday' type='checkbox'
 							name='dow_wednesday' value='1'
 							<?php
 							if ( false === empty( $settings['schedule']['dow_wednesday'] ) ) {
 								echo ' checked';
 							}
-							?> /><?php echo __( 'Wednesday' ); ?></td>
+							?> /><?php esc_html_e( 'Wednesday', 'boldgrid-backup' ); ?></td>
 						<td class='schedule-dow'><input id='dow-thursday' type='checkbox'
 							name='dow_thursday' value='1'
 							<?php
 							if ( false === empty( $settings['schedule']['dow_thursday'] ) ) {
 								echo ' checked';
 							}
-							?> /><?php echo __( 'Thursday' ); ?></td>
+							?> /><?php esc_html_e( 'Thursday', 'boldgrid-backup' ); ?></td>
 						<td class='schedule-dow'><input id='dow-friday' type='checkbox'
 							name='dow_friday' value='1'
 							<?php
 							if ( false === empty( $settings['schedule']['dow_friday'] ) ) {
 								echo ' checked';
 							}
-							?> /><?php echo __( 'Friday' ); ?></td>
+							?> /><?php esc_html_e( 'Friday', 'boldgrid-backup' ); ?></td>
 						<td class='schedule-dow'><input id='dow-saturday' type='checkbox'
 							name='dow_saturday' value='1'
 							<?php
 							if ( false === empty( $settings['schedule']['dow_saturday'] ) ) {
 								echo ' checked';
 							}
-							?> /><?php echo __( 'Saturday' ); ?></td>
+							?> /><?php esc_html_e( 'Saturday', 'boldgrid-backup' ); ?></td>
 					</tr>
 				</tbody>
 			</table>
 			<div class='hidden' id='no-backup-days'>
-				<p>* <?php echo __( 'Backup will not occur if no days are selected.' ); ?></p>
+				<p>* <?php
+				esc_html_e( 'Backup will not occur if no days are selected.', 'boldgrid-backup' );
+				?></p>
 			</div>
 		</div>
-		<h2><?php echo __( 'Time of Day' ); ?></h2>
+		<h2><?php esc_html_e( 'Time of Day', 'boldgrid-backup' ); ?></h2>
 		<div class='schedule-tod'>
 			<table id='schedule-tod-table'>
 				<tbody>
@@ -145,12 +152,14 @@ if ( true === empty( $settings ) ) {
 				</tbody>
 			</table>
 		</div>
-		<h2><?php echo __( 'Retention' ); ?></h2>
+		<h2><?php esc_html_e( 'Retention', 'boldgrid-backup' ); ?></h2>
 		<div class='retention-settings'>
 			<table id='retention-settings-table'>
 				<tbody>
 					<tr>
-						<td><?php echo __( 'Number of backup archives to retain' ); ?></td>
+						<td><?php
+						esc_html_e( 'Number of backup archives to retain', 'boldgrid-backup' );
+						?></td>
 						<td><select id='retention-count' name='retention_count'>
 							<?php
 							$is_retention_set = ( true === isset( $settings['retention_count'] ) );
@@ -173,9 +182,12 @@ if ( true === empty( $settings ) ) {
 				</tbody>
 			</table>
 		</div>
-		<h2><?php echo __( 'Auto Backup Before Updates' ); ?>
+		<h2><?php esc_html_e( 'Auto Backup Before Updates', 'boldgrid-backup' ); ?>
 		 <span class='dashicons dashicons-editor-help' title='<?php
-				echo __( 'Automatically perform a backup before WordPress updates.' );
+				esc_html_e(
+					'Automatically perform a backup before WordPress updates.',
+					'boldgrid-backup'
+				);
 		?>'></span></h2>
 		<p>
 			<input id='auto-backup-enabled' type='radio' name='auto_backup'
@@ -185,18 +197,19 @@ if ( true === empty( $settings ) ) {
 					 1 === $settings['auto_backup'] ) {
 					echo ' checked';
 				}
-				?> /> <?php echo __( 'Enabled' ); ?> &nbsp; <input
+				?> /> <?php esc_html_e( 'Enabled', 'boldgrid-backup' ); ?> &nbsp; <input
 				id='auto-backup-disabled' type='radio' name='auto_backup' value='0'
 				<?php
 				if ( true === isset( $settings['auto_backup'] ) && 0 === $settings['auto_backup'] ) {
 					echo ' checked';
 				}
-				?> /> <?php echo __( 'Disabled' ); ?>
+				?> /> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
 		</p>
-		<h2><?php echo __( 'Auto Rollback' ); ?>
+		<h2><?php esc_html_e( 'Auto Rollback', 'boldgrid-backup' ); ?>
 		 <span class='dashicons dashicons-editor-help' title='<?php
-				echo __(
-					'If something goes wrong while peforming WordPress updates, automatically restore the site using a backup made before updating WordPress.'
+				esc_html_e(
+					'If something goes wrong while peforming WordPress updates, automatically restore the site using a backup made before updating WordPress.',
+					'boldgrid-backup'
 				);
 		?>'></span></h2>
 		<p>
@@ -207,26 +220,32 @@ if ( true === empty( $settings ) ) {
 					 1 === $settings['auto_rollback'] ) {
 					echo ' checked';
 				}
-				?> /> <?php echo __( 'Enabled' ); ?> &nbsp; <input
+				?> /> <?php esc_html_e( 'Enabled', 'boldgrid-backup' ); ?> &nbsp; <input
 				id='auto-rollback-disabled' type='radio' name='auto_rollback'
 				value='0'
 				<?php
 				if ( true === isset( $settings['auto_rollback'] ) && 0 === $settings['auto_rollback'] ) {
 					echo ' checked';
 				}
-				?> /> <?php echo __( 'Disabled' ); ?>
+				?> /> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
 		</p>
-		<h2><?php echo __( 'Notifications' ); ?></h2>
+		<h2><?php esc_html_e( 'Notifications', 'boldgrid-backup' ); ?></h2>
 		<div class='notification-settings'>
 			<table id='notification-settings-table'>
 				<tbody>
 					<tr>
-						<td><?php echo __( 'Notification email address' ); ?></td>
+						<td><?php
+						esc_html_e( 'Notification email address', 'boldgrid-backup' );
+						?></td>
 						<td><input id='notification-email' type='text' size='40'
-						name='notification_email' value='<?php echo $settings['notification_email']; ?>'></td>
+						name='notification_email' value='<?php
+						echo $settings['notification_email'];
+						?>'></td>
 					</tr>
 					<tr>
-						<td><?php echo __( 'Send an email when a backup completes' ); ?></td>
+						<td><?php
+						esc_html_e( 'Send an email when a backup completes', 'boldgrid-backup' );
+						?></td>
 						<td><input id='notification-backup' type='checkbox'
 							name='notify_backup' value='1'
 							<?php
@@ -237,7 +256,12 @@ if ( true === empty( $settings ) ) {
 							?> /></td>
 					</tr>
 					<tr>
-						<td><?php echo __( 'Send an email when a restoration is performed' ); ?></td>
+						<td><?php
+						esc_html_e(
+							'Send an email when a restoration is performed',
+							'boldgrid-backup'
+						);
+						?></td>
 						<td><input id='notification-restore' type='checkbox'
 							name='notify_restore' value='1'
 							<?php
@@ -250,9 +274,9 @@ if ( true === empty( $settings ) ) {
 				</tbody>
 			</table>
 		</div>
-		<h2><?php echo __( 'Backup Directory' ); ?></h2>
+		<h2><?php esc_html_e( 'Backup Directory', 'boldgrid-backup' ); ?></h2>
 		<div class='backup-directory'>
-			<?php echo __( 'Directory to store backup archives' ); ?>:
+			<?php esc_html_e( 'Directory to store backup archives', 'boldgrid-backup' ); ?>:
 			<input id='backup-directory-path' type='text' size='50' name='backup_directory'
 			value='<?php echo $settings['backup_directory']; ?>'>
 		</div>
@@ -260,7 +284,7 @@ if ( true === empty( $settings ) ) {
 			<p>
 				<input id='boldgrid-settings-submit' class='button button-primary'
 					type='submit' name='submit'
-					value='<?php echo __( 'Save Changes' ); ?>' />
+					value='<?php esc_html_e( 'Save Changes', 'boldgrid-backup' ); ?>' />
 			</p>
 		</div>
 	</form>

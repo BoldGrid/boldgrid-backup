@@ -68,14 +68,18 @@ echo 'Loading WordPress... ';
 
 require_once $abspath . '/wp-load.php';
 
-echo __( 'Done.' ) . PHP_EOL;
+esc_html_e( 'Done.', 'boldgrid-backup' );
+
+echo PHP_EOL;
 
 // Load BoldGrid Backup.
-echo __( 'Loading BoldGrid Backup... ' );
+esc_html_e( 'Loading BoldGrid Backup... ', 'boldgrid-backup' );
 
 $boldgrid_backup_core = new Boldgrid_Backup_Admin_Core();
 
-echo __( 'Done.' ) . PHP_EOL;
+esc_html_e( 'Done.', 'boldgrid-backup' );
+
+echo PHP_EOL;
 
 // If there is no rollback deadline, then
 if ( true === empty( $pending_rollback['deadline'] ) ) {
@@ -85,17 +89,20 @@ if ( true === empty( $pending_rollback['deadline'] ) ) {
 // Perform operations.
 switch ( $input['mode'] ) {
 	case 'backup' :
-		echo __( 'Starting backup operation' );
+		esc_html_e( 'Starting backup operation', 'boldgrid-backup' );
 
 		if ( true === $dry_run ) {
-			echo __( ' (dry-run)' );
+			esc_html_e( ' (dry-run)', 'boldgrid-backup' );
 		}
 
 		echo '...';
 
 		$archive_info = $boldgrid_backup_core->archive_files( true, $dry_run );
 
-		echo __( 'Done.' ) . PHP_EOL;
+		esc_html_e( 'Done.', 'boldgrid-backup' );
+
+		echo PHP_EOL;
+
 		break;
 
 	case 'restore' :
@@ -110,7 +117,12 @@ switch ( $input['mode'] ) {
 			// Remove existing restore cron jobs.
 			$boldgrid_backup_core->settings->delete_cron_entries( 'restore' );
 
-			die( __( 'Error: Pending rollback information is missing.' ) );
+			die(
+				esc_html__(
+					'Error: Pending rollback information is missing.',
+					'boldgrid-backup'
+				)
+			);
 		}
 
 		// If the deadline has elapsed more than 2 minutes ago, then abort.
@@ -122,13 +134,18 @@ switch ( $input['mode'] ) {
 			// Remove existing restore cron jobs.
 			$boldgrid_backup_core->settings->delete_cron_entries( 'restore' );
 
-			die( __( 'Error: Pending rollback time has passed more than 2 minutes ago.' ) );
+			die(
+				esc_html__(
+					'Error: Pending rollback time has passed more than 2 minutes ago.',
+					'boldgrid-backup'
+				)
+			);
 		}
 
-		echo __( 'Starting restoration operation' );
+		esc_html_e( 'Starting restoration operation', 'boldgrid-backup' );
 
 		if ( true === $dry_run ) {
-			echo __( ' (dry-run)' );
+			esc_html_e( ' (dry-run)', 'boldgrid-backup' );
 		}
 
 		echo '...';
@@ -144,11 +161,19 @@ switch ( $input['mode'] ) {
 		// Remove existing restore cron jobs.
 		$boldgrid_backup_core->settings->delete_cron_entries( 'restore' );
 
-		echo __( 'Done.' ) . PHP_EOL;
+		esc_html_e( 'Done.', 'boldgrid-backup' );
+
+		echo PHP_EOL;
+
 		break;
 
 	default :
-		die( __( 'Error: Invalid mode "' . $input['mode'] . '" was specified.' ) );
+		die(
+			sprintf(
+				esc_html__(	'Error: Invalid mode "%s" was specified.', 'boldgrid-backup' ),
+				$input['mode']
+				)
+		);
 		break;
 }
 
@@ -160,4 +185,6 @@ if ( true === empty( $archive_info['mode'] ) ) {
 // Print report.
 $boldgrid_backup_core->print_cron_report( $archive_info );
 
-echo __( 'Operation complete.' ) . PHP_EOL;
+esc_html_e( 'Operation complete.', 'boldgrid-backup' );
+
+echo PHP_EOL;

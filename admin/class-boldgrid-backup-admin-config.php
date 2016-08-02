@@ -219,7 +219,10 @@ class Boldgrid_Backup_Admin_Config {
 			// If mkdir failed, then notify and abort.
 			if ( false === $backup_directory_created ) {
 				// Create error message.
-				$errormsg = 'Could not create directory "' . $backup_directory_path . '".';
+				$errormsg = sprintf(
+					esc_html__( 'Could not create directory "%s".', 'boldgrid-backup' ),
+					$backup_directory_path
+				);
 
 				// Trigger an admin notice.
 				do_action( 'boldgrid_backup_notice', $errormsg, 'notice notice-error is-dismissible' );
@@ -235,7 +238,10 @@ class Boldgrid_Backup_Admin_Config {
 		// If the backup directory is not a directory, then notify and abort.
 		if ( false === $backup_directory_isdir ) {
 			// Create error message.
-			$errormsg = 'Backup directory "' . $backup_directory_path . '" is not a directory.';
+			$errormsg = sprintf(
+				esc_html__( 'Backup directory "%s" is not a directory.', 'boldgrid-backup' ),
+				$backup_directory_path
+			);
 
 			// Trigger an admin notice.
 			do_action( 'boldgrid_backup_notice', $errormsg, 'notice notice-error is-dismissible' );
@@ -250,8 +256,14 @@ class Boldgrid_Backup_Admin_Config {
 			$backup_directory_mode = $wp_filesystem->getchmod( $backup_directory_path );
 
 			// Create error message.
-			$errormsg = 'Backup directory "' . $backup_directory_path . '" ('
-				. $backup_directory_mode . ') is not writable.';
+			$errormsg = sprintf(
+				esc_html__(
+					'Backup directory "%s" (mode %s) is not writable.',
+					'boldgrid-backup'
+				),
+				$backup_directory_path,
+				$backup_directory_mode
+			);
 
 			// Trigger an admin notice.
 			do_action( 'boldgrid_backup_notice', $errormsg, 'notice notice-error is-dismissible' );

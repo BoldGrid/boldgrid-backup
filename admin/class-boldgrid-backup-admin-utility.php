@@ -103,38 +103,38 @@ class Boldgrid_Backup_Admin_Utility {
 	public static function translate_zip_error( $error_code = null ) {
 		switch ( $error_code ) {
 			case ZipArchive::ER_EXISTS :
-				$message = 'File already exists.';
+				$message = esc_html__( 'File already exists' );
 				break;
 			case ZipArchive::ER_INCONS :
-				$message = 'Zip archive inconsistent.';
+				$message = esc_html__( 'Zip archive inconsistent' );
 				break;
 			case ZipArchive::ER_INVAL :
-				$message = 'Invalid argument.';
+				$message = esc_html__( 'Invalid argument' );
 				break;
 			case ZipArchive::ER_MEMORY :
-				$message = 'Malloc failure.';
+				$message = esc_html__( 'Malloc failure' );
 				break;
 			case ZipArchive::ER_NOENT :
-				$message = 'No such file.';
+				$message = esc_html__( 'No such file' );
 				break;
 			case ZipArchive::ER_NOZIP :
-				$message = 'Not a zip archive.';
+				$message = esc_html__( 'Not a zip archive' );
 				break;
 			case ZipArchive::ER_OPEN :
-				$message = 'Cannot open file.';
+				$message = esc_html__( 'Cannot open file' );
 				break;
 			case ZipArchive::ER_READ :
-				$message = 'Read error.';
+				$message = esc_html__( 'Read error' );
 				break;
 			case ZipArchive::ER_SEEK :
-				$message = 'Seek error.';
+				$message = esc_html__( 'Seek error' );
 				break;
 			default :
-				$message = 'No error code was passed.';
+				$message = esc_html__( 'No error code was passed' );
 				break;
 		}
 
-		return __( $message );
+		return $message;
 	}
 
 	/**

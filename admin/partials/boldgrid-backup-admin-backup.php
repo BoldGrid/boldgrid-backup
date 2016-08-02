@@ -11,12 +11,9 @@
  * @subpackage Boldgrid_Backup/admin/partials
  */
 
-?>
-
-<?php
 if ( true === empty( $_GET['restore_now'] ) ) {
 ?>
-<h2><?php echo __( 'Backup Results' ); ?></h2>
+<h2><?php esc_html_e( 'Backup Results', 'boldgrid-backup' ); ?></h2>
 <?php
 }
 ?>
@@ -39,7 +36,9 @@ if ( true === empty( $_GET['restore_now'] ) ) {
 if ( false === empty( $archive_info ) ) {
 	if ( false === empty( $archive_info['dryrun'] ) ) {
 ?>
-<div class="notice notice-info"><p><?php echo __( 'This was a dry run test.' ); ?></p></div>
+<div class="notice notice-info">
+	<p><?php esc_html_e( 'This was a dry run test', 'boldgrid-backup' ); ?>.</p>
+</div>
 <?php
 	}
 
@@ -49,45 +48,67 @@ if ( false === empty( $archive_info ) ) {
 <div class="notice notice-success">
 	<p><?php
 	if ( false === empty( $_GET['restore_now'] ) ) {
-		echo __( 'The selected archive file has been successfully restored.' );
+		esc_html_e( 'The selected archive file has been successfully restored', 'boldgrid-backup' );
 	} else {
-		echo __( 'A backup archive file has been created successfully.' );
+		esc_html_e( 'A backup archive file has been created successfully', 'boldgrid-backup' );
 	}
-?></p>
+?>.</p>
 <?php
 $filename = '';
 
 if ( false === empty( $archive_info['filepath'] ) ) {
 	$filename = basename( $archive_info['filepath'] );
 ?>
-	<p><?php echo __( 'File Path' ); ?>: <?php echo $archive_info['filepath']; ?></p>
+	<p><?php
+	printf(
+		esc_html__( 'File Path: %s', 'boldgrid-backup' ),
+		$archive_info['filepath']
+	);
+?></p>
 <?php
 }
 
 if ( false === empty( $archive_info['filesize'] ) ) {
 ?>
-	<p><?php echo __( 'File Size' ); ?>: <?php
-echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['filesize'] );
+	<p><?php
+	printf(
+		esc_html__( 'File Size: %s', 'boldgrid-backup' ),
+		Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['filesize'] )
+	);
 ?></p>
 <?php
 }
 
 if ( false === empty( $archive_info['total_size'] ) ) {
-	$size = Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] );
 ?>
-	<p><?php echo __( 'Total size' ); ?>: <?php echo $size; ?></p>
+	<p><?php
+	printf(
+		esc_html__( 'Total size: %s', 'boldgrid-backup' ),
+		Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] )
+	);
+?></p>
 <?php
 }
 
 if ( false === empty( $archive_info['compressor'] ) ) {
 ?>
-	<p><?php echo __( 'Compressor' ); ?>: <?php echo $archive_info['compressor']; ?></p>
+	<p><?php
+	printf(
+		esc_html__( 'Compressor: %s', 'boldgrid-backup' ),
+		$archive_info['compressor']
+	);
+?></p>
 <?php
 }
 
 if ( true === isset( $archive_info['duration'] ) ) {
 ?>
-	<p><?php echo __( 'Duration' ); ?>: <?php echo $archive_info['duration'] . __( ' seconds' ); ?></p>
+	<p><?php
+	printf(
+		esc_html__( 'Duration: %s seconds', 'boldgrid-backup' ),
+		$archive_info['duration']
+	);
+?></p>
 <?php
 }
 ?>
@@ -102,14 +123,16 @@ foreach ( $archives as $key => $archive ) {
 	// Create URL for restoring from an archive file.
 	$restore_url = get_admin_url( null,
 		'admin.php?page=boldgrid-backup&restore_now=1&archive_key=' . $key . '&archive_filename=' .
-		$archive['filename'] );
+		$archive['filename']
+	);
 
 	$restore_url = wp_nonce_url( $restore_url, 'boldgrid-backup-restore', 'restore_auth' );
 
 	// Create URL for deleting an archive file.
 	$delete_url = get_admin_url( null,
 		'admin.php?page=boldgrid-backup&delete_now=1&archive_key=' . $key . '&archive_filename=' .
-		$archive['filename'] );
+		$archive['filename']
+	);
 
 	$delete_url = wp_nonce_url( $delete_url, 'boldgrid-backup-delete', 'delete_auth' );
 
@@ -122,13 +145,13 @@ foreach ( $archives as $key => $archive ) {
 			id='backup-archive-download-<?php echo $key; ?>'
 			class='button action-download' href='#'
 			data-key='<?php echo $key ?>' data-filepath='<?php echo $archive['filepath']; ?>'
-			data-filename='<?php echo $archive['filename']; ?>'><?php echo __( 'Download' ); ?></a></td>
+			data-filename='<?php echo $archive['filename']; ?>'><?php esc_html_e( 'Download', 'boldgrid-backup' ); ?></a></td>
 		<td class='backup-archive-list-restore'><a class='button action-restore'
 			href='<?php echo $restore_url; ?>' data-filename='<?php echo $archive['filename']; ?>'>
-			<?php echo __( 'Restore' ); ?></a></td>
+			<?php esc_html_e( 'Restore', 'boldgrid-backup' ); ?></a></td>
 		<td class='backup-archive-list-delete'><a class='button action-delete'
 			href='<?php echo $delete_url; ?>' data-filename='<?php echo $archive['filename']; ?>'>
-			<?php echo __( 'Delete' ); ?></a></td>
+			<?php esc_html_e( 'Delete', 'boldgrid-backup' ); ?></a></td>
 	</tr>
 <?php
 }
@@ -146,28 +169,38 @@ foreach ( $archives as $key => $archive ) {
 		?>
 <div class="notice notice-error"><p><?php
 if ( false === empty( $_GET['restore_now'] ) ) {
-	echo __( 'There was an error restoring the selected backup archive file.' );
+	esc_html_e( 'There was an error restoring the selected backup archive file', 'boldgrid-backup' );
 } else {
-	echo __( 'There was an error creating a backup archive file.' );
+	esc_html_e( 'There was an error creating a backup archive file', 'boldgrid-backup' );
 }
-?></p>
+?>.</p>
 <?php
 if ( false === empty( $archive_info['filepath'] ) ) {
 ?>
-	<p><?php echo __( 'File Path' ); ?>: <?php echo $archive_info['filepath']; ?></p>
+	<p><?php
+	printf(
+		esc_html__( 'File Path: %s', 'boldgrid-backup' ),
+		$archive_info['filepath']
+	);
+?></p>
 <?php
 }
 ?>
 <p><?php echo $archive_info['error']; ?></p>
 <?php
 if ( true === isset( $archive_info['error_message'] ) ) {
-	echo '<p>' . __( 'Error Details: ' . $archive_info['error_message'] );
+?><p><?php
+	printf(
+		esc_html__( 'Error Details: %s', 'boldgrid-backup' ),
+		$archive_info['error_message']
+	);
 
 	if ( true === isset( $archive_info['error_code'] ) ) {
 		echo ' (' . $archive_info['error_code'] . ')';
 	}
 
-	echo '</p>';
+?></p>
+<?php
 }
 ?>
 </div>

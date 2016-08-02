@@ -48,8 +48,6 @@ class Boldgrid_Backup_Admin_Notice {
 	 * @param string $class The class string for the div.
 	 */
 	public function boldgrid_backup_notice( $message, $class = 'notice notice-error is-dismissible' ) {
-		$message = __( $message, 'boldgrid-backup' );
-
 		printf( '<div class="%1$s"><p>%2$s</p></div>', $class, $message );
 	}
 }

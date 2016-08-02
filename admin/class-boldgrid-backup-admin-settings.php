@@ -653,8 +653,12 @@ class Boldgrid_Backup_Admin_Settings {
 					// Failure.
 					$update_error = true;
 
-					do_action( 'boldgrid_backup_notice',
-						'Invalid settings submitted.  Please try again.',
+					do_action(
+						'boldgrid_backup_notice',
+						esc_html__(
+							'Invalid settings submitted.  Please try again.',
+							'boldgrid-backup'
+						),
 						'notice notice-error is-dismissible'
 					);
 				} else {
@@ -663,8 +667,12 @@ class Boldgrid_Backup_Admin_Settings {
 				}
 			} else {
 				// Interrupted by a previous error.
-				do_action( 'boldgrid_backup_notice',
-					'Invalid settings submitted.  Please try again.',
+				do_action(
+					'boldgrid_backup_notice',
+					esc_html__(
+						'Invalid settings submitted.  Please try again.',
+						'boldgrid-backup'
+					),
 					'notice notice-error is-dismissible'
 				);
 			}
@@ -674,8 +682,12 @@ class Boldgrid_Backup_Admin_Settings {
 		if ( true === isset( $cron_status ) && true !== $cron_status ) {
 			$update_error = true;
 
-			do_action( 'boldgrid_backup_notice',
-				'An error occurred when modifying cron jobs.  Please try again.',
+			do_action(
+				'boldgrid_backup_notice',
+				esc_html__(
+					'An error occurred when modifying cron jobs.  Please try again.',
+					'boldgrid-backup'
+				),
 				'notice notice-error is-dismissible'
 			);
 		}
@@ -683,8 +695,9 @@ class Boldgrid_Backup_Admin_Settings {
 		// If there was no error, then show success notice.
 		if ( false === $update_error ) {
 			// Success.
-			do_action( 'boldgrid_backup_notice',
-				'Settings saved.',
+			do_action(
+				'boldgrid_backup_notice',
+				esc_html__( 'Settings saved.', 'boldgrid-backup' ),
 				'updated settings-error notice is-dismissible'
 			);
 		}
@@ -905,17 +918,26 @@ class Boldgrid_Backup_Admin_Settings {
 
 		// If tests fail, then show an admin notice and abort.
 		if ( false === $is_functional ) {
-			do_action( 'boldgrid_backup_notice',
-				'Functionality test has failed.  You can go to <a href="' .
-				admin_url( 'admin.php?page=boldgrid-backup-test' ) .
-				'">Functionality Test</a> to view a report.',
+			do_action(
+				'boldgrid_backup_notice',
+				sprintf(
+					esc_html__(
+						'Functionality test has failed.  You can go to <a href="%s">Functionality Test</a> to view a report.',
+						'boldgrid-backup'
+					),
+					admin_url( 'admin.php?page=boldgrid-backup-test' )
+				),
 				'notice notice-error is-dismissible'
 			);
 		}
 
 		// Display warning on resource usage and backups.
-		do_action( 'boldgrid_backup_notice',
-			'Warning: Making backups uses resources. When the system is backing up, it will slow down your site for visitors. Furthermore, when the database itself is being copied, your site must “pause” temporarily to preserve data integrity. For most sites, the pause is typically a few seconds and is not noticed by visitors. Large sites take longer though. Please keep the number of backups you have stored and how often you make those backups to a minimum.',
+		do_action(
+			'boldgrid_backup_notice',
+			esc_html__(
+				'Warning: Making backups uses resources. When the system is backing up, it will slow down your site for visitors. Furthermore, when the database itself is being copied, your site must “pause” temporarily to preserve data integrity. For most sites, the pause is typically a few seconds and is not noticed by visitors. Large sites take longer though. Please keep the number of backups you have stored and how often you make those backups to a minimum.',
+				'boldgrid-backup'
+			),
 			'notice notice-warning is-dismissible'
 		);
 
@@ -924,8 +946,12 @@ class Boldgrid_Backup_Admin_Settings {
 
 		// If not part of a reseller, then show the unofficial host notice.
 		if ( true === empty( $boldgrid_reseller ) ) {
-			do_action( 'boldgrid_backup_notice',
-				'Please note that your web hosting provider may have a policy against these types of backups. Please verify with your provider or choose a BoldGrid Official Host.',
+			do_action(
+				'boldgrid_backup_notice',
+				esc_html__(
+					'Please note that your web hosting provider may have a policy against these types of backups. Please verify with your provider or choose a BoldGrid Official Host.',
+					'boldgrid-backup'
+				),
 				'notice notice-warning is-dismissible'
 			);
 		}
