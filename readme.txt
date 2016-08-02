@@ -21,6 +21,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 == Changelog ==
 
 = 1.2 In progress =
+* Bug fix:		JIRA WPB-2200	Disabled backup and restore buttons after starting a restoration.
 * Redesign:		JIRA WPB-2188	Changed backup duration display seconds to 2 decimal places.
 * Bug fix:		JIRA WPB-2194	Removed homedir not writable notice; moved info to the functionality test page.
 * Bug fix:		JIRA WPB-2193	Removed add cron action on activation.

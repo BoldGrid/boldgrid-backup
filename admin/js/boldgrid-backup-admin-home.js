@@ -110,6 +110,13 @@
 
 		// Handle response.
 		if ( true === confirmResponse ) {
+			// Disable the Backup Site Now button.
+			$( '#backup-site-now' ).attr( 'disabled', 'disabled' ).css( 'pointer-events', 'none' );
+
+			// Disable all Restore buttons.
+			$( '.action-restore' ).attr( 'disabled', 'disabled' ).css( 'pointer-events', 'none' );
+
+			// Proceed with restoration.
 			return true;
 		} else {
 			return false;
