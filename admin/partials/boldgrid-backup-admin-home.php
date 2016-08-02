@@ -95,7 +95,14 @@ foreach ( $archives as $key => $archive ) {
 	<form action='#' id='backup-site-now-form' method='POST'>
 		<?php wp_nonce_field( 'boldgrid_backup_now', 'backup_auth' ); ?>
 		<p>
-			<a id='backup-site-now' class='button button-primary'>Backup Site Now</a>
+			<a id='backup-site-now' class='button button-primary'<?php
+
+// If a restoration was just performed, then disable the backup button.
+	if ( false === empty( $_GET['restore_now'] ) ) {
+		?> disabled='disabled' style='pointer-events: none;'<?php
+	}
+
+?>>Backup Site Now</a>
 			<span class='spinner'></span>
 		</p>
 	</form>
