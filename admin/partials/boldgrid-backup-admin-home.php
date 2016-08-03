@@ -11,6 +11,22 @@
  * @subpackage Boldgrid_Backup/admin/partials
  */
 
+/*
+ * Variables passed by scope.
+ *
+ * @param int $archives_count The archive file count.
+ * @param int $archives_size The total size of all archive files.
+ * @param string $archive_nonce Nonce used for archive operations.
+ * @param array $archives {
+ * 	A numbered array of arrays containing the following indexes.
+ * 	@type string $filepath Archive file path.
+ * 	@type string $filename Archive filename.
+ * 	@type string $filedate Localized file modification date.
+ * 	@type int $filesize The archive file size in bytes.
+ * 	@type int $lastmodunix The archive file modification time in unix seconds.
+ * }
+ */
+
 ?>
 <div class='wrap'>
 <h1>BoldGrid Backup</h1>
@@ -47,40 +63,9 @@
 
 // Print the list of archive files.
 if ( false === empty( $archives ) ) {
-foreach ( $archives as $key => $archive ) {
-	// Create URL for restoring from an archive file.
-	$restore_url = get_admin_url( null,
-		'admin.php?page=boldgrid-backup&restore_now=1&archive_key=' . $key . '&archive_filename=' .
-	$archive['filename'] );
-
-	$restore_url = wp_nonce_url( $restore_url, 'boldgrid-backup-restore', 'restore_auth' );
-
-	// Create URL for deleting an archive file.
-	$delete_url = get_admin_url( null,
-		'admin.php?page=boldgrid-backup&delete_now=1&archive_key=' . $key . '&archive_filename=' .
-	$archive['filename'] );
-
-	$delete_url = wp_nonce_url( $delete_url, 'boldgrid-backup-delete', 'delete_auth' );
-
-?>
-	<tr>
-		<td class='backup-archive-list-path'><?php echo $archive['filename']; ?></td>
-		<td class='backup-archive-list-size'><?php echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive['filesize'] ); ?></td>
-		<td class='backup-archive-list-date'><?php echo $archive['filedate']; ?></td>
-		<td class='backup-archive-list-download'><a
-			id='backup-archive-download-<?php echo $key; ?>'
-			class='button action-download' href='#'
-			data-key='<?php echo $key ?>' data-filepath='<?php echo $archive['filepath']; ?>'
-			data-filename='<?php echo $archive['filename']; ?>'>Download</a></td>
-		<td class='backup-archive-list-restore'><a class='button action-restore'
-			href='<?php echo $restore_url; ?>' data-filename='<?php echo $archive['filename']; ?>'>
-			Restore</a></td>
-		<td class='backup-archive-list-delete'><a class='button action-delete'
-			href='<?php echo $delete_url; ?>' data-filename='<?php echo $archive['filename']; ?>'>
-			Delete</a></td>
-		</tr>
-<?php
-}
+	foreach ( $archives as $key => $archive ) {
+		include dirname( __FILE__ ) . '/boldgrid-backup-admin-archives.php';
+	}
 } else {
 ?>
 	<tr>
@@ -102,7 +87,7 @@ foreach ( $archives as $key => $archive ) {
 		?> disabled='disabled' style='pointer-events: none;'<?php
 	}
 
-?>>Backup Site Now</a>
+?>><?php esc_html_e( 'Backup Site Now', 'boldgrid-backup' ); ?></a>
 			<span class='spinner'></span>
 		</p>
 	</form>

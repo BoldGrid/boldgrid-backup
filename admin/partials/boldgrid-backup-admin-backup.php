@@ -11,7 +11,7 @@
  * @subpackage Boldgrid_Backup/admin/partials
  */
 
-if ( true === empty( $_GET['restore_now'] ) ) {
+if ( true === empty( $_POST['restore_now'] ) ) {
 ?>
 <h2><?php esc_html_e( 'Backup Results', 'boldgrid-backup' ); ?></h2>
 <?php
@@ -47,7 +47,7 @@ if ( false === empty( $archive_info ) ) {
 ?>
 <div class="notice notice-success">
 	<p><?php
-	if ( false === empty( $_GET['restore_now'] ) ) {
+	if ( false === empty( $_POST['restore_now'] ) ) {
 		esc_html_e( 'The selected archive file has been successfully restored', 'boldgrid-backup' );
 	} else {
 		esc_html_e( 'A backup archive file has been created successfully', 'boldgrid-backup' );
@@ -120,40 +120,7 @@ if ( true === isset( $archive_info['duration'] ) ) {
 
 // Make the new archive list.
 foreach ( $archives as $key => $archive ) {
-	// Create URL for restoring from an archive file.
-	$restore_url = get_admin_url( null,
-		'admin.php?page=boldgrid-backup&restore_now=1&archive_key=' . $key . '&archive_filename=' .
-		$archive['filename']
-	);
-
-	$restore_url = wp_nonce_url( $restore_url, 'boldgrid-backup-restore', 'restore_auth' );
-
-	// Create URL for deleting an archive file.
-	$delete_url = get_admin_url( null,
-		'admin.php?page=boldgrid-backup&delete_now=1&archive_key=' . $key . '&archive_filename=' .
-		$archive['filename']
-	);
-
-	$delete_url = wp_nonce_url( $delete_url, 'boldgrid-backup-delete', 'delete_auth' );
-
-?>
-	<tr>
-		<td class='backup-archive-list-path'><?php echo $archive['filename']; ?></td>
-		<td class='backup-archive-list-size'><?php echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive['filesize'] ); ?></td>
-		<td class='backup-archive-list-date'><?php echo $archive['filedate']; ?></td>
-		<td class='backup-archive-list-download'><a
-			id='backup-archive-download-<?php echo $key; ?>'
-			class='button action-download' href='#'
-			data-key='<?php echo $key ?>' data-filepath='<?php echo $archive['filepath']; ?>'
-			data-filename='<?php echo $archive['filename']; ?>'><?php esc_html_e( 'Download', 'boldgrid-backup' ); ?></a></td>
-		<td class='backup-archive-list-restore'><a class='button action-restore'
-			href='<?php echo $restore_url; ?>' data-filename='<?php echo $archive['filename']; ?>'>
-			<?php esc_html_e( 'Restore', 'boldgrid-backup' ); ?></a></td>
-		<td class='backup-archive-list-delete'><a class='button action-delete'
-			href='<?php echo $delete_url; ?>' data-filename='<?php echo $archive['filename']; ?>'>
-			<?php esc_html_e( 'Delete', 'boldgrid-backup' ); ?></a></td>
-	</tr>
-<?php
+	include dirname( __FILE__ ) . '/boldgrid-backup-admin-archives.php';
 }
 ?>
 	</tbody>
@@ -168,7 +135,7 @@ foreach ( $archives as $key => $archive ) {
 		// Error creating backup.
 		?>
 <div class="notice notice-error"><p><?php
-if ( false === empty( $_GET['restore_now'] ) ) {
+if ( false === empty( $_POST['restore_now'] ) ) {
 	esc_html_e( 'There was an error restoring the selected backup archive file', 'boldgrid-backup' );
 } else {
 	esc_html_e( 'There was an error creating a backup archive file', 'boldgrid-backup' );

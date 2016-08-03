@@ -1289,7 +1289,14 @@ class Boldgrid_Backup_Admin_Core {
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
 	 * @param string $download_filename A filename to match to get info.
-	 * @return array An array containing file path, filename, data, and size of archive files.
+	 * @return array {
+	 * 	A numbered array of arrays containing the following indexes.
+	 * 	@type string $filepath Archive file path.
+	 * 	@type string $filename Archive filename.
+	 * 	@type string $filedate Localized file modification date.
+	 * 	@type int $filesize The archive file size in bytes.
+	 * 	@type int $lastmodunix The archive file modification time in unix seconds.
+	 * }
 	 */
 	public function get_archive_list( $download_filename = null ) {
 		// Connect to the WordPress Filesystem API.
@@ -1390,7 +1397,7 @@ class Boldgrid_Backup_Admin_Core {
 	 */
 	private function delete_archive_file() {
 		// If a deletion was not requested, then abort.
-		if ( true === empty( $_GET['delete_now'] ) ) {
+		if ( true === empty( $_POST['delete_now'] ) ) {
 			return false;
 		}
 
@@ -1398,11 +1405,11 @@ class Boldgrid_Backup_Admin_Core {
 		$delete_ok = true;
 
 		// Verify nonce, or die.
-		check_admin_referer( 'boldgrid-backup-delete', 'delete_auth' );
+		check_admin_referer( 'archive_auth', 'archive_auth' );
 
 		// Validate archive_key.
-		if ( isset( $_GET['archive_key'] ) && true === is_numeric( $_GET['archive_key'] ) ) {
-			$archive_key = sanitize_text_field( $_GET['archive_key'] );
+		if ( isset( $_POST['archive_key'] ) && true === is_numeric( $_POST['archive_key'] ) ) {
+			$archive_key = sanitize_text_field( $_POST['archive_key'] );
 		} else {
 			$delete_ok = false;
 
@@ -1416,8 +1423,8 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Validate archive_filename.
-		if ( false === empty( $_GET['archive_filename'] ) ) {
-			$archive_filename = $_GET['archive_filename'];
+		if ( false === empty( $_POST['archive_filename'] ) ) {
+			$archive_filename = $_POST['archive_filename'];
 		} else {
 			// Fail with a notice.
 			do_action(
@@ -1557,13 +1564,13 @@ class Boldgrid_Backup_Admin_Core {
 		$doing_cron = ( true === defined( 'DOING_CRON' ) && DOING_CRON );
 
 		// If a restoration was not requested, then abort.
-		if ( true === empty( $_GET['restore_now'] ) ) {
+		if ( true === empty( $_POST['restore_now'] ) ) {
 			return false;
 		}
 
 		// If not DOING_CRON and not run from CLI, then verify nonce, or die.
 		if ( false === $doing_cron && 'cli' !== php_sapi_name() ) {
-			check_admin_referer( 'boldgrid-backup-restore', 'restore_auth' );
+			check_admin_referer( 'archive_auth', 'archive_auth' );
 		}
 
 		// Check if functional.
@@ -1596,8 +1603,8 @@ class Boldgrid_Backup_Admin_Core {
 		$archive_filename = null;
 
 		// Validate archive_key.
-		if ( isset( $_GET['archive_key'] ) && true === is_numeric( $_GET['archive_key'] ) ) {
-			$archive_key = sanitize_text_field( wp_unslash( $_GET['archive_key'] ) );
+		if ( isset( $_POST['archive_key'] ) && true === is_numeric( $_POST['archive_key'] ) ) {
+			$archive_key = sanitize_text_field( wp_unslash( $_POST['archive_key'] ) );
 		} else {
 			$restore_ok = false;
 
@@ -1612,8 +1619,8 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Validate archive_filename.
-		if ( false === empty( $_GET['archive_filename'] ) ) {
-			$archive_filename = sanitize_text_field( wp_unslash( $_GET['archive_filename'] ) );
+		if ( false === empty( $_POST['archive_filename'] ) ) {
+			$archive_filename = sanitize_text_field( wp_unslash( $_POST['archive_filename'] ) );
 		} else {
 			$restore_ok = false;
 
@@ -1981,8 +1988,8 @@ class Boldgrid_Backup_Admin_Core {
 		// Get the current wp_filesystem access method.
 		$access_type = get_filesystem_method();
 
-		// Create a nonce for file downloads via AJAX.
-		$download_nonce = wp_create_nonce( 'archive_download' );
+		// Create a nonce for archive operations.
+		$archive_nonce = wp_create_nonce( 'archive_auth' );
 
 		// Create text for the restoration confirmation.
 		$restore_confirm_text = esc_html__(
@@ -1997,11 +2004,11 @@ class Boldgrid_Backup_Admin_Core {
 		);
 
 		// Create URL for backup now.
-		$backup_url = get_admin_url( null, 'admin.php?page=boldgrid-backup&backup_now=1' );
+		$backup_url = get_admin_url( null, 'admin.php?page=boldgrid-backup' );
 
 		// Create an array of data to pass to JS.
 		$localize_script_data = array(
-			'downloadNonce' => $download_nonce,
+			'archiveNonce' => $archive_nonce,
 			'accessType' => $access_type,
 			'restoreConfirmText' => $restore_confirm_text,
 			'deleteConfirmText' => $delete_confirm_text,
@@ -2019,7 +2026,7 @@ class Boldgrid_Backup_Admin_Core {
 		wp_enqueue_script( 'boldgrid-backup-admin-home' );
 
 		// If a delete operation is requested, then delete the selected backup now.
-		if ( false === empty( $_GET['delete_now'] ) ) {
+		if ( false === empty( $_POST['delete_now'] ) ) {
 			$this->delete_archive_file();
 		}
 
@@ -2040,7 +2047,7 @@ class Boldgrid_Backup_Admin_Core {
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-home.php';
 
 		// If a restoration operation is requested, then restore from a backup archive now.
-		if ( false === empty( $_GET['restore_now'] ) ) {
+		if ( false === empty( $_POST['restore_now'] ) ) {
 			$archive_info = $this->restore_archive_file();
 
 			// Generate markup, using the restore page template.
@@ -2087,6 +2094,9 @@ class Boldgrid_Backup_Admin_Core {
 		// Make the archives total size human-readable.
 		$archives_size = Boldgrid_Backup_Admin_Utility::bytes_to_human( $archives_size );
 
+		// Create a nonce for archive operations.
+		$archive_nonce = wp_create_nonce( 'archive_auth' );
+
 		// Generate markup, using the backup page template.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup.php';
 
@@ -2113,7 +2123,7 @@ class Boldgrid_Backup_Admin_Core {
 	 */
 	public function download_archive_file_callback() {
 		// Verify nonce, or die.
-		check_ajax_referer( 'archive_download', 'wpnonce' );
+		check_ajax_referer( 'archive_auth', 'wpnonce' );
 
 		// Validate download_key.
 		if ( true === is_numeric( $_POST['download_key'] ) ) {
@@ -2359,7 +2369,7 @@ class Boldgrid_Backup_Admin_Core {
 		$access_type = get_filesystem_method();
 
 		// Create a nonce for file downloads via AJAX.
-		$download_nonce = wp_create_nonce( 'archive_download' );
+		$download_nonce = wp_create_nonce( 'archive_auth' );
 
 		// Create URL for backup now.
 		$backup_url = get_admin_url( null, 'admin.php?page=boldgrid-backup&backup_now=1' );

@@ -15,7 +15,7 @@
 	var self = {};
 
 	/*
-	 * This script is passed "localizeScriptData" {"downloadNonce", "accessType", "restoreConfirmText",
+	 * This script is passed "localizeScriptData" {"archiveNonce", "accessType", "restoreConfirmText",
 	 * "deleteConfirmText", "backupUrl", "errorText"}
 	 * (via wp_localize_script() in "class-boldgrid-backup-admin-core.php").
 	 */
@@ -23,16 +23,21 @@
 	// Onload event listener.
 	$( function() {
 		// On click action for download buttons.
-		$( '.action-download' ).on( 'click', self.downloadArchive );
+		$( '.action-download' )
+			.on( 'click', self.downloadArchive );
 
 		// On click action for restore buttons.
-		$( '.action-restore' ).off( 'click' ).on( 'click', self.restoreArchiveConfirm );
+		$( '.action-restore' )
+			.off( 'click' )
+			.on( 'click', self.restoreArchiveConfirm );
 
 		// On click action for delete buttons.
-		$( '.action-delete' ).on( 'click', self.deleteArchiveConfirm );
+		$( '.action-delete' )
+			.on( 'click', self.deleteArchiveConfirm );
 
 		// On click action for the Backup Site Now button.
-		$( '#backup-site-now' ).on( 'click', self.backupNow );
+		$( '#backup-site-now' )
+			.on( 'click', self.backupNow );
 	} );
 
 	/**
@@ -70,13 +75,13 @@
 		    'action' : 'download_archive_file',
 		    'download_key' : downloadKey,
 		    'download_filename' : downloadFilename,
-		    'wpnonce' : localizeScriptData.downloadNonce
+		    'wpnonce' : localizeScriptData.archiveNonce
 		};
 
 		// Create a hidden form to request the download.
-		form = "<form class='hidden' method='POST' action='" + ajaxurl + "' target='_blank'>";
+		form = "<form id='download-now-form' class='hidden' method='POST' action='" + ajaxurl + "' target='_blank'>";
 		_.each( data, function( value, key ) {
-			form += "<input type='hidden' name='" + key + "' value='" + value + "'>";
+			form += "<input type='hidden' name='" + key + "' value='" + value + "' />";
 		} );
 		form += '</form>';
 
@@ -100,7 +105,8 @@
 	 */
 	self.restoreArchiveConfirm = function() {
 		// Declare variables.
-		var confirmResponse, ArchiveFilename, $this = $( this );
+		var $restoreSpinner, confirmResponse, ArchiveFilename,
+			$this = $( this );
 
 		// Get the backup archive filename.
 		ArchiveFilename = $this.data( 'filename' );
@@ -110,10 +116,22 @@
 
 		// Handle response.
 		if ( true === confirmResponse ) {
-			// Disable the Backup Site Now and all Restore buttons.
-			$( '#backup-site-now, .action-restore' )
+			// Disable the Backup Site Now and all Restore and Delete buttons.
+			$( '#backup-site-now, .action-restore, .action-delete' )
 				.attr( 'disabled', 'disabled' )
 				.css( 'pointer-events', 'none' );
+
+			// Create a context selector for the Restore button spinner.
+			$restoreSpinner = $this
+				.parent()
+				.find( '.spinner' );
+
+			// Show the spinner.
+			$restoreSpinner
+				.addClass( 'is-active' );
+
+			$restoreSpinner
+				.css( 'display', 'inline-block' );
 
 			// Proceed with restoration.
 			return true;
@@ -129,7 +147,8 @@
 	 */
 	self.deleteArchiveConfirm = function() {
 		// Declare variables.
-		var confirmResponse, ArchiveFilename, $this = $( this );
+		var $deleteSpinner, confirmResponse, ArchiveFilename,
+			$this = $( this );
 
 		// Get the backup archive filename.
 		ArchiveFilename = $this.data( 'filename' );
@@ -139,6 +158,19 @@
 
 		// Handle response.
 		if ( true === confirmResponse ) {
+			// Create a context selector for the Delete button spinner.
+			$deleteSpinner = $this
+				.parent()
+				.find( '.spinner' );
+
+			// Show the spinner.
+			$deleteSpinner
+				.addClass( 'is-active' );
+
+			$deleteSpinner
+				.css( 'display', 'inline-block' );
+
+			// Proceed with deletion.
 			return true;
 		} else {
 			return false;
@@ -152,14 +184,15 @@
 	 */
 	self.backupNow = function() {
 		// Declare variables.
-		var $this, $backupSiteSection, $backupSiteResults, backupNonce, wpHttpReferer, isUpdating,
-			errorCallback, data, markup;
+		var $this, $backupSiteSection, $backupSiteResults, $backupSpinner, backupNonce,
+		wpHttpReferer, isUpdating, errorCallback, data, markup;
 
 		// Assign the current jQuery object.
 		$this = $( this );
 
         // Disable the Backup Site Now link button.
-		$this.attr( 'disabled', 'disabled' ).css( 'pointer-events', 'none' );
+		$this.attr( 'disabled', 'disabled' )
+			.css( 'pointer-events', 'none' );
 
 		// Create a context selector for the Backup Site Now section.
 		$backupSiteSection = $('#backup-site-now-section');
@@ -167,16 +200,27 @@
 		// Create a context selector for the Backup Site Now results.
 		$backupSiteResults = $( '#backup-site-now-results' );
 
-		// Show the spinner.
-		$backupSiteSection.find('.spinner').addClass( 'is-active' );
+		// Create a context selector for the backup spinner.
+		$backupSpinner = $backupSiteSection
+			.find('.spinner');
 
 		// Get the wpnonce and referer values.
-		backupNonce = $backupSiteSection.find( '#backup_auth' ).val();
+		backupNonce = $backupSiteSection.find( '#backup_auth' )
+			.val();
 
-		wpHttpReferer = $backupSiteSection.find( '[name="_wp_http_referer"]' ).val();
+		wpHttpReferer = $backupSiteSection.find( '[name="_wp_http_referer"]' )
+			.val();
 
 		// Get the backup archive file key.
 		isUpdating = $this.data( 'updating' );
+
+		// Show the spinner.
+		$backupSpinner
+			.addClass( 'is-active' )
+			.css( 'display', 'inline-block' );
+
+		$backupSpinner
+			.attr( 'display', 'inline-block' );
 
 		// Create an error callback function.
 		errorCallback = function() {
@@ -193,6 +237,7 @@
 			'backup_auth' : backupNonce,
 			'_wp_http_referer' : wpHttpReferer,
 			'is_updating' : isUpdating,
+			'backup_now' : '1',
 		};
 
 		// Make the call.
@@ -206,34 +251,44 @@
 				$backupSiteResults.html( response );
 
 				// Update the archives count.
-				$( '#archives-count' ).html( $( '#archives-new-count' ) );
+				$( '#archives-count' )
+					.html( $( '#archives-new-count' ) );
 
 				// Update the archives total size.
-				$( '#archives-size' ).html( $( '#archives-new-size' ) );
+				$( '#archives-size' )
+					.html( $( '#archives-new-size' ) );
 
 				// Empty the current archive list.
-				$( '#backup-archive-list-body' ).empty();
+				$( '#backup-archive-list-body' )
+					.empty();
 
 				// Replace the old list with the new.
-				$( '#backup-archive-list-body' ).html( $( '#archive-list-new tr' ) );
+				$( '#backup-archive-list-body' )
+					.html( $( '#archive-list-new tr' ) );
 
 				// Remove the hidden new list.
-				$( '#archive-list-new' ).remove();
+				$( '#archive-list-new' )
+					.remove();
 
 				// Rebind the click events, to the updated list.
 				// On click action for download buttons.
-				$( '.action-download' ).on( 'click', self.downloadArchive );
+				$( '.action-download' )
+					.on( 'click', self.downloadArchive );
 
 				// On click action for restore buttons.
-				$( '.action-restore' ).on( 'click', self.restoreArchiveConfirm );
+				$( '.action-restore' )
+					.on( 'click', self.restoreArchiveConfirm );
 
 				// On click action for delete buttons.
-				$( '.action-delete' ).on( 'click', self.deleteArchiveConfirm );
+				$( '.action-delete' )
+					.on( 'click', self.deleteArchiveConfirm );
 			},
 			error : errorCallback,
 			complete : function() {
 				// Hide the spinner.
-				$backupSiteSection.find('.spinner').removeClass( 'is-active' );
+				$backupSiteSection
+					.find('.spinner')
+					.removeClass( 'is-active' );
 			}
 		} );
 
