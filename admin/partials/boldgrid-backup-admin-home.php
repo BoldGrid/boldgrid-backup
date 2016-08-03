@@ -16,7 +16,6 @@
  *
  * @param int $archives_count The archive file count.
  * @param int $archives_size The total size of all archive files.
- * @param string $archive_nonce Nonce used for archive operations.
  * @param array $archives {
  * 	A numbered array of arrays containing the following indexes.
  * 	@type string $filepath Archive file path.

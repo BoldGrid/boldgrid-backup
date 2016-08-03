@@ -35,10 +35,13 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 	// Onload event listener.
 	$( function() {
 		// On click action for the Cancel Rollback button.
-		$( '#cancel-rollback-button' ).on( 'click', self.cancelRollback );
+		$( '#cancel-rollback-button' )
+			.on( 'click', self.cancelRollback );
 
 		// On click action for restore buttons.
-		$( '.action-restore' ).off( 'click' ).on( 'click', self.restoreArchiveConfirm );
+		$( '.action-restore' )
+			.off( 'click' )
+			.on( 'click', self.restoreArchiveConfirm );
 	} );
 
 	/**
@@ -49,13 +52,12 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 	self.cancelRollback = function() {
 		// Declare variables.
 		var data, cancelNonce, wpHttpReferer, errorCallback, $cancelRollbackSection,
-		$cancelRollbackResults, $this;
-
-		// Assign the current jQuery object.
-		$this = $( this );
+			$cancelRollbackResults, $rollbackSpinner,
+			$this = $( this );
 
         // Disable the Cancel Rollback button.
-        $this.attr( 'disabled', 'disabled' ).css( 'pointer-events', 'none' );
+        $this.attr( 'disabled', 'disabled' )
+        	.css( 'pointer-events', 'none' );
 
 		// Create a context selector for the cancel rollback section.
 		$cancelRollbackSection = $( '#cancel-rollback-section' );
@@ -63,13 +65,23 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		// Create a context selector for the cancel rollback results.
 		$cancelRollbackResults = $( '#cancel-rollback-results' );
 
+		// Create a context selector for the cancel rollback spinner.
+		$rollbackSpinner = $cancelRollbackSection
+			.find( '.spinner' );
+
 		// Show the spinner.
-		$cancelRollbackSection.find('.spinner').addClass( 'is-active' );
+		$rollbackSpinner
+			.addClass( 'is-active' );
+
+		$rollbackSpinner
+			.css( 'display', 'inline-block' );
 
 		// Get the wpnonce and referer values.
-		cancelNonce = $cancelRollbackSection.find( '#cancel_rollback_auth' ).val();
+		cancelNonce = $cancelRollbackSection.find( '#cancel_rollback_auth' )
+			.val();
 
-		wpHttpReferer = $cancelRollbackSection.find( '[name="_wp_http_referer"]' ).val();
+		wpHttpReferer = $cancelRollbackSection.find( '[name="_wp_http_referer"]' )
+			.val();
 
 		// Create an error callback function.
 		errorCallback = function() {
@@ -94,18 +106,23 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			dataType : 'text',
 			success : function( response ) {
 				// Remove the restore now section.
-				$('#restore-now-section').empty();
+				$( '#restore-now-section' )
+					.empty();
 
 				// Insert markup in the results section.
-				$cancelRollbackResults.html( response );
+				$cancelRollbackResults
+					.html( response );
 
 				// Hide the cancel rollback section.
-				$cancelRollbackSection.hide();
+				$cancelRollbackSection
+					.hide();
 			},
 			error : errorCallback,
 			complete : function() {
 				// Hide the spinner.
-				$cancelRollbackSection.find('.spinner').removeClass( 'is-active' );
+				$cancelRollbackSection
+					.find( '.spinner' )
+					.removeClass( 'is-active' );
 			}
 		} );
 
@@ -120,11 +137,12 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 	 */
 	self.restoreArchiveConfirm = function() {
 		// Declare variables.
-		var confirmResponse, archiveFilename,
+		var confirmResponse, archiveFilename, $restoreSpinner,
 			$this = $( this );
 
 		// Get the backup archive filename.
-		archiveFilename = $this.data( 'filename' );
+		archiveFilename = $this
+			.data( 'filename' );
 
 		// Ask for confirmation.
 		confirmResponse = confirm( localizeScriptData.restoreConfirmText + ' "' + archiveFilename + '".' );
@@ -132,10 +150,20 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		// Handle response.
 		if ( true === confirmResponse ) {
 	        // Disable the restore Site Now link button.
-			$this.attr( 'disabled', 'disabled' ).css( 'pointer-events', 'none' );
+			$this
+				.attr( 'disabled', 'disabled' )
+				.css( 'pointer-events', 'none' );
+
+			// Create a context selector for the restore spinner.
+			$restoreSpinner = $('#restore-now-section')
+				.find( '.spinner' );
 
 			// Show the spinner.
-			$('#restore-now-section').find('.spinner').addClass( 'is-active' );
+			$restoreSpinner
+				.addClass( 'is-active' );
+
+			$restoreSpinner
+				.css( 'display', 'inline-block' );
 
 			return true;
 		} else {
@@ -218,10 +246,11 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 					clearInterval( interval );
 
 					// Disable the Cancel Rollback button.
-					$( '#cancel-rollback-button' ).attr( 'disabled', 'disabled' )
+					$( '#cancel-rollback-button' )
+						.attr( 'disabled', 'disabled' )
 						.css( 'pointer-events', 'none' );
 				}
-			}, 1000);
+			}, 1000 );
 		},
 
 		/**
@@ -234,7 +263,9 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			var $RollbackDeadline;
 
 			// Check for the deadline in the source (when completing updates in the admin section).
-			$RollbackDeadline = $( 'iframe' ).contents().find( '#rollback-deadline' );
+			$RollbackDeadline = $( 'iframe' )
+				.contents()
+					.find( '#rollback-deadline' );
 
 			if ( $RollbackDeadline.length ) {
 				BOLDGRID.BACKUP.RollbackTimer.deadline = $RollbackDeadline.text();
@@ -258,7 +289,8 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			}
 
 			// When the update progress iframe loads, check for a new deadline.
-			$( 'iframe' ).on( 'load', this.updateDeadline );
+			$( 'iframe' )
+				.on( 'load', this.updateDeadline );
 		}
 	};
 

@@ -2348,7 +2348,8 @@ class Boldgrid_Backup_Admin_Core {
 			$download_button = "<a id='backup-archive-download-<?php echo $key; ?>'
 			class='button action-download' href='#'
 			data-key='" . $key . "' data-filepath='" . $archive['filepath'] . "'
-			data-filename='" . $archive['filename'] . "'>Download</a>";
+			data-filename='" . $archive['filename'] . "'>" .
+			esc_html__( 'Download ', 'boldgrid-backup' ) . '</a>';
 		}
 
 		// Enqueue CSS.
@@ -2368,15 +2369,15 @@ class Boldgrid_Backup_Admin_Core {
 		// Get the current wp_filesystem access method.
 		$access_type = get_filesystem_method();
 
-		// Create a nonce for file downloads via AJAX.
-		$download_nonce = wp_create_nonce( 'archive_auth' );
+		// Create a nonce for file downloads.
+		$archive_nonce = wp_create_nonce( 'archive_auth' );
 
 		// Create URL for backup now.
 		$backup_url = get_admin_url( null, 'admin.php?page=boldgrid-backup&backup_now=1' );
 
 		// Create an array of data to pass to JS.
 		$localize_script_data = array(
-			'downloadNonce' => $download_nonce,
+			'archiveNonce' => $archive_nonce,
 			'accessType' => $access_type,
 			'backupUrl' => $backup_url,
 		);
@@ -2484,22 +2485,10 @@ class Boldgrid_Backup_Admin_Core {
 
 		$archive = $archives[ $key ];
 
-		// Create URL for restoring from an archive file.
-		$restore_url = get_admin_url( null,
-			'admin.php?page=boldgrid-backup&restore_now=1&archive_key=' . $key .
-			'&archive_filename=' . $archive['filename']
-		);
-
 		// Create an array of arguments for the notice template.
-		$args['restore_url'] = wp_nonce_url(
-			$restore_url, 'boldgrid-backup-restore', 'restore_auth'
-		);
+		$args['restore_key'] = $key;
 
 		$args['restore_filename'] = $archive['filename'];
-
-		$args['cancel_nonce_field'] = wp_nonce_field(
-			'boldgrid_rollback_notice', 'cancel_rollback_auth', true, false
-		);
 
 		// Create notice markup.
 		$notice_markup = $this->get_rollback_markup( $args );
@@ -2519,8 +2508,7 @@ class Boldgrid_Backup_Admin_Core {
 	 * @param array $args {
 	 * 		An array of arguments.
 	 *
-	 * 		@type string $cancel_nonce_field A WordPress nonce for the Cancel Rollback button form.
-	 * 		@type string $restore_url URL used to perform the restoration.
+	 * 		@type int $restore_key Key index used for restoration.
 	 * 		@type string $restore_filename Filename of the backup archive to be restored.
 	 * }
 	 * @return string The resulting markup.
@@ -2539,7 +2527,7 @@ class Boldgrid_Backup_Admin_Core {
 		esc_html__( 'Countdown', 'boldgrid-backup' ) .
 		": <span id='rollback-countdown-timer'></span></p>
 		<form action='#' id='cancel-rollback-form' method='POST'>
-		" . $args['cancel_nonce_field'] . "
+		" . wp_nonce_field( 'boldgrid_rollback_notice', 'cancel_rollback_auth', true, false ) . "
 		<p>
 		<a id='cancel-rollback-button' class='button'>" .
 		esc_html__( 'Cancel Rollback', 'boldgrid-backup' ) .
@@ -2556,11 +2544,17 @@ class Boldgrid_Backup_Admin_Core {
 		) .
 		"</p>
 		<p>
-		<a class='button action-restore' href='" . $args['restore_url'] . "' data-filename='" .
-		$args['restore_filename'] . "'>" .
-		esc_html__( 'Rollback Site Now' , 'boldgrid-backup' ) .
-		"</a>
-		<span class='spinner'></span>
+		<form action='" . get_admin_url( null, 'admin.php?page=boldgrid-backup' ) . "'
+		class='restore-now-form' method='POST'>
+			<input type='hidden' name='restore_now' value='1' />
+			<input type='hidden' name='archive_key' value='" . $args['restore_key'] . "' />
+			<input type='hidden' name='archive_filename' value='" . $args['restore_filename'] . "' />
+			" . wp_nonce_field( 'archive_auth', 'archive_auth', true, false ) . "
+			<input type='submit' class='button action-restore' data-key='" . $args['restore_key'] . "'
+			data-filename='" . $args['restore_filename'] . "'
+			value='" . esc_html__( 'Rollback Site Now', 'boldgrid-backup' ) . "' />
+			<span class='spinner'></span>
+		</form>
 		</p>
 		</div>
 		<div id='cancel-rollback-results'></div>
@@ -2600,7 +2594,6 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @see Boldgrid_Backup_Admin_Cron::delete_cron_entries().
 	 * @see Boldgrid_Backup_Admin_Settings::delete_rollback_option().
-	 *
 	 */
 	public function cancel_rollback() {
 		// Remove any cron jobs for restore actions.

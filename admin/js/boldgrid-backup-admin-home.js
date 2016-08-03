@@ -105,7 +105,7 @@
 	 */
 	self.restoreArchiveConfirm = function() {
 		// Declare variables.
-		var $restoreSpinner, confirmResponse, ArchiveFilename,
+		var confirmResponse, ArchiveFilename,
 			$this = $( this );
 
 		// Get the backup archive filename.
@@ -121,17 +121,12 @@
 				.attr( 'disabled', 'disabled' )
 				.css( 'pointer-events', 'none' );
 
-			// Create a context selector for the Restore button spinner.
-			$restoreSpinner = $this
-				.parent()
-				.find( '.spinner' );
-
 			// Show the spinner.
-			$restoreSpinner
-				.addClass( 'is-active' );
-
-			$restoreSpinner
-				.css( 'display', 'inline-block' );
+			$this
+				.parent()
+					.find( '.spinner' )
+						.addClass( 'is-active' )
+						.css( 'display', 'inline-block' );
 
 			// Proceed with restoration.
 			return true;
@@ -147,7 +142,7 @@
 	 */
 	self.deleteArchiveConfirm = function() {
 		// Declare variables.
-		var $deleteSpinner, confirmResponse, ArchiveFilename,
+		var confirmResponse, ArchiveFilename,
 			$this = $( this );
 
 		// Get the backup archive filename.
@@ -158,17 +153,12 @@
 
 		// Handle response.
 		if ( true === confirmResponse ) {
-			// Create a context selector for the Delete button spinner.
-			$deleteSpinner = $this
-				.parent()
-				.find( '.spinner' );
-
 			// Show the spinner.
-			$deleteSpinner
-				.addClass( 'is-active' );
-
-			$deleteSpinner
-				.css( 'display', 'inline-block' );
+			$this
+				.parent()
+					.find( '.spinner' )
+						.addClass( 'is-active' )
+						.css( 'display', 'inline-block' );
 
 			// Proceed with deletion.
 			return true;
@@ -184,8 +174,8 @@
 	 */
 	self.backupNow = function() {
 		// Declare variables.
-		var $this, $backupSiteSection, $backupSiteResults, $backupSpinner, backupNonce,
-		wpHttpReferer, isUpdating, errorCallback, data, markup;
+		var $this, $backupSiteSection, $backupSiteResults, backupNonce, wpHttpReferer, isUpdating,
+		errorCallback, data, markup;
 
 		// Assign the current jQuery object.
 		$this = $( this );
@@ -200,10 +190,6 @@
 		// Create a context selector for the Backup Site Now results.
 		$backupSiteResults = $( '#backup-site-now-results' );
 
-		// Create a context selector for the backup spinner.
-		$backupSpinner = $backupSiteSection
-			.find('.spinner');
-
 		// Get the wpnonce and referer values.
 		backupNonce = $backupSiteSection.find( '#backup_auth' )
 			.val();
@@ -215,12 +201,10 @@
 		isUpdating = $this.data( 'updating' );
 
 		// Show the spinner.
-		$backupSpinner
-			.addClass( 'is-active' )
-			.css( 'display', 'inline-block' );
-
-		$backupSpinner
-			.attr( 'display', 'inline-block' );
+		$backupSiteSection
+			.find('.spinner')
+				.addClass( 'is-active' )
+				.css( 'display', 'inline-block' );
 
 		// Create an error callback function.
 		errorCallback = function() {
@@ -288,7 +272,7 @@
 				// Hide the spinner.
 				$backupSiteSection
 					.find('.spinner')
-					.removeClass( 'is-active' );
+						.removeClass( 'is-active' );
 			}
 		} );
 
