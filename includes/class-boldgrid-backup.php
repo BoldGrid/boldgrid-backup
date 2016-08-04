@@ -144,6 +144,11 @@ class Boldgrid_Backup {
 		 */
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-update.php';
 
+		/**
+		 * The class responsible for the PHP profiling functionality using XHProf.
+		 */
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-xhprof.php';
+
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
 
@@ -199,7 +204,7 @@ class Boldgrid_Backup {
 			'download_archive_file_callback'
 		);
 
-		// Instantiate a Boldgrid_Backup_Admin class object.
+		// Instantiate a Boldgrid_Backup_Admin_Update class object.
 		$plugin_admin_update = new Boldgrid_Backup_Admin_Update( $this->get_plugin_name(),
 		$this->get_version() );
 

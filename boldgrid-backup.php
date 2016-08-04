@@ -88,7 +88,7 @@ if ( true === defined( 'DOING_CRON' ) && DOING_CRON ){
 	$plugin_update = new Boldgrid_Backup_Admin_Update();
 
 	// Check and update plugins.
-	$plugin_update->wp_update_this_plugin();
+	$plugin_update->wp_update_this_plugin( 'boldgrid-backup', BOLDGRID_BACKUP_VERSION );
 }
 
 /**

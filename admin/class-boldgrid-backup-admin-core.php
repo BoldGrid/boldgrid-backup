@@ -64,6 +64,15 @@ class Boldgrid_Backup_Admin_Core {
 	public $cron;
 
 	/**
+	 * The admin xhprof class object.
+	 *
+	 * @since 1.2
+	 * @access public
+	 * @var Boldgrid_Backup_Admin_Xhprof
+	 */
+	public $xhprof;
+
+	/**
 	 * Available execution functions.
 	 *
 	 * @since 1.0
@@ -150,6 +159,10 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Instantiate Boldgrid_Backup_Admin_Cron.
 		$this->cron = new Boldgrid_Backup_Admin_Cron( $this );
+
+		// Instantiate Boldgrid_Backup_Admin_Xhprof.
+		// Starts profiling and saves a report, if enabled in the "config.local.php" file.
+		$this->xhprof = new Boldgrid_Backup_Admin_Xhprof();
 
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();

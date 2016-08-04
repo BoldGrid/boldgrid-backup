@@ -1,6 +1,6 @@
 <?php
 /**
- * The admin-specific utilities methods for the plugin
+ * The admin-specific utility methods for the plugin
  *
  * @link http://www.boldgrid.com
  * @since 1.0
