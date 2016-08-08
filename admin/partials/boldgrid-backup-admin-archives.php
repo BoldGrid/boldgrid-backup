@@ -29,8 +29,7 @@
 				<input type='hidden' name='archive_key' value='<?php echo $key; ?>' />
 				<input type='hidden' name='archive_filename' value='<?php echo $archive['filename']; ?>' />
 				<?php wp_nonce_field(	'archive_auth', 'archive_auth' ); ?>
-				<input type='submit' class='button action-restore' data-key='<?php echo $key ?>'
-				data-filename='<?php echo $archive['filename']; ?>'
+				<input type='submit' class='button action-restore'
 				value='<?php esc_html_e( 'Restore', 'boldgrid-backup' ); ?>' />
 				<span class='spinner'></span>
 			</form>

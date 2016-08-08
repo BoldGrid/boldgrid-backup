@@ -2006,13 +2006,15 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Create text for the restoration confirmation.
 		$restore_confirm_text = esc_html__(
-			'Please confirm the restoration of this WordPress installation from the archive file',
+			'Please confirm the restoration of this WordPress installation from the archive file:' .
+			PHP_EOL . '"%s"' . PHP_EOL . PHP_EOL .
+			'Please be aware that you may get logged-out if your session token does not exist in the database restored.',
 			'boldgrid-backup'
 		);
 
 		// Create text for the deletion confirmation.
 		$delete_confirm_text = esc_html__(
-			'Please confirm the deletion the archive file',
+			'Please confirm the deletion the archive file:' . PHP_EOL,
 			'boldgrid-backup'
 		);
 

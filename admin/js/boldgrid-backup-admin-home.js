@@ -105,14 +105,18 @@
 	 */
 	self.restoreArchiveConfirm = function( e ) {
 		// Declare variables.
-		var confirmResponse, ArchiveFilename,
+		var confirmResponse, ArchiveFilename, restoreConfirmText,
 			$this = $( this );
 
 		// Get the backup archive filename.
-		ArchiveFilename = $this.data( 'filename' );
+		ArchiveFilename = $this.find( 'input[name=archive_filename]' ).val();
+
+		// Format the restoreConfirmText string, to add the ArchiveFilename.
+		restoreConfirmText = localizeScriptData.restoreConfirmText
+			.replace( '%s', ArchiveFilename );
 
 		// Ask for confirmation.
-		confirmResponse = confirm( localizeScriptData.restoreConfirmText + ' "' + ArchiveFilename + '".' );
+		confirmResponse = confirm( restoreConfirmText );
 
 		// Handle response.
 		if ( true === confirmResponse ) {
@@ -123,10 +127,9 @@
 
 			// Show the spinner.
 			$this
-				.parent()
-					.find( '.spinner' )
-						.addClass( 'is-active' )
-						.css( 'display', 'inline-block' );
+				.find( '.spinner' )
+					.addClass( 'is-active' )
+					.css( 'display', 'inline-block' );
 
 			// Proceed with restoration.
 			return true;
@@ -150,7 +153,7 @@
 		ArchiveFilename = $this.data( 'filename' );
 
 		// Ask for confirmation.
-		confirmResponse = confirm( localizeScriptData.deleteConfirmText + ' "' + ArchiveFilename + '".' );
+		confirmResponse = confirm( localizeScriptData.deleteConfirmText + ' "' + ArchiveFilename + '"' );
 
 		// Handle response.
 		if ( true === confirmResponse ) {
