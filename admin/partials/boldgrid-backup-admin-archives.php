@@ -22,7 +22,7 @@
 			data-filename='<?php echo $archive['filename']; ?>'>
 			<?php esc_html_e( 'Download', 'boldgrid-backup' ); ?></a>
 		</td>
-		<td class='backup-archive-list-restore'>
+		<td class='backup-archive-list-restore' nowrap>
 			<form action='<?php echo get_admin_url( null, 'admin.php?page=boldgrid-backup' ); ?>'
 			class='restore-now-form' method='POST'>
 				<input type='hidden' name='restore_now' value='1' />
@@ -35,7 +35,7 @@
 				<span class='spinner'></span>
 			</form>
 		</td>
-		<td class='backup-archive-list-delete'>
+		<td class='backup-archive-list-delete' nowrap>
 			<form action='<?php echo get_admin_url( null, 'admin.php?page=boldgrid-backup' ); ?>'
 			class='delete-now-form' method='POST'>
 				<input type='hidden' name='delete_now' value='1' />

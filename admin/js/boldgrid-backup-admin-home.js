@@ -26,10 +26,9 @@
 		$( '.action-download' )
 			.on( 'click', self.downloadArchive );
 
-		// On click action for restore buttons.
-		$( '.action-restore' )
-			.off( 'click' )
-			.on( 'click', self.restoreArchiveConfirm );
+		// On form submit of restore buttons.  "document" works with buttons placed with AJAX.
+		$( document.body )
+			.on( 'submit', 'form.restore-now-form', self.restoreArchiveConfirm );
 
 		// On click action for delete buttons.
 		$( '.action-delete' )
@@ -45,7 +44,7 @@
 	 *
 	 * @since 1.0
 	 */
-	self.downloadArchive = function() {
+	self.downloadArchive = function( e ) {
 		// Declare variables.
 		var downloadKey, downloadFilename, downloadFilepath, data, form, $formDom,
 			$this = $( this );
@@ -67,7 +66,8 @@
 				"The backup archive file path is: " + downloadFilepath
 			);
 
-			return false;
+			e.preventDefault();
+			return;
 		}
 
 		// Generate a data array for the download request.
@@ -94,8 +94,8 @@
 		// Submit the form.
 		$formDom.submit();
 
-		// Return false so the page does not reload.
-		return false;
+		// Prevent default browser action.
+		e.preventDefault();
 	};
 
 	/**
@@ -103,7 +103,7 @@
 	 *
 	 * @since 1.0
 	 */
-	self.restoreArchiveConfirm = function() {
+	self.restoreArchiveConfirm = function( e ) {
 		// Declare variables.
 		var confirmResponse, ArchiveFilename,
 			$this = $( this );
@@ -131,7 +131,8 @@
 			// Proceed with restoration.
 			return true;
 		} else {
-			return false;
+			// Prevent default browser action.
+			e.preventDefault();
 		}
 	}
 
@@ -140,7 +141,7 @@
 	 *
 	 * @since 1.0
 	 */
-	self.deleteArchiveConfirm = function() {
+	self.deleteArchiveConfirm = function( e ) {
 		// Declare variables.
 		var confirmResponse, ArchiveFilename,
 			$this = $( this );
@@ -163,7 +164,8 @@
 			// Proceed with deletion.
 			return true;
 		} else {
-			return false;
+			// Prevent default browser action.
+			e.preventDefault();
 		}
 	}
 
@@ -172,7 +174,7 @@
 	 *
 	 * @since 1.0
 	 */
-	self.backupNow = function() {
+	self.backupNow = function( e ) {
 		// Declare variables.
 		var $this, $backupSiteSection, $backupSiteResults, backupNonce, wpHttpReferer, isUpdating,
 		errorCallback, data, markup;
@@ -259,10 +261,6 @@
 				$( '.action-download' )
 					.on( 'click', self.downloadArchive );
 
-				// On click action for restore buttons.
-				$( '.action-restore' )
-					.on( 'click', self.restoreArchiveConfirm );
-
 				// On click action for delete buttons.
 				$( '.action-delete' )
 					.on( 'click', self.deleteArchiveConfirm );
@@ -276,8 +274,8 @@
 			}
 		} );
 
-		// Return false so the page does not reload.
-		return false;
+		// Prevent default browser action.
+		e.preventDefault();
 	}
 
 } )( jQuery );
