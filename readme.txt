@@ -21,6 +21,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 == Changelog ==
 
 = 1.2 In progress =
+* Bug fix:		JIRA WPB-2218	Fixed auto-update action hook.
 * Rework:		JIRA WPB-2209	Added a warning in the notice for restorations (may get logged-out).
 * New feature:	JIRA WPB-2211	Added XHProf for optional PHP profiling.  Can be enabled in "config.local.php" by setting "xhprof" to true.
 * Bug fix:		JIRA WPB-2201	Changed restore and delete buttons to POST forms, to resolve issue with people reloading the restore URL.

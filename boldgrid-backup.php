@@ -61,10 +61,23 @@ register_activation_hook( __FILE__, 'activate_boldgrid_backup' );
 register_deactivation_hook( __FILE__, 'deactivate_boldgrid_backup' );
 
 /**
- * The core plugin class that is used to define internationalization and admin-specific hooks.
+ * Begins execution of the plugin.
+ *
+ * Since everything within the plugin is registered via hooks,
+ * then kicking off the plugin from this point in the file does
+ * not affect the page life cycle.
+ *
+ * @since 1.0
  */
+function run_boldgrid_backup() {
+	$plugin = new Boldgrid_Backup();
+	$plugin->run();
+}
+
+// Load the plugin only if on a wp-admin page or when DOING_CRON.
 if ( true === is_admin() || ( true === defined( 'DOING_CRON' ) && DOING_CRON ) ) {
-	require BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup.php';
+	require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup.php';
+	run_boldgrid_backup();
 }
 
 // If DOING_CRON, then check if this plugin should be auto-updated.
@@ -89,23 +102,4 @@ if ( true === defined( 'DOING_CRON' ) && DOING_CRON ){
 
 	// Check and update plugins.
 	$plugin_update->wp_update_this_plugin( 'boldgrid-backup', BOLDGRID_BACKUP_VERSION );
-}
-
-/**
- * Begins execution of the plugin.
- *
- * Since everything within the plugin is registered via hooks,
- * then kicking off the plugin from this point in the file does
- * not affect the page life cycle.
- *
- * @since 1.0
- */
-function run_boldgrid_backup() {
-	$plugin = new Boldgrid_Backup();
-	$plugin->run();
-}
-
-// Load the plugin only if on a wp-admin page or when DOING_CRON.
-if ( true === is_admin() || ( true === defined( 'DOING_CRON' ) && DOING_CRON ) ) {
-	run_boldgrid_backup();
 }

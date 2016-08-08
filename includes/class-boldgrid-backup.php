@@ -204,10 +204,6 @@ class Boldgrid_Backup {
 			'download_archive_file_callback'
 		);
 
-		// Instantiate a Boldgrid_Backup_Admin_Update class object.
-		$plugin_admin_update = new Boldgrid_Backup_Admin_Update( $this->get_plugin_name(),
-		$this->get_version() );
-
 		// Add an action to perform an auto-backup before an auto-update occurs.
 		$this->loader->add_action( 'pre_auto_update', $plugin_admin_core,
 			'boldgrid_backup_now_auto'
