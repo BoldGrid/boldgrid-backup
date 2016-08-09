@@ -15,7 +15,7 @@
  *          Plugin Name: BoldGrid Backup
  *          Plugin URI: http://www.boldgrid.com
  *          Description: The BoldGrid Backup plugin.
- *          Version: 1.0.2
+ *          Version: 1.2
  *          Author: BoldGrid.com
  *          Author URI: http://www.boldgrid.com
  *          License: GPL-2.0+
@@ -31,7 +31,7 @@ if ( false === defined( 'WPINC' ) ) {
 
 // Define version.
 if ( false === defined( 'BOLDGRID_BACKUP_VERSION' ) ) {
-	define( 'BOLDGRID_BACKUP_VERSION', '1.0.2' );
+	define( 'BOLDGRID_BACKUP_VERSION', '1.2' );
 }
 
 // Define boldgrid-backup path.
