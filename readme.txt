@@ -21,6 +21,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 == Changelog ==
 
 = 1.2.1 In progress =
+* Bug fix:		JIRA WPB-2199	Updates via adminajax now updates the rollback timer.
 * Misc:			JIRA WPB-2256	Updated readme.txt for Tested up to: 4.6.
 
 = 1.2 =

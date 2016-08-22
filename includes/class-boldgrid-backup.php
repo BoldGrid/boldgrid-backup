@@ -234,6 +234,11 @@ class Boldgrid_Backup {
 			'upgrader_process_complete'
 		);
 
+		// Add a custom action to handle AJAX callback for getting the rollback deadline.
+		$this->loader->add_action( 'wp_ajax_boldgrid_backup_deadline', $plugin_admin_core,
+			'boldgrid_backup_deadline_callback'
+		);
+
 		return;
 	}
 

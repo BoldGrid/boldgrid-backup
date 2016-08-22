@@ -2081,13 +2081,22 @@ class Boldgrid_Backup_Admin_Core {
 	 */
 	public function boldgrid_backup_now_callback() {
 		// Verify nonce.
-		if ( false === isset( $_POST['backup_auth'] ) ||
+		if ( ! isset( $_POST['backup_auth'] ) ||
 			1 !== check_ajax_referer( 'boldgrid_backup_now', 'backup_auth', false ) ) {
 				wp_die(
 					'<div class="error"><p>' .
 					esc_html__( 'Security violation (invalid nonce).', 'boldgrid-backup' ) .
 					'</p></div>'
 				);
+		}
+
+		// Check user capabilities.
+		if ( ! current_user_can( 'update_plugins' ) ) {
+			wp_die(
+				'<div class="error"><p>' .
+				esc_html__( 'Security violation (not authorized).', 'boldgrid-backup' ) .
+				'</p></div>'
+			);
 		}
 
 		// Perform the backup operation.
@@ -2140,8 +2149,14 @@ class Boldgrid_Backup_Admin_Core {
 		// Verify nonce, or die.
 		check_ajax_referer( 'archive_auth', 'wpnonce' );
 
+		// Check user capabilities.
+		if ( ! current_user_can( 'update_plugins' ) ) {
+			esc_html_e( 'Security violation (not authorized).', 'boldgrid-backup' );
+			wp_die();
+		}
+
 		// Validate download_key.
-		if ( true === is_numeric( $_POST['download_key'] ) ) {
+		if ( is_numeric( $_POST['download_key'] ) ) {
 			$download_key = sanitize_text_field( wp_unslash( $_POST['download_key'] ) );
 		} else {
 			esc_html_e( 'INVALID DOWNLOAD KEY', 'boldgrid-backup' );
@@ -2149,7 +2164,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Validate download_filename.
-		if ( false === empty( $_POST['download_filename'] ) ) {
+		if ( ! empty( $_POST['download_filename'] ) ) {
 			$download_filename = sanitize_text_field( wp_unslash( $_POST['download_filename'] ) );
 		} else {
 			esc_html_e( 'INVALID DOWNLOAD FILENAME', 'boldgrid-backup' );
@@ -2169,13 +2184,16 @@ class Boldgrid_Backup_Admin_Core {
 		$archives = $this->get_archive_list( $download_filename );
 
 		// If no files were found, then abort.
-		if ( true === empty( $archives ) ) {
+		if ( empty( $archives ) ) {
 			esc_html_e( 'NO BACKUP ARCHIVES FOUND', 'boldgrid-backup' );
 			wp_die();
 		}
 
 		// Locate the filename by key number.
-		$filename = ( false === empty( $archives[ $download_key ]['filename'] ) ? $archives[ $download_key ]['filename'] : null );
+		$filename = (
+			! empty( $archives[ $download_key ]['filename'] ) ?
+			$archives[ $download_key ]['filename'] : null
+		);
 
 		// Verify filename.
 		if ( $download_filename !== $filename ) {
@@ -2584,11 +2602,22 @@ class Boldgrid_Backup_Admin_Core {
 	 * @since 1.0
 	 */
 	public function boldgrid_cancel_rollback_callback() {
+		// Check user capabilities.
+		if ( ! current_user_can( 'update_plugins' ) ) {
+			wp_die(
+				'<div class="error"><p>' .
+				esc_html__( 'Security violation (not authorized).', 'boldgrid-backup' ) .
+				'</p></div>'
+			);
+		}
+
 		// Verify nonce, or die with an error message.
 		if ( false === isset( $_POST['cancel_rollback_auth'] ) ||
-			1 !== check_ajax_referer( 'boldgrid_rollback_notice', 'cancel_rollback_auth', false ) ) {
+		1 !== check_ajax_referer( 'boldgrid_rollback_notice', 'cancel_rollback_auth', false ) ) {
 			wp_die(
-				'<div class="error"><p>Security violation (invalid nonce).</p></div>'
+			'<div class="error"><p>' .
+				esc_html__( 'Security violation (invalid nonce).', 'boldgrid-backup' ) .
+				'</p></div>'
 			);
 		}
 
@@ -2713,18 +2742,41 @@ class Boldgrid_Backup_Admin_Core {
 	 */
 	public function get_rollback_deadline() {
 		// Get pending rollback information.
-		if ( true === is_multisite() ) {
-			$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
-		} else {
-			$pending_rollback = get_option( 'boldgrid_backup_pending_rollback' );
-		}
+		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
 
 		// Return pending rollback deadline, or 0 if not present.
-		if ( true === empty( $pending_rollback['deadline'] ) ) {
+		if ( empty( $pending_rollback['deadline'] ) ) {
 			return 0;
 		} else {
 			return $pending_rollback['deadline'];
 		}
+	}
+
+	/**
+	 * Callback for getting the rollback deadline.
+	 *
+	 * @since 1.2.1
+	 *
+	 * @see Boldgrid_Backup_Admin_Core::get_rollback_deadline().
+	 */
+	public function boldgrid_backup_deadline_callback() {
+		// Check user capabilities.
+		if ( ! current_user_can( 'update_plugins' ) ) {
+			wp_die();
+		}
+
+		// Get the rollback deadline.
+		$deadline = $this->get_rollback_deadline();
+
+		// If there is no deadline, then die.
+		if ( empty( $deadline ) ) {
+			wp_die();
+		}
+
+		// Convert the deadline to ISO time (in ISO 8601 format).
+		$iso_time = date( 'c', $deadline );
+
+		wp_die( $iso_time );
 	}
 
 	/**
@@ -2733,7 +2785,8 @@ class Boldgrid_Backup_Admin_Core {
 	 * @since 1.2
 	 *
 	 * @link https://developer.wordpress.org/reference/hooks/upgrader_process_complete/
-	 * @see Boldgrid_Backup_Admin_Cron::update_cron().
+	 * @see Boldgrid_Backup_Admin_Cron::add_restore_cron().
+	 * @see Boldgrid_Backup_Admin_Core::get_rollback_deadline().
 	 */
 	public function upgrader_process_complete() {
 		// Add/update restoration cron job.

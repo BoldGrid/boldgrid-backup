@@ -267,9 +267,53 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 				.contents()
 					.find( '#rollback-deadline' );
 
+			// Update the rollback timer.
 			if ( $RollbackDeadline.length ) {
 				BOLDGRID.BACKUP.RollbackTimer.deadline = $RollbackDeadline.text();
 			}
+		},
+
+		/**
+		 * If updating something, then update the timer deadline from the retrieved ISO time.
+		 *
+		 * @since 1.2.1
+		 */
+		getUpdatedDeadline : function() {
+			// Declare variables.
+			var $bulkActionForm, wpnonce, wpHttpReferer, data;
+
+			// Create a context selector for bulk-action-form.
+			$bulkActionForm = $( '#bulk-action-form' );
+
+			// Get the bulk-action-form wpnonce.
+			wpnonce = $bulkActionForm
+				.find( '#_wpnonce' ).val();
+
+			// Get the bulk-action-form wpnonce.
+			wpHttpReferer = $bulkActionForm
+				.find( '[name="_wp_http_referer"]' ).val();
+
+			// Use adminajax to get the updated deadline.
+			// Generate the data array.
+			data = {
+				'action' : 'boldgrid_backup_deadline',
+				'_wpnonce' : wpnonce,
+				'_wp_http_referer' : wpHttpReferer,
+			};
+
+			// Make the call.
+			$.ajax( {
+				url : ajaxurl,
+				data : data,
+				type : 'post',
+				dataType : 'text',
+				success : function( response ) {
+					// Update the rollback timer.
+					if ( response.length ) {
+						BOLDGRID.BACKUP.RollbackTimer.deadline = response;
+					}
+				}
+			} );
 		},
 
 		/**
@@ -280,17 +324,30 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		 * @see initializeClock().
 		 */
 		init : function() {
+			// Declare vars.
+			var $document = $( document );
+
+			// If there is a defined rollout deadline, then initialize the timer.
 			if ( localizeScriptData.rolloutDeadline ) {
 				// Set the end time/deadline.
 				BOLDGRID.BACKUP.RollbackTimer.deadline = localizeScriptData.rolloutDeadline;
 
-				// Initialize the clock.
+				// Initialize the clock/timer.
 				this.initializeClock( 'rollback-countdown-timer' );
 			}
 
 			// When the update progress iframe loads, check for a new deadline.
 			$( 'iframe' )
 				.on( 'load', this.updateDeadline );
+
+			// When a plugin is updated via adminajax, then get the new deadline and update the timer.
+			$document
+				.on( 'wp-plugin-update-success', this.getUpdatedDeadline );
+
+			// When a theme is updated via adminajax, then get the new deadline and update the timer.
+			$document
+				.on( 'wp-theme-update-success', this.getUpdatedDeadline );
+
 		}
 	};
 
