@@ -81,10 +81,10 @@ if ( false === empty( $archives ) ) {
 		<p>
 			<a id='backup-site-now' class='button button-primary'<?php
 
-// If a restoration was just performed, then disable the backup button.
-	if ( false === empty( $_POST['restore_now'] ) ) {
+			// If a restoration was just performed, then disable the backup button.
+			if ( false === empty( $_POST['restore_now'] ) ) {
 		?> disabled='disabled' style='pointer-events: none;'<?php
-	}
+			}
 
 ?>><?php esc_html_e( 'Backup Site Now', 'boldgrid-backup' ); ?></a>
 			<span class='spinner'></span>
@@ -92,4 +92,28 @@ if ( false === empty( $archives ) ) {
 	</form>
 </div>
 <div id='backup-site-now-results'></div>
+<h2>Upload a Backup Archive</h2>
+<div id="upload-archive-section">
+	<form id="upload-archive-form" method="POST" enctype="multipart/form-data">
+		<input type="hidden" name="MAX_FILE_SIZE" value="1000000000" />
+		<?php wp_nonce_field( 'upload_archive_file' ); ?>
+		<input name="file" type="file" />
+		<br />
+		File size limit: <?php
+		echo Boldgrid_Backup_Admin_Utility::bytes_to_human(
+			Boldgrid_Backup_Admin_Utility::get_upload_limit()
+		);
+		?>
+		<span class='dashicons dashicons-editor-help' title='<?php
+				esc_html_e(
+					'To change the limit, you may be able to modify your server\'s php.ini or .htaccess file.  Please ask your web hosting provider if you need assistance.',
+					'boldgrid-backup'
+				);
+		?>'></span>
+		<p>
+			<input class="button" type="submit" value="Upload" />
+			<span class='spinner'></span>
+		</p>
+	</form>
+</div>
 </div>

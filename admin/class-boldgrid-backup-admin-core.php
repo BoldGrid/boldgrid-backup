@@ -1362,7 +1362,7 @@ class Boldgrid_Backup_Admin_Core {
 		foreach ( $dirlist as $fileinfo ) {
 			if (
 				1 === preg_match(
-					'/^boldgrid-backup-(' . $site_id . '|.*?-' . $backup_identifier .
+					'/^boldgrid-backup-(' . $site_id . '|.*?-?' . $backup_identifier .
 					')-.*\.(zip|tar\.gz|b2z|zlib|lzf)$/',
 					$fileinfo['name']
 				)
@@ -1963,6 +1963,8 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @since 1.0
 	 *
+	 * @see Boldgrid_Backup_Admin_Core::upload_archive_file().
+	 *
 	 * @return null
 	 */
 	public function page_backup_home() {
@@ -2043,6 +2045,11 @@ class Boldgrid_Backup_Admin_Core {
 		// If a delete operation is requested, then delete the selected backup now.
 		if ( false === empty( $_POST['delete_now'] ) ) {
 			$this->delete_archive_file();
+		}
+
+		// If uploading an archive file.
+		if ( ! empty( $_FILES['file'] ) ) {
+			$this->upload_archive_file( 'file' );
 		}
 
 		// Get archive list.
@@ -2224,6 +2231,220 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Exit.
 		wp_die();
+	}
+
+	/**
+	 * Upload archive file.
+	 *
+	 * @since 1.2.2
+	 *
+	 * @see Boldgrid_Backup_Admin_Utility::translate_upload_error().
+	 * @see Boldgrid_Backup_Admin_Config::get_backup_directory().
+	 * @see Boldgrid_Backup_Admin_Utility::bump_upload_limit().
+	 * @see Boldgrid_Backup_Admin_Utility::bump_memory_limit().
+	 * @see Boldgrid_Backup_Admin_Utility::bump_max_execution().
+	 * @see wp_check_filetype_and_ext() in wp-includes/functions.php
+	 * @see wp_handle_upload() in wp-admin/includes/file.php
+	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
+	 *
+	 * @param string $index The index used for $_FILES (default 'file').
+	 * @return bool Success of the operation.
+	 */
+	private function upload_archive_file( $index = 'file' ) {
+		// Verify capability.
+		if ( ! current_user_can( 'upload_files' ) ) {
+			// Display an error notice.
+			do_action(
+				'boldgrid_backup_notice',
+				esc_html__( 'Security violation (not authorized).', 'boldgrid-backup' ),
+				'notice notice-error is-dismissible'
+			);
+
+			return false;
+		}
+
+		// Verify the WordPress nonce.
+		if ( false === wp_verify_nonce( $_POST['_wpnonce'], 'upload_archive_file' ) ) {
+			// Display an error notice.
+			do_action(
+				'boldgrid_backup_notice',
+				esc_html__( 'Security violation (invalid nonce).', 'boldgrid-backup' ),
+				'notice notice-error is-dismissible'
+			);
+
+			return false;
+		}
+
+		// Abort if there is no file upload.
+		if ( empty( $_FILES[ $index ] ) ) {
+			return false;
+		}
+
+		// Abort if the files was not uploaded via HTTP POST.
+		if ( ! is_uploaded_file( $_FILES[ $index ]['tmp_name'] ) ) {
+			return false;
+		}
+
+		// Abort with a notice if there was an upload error.
+		if ( $_FILES[ $index ]['error'] ) {
+			// Display an error notice.
+			do_action(
+				'boldgrid_backup_notice',
+				Boldgrid_Backup_Admin_Utility::translate_upload_error( $_FILES[ $index ]['error'] ),
+				'notice notice-error is-dismissible'
+			);
+
+			return false;
+		}
+
+		// Get the backup directory.
+		$backup_directory = $this->config->get_backup_directory();
+
+		// Abort if the backup directory is not configured.
+		if ( empty( $backup_directory ) ) {
+			// Display an error notice.
+			do_action(
+				'boldgrid_backup_notice',
+				esc_html__( 'Security violation (not authorized).', 'boldgrid-backup' ),
+				'notice notice-error is-dismissible'
+			);
+
+			return false;
+		}
+
+		// Close any PHP session, so another session can open during the upload.
+		session_write_close();
+
+		// Set PHP INI runtime settings to allow an upload up to 1G.
+		Boldgrid_Backup_Admin_Utility::bump_upload_limit( '1G' );
+		Boldgrid_Backup_Admin_Utility::bump_memory_limit( '512M' );
+		Boldgrid_Backup_Admin_Utility::bump_max_execution( '0' );
+
+		// The calls above do return status, but attempt the upload regardless.
+		// Get the upload file basename.
+		$file_basename = basename( $_FILES[ $index ]['name'] );
+
+		// Validate the filename and mime type.
+		$validate = wp_check_filetype_and_ext( $_FILES[ $index ]['tmp_name'], $file_basename );
+
+		// Abort if the file is an incorrect extension.
+		// Currently only "zip"; others to be added in the future.
+		// @todo Write a method to get the allowed file extensions, based on available compressors.
+		$allowed_file_ext = array(
+			'zip'
+		);
+
+		if ( ! in_array( $validate['ext'], $allowed_file_ext, true ) ) {
+			// Display an error notice.
+			do_action(
+				'boldgrid_backup_notice',
+				sprintf(
+					esc_html__(
+						'Upload file extension type %s is not allowed.',
+						'boldgrid-backup'
+					),
+					( ! empty( $validate['ext'] ) ? '"'. $validate['ext'] . '"' : '' )
+				),
+				'notice notice-error is-dismissible'
+			);
+
+			return false;
+		}
+
+		// Check ZIP file for required file patterns.
+		$zip_patterns_exist = Boldgrid_Backup_Admin_Utility::zip_patterns_exist(
+			$_FILES[ $index ]['tmp_name'],
+			$this->filelist_filter
+		);
+
+		// Abort if the required file patterns do not all exist.
+		if ( ! $zip_patterns_exist ) {
+			// Display an error notice.
+			do_action(
+				'boldgrid_backup_notice',
+				esc_html__(
+					'The required directories and files were not found in the uploaded ZIP archive file.',
+					'boldgrid-backup'
+				),
+				'notice notice-error is-dismissible'
+			);
+
+			return false;
+		}
+
+		// If the filename had an incorrect extension based on the mime type, then fix it.
+		if ( false !== $validate['proper_filename'] ) {
+			$file_basename = $validate['proper_filename'];
+		}
+
+		// Get backup identifier.
+		$backup_identifier = $this->get_backup_identifier();
+
+		// Create the file save path.
+		$file_basename = 'boldgrid-backup-' . $backup_identifier . '-uploaded-' . $file_basename;
+
+		$file_save_path = $backup_directory . '/' . $file_basename;
+
+		// Ensure that "wp-admin/includes/file.php" is loaded for wp_handle_upload().
+		if ( ! function_exists( 'wp_handle_upload' ) ) {
+			require_once( ABSPATH . 'wp-admin/includes/file.php' );
+		}
+
+		// Use wp_handle_upload() (with overrides and custom options), to perform the actual upload.
+		$upload_overrides = array(
+			'test_form' => false,
+		);
+
+		add_filter( 'upload_dir',
+			array(
+				$this->config,
+				'custom_upload_dir',
+			)
+		);
+
+		$_FILES[ $index ]['name'] = $file_basename;
+
+		$movefile = wp_handle_upload( $_FILES[ $index ], $upload_overrides );
+
+		remove_filter( 'upload_dir',
+			array(
+				$this->config,
+				'custom_upload_dir',
+			)
+		);
+
+		// Determine success and produce and admin notice.
+		if ( $movefile && ! isset( $movefile['error'] ) ) {
+			// Connect to the WordPress Filesystem API.
+			global $wp_filesystem;
+
+			// Modify the archive file permissions to help protect from public access.
+			$wp_filesystem->chmod( $file_save_path, 0600 );
+
+			// Display an success notice.
+			do_action(
+				'boldgrid_backup_notice',
+				esc_html__( 'Upload successful.', 'boldgrid-backup' ),
+				'notice notice-success is-dismissible'
+			);
+
+			// Enforce retention setting.
+			$this->enforce_retention();
+
+			return true;
+		} else {
+			// Display an error notice.
+			do_action(
+				'boldgrid_backup_notice',
+				sprintf(
+					esc_html__( 'Upload has failed; %s.', 'boldgrid-backup' ),
+					$movefile['error']
+				),
+				'notice notice-error is-dismissible'
+			);
+
+			return false;
+		}
 	}
 
 	/**
@@ -2615,7 +2836,7 @@ class Boldgrid_Backup_Admin_Core {
 		if ( false === isset( $_POST['cancel_rollback_auth'] ) ||
 		1 !== check_ajax_referer( 'boldgrid_rollback_notice', 'cancel_rollback_auth', false ) ) {
 			wp_die(
-			'<div class="error"><p>' .
+				'<div class="error"><p>' .
 				esc_html__( 'Security violation (invalid nonce).', 'boldgrid-backup' ) .
 				'</p></div>'
 			);

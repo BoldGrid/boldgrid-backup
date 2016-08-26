@@ -21,7 +21,8 @@
 #backup-site-now-section .spinner,
 .restore-now-form .spinner,
 .delete-now-form .spinner,
-#restore-now-section .spinner {
+#restore-now-section .spinner,
+#upload-archive-section .spinner {
 	display: none;
 	float: none !important;
 }

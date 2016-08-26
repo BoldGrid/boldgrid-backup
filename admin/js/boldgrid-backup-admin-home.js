@@ -37,6 +37,11 @@
 		// On click action for the Backup Site Now button.
 		$( '#backup-site-now' )
 			.on( 'click', self.backupNow );
+
+		// On click action for the Upload button.
+		$( '#upload-archive-form' )
+			.find( '.button' )
+				.on( 'click', self.uploadButtonClicked );
 	} );
 
 	/**
@@ -186,7 +191,8 @@
 		$this = $( this );
 
         // Disable the Backup Site Now link button.
-		$this.attr( 'disabled', 'disabled' )
+		$this
+			.attr( 'disabled', 'disabled' )
 			.css( 'pointer-events', 'none' );
 
 		// Create a context selector for the Backup Site Now section.
@@ -279,6 +285,28 @@
 
 		// Prevent default browser action.
 		e.preventDefault();
+	}
+
+	/**
+	 * Confirm to delete a selected backup archive file.
+	 *
+	 * @since 1.2.2
+	 */
+	self.uploadButtonClicked = function() {
+		// Declare variables.
+		var $this = $( this );
+
+        // Disable the Upload button.
+		$this
+			.attr( 'disabled', 'disabled' )
+			.css( 'pointer-events', 'none' );
+
+		// Show the spinner.
+		$this
+			.parent()
+				.find( '.spinner' )
+					.addClass( 'is-active' )
+					.css( 'display', 'inline-block' );
 	}
 
 } )( jQuery );

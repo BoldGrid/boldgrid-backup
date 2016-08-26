@@ -280,6 +280,31 @@ class Boldgrid_Backup_Admin_Config {
 	}
 
 	/**
+	 * Custom upload directory callback.
+	 *
+	 * @since 1.2.2
+	 *
+	 * @see Boldgrid_Backup_Admin_Config::get_backup_directory()
+	 *
+	 * @param array $upload Upload data array.
+	 * @return array
+	 */
+	public function custom_upload_dir( $upload ) {
+		// Get the backup directory path.
+		$backup_directory = $this->get_backup_directory();
+
+		// Get the subdirectory name.
+		$subdir = explode( '/', $backup_directory );
+		$subdir = $subdir[ count( $subdir ) - 1 ];
+
+		$upload['subdir'] = $subdir;
+		$upload['path']   = $backup_directory;
+		$upload['url']    = null;
+
+		return $upload;
+	}
+
+	/**
 	 * Get the WordPress admin email address.
 	 *
 	 * @since 1.0.1
