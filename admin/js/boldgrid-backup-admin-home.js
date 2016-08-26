@@ -22,6 +22,9 @@
 
 	// Onload event listener.
 	$( function() {
+		// Declare vars.
+		var $fileInput = $( 'input:file' );
+
 		// On click action for download buttons.
 		$( '.action-download' )
 			.on( 'click', self.downloadArchive );
@@ -42,6 +45,21 @@
 		$( '#upload-archive-form' )
 			.find( '.button' )
 				.on( 'click', self.uploadButtonClicked );
+
+		$fileInput
+			.parent()
+				.find( 'input:submit' )
+					.attr( 'disabled', true );
+
+		$fileInput
+			.change(
+				function(){
+					if ( $(this).val() ) {
+						$( 'input:submit' )
+							.attr( 'disabled', false );
+					}
+				}
+		);
 	} );
 
 	/**
