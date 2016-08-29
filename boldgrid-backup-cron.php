@@ -15,7 +15,7 @@
 echo '== BoldGrid Backup Cron Job ==' . PHP_EOL;
 
 // Check for input variables.
-if ( true === empty( $argv ) ) {
+if ( empty( $argv ) ) {
 	die( 'Error: No parameters were passed.  A mode is required.' . PHP_EOL );
 }
 
@@ -27,7 +27,7 @@ $input = null;
 parse_str( implode( '&', array_slice( $argv, 1 ) ), $input );
 
 // Validate mode.
-if ( true === empty( $input['mode'] ) ) {
+if ( empty( $input['mode'] ) ) {
 	die( 'Error: A mode was not specified.' . PHP_EOL );
 }
 
@@ -36,12 +36,12 @@ $valid_modes = array(
 	'restore',
 );
 
-if ( false === in_array( $input['mode'], $valid_modes, true ) ) {
+if ( ! in_array( $input['mode'], $valid_modes, true ) ) {
 	die( 'Error: Invalid mode "' . $input['mode'] . '".' . PHP_EOL );
 }
 
 // Validate HTTP_HOST.
-if ( true === empty( $input['HTTP_HOST'] ) ) {
+if ( empty( $input['HTTP_HOST'] ) ) {
 	die( 'Error: HTTP_HOST was not specified.' . PHP_EOL );
 }
 
@@ -49,17 +49,17 @@ if ( true === empty( $input['HTTP_HOST'] ) ) {
 $_SERVER['HTTP_HOST'] = $input['HTTP_HOST'];
 
 // Set DOING_CRON.
-if ( false === defined( 'DOING_CRON' ) ) {
+if ( ! defined( 'DOING_CRON' ) ) {
 	define( 'DOING_CRON', true );
 }
 
 // Check of a dry run was specified.
-$dry_run = ( false === empty( $input['dry_run'] ) );
+$dry_run = ( ! empty( $input['dry_run'] ) );
 
 // Set the current working directory to the WordPress installation root directory.
 $abspath = dirname( dirname( dirname( dirname( __FILE__ ) ) ) );
 
-if ( false === chdir( $abspath ) ) {
+if ( ! chdir( $abspath ) ) {
 	die( 'Error: Could not change to directory "' . $abspath . '".' . PHP_EOL );
 }
 
@@ -82,7 +82,7 @@ esc_html_e( 'Done.', 'boldgrid-backup' );
 echo PHP_EOL;
 
 // If there is no rollback deadline, then
-if ( true === empty( $pending_rollback['deadline'] ) ) {
+if ( empty( $pending_rollback['deadline'] ) ) {
 
 }
 
@@ -91,7 +91,7 @@ switch ( $input['mode'] ) {
 	case 'backup' :
 		esc_html_e( 'Starting backup operation', 'boldgrid-backup' );
 
-		if ( true === $dry_run ) {
+		if ( $dry_run ) {
 			esc_html_e( ' (dry-run)', 'boldgrid-backup' );
 		}
 
@@ -107,13 +107,9 @@ switch ( $input['mode'] ) {
 
 	case 'restore' :
 		// If there is no pending rollback in the options, then abort.
-		if ( true === is_multisite() ) {
-			$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
-		} else {
-			$pending_rollback = get_option( 'boldgrid_backup_pending_rollback' );
-		}
+		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
 
-		if ( true === empty( $pending_rollback ) ) {
+		if ( empty( $pending_rollback ) ) {
 			// Remove existing restore cron jobs.
 			$boldgrid_backup_core->cron->delete_cron_entries( 'restore' );
 
@@ -126,7 +122,7 @@ switch ( $input['mode'] ) {
 		}
 
 		// If the deadline has elapsed more than 2 minutes ago, then abort.
-		if ( true === empty( $pending_rollback['deadline'] ) ||
+		if ( empty( $pending_rollback['deadline'] ) ||
 		$pending_rollback['deadline'] < strtotime( 'NOW -2 MINUTES' ) ) {
 			// Delete the pending rollback information.
 			$boldgrid_backup_core->settings->delete_rollback_option();
@@ -144,7 +140,7 @@ switch ( $input['mode'] ) {
 
 		esc_html_e( 'Starting restoration operation', 'boldgrid-backup' );
 
-		if ( true === $dry_run ) {
+		if ( $dry_run ) {
 			esc_html_e( ' (dry-run)', 'boldgrid-backup' );
 		}
 
@@ -152,8 +148,8 @@ switch ( $input['mode'] ) {
 
 		// Set GET variables.
 		$_GET['restore_now'] = 1;
-		$_GET['archive_key'] = ( true === isset( $input['archive_key'] ) ? $input['archive_key'] : null );
-		$_GET['archive_filename'] = ( false === empty( $input['archive_filename'] ) ? $input['archive_filename'] : null );
+		$_GET['archive_key'] = ( isset( $input['archive_key'] ) ? $input['archive_key'] : null );
+		$_GET['archive_filename'] = ( ! empty( $input['archive_filename'] ) ? $input['archive_filename'] : null );
 
 		// Call the restore function.
 		$archive_info = $boldgrid_backup_core->restore_archive_file( $dry_run );
@@ -170,15 +166,15 @@ switch ( $input['mode'] ) {
 	default :
 		die(
 			sprintf(
-				esc_html__(	'Error: Invalid mode "%s" was specified.', 'boldgrid-backup' ),
+				esc_html__( 'Error: Invalid mode "%s" was specified.', 'boldgrid-backup' ),
 				$input['mode']
-				)
+			)
 		);
 		break;
 }
 
 // Check return for mode.
-if ( true === empty( $archive_info['mode'] ) ) {
+if ( empty( $archive_info['mode'] ) ) {
 	$archive_info['mode'] = $input['mode'];
 }
 

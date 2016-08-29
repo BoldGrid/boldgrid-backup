@@ -72,14 +72,14 @@ class Boldgrid_Backup_Admin_Cron {
 
 		// Add scheduled days to the list.
 		foreach ( $days as $index => $int ) {
-			if ( true === isset( $settings['schedule'][ $index ] ) &&
-				1 === $settings['schedule'][ $index ] ) {
+			if ( isset( $settings['schedule'][ $index ] ) &&
+			1 === $settings['schedule'][ $index ] ) {
 					$days_scheduled_list .= $int . ',';
-				}
+			}
 		}
 
 		// If no days are scheduled, then abort.
-		if ( true === empty( $days_scheduled_list ) ) {
+		if ( empty( $days_scheduled_list ) ) {
 			return true;
 		}
 
@@ -98,7 +98,7 @@ class Boldgrid_Backup_Admin_Cron {
 		'/boldgrid-backup-cron.php" mode=backup HTTP_HOST=' . $_SERVER['HTTP_HOST'];
 
 		// If not Windows, then also silence the cron job.
-		if ( false === $this->core->test->is_windows() ) {
+		if ( ! $this->core->test->is_windows() ) {
 			$entry .= ' > /dev/null 2>&1';
 		}
 
@@ -138,13 +138,9 @@ class Boldgrid_Backup_Admin_Cron {
 		$is_multisite = is_multisite();
 
 		// If a backup was not made prior to an update (from an update page), then abort.
-		if ( true === $is_multisite ) {
-			$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
-		} else {
-			$pending_rollback = get_option( 'boldgrid_backup_pending_rollback' );
-		}
+		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
 
-		if ( true === empty( $pending_rollback ) ) {
+		if ( empty( $pending_rollback ) ) {
 			return;
 		}
 
@@ -180,22 +176,22 @@ class Boldgrid_Backup_Admin_Cron {
 		);
 
 		// Split the time into hour, minute, and second.
-		if ( false === empty( $system_time ) ) {
+		if ( ! empty( $system_time ) ) {
 			list( $hour, $minute, $second, $system_time_iso ) = explode( '|', $system_time );
 		}
 
 		// Validate hour; use system hour, or the date code for hour ("G").
-		if ( false === isset( $hour ) ) {
+		if ( ! isset( $hour ) ) {
 			$hour = 'G';
 		}
 
 		// Validate hour; use system hour, or the date code for minute ("i").
-		if ( false === isset( $minute ) ) {
+		if ( ! isset( $minute ) ) {
 			$minute = 'i';
 		}
 
 		// Mark the deadline.
-		if ( false === empty( $system_time_iso ) ) {
+		if ( ! empty( $system_time_iso ) ) {
 			$deadline = strtotime( $system_time_iso );
 		} else {
 			$deadline = $time_5_minutes_later;
@@ -210,7 +206,7 @@ class Boldgrid_Backup_Admin_Cron {
 		$entry .= ' archive_key=' . $archive_key . ' archive_filename=' . $archive_filename;
 
 		// If not Windows, then also silence the cron job.
-		if ( false === $this->core->test->is_windows() ) {
+		if ( ! $this->core->test->is_windows() ) {
 			$entry .= ' > /dev/null 2>&1';
 		}
 
@@ -218,14 +214,10 @@ class Boldgrid_Backup_Admin_Cron {
 		$status = $this->update_cron( $entry );
 
 		// If cron job was added, then update the boldgrid_backup_pending_rollback option with time.
-		if ( true === $status ) {
+		if ( $status ) {
 			$pending_rollback['deadline'] = $deadline;
 
-			if ( true === $is_multisite ) {
-				update_site_option( 'boldgrid_backup_pending_rollback', $pending_rollback );
-			} else {
-				update_option( 'boldgrid_backup_pending_rollback', $pending_rollback );
-			}
+			update_site_option( 'boldgrid_backup_pending_rollback', $pending_rollback );
 		}
 
 		return;
@@ -252,7 +244,7 @@ class Boldgrid_Backup_Admin_Cron {
 		$is_wpcron_available = $this->core->test->wp_cron_enabled();
 
 		// If crontab or wp-cron is not available, then return an empty array.
-		if ( true !== $is_crontab_available && true !== $is_wpcron_available ) {
+		if ( ! $is_crontab_available && ! $is_wpcron_available ) {
 			return array();
 		}
 
@@ -274,7 +266,7 @@ class Boldgrid_Backup_Admin_Cron {
 		$pattern = dirname( dirname( __FILE__ ) ) . '/boldgrid-backup-cron.php" mode=' . $mode;
 
 		// Use either crontab or wp-cron.
-		if ( true === $is_crontab_available ) {
+		if ( $is_crontab_available ) {
 			// Use crontab.
 			// Read crontab.
 			$command = 'crontab -l';
@@ -282,7 +274,7 @@ class Boldgrid_Backup_Admin_Cron {
 			$crontab = $this->core->execute_command( $command, null, $success );
 
 			// If the command to retrieve crontab failed, then return an empty array.
-			if ( true !== $success ) {
+			if ( ! $success ) {
 				return array();
 			}
 
@@ -307,19 +299,19 @@ class Boldgrid_Backup_Admin_Cron {
 			}
 
 			// If a match was found, then get the schedule.
-			if ( false === empty( $entry ) ) {
+			if ( ! empty( $entry ) ) {
 				// Parse cron schedule.
 				preg_match_all( '/([0-9*]+)(,([0-9*])+)*? /', $entry, $matches );
 
 				// Minute.
-				if ( true === isset( $matches[1][0] ) && true === is_numeric( $matches[1][0] ) ) {
+				if ( isset( $matches[1][0] ) && is_numeric( $matches[1][0] ) ) {
 					$schedule['tod_m'] = intval( $matches[1][0] );
 				} else {
 					return array();
 				}
 
 				// Hour.
-				if ( true === isset( $matches[1][1] ) && true === is_numeric( $matches[1][1] ) ) {
+				if ( isset( $matches[1][1] ) && is_numeric( $matches[1][1] ) ) {
 					$schedule['tod_h'] = intval( $matches[1][1] );
 				} else {
 					return array();
@@ -332,7 +324,7 @@ class Boldgrid_Backup_Admin_Cron {
 				$schedule['tod_a'] = date( 'A', $unix_time );
 
 				// Days of the week.
-				if ( true === isset( $matches[0][4] ) ) {
+				if ( isset( $matches[0][4] ) ) {
 					$days = explode( ',', $matches[0][4] );
 
 					foreach ( $days as $day ) {
@@ -384,7 +376,7 @@ class Boldgrid_Backup_Admin_Cron {
 	 */
 	public function update_cron( $entry ) {
 		// If no entry was passed, then abort.
-		if ( true === empty( $entry ) ) {
+		if ( empty( $entry ) ) {
 			return false;
 		}
 
@@ -395,17 +387,17 @@ class Boldgrid_Backup_Admin_Cron {
 		$is_wpcron_available = $this->core->test->wp_cron_enabled();
 
 		// If crontab or wp-cron is not available, then abort.
-		if ( true !== $is_crontab_available && true !== $is_wpcron_available ) {
+		if ( ! $is_crontab_available && ! $is_wpcron_available ) {
 			return false;
 		}
 
 		// Check if the backup directory is configured.
-		if ( false === $this->core->config->get_backup_directory() ) {
+		if ( ! $this->core->config->get_backup_directory() ) {
 			return false;
 		}
 
 		// Use either crontab or wp-cron.
-		if ( true === $is_crontab_available ) {
+		if ( $is_crontab_available ) {
 			// Use crontab.
 			// Read crontab.
 			$command = 'crontab -l';
@@ -433,7 +425,7 @@ class Boldgrid_Backup_Admin_Cron {
 			global $wp_filesystem;
 
 			// Check if the backup directory is writable.
-			if ( true !== $wp_filesystem->is_writable( $backup_directory ) ) {
+			if ( ! $wp_filesystem->is_writable( $backup_directory ) ) {
 				return false;
 			}
 
@@ -443,7 +435,7 @@ class Boldgrid_Backup_Admin_Cron {
 			$wp_filesystem->put_contents( $temp_crontab_path, $crontab, 0600 );
 
 			// Check if the defaults file was written.
-			if ( false === $wp_filesystem->exists( $temp_crontab_path ) ) {
+			if ( ! $wp_filesystem->exists( $temp_crontab_path ) ) {
 				return false;
 			}
 
@@ -456,7 +448,7 @@ class Boldgrid_Backup_Admin_Cron {
 			$wp_filesystem->delete( $temp_crontab_path, false, 'f' );
 
 			// Check for failure.
-			if ( false === $crontab || true !== $success ) {
+			if ( false === $crontab || ! $success ) {
 				return false;
 			}
 		} else {
@@ -486,12 +478,12 @@ class Boldgrid_Backup_Admin_Cron {
 		$is_wpcron_available = $this->core->test->wp_cron_enabled();
 
 		// If crontab or wp-cron is not available, then abort.
-		if ( true !== $is_crontab_available && true !== $is_wpcron_available ) {
+		if ( ! $is_crontab_available && ! $is_wpcron_available ) {
 			return false;
 		}
 
 		// Check if the backup directory is configured.
-		if ( false === $this->core->config->get_backup_directory() ) {
+		if ( ! $this->core->config->get_backup_directory() ) {
 			return false;
 		}
 
@@ -506,7 +498,7 @@ class Boldgrid_Backup_Admin_Cron {
 		}
 
 		// Use either crontab or wp-cron.
-		if ( true === $is_crontab_available ) {
+		if ( $is_crontab_available ) {
 			// Use crontab.
 			// Read crontab.
 			$command = 'crontab -l';
@@ -514,7 +506,7 @@ class Boldgrid_Backup_Admin_Cron {
 			$crontab = $this->core->execute_command( $command, null, $success );
 
 			// If the command to retrieve crontab failed, then abort.
-			if ( true !== $success ) {
+			if ( ! $success ) {
 				return false;
 			}
 
@@ -542,7 +534,7 @@ class Boldgrid_Backup_Admin_Cron {
 			global $wp_filesystem;
 
 			// Check if the backup directory is writable.
-			if ( true !== $wp_filesystem->is_writable( $backup_directory ) ) {
+			if ( ! $wp_filesystem->is_writable( $backup_directory ) ) {
 				return false;
 			}
 
@@ -553,7 +545,7 @@ class Boldgrid_Backup_Admin_Cron {
 			$wp_filesystem->put_contents( $temp_crontab_path, $crontab, 0600 );
 
 			// Check if the defaults file was written.
-			if ( false === $wp_filesystem->exists( $temp_crontab_path ) ) {
+			if ( ! $wp_filesystem->exists( $temp_crontab_path ) ) {
 				return false;
 			}
 
@@ -581,7 +573,7 @@ class Boldgrid_Backup_Admin_Cron {
 	 */
 	public function print_cron_report( $archive_info ) {
 		// Validate mode.
-		if ( true === empty( $archive_info['mode'] ) ) {
+		if ( empty( $archive_info['mode'] ) ) {
 			esc_html_e( 'Error: A mode was not specified.', 'boldgrid-backup' );
 			wp_die();
 		}
@@ -591,7 +583,7 @@ class Boldgrid_Backup_Admin_Cron {
 			'restore',
 		);
 
-		if ( false === in_array( $archive_info['mode'], $valid_modes, true ) ) {
+		if ( ! in_array( $archive_info['mode'], $valid_modes, true ) ) {
 			printf(
 				esc_html__( 'Error: Invalid mode "%s".', 'boldgrid-backup' ),
 				$archive_info['mode']
@@ -615,7 +607,7 @@ class Boldgrid_Backup_Admin_Cron {
 		}
 
 		// Print report.
-		if ( false === empty( $archive_info['error'] ) ) {
+		if ( ! empty( $archive_info['error'] ) ) {
 			// Error.
 			printf(
 				esc_html__( 'There was an error $s backup archive file.', 'boldgrid-backup' ),
@@ -631,14 +623,14 @@ class Boldgrid_Backup_Admin_Cron {
 
 			echo PHP_EOL;
 
-			if ( true === isset( $archive_info['error_message'] ) ) {
+			if ( isset( $archive_info['error_message'] ) ) {
 				printf(
 					esc_html__( 'Error Message: %s', 'boldgrid-backup' ),
 					$archive_info['error_message']
 				);
 			}
 
-			if ( true === isset( $archive_info['error_code'] ) ) {
+			if ( isset( $archive_info['error_code'] ) ) {
 				printf(
 					' (%s)',
 					$archive_info['error_code']
@@ -646,9 +638,9 @@ class Boldgrid_Backup_Admin_Cron {
 			}
 
 			echo PHP_EOL;
-		} elseif ( false === empty( $archive_info['filesize'] ) || false === empty( $archive_info['dryrun'] ) ) {
+		} elseif ( ! empty( $archive_info['filesize'] ) || ! empty( $archive_info['dryrun'] ) ) {
 			// Dry run.
-			if ( false === empty( $archive_info['filepath'] ) ) {
+			if ( ! empty( $archive_info['filepath'] ) ) {
 				printf(
 					esc_html__( 'File Path: %s', 'boldgrid-backup' ),
 					$archive_info['filepath']
@@ -657,7 +649,7 @@ class Boldgrid_Backup_Admin_Cron {
 				echo PHP_EOL;
 			}
 
-			if ( false === empty( $archive_info['filesize'] ) ) {
+			if ( ! empty( $archive_info['filesize'] ) ) {
 				printf(
 					esc_html__( 'File Size: %s', 'boldgrid-backup' ),
 					Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['filesize'] )
@@ -666,7 +658,7 @@ class Boldgrid_Backup_Admin_Cron {
 				echo PHP_EOL;
 			}
 
-			if ( false === empty( $archive_info['total_size'] ) ) {
+			if ( ! empty( $archive_info['total_size'] ) ) {
 				printf(
 					esc_html__( 'Total size: %s', 'boldgrid-backup' ),
 					Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] )
@@ -675,7 +667,7 @@ class Boldgrid_Backup_Admin_Cron {
 				echo PHP_EOL;
 			}
 
-			if ( false === empty( $archive_info['compressor'] ) ) {
+			if ( ! empty( $archive_info['compressor'] ) ) {
 				printf(
 					esc_html__( 'Compressor: %s', 'boldgrid-backup' ),
 					$archive_info['compressor']
@@ -684,7 +676,7 @@ class Boldgrid_Backup_Admin_Cron {
 				echo PHP_EOL;
 			}
 
-			if ( true === isset( $archive_info['duration'] ) ) {
+			if ( isset( $archive_info['duration'] ) ) {
 				printf(
 					esc_html__( 'Duration: %s seconds', 'boldgrid-backup' ),
 					$archive_info['duration']

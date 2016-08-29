@@ -12,11 +12,13 @@
  */
 
 // Check if settings are available, show an error notice if not.
-if ( true === empty( $settings ) ) {
-	add_action( 'admin_footer', array(
-		$this,
-		'notice_settings_retrieval',
-	) );
+if ( empty( $settings ) ) {
+	add_action( 'admin_footer',
+		array(
+			$this,
+			'notice_settings_retrieval',
+		)
+	);
 }
 ?>
 <div class='wrap'>
@@ -38,49 +40,49 @@ if ( true === empty( $settings ) ) {
 						<td class='schedule-dow'><input id='dow-sunday' type='checkbox'
 							name='dow_sunday' value='1'
 							<?php
-							if ( false === empty( $settings['schedule']['dow_sunday'] ) ) {
+							if ( ! empty( $settings['schedule']['dow_sunday'] ) ) {
 								echo ' checked';
 							}
 							?> /><?php esc_html_e( 'Sunday', 'boldgrid-backup' ); ?></td>
 						<td class='schedule-dow'><input id='dow-monday' type='checkbox'
 							name='dow_monday' value='1'
 							<?php
-							if ( false === empty( $settings['schedule']['dow_monday'] ) ) {
+							if ( ! empty( $settings['schedule']['dow_monday'] ) ) {
 								echo ' checked';
 							}
 							?> /><?php esc_html_e( 'Monday', 'boldgrid-backup' ); ?></td>
 						<td class='schedule-dow'><input id='dow-tuesday' type='checkbox'
 							name='dow_tuesday' value='1'
 							<?php
-							if ( false === empty( $settings['schedule']['dow_tuesday'] ) ) {
+							if ( ! empty( $settings['schedule']['dow_tuesday'] ) ) {
 								echo ' checked';
 							}
 							?> /><?php esc_html_e( 'Tuesday', 'boldgrid-backup' ); ?></td>
 						<td class='schedule-dow'><input id='dow-wednesday' type='checkbox'
 							name='dow_wednesday' value='1'
 							<?php
-							if ( false === empty( $settings['schedule']['dow_wednesday'] ) ) {
+							if ( ! empty( $settings['schedule']['dow_wednesday'] ) ) {
 								echo ' checked';
 							}
 							?> /><?php esc_html_e( 'Wednesday', 'boldgrid-backup' ); ?></td>
 						<td class='schedule-dow'><input id='dow-thursday' type='checkbox'
 							name='dow_thursday' value='1'
 							<?php
-							if ( false === empty( $settings['schedule']['dow_thursday'] ) ) {
+							if ( ! empty( $settings['schedule']['dow_thursday'] ) ) {
 								echo ' checked';
 							}
 							?> /><?php esc_html_e( 'Thursday', 'boldgrid-backup' ); ?></td>
 						<td class='schedule-dow'><input id='dow-friday' type='checkbox'
 							name='dow_friday' value='1'
 							<?php
-							if ( false === empty( $settings['schedule']['dow_friday'] ) ) {
+							if ( ! empty( $settings['schedule']['dow_friday'] ) ) {
 								echo ' checked';
 							}
 							?> /><?php esc_html_e( 'Friday', 'boldgrid-backup' ); ?></td>
 						<td class='schedule-dow'><input id='dow-saturday' type='checkbox'
 							name='dow_saturday' value='1'
 							<?php
-							if ( false === empty( $settings['schedule']['dow_saturday'] ) ) {
+							if ( ! empty( $settings['schedule']['dow_saturday'] ) ) {
 								echo ' checked';
 							}
 							?> /><?php esc_html_e( 'Saturday', 'boldgrid-backup' ); ?></td>
@@ -104,7 +106,7 @@ if ( true === empty( $settings ) ) {
 							?>
 							<option value='<?php echo $x;?>'
 									<?php
-									if ( false === empty( $settings['schedule']['tod_h'] ) &&
+									if ( ! empty( $settings['schedule']['tod_h'] ) &&
 									$x === $settings['schedule']['tod_h'] ) {
 										echo ' selected';
 									}
@@ -122,7 +124,7 @@ if ( true === empty( $settings ) ) {
 							?>
 							<option value='<?php echo $x;?>'
 									<?php
-									if ( false === empty( $settings['schedule']['tod_m'] ) &&
+									if ( ! empty( $settings['schedule']['tod_m'] ) &&
 									$x == $settings['schedule']['tod_m'] ) {
 										echo ' selected';
 									}
@@ -135,14 +137,14 @@ if ( true === empty( $settings ) ) {
 						<td><select id='tod-a' name='tod_a'>
 								<option value='AM'
 									<?php
-									if ( false === isset( $settings['schedule']['tod_a'] ) ||
+									if ( ! isset( $settings['schedule']['tod_a'] ) ||
 										 'PM' !== $settings['schedule']['tod_a'] ) {
 										echo ' selected';
 									}
 									?>>AM</option>
 								<option value='PM'
 									<?php
-									if ( true === isset( $settings['schedule']['tod_a'] ) &&
+									if ( isset( $settings['schedule']['tod_a'] ) &&
 										 'PM' === $settings['schedule']['tod_a'] ) {
 										echo ' selected';
 									}
@@ -162,7 +164,7 @@ if ( true === empty( $settings ) ) {
 						?></td>
 						<td><select id='retention-count' name='retention_count'>
 							<?php
-							$is_retention_set = ( true === isset( $settings['retention_count'] ) );
+							$is_retention_set = ( isset( $settings['retention_count'] ) );
 
 							for ( $x = 1; $x <= 10; $x ++ ) {
 								?>
@@ -170,7 +172,7 @@ if ( true === empty( $settings ) ) {
 									<?php
 									// If set, select the number, or use 5 as a default.
 									if ( ( $is_retention_set && $x === $settings['retention_count'] ) ||
-									( false === $is_retention_set && 5 === $x ) ) {
+									( ! $is_retention_set && 5 === $x ) ) {
 										echo ' selected';
 									}
 								?>><?php echo $x; ?></option>
@@ -193,14 +195,14 @@ if ( true === empty( $settings ) ) {
 			<input id='auto-backup-enabled' type='radio' name='auto_backup'
 				value='1'
 				<?php
-				if ( false === isset( $settings['auto_backup'] ) ||
+				if ( ! isset( $settings['auto_backup'] ) ||
 					 1 === $settings['auto_backup'] ) {
 					echo ' checked';
 				}
 				?> /> <?php esc_html_e( 'Enabled', 'boldgrid-backup' ); ?> &nbsp; <input
 				id='auto-backup-disabled' type='radio' name='auto_backup' value='0'
 				<?php
-				if ( true === isset( $settings['auto_backup'] ) && 0 === $settings['auto_backup'] ) {
+				if ( isset( $settings['auto_backup'] ) && 0 === $settings['auto_backup'] ) {
 					echo ' checked';
 				}
 				?> /> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
@@ -216,7 +218,7 @@ if ( true === empty( $settings ) ) {
 			<input id='auto-rollback-enabled' type='radio' name='auto_rollback'
 				value='1'
 				<?php
-				if ( false === isset( $settings['auto_rollback'] ) ||
+				if ( ! isset( $settings['auto_rollback'] ) ||
 					 1 === $settings['auto_rollback'] ) {
 					echo ' checked';
 				}
@@ -224,7 +226,7 @@ if ( true === empty( $settings ) ) {
 				id='auto-rollback-disabled' type='radio' name='auto_rollback'
 				value='0'
 				<?php
-				if ( true === isset( $settings['auto_rollback'] ) && 0 === $settings['auto_rollback'] ) {
+				if ( isset( $settings['auto_rollback'] ) && 0 === $settings['auto_rollback'] ) {
 					echo ' checked';
 				}
 				?> /> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
@@ -249,8 +251,8 @@ if ( true === empty( $settings ) ) {
 						<td><input id='notification-backup' type='checkbox'
 							name='notify_backup' value='1'
 							<?php
-							if ( false === isset( $settings['notifications']['backup'] ) ||
-								 0 !== $settings['notifications']['backup'] ) {
+							if ( ! isset( $settings['notifications']['backup'] ) ||
+							0 !== $settings['notifications']['backup'] ) {
 								echo ' checked';
 							}
 							?> /></td>
@@ -265,8 +267,8 @@ if ( true === empty( $settings ) ) {
 						<td><input id='notification-restore' type='checkbox'
 							name='notify_restore' value='1'
 							<?php
-							if ( false === isset( $settings['notifications']['restore'] ) ||
-								 0 !== $settings['notifications']['restore'] ) {
+							if ( ! isset( $settings['notifications']['restore'] ) ||
+							0 !== $settings['notifications']['restore'] ) {
 								echo ' checked';
 							}
 							?> /></td>

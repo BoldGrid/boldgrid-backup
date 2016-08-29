@@ -50,10 +50,11 @@ class Boldgrid_Backup_Admin_Xhprof {
 
 		// If XHprof was enabled, then register a shutdown action to disable XHProf and
 		// save the run report data to file.
-		if ( true === $this->xhprof_active ) {
-			add_action( 'shutdown', array(
+		if ( $this->xhprof_active ) {
+			add_action( 'shutdown',
+				array(
 					$this,
-					'xhprof_disable'
+					'xhprof_disable',
 				), 10, 0
 			);
 		}
@@ -69,12 +70,12 @@ class Boldgrid_Backup_Admin_Xhprof {
 	 */
 	private function get_configs() {
 		// If configs were already set, then return the array.
-		if ( false === empty( $this->configs ) ) {
+		if ( ! empty( $this->configs ) ) {
 			return $this->configs;
 		}
 
 		// If the update class method to get configs is callable, then use it.
-		if ( true === is_callable( 'Boldgrid_Backup_Admin_Update', 'get_configs' ) ) {
+		if ( is_callable( 'Boldgrid_Backup_Admin_Update', 'get_configs' ) ) {
 			$this->configs = Boldgrid_Backup_Admin_Update::get_configs();
 		}
 
@@ -90,7 +91,7 @@ class Boldgrid_Backup_Admin_Xhprof {
 	 */
 	private function xhprof_enable() {
 		// If the action is "heartbeat", then abort.
-		if( false === empty( $_POST['action'] ) && 'heartbeat' == $_POST['action'] ){
+		if ( ! empty( $_POST['action'] ) && 'heartbeat' === $_POST['action'] ) {
 			return false;
 		}
 
@@ -98,7 +99,7 @@ class Boldgrid_Backup_Admin_Xhprof {
 		$configs = $this->get_configs();
 
 		// If available and enabled, then start XHProf.
-		if ( false === empty( $configs['xhprof'] ) && extension_loaded( 'xhprof' ) ) {
+		if ( ! empty( $configs['xhprof'] ) && extension_loaded( 'xhprof' ) ) {
 			xhprof_enable( XHPROF_FLAGS_CPU | XHPROF_FLAGS_MEMORY );
 
 			return true;
@@ -117,7 +118,7 @@ class Boldgrid_Backup_Admin_Xhprof {
 	 */
 	public function xhprof_disable() {
 		// If XHProf is not active, then abort.
-		if ( true !== $this->xhprof_active ) {
+		if ( ! $this->xhprof_active ) {
 			return;
 		}
 
@@ -125,12 +126,12 @@ class Boldgrid_Backup_Admin_Xhprof {
 		$configs = $this->get_configs();
 
 		// Save report to the log.
-		if ( false === empty( $configs['xhprof'] ) && extension_loaded( 'xhprof' ) ) {
+		if ( ! empty( $configs['xhprof'] ) && extension_loaded( 'xhprof' ) ) {
 			// Disable XHProf and collect the data return array.
 			$xhprof_data = xhprof_disable();
 
 			// If there is no data, then abort.
-			if ( true === empty( $xhprof_data ) ) {
+			if ( empty( $xhprof_data ) ) {
 				return;
 			}
 
@@ -139,19 +140,20 @@ class Boldgrid_Backup_Admin_Xhprof {
 
 			// If the utility libraries exists, then load them.
 			if ( file_exists( $xhprof_utils_path . '/xhprof_lib.php' ) &&
-				file_exists( $xhprof_utils_path . '/xhprof_runs.php' ) ) {
-					require_once $xhprof_utils_path . '/xhprof_lib.php';
-					require_once $xhprof_utils_path . '/xhprof_runs.php';
+			file_exists( $xhprof_utils_path . '/xhprof_runs.php' ) ) {
+				require_once $xhprof_utils_path . '/xhprof_lib.php';
+				require_once $xhprof_utils_path . '/xhprof_runs.php';
 
-					// Save the run data to file.
-					$xhprof_runs = new XHProfRuns_Default();
-					$run_id = $xhprof_runs->save_run( $xhprof_data, 'xhprof_boldgrid_backup' );
+				// Save the run data to file.
+				$xhprof_runs = new XHProfRuns_Default();
+				$run_id = $xhprof_runs->save_run( $xhprof_data, 'xhprof_boldgrid_backup' );
 
-					// Write the report URL to the error log.
-					error_log(
-						__METHOD__ . ': https://' . $_SERVER['HTTP_HOST'] . '/xhprof/index.php?run=' .
-						$run_id . '&source=xhprof_boldgrid_backup' );
-				}
+				// Write the report URL to the error log.
+				error_log(
+					__METHOD__ . ': https://' . $_SERVER['HTTP_HOST'] .
+					'/xhprof/index.php?run=' . $run_id . '&source=xhprof_boldgrid_backup'
+				);
+			}
 		}
 
 		return;

@@ -61,7 +61,7 @@
 <?php
 
 // Print the list of archive files.
-if ( false === empty( $archives ) ) {
+if ( ! empty( $archives ) ) {
 	foreach ( $archives as $key => $archive ) {
 		include dirname( __FILE__ ) . '/boldgrid-backup-admin-archives.php';
 	}
@@ -82,7 +82,7 @@ if ( false === empty( $archives ) ) {
 			<a id='backup-site-now' class='button button-primary'<?php
 
 			// If a restoration was just performed, then disable the backup button.
-			if ( false === empty( $_POST['restore_now'] ) ) {
+			if ( ! empty( $_POST['restore_now'] ) ) {
 		?> disabled='disabled' style='pointer-events: none;'<?php
 			}
 

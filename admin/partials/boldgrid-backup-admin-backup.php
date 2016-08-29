@@ -11,7 +11,7 @@
  * @subpackage Boldgrid_Backup/admin/partials
  */
 
-if ( true === empty( $_POST['restore_now'] ) ) {
+if ( empty( $_POST['restore_now'] ) ) {
 ?>
 <h2><?php esc_html_e( 'Backup Results', 'boldgrid-backup' ); ?></h2>
 <?php
@@ -33,8 +33,8 @@ if ( true === empty( $_POST['restore_now'] ) ) {
  *        @type string $error_message A human-readable interpretation or the error code.
  *        }
  */
-if ( false === empty( $archive_info ) ) {
-	if ( false === empty( $archive_info['dryrun'] ) ) {
+if ( ! empty( $archive_info ) ) {
+	if ( ! empty( $archive_info['dryrun'] ) ) {
 ?>
 <div class="notice notice-info">
 	<p><?php esc_html_e( 'This was a dry run test', 'boldgrid-backup' ); ?>.</p>
@@ -42,12 +42,12 @@ if ( false === empty( $archive_info ) ) {
 <?php
 	}
 
-	if ( true === empty( $archive_info['error'] ) ) {
+	if ( empty( $archive_info['error'] ) ) {
 		// Successful backup.
 ?>
 <div class="notice notice-success">
 	<p><?php
-	if ( false === empty( $_POST['restore_now'] ) ) {
+	if ( ! empty( $_POST['restore_now'] ) ) {
 		esc_html_e( 'The selected archive file has been successfully restored', 'boldgrid-backup' );
 	} else {
 		esc_html_e( 'A backup archive file has been created successfully', 'boldgrid-backup' );
@@ -56,7 +56,7 @@ if ( false === empty( $archive_info ) ) {
 <?php
 $filename = '';
 
-if ( false === empty( $archive_info['filepath'] ) ) {
+if ( ! empty( $archive_info['filepath'] ) ) {
 	$filename = basename( $archive_info['filepath'] );
 ?>
 	<p><?php
@@ -68,7 +68,7 @@ if ( false === empty( $archive_info['filepath'] ) ) {
 <?php
 }
 
-if ( false === empty( $archive_info['filesize'] ) ) {
+if ( ! empty( $archive_info['filesize'] ) ) {
 ?>
 	<p><?php
 	printf(
@@ -79,7 +79,7 @@ if ( false === empty( $archive_info['filesize'] ) ) {
 <?php
 }
 
-if ( false === empty( $archive_info['total_size'] ) ) {
+if ( ! empty( $archive_info['total_size'] ) ) {
 ?>
 	<p><?php
 	printf(
@@ -90,7 +90,7 @@ if ( false === empty( $archive_info['total_size'] ) ) {
 <?php
 }
 
-if ( false === empty( $archive_info['compressor'] ) ) {
+if ( ! empty( $archive_info['compressor'] ) ) {
 ?>
 	<p><?php
 	printf(
@@ -101,7 +101,7 @@ if ( false === empty( $archive_info['compressor'] ) ) {
 <?php
 }
 
-if ( true === isset( $archive_info['duration'] ) ) {
+if ( isset( $archive_info['duration'] ) ) {
 ?>
 	<p><?php
 	printf(
@@ -135,14 +135,14 @@ foreach ( $archives as $key => $archive ) {
 		// Error creating backup.
 		?>
 <div class="notice notice-error"><p><?php
-if ( false === empty( $_POST['restore_now'] ) ) {
+if ( ! empty( $_POST['restore_now'] ) ) {
 	esc_html_e( 'There was an error restoring the selected backup archive file', 'boldgrid-backup' );
 } else {
 	esc_html_e( 'There was an error creating a backup archive file', 'boldgrid-backup' );
 }
 ?>.</p>
 <?php
-if ( false === empty( $archive_info['filepath'] ) ) {
+if ( ! empty( $archive_info['filepath'] ) ) {
 ?>
 	<p><?php
 	printf(
@@ -155,14 +155,14 @@ if ( false === empty( $archive_info['filepath'] ) ) {
 ?>
 <p><?php echo $archive_info['error']; ?></p>
 <?php
-if ( true === isset( $archive_info['error_message'] ) ) {
+if ( isset( $archive_info['error_message'] ) ) {
 ?><p><?php
 	printf(
 		esc_html__( 'Error Details: %s', 'boldgrid-backup' ),
 		$archive_info['error_message']
 	);
 
-	if ( true === isset( $archive_info['error_code'] ) ) {
+	if ( isset( $archive_info['error_code'] ) ) {
 		echo ' (' . $archive_info['error_code'] . ')';
 	}
 

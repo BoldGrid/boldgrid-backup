@@ -183,18 +183,18 @@ class Boldgrid_Backup_Admin_Test {
 		// Get the WP-CRON array.
 		$wp_cron_array = array();
 
-		if ( true === function_exists( '_get_cron_array' ) ) {
+		if ( function_exists( '_get_cron_array' ) ) {
 			$wp_cron_array = _get_cron_array();
 		}
 
 		// Check for the DISABLE_WP_CRON constant and value.
 		$disable_wp_cron = false;
 
-		if ( true === defined( 'DISABLE_WP_CRON' ) ) {
+		if ( defined( 'DISABLE_WP_CRON' ) ) {
 			$disable_wp_cron = DISABLE_WP_CRON;
 		}
 
-		$this->wp_cron_enabled = ( false === empty( $wp_cron_array ) && false === $disable_wp_cron );
+		$this->wp_cron_enabled = ( ! empty( $wp_cron_array ) && ! $disable_wp_cron );
 
 		return $this->wp_cron_enabled;
 	}
@@ -257,7 +257,7 @@ class Boldgrid_Backup_Admin_Test {
 	 */
 	public function run_functionality_tests() {
 		// If functionality tests were already performed, then just return status.
-		if ( true === $this->functionality_tested && null !== $this->is_functional ) {
+		if ( $this->functionality_tested && null !== $this->is_functional ) {
 			return $this->is_functional;
 		}
 
@@ -265,12 +265,12 @@ class Boldgrid_Backup_Admin_Test {
 		global $wp_filesystem;
 
 		// If not writable, then mark as not functional.
-		if ( true !== $this->get_is_abspath_writable() ) {
+		if ( ! $this->get_is_abspath_writable() ) {
 			$this->is_functional = false;
 		}
 
 		// Configure the backup directory path, or mark as not functional.
-		if ( false === $this->core->config->get_backup_directory() ) {
+		if ( ! $this->core->config->get_backup_directory() ) {
 			$this->is_functional = false;
 		}
 
@@ -278,27 +278,27 @@ class Boldgrid_Backup_Admin_Test {
 		$available_compressors = $this->core->config->get_available_compressors();
 
 		// Test for available compressors, and add them to the array, or mark as not functional.
-		if ( true === empty( $available_compressors ) ) {
+		if ( empty( $available_compressors ) ) {
 			$this->is_functional = false;
 		}
 
 		// Test for crontab. For now, don't check if wp-cron is enabled.
-		if ( true !== $this->is_crontab_available() ) {
+		if ( ! $this->is_crontab_available() ) {
 			$this->is_functional = false;
 		}
 
 		// Test for mysqldump. For now, don't use wpbd.
-		if ( true !== $this->is_mysqldump_available() ) {
+		if ( ! $this->is_mysqldump_available() ) {
 			$this->is_functional = false;
 		}
 
 		// Test for PHP safe mode.
-		if ( false !== $this->is_php_safemode() ) {
+		if ( $this->is_php_safemode() ) {
 			$this->is_functional = false;
 		}
 
 		// Test for PHP Zip (currently the only one coded).
-		if ( true !== $this->core->config->is_compressor_available( 'php_zip' ) ) {
+		if ( ! $this->core->config->is_compressor_available( 'php_zip' ) ) {
 			$this->is_functional = false;
 		}
 
@@ -331,8 +331,8 @@ class Boldgrid_Backup_Admin_Test {
 		$home_dir = $this->core->config->get_home_directory();
 
 		// If the home directory is not defined, not a directory or not writable, then return 0.00.
-		if ( true === empty( $home_dir ) || false === $wp_filesystem->is_dir( $home_dir ) ||
-			false === $wp_filesystem->is_writable( $home_dir ) ) {
+		if ( empty( $home_dir ) || ! $wp_filesystem->is_dir( $home_dir ) ||
+			! $wp_filesystem->is_writable( $home_dir ) ) {
 			return array(
 				0.00,
 				0.00,
@@ -340,26 +340,26 @@ class Boldgrid_Backup_Admin_Test {
 			);
 		}
 
-			// Get filesystem disk space information.
-			$disk_total_space = disk_total_space( $home_dir );
-			$disk_free_space = disk_free_space( $home_dir );
-			$disk_used_space = $disk_total_space - $disk_free_space;
+		// Get filesystem disk space information.
+		$disk_total_space = disk_total_space( $home_dir );
+		$disk_free_space = disk_free_space( $home_dir );
+		$disk_used_space = $disk_total_space - $disk_free_space;
 
-			// Initialize $wp_root_size.
-			$wp_root_size = false;
+		// Initialize $wp_root_size.
+		$wp_root_size = false;
 
-			// Get the size of the filtered WordPress installation root directory (ABSPATH).
-			if ( true === $get_wp_size ) {
-				$wp_root_size = $this->get_wp_size();
-			}
+		// Get the size of the filtered WordPress installation root directory (ABSPATH).
+		if ( $get_wp_size ) {
+			$wp_root_size = $this->get_wp_size();
+		}
 
-			// Return the disk information array.
-			return array(
-				$disk_total_space,
-				$disk_used_space,
-				$disk_free_space,
-				$wp_root_size,
-			);
+		// Return the disk information array.
+		return array(
+			$disk_total_space,
+			$disk_used_space,
+			$disk_free_space,
+			$wp_root_size,
+		);
 	}
 
 	/**
@@ -377,7 +377,7 @@ class Boldgrid_Backup_Admin_Test {
 		$is_functional = $this->run_functionality_tests();
 
 		// If plugin is not functional, then return FALSE.
-		if ( false === $is_functional ) {
+		if ( ! $is_functional ) {
 			return false;
 		}
 
@@ -385,7 +385,7 @@ class Boldgrid_Backup_Admin_Test {
 		$filelist = $this->core->get_filtered_filelist( ABSPATH );
 
 		// If nothing was found, then return 0.
-		if ( true === empty( $filelist ) ) {
+		if ( empty( $filelist ) ) {
 			return 0;
 		}
 
@@ -424,7 +424,7 @@ class Boldgrid_Backup_Admin_Test {
 		);
 
 		// Check query.
-		if ( true === empty( $query ) ) {
+		if ( empty( $query ) ) {
 			return 0;
 		}
 
@@ -489,25 +489,5 @@ class Boldgrid_Backup_Admin_Test {
 
 		// Return the result.
 		return $this->is_homedir_writable;
-	}
-
-	/**
-	 * Get and return a boolean for whether or not the plugin will be functional.
-	 *
-	 * @since 1.0
-	 *
-	 * @return bool
-	 */
-	public function get_is_functional() {
-		// If functionality tests were already performed, then just return status.
-		if ( true === $this->functionality_tested && null !== $this->is_functional ) {
-			return $this->is_functional;
-		}
-
-		// Run the functionality tests.
-		$this->run_functionality_tests();
-
-		// Return the result.
-		return $this->is_functional;
 	}
 }

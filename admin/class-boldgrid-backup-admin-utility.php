@@ -31,7 +31,7 @@ class Boldgrid_Backup_Admin_Utility {
 	 */
 	public static function bytes_to_human( $bytes = 0, $decimals = 2 ) {
 		// If $bytes is not a number, then fail.
-		if ( false === is_numeric( $bytes ) ) {
+		if ( ! is_numeric( $bytes ) ) {
 			return 'INVALID';
 		}
 
@@ -227,7 +227,7 @@ class Boldgrid_Backup_Admin_Utility {
 		// Validate file path string.
 		$filepath = realpath( $filepath );
 
-		if ( true === empty( $filepath ) ) {
+		if ( empty( $filepath ) ) {
 			return true;
 		}
 
@@ -235,11 +235,11 @@ class Boldgrid_Backup_Admin_Utility {
 		global $wp_filesystem;
 
 		// If path exists and is not writable, then make writable.
-		if ( true === $wp_filesystem->exists( $filepath ) ) {
-			if ( false === $wp_filesystem->is_writable( $filepath ) ) {
-				if ( true === $wp_filesystem->is_dir( $filepath ) ) {
+		if ( $wp_filesystem->exists( $filepath ) ) {
+			if ( ! $wp_filesystem->is_writable( $filepath ) ) {
+				if ( $wp_filesystem->is_dir( $filepath ) ) {
 					// Is a directory.
-					if ( false === $wp_filesystem->chmod( $filepath, 0755 ) ) {
+					if ( ! $wp_filesystem->chmod( $filepath, 0755 ) ) {
 						// Error chmod 755 a directory.
 						error_log(
 							__METHOD__ . ': Error using chmod 0755 on directory "' . $filepath . '".'
@@ -249,7 +249,7 @@ class Boldgrid_Backup_Admin_Utility {
 					}
 				} else {
 					// Is a file.
-					if ( false === $wp_filesystem->chmod( $filepath, 0644 ) ) {
+					if ( ! $wp_filesystem->chmod( $filepath, 0644 ) ) {
 						// Error chmod 644 a file.
 						error_log(
 							__METHOD__ . ': Error using chmod 0644 on file "' . $filepath . '".'
@@ -389,7 +389,7 @@ class Boldgrid_Backup_Admin_Utility {
 	 * @link http://php.net/manual/en/ini.core.php#ini.file-uploads
 	 * @link http://php.net/manual/en/ini.core.php#ini.max-file-uploads
 	 *
-	 * @param string $size A php.ini style upload_max_filesize string.
+	 * @param string $max_filesize A php.ini style upload_max_filesize string.
 	 * @return bool Success of the operation.
 	 */
 	public static function bump_upload_limit( $max_filesize ) {
@@ -464,7 +464,7 @@ class Boldgrid_Backup_Admin_Utility {
 	 *
 	 * @param string $zip_file Path to a ZIP file.
 	 * @param string $locate_file A filename or path to be located.
-	 * @param bool   $is_path Is the input file a path?
+	 * @param bool   $is_path Is the input file a path.
 	 * @return bool
 	 */
 	public static function zip_file_exists( $zip_file, $locate_file, $is_path = false ) {

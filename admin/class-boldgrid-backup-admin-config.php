@@ -75,43 +75,43 @@ class Boldgrid_Backup_Admin_Config {
 	 */
 	public function get_home_directory() {
 		// If home directory was already set, then return it.
-		if ( false === empty( $this->home_dir ) ) {
+		if ( ! empty( $this->home_dir ) ) {
 			return $this->home_dir;
 		}
 
 		// For Windows and Linux.
-		if ( true === $this->core->test->is_windows() ) {
+		if ( $this->core->test->is_windows() ) {
 			// Windows.
-			$home_drive = ( false === empty( $_SERVER['HOMEDRIVE'] ) ? $_SERVER['HOMEDRIVE'] : null );
-			$home_path = ( false === empty( $_SERVER['HOMEPATH'] ) ? $_SERVER['HOMEPATH'] : null );
+			$home_drive = ( ! empty( $_SERVER['HOMEDRIVE'] ) ? $_SERVER['HOMEDRIVE'] : null );
+			$home_path = ( ! empty( $_SERVER['HOMEPATH'] ) ? $_SERVER['HOMEPATH'] : null );
 
-			if ( false === ( empty( $home_drive ) || empty( $home_path ) ) ) {
+			if ( ! ( empty( $home_drive ) || empty( $home_path ) ) ) {
 				$home_dir = $home_drive . $home_path;
 			}
 
 			// If still unknown, then try getenv USERPROFILE.
-			if ( true === empty( $home_dir ) ) {
+			if ( empty( $home_dir ) ) {
 				$home_dir = getenv( 'USERPROFILE' );
 			}
 		} else {
 			// Linux.
 			$home_dir = getenv( 'HOME' );
 
-			if ( true === empty( $home_dir ) ) {
-				$home_dir = ( false === empty( $_SERVER['HOME'] ) ? $_SERVER['HOME'] : null );
+			if ( empty( $home_dir ) ) {
+				$home_dir = ( ! empty( $_SERVER['HOME'] ) ? $_SERVER['HOME'] : null );
 			}
 		}
 
 		// If still unknown, then try posix_getpwuid and posix_getuid.
-		if ( true === empty( $home_dir ) && function_exists( 'posix_getuid' ) &&
+		if ( empty( $home_dir ) && function_exists( 'posix_getuid' ) &&
 			function_exists( 'posix_getpwuid' ) ) {
 				$user = posix_getpwuid( posix_getuid() );
 
-				$home_dir = ( false === empty( $user['dir'] ) ? $user['dir'] : null );
+				$home_dir = ( ! empty( $user['dir'] ) ? $user['dir'] : null );
 		}
 
 		// Could not find the user home directory, so use the WordPress root directory.
-		if ( true === empty( $home_dir ) ) {
+		if ( empty( $home_dir ) ) {
 			$home_dir = ABSPATH;
 		}
 
@@ -154,7 +154,7 @@ class Boldgrid_Backup_Admin_Config {
 	 */
 	public function get_backup_directory() {
 		// If home directory is not set, then set it.
-		if ( true === empty( $this->backup_directory ) ) {
+		if ( empty( $this->backup_directory ) ) {
 			// Initialize $backup_directory.
 			$backup_directory = '';
 
@@ -162,14 +162,14 @@ class Boldgrid_Backup_Admin_Config {
 			$settings = $this->core->settings->get_settings();
 
 			// If the backup directory was saved in the settings, then use it.
-			if ( false === empty( $settings['backup_directory'] ) ) {
+			if ( ! empty( $settings['backup_directory'] ) ) {
 				$backup_directory = $settings['backup_directory'];
 			}
 
 			$is_directory_set = $this->set_backup_directory( $backup_directory );
 
 			// The backup directory could not be set.
-			if ( false === $is_directory_set ) {
+			if ( ! $is_directory_set ) {
 				return false;
 			}
 		}
@@ -190,7 +190,7 @@ class Boldgrid_Backup_Admin_Config {
 	 */
 	public function set_backup_directory( $backup_directory_path = '' ) {
 		// If a backup directory was not specified, then use the default.
-		if ( true === empty( $backup_directory_path ) ) {
+		if ( empty( $backup_directory_path ) ) {
 			// Get the user home directory.
 			$home_dir = $this->get_home_directory();
 
@@ -198,7 +198,7 @@ class Boldgrid_Backup_Admin_Config {
 			$home_dir_writable = $this->core->test->is_homedir_writable();
 
 			// If home directory is not writable, then abort.
-			if ( false === $home_dir_writable ) {
+			if ( ! $home_dir_writable ) {
 				return false;
 			}
 
@@ -213,11 +213,11 @@ class Boldgrid_Backup_Admin_Config {
 		$backup_directory_exists = $wp_filesystem->exists( $backup_directory_path );
 
 		// If the backup directory does not exist, then attempt to create it.
-		if ( false === $backup_directory_exists ) {
+		if ( ! $backup_directory_exists ) {
 			$backup_directory_created = $wp_filesystem->mkdir( $backup_directory_path, 0700 );
 
 			// If mkdir failed, then notify and abort.
-			if ( false === $backup_directory_created ) {
+			if ( ! $backup_directory_created ) {
 				// Create error message.
 				$errormsg = sprintf(
 					esc_html__( 'Could not create directory "%s".', 'boldgrid-backup' ),
@@ -236,7 +236,7 @@ class Boldgrid_Backup_Admin_Config {
 		$backup_directory_isdir = $wp_filesystem->is_dir( $backup_directory_path );
 
 		// If the backup directory is not a directory, then notify and abort.
-		if ( false === $backup_directory_isdir ) {
+		if ( ! $backup_directory_isdir ) {
 			// Create error message.
 			$errormsg = sprintf(
 				esc_html__( 'Backup directory "%s" is not a directory.', 'boldgrid-backup' ),
@@ -251,7 +251,7 @@ class Boldgrid_Backup_Admin_Config {
 		}
 
 		// If the backup directory is not writable, then notify and abort.
-		if ( false === $wp_filesystem->is_writable( $backup_directory_path ) ) {
+		if ( ! $wp_filesystem->is_writable( $backup_directory_path ) ) {
 			// Get the mode of the directory.
 			$backup_directory_mode = $wp_filesystem->getchmod( $backup_directory_path );
 
@@ -317,17 +317,17 @@ class Boldgrid_Backup_Admin_Config {
 
 		// Get the site email address.
 		// Try get_bloginfo.
-		if ( true === function_exists( 'get_bloginfo' ) ) {
+		if ( function_exists( 'get_bloginfo' ) ) {
 			$admin_email = get_bloginfo( 'admin_email' );
 		}
 
 		// If the email address is still needed, then try wp_get_current_user.
-		if ( true === empty( $admin_email ) && true === function_exists( 'wp_get_current_user' ) ) {
+		if ( empty( $admin_email ) && function_exists( 'wp_get_current_user' ) ) {
 			// Get the current user information.
 			$current_user = wp_get_current_user();
 
 			// Check if user information was retrieved, abort if not.
-			if ( false === $current_user ) {
+			if ( ! $current_user ) {
 				return false;
 			}
 
@@ -336,7 +336,7 @@ class Boldgrid_Backup_Admin_Config {
 		}
 
 		// If there is no email address found, then abort.
-		if ( true === empty( $admin_email ) ) {
+		if ( empty( $admin_email ) ) {
 			return false;
 		}
 
@@ -354,9 +354,8 @@ class Boldgrid_Backup_Admin_Config {
 	 * @return null
 	 */
 	private function add_compressor( $compressor = null ) {
-		if ( false === empty( $compressor ) &&
-			false === in_array( $compressor, $this->available_compressors, true )
-		) {
+		if ( ! empty( $compressor ) &&
+		! in_array( $compressor, $this->available_compressors, true ) ) {
 			$this->available_compressors[] = $compressor;
 		}
 
@@ -373,7 +372,7 @@ class Boldgrid_Backup_Admin_Config {
 	 */
 	public function is_compressor_available( $compressor = null ) {
 		// If input parameter is empty, then fail.
-		if ( true === empty( $compressor ) || true === empty( $this->available_compressors ) ) {
+		if ( empty( $compressor ) || empty( $this->available_compressors ) ) {
 			return false;
 		}
 
@@ -395,7 +394,7 @@ class Boldgrid_Backup_Admin_Config {
 	 */
 	public function get_available_compressors() {
 		// If at least one compressor is already configured, then return TRUE.
-		if ( false === empty( $this->available_compressors ) ) {
+		if ( ! empty( $this->available_compressors ) ) {
 			return $this->available_compressors;
 		}
 

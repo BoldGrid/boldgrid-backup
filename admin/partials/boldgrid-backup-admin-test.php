@@ -8,6 +8,7 @@
  * @package Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin/partials
  */
+
 ?>
 <div class='functionality-test-section wrap'>
 <h1><?php esc_html_e( 'BoldGrid Backup', 'boldgrid-backup' ); ?></h1>
@@ -22,84 +23,84 @@ printf(
 <p><?php
 	esc_html_e(
 		'Home directory writable? ' .
-		( true === $home_dir_writable ? 'Yes' : 'No' ),
+		( $home_dir_writable ? 'Yes' : 'No' ),
 		'boldgrid-backup'
 	);
 ?></p>
 <p><?php
 	esc_html_e(
 		'WordPress directory writable? ' .
-		( true === $this->test->get_is_abspath_writable() ? 'Yes' : 'No' ),
+		( $this->test->get_is_abspath_writable() ? 'Yes' : 'No' ),
 		'boldgrid-backup'
 	);
 ?></p>
 <p><?php
 	esc_html_e(
 		'Backup directory exists? ' .
-		( true === empty( $backup_directory ) ? 'No' : 'Yes' ),
+		( empty( $backup_directory ) ? 'No' : 'Yes' ),
 		'boldgrid-backup'
 	);
 ?></p>
 <p><?php
 	esc_html_e(
 		'PHP ZipArchive available? ' .
-		( true === $this->config->is_compressor_available( 'php_zip' ) ? 'Yes' : 'No' ),
+		( $this->config->is_compressor_available( 'php_zip' ) ? 'Yes' : 'No' ),
 		'boldgrid-backup'
 	);
 ?></p>
 <p><?php
 esc_html_e(
 	'PHP Bzip2 available? ' .
-	( true === $this->config->is_compressor_available( 'php_bz2' ) ? 'Yes' : 'No' ),
+	( $this->config->is_compressor_available( 'php_bz2' ) ? 'Yes' : 'No' ),
 	'boldgrid-backup'
 );
 ?></p>
 <p><?php
 esc_html_e(
 	'PHP Zlib available? ' .
-	( true === $this->config->is_compressor_available( 'php_zlib' ) ? 'Yes' : 'No' ),
+	( $this->config->is_compressor_available( 'php_zlib' ) ? 'Yes' : 'No' ),
 	'boldgrid-backup'
 );
 ?></p>
 <p><?php
 esc_html_e(
 	'PHP LZF available? ' .
-	( true === $this->config->is_compressor_available( 'php_lzf' ) ? 'Yes' : 'No' ),
+	( $this->config->is_compressor_available( 'php_lzf' ) ? 'Yes' : 'No' ),
 	'boldgrid-backup'
 );
 ?></p>
 <p><?php
 esc_html_e(
 	'System TAR available? ' .
-	( true === $this->config->is_compressor_available( 'system_tar' ) ? 'Yes' : 'No' ),
+	( $this->config->is_compressor_available( 'system_tar' ) ? 'Yes' : 'No' ),
 	'boldgrid-backup'
 );
 ?></p>
 <p><?php
 esc_html_e(
 	'System ZIP available? ' .
-	( true === $this->config->is_compressor_available( 'system_zip' ) ? 'Yes' : 'No' ),
+	( $this->config->is_compressor_available( 'system_zip' ) ? 'Yes' : 'No' ),
 	'boldgrid-backup'
 );
 ?></p>
 <p><?php
 esc_html_e(
 	'PHP in safe mode? ' .
-	( true === $this->test->is_php_safemode() ? 'Yes' : 'No' ),
+	( $this->test->is_php_safemode() ? 'Yes' : 'No' ),
 	'boldgrid-backup'
 );
 ?></p>
 <p><?php
 esc_html_e(
 	'System mysqldump available? ' .
-	( true === $this->test->is_mysqldump_available() ? 'Yes' : 'No' ),
+	( $this->test->is_mysqldump_available() ? 'Yes' : 'No' ),
 	'boldgrid-backup'
 );
 ?></p>
 <p><?php
 esc_html_e(
 	'System crontab available? ' .
-	( true === $this->test->is_crontab_available() ? 'Yes' : 'No' ),
+	( $this->test->is_crontab_available() ? 'Yes' : 'No' ),
 	'boldgrid-backup'
 );
 ?></p>
@@ -120,7 +121,7 @@ esc_html_e(
 );
 ?></p>
 <?php
-if ( true === $is_functional ) {
+if ( $is_functional ) {
 ?>
 <p><?php
 printf(
@@ -141,7 +142,7 @@ printf(
 );
 ?></p>
 <?php
-	if ( false === empty( $disk_space[3] ) ) {
+if ( ! empty( $disk_space[3] ) ) {
 ?>
 <p><?php
 printf(
@@ -150,7 +151,7 @@ printf(
 );
 ?></p>
 <?php
-	}
+}
 ?>
 <p><?php
 printf(
@@ -171,54 +172,54 @@ printf(
 );
 ?></p>
 <?php
-	if ( false === empty( $archive_info['error'] ) ) {
+if ( ! empty( $archive_info['error'] ) ) {
 ?>
 <p><?php
-printf(
-	esc_html__( 'Archive error: %s', 'boldgrid-backup'),
-	$archive_info['error']
-);
+	printf(
+		esc_html__( 'Archive error: %s', 'boldgrid-backup' ),
+		$archive_info['error']
+	);
 ?></p>
 <?php
-		if ( false === empty( $archive_info['error_code'] ) ) {
+if ( ! empty( $archive_info['error_code'] ) ) {
 ?>
 <p><?php
-printf(
-	esc_html__( 'Compressor error code: %s', 'boldgrid-backup' ),
-	$archive_info['error_code']
-);
+		printf(
+			esc_html__( 'Compressor error code: %s', 'boldgrid-backup' ),
+			$archive_info['error_code']
+		);
 ?></p>
 <?php
-			if ( false === empty( $archive_info['error_message'] ) ) {
+if ( ! empty( $archive_info['error_message'] ) ) {
 ?>
 <p><?php
-printf(
-	esc_html__( 'Compressor error message: %s', 'boldgrid-backup' ),
-	$archive_info['error_message']
-);
+			printf(
+				esc_html__( 'Compressor error message: %s', 'boldgrid-backup' ),
+				$archive_info['error_message']
+			);
 ?></p>
 <?php
-			}
-		}
-	}
+}
+}
+}
 
-	if ( false === empty( $archive_info['total_size'] ) ) {
+if ( ! empty( $archive_info['total_size'] ) ) {
 ?>
 <p><?php
-printf(
-	esc_html__( 'Backup archive size: %s', 'boldgrid-backup' ),
-	Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] )
-);
+	printf(
+		esc_html__( 'Backup archive size: %s', 'boldgrid-backup' ),
+		Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] )
+	);
 ?></p>
 <?php
-		// Calculate possible disk free space after a backup, using the entire WP directory size.
-		$disk_free_post = $disk_space[2] - $archive_info['total_size'] - $db_size;
-	} else {
-		// Calculate possible disk free space after a backup, using the entire WP directory size.
-		$disk_free_post = $disk_space[2] - $disk_space[3] - $db_size;
-	}
+	// Calculate possible disk free space after a backup, using the entire WP directory size.
+	$disk_free_post = $disk_space[2] - $archive_info['total_size'] - $db_size;
+} else {
+	// Calculate possible disk free space after a backup, using the entire WP directory size.
+	$disk_free_post = $disk_space[2] - $disk_space[3] - $db_size;
+}
 
-	if ( $disk_free_post > 0 ) {
+if ( $disk_free_post > 0 ) {
 ?>
 <p><?php
 printf(
@@ -227,14 +228,14 @@ printf(
 );
 ?></p>
 <?php
-	} else {
+} else {
 ?>
 <p><?php esc_html_e( 'THERE IS NOT ENOUGH SPACE TO PERFORM A BACKUP!', 'boldgrid-backup' ); ?></p>
 <?php
-	}
+}
 }
 ?>
 <p><?php
-esc_html_e( 'Functionality test status: ' . ( $this->test->get_is_functional() ? 'PASS' : 'FAIL' ) );
+esc_html_e( 'Functionality test status: ' . ( $this->test->run_functionality_tests() ? 'PASS' : 'FAIL' ) );
 ?></p>
 </div>
