@@ -25,17 +25,17 @@
  */
 
 // If this file is called directly, abort.
-if ( false === defined( 'WPINC' ) ) {
+if ( ! defined( 'WPINC' ) ) {
 	die();
 }
 
 // Define version.
-if ( false === defined( 'BOLDGRID_BACKUP_VERSION' ) ) {
+if ( ! defined( 'BOLDGRID_BACKUP_VERSION' ) ) {
 	define( 'BOLDGRID_BACKUP_VERSION', '1.2.1' );
 }
 
 // Define boldgrid-backup path.
-if ( false === defined( 'BOLDGRID_BACKUP_PATH' ) ) {
+if ( ! defined( 'BOLDGRID_BACKUP_PATH' ) ) {
 	define( 'BOLDGRID_BACKUP_PATH', dirname( __FILE__ ) );
 }
 
@@ -75,31 +75,25 @@ function run_boldgrid_backup() {
 }
 
 // Load the plugin only if on a wp-admin page or when DOING_CRON.
-if ( true === is_admin() || ( true === defined( 'DOING_CRON' ) && DOING_CRON ) ) {
+if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) ) {
 	require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup.php';
 	run_boldgrid_backup();
 }
 
 // If DOING_CRON, then check if this plugin should be auto-updated.
-if ( true === defined( 'DOING_CRON' ) && DOING_CRON ){
+if ( defined( 'DOING_CRON' ) && DOING_CRON ) {
 	// Ensure required definitions for pluggable.
-	if ( false === defined( 'AUTH_COOKIE' ) ) {
+	if ( ! defined( 'AUTH_COOKIE' ) ) {
 		define( 'AUTH_COOKIE', null );
 	}
 
-	if ( false === defined( 'LOGGED_IN_COOKIE' ) ) {
+	if ( ! defined( 'LOGGED_IN_COOKIE' ) ) {
 		define( 'LOGGED_IN_COOKIE', null );
 	}
 
-	// Load the pluggable class, if needed.
-	require_once ABSPATH . 'wp-includes/pluggable.php';
-
-	// Include the update class.
-	require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-update.php';
-
 	// Instantiate the update class.
-	$plugin_update = new Boldgrid_Backup_Admin_Update();
+	$plugin_update = new Boldgrid_Backup_Admin_Update( 'boldgrid-backup', BOLDGRID_BACKUP_VERSION );
 
 	// Check and update plugins.
-	$plugin_update->wp_update_this_plugin( 'boldgrid-backup', BOLDGRID_BACKUP_VERSION );
+	$plugin_update->wp_update_this_plugin();
 }

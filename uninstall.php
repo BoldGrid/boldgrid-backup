@@ -9,7 +9,7 @@
  */
 
 // If uninstall not called from WordPress, then exit.
-if ( false === defined( 'WP_UNINSTALL_PLUGIN' ) ) {
+if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit();
 }
 
@@ -20,14 +20,6 @@ $delete_options = array(
 	'boldgrid_backup_pending_rollback',
 );
 
-$is_mutlisite = is_multisite();
-
-if ( true === $is_multisite ) {
-	foreach ( $delete_options as $option ) {
-		delete_site_option( $option );
-	}
-} else {
-	foreach ( $delete_options as $option ) {
-		delete_option( $option );
-	}
+foreach ( $delete_options as $option ) {
+	delete_site_option( $option );
 }

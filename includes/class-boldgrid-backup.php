@@ -64,7 +64,7 @@ class Boldgrid_Backup {
 	 */
 	public function __construct() {
 		$this->plugin_name = 'boldgrid-backup';
-		$this->version = ( true === defined( 'BOLDGRID_BACKUP_VERSION' ) ? BOLDGRID_BACKUP_VERSION : '' );
+		$this->version = ( defined( 'BOLDGRID_BACKUP_VERSION' ) ? BOLDGRID_BACKUP_VERSION : '' );
 
 		$this->load_dependencies();
 		$this->set_locale();
@@ -183,6 +183,12 @@ class Boldgrid_Backup {
 
 		// Instantiate the admin core.
 		$plugin_admin_core = new Boldgrid_Backup_Admin_Core();
+
+		// Instantiate the admin update class, if not already done for cron.
+		if ( ! defined( 'DOING_CRON' ) || ! DOING_CRON ) {
+			$plugin_admin_update = new Boldgrid_Backup_Admin_Update( 'boldgrid-backup',
+			BOLDGRID_BACKUP_VERSION );
+		}
 
 		// Add nav menu items.
 		$this->loader->add_action( 'admin_menu', $plugin_admin_core,
