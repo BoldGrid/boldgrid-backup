@@ -134,9 +134,6 @@ class Boldgrid_Backup_Admin_Cron {
 			return;
 		}
 
-		// Determine if multisite.
-		$is_multisite = is_multisite();
-
 		// If a backup was not made prior to an update (from an update page), then abort.
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
 
