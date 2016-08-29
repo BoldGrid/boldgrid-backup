@@ -64,11 +64,8 @@ class Boldgrid_Backup_Admin_Update {
 		// Set the plugin version.
 		$this->version = $version;
 
-		// Load the WordPress pluggable class, if needed.
-		require_once ABSPATH . 'wp-includes/pluggable.php';
-
-		// Only for admin pages where the current user can update plugins.
-		if ( is_admin() && current_user_can( 'update_plugins' ) ) {
+		// Only for admin pages.
+		if ( is_admin() ) {
 			// Get the current WordPress page filename.
 			global $pagenow;
 

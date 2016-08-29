@@ -91,6 +91,9 @@ if ( defined( 'DOING_CRON' ) && DOING_CRON ) {
 		define( 'LOGGED_IN_COOKIE', null );
 	}
 
+	// Load the WordPress pluggable class, if needed.
+	require_once ABSPATH . 'wp-includes/pluggable.php';
+
 	// Instantiate the update class.
 	$plugin_update = new Boldgrid_Backup_Admin_Update( 'boldgrid-backup', BOLDGRID_BACKUP_VERSION );
 

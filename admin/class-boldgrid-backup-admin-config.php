@@ -206,6 +206,9 @@ class Boldgrid_Backup_Admin_Config {
 			$backup_directory_path = $home_dir . '/boldgrid_backup';
 		}
 
+		// Initialize WP_Filesystem.
+		WP_Filesystem();
+
 		// Connect to the WordPress Filesystem API.
 		global $wp_filesystem;
 
