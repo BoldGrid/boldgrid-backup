@@ -181,7 +181,6 @@ class Boldgrid_Backup_Admin_Update {
 				$version_data->updated = time();
 
 				// Save the update data in a transient.
-				delete_site_transient( 'boldgrid_backup_version_data' );
 				set_site_transient( 'boldgrid_backup_version_data', $version_data,
 				8 * HOUR_IN_SECONDS );
 			} else {
