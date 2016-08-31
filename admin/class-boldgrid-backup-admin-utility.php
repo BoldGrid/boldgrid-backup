@@ -488,7 +488,7 @@ class Boldgrid_Backup_Admin_Utility {
 		if ( $is_path ) {
 			$index = $zip->locateName( $locate_file );
 		} else {
-			$index = $zip->locateName( $$locate_file, ZipArchive::FL_NODIR );
+			$index = $zip->locateName( $locate_file, ZipArchive::FL_NODIR );
 		}
 
 		// Close the ZIP file.
