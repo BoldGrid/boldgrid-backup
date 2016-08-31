@@ -53,18 +53,7 @@ function activate_boldgrid_backup() {
  * This action is documented in includes/class-boldgrid-backup-deactivator.php
  */
 function deactivate_boldgrid_backup() {
-	// Require dependent files.
-	require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-config.php';
-	require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-core.php';
-	require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-cron.php';
-	require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-notice.php';
-	require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-settings.php';
-	require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-test.php';
-	require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-update.php';
-	require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-xhprof.php';
 	require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-deactivator.php';
-
-	// Deactivate.
 	Boldgrid_Backup_Deactivator::deactivate();
 }
 
