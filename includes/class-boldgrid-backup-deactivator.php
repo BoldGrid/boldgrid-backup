@@ -27,20 +27,5 @@ class Boldgrid_Backup_Deactivator {
 	 * @since 1.0
 	 */
 	public static function deactivate() {
-		// Require dependent files.
-		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-config.php';
-		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-core.php';
-		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-cron.php';
-		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-notice.php';
-		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-settings.php';
-		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-test.php';
-		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-update.php';
-		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-xhprof.php';
-
-		// Instantiate the admin core.
-		$plugin_admin_core = new Boldgrid_Backup_Admin_Core();
-
-		// Delete cron jobs for backup tasks.
-		$plugin_admin_core->cron->delete_cron_entries();
 	}
 }
