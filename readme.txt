@@ -20,6 +20,9 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 
 == Changelog ==
 
+= 1.2.3 IN progress =
+* Bug fix:		JIRA WPB-2347	Fixed typo in archive deletion confirmation dialogue.
+
 = 1.2.2 =
 * Bug fix:		JIRA WPB-2314	Fixed errors during deactivation.
 * Bug fix:		JIRA WPB-2311	Update class was not getting current plugin version.

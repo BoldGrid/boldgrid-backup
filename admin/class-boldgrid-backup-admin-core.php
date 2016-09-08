@@ -2018,7 +2018,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Create text for the deletion confirmation.
 		$delete_confirm_text = esc_html__(
-			'Please confirm the deletion the archive file:' . PHP_EOL,
+			'Please confirm the deletion of the archive file:' . PHP_EOL,
 			'boldgrid-backup'
 		);
 
