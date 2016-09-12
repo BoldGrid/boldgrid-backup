@@ -151,7 +151,8 @@ class Boldgrid_Backup_Admin_Update {
 		 */
 		if ( ! empty( $configs ) && ( ! $version_data || ( $is_force_check && $is_data_old ) ) ) {
 			// Determine the plugin update release channel.
-			$options = get_site_option( 'boldgrid_settings' );
+			( $options = get_site_option( 'boldgrid_settings' ) ) ||
+			( $options = get_option( 'boldgrid_settings' ) );
 
 			// Set the release channel.
 			$channel = (
