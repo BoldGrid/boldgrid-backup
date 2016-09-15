@@ -24,32 +24,47 @@
  * 	@type int $filesize The archive file size in bytes.
  * 	@type int $lastmodunix The archive file modification time in unix seconds.
  * }
+ * @param string $backup_identifier The backup identifier for this installation.
  */
 
 ?>
 <div class='wrap'>
 <h1>BoldGrid Backup</h1>
 <hr />
-<h2>Backup Archive Summary</h2>
+<h2><?php esc_html_e( 'Backup Archive Summary', 'boldgrid-backup' ); ?></h2>
 <table id='backup-archive-summary-table'>
 	<tbody id='backup-archive-list-header'>
 		<tr>
-			<td class='backup-archive-summary-metric'>Archive Count:</td>
-			<td class='backup-archive-summary-value' id='archives-count'><?php echo $archives_count; ?></td>
+			<td class='backup-archive-summary-metric'>
+				<?php esc_html_e( 'Archive Count', 'boldgrid-backup' ); ?>:
+			</td>
+			<td class='backup-archive-summary-value' id='archives-count'>
+				<?php echo $archives_count; ?>
+			</td>
 		</tr>
 		<tr>
-			<td class='backup-archive-summary-metric'>Total Size:</td>
-			<td class='backup-archive-summary-value' id='archives-size'><?php echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archives_size );?></td>
+			<td class='backup-archive-summary-metric'>
+				<?php esc_html_e( 'Total Size', 'boldgrid-backup' ); ?>:
+			</td>
+			<td class='backup-archive-summary-value' id='archives-size'>
+				<?php echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archives_size );?>
+			</td>
 		</tr>
 	</tbody>
 </table>
-<h2>Backup Archives</h2>
+<h2><?php esc_html_e( 'Backup Archives', 'boldgrid-backup' ); ?></h2>
 <table id='backup-archive-list-table'>
 	<thead id='backup-archive-list-header'>
 		<tr>
-			<th class='backup-archive-list-path'>Filename</th>
-			<th class='backup-archive-list-size'>Size</th>
-			<th class='backup-archive-list-date'>Date</th>
+			<th class='backup-archive-list-path'>
+				<?php esc_html_e( 'Filename', 'boldgrid-backup' ); ?>
+			</th>
+			<th class='backup-archive-list-size'>
+				<?php esc_html_e( 'Size', 'boldgrid-backup' ); ?>
+			</th>
+			<th class='backup-archive-list-date'>
+				<?php esc_html_e( 'Date', 'boldgrid-backup' ); ?>
+			</th>
 			<th class='backup-archive-list-download'></th>
 			<th class='backup-archive-list-restore'></th>
 		</tr>
@@ -68,7 +83,14 @@ if ( ! empty( $archives ) ) {
 } else {
 ?>
 	<tr>
-		<td colspan='3'>There are no archives for this site in the backup directory.</td>
+		<td colspan='3'>
+			<?php
+			esc_html_e(
+				'There are no archives for this site in the backup directory.',
+				'boldgrid-backup'
+			);
+			?>
+		</td>
 	</tr>
 <?php
 }
@@ -92,28 +114,49 @@ if ( ! empty( $archives ) ) {
 	</form>
 </div>
 <div id='backup-site-now-results'></div>
-<h2>Upload a Backup Archive</h2>
+<h2><?php esc_html_e( 'Upload a Backup Archive', 'boldgrid-backup' ); ?></h2>
 <div id="upload-archive-section">
-	<form id="upload-archive-form" method="POST" enctype="multipart/form-data">
+	<form id="upload-archive-form" method="POST"
+	enctype="multipart/form-data">
 		<input type="hidden" name="MAX_FILE_SIZE" value="1000000000" />
+		<input type="hidden" name="uploading" value="1" />
 		<?php wp_nonce_field( 'upload_archive_file' ); ?>
 		<input name="file" type="file" />
 		<br />
-		File size limit: <?php
-		echo Boldgrid_Backup_Admin_Utility::bytes_to_human(
+		<?php
+		// Print the file upload limit.
+		echo esc_html__( 'File size limit', 'boldgrid-backup' ) . ': ' .
+		Boldgrid_Backup_Admin_Utility::bytes_to_human(
 			Boldgrid_Backup_Admin_Utility::get_upload_limit()
 		);
 		?>
-		<span class='dashicons dashicons-editor-help' title='<?php
-				esc_html_e(
-					'To change the limit, you may be able to modify your server\'s php.ini or .htaccess file.  Please ask your web hosting provider if you need assistance.',
-					'boldgrid-backup'
-				);
-		?>'></span>
+		<span class="dashicons dashicons-editor-help" aria-expanded="false"></span>
+		<p class="help">
+			<?php
+			esc_html_e(
+				'To change the limit, you may be able to modify your server\'s php.ini or .htaccess file.  Please ask your web hosting provider if you need assistance.',
+				'boldgrid-backup'
+			);
+			?>
+		</p>
 		<p>
 			<input class="button" type="submit" value="Upload" />
 			<span class='spinner'></span>
 		</p>
 	</form>
 </div>
+<h2><?php esc_html_e( 'Backup Id', 'boldgrid-backup' ); ?></h2>
+<?php
+// Print the backup identifier.
+echo esc_html__( 'BoldGrid Backup id', 'boldgrid-backup' ) . ': ' . $backup_identifier;
+?>
+ <span class="dashicons dashicons-editor-help" aria-expanded="false"></span>
+<p class="help">
+	<?php
+	esc_html_e(
+		'The backup id is used to determine if a backup archive file is associated with this WordPress installation.',
+		'boldgrid-backup'
+	);
+	?>
+</p>
 </div>

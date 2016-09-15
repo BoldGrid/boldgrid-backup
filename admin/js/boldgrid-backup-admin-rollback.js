@@ -89,7 +89,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			markup = '<div class="notice notice-error"><p>There was an error processing your request.  Please reload the page and try again.</p></div>';
 
 			$cancelRollbackResults.html( markup );
-		}
+		};
 
 		// Generate a data array for the download request.
 		data = {
@@ -169,7 +169,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		} else {
 			return false;
 		}
-	}
+	};
 
 	/**
 	 * Namespace BOLDGRID.BACKUP.RollbackTimer.
@@ -198,7 +198,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 					'total': 0,
 					'minutes': '0',
 					'seconds': '00',
-				}
+				};
 			}
 
 			// Calculate seconds, minutes, hours, days.

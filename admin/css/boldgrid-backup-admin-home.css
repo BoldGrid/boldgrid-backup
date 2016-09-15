@@ -26,3 +26,14 @@
 	display: none;
 	float: none !important;
 }
+
+.dashicons-editor-help {
+	cursor: pointer;
+}
+
+.help {
+	display: none;
+	font-style: italic;
+	font-weight: normal;
+	text-transform: none;
+}

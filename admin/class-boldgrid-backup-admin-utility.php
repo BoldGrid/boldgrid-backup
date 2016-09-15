@@ -568,4 +568,169 @@ class Boldgrid_Backup_Admin_Utility {
 		// Return success.
 		return true;
 	}
+
+	/**
+	 * Chmod a directory or file.
+	 *
+	 * @since 1.2.2
+	 *
+	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
+	 *
+	 * @param string $file Path to a directory or file.
+	 * @param int    $mode 	(Optional) The permissions as octal number, usually 0644 for files, 0755 for dirs.
+	 * @return bool
+	 */
+	public static function chmod( $file, $mode = false ) {
+		// Connect to the WordPress Filesystem API.
+		global $wp_filesystem;
+
+		// Modify the file permissions.
+		$result = $wp_filesystem->chmod( $file, $mode );
+
+		// Return the result.
+		return $result;
+	}
+
+	/**
+	 * Fix wp-config.php file.
+	 *
+	 * If restoring "wp-config.php", then ensure that the credentials remain intact.
+	 *
+	 * @since 1.2.2
+	 *
+	 * @see http://us1.php.net/manual/en/function.preg-replace.php#103985
+	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
+	 *
+	 * @static
+	 *
+	 * @return bool
+	 */
+	public static function fix_wpconfig() {
+		// Connect to the WordPress Filesystem API.
+		global $wp_filesystem;
+
+		// Set the file path.
+		$file = ABSPATH . 'wp-config.php';
+
+		// Abort if the file does not exist.
+		if ( ! $wp_filesystem->exists( $file ) ) {
+			return false;
+		}
+
+		// Get the file contents.
+		$file_contents = $wp_filesystem->get_contents( $file );
+
+		// Create an array containing the definition names to replace.
+		$definitions = array(
+			'DB_NAME',
+			'DB_USER',
+			'DB_PASSWORD',
+			'DB_HOST',
+			'AUTH_KEY',
+			'SECURE_AUTH_KEY',
+			'LOGGED_IN_KEY',
+			'NONCE_KEY',
+			'AUTH_SALT',
+			'SECURE_AUTH_SALT',
+			'LOGGED_IN_SALT',
+			'NONCE_SALT',
+		);
+
+		// Replace the definitions.
+		foreach ( $definitions as $definition ) {
+			// If the definition does not exist, then skip it.
+			if ( ! defined( $definition ) ) {
+				continue;
+			}
+
+			// Replace $n ($0-$99) backreferences before preg_replace.
+			// @see http://us1.php.net/manual/en/function.preg-replace.php#103985 .
+			$value = preg_replace( '/\$(\d)/', '\\\$$1', constant( $definition ) );
+
+			// Replace definition.
+			$file_contents = preg_replace(
+				'#define.*?' . $definition . '.*?;#',
+				"define('" . $definition . "', '" . $value . "');",
+				$file_contents,
+				1
+			);
+
+			// If there was a failure, then abort.
+			if ( null === $file_contents ) {
+				return false;
+			}
+		}
+
+		// Write the changes to file.
+		$wp_filesystem->put_contents( $file, $file_contents, 0600 );
+
+		return true;
+	}
+
+	/**
+	 * Replace the siteurl in the WordPress database.
+	 *
+	 * @since 1.2.3
+	 *
+	 * @global wpdb $wpdb The WordPress database class object.
+	 *
+	 * @static
+	 *
+	 * @param string $old_siteurl The old/restored siteurl to find and be replaced.
+	 * @param string $new_siteurl The siteurl to replace the old siteurl.
+	 * @return bool
+	 */
+	public static function update_siteurl( $old_siteurl, $new_siteurl ) {
+		// Define filter options.
+		$filter_options = FILTER_FLAG_SCHEME_REQUIRED | FILTER_FLAG_HOST_REQUIRED;
+
+		// Validate the old siteurl.
+		if ( false === filter_var( $old_siteurl, FILTER_VALIDATE_URL, $filter_options ) ) {
+			return false;
+		}
+
+		// Validate the new siteurl.
+		if ( false === filter_var( $replace, FILTER_VALIDATE_URL, $filter_options ) ) {
+			return false;
+		}
+
+		// Ensure there are no trailing slashes in siteurl.
+		$old_siteurl = untrailingslashit( $old_siteurl );
+		$new_siteurl = untrailingslashit( $new_siteurl );
+
+		// Update the WP otion "siteurl".
+		update_option( 'siteurl', $wp_siteurl );
+
+		// Connect to the WordPress database via $wpdb.
+		global $wpdb;
+
+		// Get the database prefix (blog id 1 or 0 gets the base prefix).
+		$db_prefix = $wpdb->get_blog_prefix( 1 );
+
+		// Replace the URL in wp_posts.
+		$wpdb->query(
+			$wpdb->prepare(
+				'UPDATE `%sposts` SET `post_content` = REPLACE( `post_content`, %s, %s );',
+				array(
+					$db_prefix,
+					$old_siteurl,
+					$replace,
+				)
+			)
+		);
+
+		// Check if the upload_url_path needs to be updated.
+		$upload_url_path = get_option( 'upload_url_path' );
+
+		if ( ! empty( $upload_url_path ) ) {
+			$upload_url_path = str_replace( $old_siteurl, $new_siteurl, $upload_url_path );
+
+			update_option( 'upload_url_path', $upload_url_path );
+		}
+
+		// Find references of the old siteurl in WP options, then replace them.
+
+
+		return true;
+	}
 }

@@ -132,7 +132,7 @@ foreach ( $archives as $key => $archive ) {
 </div>
 <?php
 	} else {
-		// Error creating backup.
+		// Error creating or restoring a backup archive file.
 		?>
 <div class="notice notice-error"><p><?php
 if ( ! empty( $_POST['restore_now'] ) ) {

@@ -60,6 +60,9 @@
 					}
 				}
 		);
+
+		// On click action for toggling a help section.
+		$( '.dashicons-editor-help' ).on( 'click', self.toggleHelp );
 	} );
 
 	/**
@@ -160,7 +163,7 @@
 			// Prevent default browser action.
 			e.preventDefault();
 		}
-	}
+	};
 
 	/**
 	 * Confirm to delete a selected backup archive file.
@@ -193,7 +196,7 @@
 			// Prevent default browser action.
 			e.preventDefault();
 		}
-	}
+	};
 
 	/**
 	 * Perform a backup now.
@@ -242,7 +245,7 @@
 				'</p></div>';
 
 			$backupSiteResults.html( markup );
-		}
+		};
 
 		// Generate the data array.
 		data = {
@@ -303,7 +306,7 @@
 
 		// Prevent default browser action.
 		e.preventDefault();
-	}
+	};
 
 	/**
 	 * Confirm to delete a selected backup archive file.
@@ -316,7 +319,6 @@
 
         // Disable the Upload button.
 		$this
-			.attr( 'disabled', 'disabled' )
 			.css( 'pointer-events', 'none' );
 
 		// Show the spinner.
@@ -325,6 +327,14 @@
 				.find( '.spinner' )
 					.addClass( 'is-active' )
 					.css( 'display', 'inline-block' );
-	}
+	};
 
+	/**
+	 * Toggle a help section.
+	 *
+	 * @since 1.2.2
+	 */
+	self.toggleHelp = function() {
+		$( this ).next().toggle();
+	};
 } )( jQuery );

@@ -149,6 +149,11 @@ class Boldgrid_Backup {
 		 */
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-xhprof.php';
 
+		/**
+		 * The class responsible for the plugin file upload functionality in the admin area.
+		 */
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-upload.php';
+
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
 
