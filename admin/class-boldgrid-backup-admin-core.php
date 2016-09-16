@@ -708,11 +708,11 @@ class Boldgrid_Backup_Admin_Core {
 	 * @see Boldgrid_Backup_Admin_Test::run_functionality_tests()
 	 * @see Boldgrid_Backup_Admin_Config::get_backup_directory()
 	 * @see Boldgrid_Backup_Admin_Core::execute_command()
-	 * @see Boldgrid_Backup_Admin_Utility::update_hyperlinks()
+	 * @see Boldgrid_Backup_Admin_Utility::update_siteurl()
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 * @global wpdb $wpdb The WordPress database class object.
 	 *
-	 * @param string $db_dump_filepath FIle path to the mysql dump file.
+	 * @param string $db_dump_filepath File path to the mysql dump file.
 	 * @param string $db_prefix The database prefix to use, if restoring and it changed.
 	 * @return bool Status of the operation.
 	 */
@@ -818,11 +818,27 @@ class Boldgrid_Backup_Admin_Core {
 
 		// If changed, then update the siteurl in the database.
 		if ( $restored_wp_siteurl !== $wp_siteurl ) {
-			Boldgrid_Backup_Admin_Utility::update_siteurl( $restored_wp_siteurl, $wp_siteurl );
+			$update_siteurl_success =
+				Boldgrid_Backup_Admin_Utility::update_siteurl( $restored_wp_siteurl, $wp_siteurl );
+
+			if ( ! $update_siteurl_success ) {
+				// Display an error notice.
+				do_action(
+					'boldgrid_backup_notice',
+					esc_html__(
+						'The WordPress siteurl has changed.  There was an issue changing it back.  You will have to fix the siteurl manually in the database, or use an override in your wp-config.php file.',
+						'boldgrid-backup'
+					),
+					'notice notice-error is-dismissible'
+				);
+			}
 		}
 
 		// If changed, then restore the WP Option for "home".
 		if ( $restored_wp_home !== $wp_home ) {
+			// Ensure there are no trailing slashes in siteurl.
+			$wp_home = untrailingslashit( $wp_home );
+
 			update_option( 'home', $wp_home );
 		}
 
@@ -2072,7 +2088,7 @@ class Boldgrid_Backup_Admin_Core {
 		// Enqueue CSS for the home page.
 		wp_enqueue_style( 'boldgrid-backup-admin-home',
 			plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-home.css', array(),
-			BOLDGRID_BACKUP_VERSION, 'all'
+			BOLDGRID_BACKUP_VERSION
 		);
 
 		// Register the JS for the home page.

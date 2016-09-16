@@ -197,7 +197,7 @@ class Boldgrid_Backup {
 
 		// Add nav menu items.
 		$this->loader->add_action( 'admin_menu', $plugin_admin_core,
-			'add_menu_items', 1002
+			'add_menu_items'
 		);
 
 		// Add a custom action for admin notices.

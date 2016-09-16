@@ -649,7 +649,7 @@ class Boldgrid_Backup_Admin_Utility {
 
 			// Replace definition.
 			$file_contents = preg_replace(
-				'#define.*?' . $definition . '.*?;#',
+				'#define.*?' . $definition . '.*;#',
 				"define('" . $definition . "', '" . $value . "');",
 				$file_contents,
 				1
@@ -672,6 +672,7 @@ class Boldgrid_Backup_Admin_Utility {
 	 *
 	 * @since 1.2.3
 	 *
+	 * @see Boldgrid_Backup_Admin_Utility::str_replace_recursive()
 	 * @global wpdb $wpdb The WordPress database class object.
 	 *
 	 * @static
@@ -690,7 +691,7 @@ class Boldgrid_Backup_Admin_Utility {
 		}
 
 		// Validate the new siteurl.
-		if ( false === filter_var( $replace, FILTER_VALIDATE_URL, $filter_options ) ) {
+		if ( false === filter_var( $new_siteurl, FILTER_VALIDATE_URL, $filter_options ) ) {
 			return false;
 		}
 
@@ -699,7 +700,7 @@ class Boldgrid_Backup_Admin_Utility {
 		$new_siteurl = untrailingslashit( $new_siteurl );
 
 		// Update the WP otion "siteurl".
-		update_option( 'siteurl', $wp_siteurl );
+		update_option( 'siteurl', $new_siteurl );
 
 		// Connect to the WordPress database via $wpdb.
 		global $wpdb;
@@ -710,11 +711,11 @@ class Boldgrid_Backup_Admin_Utility {
 		// Replace the URL in wp_posts.
 		$wpdb->query(
 			$wpdb->prepare(
-				'UPDATE `%sposts` SET `post_content` = REPLACE( `post_content`, %s, %s );',
+				'UPDATE `%1$sposts` SET `post_content` = REPLACE( `post_content`, %2$s, %3$s ) WHERE `post_content` LIKE \'%%%2$s%%\';',
 				array(
 					$db_prefix,
 					$old_siteurl,
-					$replace,
+					$new_siteurl,
 				)
 			)
 		);
@@ -728,9 +729,83 @@ class Boldgrid_Backup_Admin_Utility {
 			update_option( 'upload_url_path', $upload_url_path );
 		}
 
-		// Find references of the old siteurl in WP options, then replace them.
+		// Find old siteurl references in WP options.
+		$matched_options = $wpdb->get_results(
+			$wpdb->prepare(
+				'SELECT `option_name` FROM `%1$soptions` WHERE `option_value` LIKE \'%%%2$s%%\' OR `option_value` LIKE \'%%%3$s%%\';',
+				array(
+					$db_prefix,
+					$old_siteurl,
+					addslashes( $old_siteurl ),
+				)
+			),
+			ARRAY_N
+		);
 
+		// If there are no matches options, then return.
+		if ( ! $matched_options ) {
+			return true;
+		}
+
+		// Replace the siteurl in matched options.
+		foreach ( $matched_options as $option_name ) {
+			$option_value = get_option( $option_name[0] );
+
+			// Replace siteurl.
+			$option_value = Boldgrid_Backup_Admin_Utility::str_replace_recursive(
+				$old_siteurl,
+				$new_siteurl,
+				$option_value
+			);
+
+			// Replace siteurl escaped with slashes.
+			$option_value = Boldgrid_Backup_Admin_Utility::str_replace_recursive(
+				addslashes( $old_siteurl ),
+				addslashes( $new_siteurl ),
+				$option_value
+			);
+
+			update_option( $option_name[0], $option_value );
+		}
 
 		return true;
+	}
+
+	/**
+	 * Replace string(s) in a string or recurively in an array or object.
+	 *
+	 * @since 1.2.3
+	 *
+	 * @static
+	 *
+	 * @param string $search Search string.
+	 * @param string $replace Replace string.
+	 * @param mixed  $subject Input subject (array|object|string).
+	 * @return mixed The input subject with recursive string replacements.
+	 */
+	public static function str_replace_recursive( $search, $replace, $subject ) {
+		if ( is_string( $subject ) ) {
+			$subject = str_replace( $search, $replace, $subject );
+		} elseif ( is_array( $subject ) ) {
+			foreach ( $subject as $index => $element ) {
+				// Recurse.
+				$subject[ $index ] = Boldgrid_Backup_Admin_Utility::str_replace_recursive(
+					$search,
+					$replace,
+					$element
+				);
+			}
+		} elseif ( is_object( $subject ) ) {
+			foreach ( $subject as $index => $element ) {
+				// Recurse.
+				$subject->$index = Boldgrid_Backup_Admin_Utility::str_replace_recursive(
+					$search,
+					$replace,
+					$element
+				);
+			}
+		}
+
+		return $subject;
 	}
 }
