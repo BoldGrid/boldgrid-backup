@@ -2022,10 +2022,14 @@ class Boldgrid_Backup_Admin_Core {
 				$db_prefix = null;
 
 				// Get the database table prefix from the new "wp-config.php" file, if exists.
-				if ( ! empty( $file_contents ) ) {
+				if ( $wp_filesystem->exists( ABSPATH . 'wp-config.php' ) ) {
+					$wpcfg_contents = $wp_filesystem->get_contents( ABSPATH . 'wp-config.php' );
+				}
+
+				if ( ! empty( $wpcfg_contents ) ) {
 					preg_match(
 						'#\$table_prefix.*?=.*?' . "'" . '(.*?)' . "'" . ';#',
-						$file_contents,
+						$wpcfg_contents,
 						$matches
 					);
 
