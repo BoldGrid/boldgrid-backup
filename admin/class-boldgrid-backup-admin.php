@@ -78,6 +78,14 @@ class Boldgrid_Backup_Admin {
 		 * class.
 		 */
 		wp_enqueue_style( $this->plugin_name,
-		plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin.css', array(), $this->version, 'all' );
+		plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin.css', array(), $this->version );
+
+		// Enqueue CSS for the home page.
+		if ( isset( $_REQUEST['page'] ) && 'boldgrid-backup' === $_REQUEST['page'] ) {
+			wp_enqueue_style( 'boldgrid-backup-admin-home',
+				plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-home.css', array(),
+				BOLDGRID_BACKUP_VERSION
+			);
+		}
 	}
 }

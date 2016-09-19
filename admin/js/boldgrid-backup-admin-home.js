@@ -335,6 +335,6 @@
 	 * @since 1.2.2
 	 */
 	self.toggleHelp = function() {
-		$( this ).next().toggle();
+		$( this ).next( '.help' ).toggle();
 	};
 } )( jQuery );

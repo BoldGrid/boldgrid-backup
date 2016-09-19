@@ -114,7 +114,18 @@ if ( ! empty( $archives ) ) {
 	</form>
 </div>
 <div id='backup-site-now-results'></div>
-<h2><?php esc_html_e( 'Upload a Backup Archive', 'boldgrid-backup' ); ?></h2>
+<h2 class='help-next'><?php esc_html_e( 'Upload a Backup Archive', 'boldgrid-backup' ); ?></h2>
+<span class="dashicons dashicons-editor-help" aria-expanded="false"></span>
+<p class="help">
+	<?php
+	esc_html_e(
+		'You can upload a backup file that was created with BoldGrid Backup.
+		If you choose to restore an uploaded file from a different web location (URL), then we will try to ensure that references to URL address are updated.
+		There may be times when some items may need to be updated manually.',
+		'boldgrid-backup'
+	);
+	?>
+</p>
 <div id="upload-archive-section">
 	<form id="upload-archive-form" method="POST"
 	enctype="multipart/form-data">
@@ -153,9 +164,19 @@ echo esc_html__( 'BoldGrid Backup id', 'boldgrid-backup' ) . ': ' . $backup_iden
  <span class="dashicons dashicons-editor-help" aria-expanded="false"></span>
 <p class="help">
 	<?php
-	esc_html_e(
-		'The backup id is used to determine if a backup archive file is associated with this WordPress installation.',
-		'boldgrid-backup'
+	printf(
+		esc_html__(
+			'The backup id is used to determine if a backup archive file is associated with this WordPress installation.
+			You can upload an archive file that was created with BoldGrid Backup using this page or a manual method such as FTP.%1$s
+			Manually uploaded archive files must have filenames starting with "%2$s", contain the BoldGrid Backup id "%3$s", and end with "%4$s", to be recognized.%1$s
+			For example: %5$s',
+			'boldgrid-backup'
+		),
+		'<br />',
+		'boldgrid-backup-',
+		$backup_identifier,
+		'.zip',
+		'boldgrid-backup-' . $backup_identifier . '-my_backup_file.zip'
 	);
 	?>
 </p>

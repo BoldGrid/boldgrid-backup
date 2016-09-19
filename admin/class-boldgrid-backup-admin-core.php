@@ -488,16 +488,18 @@ class Boldgrid_Backup_Admin_Core {
 		);
 
 		add_submenu_page( 'boldgrid-backup', 'Backup Settings', 'Backup Settings', 'administrator',
-			'boldgrid-backup-settings', array(
-			$this->settings,
-			'page_backup_settings',
+			'boldgrid-backup-settings',
+			array(
+				$this->settings,
+				'page_backup_settings',
 			)
 		);
 
 		add_submenu_page( 'boldgrid-backup', 'Functionality Test', 'Functionality Test',
-			'administrator', 'boldgrid-backup-test', array(
-			$this,
-			'page_backup_test',
+			'administrator', 'boldgrid-backup-test',
+			array(
+				$this,
+				'page_backup_test',
 			)
 		);
 
@@ -1332,6 +1334,14 @@ class Boldgrid_Backup_Admin_Core {
 				'boldgrid-backup'
 			) . ".\n\n";
 
+			$body .= sprintf(
+				esc_html__(
+					'For help with restoring a BoldGrid Backup archive file, please visit: %s',
+					'boldgrid-backup'
+				),
+				'https://www.boldgrid.com/support/advanced-tutorials/restoring-boldgrid-backup/'
+			) . "\n\n";
+
 			$body .= esc_html__( 'Best regards', 'boldgrid-backup' ) . ",\n\n";
 
 			$body .= esc_html__( 'The BoldGrid Backup plugin', 'boldgrid-backup' ) . "\n\n";
@@ -1629,6 +1639,7 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @since 1.0
 	 *
+	 * @see https://codex.wordpress.org/Function_Reference/flush_rewrite_rules
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
 	 * @param bool $dryrun An optional switch to perform a dry run test.
@@ -1930,6 +1941,19 @@ class Boldgrid_Backup_Admin_Core {
 						break;
 					}
 
+					// If restoring ".htaccess", then make a backup copy before restoring.
+					if ( '.htaccess' === $name ) {
+						$wp_filesystem->copy(
+							ABSPATH . '.htaccess',
+							ABSPATH . '.htaccess.bgb',
+							true,
+							0644
+						);
+
+						// Recreate/flush rewrite rules in .htaccess on PHP shutdown.
+						add_action( 'shutdown', 'flush_rewrite_rules' );
+					}
+
 					// Extract the file.
 					if ( ! $zip->extractTo( $wp_root, array( $name ) ) ) {
 						// Error extracting.
@@ -2031,10 +2055,10 @@ class Boldgrid_Backup_Admin_Core {
 					'error' => $info['error'],
 				);
 			}
-		} else {
-			// Clear rollback information and restoration cron jobs that may be present.
-			$this->cancel_rollback();
 		}
+
+		// Clear rollback information and restoration cron jobs that may be present.
+		$this->cancel_rollback();
 
 		// Get settings.
 		$settings = $this->settings->get_settings();
@@ -2085,18 +2109,12 @@ class Boldgrid_Backup_Admin_Core {
 			return;
 		}
 
-		// Enqueue CSS for the home page.
-		wp_enqueue_style( 'boldgrid-backup-admin-home',
-			plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-home.css', array(),
-			BOLDGRID_BACKUP_VERSION
-		);
-
 		// Register the JS for the home page.
 		wp_register_script( 'boldgrid-backup-admin-home',
 			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-home.js',
 			array(
 				'jquery',
-			), BOLDGRID_BACKUP_VERSION, false
+			), BOLDGRID_BACKUP_VERSION
 		);
 
 		// Get the current wp_filesystem access method.

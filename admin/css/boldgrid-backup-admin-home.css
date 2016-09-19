@@ -37,3 +37,7 @@
 	font-weight: normal;
 	text-transform: none;
 }
+
+.help-next {
+	display: inline;
+}
