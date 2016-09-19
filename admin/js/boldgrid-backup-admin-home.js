@@ -63,6 +63,9 @@
 
 		// On click action for toggling a help section.
 		$( '.dashicons-editor-help' ).on( 'click', self.toggleHelp );
+
+		// Remove restoration notice.
+		self.hideRestoreNotice();
 	} );
 
 	/**
@@ -125,6 +128,36 @@
 	};
 
 	/**
+	 * Show the restore archive spinner and disable action buttons.
+	 *
+	 * @since 1.2.3
+	 */
+	self.showRestoreSpinner = function( $this ) {
+		// Disable the Backup Site Now and all Restore and Delete buttons.
+		$( '#backup-site-now, .action-restore, .action-delete' )
+			.prop( 'disabled', true )
+			.css( 'pointer-events', 'none' );
+
+		// Show the spinner.
+		$this.find( '.spinner' ).addClass( 'is-active' ).css( 'display', 'inline-block' );
+	};
+
+	/**
+	 * Hide the restore archive notice and enable action buttons.
+	 *
+	 * @since 1.2.3
+	 */
+	self.hideRestoreNotice = function() {
+		// Enable the Backup Site Now and all Restore and Delete buttons.
+		$( '#backup-site-now, .action-restore, .action-delete' )
+			.prop( 'disabled', false )
+			.css( 'pointer-events', '' );
+
+		// Hide the restore notice.
+		$( '.restoration-in-progress' ).hide();
+	};
+
+	/**
 	 * Confirm to restore a selected backup archive file.
 	 *
 	 * @since 1.0
@@ -132,7 +165,7 @@
 	self.restoreArchiveConfirm = function( e ) {
 		// Declare variables.
 		var confirmResponse, ArchiveFilename, restoreConfirmText,
-			$this = $( this );
+		$this = $( this );
 
 		// Get the backup archive filename.
 		ArchiveFilename = $this.find( 'input[name=archive_filename]' ).val();
@@ -147,15 +180,7 @@
 		// Handle response.
 		if ( true === confirmResponse ) {
 			// Disable the Backup Site Now and all Restore and Delete buttons.
-			$( '#backup-site-now, .action-restore, .action-delete' )
-				.attr( 'disabled', 'disabled' )
-				.css( 'pointer-events', 'none' );
-
-			// Show the spinner.
-			$this
-				.find( '.spinner' )
-					.addClass( 'is-active' )
-					.css( 'display', 'inline-block' );
+			self.showRestoreSpinner( $this );
 
 			// Proceed with restoration.
 			return true;

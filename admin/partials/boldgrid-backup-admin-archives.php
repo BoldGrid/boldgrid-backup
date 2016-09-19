@@ -31,7 +31,7 @@
 				<input type='hidden' name='archive_filename' value='<?php echo $archive['filename']; ?>' />
 				<?php wp_nonce_field( 'archive_auth', 'archive_auth' ); ?>
 				<input type='submit' class='button action-restore'
-				value='<?php esc_html_e( 'Restore', 'boldgrid-backup' ); ?>' />
+				value='<?php esc_html_e( 'Restore', 'boldgrid-backup' ); ?>' disabled="disabled" />
 				<span class='spinner'></span>
 			</form>
 		</td>
@@ -44,7 +44,7 @@
 				<?php wp_nonce_field( 'archive_auth', 'archive_auth' ); ?>
 				<input type='submit' class='button action-delete' data-key='<?php echo $key ?>'
 				data-filename='<?php echo $archive['filename']; ?>'
-				value='<?php esc_html_e( 'Delete', 'boldgrid-backup' ); ?>' />
+				value='<?php esc_html_e( 'Delete', 'boldgrid-backup' ); ?>' disabled="disabled" />
 				<span class='spinner'></span>
 			</form>
 		</td>

@@ -2195,6 +2195,12 @@ class Boldgrid_Backup_Admin_Core {
 
 		// If a restoration operation is requested, then restore from a backup archive now.
 		if ( ! empty( $_POST['restore_now'] ) ) {
+			printf(
+				'<div class="%1$s"><p>%2$s</p></div>',
+				'notice notice-info restoration-in-progress',
+				esc_html__( 'Restoration in progress', 'boldgrid-backup' )
+			);
+
 			$archive_info = $this->restore_archive_file();
 
 			// Generate markup, using the restore page template.
