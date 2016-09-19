@@ -711,7 +711,7 @@ class Boldgrid_Backup_Admin_Utility {
 		// Replace the URL in wp_posts.
 		$wpdb->query(
 			$wpdb->prepare(
-				'UPDATE `%1$sposts` SET `post_content` = REPLACE( `post_content`, %2$s, %3$s ) WHERE `post_content` LIKE \'%%%2$s%%\';',
+				'UPDATE `%1$sposts` SET `post_content` = REPLACE( `post_content`, \'%2$s\', \'%3$s\' ) WHERE `post_content` LIKE \'%%%2$s%%\';',
 				array(
 					$db_prefix,
 					$old_siteurl,
