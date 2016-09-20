@@ -730,6 +730,7 @@ class Boldgrid_Backup_Admin_Utility {
 		}
 
 		// Find old siteurl references in WP options.
+		// Match old_siteurl with and without escaped URL, for example, JSON data escapes slashes.
 		$matched_options = $wpdb->get_results(
 			$wpdb->prepare(
 				'SELECT `option_name` FROM `%1$soptions` WHERE `option_value` LIKE \'%%%2$s%%\' OR `option_value` LIKE \'%%%3$s%%\';',

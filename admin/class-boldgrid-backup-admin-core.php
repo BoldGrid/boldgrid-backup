@@ -521,16 +521,7 @@ class Boldgrid_Backup_Admin_Core {
 		// Check if functional.
 		if ( ! $this->test->run_functionality_tests() ) {
 			// Display an error notice.
-			$message = sprintf(
-				esc_html__(
-					'Functionality test has failed.  You can go to %1$sFunctionality Test%2$s to view a report.',
-					'boldgrid-backup'
-				),
-				'<a href="' . admin_url( 'admin.php?page=boldgrid-backup-test' ) . '">',
-				'</a>'
-			);
-
-			do_action( 'boldgrid_backup_notice', $message, 'notice notice-error is-dismissible' );
+			$this->notice->functionality_fail_notice();
 
 			return false;
 		}
@@ -734,16 +725,7 @@ class Boldgrid_Backup_Admin_Core {
 		// Check if functional.
 		if ( ! $this->test->run_functionality_tests() ) {
 			// Display an error notice.
-			$message = sprintf(
-				esc_html__(
-					'Functionality test has failed.  You can go to %1$sFunctionality Test%2$s to view a report.',
-					'boldgrid-backup'
-				),
-				'<a href="' . admin_url( 'admin.php?page=boldgrid-backup-test' ) . '">',
-				'</a>'
-			);
-
-			do_action( 'boldgrid_backup_notice', $message, 'notice notice-error is-dismissible' );
+			$this->notice->functionality_fail_notice();
 
 			// Delete the dump file.
 			$wp_filesystem->delete( $db_dump_filepath, false, 'f' );
@@ -1055,20 +1037,7 @@ class Boldgrid_Backup_Admin_Core {
 			// Display an error notice, if not already on the test page.
 			if ( ! isset( $_GET['page'] ) || 'boldgrid-backup-test' !== $_GET['page'] ) {
 				// Display an error notice.
-				$message = sprintf(
-					esc_html(
-						'Functionality test has failed.  You can go to %sFunctionality Test%s to view a report.',
-						'boldgrid-backup'
-					),
-					'<a href="' . admin_url( 'admin.php?page=boldgrid-backup-test' ) . '">',
-					'</a>'
-				);
-
-				do_action(
-					'boldgrid_backup_notice',
-					$message,
-					'notice notice-error is-dismissible'
-				);
+				$this->notice->functionality_fail_notice();
 			}
 
 			return array(
@@ -1622,7 +1591,9 @@ class Boldgrid_Backup_Admin_Core {
 			}
 		);
 
-		// Find the first occurrence.
+		// Find the first occurrence of a MySQL dump file.
+		// Format: *.########-######.sql
+		// An example filename: joec_wrdp2.20160919-162431.sql
 		foreach ( $dirlist as $fileinfo ) {
 			if ( 1 === preg_match( '/\.[\d]+-[\d]+\.sql$/',$fileinfo['name'] ) ) {
 				$db_dump_filepath = ABSPATH . $fileinfo['name'];
@@ -1666,20 +1637,7 @@ class Boldgrid_Backup_Admin_Core {
 		if ( ! $this->test->run_functionality_tests() ) {
 			// Display an error notice, if not DOING_CRON.
 			if ( ! $doing_cron ) {
-				$message = sprintf(
-					esc_html__(
-						'Functionality test has failed.  You can go to %1$sFunctionality Test%2$s to view a report.',
-						'boldgrid-backup'
-					),
-					'<a href="' . admin_url( 'admin.php?page=boldgrid-backup-test' ) . '">',
-					'</a>'
-				);
-
-				do_action(
-					'boldgrid_backup_notice',
-					$message,
-					'notice notice-error is-dismissible'
-				);
+				$this->notice->functionality_fail_notice();
 			}
 
 			return array(
@@ -2099,16 +2057,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// If tests fail, then show an admin notice and abort.
 		if ( ! $is_functional ) {
-			$message = sprintf(
-				esc_html__(
-					'Functionality test has failed.  You can go to %1$sFunctionality Test%2$s to view a report.',
-					'boldgrid-backup'
-				),
-				'<a href="' . admin_url( 'admin.php?page=boldgrid-backup-test' ) . '">',
-				'</a>'
-			);
-
-			do_action( 'boldgrid_backup_notice', $message, 'notice notice-error is-dismissible' );
+			$this->notice->functionality_fail_notice();
 
 			return;
 		}
@@ -2375,12 +2324,8 @@ class Boldgrid_Backup_Admin_Core {
 		$is_functional = $this->test->run_functionality_tests();
 
 		if ( ! $is_functional ) {
-			// Display an error notice.
-			do_action(
-				'boldgrid_backup_notice',
-				esc_html__( 'Functionality test has failed.', 'boldgrid-backup' ),
-				'notice notice-error is-dismissible'
-			);
+			// Display an error notice, with no link.
+			$this->notice->functionality_fail_notice( false );
 		}
 
 		// Get the user home directory.
