@@ -20,7 +20,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 
 == Changelog ==
 
-= 1.2.3 In progress =
+= 1.2.3 =
 * Misc:			JIRA WPB-2344	Updated readme.txt for Tested up to 4.6.1.
 * Bug fix:		JIRA WPB-2303	Added handling for restoration if site URL changed.  Fixed upload button in Chrome.
 * Bug fix:		JIRA WPB-2336	Load BoldGrid settings from the correct WP option (site/blog).
