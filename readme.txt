@@ -12,6 +12,14 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 
 BoldGrid Backup provides WordPress backup and restoration with update protection.
 
+== Requirements ==
+
+* PHP 5.3 or higher
+* At least one of the following PHP execution functions enabled: "popen", "proc_open", "exec", "shell_exec", "passthru", or "system".
+* MySQL with the "mysqldump" utility.
+* PHP ZipArchive (zip).
+* A Cron system with the "crontab" utility.
+
 == Installation ==
 
 1. Upload the entire boldgrid-backup folder to the /wp-content/plugins/ directory.
@@ -19,6 +27,9 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 2. Activate the plugin through the Plugins menu in WordPress.
 
 == Changelog ==
+
+= 1.3.1 In progress =
+* Misc:			JIRA WPB-2503	Added plugin requirements to readme.txt file.
 
 = 1.3 =
 * Update:						Bump version.
