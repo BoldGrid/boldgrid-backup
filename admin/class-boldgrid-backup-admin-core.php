@@ -2499,24 +2499,26 @@ class Boldgrid_Backup_Admin_Core {
 		// Create admin notice text.
 		$notice_text = sprintf(
 			__(
-				"BoldGrid Backup last created backup archive:<p>%s %s</p>
+				'BoldGrid Backup last created backup archive:<p>%1$s %2$s</p>
 		<p>It is recommended to backup your site before performing updates.
-		If you perform a backup here, before performing updates, then an automatic rollback is possible.</p>
-		<div id='backup-site-now-section'>
-		<form action='#' id='backup-site-now-form' method='POST'>
-				%s
+		If you perform a backup here, before performing updates, then an automatic rollback is possible.
+		More information is available in the <a href="%4$s">Backup Archive</a> page.</p>
+		<div id="backup-site-now-section">
+		<form action="#" id="backup-site-now-form" method="POST">
+				%3$s
 				<p>
-					<a id='backup-site-now' class='button button-primary' data-updating='true'>Backup Site Now</a>
-					<span class='spinner'></span>
+					<a id="backup-site-now" class="button button-primary" data-updating="true">Backup Site Now</a>
+					<span class="spinner"></span>
 				</p>
 			</form>
 		</div>
-		<div id='backup-site-now-results'></div>",
+		<div id="backup-site-now-results"></div>',
 				'boldgrid-backup'
 			),
 			$listing,
 			$download_button,
-			wp_nonce_field( 'boldgrid_backup_now', 'backup_auth' )
+			wp_nonce_field( 'boldgrid_backup_now', 'backup_auth' ),
+			admin_url( 'admin.php?page=boldgrid-backup' )
 		) . PHP_EOL;
 
 		// Show admin notice.

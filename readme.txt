@@ -30,6 +30,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 
 = 1.3.1 In progress =
 * Misc:			JIRA WPB-2503	Added plugin requirements to readme.txt file.
+* Update:		JIRA WPB-2584	Modify 'last created archive' message with link to archives.
 
 = 1.3 =
 * Update:						Bump version.
