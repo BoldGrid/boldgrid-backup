@@ -103,9 +103,20 @@ if ( isset( $archive_info['duration'] ) ) {
 ?>
 <p>
 <?php
-printf( 'See <a href="%1$s">Settings for BoldGrid Backup</a> for details.',
-	admin_url( 'admin.php?page=boldgrid-backup-settings' )
+/*
+ * Print a link to settings page.
+ *
+ * $url and $link format taken from https://codex.wordpress.org/I18n_for_WordPress_Developers
+ */
+$url = admin_url( 'admin.php?page=boldgrid-backup-settings' );
+$link = sprintf(
+	wp_kses(
+		__( 'See <a href="%s">Settings for BoldGrid Backup</a> for details.', 'boldgrid-backup' ),
+		array(  'a' => array( 'href' => array() ) )
+	),
+	esc_url( $url )
 );
+echo $link;
 ?>
 </p>
 </div>
