@@ -90,17 +90,6 @@ if ( ! empty( $archive_info['total_size'] ) ) {
 <?php
 }
 
-if ( ! empty( $archive_info['compressor'] ) ) {
-?>
-	<p><?php
-	printf(
-		esc_html__( 'Compressor: %s', 'boldgrid-backup' ),
-		$archive_info['compressor']
-	);
-?></p>
-<?php
-}
-
 if ( isset( $archive_info['duration'] ) ) {
 ?>
 	<p><?php
@@ -112,6 +101,13 @@ if ( isset( $archive_info['duration'] ) ) {
 <?php
 }
 ?>
+<p>
+<?php
+printf( 'See <a href="%1$s">Settings for BoldGrid Backup</a> for details.',
+	admin_url( 'admin.php?page=boldgrid-backup-settings' )
+);
+?>
+</p>
 </div>
 <div class='hidden'>
 <table>
