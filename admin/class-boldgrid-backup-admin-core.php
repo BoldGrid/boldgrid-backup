@@ -480,23 +480,68 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return null
 	 */
 	public function add_menu_items() {
-		add_menu_page( 'BoldGrid Backup', 'BoldGrid Backup', 'administrator', 'boldgrid-backup',
-			array(
-				$this,
-				'page_backup_home',
-			), 'none'
+		$lang = array(
+			'backup_archive' =>  __( 'Backup Archive', 'boldgrid-backup' ),
+			'boldgrid_backup' => __( 'BoldGrid Backup', 'boldgrid-backup' ),
+			'preflight_check' => __( 'Preflight Check', 'boldgrid-backup' ),
+			'settings' =>        __( 'Settings', 'boldgrid-backup' ),
 		);
 
-		add_submenu_page( 'boldgrid-backup', 'Backup Settings', 'Backup Settings', 'administrator',
-			'boldgrid-backup-settings',
+		// The main slug all sub menu items are children of.
+		$main_slug = 'boldgrid-backup-settings';
+
+		// The callable function for the settings page.
+		$settings_page = array(
+			$this->settings,
+			'page_backup_settings',
+		);
+
+		// The capability required for these menu items to be displayed to the user.
+		$capability = 'administrator';
+
+		add_menu_page(
+			$lang['boldgrid_backup'],
+			$lang['boldgrid_backup'],
+			$capability,
+			$main_slug,
+			$settings_page,
+			'none'
+		);
+
+		/*
+		 * Add "Settings", formally known as "Backup Settings".
+		 *
+		 * @link http://wordpress.stackexchange.com/questions/66498/add-menu-page-with-different-name-for-first-submenu-item
+		 */
+		add_submenu_page(
+			$main_slug,
+			$lang['boldgrid_backup'] . ' ' . $lang['settings'],
+			$lang['settings'],
+			$capability,
+			$main_slug,
+			$settings_page
+		);
+
+		// Add "Backup Archive", formally known as "BoldGrid Backup".
+		add_submenu_page(
+			$main_slug,
+			'BoldGrid ' . $lang['backup_archive'],
+			$lang['backup_archive'],
+			$capability,
+			'boldgrid-backup',
 			array(
-				$this->settings,
-				'page_backup_settings',
+				$this,
+				'page_archives',
 			)
 		);
 
-		add_submenu_page( 'boldgrid-backup', 'Functionality Test', 'Functionality Test',
-			'administrator', 'boldgrid-backup-test',
+		// Add "Preflight Check" page, formally know as "Functionality Test".
+		add_submenu_page(
+			$main_slug,
+			$lang['boldgrid_backup'] . ' ' . $lang['preflight_check'],
+			$lang['preflight_check'],
+			$capability,
+			'boldgrid-backup-test',
 			array(
 				$this,
 				'page_backup_test',
@@ -2051,7 +2096,7 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @return null
 	 */
-	public function page_backup_home() {
+	public function page_archives() {
 		// Run the functionality tests.
 		$is_functional = $this->test->run_functionality_tests();
 
