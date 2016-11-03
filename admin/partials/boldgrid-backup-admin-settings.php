@@ -23,12 +23,26 @@ if ( empty( $settings ) ) {
 ?>
 <div class='wrap'>
 	<h1><?php esc_html_e( 'BoldGrid Backup and Restore Settings', 'boldgrid-backup' ); ?></h1>
-	<p><?php
-	esc_html_e(
-		'The BoldGrid Backup and Restore system allows you to upgrade your themes and plugins without being afraid it will do something you cannot easily undo. We preform a “Preflight Check” to see if the needed support is available on your web hosting account.',
-		'boldgrid-backup'
-	);
-	?></p>
+	<p>
+		<?php
+		/*
+		 * Print this text:
+		 *
+		 * The BoldGrid Backup and Restore system allows you to upgrade your themes and plugins without
+		 * being afraid it will do something you cannot easily undo. We preform a Preflight Check to see
+		 * if the needed support is available on your web hosting account.
+		 */
+		$url = admin_url( 'admin.php?page=boldgrid-backup-test' );
+		$link = sprintf(
+			wp_kses(
+				__( 'The BoldGrid Backup and Restore system allows you to upgrade your themes and plugins without being afraid it will do something you cannot easily undo. We preform a <a href="%s">Preflight Check</a> to see if the needed support is available on your web hosting account.', 'boldgrid-backup' ),
+				array(  'a' => array( 'href' => array() ) )
+			),
+			esc_url( $url )
+		);
+		echo $link;
+		?>
+	</p>
 	<form id='schedule-form' method='post'>
 	<?php wp_nonce_field( 'boldgrid-backup-settings', 'settings_auth' ); ?>
 		<input type='hidden' name='save_time' value='<?php echo time(); ?>' />
