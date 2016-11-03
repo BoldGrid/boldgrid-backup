@@ -459,12 +459,21 @@ class Boldgrid_Backup_Admin_Settings {
 		);
 
 		// Enqueue the JS for the settings page.
-		wp_enqueue_script( 'boldgrid-backup-admin-settings',
+		wp_register_script( 'boldgrid-backup-admin-settings',
 			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-settings.js',
-			array(
-				'jquery',
-			), BOLDGRID_BACKUP_VERSION, false
+			array( 'jquery' ),
+			BOLDGRID_BACKUP_VERSION,
+			false
 		);
+
+		$translation = array(
+			'website_size' => esc_html__( 'Website Size:', 'boldgrid-backup' ),
+			'database_size' => esc_html__( 'Database Size:', 'boldgrid-backup' ),
+		);
+
+		wp_localize_script( 'boldgrid-backup-admin-settings', 'BoldGridBackupAdminSettings', $translation );
+
+		wp_enqueue_script( 'boldgrid-backup-admin-settings' );
 
 		// Get settings.
 		$settings = $this->get_settings();
@@ -476,6 +485,9 @@ class Boldgrid_Backup_Admin_Settings {
 
 		// Include the page template.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-settings.php';
+
+		// Include our js templates.
+		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-js-templates.php';
 
 		return;
 	}

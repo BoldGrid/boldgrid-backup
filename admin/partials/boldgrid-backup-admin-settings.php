@@ -43,6 +43,18 @@ if ( empty( $settings ) ) {
 		echo $link;
 		?>
 	</p>
+
+	<?php include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/premium-message.php'; ?>
+
+	<div id='size-data'>
+		<?php
+		wp_nonce_field( 'boldgrid_backup_sizes', 'sizes_auth' );
+		printf( '<p><span class="spinner" style="float:none; visibility:visible; margin-top: -10px; margin-left:0px;"></span>%s</p>',
+			esc_html__( 'Calculating disk space...' )
+		);
+		?>
+	</div>
+
 	<form id='schedule-form' method='post'>
 	<?php wp_nonce_field( 'boldgrid-backup-settings', 'settings_auth' ); ?>
 		<input type='hidden' name='save_time' value='<?php echo time(); ?>' />

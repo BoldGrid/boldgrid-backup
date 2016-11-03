@@ -21,6 +21,35 @@
 	$noBackupDays = $( '#no-backup-days' );
 
 	/**
+	 * Show disk and db sizes.
+	 *
+	 * @since 1.3.1
+	 */
+	self.getSizeData = function() {
+		var sizes,
+			data = {
+				'action': 'boldgrid_backup_sizes',
+				'sizes_auth' : $( '#sizes_auth' ).val()
+			},
+			template = wp.template( 'boldgrid-backup-sizes' );
+
+		var successAction = function( msg ) {
+			if( 'unauthorized' === msg ) {
+				return;
+			}
+
+			sizes = JSON.parse( msg );
+
+			// Add our translation settings.
+			sizes.lang = BoldGridBackupAdminSettings;
+
+			$( '#size-data' ).html( template( sizes ) );
+		}
+
+		$.post( ajaxurl, data, successAction );
+	}
+
+	/**
 	 * @summary Check if any days of the week selected.
 	 *
 	 * @since 1.0
@@ -51,7 +80,6 @@
 
 	// Onload event listener.
 	$( function() {
-
 		// Check if any days or the week are checked, toggle notice.
 		self.toggleNoBackupDays();
 
@@ -59,6 +87,7 @@
 		// toggle notice.
 		$scheduleDow.on( 'click', self.toggleNoBackupDays );
 
+		self.getSizeData();
 	} );
 
 } )( jQuery );

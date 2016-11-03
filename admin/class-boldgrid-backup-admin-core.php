@@ -2904,6 +2904,43 @@ class Boldgrid_Backup_Admin_Core {
 	}
 
 	/**
+	 * Callback for getting size data.
+	 *
+	 * @since 1.3.1
+	 */
+	public function boldgrid_backup_sizes_callback() {
+		// Check user capabilities.
+		if ( ! current_user_can( 'update_plugins' ) ) {
+			wp_die( 'unauthorized' );
+		}
+
+		// Check nonce.
+		if( ! check_ajax_referer( 'boldgrid_backup_sizes', 'sizes_auth', false ) ) {
+			wp_die( 'unauthorized' );
+		}
+
+		$return = array(
+			'disk_space' => $this->test->get_disk_space(),
+			'db_size' => $this->test->get_database_size()
+		);
+
+		/*
+		 * Add additonal _hr (human readable as in 466.55MB) data to our $return variable. Done here
+		 * so as not needed to be done by js.
+		 */
+
+		foreach( $return[ 'disk_space' ] as $k => $v ) {
+			$return[ 'disk_space_hr' ][ $k ] = Boldgrid_Backup_Admin_Utility::bytes_to_human( $v );
+		}
+
+		$return[ 'db_size_hr' ] = Boldgrid_Backup_Admin_Utility::bytes_to_human( $return[ 'db_size'] );
+
+		echo json_encode( $return );
+
+		wp_die();
+	}
+
+	/**
 	 * Callback function for the hook "upgrader_process_complete".
 	 *
 	 * @since 1.2
