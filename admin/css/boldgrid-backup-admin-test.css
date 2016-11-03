@@ -1,3 +1,21 @@
-.functionality-test-section p {
-	margin: 0;
+.functionality-test-section table {
+	border-collapse: collapse;
+}
+
+.functionality-test-section table tr {
+	border: 1px solid #ddd;	
+}
+
+.functionality-test-section table tr td {
+	padding: 5px 10px;
+}
+
+.functionality-test-section table tr:last-of-type {
+	border: 0px;
+	background: none;
+	font-weight: bold;	
+}
+
+.functionality-test-section table tr:last-of-type td {
+	padding: 15px 0px 10px 11px;
 }
