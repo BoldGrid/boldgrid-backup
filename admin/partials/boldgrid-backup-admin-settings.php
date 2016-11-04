@@ -125,6 +125,21 @@ if ( empty( $settings ) ) {
 				esc_html_e( 'Free Backup License supports only scheduling two days a week.', 'boldgrid-backup' );
 				?></p>
 			</div>
+			<?php
+			$url = 'https://www.boldgrid.com';
+			$link = sprintf(
+				wp_kses(
+					__( 'Note: Backups use resources and <a href="%s" target="_blank">must pause your site</a> momentarily. Use sparingly.', 'boldgrid-backup' ),
+					array(  'a' => array( 'href' => array() ) )
+				),
+				esc_url( $url )
+			);
+			printf( '<div id="use-sparingly"><p>* %s</p></div>', $link );
+			?>
+
+
+
+
 		</div>
 		<h2><?php esc_html_e( 'Time of Day', 'boldgrid-backup' ); ?></h2>
 		<div class='schedule-tod'>

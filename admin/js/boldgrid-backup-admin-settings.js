@@ -12,7 +12,7 @@
 
 	// General Variables.
 	var self = {},
-		$scheduleDow, $noBackupDays, $freeDowLimit;
+		$scheduleDow, $noBackupDays, $freeDowLimit, $useSparingly;
 
 	// Define a context selector for schedule-dow.
 	$scheduleDow = $( '.schedule-dow' );
@@ -26,6 +26,13 @@
 	 * @since 1.3.1
 	 */
 	$freeDowLimit = $( '#free-dow-limit' );
+
+	/**
+	 * Message describing resource usage.
+	 *
+	 * @since 1.3.1
+	 */
+	$useSparingly = $( '#use-sparingly' );
 
 	/**
 	 * Show disk and db sizes.
@@ -101,6 +108,18 @@
 				// Hide the message.
 				$freeDowLimit.hide();
 			}
+		}
+
+		/*
+		 * If the user has selected more than 1 day under "Days of the Week", show a message about
+		 * resource usage.
+		 *
+		 * @since 1.3.1
+		 */
+		if( daysCount > 1 ) {
+			$useSparingly.show();
+		} else {
+			$useSparingly.hide();
 		}
 
 		if ( true === self.scheduleDowChecked() ) {
