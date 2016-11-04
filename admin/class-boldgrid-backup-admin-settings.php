@@ -28,6 +28,13 @@ class Boldgrid_Backup_Admin_Settings {
 	private $core;
 
 	/**
+	 * Config array.
+	 *
+	 * @since  1.3.1
+	 */
+	public $config;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.0
@@ -37,6 +44,40 @@ class Boldgrid_Backup_Admin_Settings {
 	public function __construct( $core ) {
 		// Save the Boldgrid_Backup_Admin_Core object as a class property.
 		$this->core = $core;
+
+		$this->config = array(
+			// Is this a premium version of the plugin?
+			'premium' => false,
+			// Max days of the week backups can be scheduled for.
+			'max_dow' => 2,
+		);
+	}
+
+	/**
+	 * How many days of the week are being saved?
+	 *
+	 * This method counts the number of $_POST keys that begin with "dow_". The count returned by
+	 * this method is used to help enforce restrictions on the free version of the plugin.
+	 *
+	 * @since 1.3.1
+	 *
+	 * @return int
+	 */
+	public function get_dow_count() {
+		$count = 0;
+
+		if( ! isset( $_POST ) || ! is_array( $_POST ) ) {
+			return 0;
+		}
+
+		// Loop through each $_POST value and check if the key begins with dow_.
+		foreach( $_POST as $k => $v ) {
+			if ( substr( $k, 0, 4 ) === "dow_" ) {
+				$count++;
+			}
+		}
+
+		return $count;
 	}
 
 	/**
@@ -165,6 +206,18 @@ class Boldgrid_Backup_Admin_Settings {
 	private function update_settings() {
 		// Verify nonce.
 		check_admin_referer( 'boldgrid-backup-settings', 'settings_auth' );
+
+		/*
+		 * If we're on the free version of the plugin and the scheduled "Days of the Week"
+		 * limitation has been reached, show an error and abort.
+		 */
+		if( ! $this->config['premium'] && $this->get_dow_count() > $this->config['max_dow'] ) {
+			printf( '<div class="notice notice-error is-dismissible"><p>%s %d<p></div>',
+					esc_html__( 'Error: You have scheduled backups to run during too many days of the week. The free version of BoldGrid Backup supports:', 'boldgrid-backup' ),
+					$this->config['max_dow']
+			);
+			return;
+		}
 
 		// Check for settings update.
 		if ( ! empty( $_POST['save_time'] ) ) {
@@ -470,9 +523,9 @@ class Boldgrid_Backup_Admin_Settings {
 			'website_size' => esc_html__( 'Website Size:', 'boldgrid-backup' ),
 			'database_size' => esc_html__( 'Database Size:', 'boldgrid-backup' ),
 			// Is this a premium version of the plugin?
-			'premium' => 'false',
+			'premium' => ( $this->config['premium'] ? 'true' : 'false' ),
 			// Max days of the week backups can be scheduled for.
-			'max_dow' => 2,
+			'max_dow' => $this->config['max_dow'],
 		);
 
 		wp_localize_script( 'boldgrid-backup-admin-settings', 'BoldGridBackupAdminSettings', $translation );
