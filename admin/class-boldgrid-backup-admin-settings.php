@@ -469,6 +469,10 @@ class Boldgrid_Backup_Admin_Settings {
 		$translation = array(
 			'website_size' => esc_html__( 'Website Size:', 'boldgrid-backup' ),
 			'database_size' => esc_html__( 'Database Size:', 'boldgrid-backup' ),
+			// Is this a premium version of the plugin?
+			'premium' => 'false',
+			// Max days of the week backups can be scheduled for.
+			'max_dow' => 2,
 		);
 
 		wp_localize_script( 'boldgrid-backup-admin-settings', 'BoldGridBackupAdminSettings', $translation );

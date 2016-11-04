@@ -12,13 +12,20 @@
 
 	// General Variables.
 	var self = {},
-		$scheduleDow, $noBackupDays;
+		$scheduleDow, $noBackupDays, $freeDowLimit;
 
 	// Define a context selector for schedule-dow.
 	$scheduleDow = $( '.schedule-dow' );
 
 	// Define a context selector for no-backup-days.
 	$noBackupDays = $( '#no-backup-days' );
+
+	/**
+	 * Message describing dow limitations.
+	 *
+	 * @since 1.3.1
+	 */
+	$freeDowLimit = $( '#free-dow-limit' );
 
 	/**
 	 * Show disk and db sizes.
@@ -44,7 +51,7 @@
 			sizes.lang = BoldGridBackupAdminSettings;
 
 			$( '#size-data' ).html( template( sizes ) );
-		}
+		};
 
 		$.post( ajaxurl, data, successAction );
 	}
@@ -71,6 +78,31 @@
 	 * @since 1.0
 	 */
 	self.toggleNoBackupDays = function() {
+		// How many days of the week are checked?
+		var daysCount = $scheduleDow.find( ':checked' ).length;
+
+		/*
+		 * If this is not the premium version of the plugin, enforce a limit to the days of the week
+		 * selection.
+		 *
+		 * @since 1.3.1
+		 */
+		if( 'false' === BoldGridBackupAdminSettings.premium ) {
+			if( daysCount >= BoldGridBackupAdminSettings.max_dow ) {
+				// Disable all checkboxes not currently selected.
+				$scheduleDow.find( ':checkbox:not(:checked)' ).prop( 'disabled', true );
+
+				// Show a message.
+				$freeDowLimit.show();
+			} else {
+				// Enable all checkboxes.
+				$scheduleDow.find( ':checkbox' ).prop( 'disabled', false );
+
+				// Hide the message.
+				$freeDowLimit.hide();
+			}
+		}
+
 		if ( true === self.scheduleDowChecked() ) {
 			$noBackupDays.hide();
 		} else {

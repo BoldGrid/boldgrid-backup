@@ -120,6 +120,11 @@ if ( empty( $settings ) ) {
 				esc_html_e( 'Backup will not occur if no days are selected.', 'boldgrid-backup' );
 				?></p>
 			</div>
+			<div class='hidden' id='free-dow-limit'>
+				<p>* <?php
+				esc_html_e( 'Free Backup License supports only scheduling two days a week.', 'boldgrid-backup' );
+				?></p>
+			</div>
 		</div>
 		<h2><?php esc_html_e( 'Time of Day', 'boldgrid-backup' ); ?></h2>
 		<div class='schedule-tod'>

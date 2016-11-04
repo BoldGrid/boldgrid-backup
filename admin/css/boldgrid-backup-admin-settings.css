@@ -13,6 +13,7 @@
 	height: 22px;
 }
 
+#free-dow-limit,
 #no-backup-days {
 	color: #f95b26;
 }
@@ -25,4 +26,9 @@
 	display: inline-block;
 	position: relative;
 	cursor: help;
+}
+
+/* If a day of the week checkbox is disabled, modify its hover cursor. */
+.schedule-dow input[type='checkbox'][disabled]:hover {
+	cursor: not-allowed;
 }
