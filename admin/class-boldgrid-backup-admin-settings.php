@@ -48,9 +48,13 @@ class Boldgrid_Backup_Admin_Settings {
 		$this->config = array(
 			// Is this a premium version of the plugin?
 			'premium' => false,
-			// Max days of the week backups can be scheduled for.
+			// Free plugin: Max days of the week backups can be scheduled for.
 			'max_dow' => 2,
+			// Free plugin: Max number of archives to retain.
+			'max_retention' => 4,
 		);
+
+		$this->config['default_retention'] = ( $this->config['premium'] ? 5 : 4 );
 	}
 
 	/**
@@ -207,6 +211,13 @@ class Boldgrid_Backup_Admin_Settings {
 		// Verify nonce.
 		check_admin_referer( 'boldgrid-backup-settings', 'settings_auth' );
 
+		// Get the retention count.
+		if( isset( $_POST['retention_count'] ) ) {
+			$retention_count = intval( $_POST['retention_count'] );
+		} else {
+			$retention_count = $this->config['default_retention'];
+		}
+
 		/*
 		 * If we're on the free version of the plugin and the scheduled "Days of the Week"
 		 * limitation has been reached, show an error and abort.
@@ -215,6 +226,18 @@ class Boldgrid_Backup_Admin_Settings {
 			printf( '<div class="notice notice-error is-dismissible"><p>%s %d<p></div>',
 					esc_html__( 'Error: You have scheduled backups to run during too many days of the week. The free version of BoldGrid Backup supports:', 'boldgrid-backup' ),
 					$this->config['max_dow']
+			);
+			return;
+		}
+
+		/*
+		 * If we're on the free version of the plugin and the retention count is set higher than the
+		 * limitation, show an error and abort.
+		 */
+		if( ! $this->config['premium'] && $retention_count > $this->config['max_retention'] ) {
+			printf( '<div class="notice notice-error is-dismissible"><p>%s %d<p></div>',
+				esc_html__( 'Error: You tried setting the backup archive count more than which the free version supports:', 'boldgrid-backup' ),
+				$this->config['max_retention']
 			);
 			return;
 		}

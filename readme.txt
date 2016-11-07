@@ -35,6 +35,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 * Update:		JIRA WPB-2586	Modify BoldGrid Backup menus.
 * Update:		JIRA WPB-2589	Adjust display of preflight check.
 * Update:		JIRA WPB-2592	Free limitations to days of the week.
+* Update:		JIRA WPB-2595	Free limitations to retention.
 
 = 1.3 =
 * Update:						Bump version.

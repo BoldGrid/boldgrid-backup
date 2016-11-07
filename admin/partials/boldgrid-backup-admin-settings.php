@@ -148,6 +148,7 @@ if ( empty( $settings ) ) {
 					<tr>
 						<td><select id='tod-h' name='tod_h'>
 						<?php
+
 						for ( $x = 1; $x <= 12; $x ++ ) {
 							?>
 							<option value='<?php echo $x;?>'
@@ -200,36 +201,9 @@ if ( empty( $settings ) ) {
 				</tbody>
 			</table>
 		</div>
-		<h2><?php esc_html_e( 'Retention', 'boldgrid-backup' ); ?></h2>
-		<div class='retention-settings'>
-			<table id='retention-settings-table'>
-				<tbody>
-					<tr>
-						<td><?php
-						esc_html_e( 'Number of backup archives to retain', 'boldgrid-backup' );
-						?></td>
-						<td><select id='retention-count' name='retention_count'>
-							<?php
-							$is_retention_set = ( isset( $settings['retention_count'] ) );
 
-							for ( $x = 1; $x <= 10; $x ++ ) {
-								?>
-								<option value='<?php echo $x; ?>'
-									<?php
-									// If set, select the number, or use 5 as a default.
-									if ( ( $is_retention_set && $x === $settings['retention_count'] ) ||
-									( ! $is_retention_set && 5 === $x ) ) {
-										echo ' selected';
-									}
-								?>><?php echo $x; ?></option>
-								<?php
-							}
-							?>
-							</select></td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
+		<?php include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/retention.php'; ?>
+
 		<h2><?php esc_html_e( 'Auto Backup Before Updates', 'boldgrid-backup' ); ?>
 		 <span class='dashicons dashicons-editor-help' title='<?php
 				esc_html_e(
