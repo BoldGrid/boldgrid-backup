@@ -80,6 +80,14 @@ class Boldgrid_Backup_Admin {
 		wp_enqueue_style( $this->plugin_name,
 		plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin.css', array(), $this->version );
 
+		// Enqueue JS.
+		wp_enqueue_script( 'boldgrid-backup-admin',
+			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin.js',
+			array( 'jquery' ),
+			BOLDGRID_BACKUP_VERSION,
+			false
+		);
+
 		// Enqueue CSS for the home page.
 		if ( isset( $_REQUEST['page'] ) && 'boldgrid-backup' === $_REQUEST['page'] ) {
 			wp_enqueue_style( 'boldgrid-backup-admin-home',

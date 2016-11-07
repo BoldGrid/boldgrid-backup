@@ -204,13 +204,14 @@ if ( empty( $settings ) ) {
 
 		<?php include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/retention.php'; ?>
 
-		<h2><?php esc_html_e( 'Auto Backup Before Updates', 'boldgrid-backup' ); ?>
-		 <span class='dashicons dashicons-editor-help' title='<?php
-				esc_html_e(
-					'Automatically perform a backup before WordPress updates.',
-					'boldgrid-backup'
-				);
-		?>'></span></h2>
+		<h2>
+			<?php esc_html_e( 'Auto Backup Before Updates', 'boldgrid-backup' ); ?>
+		 	<span class='dashicons dashicons-editor-help' data-id='auto-backup'></span>
+		 </h2>
+		<p class='help' data-id='auto-backup'>
+			<?php
+			esc_html_e( 'Automatically perform a backup before WordPress updates.', 'boldgrid-backup' );
+			?>
 		<p>
 			<input id='auto-backup-enabled' type='radio' name='auto_backup'
 				value='1'
@@ -227,13 +228,18 @@ if ( empty( $settings ) ) {
 				}
 				?> /> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
 		</p>
-		<h2><?php esc_html_e( 'Auto Rollback', 'boldgrid-backup' ); ?>
-		 <span class='dashicons dashicons-editor-help' title='<?php
-				esc_html_e(
-					'If something goes wrong while peforming WordPress updates, automatically restore the site using a backup made before updating WordPress.',
-					'boldgrid-backup'
-				);
-		?>'></span></h2>
+		<h2>
+			<?php esc_html_e( 'Auto Rollback', 'boldgrid-backup' ); ?>
+			<span class='dashicons dashicons-editor-help' data-id='auto-rollback'></span>
+		</h2>
+		<p class='help' data-id='auto-rollback'>
+			<?php
+			esc_html_e(
+				'If something goes wrong while peforming WordPress updates, automatically restore the site using a backup made before updating WordPress.',
+				'boldgrid-backup'
+			);
+			?>
+		</p>
 		<p>
 			<input id='auto-rollback-enabled' type='radio' name='auto_rollback'
 				value='1'

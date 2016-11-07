@@ -114,9 +114,11 @@ if ( ! empty( $archives ) ) {
 	</form>
 </div>
 <div id='backup-site-now-results'></div>
-<h2 class='help-next'><?php esc_html_e( 'Upload a Backup Archive', 'boldgrid-backup' ); ?></h2>
-<span class="dashicons dashicons-editor-help" aria-expanded="false"></span>
-<p class="help">
+<h2>
+	<?php esc_html_e( 'Upload a Backup Archive', 'boldgrid-backup' ); ?>
+	<span class="dashicons dashicons-editor-help" data-id="upload-backup"></span>
+</h2>
+<p class="help" data-id="upload-backup">
 	<?php
 	esc_html_e(
 		'You can upload a backup file that was created with BoldGrid Backup.
@@ -133,16 +135,17 @@ if ( ! empty( $archives ) ) {
 		<input type="hidden" name="uploading" value="1" />
 		<?php wp_nonce_field( 'upload_archive_file' ); ?>
 		<input name="file" type="file" />
-		<br />
-		<?php
-		// Print the file upload limit.
-		echo esc_html__( 'File size limit', 'boldgrid-backup' ) . ': ' .
-		Boldgrid_Backup_Admin_Utility::bytes_to_human(
-			Boldgrid_Backup_Admin_Utility::get_upload_limit()
-		);
-		?>
-		<span class="dashicons dashicons-editor-help" aria-expanded="false"></span>
-		<p class="help">
+		<p>
+			<?php
+			// Print the file upload limit.
+			echo esc_html__( 'File size limit', 'boldgrid-backup' ) . ': ' .
+			Boldgrid_Backup_Admin_Utility::bytes_to_human(
+				Boldgrid_Backup_Admin_Utility::get_upload_limit()
+			);
+			?>
+			<span class="dashicons dashicons-editor-help" data-id="size-limit"></span>
+		</p>
+		<p class="help" data-id="size-limit">
 			<?php
 			esc_html_e(
 				'To change the limit, you may be able to modify your server\'s php.ini or .htaccess file.  Please ask your web hosting provider if you need assistance.',
@@ -156,13 +159,11 @@ if ( ! empty( $archives ) ) {
 		</p>
 	</form>
 </div>
-<h2><?php esc_html_e( 'Backup Id', 'boldgrid-backup' ); ?></h2>
-<?php
-// Print the backup identifier.
-echo esc_html__( 'BoldGrid Backup id', 'boldgrid-backup' ) . ': ' . $backup_identifier;
-?>
- <span class="dashicons dashicons-editor-help" aria-expanded="false"></span>
-<p class="help">
+<h2>
+	<?php esc_html_e( 'Backup Id', 'boldgrid-backup' ); ?>
+	<span class="dashicons dashicons-editor-help" data-id="backup-id"></span>
+</h2>
+<p class="help" data-id="backup-id">
 	<?php
 	printf(
 		esc_html__(
@@ -180,4 +181,8 @@ echo esc_html__( 'BoldGrid Backup id', 'boldgrid-backup' ) . ': ' . $backup_iden
 	);
 	?>
 </p>
+<?php
+// Print the backup identifier.
+echo esc_html__( 'BoldGrid Backup id', 'boldgrid-backup' ) . ': ' . $backup_identifier;
+?>
 </div>

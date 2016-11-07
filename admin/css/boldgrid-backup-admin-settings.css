@@ -23,12 +23,6 @@
 	margin-top: 20px;
 }
 
-.dashicons-editor-help {
-	display: inline-block;
-	position: relative;
-	cursor: help;
-}
-
 /* If a day of the week checkbox is disabled, modify its hover cursor. */
 .schedule-dow input[type='checkbox'][disabled]:hover {
 	cursor: not-allowed;
