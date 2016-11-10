@@ -20,6 +20,7 @@ if ( empty( $settings ) ) {
 		)
 	);
 }
+
 ?>
 <div class='wrap'>
 	<h1><?php esc_html_e( 'BoldGrid Backup and Restore Settings', 'boldgrid-backup' ); ?></h1>

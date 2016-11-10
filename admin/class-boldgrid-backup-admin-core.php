@@ -2184,6 +2184,13 @@ class Boldgrid_Backup_Admin_Core {
 		// Get backup identifier.
 		$backup_identifier = $this->get_backup_identifier();
 
+		$settings = $this->settings->get_settings();
+
+		// If the directory path is not in the settings, then add it for the form.
+		if ( empty( $settings['backup_directory'] ) ) {
+			$settings['backup_directory'] = $this->config->get_backup_directory();
+		}
+
 		// Include the home page template.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-home.php';
 
