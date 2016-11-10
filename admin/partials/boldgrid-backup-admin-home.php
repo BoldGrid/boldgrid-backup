@@ -123,6 +123,28 @@ if ( ! empty( $archives ) ) {
 ?>><?php esc_html_e( 'Backup Site Now', 'boldgrid-backup' ); ?></a>
 			<span class='spinner'></span>
 		</p>
+
+		<p>
+		<?php
+		/*
+		 * Print this text:
+		 *
+		 * Note: Backups use resources and <a>must pause your site</a> momentarily.  Use sparingly.
+		 */
+		$link = sprintf(
+			wp_kses(
+				__( '<strong>Note</strong>: Backups use resources and <a href="%s" target="_blank">must pause your site</a> momentarily.  Use sparingly.', 'boldgrid-backup' ),
+				array(
+					'a' => array( 'href' => array(), 'target' => array() ),
+					'strong' => array(),
+		 		)
+			),
+			esc_url( 'https://www.boldgrid.com/support' )
+		);
+		echo $link;
+		?>
+		</p>
+
 	</form>
 </div>
 <div id='backup-site-now-results'></div>

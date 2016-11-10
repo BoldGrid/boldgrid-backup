@@ -11,15 +11,6 @@
  * @subpackage Boldgrid_Backup/admin/partials
  */
 
-if ( empty( $_POST['restore_now'] ) ) {
-?>
-<h2><?php esc_html_e( 'Backup Results', 'boldgrid-backup' ); ?></h2>
-<?php
-}
-?>
-
-<?php
-
 /**
  * If data exists in the $archive_info array, then print results, else show an error message.
  *
@@ -46,6 +37,9 @@ if ( ! empty( $archive_info ) ) {
 		// Successful backup.
 ?>
 <div class="notice notice-success">
+	<?php
+	printf( '<h2>%s</h2>', esc_html__( 'Backup Results', 'boldgrid-backup' ) );
+	?>
 	<p><?php
 	if ( ! empty( $_POST['restore_now'] ) ) {
 		esc_html_e( 'The selected archive file has been successfully restored', 'boldgrid-backup' );
