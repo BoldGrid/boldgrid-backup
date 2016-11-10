@@ -7,9 +7,7 @@
  * @since 1.3.1
  */
 
-$premium_plugin = false;
-
-if( $premium_plugin ) {
+if( $this->core->config->get_is_premium() ) {
 	/*
 	 * Print this message:
 	 *

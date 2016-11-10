@@ -7,6 +7,9 @@
  *
  * @param $ The jQuery object.
  */
+
+/* global BoldGridBackupAdmin */
+
 ( function( $ ) {
 	'use strict';
 
@@ -33,35 +36,6 @@
 	 * @since 1.3.1
 	 */
 	$useSparingly = $( '#use-sparingly' );
-
-	/**
-	 * Show disk and db sizes.
-	 *
-	 * @since 1.3.1
-	 */
-	self.getSizeData = function() {
-		var sizes,
-			data = {
-				'action': 'boldgrid_backup_sizes',
-				'sizes_auth' : $( '#sizes_auth' ).val()
-			},
-			template = wp.template( 'boldgrid-backup-sizes' );
-
-		var successAction = function( msg ) {
-			if( 'unauthorized' === msg ) {
-				return;
-			}
-
-			sizes = JSON.parse( msg );
-
-			// Add our translation settings.
-			sizes.lang = BoldGridBackupAdminSettings;
-
-			$( '#size-data' ).html( template( sizes ) );
-		};
-
-		$.post( ajaxurl, data, successAction );
-	}
 
 	/**
 	 * @summary Check if any days of the week selected.
@@ -94,8 +68,8 @@
 		 *
 		 * @since 1.3.1
 		 */
-		if( 'false' === BoldGridBackupAdminSettings.premium ) {
-			if( daysCount >= BoldGridBackupAdminSettings.max_dow ) {
+		if( 'false' === BoldGridBackupAdmin.is_premium ) {
+			if( daysCount >= BoldGridBackupAdmin.max_dow ) {
 				// Disable all checkboxes not currently selected.
 				$scheduleDow.find( ':checkbox:not(:checked)' ).prop( 'disabled', true );
 
@@ -137,8 +111,6 @@
 		// On click action for days, check if any days or the week are checked,
 		// toggle notice.
 		$scheduleDow.on( 'click', self.toggleNoBackupDays );
-
-		self.getSizeData();
 	} );
 
 } )( jQuery );

@@ -55,6 +55,51 @@ class Boldgrid_Backup_Admin_Config {
 	private $available_compressors = array();
 
 	/**
+	 * The default retention.
+	 *
+	 * @since  1.3.1
+	 * @access private
+	 * @var    int
+	 */
+	private $default_retention = 4;
+
+	/**
+	 * This is the premium version of the plugin.
+	 *
+	 * @since  1.3.1
+	 * @access private
+	 * @var    bool
+	 */
+	private $is_premium = false;
+
+	/**
+	 * Language.
+	 *
+	 * @since  1.3.1
+	 * @access public
+	 * @var    array
+	 */
+	public $lang = array();
+
+	/**
+	 * Free plugin: Max days of the week backups can be scheduled for.
+	 *
+	 * @since  1.3.1
+	 * @access private
+	 * @var    int
+	 */
+	private $max_dow = 2;
+
+	/**
+	 * Free plugin: Max number of archives to retain.
+	 *
+	 * @since  1.3.1
+	 * @access private
+	 * @var    int
+	 */
+	private $max_retention = 4;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.0
@@ -63,7 +108,15 @@ class Boldgrid_Backup_Admin_Config {
 	 */
 	public function __construct( $core ) {
 		// Save the Boldgrid_Backup_Admin_Core object as a class property.
-		$this->core = $core;
+		if( is_object( $core ) ) {
+			$this->core = $core;
+		}
+
+		if( true === $this->is_premium ) {
+			$this->default_retention = 5;
+		}
+
+		$this->set_lang();
 	}
 
 	/**
@@ -146,6 +199,39 @@ class Boldgrid_Backup_Admin_Config {
 	}
 
 	/**
+	 * Get is_premium.
+	 *
+	 * @since 1.3.1
+	 *
+	 * @return bool
+	 */
+	public function get_is_premium() {
+		return $this->is_premium;
+	}
+
+	/**
+	 * Get max_dow.
+	 *
+	 * @since 1.3.1
+	 *
+	 * @return int
+	 */
+	public function get_max_dow() {
+		return $this->max_dow;
+	}
+
+	/**
+	 * Get max_retention.
+	 *
+	 * @since 1.3.1
+	 *
+	 * @return int
+	 */
+	public function get_max_retention() {
+		return $this->max_retention;
+	}
+
+	/**
 	 * Get and return the backup directory path.
 	 *
 	 * @since 1.0
@@ -176,6 +262,17 @@ class Boldgrid_Backup_Admin_Config {
 
 		// Backup directory was set, so return the path.
 		return $this->backup_directory;
+	}
+
+	/**
+	 * Get default_retention.
+	 *
+	 * @since 1.3.1
+	 *
+	 * @return int
+	 */
+	public function get_default_retention() {
+		return $this->default_retention;
 	}
 
 	/**
@@ -280,6 +377,18 @@ class Boldgrid_Backup_Admin_Config {
 
 		// Return success.
 		return true;
+	}
+
+	/**
+	 * Set lang.
+	 *
+	 * @since 1.3.1
+	 */
+	public function set_lang() {
+		$this->lang = array(
+			'website_size' => esc_html__( 'Website Size:', 'boldgrid-backup' ),
+			'database_size' => esc_html__( 'Database Size:', 'boldgrid-backup' ),
+		);
 	}
 
 	/**

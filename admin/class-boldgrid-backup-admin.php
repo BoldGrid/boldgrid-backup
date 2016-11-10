@@ -60,6 +60,8 @@ class Boldgrid_Backup_Admin {
 			require_once ABSPATH . '/wp-admin/includes/file.php';
 			WP_Filesystem();
 		}
+
+		$this->config = new Boldgrid_Backup_Admin_Config( null );
 	}
 
 	/**
@@ -81,12 +83,22 @@ class Boldgrid_Backup_Admin {
 		plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin.css', array(), $this->version );
 
 		// Enqueue JS.
-		wp_enqueue_script( 'boldgrid-backup-admin',
+		wp_register_script( 'boldgrid-backup-admin',
 			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin.js',
 			array( 'jquery' ),
 			BOLDGRID_BACKUP_VERSION,
 			false
 		);
+
+		$translation = array(
+			'is_premium' => ( true === $this->config->get_is_premium() ? 'true' : 'false' ),
+			'max_dow' => $this->config->get_max_dow(),
+			'lang' => $this->config->lang,
+		);
+
+		wp_localize_script( 'boldgrid-backup-admin', 'BoldGridBackupAdmin', $translation );
+
+		wp_enqueue_script( 'boldgrid-backup-admin' );
 
 		// Enqueue CSS for the home page.
 		if ( isset( $_REQUEST['page'] ) && 'boldgrid-backup' === $_REQUEST['page'] ) {

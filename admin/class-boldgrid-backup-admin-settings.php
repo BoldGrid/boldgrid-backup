@@ -28,13 +28,6 @@ class Boldgrid_Backup_Admin_Settings {
 	private $core;
 
 	/**
-	 * Config array.
-	 *
-	 * @since  1.3.1
-	 */
-	public $config;
-
-	/**
 	 * Constructor.
 	 *
 	 * @since 1.0
@@ -44,17 +37,6 @@ class Boldgrid_Backup_Admin_Settings {
 	public function __construct( $core ) {
 		// Save the Boldgrid_Backup_Admin_Core object as a class property.
 		$this->core = $core;
-
-		$this->config = array(
-			// Is this a premium version of the plugin?
-			'premium' => false,
-			// Free plugin: Max days of the week backups can be scheduled for.
-			'max_dow' => 2,
-			// Free plugin: Max number of archives to retain.
-			'max_retention' => 4,
-		);
-
-		$this->config['default_retention'] = ( $this->config['premium'] ? 5 : 4 );
 	}
 
 	/**
@@ -222,10 +204,10 @@ class Boldgrid_Backup_Admin_Settings {
 		 * If we're on the free version of the plugin and the scheduled "Days of the Week"
 		 * limitation has been reached, show an error and abort.
 		 */
-		if( ! $this->config['premium'] && $this->get_dow_count() > $this->config['max_dow'] ) {
+		if( ! $this->core->config->get_is_premium() && $this->get_dow_count() > $this->core->config->get_max_dow() ) {
 			printf( '<div class="notice notice-error is-dismissible"><p>%s %d<p></div>',
 					esc_html__( 'Error: You have scheduled backups to run during too many days of the week. The free version of BoldGrid Backup supports:', 'boldgrid-backup' ),
-					$this->config['max_dow']
+					$this->core->config->get_max_dow()
 			);
 			return;
 		}
@@ -234,7 +216,7 @@ class Boldgrid_Backup_Admin_Settings {
 		 * If we're on the free version of the plugin and the retention count is set higher than the
 		 * limitation, show an error and abort.
 		 */
-		if( ! $this->config['premium'] && $retention_count > $this->config['max_retention'] ) {
+		if( ! $this->core->config->get_is_premium() && $retention_count > $this->core->config->get_max_retention() ) {
 			printf( '<div class="notice notice-error is-dismissible"><p>%s %d<p></div>',
 				esc_html__( 'Error: You tried setting the backup archive count more than which the free version supports:', 'boldgrid-backup' ),
 				$this->config['max_retention']
@@ -535,25 +517,12 @@ class Boldgrid_Backup_Admin_Settings {
 		);
 
 		// Enqueue the JS for the settings page.
-		wp_register_script( 'boldgrid-backup-admin-settings',
+		wp_enqueue_script( 'boldgrid-backup-admin-settings',
 			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-settings.js',
 			array( 'jquery' ),
 			BOLDGRID_BACKUP_VERSION,
 			false
 		);
-
-		$translation = array(
-			'website_size' => esc_html__( 'Website Size:', 'boldgrid-backup' ),
-			'database_size' => esc_html__( 'Database Size:', 'boldgrid-backup' ),
-			// Is this a premium version of the plugin?
-			'premium' => ( $this->config['premium'] ? 'true' : 'false' ),
-			// Max days of the week backups can be scheduled for.
-			'max_dow' => $this->config['max_dow'],
-		);
-
-		wp_localize_script( 'boldgrid-backup-admin-settings', 'BoldGridBackupAdminSettings', $translation );
-
-		wp_enqueue_script( 'boldgrid-backup-admin-settings' );
 
 		// Get settings.
 		$settings = $this->get_settings();

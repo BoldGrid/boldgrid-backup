@@ -2187,6 +2187,9 @@ class Boldgrid_Backup_Admin_Core {
 		// Include the home page template.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-home.php';
 
+		// Include our js templates.
+		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-js-templates.php';
+
 		// If a restoration operation is requested, then restore from a backup archive now.
 		if ( ! empty( $_POST['restore_now'] ) ) {
 			printf(

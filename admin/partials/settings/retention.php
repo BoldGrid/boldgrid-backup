@@ -25,19 +25,19 @@ $is_retention_set = ( isset( $settings['retention_count'] ) );
 					// Loop through each <option> and print it.
 					for ( $x = 1; $x <= 10; $x ++ ) {
 						// Should this option be 'disabled'?
-						$disabled = ( ! $this->config['premium'] && $x > $this->config['max_retention'] ? ' disabled' : '' );
+						$disabled = ( ! $this->core->config->get_is_premium() && $x > $this->core->config->get_max_retention() ? ' disabled' : '' );
 
 						// Is retention set and $x = that set retention?
 						$x_is_retention = ( $is_retention_set && $x === $settings['retention_count'] );
 
 						// Is retention not set and $x = the default retention?
-						$x_is_default = ( ! $is_retention_set && $this->config['default_retention'] === $x );
+						$x_is_default = ( ! $is_retention_set && $this->core->config->get_default_retention() === $x );
 
 						// Should this option be 'selected'?
 						$selected = ( ( $x_is_retention || $x_is_default ) ? ' selected' : '' );
 
 						// Should we flag this option as "Requires Upgrade"?
-						if( ! $this->config['premium'] && ( $this->config['default_retention'] + 1 ) === $x ) {
+						if( ! $this->core->config->get_is_premium() && ( $this->core->config->get_default_retention() + 1 ) === $x ) {
 							$requires_upgrade = esc_html__( '- Requires Upgrade', 'boldgrid-backup' );
 						} else {
 							$requires_upgrade = '';
