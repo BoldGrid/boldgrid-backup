@@ -423,6 +423,82 @@ class Boldgrid_Backup_Admin_Test {
 	}
 
 	/**
+	 * Get any applicable messages regarding disk / db sizes.
+	 *
+	 * One message is returned for disk space, and another returned for db size.
+	 *
+	 * For example, "Cannot backup your account, too much disk space used."
+	 *
+	 * @since 1.3.1
+	 *
+	 * @param  array $disk_space
+	 * @param  int   $db_size
+	 * @return array
+	 */
+	public function get_size_messages( $disk_space, $db_size ) {
+		// Define an array of possible messages for the user.
+		$messages = array(
+			// Supported but <a>Issues may Occur</a>.
+			'issues_may_occur' => sprintf(
+				wp_kses(
+					__( 'Supported but <a href="%s" target="_blank">Issues may Occur</a>', 'boldgrid-backup' ),
+					array(  'a' => array( 'href' => array() ), 'target' => array() )
+				),
+				esc_url( 'https://www.boldgrid.com' )
+			),
+			// <a>Must Reduce before Running</a>.
+			'must_reduce' => sprintf(
+				'<a href="https://www.boldgrid.com" target="_blank">%s</a>',
+				esc_html__( 'Must Reduce before Running', 'boldgrid-backup' )
+			),
+			// Requires Upgrade.
+			'requires_upgrade' => esc_html__( 'Requires Upgrade', 'boldgrid-backup' ),
+			// Supported.
+			'supported' => esc_html__( 'Supported', 'boldgrid-backup' ),
+		);
+
+		/*
+		 * There are certain restrictions on free / premium version of the plugin. The IF statement
+		 * adds notices for the free version of the plugin, the ELSE premium notices.
+		*/
+		if( false === $this->core->config->get_is_premium() ) {
+			// Check disk space.
+			if( $disk_space[3] > $this->core->config->get_max_free_disk() ) {
+				$return['disk'] = $messages['requires_upgrade'];
+			} else {
+				$return['disk'] = $messages['supported'];
+			}
+
+			// Check db space.
+			if( $db_size > $this->core->config->get_max_free_db() ) {
+				$return['db'] = $messages['requires_upgrade'];
+			} else {
+				$return['db'] = $messages['supported'];
+			}
+		} else {
+			// Check disk space.
+			if( $disk_space[3] > $this->core->config->get_max_disk_high() ) {
+				$return['disk'] = $messages['must_reduce'];
+			}elseif( $disk_space[3] > $this->core->config->get_max_disk_low() ) {
+				$return['disk'] = $messages['issues_may_occur'];
+			} else {
+				$return['disk'] = $messages['supported'];
+			}
+
+			// Check db space.
+			if( $db_size > $this->core->config->get_max_db_high() ) {
+				$return['db'] = $messages['must_reduce'];
+			}elseif( $db_size > $this->core->config->get_max_db_low() ) {
+				$return['db'] = $messages['issues_may_occur'];
+			} else {
+				$return['db'] = $messages['supported'];
+			}
+		}
+
+		return $return;
+	}
+
+	/**
 	 * Get database size.
 	 *
 	 * @since 1.0

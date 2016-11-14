@@ -2917,9 +2917,12 @@ class Boldgrid_Backup_Admin_Core {
 			wp_die( 'unauthorized' );
 		}
 
+		$disk_space = $this->test->get_disk_space();
+		$db_size = $this->test->get_database_size();
+
 		$return = array(
-			'disk_space' => $this->test->get_disk_space(),
-			'db_size' => $this->test->get_database_size()
+			'disk_space' => $disk_space,
+			'db_size' => $db_size,
 		);
 
 		/*
@@ -2927,11 +2930,14 @@ class Boldgrid_Backup_Admin_Core {
 		 * so as not needed to be done by js.
 		 */
 
-		foreach( $return[ 'disk_space' ] as $k => $v ) {
+		foreach( $disk_space as $k => $v ) {
 			$return[ 'disk_space_hr' ][ $k ] = Boldgrid_Backup_Admin_Utility::bytes_to_human( $v );
 		}
 
-		$return[ 'db_size_hr' ] = Boldgrid_Backup_Admin_Utility::bytes_to_human( $return[ 'db_size'] );
+		$return[ 'db_size_hr' ] = Boldgrid_Backup_Admin_Utility::bytes_to_human( $db_size );
+
+		// Add status messages about disk space and db size.
+		$return['messages'] = $this->test->get_size_messages( $disk_space, $db_size );
 
 		echo json_encode( $return );
 
