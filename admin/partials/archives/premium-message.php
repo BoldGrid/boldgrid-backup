@@ -16,7 +16,7 @@ if( $this->config->get_is_premium() ) {
 	 */
 	printf(
 		wp_kses(
-			__( '<p>You are running the Premium version of the BoldGrid Backup Plugin. Please visit our <a href="%s" target="_blank">BoldGrid Backup User Guide - Premium Addition for more information.</p>', 'boldgrid-backup' ),
+			__( '<p>You are running the Premium version of the BoldGrid Backup Plugin. Please visit our <a href="%s" target="_blank">BoldGrid Backup User Guide - Premium Addition</a> for more information.</p>', 'boldgrid-backup' ),
 			array(
 				'a' => array( 'href' => array(), 'target' => array() ),
 				'p' => array(),
