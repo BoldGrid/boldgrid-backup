@@ -109,6 +109,15 @@ class Boldgrid_Backup_Admin_Test {
 	private $is_functional = null;
 
 	/**
+	 * Transient time for disk / db size data.
+	 *
+	 * @since  1.3.1
+	 * @access public
+	 * @var    int
+	 */
+	public $transient_time = 0;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.0
@@ -118,6 +127,8 @@ class Boldgrid_Backup_Admin_Test {
 	public function __construct( $core ) {
 		// Save the Boldgrid_Backup_Admin_Core object as a class property.
 		$this->core = $core;
+
+		$this->transient_time = 5 * MINUTE_IN_SECONDS;
 	}
 
 	/**
@@ -381,6 +392,11 @@ class Boldgrid_Backup_Admin_Test {
 			return false;
 		}
 
+		// Save time, use transients.
+		if( false !== ( $transient = get_transient( 'boldgrid_backup_wp_size' ) ) ) {
+			return $transient;
+		}
+
 		// Get the filtered file list.
 		$filelist = $this->core->get_filtered_filelist( ABSPATH );
 
@@ -399,9 +415,11 @@ class Boldgrid_Backup_Admin_Test {
 			$size += $fileinfo[2];
 		}
 
+		// Save time, use transients.
+		set_transient( 'boldgrid_backup_wp_size', $size, $this->transient_time );
+
 		// Return the result.
 		return $size;
-
 	}
 
 	/**
@@ -414,6 +432,11 @@ class Boldgrid_Backup_Admin_Test {
 	 * @return int The total size of the database (in bytes).
 	 */
 	public function get_database_size() {
+		// Save some time, get transient.
+		if( false !== ( $transient = get_transient( 'boldgrid_backup_db_size' ) ) ) {
+			return $transient;
+		}
+
 		// Connect to the WordPress database via $wpdb.
 		global $wpdb;
 
@@ -435,6 +458,9 @@ class Boldgrid_Backup_Admin_Test {
 		if ( empty( $result ) ) {
 			return 0;
 		}
+
+		// Save some time, set transient.
+		set_transient( 'boldgrid_backup_db_size', $result[0], $this->transient_time );
 
 		// Return result.
 		return $result[0];

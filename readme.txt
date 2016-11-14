@@ -40,6 +40,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 * Update:		JIRA WPB-2605	Add intro message to Archive page.
 * Update:		JIRA WPB-2607	Modify backup id section on archives page.
 * Update:		JIRA WPB-2608	Modify Backup Site messages.
+* Update:		JIRA WPB-2594	Cache disk space data.
 
 = 1.3 =
 * Update:						Bump version.

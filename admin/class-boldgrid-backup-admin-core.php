@@ -2410,19 +2410,7 @@ class Boldgrid_Backup_Admin_Core {
 		// Get the database collation.
 		$db_collate = $wpdb->collate;
 
-		// Get archive info, if plugin is functional.
-		if ( $is_functional ) {
-			$archive_info = $this->archive_files( false );
-		}
-
-		// Get disk space information array.
-		if ( ! empty( $archive_info['total_size'] ) ) {
-			$disk_space = $this->test->get_disk_space( false );
-
-			$disk_space[3] = $archive_info['total_size'];
-		} else {
-			$disk_space = $this->test->get_disk_space();
-		}
+		$disk_space = $this->test->get_disk_space();
 
 		// Enqueue CSS for the test page.
 		wp_enqueue_style( 'boldgrid-backup-admin-test',

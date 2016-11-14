@@ -142,11 +142,6 @@ if ( $is_functional ) {
 	}
 
 	if ( ! empty( $archive_info['total_size'] ) ) {
-		$tests[] = array(
-			'k' => __( 'Backup archive size:', 'boldgrid-backup' ),
-			'v' => Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] ),
-		);
-
 		// Calculate possible disk free space after a backup, using the entire WP directory size.
 		$disk_free_post = $disk_space[2] - $archive_info['total_size'] - $db_size;
 	} else {
