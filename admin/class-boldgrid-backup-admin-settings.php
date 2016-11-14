@@ -437,6 +437,11 @@ class Boldgrid_Backup_Admin_Settings {
 			);
 		}
 
+		// Temporary.
+		if( isset( $_POST['is_premium'] ) && 'true' === $_POST['is_premium'] ) {
+			update_option( 'boldgrid_backup_is_premium', 'true' );
+		}
+
 		// Return success.
 		return ! $update_error;
 	}

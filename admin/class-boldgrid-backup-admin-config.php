@@ -70,7 +70,7 @@ class Boldgrid_Backup_Admin_Config {
 	 * @access private
 	 * @var    bool
 	 */
-	private $is_premium = true;
+	private $is_premium = false;
 
 	/**
 	 * Language.
@@ -184,6 +184,11 @@ class Boldgrid_Backup_Admin_Config {
 		// Save the Boldgrid_Backup_Admin_Core object as a class property.
 		if( is_object( $core ) ) {
 			$this->core = $core;
+		}
+
+		// Temporary, for testing only.
+		if( 'true' === get_option( 'boldgrid_backup_is_premium' ) ) {
+			$this->is_premium = true;
 		}
 
 		if( true === $this->is_premium ) {
