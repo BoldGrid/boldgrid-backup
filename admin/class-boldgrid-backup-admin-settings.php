@@ -197,7 +197,7 @@ class Boldgrid_Backup_Admin_Settings {
 		if( isset( $_POST['retention_count'] ) ) {
 			$retention_count = intval( $_POST['retention_count'] );
 		} else {
-			$retention_count = $this->config['default_retention'];
+			$retention_count = $this->core->config->get_default_retention();
 		}
 
 		/*
@@ -219,7 +219,7 @@ class Boldgrid_Backup_Admin_Settings {
 		if( ! $this->core->config->get_is_premium() && $retention_count > $this->core->config->get_max_retention() ) {
 			printf( '<div class="notice notice-error is-dismissible"><p>%s %d<p></div>',
 				esc_html__( 'Error: You tried setting the backup archive count more than which the free version supports:', 'boldgrid-backup' ),
-				$this->config['max_retention']
+				$this->core->config->get_max_retention()
 			);
 			return;
 		}
@@ -438,8 +438,8 @@ class Boldgrid_Backup_Admin_Settings {
 		}
 
 		// Temporary.
-		if( isset( $_POST['is_premium'] ) && 'true' === $_POST['is_premium'] ) {
-			update_option( 'boldgrid_backup_is_premium', 'true' );
+		if( isset( $_POST['is_premium'] ) && in_array( $_POST['is_premium'], array( 'true', 'false' ) ) ) {
+			update_option( 'boldgrid_backup_is_premium', $_POST['is_premium'] );
 		}
 
 		// Return success.
