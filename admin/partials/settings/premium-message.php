@@ -36,7 +36,7 @@ if( $this->core->config->get_is_premium() ) {
 		wp_kses(
 			__(
 				'
-				<p>The BoldGrid Backup plugin comes in two versions, the Free and Premium. The Premium version is part of the BoldGrid Premium Suite. To learn about the capabilities of the BoldGrid Backup Plugin, check out our <a href="%1$s" target="_blank">BoldGrid Backup User Guide</a>.<p>
+				<p>The BoldGrid Backup plugin comes in two versions, the Free and Premium. The Premium version is part of the BoldGrid Premium Suite. To learn about the capabilities of the BoldGrid Backup Plugin, check out our <a href="%1$s" target="_blank">BoldGrid Backup User Guide</a>.</p>
 				<p>Key differences are size of backups supported, scheduling capabilities, and number of archives supported. To upgrade now, go <a href="%2$s" target="_blank">here</a>.</p>
 				',
 				'boldgrid-backup'

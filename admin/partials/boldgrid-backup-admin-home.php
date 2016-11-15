@@ -36,7 +36,7 @@
 <div id='size-data'>
 		<?php
 		wp_nonce_field( 'boldgrid_backup_sizes', 'sizes_auth' );
-		printf( '<p><span class="spinner" style="float:none; visibility:visible; margin-top: -10px; margin-left:0px;"></span>%s</p>',
+		printf( '<p><span class="spinner inline"></span>%s</p>',
 			esc_html__( 'Calculating disk space...' )
 		);
 		?>

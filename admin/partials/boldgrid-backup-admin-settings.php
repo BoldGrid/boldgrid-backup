@@ -30,13 +30,13 @@ if ( empty( $settings ) ) {
 		 * Print this text:
 		 *
 		 * The BoldGrid Backup and Restore system allows you to upgrade your themes and plugins without
-		 * being afraid it will do something you cannot easily undo. We preform a Preflight Check to see
+		 * being afraid it will do something you cannot easily undo. We perform a Preflight Check to see
 		 * if the needed support is available on your web hosting account.
 		 */
 		$url = admin_url( 'admin.php?page=boldgrid-backup-test' );
 		$link = sprintf(
 			wp_kses(
-				__( 'The BoldGrid Backup and Restore system allows you to upgrade your themes and plugins without being afraid it will do something you cannot easily undo. We preform a <a href="%s">Preflight Check</a> to see if the needed support is available on your web hosting account.', 'boldgrid-backup' ),
+				__( 'The BoldGrid Backup and Restore system allows you to upgrade your themes and plugins without being afraid it will do something you cannot easily undo. We perform a <a href="%s">Preflight Check</a> to see if the needed support is available on your web hosting account.', 'boldgrid-backup' ),
 				array(  'a' => array( 'href' => array() ) )
 			),
 			esc_url( $url )
@@ -50,7 +50,7 @@ if ( empty( $settings ) ) {
 	<div id='size-data'>
 		<?php
 		wp_nonce_field( 'boldgrid_backup_sizes', 'sizes_auth' );
-		printf( '<p><span class="spinner" style="float:none; visibility:visible; margin-top: -10px; margin-left:0px;"></span>%s</p>',
+		printf( '<p><span class="spinner inline"></span>%s</p>',
 			esc_html__( 'Calculating disk space...' )
 		);
 		?>

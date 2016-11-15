@@ -11,3 +11,11 @@
 .help[data-id] {
 	display: none;
 }
+
+/* Create an inline spinner. */
+.spinner.inline {
+	float: none;
+	visibility: visible;
+	vertical-align: bottom;
+	margin-left: 0px;
+}
