@@ -109,13 +109,15 @@ class Boldgrid_Backup_Admin_Test {
 	private $is_functional = null;
 
 	/**
-	 * Transient time for disk / db size data.
+	 * Transient time (in seconds) for disk / db size data.
+	 *
+	 * Default value is 300 seconds (5 minutes).
 	 *
 	 * @since  1.3.1
 	 * @access public
 	 * @var    int
 	 */
-	public $transient_time = 0;
+	public $transient_time = 300;
 
 	/**
 	 * Constructor.
@@ -127,8 +129,6 @@ class Boldgrid_Backup_Admin_Test {
 	public function __construct( $core ) {
 		// Save the Boldgrid_Backup_Admin_Core object as a class property.
 		$this->core = $core;
-
-		$this->transient_time = 5 * MINUTE_IN_SECONDS;
 	}
 
 	/**

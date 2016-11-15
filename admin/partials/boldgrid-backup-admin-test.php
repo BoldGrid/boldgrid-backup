@@ -120,34 +120,8 @@ if ( $is_functional ) {
 		'v' => $db_collate,
 	);
 
-	if ( ! empty( $archive_info['error'] ) ) {
-		$tests[] = array(
-			'k' => __( 'Archive error:', 'boldgrid-backup' ),
-			'v' => $archive_info['error'],
-		);
-
-		if ( ! empty( $archive_info['error_code'] ) ) {
-			$tests[] = array(
-				'k' => __( 'Compressor error code:', 'boldgrid-backup' ),
-				'v' => $archive_info['error_code'],
-			);
-
-			if ( ! empty( $archive_info['error_message'] ) ) {
-				$tests[] = array(
-					'k' => __( 'Compressor error message:', 'boldgrid-backup' ),
-					'v' => $archive_info['error_message'],
-				);
-			}
-		}
-	}
-
-	if ( ! empty( $archive_info['total_size'] ) ) {
-		// Calculate possible disk free space after a backup, using the entire WP directory size.
-		$disk_free_post = $disk_space[2] - $archive_info['total_size'] - $db_size;
-	} else {
-		// Calculate possible disk free space after a backup, using the entire WP directory size.
-		$disk_free_post = $disk_space[2] - $disk_space[3] - $db_size;
-	}
+	// Calculate possible disk free space after a backup, using the entire WP directory size.
+	$disk_free_post = $disk_space[2] - $disk_space[3] - $db_size;
 
 	if ( $disk_free_post > 0 ) {
 		$tests[] = array(
