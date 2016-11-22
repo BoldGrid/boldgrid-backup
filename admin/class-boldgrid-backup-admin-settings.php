@@ -180,6 +180,36 @@ class Boldgrid_Backup_Admin_Settings {
 	}
 
 	/**
+	 * Move backups from one directory to another.
+	 *
+	 * @since 1.3.2
+	 *
+	 * @global object $wp_filesystem
+	 *
+	 * @param string $old_dir
+	 * @param string $new_dir
+	 */
+	private function move_backups( $old_dir, $new_dir ) {
+		global $wp_filesystem;
+
+		// Don't assume paths end in '/'. First remove forward slashes at the end, then add back.
+		$old_dir = rtrim( $old_dir, '/' ) . '/';
+		$new_dir = rtrim( $new_dir, '/' ) . '/';
+
+		$archives = $this->core->get_archive_list( null, $old_dir );
+
+		ignore_user_abort(true);
+
+		// Loop through each archive and move it.
+		foreach( $archives as $archive ) {
+			$source = $archive['filepath'];
+			$destination = $new_dir . $archive['filename'];
+
+			$success = $wp_filesystem->move( $source, $destination );
+		}
+	}
+
+	/**
 	 * Update settings.
 	 *
 	 * @since 1.0
@@ -357,11 +387,11 @@ class Boldgrid_Backup_Admin_Settings {
 			}
 
 			// Get the current backup directory path.
-			$backup_directory = $this->core->config->get_backup_directory();
+			$original_backup_directory = $this->core->config->get_backup_directory();
 
 			// Save backup directory, if changed.
 			if ( ! empty( $_POST['backup_directory'] ) &&
-			trim( $_POST['backup_directory'] ) !== $backup_directory ) {
+			trim( $_POST['backup_directory'] ) !== $original_backup_directory ) {
 				// Sanitize.
 				$backup_directory = trim( $_POST['backup_directory'] );
 
@@ -371,6 +401,11 @@ class Boldgrid_Backup_Admin_Settings {
 				// If the backup directory was configured, then save the new setting.
 				if ( $is_directory_set ) {
 					$settings['backup_directory'] = $backup_directory;
+
+					// Move backups to the new directory.
+					if( isset( $_POST['move-backups'] ) && 'on' === $_POST['move-backups'] ) {
+						$this->move_backups( $original_backup_directory, $backup_directory );
+					}
 				} else {
 					$update_error = true;
 				}

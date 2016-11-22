@@ -1385,6 +1385,7 @@ class Boldgrid_Backup_Admin_Core {
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
 	 * @param string $download_filename A filename to match to get info.
+	 * @param string $backup_directory  Specify a directory to look within for backups.
 	 * @return array {
 	 * 	A numbered array of arrays containing the following indexes.
 	 * 	@type string $filepath Archive file path.
@@ -1394,7 +1395,7 @@ class Boldgrid_Backup_Admin_Core {
 	 * 	@type int $lastmodunix The archive file modification time in unix seconds.
 	 * }
 	 */
-	public function get_archive_list( $download_filename = null ) {
+	public function get_archive_list( $download_filename = null, $backup_directory = null ) {
 		// Connect to the WordPress Filesystem API.
 		global $wp_filesystem;
 
@@ -1402,7 +1403,9 @@ class Boldgrid_Backup_Admin_Core {
 		$archive_files = array();
 
 		// Get the backup directory.
-		$backup_directory = $this->config->get_backup_directory();
+		if( is_null( $backup_directory ) ) {
+			$backup_directory = $this->config->get_backup_directory();
+		}
 
 		// If the backup directory is not configured, then return an empty array.
 		if ( ! $backup_directory ) {

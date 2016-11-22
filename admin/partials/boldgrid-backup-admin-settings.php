@@ -303,12 +303,8 @@ if ( empty( $settings ) ) {
 				</tbody>
 			</table>
 		</div>
-		<h2><?php esc_html_e( 'Backup Directory', 'boldgrid-backup' ); ?></h2>
-		<div class='backup-directory'>
-			<?php esc_html_e( 'Directory to store backup archives', 'boldgrid-backup' ); ?>:
-			<input id='backup-directory-path' type='text' size='50' name='backup_directory'
-			value='<?php echo $settings['backup_directory']; ?>'>
-		</div>
+
+		<?php include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/backup-directory.php'; ?>
 
 		<?php
 		// This is a temporary section.
