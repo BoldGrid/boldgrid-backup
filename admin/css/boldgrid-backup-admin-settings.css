@@ -27,3 +27,15 @@
 .schedule-dow input[type='checkbox'][disabled]:hover {
 	cursor: not-allowed;
 }
+
+#notification-settings-table td,
+.backup-directory td {
+	width: 275px;
+	vertical-align: top;
+}
+
+#notification-settings-table td input,
+.backup-directory td input {
+	margin-left: 0px;
+	border-color: #ddd;
+}
