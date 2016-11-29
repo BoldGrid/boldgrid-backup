@@ -402,12 +402,12 @@ class Boldgrid_Backup_Admin_Test {
 		 * installations. If the recurse_dirsize function does not exist, include the necessary
 		 * file.
 		 */
-		if( ! function_exists( 'recurse_dirsize' ) ) {
+		if ( ! function_exists( 'recurse_dirsize' ) ) {
 			require_once ABSPATH . 'wp-includes/ms-functions.php';
 		}
 
 		// Save time, use transients.
-		if( false !== ( $transient = get_transient( 'boldgrid_backup_wp_size' ) ) ) {
+		if ( false !== ( $transient = get_transient( 'boldgrid_backup_wp_size' ) ) ) {
 			return $transient;
 		}
 
@@ -422,10 +422,10 @@ class Boldgrid_Backup_Admin_Test {
 		// Initialize total_size.
 		$size = 0;
 
-		foreach( $filelist as $file ) {
+		foreach ( $filelist as $file ) {
 			$file_path = ABSPATH . $file;
 
-			if( is_dir( $file_path ) ) {
+			if ( is_dir( $file_path ) ) {
 				$size += recurse_dirsize( $file_path );
 			} else {
 				$size += $wp_filesystem->size( $file_path );
@@ -459,7 +459,7 @@ class Boldgrid_Backup_Admin_Test {
 			'issues_may_occur' => sprintf(
 				wp_kses(
 					__( 'Supported but <a href="%s" target="_blank">Issues may Occur</a>', 'boldgrid-backup' ),
-					array(  'a' => array( 'href' => array() ), 'target' => array() )
+					array( 'a' => array( 'href' => array() ), 'target' => array() )
 				),
 				esc_url( 'https://www.boldgrid.com' )
 			),
@@ -478,34 +478,34 @@ class Boldgrid_Backup_Admin_Test {
 		 * There are certain restrictions on free / premium version of the plugin. The IF statement
 		 * adds notices for the free version of the plugin, the ELSE premium notices.
 		*/
-		if( false === $this->core->config->get_is_premium() ) {
+		if ( false === $this->core->config->get_is_premium() ) {
 			// Check disk space.
-			if( $disk_space[3] > $this->core->config->get_max_free_disk() ) {
+			if ( $disk_space[3] > $this->core->config->get_max_free_disk() ) {
 				$return['disk'] = $messages['requires_upgrade'];
 			} else {
 				$return['disk'] = $messages['supported'];
 			}
 
 			// Check db space.
-			if( $db_size > $this->core->config->get_max_free_db() ) {
+			if ( $db_size > $this->core->config->get_max_free_db() ) {
 				$return['db'] = $messages['requires_upgrade'];
 			} else {
 				$return['db'] = $messages['supported'];
 			}
 		} else {
 			// Check disk space.
-			if( $disk_space[3] > $this->core->config->get_max_disk_high() ) {
+			if ( $disk_space[3] > $this->core->config->get_max_disk_high() ) {
 				$return['disk'] = $messages['must_reduce'];
-			}elseif( $disk_space[3] > $this->core->config->get_max_disk_low() ) {
+			} elseif ( $disk_space[3] > $this->core->config->get_max_disk_low() ) {
 				$return['disk'] = $messages['issues_may_occur'];
 			} else {
 				$return['disk'] = $messages['supported'];
 			}
 
 			// Check db space.
-			if( $db_size > $this->core->config->get_max_db_high() ) {
+			if ( $db_size > $this->core->config->get_max_db_high() ) {
 				$return['db'] = $messages['must_reduce'];
-			}elseif( $db_size > $this->core->config->get_max_db_low() ) {
+			} elseif ( $db_size > $this->core->config->get_max_db_low() ) {
 				$return['db'] = $messages['issues_may_occur'];
 			} else {
 				$return['db'] = $messages['supported'];
@@ -526,7 +526,7 @@ class Boldgrid_Backup_Admin_Test {
 	 */
 	public function get_database_size() {
 		// Save some time, get transient.
-		if( false !== ( $transient = get_transient( 'boldgrid_backup_db_size' ) ) ) {
+		if ( false !== ( $transient = get_transient( 'boldgrid_backup_db_size' ) ) ) {
 			return $transient;
 		}
 
