@@ -380,10 +380,13 @@ class Boldgrid_Backup_Admin_Test {
 	 * @access private
 	 *
 	 * @see get_filtered_filelist
+	 * @global object $wp_filesystem
 	 *
 	 * @return int|bool The total size for the WordPress file system in bytes, or FALSE on error.
 	 */
 	private function get_wp_size() {
+		global $wp_filesystem;
+
 		// Perform functionality tests.
 		$is_functional = $this->run_functionality_tests();
 
@@ -392,13 +395,24 @@ class Boldgrid_Backup_Admin_Test {
 			return false;
 		}
 
+		/*
+		 * Include wp-includes/ms-functions.php.
+		 *
+		 * This method uses WordPress' recurse_dirsize function, which is loaded on multisite
+		 * installations. If the recurse_dirsize function does not exist, include the necessary
+		 * file.
+		 */
+		if( ! function_exists( 'recurse_dirsize' ) ) {
+			require_once ABSPATH . 'wp-includes/ms-functions.php';
+		}
+
 		// Save time, use transients.
 		if( false !== ( $transient = get_transient( 'boldgrid_backup_wp_size' ) ) ) {
 			return $transient;
 		}
 
 		// Get the filtered file list.
-		$filelist = $this->core->get_filtered_filelist( ABSPATH );
+		$filelist = $this->core->get_filelist_filter();
 
 		// If nothing was found, then return 0.
 		if ( empty( $filelist ) ) {
@@ -408,11 +422,14 @@ class Boldgrid_Backup_Admin_Test {
 		// Initialize total_size.
 		$size = 0;
 
-		// Add up the file sizes.
-		foreach ( $filelist as $fileinfo ) {
-			// Add the file size to the total.
-			// get_filelist() returns fileinfo array with index 2 for filesize.
-			$size += $fileinfo[2];
+		foreach( $filelist as $file ) {
+			$file_path = ABSPATH . $file;
+
+			if( is_dir( $file_path ) ) {
+				$size += recurse_dirsize( $file_path );
+			} else {
+				$size += $wp_filesystem->size( $file_path );
+			}
 		}
 
 		// Save time, use transients.
