@@ -603,7 +603,7 @@ class Boldgrid_Backup_Admin_Core {
 		$defaults_filepath = $backup_directory . '/mysqldump.cnf';
 
 		$defaults_file_data = '[client]' . PHP_EOL . 'host=' . DB_HOST . PHP_EOL . 'user=' . DB_USER .
-			 PHP_EOL . 'password=' . DB_PASSWORD . PHP_EOL;
+			 PHP_EOL . 'password="' . DB_PASSWORD . '"' . PHP_EOL;
 
 		$status = $wp_filesystem->put_contents( $defaults_filepath, $defaults_file_data, 0600 );
 

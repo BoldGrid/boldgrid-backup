@@ -29,8 +29,9 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 == Changelog ==
 
 = 1.3.2 In progress =
+* Bug fix:		JIRA WPB-2657	Added double-quote encapsulation to password in mysqldump defaults file.
 * Update:		JIRA WPB-2637	Move backups when changing backup directory.
-* Bug fix:                      Typo fix.
+* Bug fix:						Typo fix.
 * Update:		JIRA WPB-2652	Improve time to calculate disk space.
 
 = 1.3.1 =
