@@ -2,7 +2,7 @@
 Contributors: imh_brad, joemoto, rramo012, timph
 Tags: inspiration,customization,build,create,design,seo,search engine optimization
 Requires at least: 4.3
-Tested up to: 4.6.1
+Tested up to: 4.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -28,7 +28,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 
 == Changelog ==
 
-= 1.3.2 In progress =
+= 1.3.2 =
 * Bug fix:		JIRA WPB-2657	Added double-quote encapsulation to password in mysqldump defaults file.
 * Update:		JIRA WPB-2637	Move backups when changing backup directory.
 * Bug fix:						Typo fix.
