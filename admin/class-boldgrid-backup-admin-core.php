@@ -2926,6 +2926,8 @@ class Boldgrid_Backup_Admin_Core {
 		$return = array(
 			'disk_space' => $disk_space,
 			'db_size' => $db_size,
+			'disk_limit' => $this->config->get_max_disk(),
+			'db_limit' => $this->config->get_max_db(),
 		);
 
 		/*
@@ -2938,6 +2940,8 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		$return[ 'db_size_hr' ] = Boldgrid_Backup_Admin_Utility::bytes_to_human( $db_size );
+		$return[ 'disk_limit_hr' ] = Boldgrid_Backup_Admin_Utility::bytes_to_human( $return[ 'disk_limit' ] );
+		$return[ 'db_limit_hr' ] = Boldgrid_Backup_Admin_Utility::bytes_to_human( $return[ 'db_limit' ] );
 
 		// Add status messages about disk space and db size.
 		$return['messages'] = $this->test->get_size_messages( $disk_space, $db_size );

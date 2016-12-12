@@ -289,6 +289,19 @@ class Boldgrid_Backup_Admin_Config {
 	}
 
 	/**
+	 * Return max db size that can be backed up.
+	 *
+	 * This method takes into consideration whether you have a premium account or not.
+	 *
+	 * @since 1.3.3
+	 *
+	 * @return int
+	 */
+	public function get_max_db() {
+		return ( $this->is_premium ? $this->max_db_high : $this->max_free_db );
+	}
+
+	/**
 	 * Get max_db_low.
 	 *
 	 * @since 1.3.1
@@ -297,6 +310,19 @@ class Boldgrid_Backup_Admin_Config {
 	 */
 	public function get_max_db_low() {
 		return $this->max_db_low;
+	}
+
+	/**
+	 * Return max disk space that can be backed up.
+	 *
+	 * This method takes into consideration whether you have a premium account or not.
+	 *
+	 * @since 1.3.3
+	 *
+	 * @return int
+	 */
+	public function get_max_disk() {
+		return ( $this->is_premium ? $this->max_disk_high : $this->max_free_disk );
 	}
 
 	/**
@@ -533,6 +559,7 @@ class Boldgrid_Backup_Admin_Config {
 		$this->lang = array(
 			'website_size' => esc_html__( 'Website Size:', 'boldgrid-backup' ),
 			'database_size' => esc_html__( 'Database Size:', 'boldgrid-backup' ),
+			'of' => esc_html__( 'of', 'boldgrid-backup' ),
 		);
 	}
 

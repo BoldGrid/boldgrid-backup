@@ -9,6 +9,6 @@
 ?>
 
 <script type="text/html" id="tmpl-boldgrid-backup-sizes">
-	<strong>{{data.lang.website_size}}</strong> {{data.disk_space_hr[3]}} ({{{data.messages.disk}}})<br />
-	<strong>{{data.lang.database_size}}</strong> {{data.db_size_hr}} ({{{data.messages.db}}})
+	<strong>{{data.lang.website_size}}</strong> {{data.disk_space_hr[3]}} {{data.lang.of}} {{data.disk_limit_hr}} ({{{data.messages.disk}}})<br />
+	<strong>{{data.lang.database_size}}</strong> {{data.db_size_hr}} {{data.lang.of}} {{data.db_limit_hr}} ({{{data.messages.db}}})
 </script>
