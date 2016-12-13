@@ -451,7 +451,7 @@ class Boldgrid_Backup_Admin_Test {
 	 * @param  array $disk_space
 	 * @param  int   $db_size
 	 * @param  int   $max_size
-	 * @param  int   $max_size
+	 * @param  int   $max_db
 	 * @return array
 	 */
 	public function get_size_messages( $disk_space, $db_size, $max_disk, $max_db ) {
