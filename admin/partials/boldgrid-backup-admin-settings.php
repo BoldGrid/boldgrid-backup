@@ -45,16 +45,11 @@ if ( empty( $settings ) ) {
 		?>
 	</p>
 
-	<?php include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/premium-message.php'; ?>
+	<?php
+		include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/premium-message.php';
 
-	<div id='size-data'>
-		<?php
-		wp_nonce_field( 'boldgrid_backup_sizes', 'sizes_auth' );
-		printf( '<p><span class="spinner inline"></span>%s</p>',
-			esc_html__( 'Calculating disk space...' )
-		);
-		?>
-	</div>
+		echo( include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-size-data.php' );
+	?>
 
 	<form id='schedule-form' method='post'>
 	<?php wp_nonce_field( 'boldgrid-backup-settings', 'settings_auth' ); ?>
@@ -117,12 +112,12 @@ if ( empty( $settings ) ) {
 				</tbody>
 			</table>
 			<div class='hidden' id='no-backup-days'>
-				<p>* <?php
+				<p><span class="dashicons dashicons-warning yellow"></span> <?php
 				esc_html_e( 'Backup will not occur if no days are selected.', 'boldgrid-backup' );
 				?></p>
 			</div>
 			<div class='hidden' id='free-dow-limit'>
-				<p>* <?php
+				<p><span class="dashicons dashicons-warning yellow"></span> <?php
 				esc_html_e( 'Free Backup License supports only scheduling two days a week.', 'boldgrid-backup' );
 				?></p>
 			</div>
@@ -130,12 +125,12 @@ if ( empty( $settings ) ) {
 			$url = 'https://www.boldgrid.com';
 			$link = sprintf(
 				wp_kses(
-					__( 'Note: Backups use resources and <a href="%s" target="_blank">must pause your site</a> momentarily. Use sparingly.', 'boldgrid-backup' ),
+					__( 'Backups use resources and <a href="%s" target="_blank">must pause your site</a> momentarily. Use sparingly.', 'boldgrid-backup' ),
 					array(  'a' => array( 'href' => array() ) )
 				),
 				esc_url( $url )
 			);
-			printf( '<div id="use-sparingly"><p>* %s</p></div>', $link );
+			printf( '<div id="use-sparingly"><p><span class="dashicons dashicons-warning yellow"></span> %s</p></div>', $link );
 			?>
 
 

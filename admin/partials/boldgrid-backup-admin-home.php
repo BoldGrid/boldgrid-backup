@@ -31,16 +31,15 @@
 <div class='wrap'>
 <h1>BoldGrid Backup</h1>
 
-<?php include BOLDGRID_BACKUP_PATH . '/admin/partials/archives/premium-message.php'; ?>
+<?php
+	include BOLDGRID_BACKUP_PATH . '/admin/partials/archives/premium-message.php';
 
-<div id='size-data'>
-		<?php
-		wp_nonce_field( 'boldgrid_backup_sizes', 'sizes_auth' );
-		printf( '<p><span class="spinner inline"></span>%s</p>',
-			esc_html__( 'Calculating disk space...' )
-		);
-		?>
-</div>
+	echo( include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-size-data.php' );
+	echo( include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-button.php' );
+
+	include BOLDGRID_BACKUP_PATH . '/admin/partials/archives/note-pre-backup.php';
+?>
+
 
 <hr />
 <h2><?php esc_html_e( 'Backup Archive Summary', 'boldgrid-backup' ); ?></h2>
@@ -116,67 +115,6 @@ if ( ! empty( $archives ) ) {
 </p>
 <?php } ?>
 
-<div id='backup-site-now-section'>
-	<form action='#' id='backup-site-now-form' method='POST'>
-		<?php wp_nonce_field( 'boldgrid_backup_now', 'backup_auth' ); ?>
-		<p>
-			<a id='backup-site-now' class='button button-primary'<?php
-
-			// If a restoration was just performed, then disable the backup button.
-			if ( ! empty( $_POST['restore_now'] ) ) {
-		?> disabled='disabled' style='pointer-events: none;'<?php
-			}
-
-?>><?php esc_html_e( 'Backup Site Now', 'boldgrid-backup' ); ?></a>
-			<span class='spinner'></span>
-		</p>
-
-		<p>
-		<?php
-		/*
-		 * Print this text:
-		 *
-		 * Note: Backups use resources and <a>must pause your site</a> momentarily.  Use sparingly.
-		 */
-		$link = sprintf(
-			wp_kses(
-				__( '<strong>Note</strong>: Backups use resources and <a href="%s" target="_blank">must pause your site</a> momentarily.  Use sparingly. ', 'boldgrid-backup' ),
-				array(
-					'a' => array( 'href' => array(), 'target' => array() ),
-					'strong' => array(),
-		 		)
-			),
-			esc_url( 'https://www.boldgrid.com/support' )
-		);
-		echo $link;
-
-		/*
-		 * Print this text:
-		 *
-		 * You currently have x backups stored on your server, and your <a>backup settings</a> are
-		 * only configured to store x. Backing up your site now will delete your oldest backup to
-		 * make room for your new backup. We recommend you download a backup to your local computer.
-		 */
-		if( count( $archives ) >= $settings['retention_count'] ) {
-			$link = sprintf(
-				wp_kses(
-					__( 'You currently have %1$s backups stored on your server, and your <a href="%3$s">backup settings</a> are only configured to store %2$s. Backing up your site now will delete your oldest backup to make room for your new backup. We recommend you download a backup to your local computer.', 'boldgrid-backup' ),
-					array(
-						'a' => array( 'href' => array() ),
-					)
-				),
-				count( $archives ),
-				$settings['retention_count'],
-				get_admin_url( null, 'admin.php?page=boldgrid-backup-settings' )
-			);
-			echo $link;
-		}
-		?>
-		</p>
-
-	</form>
-</div>
-<div id='backup-site-now-results'></div>
 <h2>
 	<?php esc_html_e( 'Upload a Backup Archive', 'boldgrid-backup' ); ?>
 	<span class="dashicons dashicons-editor-help" data-id="upload-backup"></span>

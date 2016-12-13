@@ -33,48 +33,12 @@ BoldGrid.Backup = function( $ ) {
 	};
 
 	/**
-	 * Show disk and db sizes.
-	 *
-	 * @since 1.3.1
-	 */
-	self.getSizeData = function() {
-		var sizes,
-			data = {
-				'action': 'boldgrid_backup_sizes',
-				'sizes_auth' : $( '#sizes_auth' ).val()
-			},
-			template = wp.template( 'boldgrid-backup-sizes' ),
-			$sizeData = $( '#size-data' );
-
-		// If #size-data is not on this page, abort.
-		if( 0 === $sizeData.length ) {
-			return;
-		}
-
-		var successAction = function( msg ) {
-			if( 'unauthorized' === msg ) {
-				return;
-			}
-
-			sizes = JSON.parse( msg );
-
-			// Add our translation settings.
-			sizes.lang = BoldGridBackupAdmin.lang;
-
-			$( '#size-data' ).html( template( sizes ) );
-		};
-
-		$.post( ajaxurl, data, successAction );
-	};
-
-	/**
 	 * @summary Init.
 	 *
 	 * @since 1.3.1
 	 */
 	this.init = function() {
 		self.bindHelpClick();
-		self.getSizeData();
 	};
 
 	$( function() {

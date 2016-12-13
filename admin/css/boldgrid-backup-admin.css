@@ -19,3 +19,43 @@
 	vertical-align: bottom;
 	margin-left: 0px;
 }
+
+/* Prevent clicks on disabled links. */
+a[disabled] {
+	pointer-events: none;
+}
+
+.dashicons-warning.red {
+	color: #dc3232;
+}
+
+.dashicons-warning.yellow {
+	color: #ffb900;
+}
+
+/* The table of size data. */
+#size-data table tr td {
+	vertical-align: top;
+}
+
+.total-size {
+	background: #ddd;
+	width: 325px;
+}
+
+.usage {
+	height: 5px;
+	max-width: 100% !important;
+}
+
+.usage.size-error {
+	background: #dc3232;
+}
+
+.usage.size-warning {
+	background: #ffb900;
+}
+
+.usage.size-success {
+	background: #46b450;
+}

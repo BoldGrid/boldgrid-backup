@@ -145,6 +145,8 @@ class Boldgrid_Backup_Admin_Core {
 	 * @since 1.0
 	 */
 	public function __construct() {
+		add_action( 'admin_enqueue_scripts', array( $this, 'register_scripts' ) );
+
 		// Instantiate Boldgrid_Backup_Admin_Settings.
 		$this->settings = new Boldgrid_Backup_Admin_Settings( $this );
 
@@ -2118,6 +2120,8 @@ class Boldgrid_Backup_Admin_Core {
 			), BOLDGRID_BACKUP_VERSION
 		);
 
+		wp_enqueue_script( 'boldgrid-backup-now' );
+
 		// Get the current wp_filesystem access method.
 		$access_type = get_filesystem_method();
 
@@ -2428,6 +2432,20 @@ class Boldgrid_Backup_Admin_Core {
 	}
 
 	/**
+	 * Register scripts.
+	 *
+	 * @since 1.3.3.
+	 */
+	public function register_scripts() {
+		wp_register_script( 'boldgrid-backup-now',
+			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-now.js',
+			array( 'jquery', ),
+			BOLDGRID_BACKUP_VERSION,
+			false
+		);
+	}
+
+	/**
 	 * Send a notification email to the admin email address.
 	 *
 	 * @since 1.0
@@ -2541,34 +2559,29 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Enqueue JS.
 		wp_enqueue_script( 'boldgrid-backup-admin-home' );
+		wp_enqueue_script( 'boldgrid-backup-now' );
 
 		// Create admin notice text.
 		$notice_text = sprintf(
-			__(
-				'BoldGrid Backup last created backup archive:<p>%1$s %2$s</p>
-		<p>It is recommended to backup your site before performing updates.
-		If you perform a backup here, before performing updates, then an automatic rollback is possible.
-		More information is available in the <a href="%4$s">Backup Archive</a> page.</p>
-		<div id="backup-site-now-section">
-		<form action="#" id="backup-site-now-form" method="POST">
-				%3$s
-				<p>
-					<a id="backup-site-now" class="button button-primary" data-updating="true">Backup Site Now</a>
-					<span class="spinner"></span>
-				</p>
-			</form>
-		</div>
-		<div id="backup-site-now-results"></div>',
+			__(	'BoldGrid Backup last created backup archive:<p>%1$s %2$s</p>
+				<p>It is recommended to backup your site before performing updates.
+				If you perform a backup here, before performing updates, then an automatic rollback is possible.
+				More information is available in the <a href="%3$s">Backup Archive</a> page.</p>',
 				'boldgrid-backup'
 			),
 			$listing,
 			$download_button,
-			wp_nonce_field( 'boldgrid_backup_now', 'backup_auth' ),
 			admin_url( 'admin.php?page=boldgrid-backup' )
 		) . PHP_EOL;
 
+		$backup_button = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-button.php';
+
+		$size_data = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-size-data.php';
+
 		// Show admin notice.
-		do_action( 'boldgrid_backup_notice', $notice_text, 'notice notice-warning is-dismissible' );
+		do_action( 'boldgrid_backup_notice', $notice_text . $size_data . $backup_button, 'notice notice-warning is-dismissible' );
+
+		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-js-templates.php';
 	}
 
 	/**
@@ -2922,12 +2935,14 @@ class Boldgrid_Backup_Admin_Core {
 
 		$disk_space = $this->test->get_disk_space();
 		$db_size = $this->test->get_database_size();
+		$max_disk = $this->config->get_max_disk();
+		$max_db = $this->config->get_max_db();
 
 		$return = array(
 			'disk_space' => $disk_space,
 			'db_size' => $db_size,
-			'disk_limit' => $this->config->get_max_disk(),
-			'db_limit' => $this->config->get_max_db(),
+			'disk_limit' => $max_disk,
+			'db_limit' => $max_db,
 		);
 
 		/*
@@ -2940,11 +2955,11 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		$return[ 'db_size_hr' ] = Boldgrid_Backup_Admin_Utility::bytes_to_human( $db_size );
-		$return[ 'disk_limit_hr' ] = Boldgrid_Backup_Admin_Utility::bytes_to_human( $return[ 'disk_limit' ] );
-		$return[ 'db_limit_hr' ] = Boldgrid_Backup_Admin_Utility::bytes_to_human( $return[ 'db_limit' ] );
+		$return[ 'disk_limit_hr' ] = Boldgrid_Backup_Admin_Utility::bytes_to_human( $max_disk );
+		$return[ 'db_limit_hr' ] = Boldgrid_Backup_Admin_Utility::bytes_to_human( $max_db );
 
 		// Add status messages about disk space and db size.
-		$return['messages'] = $this->test->get_size_messages( $disk_space, $db_size );
+		$return['messages'] = $this->test->get_size_messages( $disk_space, $db_size, $max_disk, $max_db );
 
 		echo json_encode( $return );
 

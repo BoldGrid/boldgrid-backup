@@ -564,6 +564,8 @@ class Boldgrid_Backup_Admin_Settings {
 			false
 		);
 
+		wp_enqueue_script( 'boldgrid-backup-now' );
+
 		// Get settings.
 		$settings = $this->get_settings();
 
