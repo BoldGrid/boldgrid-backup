@@ -440,6 +440,49 @@ class Boldgrid_Backup_Admin_Test {
 	}
 
 	/**
+	 * Get an array of data concerning sizes.
+	 *
+	 * This data includes information about current disk and database usage and limits. It also
+	 * calls $this->get_size_messages() to get text for the user explaining if / why they cannot
+	 * backup their site.
+	 *
+	 * @since 1.3.3
+	 *
+	 * @return array.
+	 */
+	public function get_size_data() {
+		$disk_space = $this->get_disk_space();
+		$db_size = $this->get_database_size();
+		$max_disk = $this->core->config->get_max_disk();
+		$max_db = $this->core->config->get_max_db();
+
+		$return = array(
+			'disk_space' => $disk_space,
+			'db_size' => $db_size,
+			'disk_limit' => $max_disk,
+			'db_limit' => $max_db,
+		);
+
+		/*
+		 * Add additonal _hr (human readable as in 466.55MB) data to our $return variable. Done here
+		 * so as not needed to be done by js.
+		*/
+
+		foreach( $disk_space as $k => $v ) {
+			$return[ 'disk_space_hr' ][ $k ] = Boldgrid_Backup_Admin_Utility::bytes_to_human( $v );
+		}
+
+		$return[ 'db_size_hr' ] = Boldgrid_Backup_Admin_Utility::bytes_to_human( $db_size );
+		$return[ 'disk_limit_hr' ] = Boldgrid_Backup_Admin_Utility::bytes_to_human( $max_disk );
+		$return[ 'db_limit_hr' ] = Boldgrid_Backup_Admin_Utility::bytes_to_human( $max_db );
+
+		// Add status messages about disk space and db size.
+		$return['messages'] = $this->get_size_messages( $disk_space, $db_size, $max_disk, $max_db );
+
+		return $return;
+	}
+
+	/**
 	 * Get any applicable messages regarding disk / db sizes.
 	 *
 	 * One message is returned for disk space, and another returned for db size.

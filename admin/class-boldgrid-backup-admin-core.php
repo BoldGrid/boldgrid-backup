@@ -1079,6 +1079,8 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return array An array of archive file information.
 	 */
 	public function archive_files( $save = false, $dryrun = false ) {
+		$email_templates = include BOLDGRID_BACKUP_PATH . '/includes/config/email-templates.php';
+
 		// Check if functional.
 		if ( ! $this->test->run_functionality_tests() ) {
 			// Display an error notice, if not already on the test page.
@@ -1089,6 +1091,26 @@ class Boldgrid_Backup_Admin_Core {
 
 			return array(
 				'error' => 'Functionality tests fail.',
+			);
+		}
+
+		/*
+		 * Check if disk and db are within limits of backup.
+		 *
+		 * For example, are they trying to backup 20G of disk when the plugin only supports 10? If
+		 * check fails, abort with appropriate message.
+		 */
+		$size_data = $this->test->get_size_data();
+		if( ! empty( $size_data['messages']['notSupported'] ) ) {
+			// If we're backing up via cron, send email.
+			if( DOING_CRON ) {
+				$body = sprintf( $email_templates['fail_size']['body'], $size_data['messages']['notSupported'] );
+				$subject = sprintf( $email_templates['fail_size']['subject'], get_site_url() );
+				$this->send_notification( $subject, $body );
+			}
+
+			return array(
+				'error' => $size_data['messages']['notSupported'],
 			);
 		}
 
@@ -2933,33 +2955,7 @@ class Boldgrid_Backup_Admin_Core {
 			wp_die( 'unauthorized' );
 		}
 
-		$disk_space = $this->test->get_disk_space();
-		$db_size = $this->test->get_database_size();
-		$max_disk = $this->config->get_max_disk();
-		$max_db = $this->config->get_max_db();
-
-		$return = array(
-			'disk_space' => $disk_space,
-			'db_size' => $db_size,
-			'disk_limit' => $max_disk,
-			'db_limit' => $max_db,
-		);
-
-		/*
-		 * Add additonal _hr (human readable as in 466.55MB) data to our $return variable. Done here
-		 * so as not needed to be done by js.
-		 */
-
-		foreach( $disk_space as $k => $v ) {
-			$return[ 'disk_space_hr' ][ $k ] = Boldgrid_Backup_Admin_Utility::bytes_to_human( $v );
-		}
-
-		$return[ 'db_size_hr' ] = Boldgrid_Backup_Admin_Utility::bytes_to_human( $db_size );
-		$return[ 'disk_limit_hr' ] = Boldgrid_Backup_Admin_Utility::bytes_to_human( $max_disk );
-		$return[ 'db_limit_hr' ] = Boldgrid_Backup_Admin_Utility::bytes_to_human( $max_db );
-
-		// Add status messages about disk space and db size.
-		$return['messages'] = $this->test->get_size_messages( $disk_space, $db_size, $max_disk, $max_db );
+		$return = $this->test->get_size_data();
 
 		echo json_encode( $return );
 

@@ -32,6 +32,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 * Update:		JIRA WPB-2714	Show backup limits to users.
 * Update:		JIRA WPB-2717	Misc notices.
 * Update:		JIRA WPB-2719	Disable backup now button.
+* Update:		JIRA WPB-2651	Prevent backup if account is too large.
 
 = 1.3.2 =
 * Bug fix:		JIRA WPB-2657	Added double-quote encapsulation to password in mysqldump defaults file.
