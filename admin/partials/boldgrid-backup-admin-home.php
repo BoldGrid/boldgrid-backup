@@ -111,7 +111,7 @@ if ( ! empty( $archives ) ) {
 
 <?php if( ! empty( $archives ) ) { ?>
 <p>
-<?php esc_html_e( 'These backups are stored on your server. You should occasionally download them to your local computer.', 'boldgrid-staging' ); ?>
+<?php esc_html_e( 'These backups are stored on your server. You should occasionally download them to your local computer.', 'boldgrid-backup' ); ?>
 </p>
 <?php } ?>
 
