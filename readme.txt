@@ -28,7 +28,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 
 == Changelog ==
 
-= 1.3.3 In progress =
+= 1.3.3 =
 * Update:		JIRA WPB-2714	Show backup limits to users.
 * Update:		JIRA WPB-2717	Misc notices.
 * Update:		JIRA WPB-2719	Disable backup now button.
