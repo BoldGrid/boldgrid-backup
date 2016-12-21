@@ -37,6 +37,15 @@ class Boldgrid_Backup_Admin_Core {
 	public $config;
 
 	/**
+	 * Plugin configs.
+	 *
+	 * @since  1.3.4
+	 * @access plublic
+	 * @var    array
+	 */
+	public $configs;
+
+	/**
 	 * The functionality test class object.
 	 *
 	 * @since 1.0
@@ -171,6 +180,8 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
+
+		$this->configs = Boldgrid_Backup_Admin_Update::get_configs();
 	}
 
 	/**
@@ -1377,7 +1388,7 @@ class Boldgrid_Backup_Admin_Core {
 					'For help with restoring a BoldGrid Backup archive file, please visit: %s',
 					'boldgrid-backup'
 				),
-				'https://www.boldgrid.com/support/advanced-tutorials/restoring-boldgrid-backup/'
+				esc_url( $this->core->configs['urls']['restore'] )
 			) . "\n\n";
 
 			$body .= esc_html__( 'Best regards', 'boldgrid-backup' ) . ",\n\n";

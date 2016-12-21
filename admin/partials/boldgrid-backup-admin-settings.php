@@ -122,11 +122,11 @@ if ( empty( $settings ) ) {
 				?></p>
 			</div>
 			<?php
-			$url = 'https://www.boldgrid.com';
+			$url = $this->core->configs['urls']['resource_usage'];
 			$link = sprintf(
 				wp_kses(
 					__( 'Backups use resources and <a href="%s" target="_blank">must pause your site</a> momentarily. Use sparingly.', 'boldgrid-backup' ),
-					array(  'a' => array( 'href' => array() ) )
+					array(  'a' => array( 'href' => array(), 'target' => array(), ) )
 				),
 				esc_url( $url )
 			);

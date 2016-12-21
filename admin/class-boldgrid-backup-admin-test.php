@@ -504,14 +504,15 @@ class Boldgrid_Backup_Admin_Test {
 			'issues_may_occur' => sprintf(
 				wp_kses(
 					__( 'Supported but <a href="%s" target="_blank">Issues may Occur</a>', 'boldgrid-backup' ),
-					array( 'a' => array( 'href' => array() ), 'target' => array() )
+					array( 'a' => array( 'href' => array(), 'target' => array() ) )
 				),
-				esc_url( 'https://www.boldgrid.com' )
+				esc_url( $this->core->configs['urls']['possible_issues'] )
 			),
 			// <a>Must Reduce before Running</a>.
 			'must_reduce' => sprintf(
-				'<a href="https://www.boldgrid.com" target="_blank">%s</a>',
-				esc_html__( 'Must Reduce before Running', 'boldgrid-backup' )
+				'<a href="%2$s" target="_blank">%1$s</a>',
+				esc_html__( 'Must Reduce before Running', 'boldgrid-backup' ),
+				esc_url( $this->core->configs['urls']['reduce_size_warning'] )
 			),
 			// Requires Upgrade.
 			'requires_upgrade' => esc_html__( 'Requires Upgrade', 'boldgrid-backup' ),

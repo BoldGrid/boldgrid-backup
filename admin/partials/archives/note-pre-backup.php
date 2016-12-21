@@ -24,7 +24,7 @@
 				'strong' => array(),
 	 		)
 		),
-		esc_url( 'https://www.boldgrid.com/support' )
+		esc_url( $this->configs['urls']['resource_usage'] )
 	);
 	echo $link;
 

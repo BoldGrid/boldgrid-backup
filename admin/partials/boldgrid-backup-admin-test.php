@@ -150,10 +150,11 @@ if ( $is_functional ) {
 		<hr />
 		<p>
 			%1$s<br />
-			<a href="https://www.boldgrid.com" target="_blank" />%2$s</a>
+			<a href="%3$s" target="_blank" />%2$s</a>
 		</p>',
 		esc_html__( 'BoldGrid Backup is not compatible with your hosting account. For further help please see:', 'boldgrid-backup' ),
-		esc_html__( 'Making your web hosting account compatible with BoldGrid Backup', 'boldgrid-backup' )
+		esc_html__( 'Making your web hosting account compatible with BoldGrid Backup', 'boldgrid-backup' ),
+		esc_url( $this->core->configs['urls']['compatibility'] )
 	);
 }
 

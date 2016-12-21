@@ -22,7 +22,7 @@ if( $this->config->get_is_premium() ) {
 				'p' => array(),
 			)
 		),
-		esc_url( 'https://www.boldgrid.com' )
+		esc_url( $this->configs['urls']['user_guide'] )
 	);
 } else {
 	/*
@@ -40,7 +40,7 @@ if( $this->config->get_is_premium() ) {
 				'p' => array(),
 			)
 		),
-		esc_url( 'https://www.boldgrid.com' )
+		esc_url( $this->configs['urls']['user_guide'] )
 	);
 
 	/*
@@ -57,7 +57,7 @@ if( $this->config->get_is_premium() ) {
 				'p' => array(),
 			)
 		),
-		esc_url( 'https://www.boldgrid.com' )
+		esc_url( $this->configs['urls']['upgrade'] )
 	);
 }
 ?>

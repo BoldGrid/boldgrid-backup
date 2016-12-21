@@ -8,6 +8,7 @@
  */
 
 if( $this->core->config->get_is_premium() ) {
+	?><p><?php
 	/*
 	 * Print this message:
 	 *
@@ -16,11 +17,12 @@ if( $this->core->config->get_is_premium() ) {
 	 */
 	printf(
 		wp_kses(
-			__( 'You are running the Premium version of the BoldGrid Backup Plugin. Please visit our <a href="%s">BoldGrid Backup User Guide</a> for more information.', 'boldgrid-backup' ),
-			array(  'a' => array( 'href' => array() ) )
+			__( 'You are running the Premium version of the BoldGrid Backup Plugin. Please visit our <a href="%s" target="_blank">BoldGrid Backup User Guide</a> for more information.', 'boldgrid-backup' ),
+			array( 'a' => array( 'href' => array(), 'target' => array() ) )
 		),
-		esc_url( 'https://www.boldgrid.com' )
+		esc_url( $this->core->configs['urls']['user_guide'] )
 	);
+	?></p><?php
 } else {
 	/*
 	 * Print this message:
@@ -46,8 +48,8 @@ if( $this->core->config->get_is_premium() ) {
 				'p' => array(),
 			)
 		),
-		esc_url( 'https://www.boldgrid.com' ),
-		esc_url( 'https://www.boldgrid.com' )
+		esc_url( $this->core->configs['urls']['user_guide'] ),
+		esc_url( $this->core->configs['urls']['upgrade'] )
 	);
 }
 ?>
