@@ -2956,6 +2956,8 @@ class Boldgrid_Backup_Admin_Core {
 	 * @since 1.3.1
 	 */
 	public function boldgrid_backup_sizes_callback() {
+		session_write_close();
+
 		// Check user capabilities.
 		if ( ! current_user_can( 'update_plugins' ) ) {
 			wp_die( 'unauthorized' );
