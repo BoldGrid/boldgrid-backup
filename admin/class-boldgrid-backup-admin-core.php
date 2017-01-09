@@ -1388,7 +1388,7 @@ class Boldgrid_Backup_Admin_Core {
 					'For help with restoring a BoldGrid Backup archive file, please visit: %s',
 					'boldgrid-backup'
 				),
-				esc_url( $this->core->configs['urls']['restore'] )
+				esc_url( $this->configs['urls']['restore'] )
 			) . "\n\n";
 
 			$body .= esc_html__( 'Best regards', 'boldgrid-backup' ) . ",\n\n";
