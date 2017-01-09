@@ -2472,7 +2472,7 @@ class Boldgrid_Backup_Admin_Core {
 	public function register_scripts() {
 		wp_register_script( 'boldgrid-backup-now',
 			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-now.js',
-			array( 'jquery', ),
+			array( 'jquery', 'wp-util' ),
 			BOLDGRID_BACKUP_VERSION,
 			false
 		);
