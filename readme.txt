@@ -28,6 +28,9 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 
 == Changelog ==
 
+= 1.3.5 In progress =
+* Bug fix:		JIRA WPB-2682	Backing up fails after 5 minutes.
+
 = 1.3.4 =
 * Bug fix:		JIRA WPB-2755	Fixed missing link in email.
 * Testing:		JIRA WPB-2744	Tested on WordPress 4.7.

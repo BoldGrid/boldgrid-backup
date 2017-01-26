@@ -707,10 +707,7 @@ class Boldgrid_Backup_Admin_Core {
 			 ' --dump-date --opt --tz-utc --result-file=' . $db_dump_filepath . ' ' . DB_NAME .
 		' `cat ' . $tables_filepath . '`';
 
-		// Set the PHP timeout limit to at least 300 seconds.
-		set_time_limit(
-			( ( $max_execution_time = ini_get( 'max_execution_time' ) ) > 300 ? $max_execution_time : 300 )
-		);
+		$this->set_time_limit();
 
 		// Execute the command.
 		$output = $this->execute_command( $command, null, $status );
@@ -834,10 +831,7 @@ class Boldgrid_Backup_Admin_Core {
 		$command = 'mysql --defaults-file=' . $defaults_filepath . ' --force --one-database ' .
 		DB_NAME . ' < ' . $db_dump_filepath;
 
-		// Set the PHP timeout limit to at least 300 seconds.
-		set_time_limit(
-			( ( $max_execution_time = ini_get( 'max_execution_time' ) ) > 300 ? $max_execution_time : 300 )
-		);
+		$this->set_time_limit();
 
 		// Execute the command.
 		$output = $this->execute_command( $command, null, $status );
@@ -1213,8 +1207,7 @@ class Boldgrid_Backup_Admin_Core {
 		// Prepend the $db_file_array element to the beginning of the $filelist array.
 		array_unshift( $filelist, $db_file_array );
 
-		// Set the PHP timeout limit to at least 300 seconds.
-		set_time_limit( ( ( $max_execution_time = ini_get( 'max_execution_time' ) ) > 300 ? $max_execution_time : 300 ) );
+		$this->set_time_limit();
 
 		/*
 		 * Use the chosen compressor to build an archive.
@@ -1915,8 +1908,7 @@ class Boldgrid_Backup_Admin_Core {
 			// Prevent this script from dying.
 			ignore_user_abort( true );
 
-			// Set the PHP timeout limit to at least 300 seconds.
-			set_time_limit( ( ( $max_execution_time = ini_get( 'max_execution_time' ) ) > 300 ? $max_execution_time : 300 ) );
+			$this->set_time_limit();
 
 			// Open the ZIP file while checking for consistency.
 			$zip = new ZipArchive;
@@ -2512,6 +2504,23 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Return status.
 		return $status;
+	}
+
+	/**
+	 * Set the PHP timeout limit to at least 15 minutes.
+	 *
+	 * Various places within this class use to set the timeout limit to 300 seconds. This timeout
+	 * limit has been increased to 900 seconds and moved into its own method.
+	 *
+	 * @since 1.3.5
+	 *
+	 * @param int $time_limit Limit in seconds.
+	 */
+	public function set_time_limit( $time_limit = 900 ) {
+		set_time_limit( ( ( $max_execution_time = ini_get( 'max_execution_time' ) ) > $time_limit ?
+			$max_execution_time :
+			$time_limit
+		) );
 	}
 
 	/**
