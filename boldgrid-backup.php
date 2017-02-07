@@ -75,28 +75,7 @@ function run_boldgrid_backup() {
 }
 
 // Load the plugin only if on a wp-admin page or when DOING_CRON.
-if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) ) {
+if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) || defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup.php';
 	run_boldgrid_backup();
-}
-
-// If DOING_CRON, then check if this plugin should be auto-updated.
-if ( defined( 'DOING_CRON' ) && DOING_CRON ) {
-	// Ensure required definitions for pluggable.
-	if ( ! defined( 'AUTH_COOKIE' ) ) {
-		define( 'AUTH_COOKIE', null );
-	}
-
-	if ( ! defined( 'LOGGED_IN_COOKIE' ) ) {
-		define( 'LOGGED_IN_COOKIE', null );
-	}
-
-	// Load the WordPress pluggable class, if needed.
-	require_once ABSPATH . 'wp-includes/pluggable.php';
-
-	// Instantiate the update class.
-	$plugin_update = new Boldgrid_Backup_Admin_Update( 'boldgrid-backup', BOLDGRID_BACKUP_VERSION );
-
-	// Check and update plugins.
-	$plugin_update->wp_update_this_plugin();
 }

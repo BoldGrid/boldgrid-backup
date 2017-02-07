@@ -181,7 +181,7 @@ class Boldgrid_Backup_Admin_Core {
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
 
-		$this->configs = Boldgrid_Backup_Admin_Update::get_configs();
+		$this->configs = Boldgrid_Backup_Admin::get_configs();
 	}
 
 	/**

@@ -19,15 +19,6 @@
  */
 class Boldgrid_Backup_Admin_Xhprof {
 	/**
-	 * Configuration array for BoldGrid Backup.
-	 *
-	 * @since 1.2
-	 * @access private
-	 * @var array
-	 */
-	private $configs = array();
-
-	/**
 	 * Is XHProf active?
 	 *
 	 * @since 1.2
@@ -43,7 +34,7 @@ class Boldgrid_Backup_Admin_Xhprof {
 	 */
 	public function __construct() {
 		// Set the configuration array.
-		$this->get_configs();
+		Boldgrid_Backup_Admin::get_configs();
 
 		// Try to enable XHProf.
 		$this->xhprof_active = $this->xhprof_enable();
@@ -61,28 +52,6 @@ class Boldgrid_Backup_Admin_Xhprof {
 	}
 
 	/**
-	 * Get the BoldGrid Backup configuration array, set it if needed.
-	 *
-	 * @since 1.2
-	 * @access private
-	 *
-	 * @return array The configuration array.
-	 */
-	private function get_configs() {
-		// If configs were already set, then return the array.
-		if ( ! empty( $this->configs ) ) {
-			return $this->configs;
-		}
-
-		// If the update class method to get configs is callable, then use it.
-		if ( is_callable( 'Boldgrid_Backup_Admin_Update', 'get_configs' ) ) {
-			$this->configs = Boldgrid_Backup_Admin_Update::get_configs();
-		}
-
-		return $this->configs;
-	}
-
-	/**
 	 * Enable XHProf.
 	 *
 	 * @since 1.2
@@ -96,7 +65,7 @@ class Boldgrid_Backup_Admin_Xhprof {
 		}
 
 		// Get configs.
-		$configs = $this->get_configs();
+		$configs = Boldgrid_Backup_Admin::get_configs();
 
 		// If available and enabled, then start XHProf.
 		if ( ! empty( $configs['xhprof'] ) && extension_loaded( 'xhprof' ) ) {
@@ -123,7 +92,7 @@ class Boldgrid_Backup_Admin_Xhprof {
 		}
 
 		// Get configs.
-		$configs = $this->get_configs();
+		$configs = Boldgrid_Backup_Admin::get_configs();
 
 		// Save report to the log.
 		if ( ! empty( $configs['xhprof'] ) && extension_loaded( 'xhprof' ) ) {

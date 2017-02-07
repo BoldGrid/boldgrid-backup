@@ -191,8 +191,16 @@ class Boldgrid_Backup {
 
 		// Instantiate the admin update class, if not already done for cron.
 		if ( ! defined( 'DOING_CRON' ) || ! DOING_CRON ) {
-			$plugin_admin_update = new Boldgrid_Backup_Admin_Update( 'boldgrid-backup',
-			BOLDGRID_BACKUP_VERSION );
+			$plugin_data = array(
+				'plugin_key_code' => 'backup',
+				'slug' => 'boldgrid-backup',
+				'main_file_path' => BOLDGRID_BACKUP_PATH . '/boldgrid-backup.php',
+				'configs' => Boldgrid_Backup_Admin::get_configs(),
+				'version_data' => get_site_transient( 'boldgrid_backup_version_data' ),
+				'transient' => 'boldgrid_backup_version_data',
+			);
+
+			$plugin_admin_update = new Boldgrid_Backup_Admin_Update( $plugin_data );
 		}
 
 		// Add nav menu items.

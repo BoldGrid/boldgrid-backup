@@ -39,6 +39,16 @@ class Boldgrid_Backup_Admin {
 	private $version;
 
 	/**
+	 * Configuration array.
+	 *
+	 * @since 1.3.5
+	 *
+	 * @var array
+	 * @staticvar
+	 */
+	private static $configs;
+
+	/**
 	 * Initialize the class and set its properties.
 	 *
 	 * @since 1.0
@@ -62,6 +72,72 @@ class Boldgrid_Backup_Admin {
 		}
 
 		$this->config = new Boldgrid_Backup_Admin_Config( null );
+
+		$this->prepare_update();
+	}
+
+	/**
+	 * Prepare for the update class.
+	 *
+	 * @since 1.3.5
+	 *
+	 * @see self::wpcron()
+	 * @see self::load_update()
+	 */
+	public function prepare_update() {
+		$is_cron = ( defined( 'DOING_CRON' ) && DOING_CRON );
+		$is_wpcli = ( defined( 'WP_CLI' ) && WP_CLI );
+
+		if ( $is_cron || $is_wpcli || is_admin() ) {
+			add_action( 'init', array (
+				$this,
+				'load_update'
+			) );
+		}
+
+		if ( $is_cron ){
+			$this->wpcron();
+		}
+	}
+
+	/**
+	 * WP-CRON init.
+	 *
+	 * @since 1.3.5
+	 */
+	public function wpcron() {
+		// Ensure required definitions for pluggable.
+		if ( ! defined( 'AUTH_COOKIE' ) ) {
+			define( 'AUTH_COOKIE', null );
+		}
+
+		if ( ! defined( 'LOGGED_IN_COOKIE' ) ) {
+			define( 'LOGGED_IN_COOKIE', null );
+		}
+
+		// Load the pluggable class, if needed.
+		require_once ABSPATH . 'wp-includes/pluggable.php';
+	}
+
+	/**
+	 * Load update class.
+	 *
+	 * @since 1.3.5
+	 */
+	public function load_update() {
+		// Load and check for plugin updates.
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-update.php';
+
+		$plugin_data = array(
+			'plugin_key_code' => 'backup',
+			'slug' => 'boldgrid-backup',
+			'main_file_path' => BOLDGRID_BACKUP_PATH . '/boldgrid-backup.php',
+			'configs' => self::$configs,
+			'version_data' => get_site_transient( 'boldgrid_backup_version_data' ),
+			'transient' => 'boldgrid_backup_version_data',
+		);
+
+		$plugin_update = new Boldgrid_Backup_Admin_Update( $plugin_data );
 	}
 
 	/**
@@ -107,5 +183,67 @@ class Boldgrid_Backup_Admin {
 				BOLDGRID_BACKUP_VERSION
 			);
 		}
+	}
+
+	/**
+	 * Get configuration settings.
+	 *
+	 * @since 1.3.5
+	 *
+	 * @static
+	 *
+	 * @return array An array of configuration settings.
+	 */
+	public static function get_configs() {
+		// If the configuration array was already created, then return it.
+			if ( ! empty( self::$configs ) ) {
+			return self::$configs;
+		}
+
+		// Set the config directory.
+		$config_dir = BOLDGRID_BACKUP_PATH . '/includes/config';
+
+		// Set the config file paths.
+		$global_config_path = $config_dir . '/config.plugin.php';
+		$local_config_path = $config_dir . '/config.local.php';
+
+		// Initialize $global_configs array.
+		$global_configs = array();
+
+		// If a global config file exists, read the global configuration settings.
+		if ( file_exists( $global_config_path ) ) {
+			$global_configs = require $global_config_path;
+		}
+
+		// Initialize $local_configs array.
+		$local_configs = array();
+
+		// If a local configuration file exists, then read the settings.
+		if ( file_exists( $local_config_path ) ) {
+			$local_configs = require $local_config_path;
+		}
+
+		// If an api key hash stored in the database, then set it as the global api_key.
+		$api_key_from_database = get_option( 'boldgrid_api_key' );
+
+		if ( ! empty( $api_key_from_database ) ) {
+			$global_configs['api_key'] = $api_key_from_database;
+		}
+
+		// Get the WordPress site url and set it in the global configs array.
+		$global_configs['site_url'] = get_site_url();
+
+		// Merge global and local configuration settings.
+		if ( ! empty( $local_configs ) ) {
+			$configs = array_merge( $global_configs, $local_configs );
+		} else {
+			$configs = $global_configs;
+		}
+
+		// Set the configuration array in the class property.
+		self::$configs = $configs;
+
+		// Return the configuration array.
+		return $configs;
 	}
 }
