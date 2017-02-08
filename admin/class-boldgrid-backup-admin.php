@@ -39,6 +39,15 @@ class Boldgrid_Backup_Admin {
 	private $version;
 
 	/**
+	 * Boldgrid_Backup_Admin_Config class object.
+	 *
+	 * @since 1.3.6
+	 *
+	 * @var Boldgrid_Backup_Admin_Config
+	 */
+	private $config;
+
+	/**
 	 * Configuration array.
 	 *
 	 * @since 1.3.5
@@ -73,71 +82,31 @@ class Boldgrid_Backup_Admin {
 
 		$this->config = new Boldgrid_Backup_Admin_Config( null );
 
-		$this->prepare_update();
+		$this->prepare_plugin_update();
 	}
 
 	/**
-	 * Prepare for the update class.
+	 * Prepare the plugin update class.
 	 *
-	 * @since 1.3.5
+	 * @since 1.3.6
 	 *
 	 * @see self::wpcron()
 	 * @see self::load_update()
 	 */
-	public function prepare_update() {
+	public function prepare_plugin_update() {
 		$is_cron = ( defined( 'DOING_CRON' ) && DOING_CRON );
 		$is_wpcli = ( defined( 'WP_CLI' ) && WP_CLI );
 
 		if ( $is_cron || $is_wpcli || is_admin() ) {
+			require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-update.php';
+
+			$plugin_update = new Boldgrid_Backup_Update( self::get_configs() );
+
 			add_action( 'init', array (
-				$this,
-				'load_update'
+				$plugin_update,
+				'add_hooks'
 			) );
 		}
-
-		if ( $is_cron ){
-			$this->wpcron();
-		}
-	}
-
-	/**
-	 * WP-CRON init.
-	 *
-	 * @since 1.3.5
-	 */
-	public function wpcron() {
-		// Ensure required definitions for pluggable.
-		if ( ! defined( 'AUTH_COOKIE' ) ) {
-			define( 'AUTH_COOKIE', null );
-		}
-
-		if ( ! defined( 'LOGGED_IN_COOKIE' ) ) {
-			define( 'LOGGED_IN_COOKIE', null );
-		}
-
-		// Load the pluggable class, if needed.
-		require_once ABSPATH . 'wp-includes/pluggable.php';
-	}
-
-	/**
-	 * Load update class.
-	 *
-	 * @since 1.3.5
-	 */
-	public function load_update() {
-		// Load and check for plugin updates.
-		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-update.php';
-
-		$plugin_data = array(
-			'plugin_key_code' => 'backup',
-			'slug' => 'boldgrid-backup',
-			'main_file_path' => BOLDGRID_BACKUP_PATH . '/boldgrid-backup.php',
-			'configs' => self::$configs,
-			'version_data' => get_site_transient( 'boldgrid_backup_version_data' ),
-			'transient' => 'boldgrid_backup_version_data',
-		);
-
-		$plugin_update = new Boldgrid_Backup_Admin_Update( $plugin_data );
 	}
 
 	/**
