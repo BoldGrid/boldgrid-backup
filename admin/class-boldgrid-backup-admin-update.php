@@ -2,46 +2,38 @@
 /**
  * BoldGrid Source Code
  *
- * @package Boldgrid_Backup_Admin_Update
+ * @package Boldgrid_Update
  * @copyright BoldGrid.com
- * @version $Id$
+ * @version 1.3
  * @author BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Forms update class.
+ * BoldGrid update class.
  */
-class Boldgrid_Backup_Admin_Update {
+class Boldgrid_Backup_Update {
 	/**
-	 * Parameters needed for this update class.
-	 *
-	 * @since 1.3.1
+	 * Plugin configuration array.
 	 *
 	 * @var array
 	 */
-	private $plugin_data = array();
+	private $configs = array();
 
 	/**
 	 * Constructor.
 	 *
+	 * @param array $configs Plugin configuration array.
+	 */
+	public function __construct( array $configs ) {
+		$this->configs = $configs;
+	}
+
+	/**
 	 * Adds filters for plugin update hooks.
 	 *
 	 * @see self::wp_update_this_plugin()
-	 *
-	 * @param array $plugin_data {
-	 * 	Parameters needed for this update class.
-	 *
-	 * 	@type string $plugin_key_code Plugin key code.
-	 * 	@type string $slug            Plugin slug.
-	 * 	@type string $main_file_path  Plugin main file path.
-	 * 	@type array  $configs         Plugin configuration array.
-	 * 	@type array  $version_data    Plugin version data from transient.
-	 * 	@type string $transient       Transient name for the plugin version data.
-	 * }
 	 */
-	public function __construct( array $plugin_data ) {
-		$this->plugin_data = $plugin_data;
-
+	public function add_hooks() {
 		$is_cron = ( defined( 'DOING_CRON' ) && DOING_CRON );
 		$is_wpcli = ( defined( 'WP_CLI' ) && WP_CLI );
 
@@ -68,32 +60,36 @@ class Boldgrid_Backup_Admin_Update {
 			);
 		}
 
+		if ( $is_cron ){
+			$this->wpcron();
+		}
+
 		if ( $is_cron || $is_wpcli ){
 			$this->wp_update_this_plugin();
 		}
 	}
 
 	/**
-	 * Validate input plugin data.
-	 *
-	 * @since 1.3.1
-	 *
-	 * @return bool
+	 * WP-CRON init.
 	 */
-	private function validate_plugin_data() {
-		return (
-			! empty( $this->plugin_data['plugin_key_code'] ) &&
-			! empty( $this->plugin_data['slug'] ) &&
-			! empty( $this->plugin_data['main_file_path'] ) &&
-			! empty( $this->plugin_data['configs'] ) &&
-			! empty( $this->plugin_data['transient'] )
-		);
+	public function wpcron() {
+		// Ensure required definitions for pluggable.
+		if ( ! defined( 'AUTH_COOKIE' ) ) {
+			define( 'AUTH_COOKIE', null );
+		}
+
+		if ( ! defined( 'LOGGED_IN_COOKIE' ) ) {
+			define( 'LOGGED_IN_COOKIE', null );
+		}
+
+		// Load the pluggable class, if needed.
+		require_once ABSPATH . 'wp-includes/pluggable.php';
 	}
 
 	/**
 	 * Update the plugin transient.
 	 *
-	 * @see self::validate_plugin_data()
+	 * @see self::validate_configs()
 	 *
 	 * @global $pagenow    The current WordPress page filename.
 	 * @global $wp_version The WordPress version.
@@ -102,15 +98,9 @@ class Boldgrid_Backup_Admin_Update {
 	 * @return object $transient
 	 */
 	public function custom_plugins_transient_update( $transient ) {
-		if ( ! $this->validate_plugin_data() ) {
-			return $transient;
-		}
+		$version_data = get_site_transient( $this->configs['plugin_transient_name'] );
 
-		$version_data = $this->plugin_data['version_data'];
-
-		$plugin_data = get_plugin_data( $this->plugin_data['main_file_path'], false );
-
-		$have_configs = ( ! empty( $this->plugin_data['configs'] ) );
+		$plugin_data = get_plugin_data( $this->configs['main_file_path'], false );
 
 		$is_force_check = isset( $_GET['force-check'] );
 
@@ -120,21 +110,21 @@ class Boldgrid_Backup_Admin_Update {
 		global $wp_version;
 
 		// If we have no transient or force-check is called, and we do have configs, then get data and set transient.
-		if ( $have_configs && ( ! $version_data || ( $is_force_check && $is_data_old ) ) ) {
+		if ( ! $version_data || ( $is_force_check && $is_data_old ) ) {
 			$options = get_site_option( 'boldgrid_settings' );
 
 			$channel = isset( $options['release_channel'] ) ? $options['release_channel'] : 'stable';
 
 			$params = http_build_query( array(
-				'key' => $this->plugin_data['plugin_key_code'],
+				'key' => $this->configs['plugin_key_code'],
 				'channel' => $channel,
-				'installed_' . $this->plugin_data['plugin_key_code'] . '_version' => $plugin_data['Version'],
+				'installed_' . $this->configs['plugin_key_code'] . '_version' => $plugin_data['Version'],
 				'installed_wp_version' => $wp_version,
 				'site_hash' => get_option( 'boldgrid_site_hash' ),
 			) );
 
-			$query = $this->plugin_data['configs']['asset_server'] .
-				$this->plugin_data['configs']['ajax_calls']['get_plugin_version'] . '?' . $params;
+			$query = $this->configs['asset_server'] .
+				$this->configs['ajax_calls']['get_plugin_version'] . '?' . $params;
 
 			$version_data = json_decode( wp_remote_retrieve_body( wp_remote_get( $query ) ) );
 
@@ -145,8 +135,8 @@ class Boldgrid_Backup_Admin_Update {
 					$version_data->updated = time();
 
 					// Set version data transient, expire in 8 hours.
-					delete_site_transient( $this->plugin_data['transient'] );
-					set_site_transient( $this->plugin_data['transient'], $version_data,
+					delete_site_transient( $this->configs['plugin_transient_name'] );
+					set_site_transient( $this->configs['plugin_transient_name'], $version_data,
 						8 * HOUR_IN_SECONDS );
 			} else {
 				// Something went wrong, so just skip adding update data; return unchanged transient data.
@@ -158,7 +148,7 @@ class Boldgrid_Backup_Admin_Update {
 
 		// Create a new object to be injected into transient.
 		if ( 'plugin-install.php' === $pagenow && isset( $_GET['plugin'] ) &&
-			 $this->plugin_data['slug'] === $_GET['plugin'] ) {
+			 $this->configs['plugin_name'] === $_GET['plugin'] ) {
 			// For version information iframe (/plugin-install.php).
 			$transient = new stdClass();
 
@@ -190,8 +180,8 @@ class Boldgrid_Backup_Admin_Update {
 			$transient->tested = $version_data->result->data->tested_wp_version;
 			// $transient->downloaded = $version_data->result->data->downloads;
 			$transient->last_updated = $version_data->result->data->release_date;
-			$transient->download_link = $this->plugin_data['configs']['asset_server'] .
-				 $this->plugin_data['configs']['ajax_calls']['get_asset'] .
+			$transient->download_link = $this->configs['asset_server'] .
+				 $this->configs['ajax_calls']['get_asset'] .
 				 '?id=' . $version_data->result->data->asset_id . '&installed_plugin_version=' .
 				 $plugin_data['Version'] . '&installed_wp_version=' .
 				 $wp_version;
@@ -226,25 +216,25 @@ class Boldgrid_Backup_Admin_Update {
 					$transient->banners = $banners;
 			}
 
-			$transient->plugin_name = basename( $this->plugin_data['main_file_path'] );
-			$transient->slug = $this->plugin_data['slug'];
+			$transient->plugin_name = basename( $this->configs['main_file_path'] );
+			$transient->slug = $this->configs['plugin_name'];
 			$transient->version = $version_data->result->data->version;
 			$transient->new_version = $version_data->result->data->version;
 			// $transient->active_installs = true;
 		} else {
 			// For plugins.php and update-core.php pages, and WP-CLI.
 			$obj = new stdClass();
-			$obj->slug = $this->plugin_data['slug'];
-			$obj->plugin = $this->plugin_data['slug'] . '/' .
-				basename( $this->plugin_data['main_file_path'] );
+			$obj->slug = $this->configs['plugin_name'];
+			$obj->plugin = $this->configs['plugin_name'] . '/' .
+				basename( $this->configs['main_file_path'] );
 			$obj->new_version = $version_data->result->data->version;
 
 			if ( ! empty( $version_data->result->data->siteurl ) ) {
 				$obj->url = $version_data->result->data->siteurl;
 			}
 
-			$obj->package = $this->plugin_data['configs']['asset_server'] .
-				$this->plugin_data['configs']['ajax_calls']['get_asset'] . '?id=' .
+			$obj->package = $this->configs['asset_server'] .
+				$this->configs['ajax_calls']['get_asset'] . '?id=' .
 				$version_data->result->data->asset_id . '&installed_plugin_version=' .
 				$plugin_data['Version'] . '&installed_wp_version=' . $wp_version;
 
@@ -286,8 +276,6 @@ class Boldgrid_Backup_Admin_Update {
 	/**
 	 * Action to add a filter to check if this plugin should be auto-updated.
 	 *
-	 * @since 1.1.3
-	 *
 	 * @see wp_maybe_auto_update()
 	 */
 	public function wp_update_this_plugin () {
@@ -312,14 +300,12 @@ class Boldgrid_Backup_Admin_Update {
 	/**
 	 * Filter to check if this plugin should be auto-updated.
 	 *
-	 * @since 1.1.3
-	 *
 	 * @param bool $update Whether or not this plugin is set to update.
 	 * @param object $item The plugin transient object.
 	 * @return bool Whether or not to update this plugin.
 	 */
 	public function auto_update_this_plugin ( $update, $item ) {
-		if ( isset( $item->slug[ $this->plugin_data['slug'] ] ) && isset( $item->autoupdate ) ) {
+		if ( isset( $item->slug[ $this->configs['plugin_name'] ] ) && isset( $item->autoupdate ) ) {
 			return true;
 		} else {
 			return $update;
