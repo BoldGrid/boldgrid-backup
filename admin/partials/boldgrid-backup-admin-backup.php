@@ -88,11 +88,8 @@ if ( ! empty( $archive_info['total_size'] ) ) {
 if ( isset( $archive_info['db_duration'] ) ) {
 ?>
 	<p><?php
-	printf(
-		esc_html__( 'Estimated Pause: %s seconds', 'boldgrid-backup' ),
-		$archive_info['db_duration']
-	);
-?></p>
+		printf( $this->configs['lang']['est_pause'], $archive_info['db_duration'] );
+	?></p>
 <?php
 }
 

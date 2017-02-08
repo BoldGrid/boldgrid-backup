@@ -33,4 +33,8 @@ return array(
 		'restore' =>             'https://www.boldgrid.com/support/advanced-tutorials/restoring-boldgrid-backup/',
 		'setting_directory' =>   'https://www.boldgrid.com/support/advanced-tutorials/backup-userguide#setting-backup-directory',
 	),
+
+	'lang' => array(
+		'est_pause' => esc_html__( 'Estimated Pause: %s seconds', 'boldgrid-backup' ),
+	),
 );

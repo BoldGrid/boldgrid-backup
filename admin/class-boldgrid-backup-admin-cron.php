@@ -675,11 +675,7 @@ class Boldgrid_Backup_Admin_Cron {
 
 			// Show how long the website was paused for.
 			if ( isset( $archive_info['db_duration'] ) ) {
-				printf(
-					esc_html__( 'Estimated Pause: %s seconds', 'boldgrid-backup' ),
-					$archive_info['db_duration']
-				);
-
+				printf( $this->core->configs['lang']['est_pause'], $archive_info['db_duration'] );
 				echo PHP_EOL;
 			}
 

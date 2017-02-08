@@ -1345,10 +1345,7 @@ class Boldgrid_Backup_Admin_Core {
 			$body .= esc_html__( 'Backup details', 'boldgrid-backup' ) . ":\n";
 
 			// Show how long the website was paused for.
-			$body .= sprintf(
-				esc_html__( 'Estimated Pause: %s seconds', 'boldgrid-backup' ),
-				$info['db_duration']
-			) . "\n";
+			$body .= sprintf( $this->configs['lang']['est_pause'], $info['db_duration'] ) . "\n";
 
 			$body .= sprintf(
 				esc_html__( 'Duration: %s seconds', 'boldgrid-backup' ),
