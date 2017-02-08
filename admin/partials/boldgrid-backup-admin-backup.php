@@ -84,6 +84,18 @@ if ( ! empty( $archive_info['total_size'] ) ) {
 <?php
 }
 
+// Show how long the website was paused for.
+if ( isset( $archive_info['db_duration'] ) ) {
+?>
+	<p><?php
+	printf(
+		esc_html__( 'Estimated Pause: %s seconds', 'boldgrid-backup' ),
+		$archive_info['db_duration']
+	);
+?></p>
+<?php
+}
+
 if ( isset( $archive_info['duration'] ) ) {
 ?>
 	<p><?php

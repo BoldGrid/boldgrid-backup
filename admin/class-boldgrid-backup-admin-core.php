@@ -1168,6 +1168,9 @@ class Boldgrid_Backup_Admin_Core {
 			}
 		}
 
+		// Keep track of how long the site was paused for / the time to backup the database.
+		$db_time_stop = microtime( true );
+
 		// Get the file list.
 		$filelist = $this->get_filtered_filelist( ABSPATH );
 
@@ -1311,6 +1314,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Calculate duration.
 		$info['duration'] = number_format( ( $time_stop - $time_start ), 2, '.', '' );
+		$info['db_duration'] = number_format( ( $db_time_stop - $time_start ), 2, '.', '' );
 
 		// Get settings.
 		$settings = $this->settings->get_settings();
@@ -1339,6 +1343,12 @@ class Boldgrid_Backup_Admin_Core {
 			) . ".\n\n";
 
 			$body .= esc_html__( 'Backup details', 'boldgrid-backup' ) . ":\n";
+
+			// Show how long the website was paused for.
+			$body .= sprintf(
+				esc_html__( 'Estimated Pause: %s seconds', 'boldgrid-backup' ),
+				$info['db_duration']
+			) . "\n";
 
 			$body .= sprintf(
 				esc_html__( 'Duration: %s seconds', 'boldgrid-backup' ),
