@@ -30,6 +30,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 
 = 1.3.6 In progress =
 * Update:		JIRA WPB-2896	Show how long the site was paused for.
+* Update:		JIRA WPB-2897	Auto show move backups message.
 
 = 1.3.5 =
 * Bug fix:		JIRA WPB-2821	Fixed plugin update checks for some scenarios (WP-CLI, Plesk, etc).

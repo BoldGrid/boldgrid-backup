@@ -15,7 +15,14 @@
 
 	// General Variables.
 	var self = {},
-		$scheduleDow, $noBackupDays, $freeDowLimit, $useSparingly;
+		$scheduleDow, $noBackupDays, $freeDowLimit, $useSparingly, $backupDir, $moveBackups;
+
+	/**
+	 * Directory to store backups.
+	 *
+	 * @since 1.3.6
+	 */
+	$backupDir = $( '#backup-directory-path' );
 
 	// Define a context selector for schedule-dow.
 	$scheduleDow = $( '.schedule-dow' );
@@ -29,6 +36,13 @@
 	 * @since 1.3.1
 	 */
 	$freeDowLimit = $( '#free-dow-limit' );
+
+	/**
+	 * Message asking user if we should move their backups.
+	 *
+	 * @since 1.3.6
+	 */
+	$moveBackups = $( '#move-backups' );
 
 	/**
 	 * Message describing resource usage.
@@ -51,6 +65,19 @@
 		}
 
 		return isDowChecked;
+	};
+
+	/**
+	 * @summary Toogle the move backups message.
+	 *
+	 * @since 1.3.6
+	 */
+	self.toggleMoveBackups = function() {
+		if( $backupDir.val() === $backupDir.prop( 'defaultValue' ) ) {
+			$moveBackups.hide();
+		} else {
+			$moveBackups.show();
+		}
 	};
 
 	/**
@@ -107,6 +134,8 @@
 	$( function() {
 		// Check if any days or the week are checked, toggle notice.
 		self.toggleNoBackupDays();
+
+		$backupDir.on( 'input', self.toggleMoveBackups );
 
 		// On click action for days, check if any days or the week are checked,
 		// toggle notice.
