@@ -226,20 +226,20 @@ class Boldgrid_Backup_Admin_Config {
 				$home_dir = getenv( 'USERPROFILE' );
 			}
 		} else {
-			// Linux.
-			$home_dir = getenv( 'HOME' );
+			// Linux.  Try posix_getpwuid and posix_getuid.
+			if ( function_exists( 'posix_getuid' ) && function_exists( 'posix_getpwuid' ) ) {
+				$user = posix_getpwuid( posix_getuid() );
+				$home_dir = ( ! empty( $user['dir'] ) ? $user['dir'] : null );
+			}
 
 			if ( empty( $home_dir ) ) {
 				$home_dir = ( ! empty( $_SERVER['HOME'] ) ? $_SERVER['HOME'] : null );
 			}
-		}
 
-		// If still unknown, then try posix_getpwuid and posix_getuid.
-		if ( empty( $home_dir ) && function_exists( 'posix_getuid' ) &&
-			function_exists( 'posix_getpwuid' ) ) {
-				$user = posix_getpwuid( posix_getuid() );
-
-				$home_dir = ( ! empty( $user['dir'] ) ? $user['dir'] : null );
+			// If still unknown, then try environmental variables.
+			if ( empty( $home_dir ) ) {
+				$home_dir = getenv( 'HOME' );
+			}
 		}
 
 		// Could not find the user home directory, so use the WordPress root directory.
