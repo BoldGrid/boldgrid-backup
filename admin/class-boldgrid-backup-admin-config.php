@@ -706,12 +706,12 @@ class Boldgrid_Backup_Admin_Config {
 		}
 
 		// System tar.
-		if ( file_exists( '/bin/tar' ) && is_executable( '/bin/tar' ) ) {
+		if ( $this->core->execute_command( '/bin/tar --version' ) ) {
 			$this->add_compressor( 'system_tar' );
 		}
 
 		// System zip.
-		if ( file_exists( '/usr/bin/zip' ) && is_executable( '/usr/bin/zip' ) ) {
+		if ( $this->core->execute_command( '/usr/bin/zip -v ' ) ) {
 			$this->add_compressor( 'system_zip' );
 		}
 
