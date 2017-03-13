@@ -410,28 +410,22 @@ class Boldgrid_Backup_Admin_Config {
 	 * @return string|bool The backup directory path, or FALSE on error.
 	 */
 	public function get_backup_directory() {
-		// If home directory is not set, then set it.
-		if ( empty( $this->backup_directory ) ) {
-			// Initialize $backup_directory.
-			$backup_directory = '';
+		$backup_directory = $this->backup_directory;
 
-			// Get settings.
+		if ( empty( $backup_directory ) ) {
 			$settings = $this->core->settings->get_settings();
 
-			// If the backup directory was saved in the settings, then use it.
 			if ( ! empty( $settings['backup_directory'] ) ) {
 				$backup_directory = $settings['backup_directory'];
 			}
-
-			$is_directory_set = $this->set_backup_directory( $backup_directory );
-
-			// The backup directory could not be set.
-			if ( ! $is_directory_set ) {
-				return false;
-			}
 		}
 
-		// Backup directory was set, so return the path.
+		$is_directory_set = $this->set_backup_directory( $backup_directory );
+
+		if ( ! $is_directory_set ) {
+			return false;
+		}
+
 		return $this->backup_directory;
 	}
 
@@ -454,9 +448,10 @@ class Boldgrid_Backup_Admin_Config {
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
 	 * @param string $backup_directory_path The backup directory path to be set/configured.
+	 * @param bool   $display_notices       Whether or not to display admin notices.  Default: true.
 	 * @return bool
 	 */
-	public function set_backup_directory( $backup_directory_path = '' ) {
+	public function set_backup_directory( $backup_directory_path = '', $display_notices = true ) {
 		// If a backup directory was not specified, then use the default.
 		if ( empty( $backup_directory_path ) ) {
 			// Get the user home directory.
@@ -489,14 +484,14 @@ class Boldgrid_Backup_Admin_Config {
 
 			// If mkdir failed, then notify and abort.
 			if ( ! $backup_directory_created ) {
-				// Create error message.
-				$errormsg = sprintf(
-					esc_html__( 'Could not create directory "%s".', 'boldgrid-backup' ),
-					$backup_directory_path
-				);
+					if ( $display_notices ) {
+					$errormsg = sprintf(
+						esc_html__( 'Could not create directory "%s".', 'boldgrid-backup' ),
+						$backup_directory_path
+					);
 
-				// Trigger an admin notice.
-				do_action( 'boldgrid_backup_notice', $errormsg, 'notice notice-error is-dismissible' );
+					do_action( 'boldgrid_backup_notice', $errormsg, 'notice notice-error is-dismissible' );
+				}
 
 				// Abort.
 				return false;
@@ -508,14 +503,14 @@ class Boldgrid_Backup_Admin_Config {
 
 		// If the backup directory is not a directory, then notify and abort.
 		if ( ! $backup_directory_isdir ) {
-			// Create error message.
-			$errormsg = sprintf(
-				esc_html__( 'Backup directory "%s" is not a directory.', 'boldgrid-backup' ),
-				$backup_directory_path
-			);
+			if ( $display_notices ) {
+				$errormsg = sprintf(
+					esc_html__( 'Backup directory "%s" is not a directory.', 'boldgrid-backup' ),
+					$backup_directory_path
+				);
 
-			// Trigger an admin notice.
-			do_action( 'boldgrid_backup_notice', $errormsg, 'notice notice-error is-dismissible' );
+				do_action( 'boldgrid_backup_notice', $errormsg, 'notice notice-error is-dismissible' );
+			}
 
 			// Abort.
 			return false;
@@ -526,18 +521,18 @@ class Boldgrid_Backup_Admin_Config {
 			// Get the mode of the directory.
 			$backup_directory_mode = $wp_filesystem->getchmod( $backup_directory_path );
 
-			// Create error message.
-			$errormsg = sprintf(
-				esc_html__(
-					'Backup directory "%s" (mode %s) is not writable.',
-					'boldgrid-backup'
-				),
-				$backup_directory_path,
-				$backup_directory_mode
-			);
+			if ( $display_notices ) {
+				$errormsg = sprintf(
+					esc_html__(
+						'Backup directory "%s" (mode %s) is not writable.',
+						'boldgrid-backup'
+					),
+					$backup_directory_path,
+					$backup_directory_mode
+				);
 
-			// Trigger an admin notice.
-			do_action( 'boldgrid_backup_notice', $errormsg, 'notice notice-error is-dismissible' );
+				do_action( 'boldgrid_backup_notice', $errormsg, 'notice notice-error is-dismissible' );
+			}
 
 			// Abort.
 			return false;

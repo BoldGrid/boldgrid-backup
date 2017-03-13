@@ -582,4 +582,36 @@ class Boldgrid_Backup_Admin_Settings {
 
 		return;
 	}
+
+	/**
+	 * Set the backup directory setting.
+	 *
+	 * If the stored setting is not valid, then reset it.
+	 *
+	 * @since 1.3.8
+	 *
+	 * @return bool
+	 */
+	public function set_backup_directory() {
+		$settings = get_site_option( 'boldgrid_backup_settings' );
+
+		$settings['backup_directory'] = $settings['backup_directory'] ?: '';
+
+		$is_directory_set = $this->core->config->set_backup_directory(
+			$settings['backup_directory'],
+			false
+		);
+
+		if ( ! $is_directory_set ) {
+			$is_directory_set = $this->core->config->set_backup_directory();
+		}
+
+		if ( $is_directory_set ) {
+			$settings['backup_directory'] = $this->core->config->get_backup_directory();
+
+			update_site_option( 'boldgrid_backup_settings', $settings );
+		}
+
+		return $is_directory_set;
+	}
 }

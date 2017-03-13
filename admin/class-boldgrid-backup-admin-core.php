@@ -2120,6 +2120,9 @@ class Boldgrid_Backup_Admin_Core {
 		// Update status.
 		$info['restore_ok'] = $restore_ok;
 
+		// Check backup directory.
+		$info['backup_directory_set'] = $this->settings->set_backup_directory();
+
 		// Return info array.
 		return $info;
 	}
