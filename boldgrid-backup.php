@@ -7,21 +7,21 @@
  * registers the activation and deactivation functions, and defines a function
  * that starts the plugin.
  *
- * @link http://www.boldgrid.com
- * @since 1.0.1
- * @package Boldgrid_Backup
+ * @link        https://www.boldgrid.com
+ * @since       1.0.1
+ * @package     Boldgrid_Backup
  *
- *          @wordpress-plugin
- *          Plugin Name: BoldGrid Backup
- *          Plugin URI: http://www.boldgrid.com
- *          Description: The BoldGrid Backup plugin.
- *          Version: 1.3.7
- *          Author: BoldGrid.com
- *          Author URI: http://www.boldgrid.com
- *          License: GPL-2.0+
- *          License URI: http://www.gnu.org/licenses/gpl-2.0.txt
- *          Text Domain: boldgrid-backup
- *          Domain Path: /languages
+ * @wordpress-plugin
+ * Plugin Name: BoldGrid Backup
+ * Plugin URI:  https://www.boldgrid.com
+ * Description: The BoldGrid Backup plugin.
+ * Version:     1.3.7
+ * Author:      BoldGrid <support@boldgrid.com>
+ * Author URI:  https://www.boldgrid.com
+ * License:     GPL-2.0+
+ * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+ * Text Domain: boldgrid-backup
+ * Domain Path: /languages
  */
 
 // If this file is called directly, abort.
