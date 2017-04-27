@@ -100,7 +100,7 @@ class Boldgrid_Backup_Update {
 	public function custom_plugins_transient_update( $transient ) {
 		$version_data = get_site_transient( $this->configs['plugin_transient_name'] );
 
-		if ( ! class_exists( 'get_plugin_data' ) ) {
+		if ( ! function_exists( 'get_plugin_data' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
 
