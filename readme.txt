@@ -28,6 +28,9 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 
 == Changelog ==
 
+= 1.3.10 In progress =
+* Bug fix:		JIRA WPB-3161	Fixed auto plugin update.
+
 = 1.3.9 =
 * Bug fix:		JIRA WPB-3151	Added check and load before using get_plugin_data() for updates.
 
