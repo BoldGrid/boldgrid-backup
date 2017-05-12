@@ -154,7 +154,7 @@ if ( $is_functional ) {
 		</p>',
 		esc_html__( 'BoldGrid Backup is not compatible with your hosting account. For further help please see:', 'boldgrid-backup' ),
 		esc_html__( 'Making your web hosting account compatible with BoldGrid Backup', 'boldgrid-backup' ),
-		esc_url( $this->core->configs['urls']['compatibility'] )
+		esc_url( $this->configs['urls']['compatibility'] )
 	);
 }
 
