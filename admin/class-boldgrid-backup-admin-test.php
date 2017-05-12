@@ -341,7 +341,7 @@ class Boldgrid_Backup_Admin_Test {
 		// Get the home directory.
 		$home_dir = $this->core->config->get_home_directory();
 
-		// If the home directory is not defined, not a directory or not writable, then return 0.00.
+		// If the home directory is not defined, not a directory or not readable, then return 0.00.
 		if ( empty( $home_dir ) || ! $wp_filesystem->is_dir( $home_dir ) ||
 			! $wp_filesystem->is_readable( $home_dir ) ) {
 			return array(
