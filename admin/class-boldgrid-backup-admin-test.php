@@ -343,11 +343,12 @@ class Boldgrid_Backup_Admin_Test {
 
 		// If the home directory is not defined, not a directory or not writable, then return 0.00.
 		if ( empty( $home_dir ) || ! $wp_filesystem->is_dir( $home_dir ) ||
-			! $wp_filesystem->is_writable( $home_dir ) ) {
+			! $wp_filesystem->is_readable( $home_dir ) ) {
 			return array(
 				0.00,
 				0.00,
 				0.00,
+				false,
 			);
 		}
 
