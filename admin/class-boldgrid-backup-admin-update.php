@@ -242,11 +242,11 @@ class Boldgrid_Backup_Update {
 				$plugin_data['Version'] . '&installed_wp_version=' . $wp_version;
 
 			if ( $plugin_data['Version'] !== $version_data->result->data->version ) {
-				$transient->response[ $obj->plugin ] = $obj;
-				$transient->tested = $version_data->result->data->tested_wp_version;
 				if ( ! empty( $version_data->result->data->autoupdate ) ) {
 					$obj->autoupdate = true;
 				}
+				$transient->response[ $obj->plugin ] = $obj;
+				$transient->tested = $version_data->result->data->tested_wp_version;
 			} else {
 				$transient->no_update[ $obj->plugin ] = $obj;
 			}
