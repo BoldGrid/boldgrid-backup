@@ -566,7 +566,7 @@ class Boldgrid_Backup_Admin_Utility {
 		$zip->close();
 
 		// Return success.
-		return false;//true;
+		return true;
 	}
 
 	/**
