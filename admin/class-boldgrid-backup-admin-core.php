@@ -120,7 +120,6 @@ class Boldgrid_Backup_Admin_Core {
 		'index.php',
 		'license.txt',
 		'readme.html',
-		'readme.txt',
 		'wp-activate.php',
 		'wp-admin',
 		'wp-blog-header.php',
@@ -1011,10 +1010,10 @@ class Boldgrid_Backup_Admin_Core {
 		// Filter the filelist array.
 		foreach ( $filelist as $fileinfo ) {
 			foreach ( $this->filelist_filter as $pattern ) {
-				if ( 0 === strpos( $fileinfo[1], $pattern ) ) {
-					$new_filelist[] = $fileinfo;
-
-					break;
+				if ( 0 === strpos( $fileinfo[1], $pattern )
+					&& false === strpos( $fileinfo[1], '/node_modules/' ) ) {
+						$new_filelist[] = $fileinfo;
+						break;
 				}
 			}
 		}

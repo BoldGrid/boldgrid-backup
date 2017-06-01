@@ -2,7 +2,7 @@
 Contributors: imh_brad, joemoto, rramo012, timph
 Tags: inspiration,customization,build,create,design,seo,search engine optimization
 Requires at least: 4.3
-Tested up to: 4.7.4
+Tested up to: 4.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -27,6 +27,9 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 2. Activate the plugin through the Plugins menu in WordPress.
 
 == Changelog ==
+
+= 1.3.11 In progress =
+* Bug fix:		JIRA WPB-3211	Skip node_modules paths when creating archives.
 
 = 1.3.10 =
 * Bug fix:		JIRA WPB-3169	Fixed undefined property when pre-flight test fails.

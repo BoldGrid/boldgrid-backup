@@ -528,7 +528,7 @@ class Boldgrid_Backup_Admin_Utility {
 			return false;
 		}
 
-		// Define an array of paterns to skip.
+		// Define an array of patterns to skip.
 		$skip = array(
 			'.htaccess',
 		);
@@ -566,7 +566,7 @@ class Boldgrid_Backup_Admin_Utility {
 		$zip->close();
 
 		// Return success.
-		return true;
+		return false;//true;
 	}
 
 	/**
