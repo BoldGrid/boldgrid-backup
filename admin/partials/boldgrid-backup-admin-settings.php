@@ -201,6 +201,60 @@ if ( empty( $settings ) ) {
 		<?php include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/retention.php'; ?>
 
 		<h2>
+			<?php esc_html_e( 'Plugin Auto-Updates', 'boldgrid-backup' ); ?>
+		 	<span class="dashicons dashicons-editor-help" data-id="plugin-autoupdate"></span>
+		 </h2>
+		<p class="help" data-id="plugin-autoupdate">
+			<?php
+			esc_html_e( 'Automatically perform all plugin updates when available.',
+				'boldgrid-backup'
+			);
+			?>
+		<p>
+			<input id="plugin-autoupdate-enabled" type="radio" name="plugin_autoupdate" value="1"
+				<?php
+				if ( isset( $settings['plugin_autoupdate'] ) &&
+					 1 === $settings['plugin_autoupdate'] ) {
+						?> checked<?php
+				}
+				?> /> <?php esc_html_e( 'Enabled', 'boldgrid-backup' ); ?> &nbsp; <input
+				id="plugin-autoupdate-disabled" type="radio" name="plugin_autoupdate" value="0"
+				<?php
+				if ( ! isset( $settings['plugin_autoupdate'] ) ||
+					! $settings['plugin_autoupdate'] ) {
+						?> checked<?php
+				}
+				?> /> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
+		</p>
+
+		<h2>
+			<?php esc_html_e( 'Theme Auto-Updates', 'boldgrid-backup' ); ?>
+		 	<span class="dashicons dashicons-editor-help" data-id="theme-autoupdate"></span>
+		 </h2>
+		<p class="help" data-id="theme-autoupdate">
+			<?php
+			esc_html_e( 'Automatically perform all theme updates when available.',
+				'boldgrid-backup'
+			);
+			?>
+		<p>
+			<input id="theme-autoupdate-enabled" type="radio" name="theme_autoupdate" value="1"
+				<?php
+				if ( isset( $settings['theme_autoupdate'] ) &&
+					 1 === $settings['theme_autoupdate'] ) {
+						?> checked<?php
+				}
+				?> /> <?php esc_html_e( 'Enabled', 'boldgrid-backup' ); ?> &nbsp; <input
+				id="theme-autoupdate-disabled" type="radio" name="theme_autoupdate" value="0"
+				<?php
+				if ( ! isset( $settings['theme_autoupdate'] ) ||
+					! $settings['theme_autoupdate'] ) {
+						?> checked<?php
+				}
+				?> /> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
+		</p>
+
+		<h2>
 			<?php esc_html_e( 'Auto Backup Before Updates', 'boldgrid-backup' ); ?>
 		 	<span class='dashicons dashicons-editor-help' data-id='auto-backup'></span>
 		 </h2>
@@ -224,6 +278,7 @@ if ( empty( $settings ) ) {
 				}
 				?> /> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
 		</p>
+
 		<h2>
 			<?php esc_html_e( 'Auto Rollback', 'boldgrid-backup' ); ?>
 			<span class='dashicons dashicons-editor-help' data-id='auto-rollback'></span>

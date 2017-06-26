@@ -175,6 +175,16 @@ class Boldgrid_Backup_Admin_Settings {
 			$settings['schedule'] = array_merge( $settings['schedule'], $cron_schedule );
 		}
 
+		$boldgrid_settings = get_site_option( 'boldgrid_settings' );
+
+		$settings['plugin_autoupdate'] =  (
+			! empty( $boldgrid_settings['plugin_autoupdate'] ) ? 1 : 0
+		);
+
+		$settings['theme_autoupdate'] =  (
+			! empty( $boldgrid_settings['theme_autoupdate'] ) ? 1 : 0
+		);
+
 		// Return the settings array.
 		return $settings;
 	}
@@ -386,6 +396,16 @@ class Boldgrid_Backup_Admin_Settings {
 				$settings['notification_email'] = sanitize_email( $_POST['notification_email'] );
 			}
 
+			$settings['plugin_autoupdate'] = (
+				( isset( $_POST['plugin_autoupdate'] ) && '1' === $_POST['plugin_autoupdate'] ) ?
+				1 : 0
+			);
+
+			$settings['theme_autoupdate'] = (
+				( isset( $_POST['theme_autoupdate'] ) && '1' === $_POST['theme_autoupdate'] ) ?
+				1 : 0
+			);
+
 			// Get the current backup directory path.
 			$original_backup_directory = $this->core->config->get_backup_directory();
 
@@ -417,7 +437,10 @@ class Boldgrid_Backup_Admin_Settings {
 				$settings['updated'] = time();
 
 				// Attempt to update WP option.
-				$update_status = update_site_option( 'boldgrid_backup_settings', $settings );
+				$update_status = (
+					update_site_option( 'boldgrid_backup_settings', $settings ) &&
+					$this->update_boldgrid_settings( $settings )
+				);
 
 				if ( ! $update_status ) {
 					// Failure.
@@ -566,7 +589,6 @@ class Boldgrid_Backup_Admin_Settings {
 
 		wp_enqueue_script( 'boldgrid-backup-now' );
 
-		// Get settings.
 		$settings = $this->get_settings();
 
 		// If the directory path is not in the settings, then add it for the form.
@@ -613,5 +635,29 @@ class Boldgrid_Backup_Admin_Settings {
 		}
 
 		return $is_directory_set;
+	}
+
+	/**
+	 * Update BoldGrid general settings.
+	 *
+	 * @since 1.3.11
+	 *
+	 * @param array $settings Array of BoldGrid settings.
+	 * @return bool
+	 */
+	public function update_boldgrid_settings( array $settings ) {
+		$boldgrid_settings = get_site_option( 'boldgrid_settings' );
+
+		$boldgrid_settings['plugin_autoupdate'] = (
+			( isset( $settings['plugin_autoupdate'] ) && 1 === $settings['plugin_autoupdate'] ) ?
+			1 : 0
+		);
+
+		$boldgrid_settings['theme_autoupdate'] = (
+			( isset( $settings['theme_autoupdate'] ) && 1 === $settings['theme_autoupdate'] ) ?
+			1 : 0
+		);
+
+		return update_site_option( 'boldgrid_settings', $boldgrid_settings );
 	}
 }

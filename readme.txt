@@ -29,6 +29,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 == Changelog ==
 
 = 1.3.11 In progress =
+* New feature:	JIRA WPB-3262	Added auto-update settings for plugins and themes.
 * Bug fix:		JIRA WPB-3211	Skip node_modules paths when creating archives.
 
 = 1.3.10 =
