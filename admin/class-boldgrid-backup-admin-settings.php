@@ -396,15 +396,17 @@ class Boldgrid_Backup_Admin_Settings {
 				$settings['notification_email'] = sanitize_email( $_POST['notification_email'] );
 			}
 
-			$settings['plugin_autoupdate'] = (
+			$boldgrid_settings['plugin_autoupdate'] = (
 				( isset( $_POST['plugin_autoupdate'] ) && '1' === $_POST['plugin_autoupdate'] ) ?
 				1 : 0
 			);
 
-			$settings['theme_autoupdate'] = (
+			$boldgrid_settings['theme_autoupdate'] = (
 				( isset( $_POST['theme_autoupdate'] ) && '1' === $_POST['theme_autoupdate'] ) ?
 				1 : 0
 			);
+
+			unset( $settings['plugin_autoupdate'], $settings['theme_autoupdate'] );
 
 			// Get the current backup directory path.
 			$original_backup_directory = $this->core->config->get_backup_directory();
@@ -433,31 +435,13 @@ class Boldgrid_Backup_Admin_Settings {
 
 			// If no errors, then save the settings.
 			if ( ! $update_error ) {
-				// Record the update time.
 				$settings['updated'] = time();
 
-				// Attempt to update WP option.
-				$update_status = (
-					update_site_option( 'boldgrid_backup_settings', $settings ) &&
-					$this->update_boldgrid_settings( $settings )
-				);
+				update_site_option( 'boldgrid_backup_settings', $settings );
 
-				if ( ! $update_status ) {
-					// Failure.
-					$update_error = true;
+				$this->update_boldgrid_settings( $boldgrid_settings );
 
-					do_action(
-						'boldgrid_backup_notice',
-						esc_html__(
-							'Invalid settings submitted.  Please try again.',
-							'boldgrid-backup'
-						),
-						'notice notice-error is-dismissible'
-					);
-				} else {
-					// Delete existing backup cron jobs, and add the new cron entry.
-					$cron_status = $this->core->cron->add_cron_entry();
-				}
+				$cron_status = $this->core->cron->add_cron_entry();
 			} else {
 				// Interrupted by a previous error.
 				do_action(
