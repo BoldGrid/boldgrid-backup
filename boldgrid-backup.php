@@ -13,9 +13,9 @@
  *
  *          @wordpress-plugin
  *          Plugin Name: BoldGrid Backup
- *          Plugin URI: https://www.boldgrid.com/wordpress-backup-plugin/
+ *          Plugin URI: https://www.boldgrid.com/boldgrid-backup/
  *          Description: The BoldGrid Backup plugin.
- *          Version: 1.3.11
+ *          Version: 1.3.12
  *          Author: BoldGrid.com
  *          Author URI: https://www.boldgrid.com
  *          License: GPL-2.0+

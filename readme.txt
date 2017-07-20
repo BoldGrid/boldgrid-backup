@@ -1,6 +1,6 @@
 === BoldGrid Backup ===
 Contributors: imh_brad, joemoto, rramo012, timph
-Tags: inspiration,customization,build,create,design,seo,search engine optimization
+Tags: backup, restore, migrate, migration
 Requires at least: 4.3
 Tested up to: 4.8
 License: GPLv2 or later
@@ -28,7 +28,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 
 == Changelog ==
 
-= 1.3.12 In progress =
+= 1.3.12 =
 * Update:		JIRA WPB-3292	Updated plugin URI.
 
 = 1.3.11 =
