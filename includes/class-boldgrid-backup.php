@@ -154,6 +154,8 @@ class Boldgrid_Backup {
 		 */
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-upload.php';
 
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-restore-helper.php';
+
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
 
@@ -253,6 +255,11 @@ class Boldgrid_Backup {
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_sizes', $plugin_admin_core,
 			'boldgrid_backup_sizes_callback'
 		);
+
+		$this->loader->add_action( 'boldgrid_backup_pre_restore', $plugin_admin_core->restore_helper, 'pre_restore' );
+		$this->loader->add_action( 'boldgrid_backup_post_restore', $plugin_admin_core->restore_helper, 'post_restore' );
+		$this->loader->add_action( 'boldgrid_backup_post_restore_htaccess', $plugin_admin_core->restore_helper, 'post_restore_htaccess' );
+		$this->loader->add_action( 'boldgrid_backup_post_restore_wpconfig', $plugin_admin_core->restore_helper, 'post_restore_wpconfig' );
 
 		return;
 	}

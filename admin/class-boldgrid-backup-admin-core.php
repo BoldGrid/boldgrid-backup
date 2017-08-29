@@ -177,6 +177,8 @@ class Boldgrid_Backup_Admin_Core {
 		// Starts profiling and saves a report, if enabled in the "config.local.php" file.
 		$this->xhprof = new Boldgrid_Backup_Admin_Xhprof();
 
+		$this->restore_helper = new Boldgrid_Backup_Admin_Restore_Helper();
+
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
 
@@ -1916,141 +1918,37 @@ class Boldgrid_Backup_Admin_Core {
 
 			$this->set_time_limit();
 
-			// Open the ZIP file while checking for consistency.
-			$zip = new ZipArchive;
+			/**
+			 * Action to take before restoring an archive.
+			 *
+			 * @since 1.5.1
+			 *
+			 * @param array $info
+			 */
+			do_action( 'boldgrid_backup_pre_restore', $info );
 
-			$status = $zip->open( $filepath, ZipArchive::CHECKCONS );
+			$unzip_status = null;
+			if( ! $dryrun ) {
+				$unzip_status = unzip_file( $info['filepath'], ABSPATH );
+			}
 
-			if ( ! $status ) {
-				$message = sprintf(
-					esc_html__(
-						'Cannot unzip archive file "%1$s". Error code: %2$s (%3$s)', 'boldgrid-backup'
-					),
-					$filepath,
-					$status,
-					Boldgrid_Backup_Admin_Utility::translate_zip_error( $status )
-				);
-
-				$restore_ok = false;
-
-				// Display an error notice, if not DOING_CRON.
-				if ( ! $doing_cron ) {
-					do_action( 'boldgrid_backup_notice',
-						$message,
-						'notice notice-error is-dismissible'
-					);
-				}
-
-				// Abort.
-				return array(
-					'error' => $message,
-				);
-			} elseif ( ! $dryrun ) {
-				// Set the WordPress root directory path, with no trailing slash.
-				$wp_root = untrailingslashit( ABSPATH );
-
-				// Ensure that all targets are writable.
-				for ( $i = 0; $i < $zip->numFiles; $i++ ) {
-					// Get the entry name.
-					$name = $zip->getNameIndex( $i );
-
-					// If path exists and is not writable, then make writable.
-					if ( ! Boldgrid_Backup_Admin_Utility::make_writable( ABSPATH . $name ) ) {
-						$restore_ok = false;
-
-						$message = sprintf(
-							esc_html__( 'The file "%s" is not writable.', 'boldgrid-backup' ),
-							$name
-						);
-
-						// Display an error notice, if not DOING_CRON.
-						if ( ! $doing_cron ) {
-							do_action(
-								'boldgrid_backup_notice',
-								$message,
-								'notice notice-error is-dismissible'
-							);
-						}
-
-						// Abort.
-						return array(
-							'error' => $message,
-						);
-
-						break;
-					}
-
-					// If restoring ".htaccess", then make a backup copy before restoring.
-					if ( '.htaccess' === $name ) {
-						$wp_filesystem->copy(
-							ABSPATH . '.htaccess',
-							ABSPATH . '.htaccess.bgb',
-							true,
-							0644
-						);
-
-						// Recreate/flush rewrite rules in .htaccess on PHP shutdown.
-						add_action( 'shutdown', 'flush_rewrite_rules' );
-					}
-
-					// Extract the file.
-					if ( ! $zip->extractTo( $wp_root, array( $name ) ) ) {
-						// Error extracting.
-						$message = sprintf(
-							esc_html__(
-								'Error extracting "%1$s%2$s" from archive file "%3$s".',
-								'boldgrid-backup'
-							),
-							ABSPATH,
-							$name,
-							$filepath
-						);
-
-						error_log( __METHOD__ . ': ' . $message );
-
-						$restore_ok = false;
-
-						// Display an error notice, if not DOING_CRON.
-						if ( ! $doing_cron ) {
-							do_action( 'boldgrid_backup_notice',
-								$message,
-								'notice notice-error is-dismissible'
-							);
-						}
-
-						// Abort.
-						return array(
-							'error' => $message,
-						);
-
-						break;
-					} elseif ( 'wp-config.php' === $name ) {
-						// If restoring "wp-config.php", then ensure that the credentials remain intact.
-						$result = Boldgrid_Backup_Admin_Utility::fix_wpconfig();
-
-						// If the file could not be fixed, then raise an error.
-						if ( ! $result ) {
-							$message = esc_html__(
-								'Could not update the WordPress configuration file.',
-								'boldgrid-backup'
-							);
-
-							error_log( __METHOD__ . ': ' . $message );
-
-							// Display an error notice, if not DOING_CRON.
-							if ( ! $doing_cron ) {
-								do_action( 'boldgrid_backup_notice',
-									$message,
-									'notice notice-error is-dismissible'
-								);
-							}
-						}
-					}
+			if( is_wp_error( $unzip_status ) ) {
+				$error = $unzip_status->get_error_message();
+				if( $doing_cron ) {
+					return array( 'error' => $error );
+				} else {
+					do_action( 'boldgrid_backup_notice', $error, 'notice notice-error is-dismissible' );
 				}
 			}
 
-			// Close the ZIP file.
-			$zip->close();
+			/**
+			 * Action to take after restoring an archive.
+			 *
+			 * @since 1.5.1
+			 *
+			 * @param array $info
+			 */
+			do_action( 'boldgrid_backup_post_restore', $info );
 
 			// Restore database.
 			if ( ! $dryrun && $restore_ok ) {

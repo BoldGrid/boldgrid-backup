@@ -28,6 +28,9 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 
 == Changelog ==
 
+= 1.5.1 In progress =
+* Update		JIRA WPB-3480	Use wp filesystem when extracting backups.
+
 = 1.5 =
 * Update:						Bump version.
 
