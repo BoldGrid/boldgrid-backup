@@ -37,9 +37,9 @@ class Boldgrid_Backup_Admin_Restore_Git {
 		$chmodded = $wp_filesystem->chmod( ABSPATH . $dir, FS_CHMOD_FILE, true );
 
 		if( $chmodded ) {
-			return $message . ' ' . sprintf( __( 'We updated file permissions to %1$s, and suggest that you attempt the restoration again.', 'boldgrid-backup' ), FS_CHMOD_FILE );
+			return $message . ' ' . __( 'We updated file permissions, and suggest that you attempt the restoration again.', 'boldgrid-backup' );
 		} else {
-			return $message . ' ' . sprintf( __( 'We attempted to updated file permissions to %1$s, but that does not appear to have worked. Before attempting to restore again, please manually review these file permissions.', 'boldgrid-backup' ), FS_CHMOD_FILE );
+			return $message . ' ' . __( 'We attempted to updated file permissions, but that does not appear to have worked. Before attempting to restore again, please manually review these file permissions.', 'boldgrid-backup' );
 		}
 	}
 }

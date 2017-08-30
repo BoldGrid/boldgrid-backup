@@ -1987,23 +1987,19 @@ class Boldgrid_Backup_Admin_Core {
 
 				// Restore the database.
 				$restore_ok = $this->restore_database( $db_dump_filepath, $db_prefix );
-			}
-		}
 
-		// Display notice of deletion status.
-		if ( ! $restore_ok ) {
-			$info['error'] = esc_html__( 'Could not restore database.', 'boldgrid-backup' );
+				// Display notice of deletion status.
+				if ( ! $restore_ok ) {
+					$info['error'] = esc_html__( 'Could not restore database.', 'boldgrid-backup' );
 
-			if ( ! $doing_cron ) {
-				do_action(
-					'boldgrid_backup_notice',
-					$info['error'],
-					'notice notice-error is-dismissible'
-				);
-			} else {
-				return array(
-					'error' => $info['error'],
-				);
+					if ( ! $doing_cron ) {
+						do_action( 'boldgrid_backup_notice', $info['error'], 'notice notice-error is-dismissible' );
+					} else {
+						return array(
+							'error' => $info['error'],
+						);
+					}
+				}
 			}
 		}
 
