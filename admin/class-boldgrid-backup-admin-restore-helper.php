@@ -157,6 +157,54 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 				$this->monitor_files[$key]['copied'] = true;
 			}
 		}
+
+		// Only register this action when we know we're doing a restore.
+		add_action( 'shutdown', array( $this, 'shutdown' ) );
+	}
+
+	/**
+	 * Action to take during shutdown hook.
+	 *
+	 * This method was written because many of the calls in
+	 * wp-admin/includes/class-pclzip.php are suppressed using @. If you are
+	 * restoring a relatively large file and you reach a memory limit, the
+	 * fatal error will never be apparent because of the @ suppression.abstract
+	 *
+	 * This method allows us to show any fatal errors.
+	 *
+	 * @since 1.5.1
+	 */
+	public function shutdown() {
+		if( $this->doing_cron ) {
+			return;
+		}
+
+		$last_error = error_get_last();
+
+		/*
+		 * If there's no error or this is not fatal, abort.
+		 *
+		 * @see http://php.net/manual/en/errorfunc.constants.php
+		 */
+		if( empty( $last_error ) || 1 !== $last_error['type'] ) {
+			return;
+		}
+
+		$message = sprintf(
+			'<strong>%1$s</strong>: %2$s in %3$s on line %4$s',
+			__( 'Fatal error', 'boldgrid-backup' ),
+			$last_error['message'],
+			$last_error['file'],
+			$last_error['line']
+		);
+
+		do_action( 'boldgrid_backup_notice', $message, 'notice notice-error is-dismissible' );
+
+		echo '
+			<script type="text/javascript">
+				jQuery( ".restoration-in-progress" ).hide();
+			</script>
+		';
 	}
 
 	/**
