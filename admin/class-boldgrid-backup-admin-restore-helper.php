@@ -127,7 +127,7 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 			}
 
 			if( $file['copy'] && $file['copied'] && ! $file['keep_copy'] ) {
-				$wp_filesystem->delete( $original );
+				$wp_filesystem->delete( $new );
 			}
 		}
 	}
@@ -157,5 +157,33 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 				$this->monitor_files[$key]['copied'] = true;
 			}
 		}
+	}
+
+	/**
+	 * If a restoration fails, take action.
+	 *
+	 * @since 1.5.1
+	 *
+	 * @param  WP_Error $error
+	 * @return mixed False if no action is taken, otherwise a string containing
+	 *               a description of the action.
+	 */
+	public function restore_fail( $error ) {
+		global $wp_filesystem;
+
+		$message = $error->get_error_message();
+		$data = $error->get_error_data();
+
+		if( __( 'Could not copy file.' ) === $message ) {
+
+			// Take action if we are having trouble restoring .git/objects/.
+			preg_match('/(.*\.git\/objects\/).*/', $data, $matches );
+			if( ! empty( $matches[1] ) ) {
+				$new_error = false;
+				return apply_filters( 'boldgrid_backup_cannnot_restore_git_objects', $matches[1] );
+			}
+		}
+
+		return false;
 	}
 }

@@ -179,6 +179,8 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->restore_helper = new Boldgrid_Backup_Admin_Restore_Helper();
 
+		$this->restore_git = new Boldgrid_Backup_Admin_Restore_Git();
+
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
 
@@ -1927,16 +1929,23 @@ class Boldgrid_Backup_Admin_Core {
 			 */
 			do_action( 'boldgrid_backup_pre_restore', $info );
 
-			$unzip_status = null;
-			if( ! $dryrun ) {
-				$unzip_status = unzip_file( $info['filepath'], ABSPATH );
-			}
+			$unzip_status = ! $dryrun ? unzip_file( $info['filepath'], ABSPATH ) : null;
 
 			if( is_wp_error( $unzip_status ) ) {
-				$error = $unzip_status->get_error_message();
+				$error = false;
+
+				$error = apply_filters( 'boldgrid_backup_restore_fail', $unzip_status );
+
+				if( empty( $error ) ) {
+					$message = $unzip_status->get_error_message();
+					$data = $unzip_status->get_error_data();
+					$error = sprintf( '%1$s%2$s', $message, is_string( $data ) && ! empty( $data ) ? ': ' . $data : '' );
+				}
+
 				if( $doing_cron ) {
 					return array( 'error' => $error );
 				} else {
+					$restore_ok = false;
 					do_action( 'boldgrid_backup_notice', $error, 'notice notice-error is-dismissible' );
 				}
 			}
