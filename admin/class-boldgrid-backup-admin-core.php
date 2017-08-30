@@ -1934,6 +1934,14 @@ class Boldgrid_Backup_Admin_Core {
 			if( is_wp_error( $unzip_status ) ) {
 				$error = false;
 
+				/**
+				 * Take action when a restoration fails.
+				 *
+				 * Those actions may return a custom error message, such as:
+				 * "Your restoration failed, but we did XYZ. Please try again".
+				 *
+				 * @param WP_Error $unzip_status
+				 */
 				$error = apply_filters( 'boldgrid_backup_restore_fail', $unzip_status );
 
 				if( empty( $error ) ) {
