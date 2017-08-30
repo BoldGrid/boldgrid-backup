@@ -127,7 +127,7 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 			}
 
 			if( $file['copy'] && $file['copied'] && ! $file['keep_copy'] ) {
-				$wp_filesystem->delete( $original );
+				$wp_filesystem->delete( $new );
 			}
 		}
 	}
