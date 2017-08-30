@@ -1946,7 +1946,7 @@ class Boldgrid_Backup_Admin_Core {
 					return array( 'error' => $error );
 				} else {
 					$restore_ok = false;
-					do_action( 'boldgrid_backup_notice', $error, 'notice notice-error is-dismissible' );
+					$info['error'] = $error;
 				}
 			}
 
