@@ -100,6 +100,14 @@ class Boldgrid_Backup_Admin_Core {
 	private $db_dump_filepath = '';
 
 	/**
+	 * An instance of the Boldgrid Backup Admin Filelist Class.
+	 *
+	 * @since 1.5.1
+	 * @var   Boldgrid_Backup_Admin_Filelist object
+	 */
+	public $filelist;
+
+	/**
 	 * Base directory for the get_filelist method.
 	 *
 	 * @since 1.0
@@ -180,6 +188,8 @@ class Boldgrid_Backup_Admin_Core {
 		$this->restore_helper = new Boldgrid_Backup_Admin_Restore_Helper();
 
 		$this->restore_git = new Boldgrid_Backup_Admin_Restore_Git();
+
+		$this->filelist = new Boldgrid_Backup_Admin_Filelist();
 
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
@@ -1041,7 +1051,7 @@ class Boldgrid_Backup_Admin_Core {
 	 * @param string $extension An optional file extension.
 	 * @return string|bool An archive file path, or FALSE on error.
 	 */
-	private function generate_archive_path( $extension = null ) {
+	public function generate_archive_path( $extension = null ) {
 		// Get the backup directory path.
 		$backup_directory = $this->config->get_backup_directory();
 
@@ -1221,58 +1231,8 @@ class Boldgrid_Backup_Admin_Core {
 		 */
 		switch ( $info['compressor'] ) {
 			case 'php_zip' :
-				// Generate a new archive file path.
-				$info['filepath'] = $this->generate_archive_path( 'zip' );
-
-				if ( ! $dryrun ) {
-					$zip = new ZipArchive();
-
-					// Create the archive file.
-					$status = $zip->open( $info['filepath'], ZipArchive::CREATE );
-
-					if ( ! $status ) {
-						return array(
-							'error' => 'Cannot create ZIP archive file "' . $info['filepath'] . '".',
-							'error_code' => $status,
-							'error_message' => Boldgrid_Backup_Admin_Utility::translate_zip_error( $status ),
-						);
-					}
-				}
-
-				// Add files to the archive.
-				foreach ( $filelist as $fileinfo ) {
-
-					// Add current file to archive, if not a dry run.
-					if ( ! $dryrun ) {
-						$zip->addFile( $fileinfo[0], $fileinfo[1] );
-					}
-
-					// Add the file size to the total.
-					$info['total_size'] += $fileinfo[2];
-				}
-
-				// If a dry run, then break out of the switch.
-				if ( $dryrun ) {
-					break;
-				}
-
-				// Close (save) the ZIP file.
-				if ( ! $zip->close() ) {
-					return array(
-						'error' => 'Cannot save ZIP archive file "' . $info['filepath'] . '".',
-					);
-				} else {
-					if ( ! $wp_filesystem->exists( $info['filepath'] ) ) {
-						return array(
-							'error' => 'The archive file "' . $info['filepath'] .
-								 '" was not written.',
-						);
-					}
-
-					// Get file modification time.
-					$info['lastmodunix'] = $wp_filesystem->mtime( $info['filepath'] );
-				}
-
+				$compressor = new Boldgrid_Backup_Admin_Compressor_Php_Zip( $this );
+				$compressor->archive_files( $filelist, $info );
 				break;
 			case 'php_bz2' :
 				// Generate a new archive file path.
