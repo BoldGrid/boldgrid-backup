@@ -32,6 +32,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 * Update		JIRA WPB-3480	Use wp filesystem when extracting backups.
 * Update		JIRA WPB-3483	Separate the current php_zip archiving code.
 * New feature:	JIRA WPB-3502	Create PclZip class for archiving.
+* Update:		JIRA WPB-3503	If functionality tests fail, flag failures in red.
 
 = 1.5 =
 * Update:						Bump version.

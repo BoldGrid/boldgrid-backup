@@ -700,6 +700,10 @@ class Boldgrid_Backup_Admin_Config {
 			$this->add_compressor( 'php_lzf' );
 		}
 
+		if( $this->core->test->is_windows() ) {
+			return $this->available_compressors;
+		}
+
 		// System tar.
 		if ( $this->core->execute_command( '/bin/tar --version' ) ) {
 			$this->add_compressor( 'system_tar' );

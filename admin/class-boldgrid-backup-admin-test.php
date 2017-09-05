@@ -166,6 +166,11 @@ class Boldgrid_Backup_Admin_Test {
 			return $this->is_crontab_available;
 		}
 
+		if( $this->is_windows() ) {
+			$this->is_crontab_available = false;
+			return $this->is_crontab_available;
+		}
+
 		// Create the test command.
 		$command = 'crontab -l';
 
@@ -222,6 +227,11 @@ class Boldgrid_Backup_Admin_Test {
 	public function is_mysqldump_available() {
 		// If this test was already completed, then just return the result.
 		if ( null !== $this->mysqldump_available ) {
+			return $this->mysqldump_available;
+		}
+
+		if( $this->is_windows() ) {
+			$this->mysqldump_available = false;
 			return $this->mysqldump_available;
 		}
 
@@ -305,11 +315,6 @@ class Boldgrid_Backup_Admin_Test {
 
 		// Test for PHP safe mode.
 		if ( $this->is_php_safemode() ) {
-			$this->is_functional = false;
-		}
-
-		// Test for PHP Zip (currently the only one coded).
-		if ( ! $this->core->config->is_compressor_available( 'php_zip' ) ) {
 			$this->is_functional = false;
 		}
 

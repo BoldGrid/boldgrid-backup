@@ -19,3 +19,8 @@
 .functionality-test-section table tr:last-of-type td {
 	padding: 15px 0px 10px 11px;
 }
+
+span.error {
+	color: #dc3232;
+	font-weight: bold;
+}

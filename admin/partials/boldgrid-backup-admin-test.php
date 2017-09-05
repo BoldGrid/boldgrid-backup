@@ -17,6 +17,16 @@ $lang = array(
 	'FAIL' => __( 'FAIL', 'boldgrid-backup' ),
 );
 
+$error_span = '<span class="error">%1$s</span>';
+
+$allowed_tags = array(
+	'span' => array(
+		'class' => array(
+			'error'
+		)
+	)
+);
+
 // Run our tests.
 $tests = array(
 	array(
@@ -29,7 +39,7 @@ $tests = array(
 	),
 	array(
 		'k' => __( 'WordPress directory writable?', 'boldgrid-backup' ),
-		'v' => ( $this->test->get_is_abspath_writable() ? $lang['yes'] : $lang['no'] ),
+		'v' => ( $this->test->get_is_abspath_writable() ? $lang['yes'] : sprintf( $error_span, $lang['no'] ) ),
 	),
 	array(
 		'k' => __( 'Backup directory exists?', 'boldgrid-backup' ),
@@ -61,15 +71,15 @@ $tests = array(
 	),
 	array(
 		'k' => __( 'PHP in safe mode?', 'boldgrid-backup' ),
-		'v' => ( $this->test->is_php_safemode() ? 'Yes' : 'No' ),
+		'v' => ( $this->test->is_php_safemode() ? sprintf( $error_span, $lang['no'] ) : $lang['yes'] ),
 	),
 	array(
 		'k' => __( 'System mysqldump available?', 'boldgrid-backup' ),
-		'v' => ( $this->test->is_mysqldump_available() ? 'Yes' : 'No' ),
+		'v' => ( $this->test->is_mysqldump_available() ? $lang['yes'] : sprintf( $error_span, $lang['no'] ) ),
 	),
 	array(
 		'k' => __( 'System crontab available?', 'boldgrid-backup' ),
-		'v' => ( $this->test->is_crontab_available() ? 'Yes' : 'No' ),
+		'v' => ( $this->test->is_crontab_available() ? $lang['yes'] : sprintf( $error_span, $lang['no'] ) ),
 	),
 	array(
 		'k' => __( 'WordPress version:', 'boldgrid-backup' ),
@@ -139,7 +149,7 @@ if ( $is_functional ) {
 $tests[] = array(
 	'id' => 'pass',
 	'k' =>  __( 'Functionality test status:', 'boldgrid-backup' ),
-	'v' =>  ( $this->test->run_functionality_tests() ? $lang['PASS'] : $lang['FAIL'] ),
+	'v' =>  ( $this->test->run_functionality_tests() ? $lang['PASS'] : sprintf( $error_span, $lang['FAIL'] ) ),
 );
 
 // If server is not compatible, create fail message.
@@ -164,12 +174,12 @@ foreach( $tests as $test ) {
 	if( isset( $test['id'] ) && 'pass' === $test['id'] ) {
 		$table .= sprintf('<tr><td>%1$s</td><td><strong>%2$s</strong></td></tr>',
 			esc_html( $test['k'] ),
-			esc_html( $test['v'] )
+			wp_kses( $test['v'], $allowed_tags )
 		);
 	} elseif( isset( $test['k'] ) ) {
 		$table .= sprintf('<tr><td>%1$s</td><td><em>%2$s</em></td></tr>',
 			esc_html( $test['k'] ),
-			esc_html( $test['v'] )
+			wp_kses( $test['v'], $allowed_tags )
 		);
 	} else {
 		$table .= sprintf('<tr><td colspan="2">%1$s</td></tr>',
