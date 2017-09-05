@@ -17,15 +17,15 @@
  *
  * @since 1.0
  */
-class Boldgrid_Backup_Admin_Compressor_Php_Zip {
+class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Compressor {
 
 	/**
-	 * An instance of Boldgrid_Backup_Admin_Core.
+	 * An instance of ZipArchive.
 	 *
 	 * @since 1.5.1
-	 * @var   Boldgrid_Backup_Admin_Core object
+	 * @var   ZipArchive
 	 */
-	public $core;
+	public $zip;
 
 	/**
 	 * Constructor.
@@ -35,15 +35,45 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip {
 	 * @param Boldgrid_Backup_Admin_Core $core
 	 */
 	public function __construct( $core ) {
-		$this->core = $core;
+		parent::__construct( $core );
+	}
+
+	/**
+	 * Add all directories to our zip archive.
+	 *
+	 * Empty directories are not naturally added to our archive, this method
+	 * adds them.
+	 *
+	 * @since 1.5.1
+	 *
+	 * @param string $dir The directory to scan for folders.
+	 */
+	public function add_dirs( $dir ) {
+		$dir_list = $this->wp_filesystem->dirlist( $dir );
+
+		foreach( $dir_list as $name => $data ) {
+			if( 'd' !== $data['type'] ) {
+				continue;
+			}
+
+			$relative_dir = str_replace( ABSPATH, '', $dir );
+
+			$dir_to_add = empty( $relative_dir ) ? $name : $relative_dir . '/' . $name;
+
+			// Do not add node_modules. @todo Allow for more sophisitcated exclusions.
+			if( false !== strpos( $dir_to_add, '/node_modules/' ) ) {
+				continue;
+			}
+
+			$this->zip->addEmptyDir( $dir_to_add );
+			$this->add_dirs( trailingslashit( $dir ) . $name );
+		}
 	}
 
 	/**
 	 * Archive files.
 	 *
 	 * @since 1.5.1
-	 *
-	 * @global $wp_filesystem
 	 *
 	 * @param array $filelist See Boldgrid_Backup_Admin_Filelist::get_total_size
 	 * @param array $info {
@@ -58,8 +88,6 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip {
 	 * }
 	 */
 	public function archive_files( $filelist, &$info ) {
-		global $wp_filesystem;
-
 		$info['filepath'] = $this->core->generate_archive_path( 'zip' );
 
 		if( $info['dryrun'] ) {
@@ -67,9 +95,9 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip {
 			return true;
 		}
 
-		$zip = new ZipArchive();
+		$this->zip = new ZipArchive();
 
-		$status = $zip->open( $info['filepath'], ZipArchive::CREATE );
+		$status = $this->zip->open( $info['filepath'], ZipArchive::CREATE );
 
 		if ( ! $status ) {
 			return array(
@@ -79,24 +107,18 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip {
 			);
 		}
 
+		$this->add_dirs( ABSPATH );
+
 		foreach ( $filelist as $fileinfo ) {
-			$zip->addFile( $fileinfo[0], $fileinfo[1] );
+			$this->zip->addFile( $fileinfo[0], $fileinfo[1] );
 			$info['total_size'] += $fileinfo[2];
 		}
 
-		if ( ! $zip->close() ) {
+		if ( ! $this->zip->close() ) {
 			return array(
 				'error' => 'Cannot save ZIP archive file "' . $info['filepath'] . '".',
 			);
 		}
-
-		if ( ! $wp_filesystem->exists( $info['filepath'] ) ) {
-			return array(
-				'error' => 'The archive file "' . $info['filepath'] . '" was not written.',
-			);
-		}
-
-		$info['lastmodunix'] = $wp_filesystem->mtime( $info['filepath'] );
 
 		return true;
 	}

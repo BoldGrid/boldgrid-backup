@@ -46,6 +46,15 @@ class Boldgrid_Backup_Admin_Core {
 	public $configs;
 
 	/**
+	 * Whether or not we're doing cron.
+	 *
+	 * @since  1.5.1
+	 * @access public
+	 * @var    bool
+	 */
+	public $doing_cron;
+
+	/**
 	 * The functionality test class object.
 	 *
 	 * @since 1.0
@@ -125,6 +134,7 @@ class Boldgrid_Backup_Admin_Core {
 	 */
 	private $filelist_filter = array(
 		'.htaccess',
+		'.htaccess.bgb',
 		'index.php',
 		'license.txt',
 		'readme.html',
@@ -161,6 +171,8 @@ class Boldgrid_Backup_Admin_Core {
 	 * @since 1.0
 	 */
 	public function __construct() {
+		$this->doing_cron = ( defined( 'DOING_CRON' ) && DOING_CRON );
+
 		add_action( 'admin_enqueue_scripts', array( $this, 'register_scripts' ) );
 
 		// Instantiate Boldgrid_Backup_Admin_Settings.
@@ -1142,6 +1154,7 @@ class Boldgrid_Backup_Admin_Core {
 			'compressor' => null,
 			'filesize' => 0,
 			'save' => $save,
+			'total_size' => 0,
 		);
 
 		// Get available compressors.
@@ -1225,6 +1238,15 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->set_time_limit();
 
+		/**
+		 * Allow the filtering of our $info before generating a backup.
+		 *
+		 * @since 1.5.1
+		 *
+		 * @param array $info See Boldgrid_Backup_Admin_Compressor_Php_Zip::archive_files.
+		 */
+		$info = apply_filters( 'boldgrid_backup_pre_archive_info', $info );
+
 		/*
 		 * Use the chosen compressor to build an archive.
 		 * If the is no available compressor, then return an error.
@@ -1232,7 +1254,11 @@ class Boldgrid_Backup_Admin_Core {
 		switch ( $info['compressor'] ) {
 			case 'php_zip' :
 				$compressor = new Boldgrid_Backup_Admin_Compressor_Php_Zip( $this );
-				$compressor->archive_files( $filelist, $info );
+				$status = $compressor->archive_files( $filelist, $info );
+				break;
+			case 'pcl_zip' :
+				$compressor = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this );
+				$status = $compressor->archive_files( $filelist, $info );
 				break;
 			case 'php_bz2' :
 				// Generate a new archive file path.
@@ -1255,11 +1281,23 @@ class Boldgrid_Backup_Admin_Core {
 				$info['filepath'] = $this->generate_archive_path( 'zip' );
 				break;
 			default :
-				return array(
+				$status = array(
 					'error' => 'No available compressor',
 				);
 				break;
 		}
+
+		if ( true === $status && ! $wp_filesystem->exists( $info['filepath'] ) ) {
+			$status = array(
+				'error' => 'The archive file "' . $info['filepath'] . '" was not written.',
+			);
+		}
+
+		if( ! empty( $status['error'] ) ) {
+			return $status;
+		}
+
+		$info['lastmodunix'] = $wp_filesystem->mtime( $info['filepath'] );
 
 		if ( $save && ! $dryrun ) {
 			// Modify the archive file permissions to help protect from public access.
