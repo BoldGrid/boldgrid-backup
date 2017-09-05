@@ -596,7 +596,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * @access private
 	 *
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
-	 * @global wpdb $wpdb The WordPress database class object.
 	 *
 	 * @return bool Status of the operation.
 	 */
@@ -605,17 +604,6 @@ class Boldgrid_Backup_Admin_Core {
 		if ( ! $this->test->run_functionality_tests() ) {
 			// Display an error notice.
 			$this->notice->functionality_fail_notice();
-
-			return false;
-		}
-
-		// If mysqldump is not available, then fail.
-		if ( ! $this->test->is_mysqldump_available() ) {
-			do_action(
-				'boldgrid_backup_notice',
-				esc_html__( 'mysqldump is not available.', 'boldgrid-backup' ),
-				'notice notice-error is-dismissible'
-			);
 
 			return false;
 		}
@@ -637,28 +625,6 @@ class Boldgrid_Backup_Admin_Core {
 			return false;
 		}
 
-		// Create a mysql defaults file.
-		$defaults_filepath = $backup_directory . '/mysqldump.cnf';
-
-		$defaults_file_data = '[client]' . PHP_EOL . 'host=' . DB_HOST . PHP_EOL . 'user=' . DB_USER .
-			 PHP_EOL . 'password="' . DB_PASSWORD . '"' . PHP_EOL;
-
-		$status = $wp_filesystem->put_contents( $defaults_filepath, $defaults_file_data, 0600 );
-
-		// Check if the defaults file was written.
-		if ( ! $status || ! $wp_filesystem->exists( $defaults_filepath ) ) {
-			do_action(
-				'boldgrid_backup_notice',
-				esc_html__( 'Could not create a mysql defaults file.', 'boldgrid-backup' ),
-				'notice notice-error is-dismissible'
-			);
-
-			return false;
-		}
-
-		// Limit file permissions to the mysql defaults file.
-		$wp_filesystem->chmod( $defaults_filepath, 0600 );
-
 		// Create a file path for the dump file.
 		$db_dump_filepath = $backup_directory . '/' . DB_NAME . '.' . date( 'Ymd-His' ) .
 			 '.sql';
@@ -666,102 +632,21 @@ class Boldgrid_Backup_Admin_Core {
 		// Save the file path.
 		$this->db_dump_filepath = $db_dump_filepath;
 
-		// Connect to the WordPress database via $wpdb.
-		global $wpdb;
-
-		// Build a mysql query to get all of the table names.
-		$query = $wpdb->prepare(
-			'SELECT `TABLE_NAME` FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA`=%s AND `TABLE_NAME` LIKE %s ORDER BY `TABLE_NAME`;',
-			DB_NAME, $wpdb->get_blog_prefix( is_multisite() ) . '%'
-		);
-
-		// Check query.
-		if ( empty( $query ) ) {
-			do_action(
-				'boldgrid_backup_notice',
-				esc_html__( 'Could not determine mysql tables names.', 'boldgrid-backup' ),
-				'notice notice-error is-dismissible'
-			);
-
-			return 0;
-		}
-
-		// Get the result.
-		$tables = $wpdb->get_results( $query, ARRAY_N );
-
-		// If there was an error or nothing returned, then fail.
-		if ( empty( $tables ) ) {
-			do_action(
-				'boldgrid_backup_notice',
-				esc_html__( 'No results when getting mysql table names.', 'boldgrid-backup' ),
-				'notice notice-error is-dismissible'
-			);
-
-			return 0;
-		}
-
-		// Initialize $table_names.
-		$table_names = null;
-
-		// Get the table names from the query results (one row per result (index 0)).
-		foreach ( $tables as $table ) {
-			$table_names .= $table[0] . ' ';
-		}
-
-		// Create a file with the table names.
-		$tables_filepath = $backup_directory . '/tables.' . microtime( true ) . '.tmp';
-
-		$status = $wp_filesystem->put_contents( $tables_filepath, $table_names, 0600 );
-
-		// Check if the temp table names file was written.
-		if ( ! $status || ! $wp_filesystem->exists( $tables_filepath ) ) {
-			do_action(
-				'boldgrid_backup_notice',
-				esc_html__( 'Could not create a table names file.', 'boldgrid-backup' ),
-				'notice notice-error is-dismissible'
-			);
-
-			return false;
-		}
-
-		// Limit file permissions to the table names file.
-		$wp_filesystem->chmod( $tables_filepath, 0600 );
-
-		// Build a command to backup the database with mysqldump.
-		$command = 'mysqldump --defaults-file=' . $defaults_filepath .
-			 ' --dump-date --opt --tz-utc --result-file=' . $db_dump_filepath . ' ' . DB_NAME .
-		' `cat ' . $tables_filepath . '`';
-
 		$this->set_time_limit();
 
-		// Execute the command.
-		$output = $this->execute_command( $command, null, $status );
-
-		// Remove the defaults file.
-		$wp_filesystem->delete( $defaults_filepath, false, 'f' );
-
-		// Remove the table names file.
-		$wp_filesystem->delete( $tables_filepath, false, 'f' );
-
-		// Check command status.
-		if ( false === $output || ! $status ) {
-			do_action(
-				'boldgrid_backup_notice',
-				esc_html__( 'mysqldump was not successful.', 'boldgrid-backup' ),
-				'notice notice-error is-dismissible'
-			);
-
+		// Create a dump of our database.
+		$dumper = new Boldgrid_Backup_Admin_Db_Dump();
+		$status = $dumper->dump( $db_dump_filepath );
+		if( ! empty( $status['error'] ) ) {
+			do_action( 'boldgrid_backup_notice', $status['error'], 'notice notice-error is-dismissible' );
 			return false;
 		}
 
-		// Check if the dump file was written.
-		if ( ! $wp_filesystem->exists( $db_dump_filepath ) ) {
-			do_action(
-				'boldgrid_backup_notice',
-				esc_html__( 'A mysql dump file was not created.', 'boldgrid-backup' ),
-				'notice notice-error is-dismissible'
-			);
-
+		// Validate. Ensure file is written and is over 100 bytes.
+		$dump_exists = $wp_filesystem->exists( $db_dump_filepath );
+		$dump_size = $wp_filesystem->size( $db_dump_filepath );
+		if ( ! $dump_exists || 100 > $dump_size ) {
+			do_action( 'boldgrid_backup_notice', esc_html__( 'A mysql dump file was not created.', 'boldgrid-backup' ), 'notice notice-error is-dismissible' );
 			return false;
 		}
 

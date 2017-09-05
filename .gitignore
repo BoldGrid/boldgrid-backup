@@ -1,0 +1,11 @@
+config.php
+error_log
+*.swp
+logs*
+.buildpath
+.project
+.settings
+composer.lock
+node_modules
+bower_components
+vendor

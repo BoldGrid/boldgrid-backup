@@ -164,6 +164,9 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/compressor/php_zip.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/compressor/pcl_zip.php';
 
+		include BOLDGRID_BACKUP_PATH . '/vendor/ifsnop/mysqldump-php/src/Ifsnop/Mysqldump/Mysqldump.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-db-dump.php';
+
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
 

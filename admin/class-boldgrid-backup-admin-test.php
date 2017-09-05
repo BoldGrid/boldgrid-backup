@@ -73,15 +73,6 @@ class Boldgrid_Backup_Admin_Test {
 	private $wp_cron_enabled = null;
 
 	/**
-	 * Is mysqldump available?
-	 *
-	 * @since 1.0
-	 * @access private
-	 * @var bool
-	 */
-	private $mysqldump_available = null;
-
-	/**
 	 * Is PHP in safe mode?
 	 *
 	 * @since 1.0
@@ -216,38 +207,6 @@ class Boldgrid_Backup_Admin_Test {
 	}
 
 	/**
-	 * Is mysqldump available?
-	 *
-	 * Once the success is determined, the result is stored in a class property.
-	 *
-	 * @since 1.0
-	 *
-	 * @return bool
-	 */
-	public function is_mysqldump_available() {
-		// If this test was already completed, then just return the result.
-		if ( null !== $this->mysqldump_available ) {
-			return $this->mysqldump_available;
-		}
-
-		if( $this->is_windows() ) {
-			$this->mysqldump_available = false;
-			return $this->mysqldump_available;
-		}
-
-		// Create the test command.
-		$command = 'mysqldump -V';
-
-		// Test to see if the mysqldump command is available.
-		$output = $this->core->execute_command( $command, null, $success );
-
-		// Set class property.
-		$this->mysqldump_available = ( $success || (bool) $output );
-
-		return $this->mysqldump_available;
-	}
-
-	/**
 	 * Is PHP running in safe mode?
 	 *
 	 * @since 1.0
@@ -305,11 +264,6 @@ class Boldgrid_Backup_Admin_Test {
 
 		// Test for crontab. For now, don't check if wp-cron is enabled.
 		if ( ! $this->is_crontab_available() ) {
-			$this->is_functional = false;
-		}
-
-		// Test for mysqldump. For now, don't use wpbd.
-		if ( ! $this->is_mysqldump_available() ) {
 			$this->is_functional = false;
 		}
 

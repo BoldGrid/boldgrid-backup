@@ -33,6 +33,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 * Update		JIRA WPB-3483	Separate the current php_zip archiving code.
 * New feature:	JIRA WPB-3502	Create PclZip class for archiving.
 * Update:		JIRA WPB-3503	If functionality tests fail, flag failures in red.
+* Update:		JIRA WPB-3504	Use a script to create mysqldump rather than rely on system command.
 
 = 1.5 =
 * Update:						Bump version.

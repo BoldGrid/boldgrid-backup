@@ -74,10 +74,6 @@ $tests = array(
 		'v' => ( $this->test->is_php_safemode() ? sprintf( $error_span, $lang['no'] ) : $lang['yes'] ),
 	),
 	array(
-		'k' => __( 'System mysqldump available?', 'boldgrid-backup' ),
-		'v' => ( $this->test->is_mysqldump_available() ? $lang['yes'] : sprintf( $error_span, $lang['no'] ) ),
-	),
-	array(
 		'k' => __( 'System crontab available?', 'boldgrid-backup' ),
 		'v' => ( $this->test->is_crontab_available() ? $lang['yes'] : sprintf( $error_span, $lang['no'] ) ),
 	),
