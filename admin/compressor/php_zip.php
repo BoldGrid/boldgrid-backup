@@ -15,7 +15,7 @@
 /**
  * BoldGrid Backup Admin Compressor PHP Zip Class.
  *
- * @since 1.0
+ * @since 1.5.1
  */
 class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Compressor {
 

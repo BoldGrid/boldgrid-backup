@@ -15,7 +15,7 @@
 /**
  * BoldGrid Backup Admin Compressor Pclzip Class.
  *
- * @since 1.0
+ * @since 1.5.1
  */
 class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Compressor {
 
