@@ -143,6 +143,38 @@ class Boldgrid_Backup_Admin_Test {
 	}
 
 	/**
+	 * Determine if a dir is writable.
+	 *
+	 * @since 1.5.1
+	 *
+	 * @param  $dir string
+	 * @return bool
+	 */
+	public function is_writable( $dir ) {
+		if( true === $this->core->wp_filesystem->is_writable( $dir ) ) {
+			return true;
+		}
+
+		/*
+		 * Test if a dir is writable by attempting to write a tmp file.
+		 *
+		 * On plesk, wp_filesystem->is_writable was returning false in a Windows
+		 * environment. When attempting to actually write to the $dir though, it
+		 * was successful.
+		 */
+		$random_filename = trailingslashit( $dir ) . mt_rand() . '.txt';
+		$this->core->wp_filesystem->touch( $random_filename );
+		$exists = $this->core->wp_filesystem->exists( $random_filename );
+
+		if( ! $exists ) {
+			return false;
+		}
+
+		$this->core->wp_filesystem->delete( $random_filename );
+		return true;
+	}
+
+	/**
 	 * Is crontab available?
 	 *
 	 * Once the success is determined, the result is stored in a class property.
@@ -604,7 +636,7 @@ class Boldgrid_Backup_Admin_Test {
 		global $wp_filesystem;
 
 		// Determine if ABSPATH is writable.
-		$this->is_abspath_writable = $wp_filesystem->is_writable( ABSPATH );
+		$this->is_abspath_writable = $this->is_writable( ABSPATH );
 
 		// Return the result.
 		return $this->is_abspath_writable;

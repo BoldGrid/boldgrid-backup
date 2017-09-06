@@ -13,6 +13,7 @@
 $lang = array(
 	'yes' =>  __( 'Yes', 'boldgrid-backup' ),
 	'no' =>   __( 'No', 'boldgrid-backup' ),
+	'null' => __( 'null', 'boldgrid-backup' ),
 	'PASS' => __( 'PASS', 'boldgrid-backup' ),
 	'FAIL' => __( 'FAIL', 'boldgrid-backup' ),
 );
@@ -39,8 +40,16 @@ $tests = array(
 		'v' =>( $home_dir_writable ? $lang['yes'] : $lang['no'] ),
 	),
 	array(
+		'k' => __( 'WordPress directory', 'boldgrid-backup' ),
+		'v' => ABSPATH,
+	),
+	array(
 		'k' => __( 'WordPress directory writable?', 'boldgrid-backup' ),
 		'v' => ( $this->test->get_is_abspath_writable() ? $lang['yes'] : sprintf( $error_span, $lang['no'] ) ),
+	),
+	array(
+		'k' => __( 'Backup directory', 'boldgrid-backup' ),
+		'v' => ! empty( $backup_directory ) ? $backup_directory : sprintf( $error_span, $lang['null'] ),
 	),
 	array(
 		'k' => __( 'Backup directory exists?', 'boldgrid-backup' ),

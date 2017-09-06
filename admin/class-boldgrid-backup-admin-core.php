@@ -91,6 +91,15 @@ class Boldgrid_Backup_Admin_Core {
 	public $xhprof;
 
 	/**
+	 * An instance of the filesystem.
+	 *
+	 * @since  1.5.1
+	 * @access public
+	 * @var    WP_Filesystem
+	 */
+	public $wp_filesystem;
+
+	/**
 	 * Available execution functions.
 	 *
 	 * @since 1.0
@@ -169,9 +178,15 @@ class Boldgrid_Backup_Admin_Core {
 	 * Constructor.
 	 *
 	 * @since 1.0
+	 *
+	 * @global $wp_filesystem.
 	 */
 	public function __construct() {
+		global $wp_filesystem;
+
 		$this->doing_cron = ( defined( 'DOING_CRON' ) && DOING_CRON );
+
+		$this->wp_filesystem = $wp_filesystem;
 
 		add_action( 'admin_enqueue_scripts', array( $this, 'register_scripts' ) );
 
