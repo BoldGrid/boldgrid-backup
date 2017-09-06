@@ -966,9 +966,15 @@ class Boldgrid_Backup_Admin_Core {
 		// Create a site identifier.
 		$site_id = Boldgrid_Backup_Admin_Utility::create_site_id();
 
+		$filename = sprintf( 'boldgrid-backup-%1$s-%2$s-%3$s',
+			$site_id,
+			$backup_identifier,
+			date( 'Ymd-His' )
+		);
+		$filename = sanitize_file_name( $filename );
+
 		// Create a file path with no extension (added later).
-		$filepath = $backup_directory . '/boldgrid-backup-' . $site_id . '-' . $backup_identifier .
-			'-' . date( 'Ymd-His' );
+		$filepath = $backup_directory . '/' . $filename;
 
 		// If specified, add an extension.
 		if ( ! empty( $extension ) ) {

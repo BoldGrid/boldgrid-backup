@@ -262,11 +262,6 @@ class Boldgrid_Backup_Admin_Test {
 			$this->is_functional = false;
 		}
 
-		// Test for crontab. For now, don't check if wp-cron is enabled.
-		if ( ! $this->is_crontab_available() ) {
-			$this->is_functional = false;
-		}
-
 		// Test for PHP safe mode.
 		if ( $this->is_php_safemode() ) {
 			$this->is_functional = false;

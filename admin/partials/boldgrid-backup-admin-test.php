@@ -18,6 +18,7 @@ $lang = array(
 );
 
 $error_span = '<span class="error">%1$s</span>';
+$warning_span = '<span class="warning">%1$s</span>';
 
 $allowed_tags = array(
 	'span' => array(
@@ -75,7 +76,7 @@ $tests = array(
 	),
 	array(
 		'k' => __( 'System crontab available?', 'boldgrid-backup' ),
-		'v' => ( $this->test->is_crontab_available() ? $lang['yes'] : sprintf( $error_span, $lang['no'] ) ),
+		'v' => ( $this->test->is_crontab_available() ? $lang['yes'] : sprintf( $warning_span, $lang['no'] ) ),
 	),
 	array(
 		'k' => __( 'WordPress version:', 'boldgrid-backup' ),

@@ -24,3 +24,8 @@ span.error {
 	color: #dc3232;
 	font-weight: bold;
 }
+
+span.warning {
+	color: #ffba00;
+	font-weight: bold;
+}
