@@ -27,34 +27,34 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * @return bool   True on success.
 	 */
 	public function import( $file ) {
-		// Connect to MySQL server
-		mysql_connect( DB_HOST, DB_USER, DB_PASS ) or die('Error connecting to MySQL server: ' . mysql_error());
-		// Select database
-		mysql_select_db( DB_NAME ) or die('Error selecting MySQL database: ' . mysql_error());
+		$db = new PDO( sprintf( 'mysql:host=%1$s;dbname=%2$s;', DB_HOST, DB_NAME ), DB_USER, DB_PASSWORD );
 
-		// Temporary variable, used to store current query
 		$templine = '';
-		// Read in entire file
+
 		$lines = file( $file );
-		// Loop through each line
+		if( false === $lines ) {
+			return array( 'error' => sprintf( __( 'Unable to open mysqldump, %1$s.', 'boldgrid-backup' ), $file ) );
+		}
+
 		foreach ($lines as $line)
 		{
-			// Skip it if it's a comment
-			if (substr($line, 0, 2) == '--' || $line == '')
+			// Skip comments and empty lines.
+			if ( substr($line, 0, 2) === '--' || empty( $line ) ) {
 				continue;
+			}
 
-			// Add this line to the current segment
 			$templine .= $line;
-			// If it has a semicolon at the end, it's the end of the query
-			if (substr(trim($line), -1, 1) == ';')
-			{
-				// Perform the query
-				mysql_query($templine) or print('Error performing query \'<strong>' . $templine . '\': ' . mysql_error() . '<br /><br />');
-				// Reset temp variable to empty
+
+			// Check if this is the end of the query.
+			if( substr( trim( $line ), -1, 1 ) === ';' ) {
+				$affected_rows = $db->exec( $templine );
+				if( false === $affected_rows ) {
+					return false;
+				}
+
 				$templine = '';
 			}
 		}
-		echo "Tables imported successfully";
 
 		return true;
 	}

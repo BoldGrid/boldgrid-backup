@@ -704,32 +704,6 @@ class Boldgrid_Backup_Admin_Core {
 		// Connect to the WordPress Filesystem API.
 		global $wp_filesystem;
 
-		// Create a mysql defaults file.
-		$defaults_filepath = $backup_directory . '/mysqldump.cnf';
-
-		$defaults_file_data = '[client]' . PHP_EOL . 'host=' . DB_HOST . PHP_EOL . 'user=' . DB_USER .
-			 PHP_EOL . 'password="' . DB_PASSWORD  . '"' . PHP_EOL;
-
-		$status = $wp_filesystem->put_contents( $defaults_filepath, $defaults_file_data, 0600 );
-
-		// Check if the defaults file was written.
-		if ( ! $status || ! $wp_filesystem->exists( $defaults_filepath ) ) {
-			// Display an error notice.
-			do_action(
-				'boldgrid_backup_notice',
-				esc_html__(
-					'Error restoring database; Could not create a temporary mysql defaults file.',
-					'boldgrid-backup'
-				),
-				'notice notice-error is-dismissible'
-			);
-
-			// Delete the dump file.
-			$wp_filesystem->delete( $db_dump_filepath, false, 'f' );
-
-			return false;
-		}
-
 		// Save the file path.
 		$this->db_dump_filepath = $db_dump_filepath;
 
@@ -737,19 +711,14 @@ class Boldgrid_Backup_Admin_Core {
 		$wp_siteurl = get_option( 'siteurl' );
 		$wp_home = get_option( 'home' );
 
-// 		// Build a command to restore the database with mysqldump.
-// 		$command = 'mysql --defaults-file=' . $defaults_filepath . ' --force --one-database ' .
-// 		DB_NAME . ' < ' . $db_dump_filepath;
 
 		$this->set_time_limit();
-
-// 		// Execute the command.
-// 		$output = $this->execute_command( $command, null, $status );
 
 		$importer = new Boldgrid_Backup_Admin_Db_Import();
 		$status = $importer->import( $db_dump_filepath );
 		if( ! empty( $status['error'] ) ) {
 			do_action( 'boldgrid_backup_notice', $status['error'], 'notice notice-error is-dismissible' );
+			$wp_filesystem->delete( $db_dump_filepath, false, 'f' );
 			return false;
 		}
 
@@ -793,24 +762,6 @@ class Boldgrid_Backup_Admin_Core {
 			$wp_home = untrailingslashit( $wp_home );
 
 			update_option( 'home', $wp_home );
-		}
-
-		// Remove the defaults file.
-		$wp_filesystem->delete( $defaults_filepath, false, 'f' );
-
-		// Delete the dump file.
-		$wp_filesystem->delete( $db_dump_filepath, false, 'f' );
-
-		// Check command status.
-		if ( ! $status ) {
-			// Display an error notice.
-			do_action(
-				'boldgrid_backup_notice',
-				esc_html__( 'The mysql command was not successful.', 'boldgrid-backup' ),
-				'notice notice-error is-dismissible'
-			);
-
-			return false;
 		}
 
 		// Return success.
