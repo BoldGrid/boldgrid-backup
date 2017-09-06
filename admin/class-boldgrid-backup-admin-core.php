@@ -737,14 +737,21 @@ class Boldgrid_Backup_Admin_Core {
 		$wp_siteurl = get_option( 'siteurl' );
 		$wp_home = get_option( 'home' );
 
-		// Build a command to restore the database with mysqldump.
-		$command = 'mysql --defaults-file=' . $defaults_filepath . ' --force --one-database ' .
-		DB_NAME . ' < ' . $db_dump_filepath;
+// 		// Build a command to restore the database with mysqldump.
+// 		$command = 'mysql --defaults-file=' . $defaults_filepath . ' --force --one-database ' .
+// 		DB_NAME . ' < ' . $db_dump_filepath;
 
 		$this->set_time_limit();
 
-		// Execute the command.
-		$output = $this->execute_command( $command, null, $status );
+// 		// Execute the command.
+// 		$output = $this->execute_command( $command, null, $status );
+
+		$importer = new Boldgrid_Backup_Admin_Db_Import();
+		$status = $importer->import( $db_dump_filepath );
+		if( ! empty( $status['error'] ) ) {
+			do_action( 'boldgrid_backup_notice', $status['error'], 'notice notice-error is-dismissible' );
+			return false;
+		}
 
 		// Set the database prefix, if supplied/changed.
 		if ( ! empty( $db_prefix ) ) {

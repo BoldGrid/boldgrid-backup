@@ -531,6 +531,7 @@ class Boldgrid_Backup_Admin_Utility {
 		// Define an array of patterns to skip.
 		$skip = array(
 			'.htaccess',
+			'.htaccess.bgb',
 		);
 
 		// Check for each string pattern in the $locate_files array.
