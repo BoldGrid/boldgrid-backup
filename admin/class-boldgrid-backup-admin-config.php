@@ -211,8 +211,17 @@ class Boldgrid_Backup_Admin_Config {
 			return $this->home_dir;
 		}
 
-		// For Windows and Linux.
-		if ( $this->core->test->is_windows() ) {
+		if( $this->core->test->is_windows() && $this->core->test->is_plesk() ) {
+			/*
+			 * Plesk's File Manager labels C:\Inetpub\vhosts\domain.com as the
+			 * "Home directory". If we find we cannot read that directory, then
+			 * we'll use the document root as the home directory.
+			 */
+			$home_dir = dirname( $_SERVER['DOCUMENT_ROOT'] );
+			if( ! $this->core->wp_filesystem->is_readable( $home_dir ) ) {
+				$home_dir = $_SERVER['DOCUMENT_ROOT'];
+			}
+		} elseif( $this->core->test->is_windows() ) {
 			// Windows.
 			$home_drive = ( ! empty( $_SERVER['HOMEDRIVE'] ) ? $_SERVER['HOMEDRIVE'] : null );
 			$home_path = ( ! empty( $_SERVER['HOMEPATH'] ) ? $_SERVER['HOMEPATH'] : null );
