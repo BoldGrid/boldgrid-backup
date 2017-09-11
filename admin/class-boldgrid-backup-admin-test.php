@@ -134,7 +134,27 @@ class Boldgrid_Backup_Admin_Test {
 		$this->core = $core;
 	}
 
+	/**
+	 * Wrapper for wp_filesystem exists.
+	 *
+	 * @since 1.5.1
+	 *
+	 * @param  string $path
+	 * @return bool
+	 */
+	public function exists( $path ) {
+		$exists = $this->core->wp_filesystem->exists( $path );
 
+		/*
+		 * Initial testing shows the wp_filesystem on Windows, at least when
+		 * running in conjunction with IIS, does not always report accurately.
+		 */
+		if( ! $exists && $this->is_windows() ) {
+			$exists = file_exists( $path );
+		}
+
+		return $exists;
+	}
 
 	/**
 	 * Extensive directory test.

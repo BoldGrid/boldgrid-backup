@@ -646,7 +646,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Create a file path for the dump file.
-		$db_dump_filepath = $backup_directory . '/' . DB_NAME . '.' . date( 'Ymd-His' ) .
+		$db_dump_filepath = $backup_directory . DB_NAME . '.' . date( 'Ymd-His' ) .
 			 '.sql';
 
 		// Save the file path.
@@ -663,10 +663,12 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Ensure file is written and is over 100 bytes.
-		if( ! $this->test->exists( $db_dump_filepath ) ) {
+		$exists = $this->test->exists( $db_dump_filepath );
+		if( ! $exists ) {
 			return array( 'error' => sprintf( __( 'mysqldump file does not exist: %1$s', 'boldgrid-backup' ), $db_dump_filepath ) );
 		}
-		if( 100 > $this->test->size( $db_dump_filepath ) ) {
+		$dump_file_size = $this->wp_filesystem->size( $db_dump_filepath );
+		if( 100 > $dump_file_size ) {
 			return array( 'error' => sprintf( __( 'mysqldump file was not written to: %1$s', 'boldgrid-backup' ), $db_dump_filepath ) );
 		}
 
