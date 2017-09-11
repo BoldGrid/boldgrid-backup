@@ -408,7 +408,7 @@ class Boldgrid_Backup_Admin_Test {
 		}
 
 		// Configure the backup directory path, or mark as not functional.
-		if ( ! $this->core->backup_dir->get() ) {
+		if ( ! $this->core->backup_dir->get() || ! $this->core->backup_dir->is_valid() ) {
 			$this->is_functional = false;
 		}
 

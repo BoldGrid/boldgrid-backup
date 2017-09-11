@@ -95,6 +95,18 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	}
 
 	/**
+	 * Validate backup directory.
+	 *
+	 * Make sure it exists, it's writable, etc.
+	 */
+	public function is_valid() {
+		$backup_dir = $this->get_from_settings();
+		$perms = $this->core->test->extensive_dir_test( $backup_dir );
+
+		return $perms['exists'] && $perms['read'] && $perms['write'] && $perms['rename'] && $perms['delete'] && $perms['dirlist'];
+	}
+
+	/**
 	 * Get an array of possible backup directories.
 	 *
 	 * @since  1.5.1
@@ -212,5 +224,4 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 		// Return success.
 		return true;
 	}
-
 }
