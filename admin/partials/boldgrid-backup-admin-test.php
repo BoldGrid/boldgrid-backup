@@ -20,6 +20,11 @@ $lang = array(
 	'ensure_dir_perms' => __( 'Please be sure that your backup directory exists. If it does, also ensure it has read, write, and modify permissions.', 'boldgrid-backup' ),
 );
 
+$lang['dir_of_dir'] = $lang['ensure_dir_perms'];
+if( $this->test->is_windows() ) {
+	$lang['dir_of_dir'] = __( 'Please review directory permissions. If you are on a Windows server, your user may need to be able to read BOTH the backup directory and its parent directory.', 'boldgrid-backup' );
+}
+
 $error_span = '<span class="error">%1$s</span><br />%2$s';
 $warning_span = '<span class="warning">%1$s</span><br />%2$s';
 
@@ -39,7 +44,7 @@ $php_zip = new Boldgrid_Backup_Admin_Compressor_Php_Zip( $this );
 
 $pcl_zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this );
 
-$valid_backup_dir = $backup_dir_perms['exists'] && $backup_dir_perms['read'] && $backup_dir_perms['write'] && $backup_dir_perms['rename'] && $backup_dir_perms['delete'];
+$valid_backup_dir = $backup_dir_perms['exists'] && $backup_dir_perms['read'] && $backup_dir_perms['write'] && $backup_dir_perms['rename'] && $backup_dir_perms['delete'] && $backup_dir_perms['dirlist'];
 
 // Run our tests.
 $tests = array(
@@ -98,6 +103,11 @@ if( $backup_dir_perms['exists'] ) {
 	$tests[] = array(
 		'k' => __( 'Backup directory has read permission?', 'boldgrid-backup' ),
 		'v' => $backup_dir_perms['read'] ? $lang['yes'] : sprintf( $error_span, $lang['no'], $lang['ensure_dir_perms'] ),
+	);
+
+	$tests[] = array(
+		'k' => __( 'Directory listing of backup directory can be fetched?', 'boldgrid-backup' ),
+		'v' => $backup_dir_perms['dirlist'] ? $lang['yes'] : sprintf( $error_span, $lang['no'], $lang['dir_of_dir'] ),
 	);
 
 	$tests[] = array(

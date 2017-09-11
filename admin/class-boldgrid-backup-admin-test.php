@@ -177,6 +177,10 @@ class Boldgrid_Backup_Admin_Test {
 		$data['read'] = $this->core->wp_filesystem->is_readable( $dir );
 		$data['write'] = $this->core->wp_filesystem->is_writable( $dir );
 
+		// Can we get a directory listing?
+		$dirlist = $this->core->wp_filesystem->dirlist( $dir );
+		$data['dirlist'] = is_array( $dirlist );
+
 		// Determine if we have permission to rename a file.
 		$touched = $this->core->wp_filesystem->touch( $txt_filename );
 		$this->core->wp_filesystem->put_contents( $txt_filename, $str );
