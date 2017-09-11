@@ -29,3 +29,8 @@ span.warning {
 	color: #ffba00;
 	font-weight: bold;
 }
+
+.functionality-test-section tr.heading {
+	border: 0px;
+	background: transparent;
+}

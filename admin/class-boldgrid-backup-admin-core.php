@@ -166,6 +166,14 @@ class Boldgrid_Backup_Admin_Core {
 	);
 
 	/**
+	 * An instance of the Boldgrid Backup Admin Backup Dir class.
+	 *
+	 * @since 1.5.1
+	 * @var   Boldgrid_Backup_Admin_Backup_Dir object.
+	 */
+	public $backup_dir;
+
+	/**
 	 * A unique identifier for backups of this WordPress installation.
 	 *
 	 * @since 1.0.1
@@ -217,6 +225,10 @@ class Boldgrid_Backup_Admin_Core {
 		$this->restore_git = new Boldgrid_Backup_Admin_Restore_Git();
 
 		$this->filelist = new Boldgrid_Backup_Admin_Filelist();
+
+		$this->backup_dir = new Boldgrid_Backup_Admin_Backup_Dir( $this );
+
+		$this->compressors = new Boldgrid_Backup_Admin_Compressors( $this );
 
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
@@ -619,25 +631,18 @@ class Boldgrid_Backup_Admin_Core {
 		if ( ! $this->test->run_functionality_tests() ) {
 			// Display an error notice.
 			$this->notice->functionality_fail_notice();
-
-			return false;
+			return array( 'error' => __( 'Unable to create backup, functionality test failed.', 'boldgrid_backup' ) );
 		}
 
 		// Get the backup directory path.
-		$backup_directory = $this->config->get_backup_directory();
+		$backup_directory = $this->backup_dir->get();
 
 		// Connect to the WordPress Filesystem API.
 		global $wp_filesystem;
 
 		// Check if the backup directory is writable.
 		if ( ! $wp_filesystem->is_writable( $backup_directory ) ) {
-			do_action(
-				'boldgrid_backup_notice',
-				esc_html__( 'The backup directory is not writable.', 'boldgrid-backup' ),
-				'notice notice-error is-dismissible'
-			);
-
-			return false;
+			return array( 'error' => sprintf( __( 'The backup directory is not writable: %1$s.', 'boldgrid-backup' ), $backup_directory ) );
 		}
 
 		// Create a file path for the dump file.
@@ -657,12 +662,12 @@ class Boldgrid_Backup_Admin_Core {
 			return false;
 		}
 
-		// Validate. Ensure file is written and is over 100 bytes.
-		$dump_exists = $wp_filesystem->exists( $db_dump_filepath );
-		$dump_size = $wp_filesystem->size( $db_dump_filepath );
-		if ( ! $dump_exists || 100 > $dump_size ) {
-			do_action( 'boldgrid_backup_notice', esc_html__( 'A mysql dump file was not created.', 'boldgrid-backup' ), 'notice notice-error is-dismissible' );
-			return false;
+		// Ensure file is written and is over 100 bytes.
+		if( ! $this->test->exists( $db_dump_filepath ) ) {
+			return array( 'error' => sprintf( __( 'mysqldump file does not exist: %1$s', 'boldgrid-backup' ), $db_dump_filepath ) );
+		}
+		if( 100 > $this->test->size( $db_dump_filepath ) ) {
+			return array( 'error' => sprintf( __( 'mysqldump file was not written to: %1$s', 'boldgrid-backup' ), $db_dump_filepath ) );
 		}
 
 		// Limit file permissions to the dump file.
@@ -679,7 +684,7 @@ class Boldgrid_Backup_Admin_Core {
 	 * @access private
 	 *
 	 * @see Boldgrid_Backup_Admin_Test::run_functionality_tests()
-	 * @see Boldgrid_Backup_Admin_Config::get_backup_directory()
+	 * @see Boldgrid_Backup_Admin_Backup_Dir::get()
 	 * @see Boldgrid_Backup_Admin_Core::execute_command()
 	 * @see Boldgrid_Backup_Admin_Utility::update_siteurl()
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
@@ -714,7 +719,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Get the backup directory path.
-		$backup_directory = $this->config->get_backup_directory();
+		$backup_directory = $this->backup_dir->get();
 
 		// Connect to the WordPress Filesystem API.
 		global $wp_filesystem;
@@ -923,7 +928,7 @@ class Boldgrid_Backup_Admin_Core {
 	 */
 	public function generate_archive_path( $extension = null ) {
 		// Get the backup directory path.
-		$backup_directory = $this->config->get_backup_directory();
+		$backup_directory = $this->backup_dir->get();
 
 		// Connect to the WordPress Filesystem API.
 		global $wp_filesystem;
@@ -1021,14 +1026,7 @@ class Boldgrid_Backup_Admin_Core {
 			'total_size' => 0,
 		);
 
-		// Get available compressors.
-		$available_compressors = $this->config->get_available_compressors();
-
-		// Determine which compressor to use (first available).
-		foreach ( $available_compressors as $available_compressor ) {
-			$info['compressor'] = $available_compressor;
-			break;
-		}
+		$info['compressor'] = $this->compressors->get();
 
 		// If there is no available compressor, then fail.
 		if ( null === $info['compressor'] ) {
@@ -1050,10 +1048,9 @@ class Boldgrid_Backup_Admin_Core {
 		if ( $save && ! $dryrun ) {
 			$status = $this->backup_database();
 
-			// Check database backup status, if saving, and not a dry run.
-			if ( ! $status ) {
+			if ( ! empty( $status['error'] ) ) {
 				return array(
-					'error' => 'Error making a database backup.',
+					'error' => $status['error'],
 				);
 			}
 		}
@@ -1078,7 +1075,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Get the backup directory path.
-		$backup_directory = $this->config->get_backup_directory();
+		$backup_directory = $this->backup_dir->get();
 
 		// Connect to the WordPress Filesystem API.
 		global $wp_filesystem;
@@ -1304,7 +1301,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Get the backup directory.
 		if( is_null( $backup_directory ) ) {
-			$backup_directory = $this->config->get_backup_directory();
+			$backup_directory = $this->backup_dir->get();
 		}
 
 		// If the backup directory is not configured, then return an empty array.
@@ -2002,7 +1999,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// If the directory path is not in the settings, then add it for the form.
 		if ( empty( $settings['backup_directory'] ) ) {
-			$settings['backup_directory'] = $this->config->get_backup_directory();
+			$settings['backup_directory'] = $this->backup_dir->get();
 		}
 
 		// Include the home page template.
@@ -2192,11 +2189,6 @@ class Boldgrid_Backup_Admin_Core {
 		// Perform functionality tests.
 		$is_functional = $this->test->run_functionality_tests();
 
-		if ( ! $is_functional ) {
-			// Display an error notice, with no link.
-			$this->notice->functionality_fail_notice( false );
-		}
-
 		// Get the user home directory.
 		$home_dir = $this->config->get_home_directory();
 
@@ -2207,7 +2199,7 @@ class Boldgrid_Backup_Admin_Core {
 		$home_dir_writable = $this->test->is_homedir_writable();
 
 		// Get the backup directory path.
-		$backup_directory = $this->config->get_backup_directory();
+		$backup_directory = $this->backup_dir->get();
 
 		// Get the WordPress version.
 		global $wp_version;

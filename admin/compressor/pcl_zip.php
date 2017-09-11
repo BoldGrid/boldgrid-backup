@@ -20,6 +20,24 @@
 class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Compressor {
 
 	/**
+	 * The status of our test result.
+	 *
+	 * @since  1.5.1
+	 * @access public
+	 * @var    mixed|bool|null
+	 */
+	public static $test_result = null;
+
+	/**
+	 * An array of any errors received while testing.
+	 *
+	 * @since  1.5.1
+	 * @access public
+	 * @var    array
+	 */
+	public $test_errors = array();
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.5.1
@@ -123,6 +141,71 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 
 		$this->wp_filesystem->chdir( $cwd );
 
+		return true;
+	}
+
+	/**
+	 * Test the functionality of php_zip.
+	 *
+	 * @since 1.5
+	 *
+	 * @param  bool $display_errors
+	 * @return bool
+	 */
+	public function test( $display_errors = true ) {
+		if( null !== self::$test_result ) {
+			return self::$test_result;
+		}
+
+		$backup_dir = $this->core->backup_dir->get_from_settings();
+
+		// Strings to help with creating test files.
+		$test_file_contents = $str = __( 'This is a test file from BoldGrid Backup. You can delete this file.', 'boldgrid-backup' );
+		$safe_to_delete = __( 'safe-to-delete', 'boldgrid-backup' );
+		$test_zip_file = $this->core->test->test_prefix . '-zip';
+		$test_filename = sprintf( '%1$s%2$s-%3$s-%4$s', $backup_dir, $test_zip_file, mt_rand(), $safe_to_delete );
+		$zip_filepath = $test_filename . '.zip';
+		$random_filename = $test_filename . '.txt';
+
+		$cannot_touch_file = __( 'PclZip test failed. We were unable to create the following test file:<br />
+			%1$s.<br />
+			Please ensure your backup directory has read, write, and modify permissions.',
+			'boldgrid-backup'
+		);
+
+		$cannot_put_contents = __( 'PclZip test failed. We were able to create the following test file, but we were unable to modify it. were unable to modify it:<br />
+			%1$s<br />
+			Please ensure your backup directory has read, write, and modify permissions.',
+			'boldgrid-backup'
+		);
+
+		$touched = $this->core->wp_filesystem->touch( $random_filename );
+		if( ! $touched ) {
+			$this->test_errors[] = sprintf( $cannot_touch_file, $random_filename );
+			self::$test_result = false;
+			return false;
+		}
+
+		$contents_put = $this->core->wp_filesystem->put_contents( $random_filename, $test_file_contents );
+		if( ! $contents_put ) {
+			$this->test_errors[] = sprintf( $cannot_put_contents, $random_filename );
+			self::$test_result = false;
+			return false;
+		}
+
+		$archive = new PclZip( $zip_filepath );
+		if ( 0 === $archive ) {
+			$this->test_errors[] = sprintf( 'Cannot create ZIP archive file %1$s. %2$s.', $info['filepath'], $archive->errorInfo() );
+		}
+
+		$status = $archive->add( $random_filename );
+		if( 0 === $status ) {
+			$this->test_errors[] = sprintf( 'Cannot add files to PclZip archive file: %1$s', $archive->errorInfo() );
+		}
+
+		$this->core->test->delete_test_files( $backup_dir );
+
+		self::$test_result = true;
 		return true;
 	}
 }

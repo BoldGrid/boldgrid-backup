@@ -389,7 +389,7 @@ class Boldgrid_Backup_Admin_Cron {
 		}
 
 		// Check if the backup directory is configured.
-		if ( ! $this->core->config->get_backup_directory() ) {
+		if ( ! $this->core->backup_dir->get() ) {
 			return false;
 		}
 
@@ -416,7 +416,7 @@ class Boldgrid_Backup_Admin_Cron {
 			$crontab .= "\n";
 
 			// Get the backup directory path.
-			$backup_directory = $this->core->config->get_backup_directory();
+			$backup_directory = $this->core->backup_dir->get();
 
 			// Connect to the WordPress Filesystem API.
 			global $wp_filesystem;
@@ -480,7 +480,7 @@ class Boldgrid_Backup_Admin_Cron {
 		}
 
 		// Check if the backup directory is configured.
-		if ( ! $this->core->config->get_backup_directory() ) {
+		if ( ! $this->core->backup_dir->get() ) {
 			return false;
 		}
 
@@ -525,7 +525,7 @@ class Boldgrid_Backup_Admin_Cron {
 			}
 
 			// Get the backup directory path.
-			$backup_directory = $this->core->config->get_backup_directory();
+			$backup_directory = $this->core->backup_dir->get();
 
 			// Connect to the WordPress Filesystem API.
 			global $wp_filesystem;

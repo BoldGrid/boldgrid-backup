@@ -810,4 +810,19 @@ class Boldgrid_Backup_Admin_Utility {
 
 		return $subject;
 	}
+
+	/**
+	 * Alternative to WordPress' trailingslashit function.
+	 *
+	 * WordPress' native function does not take into account Windows / the
+	 * DIRECTORY_SEPARATOR.
+	 *
+	 * @since 1.5.1
+	 *
+	 * @param  string
+	 * @return string
+	 */
+	public static function trailingslashit( $string ) {
+		return untrailingslashit( $string ) . DIRECTORY_SEPARATOR;
+	}
 }

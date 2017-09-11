@@ -211,7 +211,9 @@ class Boldgrid_Backup_Admin_Config {
 			return $this->home_dir;
 		}
 
-		if( $this->core->test->is_windows() && $this->core->test->is_plesk() ) {
+		if( $this->core->test->is_iis() ) {
+			$home_dir = dirname( $_SERVER['DOCUMENT_ROOT'] );
+		} elseif( $this->core->test->is_windows() && $this->core->test->is_plesk() ) {
 			/*
 			 * Plesk's File Manager labels C:\Inetpub\vhosts\domain.com as the
 			 * "Home directory". If we find we cannot read that directory, then
@@ -258,6 +260,7 @@ class Boldgrid_Backup_Admin_Config {
 
 		// Use rtrim the $home_dir to strip any trailing slashes.
 		$home_dir = rtrim( $home_dir, '\\/' );
+		$home_dir = str_replace( '\\\\', '\\', $home_dir );
 
 		// Record the home directory.
 		$this->home_dir = $home_dir;
@@ -412,65 +415,6 @@ class Boldgrid_Backup_Admin_Config {
 	}
 
 	/**
-	 * Get an array of possible backup directories.
-	 *
-	 * @since  1.5.1
-	 * @return array
-	 */
-	public function get_backup_directories() {
-		$dirs = array();
-
-		$dirs[] = $this->get_home_directory();
-
-		if( ! empty( $_SERVER['DOCUMENT_ROOT'] ) ) {
-
-			/*
-			 * App_Data (Windows / Plesk).
-			 *
-			 * The App_Data folder is used as a data storage for the web
-			 * application. It can store files such as .mdf, .mdb, and XML. It
-			 * manages all of your application's data centrally. It is
-			 * accessible from anywhere in your web application. The real
-			 * advantage of the App_Data folder is that, any file you place
-			 * there won't be downloadable.
-			 */
-			$app_data = $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'App_Data';
-			if( $this->core->wp_filesystem->exists( $app_data ) ) {
-				$dirs[] = $app_data;
-			}
-		}
-
-		return $dirs;
-	}
-
-	/**
-	 * Get and return the backup directory path.
-	 *
-	 * @since 1.0
-	 *
-	 * @return string|bool The backup directory path, or FALSE on error.
-	 */
-	public function get_backup_directory() {
-		$backup_directory = $this->backup_directory;
-
-		if ( empty( $backup_directory ) ) {
-			$settings = $this->core->settings->get_settings();
-
-			if ( ! empty( $settings['backup_directory'] ) ) {
-				$backup_directory = $settings['backup_directory'];
-			}
-		}
-
-		$is_directory_set = $this->set_backup_directory( $backup_directory );
-
-		if ( ! $is_directory_set ) {
-			return false;
-		}
-
-		return $this->backup_directory;
-	}
-
-	/**
 	 * Get default_retention.
 	 *
 	 * @since 1.3.1
@@ -481,113 +425,6 @@ class Boldgrid_Backup_Admin_Config {
 		return $this->default_retention;
 	}
 
-	/**
-	 * Set backup directory.
-	 *
-	 * @since 1.0.1
-	 *
-	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
-	 *
-	 * @param string $backup_directory_path The backup directory path to be set/configured.
-	 * @param bool   $display_notices       Whether or not to display admin notices.  Default: true.
-	 * @return bool
-	 */
-	public function set_backup_directory( $backup_directory_path = '', $display_notices = true ) {
-
-		if ( empty( $backup_directory_path ) ) {
-			$dirs = $this->get_backup_directories();
-
-			foreach( $dirs as $dir ) {
-				$dir = trailingslashit( $dir );
-
-				$dir_writable = $this->core->test->is_writable( $dir );
-
-				if( $dir_writable ) {
-					$backup_directory_path = $dir . '/boldgrid_backup';
-					break;
-				}
-			}
-		}
-
-		if ( empty( $backup_directory_path ) ) {
-			return false;
-		}
-
-		// Initialize WP_Filesystem.
-		WP_Filesystem();
-
-		// Connect to the WordPress Filesystem API.
-		global $wp_filesystem;
-
-		// Check if the backup directory exists.
-		$backup_directory_exists = $wp_filesystem->exists( $backup_directory_path );
-
-		// If the backup directory does not exist, then attempt to create it.
-		if ( ! $backup_directory_exists ) {
-			$backup_directory_created = $wp_filesystem->mkdir( $backup_directory_path, 0700 );
-
-			// If mkdir failed, then notify and abort.
-			if ( ! $backup_directory_created ) {
-					if ( $display_notices ) {
-					$errormsg = sprintf(
-						esc_html__( 'Could not create directory "%s".', 'boldgrid-backup' ),
-						$backup_directory_path
-					);
-
-					do_action( 'boldgrid_backup_notice', $errormsg, 'notice notice-error is-dismissible' );
-				}
-
-				// Abort.
-				return false;
-			}
-		}
-
-		// Check if the backup directory is a directory.
-		$backup_directory_isdir = $wp_filesystem->is_dir( $backup_directory_path );
-
-		// If the backup directory is not a directory, then notify and abort.
-		if ( ! $backup_directory_isdir ) {
-			if ( $display_notices ) {
-				$errormsg = sprintf(
-					esc_html__( 'Backup directory "%s" is not a directory.', 'boldgrid-backup' ),
-					$backup_directory_path
-				);
-
-				do_action( 'boldgrid_backup_notice', $errormsg, 'notice notice-error is-dismissible' );
-			}
-
-			// Abort.
-			return false;
-		}
-
-		// If the backup directory is not writable, then notify and abort.
-		if ( ! $wp_filesystem->is_writable( $backup_directory_path ) ) {
-			// Get the mode of the directory.
-			$backup_directory_mode = $wp_filesystem->getchmod( $backup_directory_path );
-
-			if ( $display_notices ) {
-				$errormsg = sprintf(
-					esc_html__(
-						'Backup directory "%s" (mode %s) is not writable.',
-						'boldgrid-backup'
-					),
-					$backup_directory_path,
-					$backup_directory_mode
-				);
-
-				do_action( 'boldgrid_backup_notice', $errormsg, 'notice notice-error is-dismissible' );
-			}
-
-			// Abort.
-			return false;
-		}
-
-		// Record the backup directory path.
-		$this->backup_directory = $backup_directory_path;
-
-		// Return success.
-		return true;
-	}
 
 	/**
 	 * Set lang.
@@ -607,14 +444,14 @@ class Boldgrid_Backup_Admin_Config {
 	 *
 	 * @since 1.2.2
 	 *
-	 * @see Boldgrid_Backup_Admin_Config::get_backup_directory()
+	 * @see Boldgrid_Backup_Admin_Backup_Dir::get()
 	 *
 	 * @param array $upload Upload data array.
 	 * @return array
 	 */
 	public function custom_upload_dir( $upload ) {
 		// Get the backup directory path.
-		$backup_directory = $this->get_backup_directory();
+		$backup_directory = $this->core->backup_dir->get();
 
 		// Get the subdirectory name.
 		$subdir = explode( '/', $backup_directory );
@@ -721,12 +558,21 @@ class Boldgrid_Backup_Admin_Config {
 			return $this->available_compressors;
 		}
 
+		if( ! class_exists( 'PclZip' ) ) {
+			require_once( ABSPATH . '/wp-admin/includes/class-pclzip.php' );
+		}
+
 		// Initialize $this->available_compressors to an empty array.
 		$this->available_compressors = array();
 
 		// PHP zip (ZipArchive).
 		if ( extension_loaded( 'zip' ) && class_exists( 'ZipArchive' ) ) {
 			$this->add_compressor( 'php_zip' );
+		}
+
+		// PclZip
+		if( class_exists( 'PclZip' ) ) {
+			$this->add_compressor( 'pcl_zip' );
 		}
 
 		// PHP bz2 (Bzip2).

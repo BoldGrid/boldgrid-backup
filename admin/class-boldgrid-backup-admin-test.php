@@ -18,6 +18,18 @@
  * @since 1.0
  */
 class Boldgrid_Backup_Admin_Test {
+
+	/**
+	 * Base test filename.
+	 *
+	 * When we create test files, this is the prefix for all of them.
+	 *
+	 * @since  1.5.1
+	 * @access public
+	 * @var    string
+	 */
+	public $test_prefix = 'boldgrid-backup-test-file-';
+
 	/**
 	 * The core class object.
 	 *
@@ -120,6 +132,79 @@ class Boldgrid_Backup_Admin_Test {
 	public function __construct( $core ) {
 		// Save the Boldgrid_Backup_Admin_Core object as a class property.
 		$this->core = $core;
+	}
+
+
+
+	/**
+	 * Extensive directory test.
+	 *
+	 * Pass in a directory, and we'll check to see if we can read / write / etc.
+	 *
+	 * @since 1.5.1
+	 *
+	 * @param  string $dir
+	 * @return array
+	 */
+	public function extensive_dir_test( $dir ) {
+		$dir = Boldgrid_Backup_Admin_Utility::trailingslashit( $dir );
+		$random_filename = $dir . $this->test_prefix . mt_rand();
+		$txt_filename = $random_filename . '.txt';
+		$info_filename = $random_filename . '.rtf';
+		$str = __( 'This is a test file from BoldGrid Backup. You can delete this file.', 'boldgrid-backup' );
+
+		$data['exists'] = $this->core->wp_filesystem->exists( $dir );
+		$data['read'] = $this->core->wp_filesystem->is_readable( $dir );
+		$data['write'] = $this->core->wp_filesystem->is_writable( $dir );
+
+		// Determine if we have permission to rename a file.
+		$touched = $this->core->wp_filesystem->touch( $txt_filename );
+		$this->core->wp_filesystem->put_contents( $txt_filename, $str );
+		$data['rename'] = $touched && $this->core->wp_filesystem->move( $txt_filename, $info_filename );
+
+		// Delete the temp files.
+		$this->core->wp_filesystem->delete( $txt_filename );
+		$data['delete'] = $data['write'] && $this->core->wp_filesystem->delete( $info_filename );
+
+		/*
+		 * IIS Users, we've tried hard enough to delete old test files for you.
+		 * If we can't get the dir listing below, you'll need to delete all the
+		 * files in $dir starting that beging with'boldgrid-backup-test-file-'.
+		 */
+		$this->delete_test_files( $dir );
+
+		return $data;
+	}
+
+	/**
+	 * Delete test files.
+	 *
+	 * When given a $dir, we'll scan and delete all files that begin with
+	 * $this->test_prefix.
+	 *
+	 * @since 1.5.1
+	 *
+	 * @param  string $dir
+	 * @return bool
+	 */
+	public function delete_test_files( $dir ) {
+		$dir = Boldgrid_Backup_Admin_Utility::trailingslashit( $dir );
+
+		$files = $this->core->wp_filesystem->dirlist( $dir );
+
+		if( ! is_array( $files ) ) {
+			return false;
+		}
+
+		foreach( $files as $file ) {
+			$filename = $file['name'];
+
+			if( 0 === strpos( $filename, $this->test_prefix ) ) {
+				$this->core->wp_filesystem->delete( $dir . $filename );
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -299,7 +384,7 @@ class Boldgrid_Backup_Admin_Test {
 		}
 
 		// Configure the backup directory path, or mark as not functional.
-		if ( ! $this->core->config->get_backup_directory() ) {
+		if ( ! $this->core->backup_dir->get() ) {
 			$this->is_functional = false;
 		}
 
@@ -309,6 +394,20 @@ class Boldgrid_Backup_Admin_Test {
 		// Test for available compressors, and add them to the array, or mark as not functional.
 		if ( empty( $available_compressors ) ) {
 			$this->is_functional = false;
+		}
+
+		if( 'php_zip' === $this->core->compressors->get() ) {
+			$php_zip = new Boldgrid_Backup_Admin_Compressor_Php_Zip( $this->core );
+			if( ! $php_zip->test( false ) ) {
+				$this->is_functional = false;
+			}
+		}
+
+		if( 'pcl_zip' === $this->core->compressors->get() ) {
+			$pcl_zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this->core );
+			if( ! $pcl_zip->test( false ) ) {
+				$this->is_functional = false;
+			}
 		}
 
 		// Test for PHP safe mode.
@@ -679,5 +778,18 @@ class Boldgrid_Backup_Admin_Test {
 
 		// Return the result.
 		return $this->is_homedir_writable;
+	}
+
+	/**
+	 * Determine if we are on an IIS server.
+	 *
+	 * @since 1.5.1
+	 *
+	 * @return bool
+	 */
+	public function is_iis() {
+		return	$this->is_windows() &&
+				! empty( $_SERVER['SERVER_SOFTWARE'] ) &&
+				false !== strpos( $_SERVER['SERVER_SOFTWARE'], 'IIS' );
 	}
 }

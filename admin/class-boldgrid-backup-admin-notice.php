@@ -18,6 +18,15 @@
  * @since 1.2
  */
 class Boldgrid_Backup_Admin_Notice {
+
+	/**
+	 * An array of messages we've already printed to the current page.
+	 *
+	 * @since 1.5.1
+	 * @var   array
+	 */
+	public $displayed_messages = array();
+
 	/**
 	 * Print an admin notice.
 	 *
@@ -27,7 +36,13 @@ class Boldgrid_Backup_Admin_Notice {
 	 * @param string $class The class string for the div.
 	 */
 	public function boldgrid_backup_notice( $message, $class = 'notice notice-error is-dismissible' ) {
+		if( in_array( $message, $this->displayed_messages, true ) ) {
+			return;
+		}
+
 		printf( '<div class="%1$s"><p>%2$s</p></div>', $class, $message );
+
+		$this->displayed_messages[] = $message;
 	}
 
 	/**

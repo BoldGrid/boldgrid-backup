@@ -47,7 +47,7 @@ class Boldgrid_Backup_Admin_Upload {
 	 * @see current_user_can() in wp-includes/capabilities.php
 	 * @see wp_verify_nonce() in wp-includes/pluggable.php
 	 * @see Boldgrid_Backup_Admin_Utility::translate_upload_error()
-	 * @see Boldgrid_Backup_Admin_Config::get_backup_directory()
+	 * @see Boldgrid_Backup_Admin_Backup_Dir::get()
 	 *
 	 * @return bool
 	 */
@@ -125,7 +125,7 @@ class Boldgrid_Backup_Admin_Upload {
 		}
 
 		// Get the backup directory.
-		$backup_directory = $this->core->config->get_backup_directory();
+		$backup_directory = $this->core->backup_dir->get();
 
 		// Abort if the backup directory is not configured.
 		if ( empty( $backup_directory ) ) {
@@ -216,7 +216,7 @@ class Boldgrid_Backup_Admin_Upload {
 	 * @since 1.2.2
 	 *
 	 * @see Boldgrid_Backup_Admin_Config::get_backup_identifier()
-	 * @see Boldgrid_Backup_Admin_Config::get_backup_directory()
+	 * @see Boldgrid_Backup_Admin_Backup_Dir::get()
 	 *
 	 * @return string The file save path.
 	 */
@@ -228,7 +228,7 @@ class Boldgrid_Backup_Admin_Upload {
 		$backup_identifier = $this->core->get_backup_identifier();
 
 		// Get the backup directory.
-		$backup_directory = $this->core->config->get_backup_directory();
+		$backup_directory = $this->core->backup_dir->get();
 
 		// Create an array of strings to remove from the filename.
 		$remove_strings = array(

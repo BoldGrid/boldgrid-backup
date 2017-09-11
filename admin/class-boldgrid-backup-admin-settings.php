@@ -230,6 +230,8 @@ class Boldgrid_Backup_Admin_Settings {
 	 * @return bool Update success.
 	 */
 	private function update_settings() {
+		$update_errors = array();
+
 		// Verify nonce.
 		check_admin_referer( 'boldgrid-backup-settings', 'settings_auth' );
 
@@ -409,16 +411,17 @@ class Boldgrid_Backup_Admin_Settings {
 			unset( $settings['plugin_autoupdate'], $settings['theme_autoupdate'] );
 
 			// Get the current backup directory path.
-			$original_backup_directory = $this->core->config->get_backup_directory();
+			$original_backup_directory = $this->core->backup_dir->get( false );
 
 			// Save backup directory, if changed.
 			if ( ! empty( $_POST['backup_directory'] ) &&
 			trim( $_POST['backup_directory'] ) !== $original_backup_directory ) {
 				// Sanitize.
 				$backup_directory = trim( $_POST['backup_directory'] );
+				$backup_directory = str_replace( '\\\\', '\\', $backup_directory );
 
 				// Set the directory.
-				$is_directory_set = $this->core->config->set_backup_directory( $backup_directory );
+				$is_directory_set = $this->core->backup_dir->set( $backup_directory );
 
 				// If the backup directory was configured, then save the new setting.
 				if ( $is_directory_set ) {
@@ -430,6 +433,7 @@ class Boldgrid_Backup_Admin_Settings {
 					}
 				} else {
 					$update_error = true;
+					$update_errors = array_merge( $update_errors, $this->core->backup_dir->errors );
 				}
 			}
 
@@ -442,31 +446,13 @@ class Boldgrid_Backup_Admin_Settings {
 				$this->update_boldgrid_settings( $boldgrid_settings );
 
 				$cron_status = $this->core->cron->add_cron_entry();
-			} else {
-				// Interrupted by a previous error.
-				do_action(
-					'boldgrid_backup_notice',
-					esc_html__(
-						'Invalid settings submitted.  Please try again.',
-						'boldgrid-backup'
-					),
-					'notice notice-error is-dismissible'
-				);
 			}
 		}
 
 		// If delete cron failed, then show a notice.
 		if ( empty( $cron_status ) ) {
 			$update_error = true;
-
-			do_action(
-				'boldgrid_backup_notice',
-				esc_html__(
-					'An error occurred when modifying cron jobs.  Please try again.',
-					'boldgrid-backup'
-				),
-				'notice notice-error is-dismissible'
-			);
+			$update_errors[] = esc_html__( 'An error occurred when modifying cron jobs.  Please try again.', 'boldgrid-backup' );
 		}
 
 		// If there was no error, then show success notice.
@@ -477,6 +463,14 @@ class Boldgrid_Backup_Admin_Settings {
 				esc_html__( 'Settings saved.', 'boldgrid-backup' ),
 				'updated settings-error notice is-dismissible'
 			);
+		} elseif( empty( $update_errors ) ) {
+			$failure_message = esc_html__( 'Invalid settings submitted.  Please try again.', 'boldgrid-backup' );
+		} else {
+			$failure_message = sprintf( '<strong>%1$s</strong><br /><br />%2$s', __( 'We were unable to save your settings for the following reason(s):', 'boldgrid-backup' ), implode( '<br /><br />', $update_errors ) );
+		}
+
+		if( isset( $failure_message ) ) {
+			do_action( 'boldgrid_backup_notice', $failure_message );
 		}
 
 		// Temporary.
@@ -505,11 +499,14 @@ class Boldgrid_Backup_Admin_Settings {
 	 * @return null
 	 */
 	public function page_backup_settings() {
-		// Run the functionality tests.
-		$is_functional = $this->core->test->run_functionality_tests();
+		$is_saving_settings = isset( $_POST['save_time'] );
+
+		if( ! $is_saving_settings ) {
+			$is_functional = $this->core->test->run_functionality_tests();
+		}
 
 		// If tests fail, then show an admin notice and abort.
-		if ( ! $is_functional ) {
+		if ( isset( $is_functional ) && ! $is_functional ) {
 			do_action(
 				'boldgrid_backup_notice',
 				sprintf(
@@ -550,7 +547,7 @@ class Boldgrid_Backup_Admin_Settings {
 		}
 
 		// Check for settings update.
-		if ( isset( $_POST['save_time'] ) ) {
+		if ( $is_saving_settings ) {
 			// Verify nonce.
 			check_admin_referer( 'boldgrid-backup-settings', 'settings_auth' );
 
@@ -577,7 +574,7 @@ class Boldgrid_Backup_Admin_Settings {
 
 		// If the directory path is not in the settings, then add it for the form.
 		if ( empty( $settings['backup_directory'] ) ) {
-			$settings['backup_directory'] = $this->core->config->get_backup_directory();
+			$settings['backup_directory'] = $this->core->backup_dir->get();
 		}
 
 		// Include the page template.
@@ -603,17 +600,17 @@ class Boldgrid_Backup_Admin_Settings {
 
 		$settings['backup_directory'] = $settings['backup_directory'] ?: '';
 
-		$is_directory_set = $this->core->config->set_backup_directory(
+		$is_directory_set = $this->core->backup_dir->set(
 			$settings['backup_directory'],
 			false
 		);
 
 		if ( ! $is_directory_set ) {
-			$is_directory_set = $this->core->config->set_backup_directory();
+			$is_directory_set = $this->core->backup_dir->set();
 		}
 
 		if ( $is_directory_set ) {
-			$settings['backup_directory'] = $this->core->config->get_backup_directory();
+			$settings['backup_directory'] = $this->core->backup_dir->get();
 
 			update_site_option( 'boldgrid_backup_settings', $settings );
 		}
