@@ -115,7 +115,7 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	public function get_backup_directories() {
 		$dirs = array();
 
-		$dirs[] = $this->get_home_directory();
+		$dirs[] = $this->core->config->get_home_directory();
 
 		if( ! empty( $_SERVER['DOCUMENT_ROOT'] ) ) {
 
