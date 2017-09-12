@@ -37,7 +37,7 @@ $allowed_tags = array(
 	'br' => array(),
 );
 
-$backup_dir = $this->backup_dir->get_from_settings();
+$backup_dir = $this->backup_dir->get();
 $backup_dir_perms = $this->test->extensive_dir_test( $backup_dir );
 
 $php_zip = new Boldgrid_Backup_Admin_Compressor_Php_Zip( $this );

@@ -153,7 +153,7 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 			return self::$test_result;
 		}
 
-		$backup_dir = $this->core->backup_dir->get_from_settings();
+		$backup_dir = $this->core->backup_dir->get();
 
 		$test_file_contents = $str = __( 'This is a test file from BoldGrid Backup. You can delete this file.', 'boldgrid-backup' );
 		$cannot_open_zip = __( 'Unable to create zip file: %1$s', 'boldgrid-backup' );

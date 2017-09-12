@@ -411,30 +411,49 @@ class Boldgrid_Backup_Admin_Settings {
 			unset( $settings['plugin_autoupdate'], $settings['theme_autoupdate'] );
 
 			// Get the current backup directory path.
-			$original_backup_directory = $this->core->backup_dir->get( false );
+			$backup_dir_changed = false;
+			$original_backup_directory = $this->core->backup_dir->get();
 
-			// Save backup directory, if changed.
-			if ( ! empty( $_POST['backup_directory'] ) &&
-			trim( $_POST['backup_directory'] ) !== $original_backup_directory ) {
-				// Sanitize.
+			/*
+			 * Create the backup directory.
+			 *
+			 * Allow the user to submit a blank backup directory if they want
+			 * to set the backup directory to the default, which is
+			 * wp-content/boldgrid-backup.
+			 */
+			if( empty( $_POST['backup_directory'] ) ) {
+				$backup_directory = $this->core->backup_dir->create();
+				$backup_dir_changed = true;
+			} elseif( trim( $_POST['backup_directory'] ) !== $original_backup_directory ) {
 				$backup_directory = trim( $_POST['backup_directory'] );
 				$backup_directory = str_replace( '\\\\', '\\', $backup_directory );
+				$backup_directory = $this->core->backup_dir->create( $backup_directory );
+				$backup_dir_changed = true;
+			}
 
-				// Set the directory.
-				$is_directory_set = $this->core->backup_dir->set( $backup_directory );
+			// If we tried to create a backup directory but failed, adjust errors.
+			if( $backup_dir_changed && false === $backup_directory ) {
+				$update_error = true;
+				$backup_dir_changed = false;
+				$update_errors = array_merge( $update_errors, $this->core->backup_dir->errors );
+			}
 
-				// If the backup directory was configured, then save the new setting.
-				if ( $is_directory_set ) {
+			// If we are changing our backup directory, valid it.
+			if( $backup_dir_changed ) {
+				$is_valid = $this->core->backup_dir->is_valid( $backup_directory );
+
+				if( $is_valid ) {
 					$settings['backup_directory'] = $backup_directory;
-
-					// Move backups to the new directory.
-					if( isset( $_POST['move-backups'] ) && 'on' === $_POST['move-backups'] ) {
-						$this->move_backups( $original_backup_directory, $backup_directory );
-					}
 				} else {
 					$update_error = true;
+					$backup_dir_changed = false;
 					$update_errors = array_merge( $update_errors, $this->core->backup_dir->errors );
 				}
+			}
+
+			// Move backups to the new directory.
+			if( $backup_dir_changed && isset( $_POST['move-backups'] ) && 'on' === $_POST['move-backups'] ) {
+				$this->move_backups( $original_backup_directory, $backup_directory );
 			}
 
 			// If no errors, then save the settings.
