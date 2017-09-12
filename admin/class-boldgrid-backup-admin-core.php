@@ -900,11 +900,19 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Filter the filelist array.
 		foreach ( $filelist as $fileinfo ) {
+
+			// @todo The user needs a way to specifiy what to skip in the backups.
+			$is_node_modules = false !== strpos( $fileinfo[1], '/node_modules/' );
+			$is_backup_directory = false !== strpos( $fileinfo[1], $this->backup_dir->without_abspath );
+
+			if( $is_node_modules || $is_backup_directory ) {
+				continue;
+			}
+
 			foreach ( $this->filelist_filter as $pattern ) {
-				if ( 0 === strpos( $fileinfo[1], $pattern )
-					&& false === strpos( $fileinfo[1], '/node_modules/' ) ) {
-						$new_filelist[] = $fileinfo;
-						break;
+				if ( 0 === strpos( $fileinfo[1], $pattern ) ) {
+					$new_filelist[] = $fileinfo;
+					break;
 				}
 			}
 		}
@@ -954,7 +962,7 @@ class Boldgrid_Backup_Admin_Core {
 		$filename = sanitize_file_name( $filename );
 
 		// Create a file path with no extension (added later).
-		$filepath = $backup_directory . '/' . $filename;
+		$filepath = $backup_directory . $filename;
 
 		// If specified, add an extension.
 		if ( ! empty( $extension ) ) {

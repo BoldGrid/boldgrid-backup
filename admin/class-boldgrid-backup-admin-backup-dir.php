@@ -46,6 +46,15 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	public $errors = array();
 
 	/**
+	 * The backup directory with the absolute path removed.
+	 *
+	 * @since  1.5.1
+	 * @access public
+	 * @var    string
+	 */
+	public $without_abspath;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.5.1
@@ -64,7 +73,7 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	 * @param  string $backup_dir
 	 * @return string
 	 */
-	public function create( $backup_dir ) {
+	public function create( $backup_dir = false ) {
 		$check_permissions = __( 'Please ensure your backup directory exists and has the proper read, write, and modify permissions.', 'boldgrid-backup' );
 
 		$cannot_create = __( 'Unable to create necessary file: %1$s<br />%2$s', 'boldgrid-backup' );
@@ -184,6 +193,15 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 		}
 
 		$this->backup_directory = $backup_directory;
+
+		/*
+		 * Even in a Windows environment, wp_filesystem->dirlist retrieves paths
+		 * with a / instead of \. Fix $without_abspath so we can properly check
+		 * if files are in the backup directory.
+		 */
+		$this->without_abspath = str_replace( ABSPATH, '', $this->backup_directory );
+		$this->without_abspath = str_replace( '\\', '/', $this->without_abspath );
+
 		return $this->backup_directory;
 	}
 

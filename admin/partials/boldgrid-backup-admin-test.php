@@ -95,6 +95,11 @@ $tests[] = array(
 );
 
 $tests[] = array(
+	'k' => __( 'Backup directory without ABSPATH', 'boldgrid-backup' ),
+	'v' => $this->backup_dir->without_abspath,
+);
+
+$tests[] = array(
 	'k' => __( 'Backup directory exists?', 'boldgrid-backup' ),
 	'v' => $backup_dir_perms['exists'] ? $lang['yes'] : sprintf( $error_span, $lang['no'], $lang['ensure_dir_perms'] ),
 );
