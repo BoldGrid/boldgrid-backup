@@ -903,7 +903,7 @@ class Boldgrid_Backup_Admin_Core {
 
 			// @todo The user needs a way to specifiy what to skip in the backups.
 			$is_node_modules = false !== strpos( $fileinfo[1], '/node_modules/' );
-			$is_backup_directory = false !== strpos( $fileinfo[1], $this->backup_dir->without_abspath );
+			$is_backup_directory = $this->backup_dir->file_in_dir( $fileinfo[1] );
 
 			if( $is_node_modules || $is_backup_directory ) {
 				continue;

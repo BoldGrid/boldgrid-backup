@@ -279,6 +279,8 @@ class Boldgrid_Backup {
 
 		$this->loader->add_filter( 'boldgrid_backup_cannnot_restore_git_objects', $plugin_admin_core->restore_git, 'chmod_objects' );
 
+		$this->loader->add_filter( 'boldgrid_backup_file_in_dir', $plugin_admin_core->backup_dir, 'file_in_dir' );
+
 		return;
 	}
 

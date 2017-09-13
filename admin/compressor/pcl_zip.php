@@ -99,11 +99,16 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 		 * @link http://www.phpconcept.net/pclzip/user-guide/50
 		 *
 		 * @param  string $p_event  The identity of the call-back argument
-		 * @param  array  $p_header The description of the file that will be added.
+		 * @param  array  $p_header The description of the file that will be
+		 *                          added. https://pastebin.com/MTMGwaZ2
 		 * @return int    Return 0 to skip adding the file to the archive.
 		 */
 		function pre_add( $p_event, &$p_header) {
-			if( false !== strpos( $p_header['stored_filename'], '/node_modules/') ) {
+
+			$in_node_modules = false !== strpos( $p_header['stored_filename'], '/node_modules/');
+			$in_backup_directory = apply_filters( 'boldgrid_backup_file_in_dir', $p_header['stored_filename'] );
+
+			if( $in_node_modules || $in_backup_directory ) {
 				return 0;
 			}
 
@@ -157,7 +162,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 			return self::$test_result;
 		}
 
-		$backup_dir = $this->core->backup_dir->get_from_settings();
+		$backup_dir = $this->core->backup_dir->get();
 
 		// Strings to help with creating test files.
 		$test_file_contents = $str = __( 'This is a test file from BoldGrid Backup. You can delete this file.', 'boldgrid-backup' );

@@ -206,6 +206,29 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	}
 
 	/**
+	 * Determine if a file is in the backup directory.
+	 *
+	 * Pass in a filepath (relative to ABSPATH) and this method will determine
+	 * if it's within the backup directory.
+	 *
+	 * Example $this->without_abspath:
+	 * * wp-content/boldgrid-backup/
+	 *
+	 * Example $file(s):
+	 * * (no)  .htaccess
+	 * * (no)  wp-admin/admin.php
+	 * * (yes) wp-content/boldgrid-backup/boldgrid-backup-domain-000-000-000.zip
+	 *
+	 * @since 1.5.1
+	 *
+	 * @param  string $file
+	 * @return bool
+	 */
+	public function file_in_dir( $file ) {
+		return false !== strpos( $file, $this->without_abspath );
+	}
+
+	/**
 	 * Validate backup directory.
 	 *
 	 * Make sure it exists, it's writable, etc.
