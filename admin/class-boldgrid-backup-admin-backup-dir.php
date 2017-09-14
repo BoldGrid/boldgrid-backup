@@ -172,7 +172,8 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 		 * root. As of 1.5.1, if there is no backup directory set, or the one
 		 * set is empty, we'll create a new backup dir within the wp-content dir.
 		 */
-		if( empty( $backup_directory ) || empty( $this->core->wp_filesystem->dirlist( $backup_directory ) ) ) {
+		$dirlist = $this->core->wp_filesystem->dirlist( $backup_directory );
+		if( empty( $backup_directory ) || empty( $dirlist ) ) {
 			$dir_created = $this->create();
 
 			if( $dir_created ) {
