@@ -24,6 +24,9 @@ if ( empty( $settings ) ) {
 ?>
 <div class='wrap'>
 	<h1><?php esc_html_e( 'BoldGrid Backup and Restore Settings', 'boldgrid-backup' ); ?></h1>
+
+	<?php include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php'; ?>
+
 	<p>
 		<?php
 		/*
@@ -355,6 +358,8 @@ if ( empty( $settings ) ) {
 		</div>
 
 		<?php include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/backup-directory.php'; ?>
+
+		<?php include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/compressor.php'; ?>
 
 		<?php
 		// This is a temporary section.

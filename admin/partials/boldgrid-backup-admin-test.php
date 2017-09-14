@@ -322,16 +322,17 @@ foreach( $tests as $test ) {
 }
 $table .= '</table>';
 
-// Echo all content to the page.
-echo sprintf('
-	<div class="functionality-test-section wrap">
-		<h1>%1$s</h1>
-		%2$s
-		%3$s
-	</div>',
-	__( 'BoldGrid Backup', 'boldgrid-backup' ),
-	$table,
-	$fail_tips
-);
-
 ?>
+<div class="functionality-test-section wrap">
+
+	<?php
+	printf( '<h1>%1$s</h1>', __( 'BoldGrid Backup Preflight Check', 'boldgrid-backup' ) );
+
+	include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
+
+	echo $table;
+
+	echo $fail_tips;
+	?>
+
+</div>

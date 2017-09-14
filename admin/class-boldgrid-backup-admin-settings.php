@@ -456,6 +456,33 @@ class Boldgrid_Backup_Admin_Settings {
 				$this->move_backups( $original_backup_directory, $backup_directory );
 			}
 
+			/*
+			 * Save compressor settings.
+			 *
+			 * @since 1.5.1
+			 */
+			$available_compressors = $this->core->compressors->get_available();
+			$selected_compressor = $_POST['compressor'];
+			if( in_array( $selected_compressor, $available_compressors, true ) ) {
+				$settings['compressor'] = $selected_compressor;
+			} else {
+				$update_error = true;
+				$update_errors[] = __( 'The compressor you seleted is unavailable. Please select another.', 'boldgrid-backup' );
+			}
+
+			/*
+			 * Save extractor settings.
+			 *
+			 * @since 1.5.1
+			 */
+			$selected_extractor = $_POST['extractor'];
+			if( in_array( $selected_extractor, $available_compressors, true ) ) {
+				$settings['extractor'] = $selected_extractor;
+			} else {
+				$update_error = true;
+				$update_errors[] = __( 'The extractor you seleted is unavailable. Please select another.', 'boldgrid-backup' );
+			}
+
 			// If no errors, then save the settings.
 			if ( ! $update_error ) {
 				$settings['updated'] = time();
@@ -595,6 +622,8 @@ class Boldgrid_Backup_Admin_Settings {
 		if ( empty( $settings['backup_directory'] ) ) {
 			$settings['backup_directory'] = $this->core->backup_dir->get();
 		}
+
+		$available_compressors = $this->core->compressors->get_available();
 
 		// Include the page template.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-settings.php';

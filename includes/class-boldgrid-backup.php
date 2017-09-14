@@ -171,6 +171,9 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-backup-dir.php';
 
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archive-log.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archive-details.php';
+
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
 
@@ -280,6 +283,8 @@ class Boldgrid_Backup {
 		$this->loader->add_filter( 'boldgrid_backup_cannnot_restore_git_objects', $plugin_admin_core->restore_git, 'chmod_objects' );
 
 		$this->loader->add_filter( 'boldgrid_backup_file_in_dir', $plugin_admin_core->backup_dir, 'file_in_dir' );
+
+		$this->loader->add_filter( 'unzip_file_use_ziparchive', $plugin_admin_core->compressors, 'unzip_file_use_ziparchive' );
 
 		return;
 	}

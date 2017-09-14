@@ -100,6 +100,24 @@ class Boldgrid_Backup_Admin_Core {
 	public $wp_filesystem;
 
 	/**
+	 * An instance of the Archive Log class.
+	 *
+	 * @since  1.5.1
+	 * @access public
+	 * @var    Boldgrid_Backup_Admin_Archive_Log
+	 */
+	public $archive_log;
+
+	/**
+	 * An instance of the Archive Details class.
+	 *
+	 * @since  1.5.1
+	 * @access public
+	 * @var    Boldgrid_Backup_Admin_Archive_Details
+	 */
+	public $archive_details;
+
+	/**
 	 * Available execution functions.
 	 *
 	 * @since 1.0
@@ -229,6 +247,10 @@ class Boldgrid_Backup_Admin_Core {
 		$this->backup_dir = new Boldgrid_Backup_Admin_Backup_Dir( $this );
 
 		$this->compressors = new Boldgrid_Backup_Admin_Compressors( $this );
+
+		$this->archive_log = new Boldgrid_Backup_Admin_Archive_Log( $this );
+
+		$this->archive_details = new Boldgrid_Backup_Admin_Archive_Details( $this );
 
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
@@ -610,6 +632,18 @@ class Boldgrid_Backup_Admin_Core {
 			array(
 				$this,
 				'page_backup_test',
+			)
+		);
+
+		add_submenu_page(
+			null,
+			'BoldGrid ' . $lang['backup_archive'],
+			$lang['backup_archive'],
+			$capability,
+			'boldgrid-backup-archive-details',
+			array(
+				$this->archive_details,
+				'render_archive',
 			)
 		);
 
@@ -1276,6 +1310,8 @@ class Boldgrid_Backup_Admin_Core {
 			// Update WP option for "boldgrid_backup_last_backup".
 			update_site_option( 'boldgrid_backup_last_backup', time() );
 
+			$this->archive_log->write( $info );
+
 			// Enforce retention setting.
 			$this->enforce_retention();
 		}
@@ -1916,6 +1952,8 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return null
 	 */
 	public function page_archives() {
+		add_thickbox();
+
 		// Run the functionality tests.
 		$is_functional = $this->test->run_functionality_tests();
 
@@ -2686,6 +2724,8 @@ class Boldgrid_Backup_Admin_Core {
 				// Something went wrong.
 				break;
 			}
+
+			$this->archive_log->delete_by_zip( $filepath );
 
 			// Decrease the archive count.
 			$archives_count --;

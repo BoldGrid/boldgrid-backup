@@ -46,6 +46,10 @@
 			.find( '.button' )
 				.on( 'click', self.uploadButtonClicked );
 
+		$( '.page-title-action.add-new' ).on( 'click', function() {
+			$( '#add_new' ).toggle();
+		});
+
 		$fileInput
 			.parent()
 				.find( 'input:submit' )
@@ -206,21 +210,20 @@
 		// Ask for confirmation.
 		confirmResponse = confirm( localizeScriptData.deleteConfirmText + ' "' + ArchiveFilename + '"' );
 
-		// Handle response.
-		if ( true === confirmResponse ) {
-			// Show the spinner.
-			$this
-				.parent()
-					.find( '.spinner' )
-						.addClass( 'is-active' )
-						.css( 'display', 'inline-block' );
-
-			// Proceed with deletion.
-			return true;
-		} else {
-			// Prevent default browser action.
-			e.preventDefault();
+		if( ! confirmResponse ) {
+			return;
 		}
+
+		$this.closest( 'td' )
+			.find( '.row-actions' )
+				.removeClass( 'row-actions' )
+				.end()
+			.find( '.spinner' )
+				.addClass( 'is-active' )
+				.css( 'display', 'inline-block' )
+				.end()
+			.find( 'form' )
+				.submit();
 	};
 
 	/**
