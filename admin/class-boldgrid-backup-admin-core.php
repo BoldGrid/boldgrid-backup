@@ -91,6 +91,15 @@ class Boldgrid_Backup_Admin_Core {
 	public $xhprof;
 
 	/**
+	 * WP Cron class.
+	 *
+	 * @since  1.5.1
+	 * @access public
+	 * @var    Boldgrid_Backup_Admin_WP_Cron
+	 */
+	public $wp_cron;
+
+	/**
 	 * An instance of the filesystem.
 	 *
 	 * @since  1.5.1
@@ -201,6 +210,15 @@ class Boldgrid_Backup_Admin_Core {
 	private $backup_identifier = null;
 
 	/**
+	 * The scheduler class object.
+	 *
+	 * @since  1.5.1
+	 * @access public
+	 * @var    Boldgrid_Backup_Admin_Scheduler
+	 */
+	public $scheduler;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.0
@@ -251,6 +269,10 @@ class Boldgrid_Backup_Admin_Core {
 		$this->archive_log = new Boldgrid_Backup_Admin_Archive_Log( $this );
 
 		$this->archive_details = new Boldgrid_Backup_Admin_Archive_Details( $this );
+
+		$this->wp_cron = new Boldgrid_Backup_Admin_WP_Cron( $this );
+
+		$this->scheduler = new Boldgrid_Backup_Admin_Scheduler( $this );
 
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
@@ -1069,6 +1091,10 @@ class Boldgrid_Backup_Admin_Core {
 			'save' => $save,
 			'total_size' => 0,
 		);
+
+		if( $this->doing_cron ) {
+			$info['trigger'] = 'WP cron';
+		}
 
 		$info['compressor'] = $this->compressors->get();
 

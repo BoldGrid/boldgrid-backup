@@ -130,6 +130,25 @@
 		}
 	};
 
+	/**
+	 * @summary Toggle timezone.
+	 *
+	 * @since 1.5.1
+	 */
+	self.toggleTimezone = function() {
+		var $scheduler = $( '#scheduler' ),
+			$wp_cron_timezone = $( '#wp_cron_timezone' );
+
+		switch( $scheduler.val() ) {
+			case 'cron':
+				$wp_cron_timezone.hide();
+				break;
+			case 'wp-cron':
+				$wp_cron_timezone.show();
+				break;
+		}
+	}
+
 	// Onload event listener.
 	$( function() {
 		// Check if any days or the week are checked, toggle notice.
@@ -140,6 +159,13 @@
 		// On click action for days, check if any days or the week are checked,
 		// toggle notice.
 		$scheduleDow.on( 'click', self.toggleNoBackupDays );
+
+		/*
+		 * When the page loads AND when the user changes the scheduler, toggle
+		 * the timezone settings.
+		 */
+		self.toggleTimezone();
+		$( '#scheduler' ).on( 'change', self.toggleTimezone );
 	} );
 
 } )( jQuery );

@@ -27,6 +27,10 @@ $datas = array(
 		'title' => __( 'Backup date', 'boldgrid-backup' ),
 	),
 	array(
+		'key' => 'trigger',
+		'title' => __( 'Backup triggered by', 'boldgrid-backup' ),
+	),
+	array(
 		'key' => 'compressor',
 		'title' => __( 'Compressor', 'boldgrid-backup' ),
 	),
@@ -44,7 +48,7 @@ $datas = array(
 		'key' => 'mail_success',
 		'title' => __( 'Email sent after backup', 'boldgrid-backup' ),
 		'presentation' => 'bool',
-	)
+	),
 );
 ?>
 

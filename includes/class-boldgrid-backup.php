@@ -174,6 +174,10 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archive-log.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archive-details.php';
 
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-wp-cron.php';
+
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-scheduler.php';
+
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
 
@@ -285,6 +289,9 @@ class Boldgrid_Backup {
 		$this->loader->add_filter( 'boldgrid_backup_file_in_dir', $plugin_admin_core->backup_dir, 'file_in_dir' );
 
 		$this->loader->add_filter( 'unzip_file_use_ziparchive', $plugin_admin_core->compressors, 'unzip_file_use_ziparchive' );
+
+		$this->loader->add_filter( 'cron_schedules', $plugin_admin_core->wp_cron, 'cron_schedules' );
+		$this->loader->add_action( 'boldgrid_backup_wp_cron_backup', $plugin_admin_core->wp_cron, 'backup' );
 
 		return;
 	}

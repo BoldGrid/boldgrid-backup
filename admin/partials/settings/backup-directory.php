@@ -30,13 +30,13 @@
 	?>
 </p>
 
-<table class='backup-directory'>
+<table class='backup-directory form-table'>
 	<tr>
-		<td><?php esc_html_e( 'Directory to store backup archives', 'boldgrid-backup' ); ?>:</td>
+		<th><?php esc_html_e( 'Directory to store backup archives', 'boldgrid-backup' ); ?>:</th>
 		<td><input id='backup-directory-path' type='text' size='40' name='backup_directory' value='<?php echo $settings['backup_directory']; ?>'></td>
 	</tr>
 	<tr id="move-backups" class="hidden">
-		<td><?php esc_html_e( 'If you change this directory, current backups will not show in the list. Would you like us to move the backups to the new directory?', 'boldgrid-backup' ); ?></td>
+		<th><?php esc_html_e( 'If you change this directory, current backups will not show in the list. Would you like us to move the backups to the new directory?', 'boldgrid-backup' ); ?></th>
 		<td><input type='checkbox' name='move-backups' checked /></td>
 	</tr>
 </table>

@@ -47,11 +47,13 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @see Boldgrid_Backup_Admin_Cron::delete_cron_entries().
 	 * @see Boldgrid_Backup_Admin_Cron::update_cron().
 	 *
-	 * @return bool Success.
+	 * @param  array $settings
+	 * @return bool  Success.
 	 */
-	public function add_cron_entry() {
-		// Get settings.
-		$settings = $this->core->settings->get_settings();
+	public function add_cron_entry( $settings = array() ) {
+		if( empty( $settings ) ) {
+			$settings = $this->core->settings->get_settings();
+		}
 
 		// Delete existing backup cron jobs.
 		$cron_status = $this->delete_cron_entries();

@@ -483,22 +483,56 @@ class Boldgrid_Backup_Admin_Settings {
 				$update_errors[] = __( 'The extractor you seleted is unavailable. Please select another.', 'boldgrid-backup' );
 			}
 
+			/*
+			 * Change the scheduler.
+			 *
+			 * If the scheduler is indeed changed, clear all prior backup
+			 * schedules.
+			 *
+			 * @since 1.5.1
+			 */
+			$original_scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : false;
+			$schedulers_available = $this->core->scheduler->get_available();
+			$scheduler_changed = ! empty( $_POST['scheduler'] ) && $original_scheduler !== $_POST['scheduler'];
+			if( $scheduler_changed && array_key_exists( $_POST['scheduler'], $schedulers_available ) ) {
+				$settings['scheduler'] = $_POST['scheduler'];
+
+				$this->core->scheduler->clear_all_schedules();
+			}
+
+			/*
+			 * Save WP Cron settings.
+			 *
+			 * @since 1.5.1
+			 */
+			if( 'wp-cron' === $settings['scheduler'] ) {
+				$this->core->wp_cron->clear_schedules();
+				$this->core->wp_cron->schedule( $settings['schedule'], $this->core->wp_cron->hooks['backup'] );
+			}
+
+
+			/*
+			 * Schedule cron jobs.
+			 *
+			 * If our scheduler is cron, then add the entries.
+			 *
+			 * @since 1.5.1
+			 */
+			if( 'cron' === $settings['scheduler'] ) {
+				$cron_updated = $this->core->cron->add_cron_entry( $settings );
+
+				if( ! $cron_updated ) {
+					$update_error = true;
+					$update_errors[] = esc_html__( 'An error occurred when modifying cron jobs.  Please try again.', 'boldgrid-backup' );
+				}
+			}
+
 			// If no errors, then save the settings.
 			if ( ! $update_error ) {
 				$settings['updated'] = time();
-
 				update_site_option( 'boldgrid_backup_settings', $settings );
-
 				$this->update_boldgrid_settings( $boldgrid_settings );
-
-				$cron_status = $this->core->cron->add_cron_entry();
 			}
-		}
-
-		// If delete cron failed, then show a notice.
-		if ( empty( $cron_status ) ) {
-			$update_error = true;
-			$update_errors[] = esc_html__( 'An error occurred when modifying cron jobs.  Please try again.', 'boldgrid-backup' );
 		}
 
 		// If there was no error, then show success notice.
