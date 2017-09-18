@@ -2275,6 +2275,8 @@ class Boldgrid_Backup_Admin_Core {
 		// Get the backup directory path.
 		$backup_directory = $this->backup_dir->get();
 
+		$possible_backup_dirs = $this->backup_dir->get_possible_dirs();
+
 		// Get the WordPress version.
 		global $wp_version;
 

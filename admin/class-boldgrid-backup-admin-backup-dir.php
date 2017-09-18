@@ -73,17 +73,13 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	 * @param  string $backup_dir
 	 * @return string
 	 */
-	public function create( $backup_dir = false ) {
+	public function create( $backup_dir ) {
 		$check_permissions = __( 'Please ensure your backup directory exists and has the proper read, write, and modify permissions.', 'boldgrid-backup' );
 
 		$cannot_create = __( 'Unable to create necessary file: %1$s<br />%2$s', 'boldgrid-backup' );
 		$cannot_write = __( 'Unable to write to necessary file: %1$s<br />%2$s', 'boldgrid-backup' );
 
-		if( ! $backup_dir ) {
-			$backup_dir = WP_CONTENT_DIR . DIRECTORY_SEPARATOR . 'boldgrid-backup' . DIRECTORY_SEPARATOR;
-		} else {
-			$backup_dir = Boldgrid_Backup_Admin_Utility::trailingslashit( $backup_dir );
-		}
+		$backup_dir = Boldgrid_Backup_Admin_Utility::trailingslashit( $backup_dir );
 
 		$htaccess_path = $backup_dir . '.htaccess';
 		$index_html_path = $backup_dir . 'index.html';
@@ -155,45 +151,59 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 			return $this->backup_directory;
 		}
 
+		$possible_dirs = $this->get_possible_dirs();
+
+		$settings = $this->core->settings->get_settings();
+		if( ! empty( $settings['backup_directory'] ) ) {
+			$parent_from_settings = dirname( $settings['backup_directory'] );
+			array_unshift( $possible_dirs, $parent_from_settings );
+		}
+
+		foreach( $possible_dirs as $possible_dir ) {
+			// Ensure /parent_directory exists.
+			if( ! $this->core->wp_filesystem->exists( $possible_dir ) ) {
+				continue;
+			}
+
+			// Create /parent_directory/boldgrid-backup.
+			$possible_dir .= DIRECTORY_SEPARATOR . 'boldgrid-backup';
+			if( ! $this->core->wp_filesystem->exists( $possible_dir ) ) {
+				$created = $this->core->wp_filesystem->mkdir( $possible_dir );
+				if( ! $created ) {
+					continue;
+				}
+			}
+
+			// Validate read/write/modify/ect. permissions of /parent_directory/boldgrid-backup.
+			$valid = $this->is_valid( $possible_dir );
+			if( ! $valid ) {
+				continue;
+			}
+
+			// Create necessary files, such as /parent_directory/boldgrid-backup/.htaccess
+			$created = $this->create( $possible_dir );
+			if( ! $created ) {
+				continue;
+			}
+
+			$backup_directory = $created;
+			$this->backup_directory = $backup_directory;
+			break;
+		}
+
+		if( empty( $backup_directory ) ) {
+			return false;
+		}
+
 		/*
 		 * If there is not a valid backup directory stored in the settings, then
 		 * we'll need to add / overwrite the value in the settings with a dir
 		 * that we create.
 		 */
-		$overwrite_settings = false;
-
-		$settings = $this->core->settings->get_settings();
-		if( ! empty( $settings['backup_directory'] ) ) {
-			$backup_directory = $settings['backup_directory'];
-		}
-
-		/*
-		 * Prior to version 1.5.1, the backup directory was outside of the doc
-		 * root. As of 1.5.1, if there is no backup directory set, or the one
-		 * set is empty, we'll create a new backup dir within the wp-content dir.
-		 */
-		$dirlist = $this->core->wp_filesystem->dirlist( $backup_directory );
-		if( empty( $backup_directory ) || empty( $dirlist ) ) {
-			$dir_created = $this->create();
-
-			if( $dir_created ) {
-				$overwrite_settings = true;
-				$backup_directory = $dir_created;
-			}
-		}
-
-		$backup_directory = Boldgrid_Backup_Admin_Utility::trailingslashit( $backup_directory );
-
-		if( ! $this->is_valid( $backup_directory ) ) {
-			return false;
-		}
-
-		if( $overwrite_settings ) {
+		if( empty( $settings['backup_directory'] ) || $settings['backup_directory'] !== $backup_directory ) {
 			$settings['backup_directory'] = $backup_directory;
 			update_site_option( 'boldgrid_backup_settings', $settings );
 		}
-
-		$this->backup_directory = $backup_directory;
 
 		/*
 		 * Even in a Windows environment, wp_filesystem->dirlist retrieves paths
@@ -204,6 +214,44 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 		$this->without_abspath = str_replace( '\\', '/', $this->without_abspath );
 
 		return $this->backup_directory;
+	}
+
+	/**
+	 * Get an array of possible backup directories.
+	 *
+	 * @since  1.5.1
+	 * @return array
+	 */
+	public function get_possible_dirs() {
+		$dirs = array();
+
+		// Standard value, the user's home directory.
+		$dirs[] = $this->core->config->get_home_directory();
+
+		if( $this->core->test->is_windows() ) {
+			// C:\Users\user\AppData\Local
+			$dirs[] = $this->core->config->get_home_directory() . DIRECTORY_SEPARATOR . 'AppData' . DIRECTORY_SEPARATOR . 'Local';
+
+			if( ! empty( $_SERVER['DOCUMENT_ROOT'] ) ) {
+				/*
+				 * App_Data (Windows / Plesk).
+				 *
+				 * The App_Data folder is used as a data storage for the web
+				 * application. It can store files such as .mdf, .mdb, and XML. It
+				 * manages all of your application's data centrally. It is
+				 * accessible from anywhere in your web application. The real
+				 * advantage of the App_Data folder is that, any file you place
+				 * there won't be downloadable.
+				 */
+				$app_data = $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'App_Data';
+				$dirs[] = str_replace( '\\\\', '\\', $app_data );
+			}
+		}
+
+		// As a last resort, we will store backups in the /wp-content folder.
+		$dirs[] = WP_CONTENT_DIR;
+
+		return $dirs;
 	}
 
 	/**

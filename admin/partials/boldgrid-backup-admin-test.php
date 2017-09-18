@@ -16,6 +16,7 @@ $lang = array(
 	'untested' => __( 'untested', 'boldgrid-backup' ),
 	'PASS' => __( 'PASS', 'boldgrid-backup' ),
 	'FAIL' => __( 'FAIL', 'boldgrid-backup' ),
+	'not_set' => __( 'not set', 'boldgrid-backup' ),
 	'before_test_compress' => __( 'Before any compressors are tested, please be sure your backup directory is created and has proper permissions set.', 'boldgrid-backup' ),
 	'ensure_dir_perms' => __( 'Please be sure that your backup directory exists. If it does, also ensure it has read, write, and modify permissions.', 'boldgrid-backup' ),
 );
@@ -37,8 +38,7 @@ $allowed_tags = array(
 	'br' => array(),
 );
 
-$backup_dir = $this->backup_dir->get();
-$backup_dir_perms = $this->test->extensive_dir_test( $backup_dir );
+$backup_dir_perms = $this->test->extensive_dir_test( $backup_directory );
 
 $php_zip = new Boldgrid_Backup_Admin_Compressor_Php_Zip( $this );
 
@@ -90,45 +90,53 @@ $tests[] = array(
 );
 
 $tests[] = array(
+	'k' => __( 'Possible backup directory parents', 'boldgrid-backup' ),
+	'v' => implode( '<br />', $possible_backup_dirs ),
+);
+
+$tests[] = array(
 	'k' => __( 'Backup directory', 'boldgrid-backup' ),
-	'v' => ! empty( $backup_directory ) ? $backup_directory : $backup_dir,
+	'v' => ! empty( $backup_directory ) ? $backup_directory : sprintf( $error_span, $lang['not_set'], '' ),
 );
 
-$tests[] = array(
-	'k' => __( 'Backup directory without ABSPATH', 'boldgrid-backup' ),
-	'v' => $this->backup_dir->without_abspath,
-);
-
-$tests[] = array(
-	'k' => __( 'Backup directory exists?', 'boldgrid-backup' ),
-	'v' => $backup_dir_perms['exists'] ? $lang['yes'] : sprintf( $error_span, $lang['no'], $lang['ensure_dir_perms'] ),
-);
-
-if( $backup_dir_perms['exists'] ) {
+// As set of tests only to run if a backup directory is found.
+if( ! empty( $backup_directory ) ) {
 	$tests[] = array(
-		'k' => __( 'Backup directory has read permission?', 'boldgrid-backup' ),
-		'v' => $backup_dir_perms['read'] ? $lang['yes'] : sprintf( $error_span, $lang['no'], $lang['ensure_dir_perms'] ),
+		'k' => __( 'Backup directory without ABSPATH', 'boldgrid-backup' ),
+		'v' => $this->backup_dir->without_abspath,
 	);
 
 	$tests[] = array(
-		'k' => __( 'Directory listing of backup directory can be fetched?', 'boldgrid-backup' ),
-		'v' => $backup_dir_perms['dirlist'] ? $lang['yes'] : sprintf( $error_span, $lang['no'], $lang['dir_of_dir'] ),
+		'k' => __( 'Backup directory exists?', 'boldgrid-backup' ),
+		'v' => $backup_dir_perms['exists'] ? $lang['yes'] : sprintf( $error_span, $lang['no'], $lang['ensure_dir_perms'] ),
 	);
 
-	$tests[] = array(
-		'k' => __( 'Backup directory has write permission?', 'boldgrid-backup' ),
-		'v' => $backup_dir_perms['write'] ? $lang['yes'] : sprintf( $error_span, $lang['no'], $lang['ensure_dir_perms'] ),
-	);
+	if( $backup_dir_perms['exists'] ) {
+		$tests[] = array(
+			'k' => __( 'Backup directory has read permission?', 'boldgrid-backup' ),
+			'v' => $backup_dir_perms['read'] ? $lang['yes'] : sprintf( $error_span, $lang['no'], $lang['ensure_dir_perms'] ),
+		);
 
-	$tests[] = array(
-		'k' => __( 'Backup directory has modify permission?', 'boldgrid-backup' ),
-		'v' => $backup_dir_perms['rename'] ? $lang['yes'] : sprintf( $error_span, $lang['no'], $lang['ensure_dir_perms'] ),
-	);
+		$tests[] = array(
+			'k' => __( 'Directory listing of backup directory can be fetched?', 'boldgrid-backup' ),
+			'v' => $backup_dir_perms['dirlist'] ? $lang['yes'] : sprintf( $error_span, $lang['no'], $lang['dir_of_dir'] ),
+		);
 
-	$tests[] = array(
-		'k' => __( 'Backup directory has delete permission?', 'boldgrid-backup' ),
-		'v' => $backup_dir_perms['delete'] ? $lang['yes'] : sprintf( $error_span, $lang['no'], $lang['ensure_dir_perms'] ),
-	);
+		$tests[] = array(
+			'k' => __( 'Backup directory has write permission?', 'boldgrid-backup' ),
+			'v' => $backup_dir_perms['write'] ? $lang['yes'] : sprintf( $error_span, $lang['no'], $lang['ensure_dir_perms'] ),
+		);
+
+		$tests[] = array(
+			'k' => __( 'Backup directory has modify permission?', 'boldgrid-backup' ),
+			'v' => $backup_dir_perms['rename'] ? $lang['yes'] : sprintf( $error_span, $lang['no'], $lang['ensure_dir_perms'] ),
+		);
+
+		$tests[] = array(
+			'k' => __( 'Backup directory has delete permission?', 'boldgrid-backup' ),
+			'v' => $backup_dir_perms['delete'] ? $lang['yes'] : sprintf( $error_span, $lang['no'], $lang['ensure_dir_perms'] ),
+		);
+	}
 }
 
 $tests[] = array(

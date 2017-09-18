@@ -211,9 +211,7 @@ class Boldgrid_Backup_Admin_Config {
 			return $this->home_dir;
 		}
 
-		if( $this->core->test->is_iis() ) {
-			$home_dir = dirname( $_SERVER['DOCUMENT_ROOT'] );
-		} elseif( $this->core->test->is_windows() && $this->core->test->is_plesk() ) {
+		if( $this->core->test->is_windows() && $this->core->test->is_plesk() ) {
 			/*
 			 * Plesk's File Manager labels C:\Inetpub\vhosts\domain.com as the
 			 * "Home directory". If we find we cannot read that directory, then
