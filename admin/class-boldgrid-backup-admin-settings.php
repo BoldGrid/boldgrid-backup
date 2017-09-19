@@ -194,13 +194,11 @@ class Boldgrid_Backup_Admin_Settings {
 	 *
 	 * @since 1.3.2
 	 *
-	 * @global object $wp_filesystem
-	 *
 	 * @param string $old_dir
 	 * @param string $new_dir
 	 */
 	private function move_backups( $old_dir, $new_dir ) {
-		global $wp_filesystem;
+		$any_failed = false;
 
 		// Don't assume paths end in '/'. First remove forward slashes at the end, then add back.
 		$old_dir = rtrim( $old_dir, '/' ) . '/';
@@ -215,8 +213,14 @@ class Boldgrid_Backup_Admin_Settings {
 			$source = $archive['filepath'];
 			$destination = $new_dir . $archive['filename'];
 
-			$success = $wp_filesystem->move( $source, $destination );
+			$success = @$this->core->wp_filesystem->move( $source, $destination );
+
+			if( ! $success ) {
+				$any_failed = true;
+			}
 		}
+
+		return $any_failed;
 	}
 
 	/**
@@ -412,7 +416,7 @@ class Boldgrid_Backup_Admin_Settings {
 
 			// Get the current backup directory path.
 			$backup_dir_changed = false;
-			$original_backup_directory = $this->core->backup_dir->get();
+			$original_backup_directory = ! empty( $settings['backup_directory'] ) ? $settings['backup_directory'] : false;
 
 			/*
 			 * Create the backup directory.
@@ -422,12 +426,23 @@ class Boldgrid_Backup_Admin_Settings {
 			 * wp-content/boldgrid-backup.
 			 */
 			if( empty( $_POST['backup_directory'] ) ) {
-				$backup_directory = $this->core->backup_dir->create();
+				// The get method validates and creates the backup directory.
+				$backup_directory = $this->core->backup_dir->get();
+
 				$backup_dir_changed = true;
 			} elseif( trim( $_POST['backup_directory'] ) !== $original_backup_directory ) {
 				$backup_directory = trim( $_POST['backup_directory'] );
 				$backup_directory = str_replace( '\\\\', '\\', $backup_directory );
-				$backup_directory = $this->core->backup_dir->create( $backup_directory );
+
+				$valid = $this->core->backup_dir->is_valid( $backup_directory );
+				if( ! $valid ) {
+					$backup_directory = false;
+				}
+
+				if( $valid ) {
+					$backup_directory = $this->core->backup_dir->create( $backup_directory );
+				}
+
 				$backup_dir_changed = true;
 			}
 
@@ -438,22 +453,14 @@ class Boldgrid_Backup_Admin_Settings {
 				$update_errors = array_merge( $update_errors, $this->core->backup_dir->errors );
 			}
 
-			// If we are changing our backup directory, valid it.
-			if( $backup_dir_changed ) {
-				$is_valid = $this->core->backup_dir->is_valid( $backup_directory );
-
-				if( $is_valid ) {
-					$settings['backup_directory'] = $backup_directory;
-				} else {
-					$update_error = true;
-					$backup_dir_changed = false;
-					$update_errors = array_merge( $update_errors, $this->core->backup_dir->errors );
-				}
-			}
-
 			// Move backups to the new directory.
 			if( $backup_dir_changed && isset( $_POST['move-backups'] ) && 'on' === $_POST['move-backups'] ) {
-				$this->move_backups( $original_backup_directory, $backup_directory );
+				$backups_moved = $this->move_backups( $original_backup_directory, $backup_directory );
+
+				if( ! $backups_moved ) {
+					$update_error = true;
+					$update_errors[] = printf( __( 'Unable to move backups from %1$s to %2$s.', 'boldgrid-backup' ), $original_backup_directory, $backup_directory );
+				}
 			}
 
 			/*

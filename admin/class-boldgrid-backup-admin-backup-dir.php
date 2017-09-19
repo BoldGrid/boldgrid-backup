@@ -294,15 +294,15 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 		}
 
 		if( ! $perms['rename'] ) {
-			$this->errors[] = sprintf( __( 'Backup Directory does not permission to rename files: %1$s', 'boldgrid-backup' ), $backup_dir );
+			$this->errors[] = sprintf( __( 'Backup Directory does not have permission to rename files: %1$s', 'boldgrid-backup' ), $backup_dir );
 		}
 
 		if( ! $perms['delete'] ) {
-			$this->errors[] = sprintf( __( 'Backup Directory does not permission to delete files: %1$s', 'boldgrid-backup' ), $backup_dir );
+			$this->errors[] = sprintf( __( 'Backup Directory does not have permission to delete files: %1$s', 'boldgrid-backup' ), $backup_dir );
 		}
 
 		if( ! $perms['dirlist'] ) {
-			$this->errors[] = sprintf( __( 'Backup Directory does not permission to retrieve directory listing: %1$s', 'boldgrid-backup' ), $backup_dir );
+			$this->errors[] = sprintf( __( 'Backup Directory does not have permission to retrieve directory listing: %1$s', 'boldgrid-backup' ), $backup_dir );
 		}
 
 		return $perms['exists'] && $perms['read'] && $perms['write'] && $perms['rename'] && $perms['delete'] && $perms['dirlist'];

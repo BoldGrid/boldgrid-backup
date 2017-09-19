@@ -823,6 +823,15 @@ class Boldgrid_Backup_Admin_Utility {
 	 * @return string
 	 */
 	public static function trailingslashit( $string ) {
+		switch( DIRECTORY_SEPARATOR ) {
+			case '/':
+				$string = str_replace( '\\', '/', $string );
+				break;
+			case '\\':
+				$string = str_replace( '/', '\\', $string );
+				break;
+		}
+
 		return untrailingslashit( $string ) . DIRECTORY_SEPARATOR;
 	}
 }

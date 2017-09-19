@@ -178,6 +178,8 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-scheduler.php';
 
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-home-dir.php';
+
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
 

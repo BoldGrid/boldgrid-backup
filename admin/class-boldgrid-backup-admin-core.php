@@ -210,6 +210,14 @@ class Boldgrid_Backup_Admin_Core {
 	private $backup_identifier = null;
 
 	/**
+	 * An instance of the Boldgrid Backup Admin Home Dir class.
+	 *
+	 * @since 1.5.1
+	 * @var   Boldgrid_Backup_Admin_Home_Dir object.
+	 */
+	public $home_dir;
+
+	/**
 	 * The scheduler class object.
 	 *
 	 * @since  1.5.1
@@ -263,6 +271,8 @@ class Boldgrid_Backup_Admin_Core {
 		$this->filelist = new Boldgrid_Backup_Admin_Filelist();
 
 		$this->backup_dir = new Boldgrid_Backup_Admin_Backup_Dir( $this );
+
+		$this->home_dir = new Boldgrid_Backup_Admin_Home_Dir( $this );
 
 		$this->compressors = new Boldgrid_Backup_Admin_Compressors( $this );
 

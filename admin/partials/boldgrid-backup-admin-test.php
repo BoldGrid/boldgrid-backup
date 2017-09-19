@@ -229,6 +229,11 @@ if ( $is_functional ) {
 	);
 
 	$tests[] = array(
+		'k' => __( 'Directory used to calculate disk space', __( 'boldgrid-backup') ),
+		'v' => $this->home_dir->get_for_disk(),
+	);
+
+	$tests[] = array(
 		'k' => __( 'Disk total space:', 'boldgrid-backup' ),
 		'v' => Boldgrid_Backup_Admin_Utility::bytes_to_human( $disk_space[0] ),
 	);
