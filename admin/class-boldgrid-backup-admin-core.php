@@ -1972,7 +1972,7 @@ class Boldgrid_Backup_Admin_Core {
 		$info['restore_ok'] = $restore_ok;
 
 		// Check backup directory.
-		$info['backup_directory_set'] = $this->settings->set_backup_directory();
+		$info['backup_directory_set'] = $this->backup_dir->get();
 
 		// Return info array.
 		return $info;
@@ -2094,6 +2094,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// If a restoration operation is requested, then restore from a backup archive now.
 		if ( ! empty( $_POST['restore_now'] ) ) {
+
 			printf(
 				'<div class="%1$s"><p>%2$s</p></div>',
 				'notice notice-info restoration-in-progress',
@@ -2387,8 +2388,12 @@ class Boldgrid_Backup_Admin_Core {
 	 * Show an admin notice on the WordPress Updates page.
 	 *
 	 * @since 1.0
+	 *
+	 * @global string $pagenow
 	 */
 	public function backup_notice() {
+		global $pagenow;
+
 		// Get pending rollback information.
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
 

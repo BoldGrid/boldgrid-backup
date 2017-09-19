@@ -47,7 +47,7 @@ $download_button = sprintf(
 );
 
 $restore_form = sprintf(
-	'<form action="%1$s" class="restore-now-form method="POST">
+	'<form action="%1$s" class="restore-now-form" method="POST">
 		<input type="hidden" name="restore_now" value="1" />
 		<input type="hidden" name="archive_key" value="%2$s" />
 		<input type="hidden" name="archive_filename" value="%3$s" />
