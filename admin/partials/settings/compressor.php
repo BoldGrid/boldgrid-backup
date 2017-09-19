@@ -38,9 +38,9 @@ $extractor_php_zip_option = ! in_array( 'php_zip', $available_compressors ) ? ''
 	?>
 </p>
 
-<table>
+<table class="form-table">
 	<tr>
-		<td><?php echo __( 'Compressor', 'boldgrid-backup' );?>:</td>
+		<th><?php echo __( 'Compressor', 'boldgrid-backup' );?>:</th>
 		<td>
 			<select name="compressor">
 				<option value='pcl_zip' <?php echo $pcl_zip_selected; ?> >PclZip</option>
@@ -49,7 +49,7 @@ $extractor_php_zip_option = ! in_array( 'php_zip', $available_compressors ) ? ''
 		</td>
 	</tr>
 	<tr>
-		<td><?php echo __( 'Extractor', 'boldgrid-backup' ) ?>:</td>
+		<th><?php echo __( 'Extractor', 'boldgrid-backup' ) ?>:</th>
 		<td>
 			<select name="extractor">
 				<option value='pcl_zip' <?php echo $extractor_pcl_zip_selected; ?> >PclZip</option>

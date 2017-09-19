@@ -193,13 +193,23 @@ if ( empty( $settings ) ) {
 		 	</tr>
 		</table>
 
-		<?php include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/notifications.php'; ?>
-
-		<?php include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/backup-directory.php'; ?>
-
-		<?php include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/compressor.php'; ?>
-
 		<?php
+
+			include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/notifications.php';
+
+			include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/backup-directory.php';
+
+			/**
+			 * Allow the display of compressor options.
+			 *
+			 * @since 1.5.1
+			 */
+			$show_compressor_options = apply_filters( 'boldgrid_backup_show_compressor_options', false );
+
+			if( $show_compressor_options ) {
+				include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/compressor.php';
+			}
+
 		// This is a temporary section.
 		$is_premium = get_option( 'boldgrid_backup_is_premium', 'false' );
 		$premium_checked = ( 'true' === $is_premium ? 'checked' : '' );
