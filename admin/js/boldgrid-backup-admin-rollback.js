@@ -39,7 +39,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			.on( 'click', self.cancelRollback );
 
 		// On click action for restore buttons.
-		$( '.action-restore' )
+		$( '.restore-now-form' )
 			.off( 'click' )
 			.on( 'click', self.restoreArchiveConfirm );
 	} );
