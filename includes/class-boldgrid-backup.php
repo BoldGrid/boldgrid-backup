@@ -180,6 +180,8 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-home-dir.php';
 
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-auto-rollback.php';
+
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
 
@@ -294,6 +296,7 @@ class Boldgrid_Backup {
 
 		$this->loader->add_filter( 'cron_schedules', $plugin_admin_core->wp_cron, 'cron_schedules' );
 		$this->loader->add_action( 'boldgrid_backup_wp_cron_backup', $plugin_admin_core->wp_cron, 'backup' );
+		$this->loader->add_action( 'boldgrid_backup_wp_cron_restore', $plugin_admin_core->wp_cron, 'restore' );
 
 		return;
 	}

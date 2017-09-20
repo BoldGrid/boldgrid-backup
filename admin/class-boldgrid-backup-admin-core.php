@@ -18,6 +18,16 @@
  * @since 1.0
  */
 class Boldgrid_Backup_Admin_Core {
+
+	/**
+	 * Auto Rollback class.
+	 *
+	 * @since  1.5.2
+	 * @access public
+	 * @var    Boldgrid_Backup_Admin_Auto_Rollback
+	 */
+	public $auto_rollback;
+
 	/**
 	 * The settings class object.
 	 *
@@ -283,6 +293,8 @@ class Boldgrid_Backup_Admin_Core {
 		$this->wp_cron = new Boldgrid_Backup_Admin_WP_Cron( $this );
 
 		$this->scheduler = new Boldgrid_Backup_Admin_Scheduler( $this );
+
+		$this->auto_rollback = new Boldgrid_Backup_Admin_Auto_Rollback( $this );
 
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
@@ -1983,11 +1995,14 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @since 1.0
 	 *
-	 * @see Boldgrid_Backup_Admin_Upload::upload_archive_file().
+	 * @see    Boldgrid_Backup_Admin_Upload::upload_archive_file().
+	 * @global string $pagenow
 	 *
 	 * @return null
 	 */
 	public function page_archives() {
+		global $pagenow;
+
 		add_thickbox();
 
 		// Run the functionality tests.
@@ -2862,7 +2877,7 @@ class Boldgrid_Backup_Admin_Core {
 	 */
 	public function upgrader_process_complete() {
 		// Add/update restoration cron job.
-		$this->cron->add_restore_cron();
+		$this->auto_rollback->add_cron();
 
 		// If not on an admin page, then abort.
 		if ( ! is_admin() ) {
@@ -2881,8 +2896,6 @@ class Boldgrid_Backup_Admin_Core {
 		$iso_time = date( 'c', $deadline );
 
 		// Print a hidden div with the time, so that JavaScript can read it.
-?>
-<div class='hidden' id='rollback-deadline'><?php echo $iso_time; ?></div>
-<?php
+		printf( '<div class="hidden" id="rollback-deadline">%1$s</div>', $iso_time );
 	}
 }

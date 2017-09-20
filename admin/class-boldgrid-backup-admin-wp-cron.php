@@ -80,7 +80,47 @@ class Boldgrid_Backup_Admin_WP_Cron {
 				'interval' => 7 * DAY_IN_SECONDS,
 				'display' => __( 'Weekly', 'boldgrid-backup' ),
 			),
+			/*
+			 * It does not appear that crons can be added for a one time event.
+			 * Add a "never" schedule. Let someone in 1,000 years have the fun
+			 * of their site being restored out of nowhere wha ha ha!
+			 */
+			'never' => array(
+				'interval' => 1000 * YEAR_IN_SECONDS,
+				'display' => __( 'Never', 'boldgrid-backup' ),
+			),
 		);
+	}
+
+	/**
+	 * Add cron to perform auto rollback.
+	 *
+	 * @since 1.5.1
+	 */
+	public function add_restore_cron() {
+		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
+
+		// Get the archive to restore.
+		$archives = $this->core->get_archive_list();
+		$archive_key = 0;
+		$archive = $archives[ $archive_key ];
+		$archive_filename = $archive['filename'];
+
+		// Remove existing restore cron jobs.
+		$this->clear_schedules( array( $this->hooks['restore'] ) );
+
+		// Get the unix time for 5 minutes from now.
+		$time_5_minutes_later = strtotime( '+5 MINUTES' );
+
+		$event_added = wp_schedule_event( $time_5_minutes_later, 'never', $this->hooks['restore'] );
+
+		// If cron job was added, then update the boldgrid_backup_pending_rollback option with time.
+		if ( false !== $event_added ) {
+			$pending_rollback['deadline'] = $time_5_minutes_later;
+			update_site_option( 'boldgrid_backup_pending_rollback', $pending_rollback );
+		}
+
+		return;
 	}
 
 	/**
@@ -141,6 +181,40 @@ class Boldgrid_Backup_Admin_WP_Cron {
 		}
 
 		return $schedule_time;
+	}
+
+	/**
+	 * Restore via wp cron.
+	 *
+	 * @since 1.5.2
+	 */
+	public function restore() {
+		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
+		if ( empty( $pending_rollback ) ) {
+			$this->clear_schedules( array( $this->hooks['restore'] ) );
+			return false;
+		}
+
+		/*
+		 * If the deadline has elapsed more than 2 minutes ago, then abort.
+		 *
+		 * The boldgrid-backup-cron.php file has this check. As wp cron is not
+		 * as precise, we will not check.
+		 */
+
+		/*
+		 * Set GET variables.
+		 *
+		 * The archive_key and the archive_filename must match.
+		 */
+		$_POST['restore_now'] = 1;
+		$_POST['archive_key'] = 0;
+		$_POST['archive_filename'] = basename( $pending_rollback['filepath'] );
+
+		$archive_info = $this->core->restore_archive_file();
+
+		// Remove existing restore cron jobs.
+		$this->clear_schedules( array( $this->hooks['restore'] ) );
 	}
 
 	/**

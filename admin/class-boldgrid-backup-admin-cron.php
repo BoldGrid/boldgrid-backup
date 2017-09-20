@@ -126,35 +126,8 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @return null
 	 */
 	public function add_restore_cron() {
-		// Get settings.
-		$settings = $this->core->settings->get_settings();
-
-		// If auto-rollback is not enabled, then abort.
-		if ( 1 !== $settings['auto_rollback'] ) {
-			$this->core->settings->delete_rollback_option();
-
-			return;
-		}
-
-		// If a backup was not made prior to an update (from an update page), then abort.
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
-
-		if ( empty( $pending_rollback ) ) {
-			return;
-		}
-
-		// Get archive list.
 		$archives = $this->core->get_archive_list();
-
-		// Get the archive count.
-		$archive_count = count( $archives );
-
-		// If there are no archives, then abort.
-		if ( $archive_count <= 0 ) {
-			$this->core->settings->delete_rollback_option();
-
-			return;
-		}
 
 		// Use the first key to get info on the most recent archive.
 		$archive_key = 0;

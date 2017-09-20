@@ -468,13 +468,15 @@ class Boldgrid_Backup_Admin_Settings {
 			 *
 			 * @since 1.5.1
 			 */
-			$available_compressors = $this->core->compressors->get_available();
-			$selected_compressor = $_POST['compressor'];
-			if( in_array( $selected_compressor, $available_compressors, true ) ) {
-				$settings['compressor'] = $selected_compressor;
-			} else {
-				$update_error = true;
-				$update_errors[] = __( 'The compressor you seleted is unavailable. Please select another.', 'boldgrid-backup' );
+			if( ! empty( $_POST['compressor'] ) ) {
+				$available_compressors = $this->core->compressors->get_available();
+				$selected_compressor = $_POST['compressor'];
+				if( in_array( $selected_compressor, $available_compressors, true ) ) {
+					$settings['compressor'] = $selected_compressor;
+				} else {
+					$update_error = true;
+					$update_errors[] = __( 'The compressor you seleted is unavailable. Please select another.', 'boldgrid-backup' );
+				}
 			}
 
 			/*
@@ -482,12 +484,14 @@ class Boldgrid_Backup_Admin_Settings {
 			 *
 			 * @since 1.5.1
 			 */
-			$selected_extractor = $_POST['extractor'];
-			if( in_array( $selected_extractor, $available_compressors, true ) ) {
-				$settings['extractor'] = $selected_extractor;
-			} else {
-				$update_error = true;
-				$update_errors[] = __( 'The extractor you seleted is unavailable. Please select another.', 'boldgrid-backup' );
+			if( ! empty( $_POST['extractor'] ) ) {
+				$selected_extractor = $_POST['extractor'];
+				if( in_array( $selected_extractor, $available_compressors, true ) ) {
+					$settings['extractor'] = $selected_extractor;
+				} else {
+					$update_error = true;
+					$update_errors[] = __( 'The extractor you seleted is unavailable. Please select another.', 'boldgrid-backup' );
+				}
 			}
 
 			/*
