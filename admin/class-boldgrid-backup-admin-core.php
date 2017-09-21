@@ -137,6 +137,15 @@ class Boldgrid_Backup_Admin_Core {
 	public $archive_details;
 
 	/**
+	 * An instance of the Archive Fail class.
+	 *
+	 * @since  1.5.2
+	 * @access public
+	 * @var    Boldgrid_Backup_Admin_Archive_Fail
+	 */
+	public $archive_fail;
+
+	/**
 	 * Available execution functions.
 	 *
 	 * @since 1.0
@@ -149,10 +158,10 @@ class Boldgrid_Backup_Admin_Core {
 	 * Database backup file path.
 	 *
 	 * @since 1.0
-	 * @access private
+	 * @access public
 	 * @var string
 	 */
-	private $db_dump_filepath = '';
+	public $db_dump_filepath = '';
 
 	/**
 	 * An instance of the Boldgrid Backup Admin Filelist Class.
@@ -289,6 +298,8 @@ class Boldgrid_Backup_Admin_Core {
 		$this->archive_log = new Boldgrid_Backup_Admin_Archive_Log( $this );
 
 		$this->archive_details = new Boldgrid_Backup_Admin_Archive_Details( $this );
+
+		$this->archive_fail = new Boldgrid_Backup_Admin_Archive_Fail( $this );
 
 		$this->wp_cron = new Boldgrid_Backup_Admin_WP_Cron( $this );
 
@@ -1066,6 +1077,14 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return array An array of archive file information.
 	 */
 	public function archive_files( $save = false, $dryrun = false ) {
+
+		/**
+		 * Actions to take before any archiving begins.
+		 *
+		 * @since 1.5.2
+		 */
+		do_action( 'boldgrid_backup_archive_files_init' );
+
 		$email_templates = include BOLDGRID_BACKUP_PATH . '/includes/config/email-templates.php';
 
 		// Check if functional.

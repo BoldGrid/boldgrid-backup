@@ -266,11 +266,34 @@
 				.addClass( 'is-active' )
 				.css( 'display', 'inline-block' );
 
-		// Create an error callback function.
-		errorCallback = function() {
+		/**
+		 * @summary backupNow error callback.
+		 *
+		 * @since 1.0
+		 *
+		 * @param object jqXHR
+		 * @param string textStatus
+		 * @param string errorThrown
+		 */
+		errorCallback = function( jqXHR, textStatus, errorThrown ) {
+			var data,
+				errorText = localizeScriptData.errorText;
+
+			/*
+			 * As of 1.5.2, we are hooking into the shutdown and checking for
+			 * errors. If a fatal error is found, we will return that, rather
+			 * than the generic errorText defined above.
+			 */
+			if( jqXHR.responseText !== undefined && '{' === jqXHR.responseText.charAt( 0 ) ) {
+				data = JSON.parse( jqXHR.responseText );
+
+				if( data !== undefined && data.data !== undefined && data.data.errorText !== undefined ) {
+					errorText = data.data.errorText;
+				}
+			}
+
 			// Show error message.
-			markup = '<div class="notice notice-error"><p>' + localizeScriptData.errorText +
-				'</p></div>';
+			markup = '<div class="notice notice-error"><p>' + errorText + '</p></div>';
 
 			$backupSiteResults.html( markup );
 		};
