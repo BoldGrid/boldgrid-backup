@@ -318,10 +318,23 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @since 1.2.2
 	 *
+	 * @param  bool  $exclude_not_exists Remove files that don't exist.
 	 * @return array
 	 */
-	public function get_filelist_filter() {
-		return $this->filelist_filter;
+	public function get_filelist_filter( $exclude_not_exists = false ) {
+		$filelist_filter = $this->filelist_filter;
+
+		if( ! $exclude_not_exists ) {
+			return $filelist_filter;
+		}
+
+		foreach( $filelist_filter as $key => $filename ) {
+			if( ! $this->wp_filesystem->exists( ABSPATH . $filename ) ) {
+				unset( $filelist_filter[$key] );
+			}
+		}
+
+		return $filelist_filter;
 	}
 
 	/**
