@@ -124,7 +124,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 		 * adding instead only folders and top level files to the archive, the
 		 * archiving completes much faster.
 		 */
-		$filelist = $this->core->get_filelist_filter();
+		$filelist = $this->core->get_filelist_filter( true );
 		$this->wp_filesystem->chdir( ABSPATH );
 
 		$status = $archive->add( $filelist,
