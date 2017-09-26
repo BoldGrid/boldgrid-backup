@@ -16,6 +16,7 @@ $datas = array(
 	array(
 		'key' => 'filepath',
 		'title' => __( 'File path', 'boldgrid-backup' ),
+		'hidden_input' => true,
 	),
 	array(
 		'key' => 'filesize',
@@ -50,6 +51,9 @@ $datas = array(
 		'presentation' => 'bool',
 	),
 );
+
+wp_nonce_field( 'boldgrid_backup_remote_storage_upload' );
+
 ?>
 
 <img src="//repo.boldgrid.com/assets/banner-backup-772x250.png" id="header_banner" />
@@ -78,6 +82,12 @@ foreach( $datas as $data ) {
 		$value .= $data['suffix'];
 	}
 
+	if( ! empty( $data['hidden_input' ] ) ) {
+		$value .= sprintf( '<input type="hidden" id="%1$s" value="%2$s" />', $data['key'], $archive[ $data['key'] ] );
+	}
+
 	printf( $attribute, $data['title'], $value );
 }
+
+include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/remote-storage.php';
 ?>

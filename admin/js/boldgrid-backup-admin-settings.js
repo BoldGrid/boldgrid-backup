@@ -15,7 +15,13 @@
 
 	// General Variables.
 	var self = {},
-		$scheduleDow, $noBackupDays, $freeDowLimit, $useSparingly, $backupDir, $moveBackups;
+		$scheduleDow,
+		$noBackupDays,
+		$freeDowLimit,
+		$useSparingly,
+		$backupDir,
+		tb_unload_count,
+		$moveBackups;
 
 	/**
 	 * Directory to store backups.
@@ -45,11 +51,82 @@
 	$moveBackups = $( '#move-backups' );
 
 	/**
+	 * @summary Number of times tb_unload has been triggered.
+	 *
+	 * When a thickbox is closed, tb_unload is called twice. We need to keep
+	 * track of how many times it's been called so that we know to only run our
+	 * callback once.
+	 *
+	 * @since 1.5.2
+	 */
+	tb_unload_count = 0;
+
+	/**
 	 * Message describing resource usage.
 	 *
 	 * @since 1.3.1
 	 */
 	$useSparingly = $( '#use-sparingly' );
+
+	/**
+	 * @summary Action to take when a remote storage provider has been clicked.
+	 *
+	 * Primary function is to flag the clicked provider with the active class.
+	 *
+	 * @since 1.5.2
+	 */
+	self.on_click_provider = function() {
+		var $a = $(this),
+			$tr = $a.closest( 'tr' ),
+			$table = $a.closest( 'table' );
+
+		$table.find( 'tr' ).removeClass( 'active' );
+
+		$tr.addClass( 'active' );
+	}
+
+	/**
+	 * @summary Action to take when the thickbox is closed.
+	 *
+	 * @since 1.5.2
+	 */
+	self.on_tb_unload = function() {
+		tb_unload_count++;
+
+		// Only take action on the odd occurences of tb_unload.
+		if( 0 === tb_unload_count % 2 ) {
+			return;
+		}
+
+		self.refresh_storage_configuration();
+	}
+
+	/**
+	 * @summary Refresh remote storage provider summary.
+	 *
+	 * For example, if Amazon S3 was unconfigured, an applicable message will
+	 * show. After being configured, the "unconfigured" message needs to be
+	 * updated.
+	 *
+	 * @since 1.5.2
+	 */
+	self.refresh_storage_configuration = function() {
+		var $tr = $( '#storage_locations tr.active' ),
+			$td_configure = $tr.find( 'td.configure' ),
+			$nonce = $( '#_wpnonce' ),
+			data = {
+				'action' : 'boldgrid_backup_is_setup_' + $tr.attr( 'data-key' ),
+				'security' : $nonce.val(),
+			},
+			$new_tr;
+
+		$td_configure.html( '<span class="spinner inline"></span>' );
+
+		$.post( ajaxurl, data, function( response ) {
+			$new_tr = $( response.data ).addClass( 'active' );
+			$tr.replaceWith( $new_tr );
+		});
+	}
 
 	/**
 	 * @summary Check if any days of the week selected.
@@ -166,6 +243,10 @@
 		 */
 		self.toggleTimezone();
 		$( '#scheduler' ).on( 'change', self.toggleTimezone );
+
+		$( window ).on( 'tb_unload', self.on_tb_unload );
+
+		$( '#storage_locations .thickbox' ).on( 'click', self.on_click_provider );
 	} );
 
 } )( jQuery );

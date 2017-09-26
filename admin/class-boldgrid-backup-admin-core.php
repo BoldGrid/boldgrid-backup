@@ -20,6 +20,15 @@
 class Boldgrid_Backup_Admin_Core {
 
 	/**
+	 * Amazon S3 class.
+	 *
+	 * @since  1.5.2
+	 * @access public
+	 * @var    Boldgrid_Backup_Admin_Remote_Amazon_S3
+	 */
+	public $amazon_s3;
+
+	/**
 	 * Auto Rollback class.
 	 *
 	 * @since  1.5.2
@@ -306,6 +315,8 @@ class Boldgrid_Backup_Admin_Core {
 		$this->scheduler = new Boldgrid_Backup_Admin_Scheduler( $this );
 
 		$this->auto_rollback = new Boldgrid_Backup_Admin_Auto_Rollback( $this );
+
+		$this->amazon_s3 = new Boldgrid_Backup_Admin_Remote_Amazon_S3( $this );
 
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
@@ -699,6 +710,18 @@ class Boldgrid_Backup_Admin_Core {
 			array(
 				$this->archive_details,
 				'render_archive',
+			)
+		);
+
+		add_submenu_page(
+			null,
+			__( 'Amazon S3 Settings', 'boldgrid-backup' ),
+			__( 'Amazon S3 Settings', 'boldgrid-backup' ),
+			$capability,
+			'boldgrid-backup-amazon-s3',
+			array(
+				$this->amazon_s3,
+				'submenu_page',
 			)
 		);
 

@@ -185,6 +185,10 @@ class Boldgrid_Backup_Admin_Settings {
 			! empty( $boldgrid_settings['theme_autoupdate'] ) ? 1 : 0
 		);
 
+		if( empty( $settings['remote'] ) ) {
+			$settings['remote'] = array();
+		}
+
 		// Return the settings array.
 		return $settings;
 	}
@@ -538,6 +542,22 @@ class Boldgrid_Backup_Admin_Settings {
 				}
 			}
 
+			/*
+			 * Save storage locations.
+			 *
+			 * @since 1.5.2
+			 */
+			$storage_locations = ! empty( $settings['remote'] ) ? $settings['remote'] : array();
+			$storage_locations_save = ! empty( $_POST['storage_location'] ) ? $_POST['storage_location'] : array();
+			// Start off by disabling each storage location.
+			foreach( $settings['remote'] as $remote_key => $storage_location ) {
+				$settings['remote'][$remote_key]['enabled'] = false;
+			}
+			// Then enable it only if submitted.
+			foreach( $storage_locations_save as $storage_location => $storage_location_enabled ) {
+				$settings['remote'][$storage_location]['enabled'] = true;
+			}
+
 			// If no errors, then save the settings.
 			if ( ! $update_error ) {
 				$settings['updated'] = time();
@@ -590,6 +610,8 @@ class Boldgrid_Backup_Admin_Settings {
 	 * @return null
 	 */
 	public function page_backup_settings() {
+		add_thickbox();
+
 		$is_saving_settings = isset( $_POST['save_time'] );
 
 		if( ! $is_saving_settings ) {

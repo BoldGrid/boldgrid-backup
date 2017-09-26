@@ -59,3 +59,8 @@ a[disabled] {
 .usage.size-success {
 	background: #46b450;
 }
+
+/* Format a table within a table. */
+.form-table table td {
+	padding: 0px 10px 0px 0px;
+}

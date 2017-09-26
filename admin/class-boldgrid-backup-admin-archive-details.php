@@ -53,6 +53,20 @@ class Boldgrid_Backup_Admin_Archive_Details {
 			'all'
 		);
 
+		wp_register_script(
+			'boldgrid-backup-admin-archive-details',
+			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-archive-details.js',
+			array( 'jquery', ),
+			BOLDGRID_BACKUP_VERSION
+		);
+		$translations = array(
+			'uploading' => __( 'Uploading', 'boldgrid-backup' ),
+			'uploaded' => __( 'Uploaded', 'boldgrid-backup' ),
+			'failUpload' => __( 'Unable to upload backup file.', 'boldgrid-backup' ),
+		);
+		wp_localize_script( 'boldgrid-backup-admin-archive-details', 'boldgrid_backup_archive_details', $translations );
+		wp_enqueue_script( 'boldgrid-backup-admin-archive-details' );
+
 		$md5 = ! empty( $_GET['md5'] ) ? $_GET['md5'] : false;
 		$archive_found = false;
 

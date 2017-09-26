@@ -31,6 +31,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 = 1.5.2 In progress =
 * New feature:  JIRA WPB-3516   Auto rollback via wp cron.
 * Update:       JIRA WPB-3522   Show more detailed error messages when archiving fails.
+* New feature:  JIRA BGBKUP-29  One click upload to Amazon S3.
 
 = 1.5.1 =
 * Update		JIRA WPB-3480	Use wp filesystem when extracting backups.

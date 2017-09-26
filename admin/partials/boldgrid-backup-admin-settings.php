@@ -21,6 +21,8 @@ if ( empty( $settings ) ) {
 	);
 }
 
+wp_nonce_field( 'boldgrid_backup_settings' );
+
 ?>
 <div class='wrap'>
 	<h1><?php esc_html_e( 'BoldGrid Backup and Restore Settings', 'boldgrid-backup' ); ?></h1>
@@ -68,6 +70,7 @@ if ( empty( $settings ) ) {
 
 		if( $this->core->scheduler->is_available( 'cron' ) || $this->core->scheduler->is_available( 'wp-cron' ) ) {
 			include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/cron.php';
+			include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/storage.php';
 		}
 
 		echo '</table>';
