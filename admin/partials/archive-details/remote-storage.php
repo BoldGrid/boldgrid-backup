@@ -19,7 +19,7 @@ foreach( $remote_storage_li as $provider ) {
 	} elseif( $provider['allow_upload'] ) {
 		$upload = sprintf( '<a class="button button-primary upload">%1$s</a>', __( 'Upload', 'boldgrid-backup' ) );
 	} else {
-		$upload = __( 'Not available', 'boldgrid-backup' );
+		$upload = sprintf( __( 'Please go to your <a target="_parent" href="%1$s">%2$s</a> to configure %3$s.', 'boldgrid-backup' ), 'admin.php?page=boldgrid-backup-settings', __( 'settings page', 'boldgrid-backup' ), $provider['title'] );
 	}
 
 	printf( '

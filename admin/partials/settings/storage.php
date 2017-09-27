@@ -13,6 +13,7 @@ $storage_locations = array(
 		'title' => __( 'Local storage', 'boldgrid-backup' ),
 		'key' => 'local',
 		'is_setup' => true,
+		'enabled' => ! empty( $settings['remote']['local']['enabled'] ) && true === $settings['remote']['local']['enabled'],
 	),
 );
 
@@ -27,7 +28,8 @@ $storage_locations = array(
  *     @type string $title     Amazon S3
  *     @type string $key       amazon_s3
  *     @type string $configure admin.php?page=boldgrid-backup-amazon-s3
- *     @type bool   $enabled   true
+ *     @type bool   $is_setup  Whether or not this provider is properly configured.
+ *     @type bool   $enabled   Whether or not the checkbox should be checked.
  * }
  */
 $storage_locations = apply_filters( 'boldgrid_backup_register_storage_location', $storage_locations );
@@ -47,6 +49,12 @@ $storage_locations = apply_filters( 'boldgrid_backup_register_storage_location',
 		}
 		?>
 		</table>
+
+		<br />
+		<p class="hidden" id="no_storage">
+			<span class="dashicons dashicons-warning yellow"></span>
+			<?php echo __( 'Backup will not occur if no storage locations are selected.', 'boldgrid-backup' ); ?>
+		</p>
 
 	</td>
 </tr>

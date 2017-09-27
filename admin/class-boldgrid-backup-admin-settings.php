@@ -611,6 +611,7 @@ class Boldgrid_Backup_Admin_Settings {
 	 */
 	public function page_backup_settings() {
 		add_thickbox();
+		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
 
 		$is_saving_settings = isset( $_POST['save_time'] );
 

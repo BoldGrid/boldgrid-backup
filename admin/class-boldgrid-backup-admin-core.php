@@ -742,6 +742,29 @@ class Boldgrid_Backup_Admin_Core {
 	}
 
 	/**
+	 * Register / enqueue scripts.
+	 *
+	 * This method is being called during the "admin_enqueue_scripts" hook.
+	 *
+	 * @since 1.5.2
+	 */
+	public function admin_enqueue_scripts() {
+		wp_register_style(
+			'boldgrid-backup-admin-new-thickbox-style',
+			plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-new-thickbox-style.css',
+			array(),
+			BOLDGRID_BACKUP_VERSION
+		);
+
+		wp_register_style(
+			'boldgrid-backup-admin-hide-all',
+			plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-hide-all.css',
+			array(),
+			BOLDGRID_BACKUP_VERSION
+		);
+	}
+
+	/**
 	 * Backup the WordPress database.
 	 *
 	 * @since 1.0
@@ -2059,6 +2082,7 @@ class Boldgrid_Backup_Admin_Core {
 		global $pagenow;
 
 		add_thickbox();
+		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
 
 		// Run the functionality tests.
 		$is_functional = $this->test->run_functionality_tests();

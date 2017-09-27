@@ -10,11 +10,13 @@
 
 /* global BoldGridBackupAdmin */
 
-( function( $ ) {
+var BoldGrid = BoldGrid || {};
+
+BoldGrid.Settings = function( $ ) {
 	'use strict';
 
 	// General Variables.
-	var self = {},
+	var self = this,
 		$scheduleDow,
 		$noBackupDays,
 		$freeDowLimit,
@@ -125,6 +127,8 @@
 		$.post( ajaxurl, data, function( response ) {
 			$new_tr = $( response.data ).addClass( 'active' );
 			$tr.replaceWith( $new_tr );
+
+			self.toggleNoStorage();
 		});
 	}
 
@@ -208,6 +212,22 @@
 	};
 
 	/**
+	 * @summary Toggle the warning about no backups if no storage selected.
+	 *
+	 * @since 1.5.2
+	 */
+	self.toggleNoStorage = function() {
+		var count_checked = $( '#storage_locations input[type="checkbox"]:checked' ).length,
+			$noStorage = $( '#no_storage' );
+
+		if( 0 === count_checked ) {
+			$noStorage.show();
+		} else {
+			$noStorage.hide();
+		}
+	}
+
+	/**
 	 * @summary Toggle timezone.
 	 *
 	 * @since 1.5.1
@@ -231,6 +251,9 @@
 		// Check if any days or the week are checked, toggle notice.
 		self.toggleNoBackupDays();
 
+		self.toggleNoStorage();
+		$( 'body' ).on( 'click', '#storage_locations input[type="checkbox"]', self.toggleNoStorage );
+
 		$backupDir.on( 'input', self.toggleMoveBackups );
 
 		// On click action for days, check if any days or the week are checked,
@@ -249,4 +272,6 @@
 		$( '#storage_locations .thickbox' ).on( 'click', self.on_click_provider );
 	} );
 
-} )( jQuery );
+}
+
+BoldGrid.Settings( jQuery );

@@ -53,6 +53,8 @@ class Boldgrid_Backup_Admin_Archive_Details {
 			'all'
 		);
 
+		wp_enqueue_style( 'boldgrid-backup-admin-hide-all' );
+
 		wp_register_script(
 			'boldgrid-backup-admin-archive-details',
 			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-archive-details.js',

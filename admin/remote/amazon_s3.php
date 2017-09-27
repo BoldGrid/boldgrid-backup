@@ -30,7 +30,7 @@ class Boldgrid_Backup_Admin_Remote_Amazon_S3 {
 	 * @since 1.5.2
 	 * @var string $bucket_id
 	 */
-	public $bucket_id = 'boldgrid-backup';
+	public $bucket_id = null;
 
 	/**
 	 * Our S3 client.
@@ -78,7 +78,9 @@ class Boldgrid_Backup_Admin_Remote_Amazon_S3 {
 
 		$this->key =       ! empty( $settings['remote']['amazon_s3']['key'] )       ? $settings['remote']['amazon_s3']['key']       : $this->key;
 		$this->secret =    ! empty( $settings['remote']['amazon_s3']['secret'] )    ? $settings['remote']['amazon_s3']['secret']    : $this->secret;
-		$this->bucket_id = ! empty( $settings['remote']['amazon_s3']['bucket_id'] ) ? $settings['remote']['amazon_s3']['bucket_id'] : $this->bucket_id;
+		$this->bucket_id = ! empty( $settings['remote']['amazon_s3']['bucket_id'] ) ? $settings['remote']['amazon_s3']['bucket_id'] : $this->create_unique_bucket();
+
+		$this->create_unique_bucket();
 	}
 
 	/**
@@ -132,6 +134,24 @@ class Boldgrid_Backup_Admin_Remote_Amazon_S3 {
 	}
 
 	/**
+	 * Create a unique bucket id.
+	 *
+	 * When you delete a bucket, Amazon gives you the following message:
+	 * Amazon S3 buckets are unique. If you delete this bucket, you may lose the
+	 * bucket name to another AWS user.
+	 */
+	public function create_unique_bucket() {
+		$url = parse_url( get_site_url() );
+
+		$bucket_parts[] = 'boldgrid-backup';
+		$bucket_parts[] = $url['host'];
+
+		$bucket_id = implode( '-', $bucket_parts );
+
+		return $bucket_id;
+	}
+
+	/**
 	 * Get the contents of a bucket.
 	 *
 	 * @since 1.5.2
@@ -159,6 +179,23 @@ class Boldgrid_Backup_Admin_Remote_Amazon_S3 {
 		}
 
 		return $bucket_contents;
+	}
+
+	/**
+	 * Get settings.
+	 *
+	 * @since 1.5.2
+	 */
+	public function get_details() {
+		$settings = $this->core->settings->get_settings();
+
+		return array(
+			'title' => __( 'Amazon S3', 'boldgrid-backup' ),
+			'key' => 'amazon_s3',
+			'configure' => 'admin.php?page=boldgrid-backup-amazon-s3',
+			'is_setup' => $this->is_setup(),
+			'enabled' => ! empty( $settings['remote']['amazon_s3']['enabled'] ) && $settings['remote']['amazon_s3']['enabled'] && $this->is_setup(),
+		);
 	}
 
 	/**
@@ -218,11 +255,15 @@ class Boldgrid_Backup_Admin_Remote_Amazon_S3 {
 	 * @return array
 	 */
 	public function single_archive_remote_option( $remote_storage, $filepath ) {
+
+		$allow_upload = $this->is_setup();
+		$uploaded = $allow_upload && $this->in_bucket( null, $filepath );
+
 		$remote_storage_li[] = array(
 			'id' => 'amazon_s3',
 			'title' => 'Amazon S3',
-			'uploaded' => $this->in_bucket( null, $filepath ),
-			'allow_upload' => true,
+			'uploaded' => $uploaded,
+			'allow_upload' => $allow_upload,
 		);
 
 		return $remote_storage_li;
@@ -234,6 +275,8 @@ class Boldgrid_Backup_Admin_Remote_Amazon_S3 {
 	 * @since 1.5.2
 	 */
 	public function submenu_page() {
+		wp_enqueue_style( 'boldgrid-backup-admin-hide-all' );
+
 		$this->submenu_page_save();
 
 		$settings = $this->core->settings->get_settings();
@@ -260,7 +303,7 @@ class Boldgrid_Backup_Admin_Remote_Amazon_S3 {
 		}
 
 		$settings = $this->core->settings->get_settings();
-		if( ! is_array( $settings['remote']['amazon_s3'] ) ) {
+		if( ! isset( $settings['remote']['amazon_s3'] ) || ! is_array( $settings['remote']['amazon_s3'] ) ) {
 			$settings['remote']['amazon_s3'] = array();
 		}
 
@@ -274,6 +317,7 @@ class Boldgrid_Backup_Admin_Remote_Amazon_S3 {
 
 			$this->key = null;
 			$this->secret = null;
+			$this->bucket_id = null;
 
 			do_action( 'boldgrid_backup_notice', __( 'Settings saved.', 'boldgrid-backup' ), 'notice updated is-dismissible' );
 			return;
@@ -286,6 +330,15 @@ class Boldgrid_Backup_Admin_Remote_Amazon_S3 {
 		$bucket_id = ! empty( $_POST['bucket_id'] ) ? $_POST['bucket_id'] : null;
 
 		$valid_credentials = $this->is_valid_credentials( $key, $secret );
+
+		/*
+		 * Check if we have a valid bucket name.
+		 *
+		 * If we don't have a valid client, set that first.
+		 */
+		if( is_null( $this->client ) ) {
+			$this->set_client();
+		}
 		$valid_bucket = $this->client->isValidBucketName( $bucket_id );
 
 		if( $valid_credentials ) {
@@ -401,12 +454,7 @@ class Boldgrid_Backup_Admin_Remote_Amazon_S3 {
 
 		$settings = $this->core->settings->get_settings();
 
-		$location = array(
-			'title' => __( 'Amazon S3', 'boldgrid-backup' ),
-			'key' => 'amazon_s3',
-			'configure' => 'admin.php?page=boldgrid-backup-amazon-s3',
-			'enabled' => $settings['remote']['amazon_s3']['enabled'] && $this->is_setup(),
-		);
+		$location = $this->get_details();
 		$tr = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/storage-location.php';
 
 		if( $this->is_setup() ) {
@@ -453,14 +501,7 @@ class Boldgrid_Backup_Admin_Remote_Amazon_S3 {
 	 * @since 1.5.2
 	 */
 	public function register_storage_location( $storage_locations ) {
-		$settings = $this->core->settings->get_settings();
-
-		$storage_locations[] = array(
-			'title' => __( 'Amazon S3', 'boldgrid-backup' ),
-			'key' => 'amazon_s3',
-			'configure' => 'admin.php?page=boldgrid-backup-amazon-s3',
-			'enabled' => ! empty( $settings['remote']['amazon_s3']['enabled'] ) && $settings['remote']['amazon_s3']['enabled'] && $this->is_setup(),
-		);
+		$storage_locations[] = $this->get_details();
 
 		return $storage_locations;
 	}

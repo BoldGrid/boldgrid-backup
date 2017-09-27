@@ -1,0 +1,23 @@
+/**
+* Thickbox styles.
+*
+* Thickbox appears when user clicks "View details" for a backup. These styles
+* make the standard thickbox look more like the modal of a plugin's
+* "View details" link.
+*/
+body #TB_window,
+#TB_window #TB_title {
+	background-color: rgba(0, 0, 0, 0);
+	border: 0px;
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+}
+#TB_closeAjaxWindow #TB_closeWindowButton {
+	right: -29px;
+	top: 30px;
+}
+#TB_closeAjaxWindow .tb-close-icon:before {
+	font: normal 30px/30px dashicons;
+	color: #eee;
+}

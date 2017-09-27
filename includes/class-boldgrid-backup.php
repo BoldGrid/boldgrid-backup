@@ -312,6 +312,8 @@ class Boldgrid_Backup {
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_is_setup_amazon_s3',  $plugin_admin_core->amazon_s3, 'is_setup_ajax' );
 		$this->loader->add_filter( 'boldgrid_backup_register_storage_location', $plugin_admin_core->amazon_s3, 'register_storage_location' );
 
+		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core, 'admin_enqueue_scripts' );
+
 		return;
 	}
 

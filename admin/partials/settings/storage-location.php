@@ -15,21 +15,16 @@
  *     @type string $key       amazon_s3
  *     @type string $configure A url to configure the provider, such as
  *                             admin.php?page=boldgrid-backup-amazon-s3
+ *     @type bool   $is_setup  Whether or not this provider is properly
+ *                             configured / setup.
  *     @type bool   $enabled   Whether or not this provider is enabled.
  * }
  * @return string
  */
 
-/**
- * Determine if a remote storage provider is properly setup.
- *
- * @since 1.5.2
- */
-$is_setup = apply_filters( 'boldgrid_backup_is_setup_' . $location['key'], false );
-
 $configure_link = '<a href="%1$s&TB_iframe=true&width=600&height=550" class="thickbox">%2$s</a>';
 
-if( $is_setup ) {
+if( $location['is_setup'] && ! empty( $location['configure'] ) ) {
 	$configure = sprintf( '&#10003; %1$s', __( 'Configured', 'boldgrid-backup' ) );
 	$configure .= ' (' . sprintf( $configure_link, $location['configure'], __( 'update', 'boldgrid-backup' ) ) . ')';
 } elseif ( ! empty( $location['configure' ] ) ) {
@@ -38,7 +33,7 @@ if( $is_setup ) {
 	$configure = '';
 }
 
-$disabled = $is_setup ? '' : 'disabled';
+$disabled = $location['is_setup'] ? '' : 'disabled';
 
 $checked = isset( $location['enabled'] ) && true === $location['enabled'] ? 'checked' : '';
 
@@ -47,7 +42,7 @@ return sprintf( '
 		<td>
 			<input type="checkbox" name="storage_location[%4$s]" value="1" %3$s %5$s> <strong>%1$s</strong>
 		</td>
-		<td class="storage">
+		<td class="configure">
 			%2$s
 		</td>
 	</tr>
