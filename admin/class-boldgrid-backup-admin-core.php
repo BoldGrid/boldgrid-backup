@@ -318,6 +318,10 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->amazon_s3 = new Boldgrid_Backup_Admin_Remote_Amazon_S3( $this );
 
+		$this->remote = new Boldgrid_Backup_Admin_Remote( $this );
+
+		$this->jobs = new Boldgrid_Backup_Admin_Jobs( $this );
+
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
 
@@ -1441,6 +1445,29 @@ class Boldgrid_Backup_Admin_Core {
 			// Enforce retention setting.
 			$this->enforce_retention();
 		}
+
+		/**
+		 * Actions to take after a backup has been created.
+		 *
+		 * @since 1.5.2
+		 *
+		 * @param array $info{
+		 *     An array of info about the backup just created.
+		 *
+		 *     @type string $mode         backup
+		 *     @type bool   $dryrun
+		 *     @type string $compressor   pcl_zip
+		 *     @type int    $filesize     30992482
+		 *     @type bool   $save
+		 *     @type int    $total_size
+		 *     @type string $filepath     C:\file.zip
+		 *     @type int    $lastmodunix  1506602959
+		 *     @type int    $duration     57.08
+		 *     @type int    $db_duration  0.35
+		 *     @type bool   $mail_success
+		 * }
+		 */
+		do_action( 'boldgrid-backup-post-archive-files', $info );
 
 		// Return the array of archive information.
 		return $info;

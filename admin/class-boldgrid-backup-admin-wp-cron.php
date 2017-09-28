@@ -54,6 +54,7 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	public $hooks = array(
 		'backup' => 'boldgrid_backup_wp_cron_backup',
 		'restore' => 'boldgrid_backup_wp_cron_restore',
+		'run_jobs' => 'boldgrid_backup_wp_cron_run_jobs',
 	);
 
 	/**
@@ -76,6 +77,10 @@ class Boldgrid_Backup_Admin_WP_Cron {
 		$this->core = $core;
 
 		$this->schedules = array(
+			'every-5-minutes' => array(
+				'interval' => 5 * MINUTE_IN_SECONDS,
+				'display' => __( 'Every 5 minutes', 'boldgrid-backup' ),
+			),
 			'weekly' => array(
 				'interval' => 7 * DAY_IN_SECONDS,
 				'display' => __( 'Weekly', 'boldgrid-backup' ),
@@ -239,6 +244,24 @@ class Boldgrid_Backup_Admin_WP_Cron {
 			$schedule_time = $this->get_next_time( $day, $h, $m, $p );
 
 			wp_schedule_event( $schedule_time, 'weekly', $hook );
+		}
+	}
+
+	/**
+	 * Schedule the "run_jobs" hook.
+	 *
+	 * This hook will run every 5 minutes and run one job at a time, such as
+	 * upload to a remote storage provider.
+	 *
+	 * This method is usually ran after saving the BoldGrid Backup settings. If
+	 * after save wp-cron is our scheduler, then we need to make sure we have
+	 * the "run_jobs" wp-cron scheduled.
+	 *
+	 * @since 1.5.2
+	 */
+	public function schedule_jobs() {
+		if( ! wp_next_scheduled( $this->hooks['run_jobs'] ) ) {
+			wp_schedule_event( time(), 'every-5-minutes', $this->hooks['run_jobs'] );
 		}
 	}
 

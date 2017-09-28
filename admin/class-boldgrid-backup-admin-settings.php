@@ -523,6 +523,7 @@ class Boldgrid_Backup_Admin_Settings {
 			if( ! empty( $settings['scheduler'] ) && 'wp-cron' === $settings['scheduler'] ) {
 				$this->core->wp_cron->clear_schedules();
 				$this->core->wp_cron->schedule( $settings['schedule'], $this->core->wp_cron->hooks['backup'] );
+				$this->core->wp_cron->schedule_jobs();
 			}
 
 

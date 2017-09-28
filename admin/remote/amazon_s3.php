@@ -420,11 +420,27 @@ class Boldgrid_Backup_Admin_Remote_Amazon_S3 {
 
 		try {
 			$uploader->upload();
-			return true;
 		} catch( MultipartUploadException $e ) {
 			$uploader->abort();
 			return __( 'Failed to upload.', 'boldgrid-inspirations' );
 		}
+
+		return true;
+	}
+
+	/**
+	 * Upload a file.
+	 *
+	 * The jobs queue will call this method to upload a file.
+	 *
+	 * @since 1.5.2
+	 *
+	 * @param string $filepath
+	 */
+	public function upload_post_archiving( $filepath ) {
+		$success = $this->upload( $filepath );
+
+		return $success;
 	}
 
 	/**
@@ -487,6 +503,26 @@ class Boldgrid_Backup_Admin_Remote_Amazon_S3 {
 			// Deubg.
 			// echo '<pre>'; echo get_class( $e ); echo '</pre>';
 			return false;
+		}
+	}
+
+	/**
+	 * Actions to take after a backup file has been generated.
+	 *
+	 * @since 1.5.2
+	 *
+	 * @param array $info
+	 */
+	public function post_archive_files( $info ) {
+		if( $this->core->remote->is_enabled( 'amazon_s3' ) && ! $info['dryrun'] && $info['save'] ) {
+
+			$args = array(
+				'filepath' => $info['filepath'],
+				'action' => 'boldgrid_backup_amazon_s3_upload_post_archive',
+				'action_data' => $info['filepath'],
+			);
+
+			$this->core->jobs->add( $args );
 		}
 	}
 
