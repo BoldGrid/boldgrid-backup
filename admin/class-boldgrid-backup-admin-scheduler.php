@@ -55,7 +55,9 @@ class Boldgrid_Backup_Admin_Scheduler {
 	 */
 	public function clear_all_schedules() {
 		$this->core->wp_cron->clear_schedules();
+
 		$this->core->cron->delete_cron_entries();
+		$this->core->cron->delete_cron_entries( $this->core->cron->run_jobs );
 	}
 
 	/**

@@ -536,8 +536,9 @@ class Boldgrid_Backup_Admin_Settings {
 			 */
 			if( ! empty( $settings['scheduler'] ) && 'cron' === $settings['scheduler'] ) {
 				$cron_updated = $this->core->cron->add_cron_entry( $settings );
+				$jobs_scheduled = $this->core->cron->schedule_jobs();
 
-				if( ! $cron_updated ) {
+				if( ! $cron_updated || ! $jobs_scheduled ) {
 					$update_error = true;
 					$update_errors[] = esc_html__( 'An error occurred when modifying cron jobs.  Please try again.', 'boldgrid-backup' );
 				}

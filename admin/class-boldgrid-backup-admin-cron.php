@@ -28,6 +28,14 @@ class Boldgrid_Backup_Admin_Cron {
 	private $core;
 
 	/**
+	 * Path to run_jobs.php
+	 *
+	 * @since 1.5.2
+	 * @var   string
+	 */
+	public $run_jobs = 'cron/run_jobs.php';
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.2
@@ -337,6 +345,24 @@ class Boldgrid_Backup_Admin_Cron {
 	}
 
 	/**
+	 * Schedule "run_jobs".
+	 *
+	 * This hook will run every 5 minutes and run one job at a time, such as
+	 * upload to a remote storage provider.
+	 *
+	 * This method is usually ran after saving the BoldGrid Backup settings. If
+	 * after save cron is our scheduler, then we need to make sure we have
+	 * the "run_jobs" wp-cron scheduled.
+	 *
+	 * @since 1.5.2
+	 */
+	public function schedule_jobs() {
+		$entry = sprintf( '*/5 * * * * php -qf "%1$s/%2$s" > /dev/null 2>&1', dirname( dirname( __FILE__ ) ), $this->run_jobs );
+
+		return $this->update_cron( $entry );
+	}
+
+	/**
 	 * Update or add an entry to the system user crontab or wp-cron.
 	 *
 	 * @since 1.2
@@ -432,15 +458,15 @@ class Boldgrid_Backup_Admin_Cron {
 	}
 
 	/**
-	 * Delete boldgrid-backup cron entries from the system user crontab or wp-cron.
+	 * Delete boldgrid-backup cron entries from the system user crontab.
 	 *
 	 * @since 1.2
 	 *
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
-	 * @param string $mode If "restore" is specified, then only the restore cron jobs are removed,
-	 * else all backup and restore cron jobs will be removed.
-	 * @return bool Success.
+	 * @param  string $mode Please see in-method comments when the $pattern is
+	 *                      configured.
+	 * @return bool         Success.
 	 */
 	public function delete_cron_entries( $mode = '' ) {
 		// Check if crontab is available.
@@ -459,14 +485,24 @@ class Boldgrid_Backup_Admin_Cron {
 			return false;
 		}
 
-		// Set a search pattern to match for our cron jobs.
-		$pattern = dirname( dirname( __FILE__ ) ) . '/boldgrid-backup-cron.php" mode=';
-
-		// Target the cron job entries for the current mode (backup|restore).
-		if ( 'restore' === $mode ) {
-			$pattern .= 'restore';
+		/*
+		 * Configure our pattern.
+		 *
+		 * When this method was initiall written, $mode was either
+		 * empty (defaulting to "backup") or "restore", hence the first two
+		 * conditionals below.
+		 *
+		 * As of @1.5.2, you can pass any other string to this method, such as
+		 * "cron/run_jobs.php", so that the pattern will become
+		 * /home/user/public_html/wp-content/plugins/boldgrid-backup/cron/run_jobs.php
+		 */
+		$pattern = dirname( dirname( __FILE__ ) ) . '/';
+		if( '' === $mode ) {
+			$pattern .= 'boldgrid-backup-cron.php" mode=';
+		} elseif( 'restore' === $mode ) {
+			$pattern .= 'boldgrid-backup-cron.php" mode=restore';
 		} else {
-			$pattern .= 'backup';
+			$pattern .= $mode;
 		}
 
 		// Use either crontab or wp-cron.
