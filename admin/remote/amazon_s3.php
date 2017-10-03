@@ -57,6 +57,14 @@ class Boldgrid_Backup_Admin_Remote_Amazon_S3 {
 	private $key = null;
 
 	/**
+	 * Retention count.
+	 *
+	 * @since 1.5.2
+	 * @var   int $retention_count
+	 */
+	private $retention_count = 5;
+
+	/**
 	 * Secret, I'm not telling.
 	 *
 	 * @since 1.5.2
@@ -79,6 +87,7 @@ class Boldgrid_Backup_Admin_Remote_Amazon_S3 {
 		$this->key =       ! empty( $settings['remote']['amazon_s3']['key'] )       ? $settings['remote']['amazon_s3']['key']       : $this->key;
 		$this->secret =    ! empty( $settings['remote']['amazon_s3']['secret'] )    ? $settings['remote']['amazon_s3']['secret']    : $this->secret;
 		$this->bucket_id = ! empty( $settings['remote']['amazon_s3']['bucket_id'] ) ? $settings['remote']['amazon_s3']['bucket_id'] : $this->create_unique_bucket();
+		$this->retention_count = ! empty( $settings['remote']['amazon_s3']['retention_count'] ) ? $settings['remote']['amazon_s3']['retention_count'] : $this->retention_count;
 
 		$this->create_unique_bucket();
 	}
@@ -139,6 +148,8 @@ class Boldgrid_Backup_Admin_Remote_Amazon_S3 {
 	 * When you delete a bucket, Amazon gives you the following message:
 	 * Amazon S3 buckets are unique. If you delete this bucket, you may lose the
 	 * bucket name to another AWS user.
+	 *
+	 * @since 1.5.2
 	 */
 	public function create_unique_bucket() {
 		$url = parse_url( get_site_url() );
@@ -152,14 +163,58 @@ class Boldgrid_Backup_Admin_Remote_Amazon_S3 {
 	}
 
 	/**
+	 * Enforce retention.
+	 *
+	 * @since 1.5.2
+	 */
+	public function enforce_retention() {
+		if( empty( $this->retention_count ) ) {
+			return;
+		}
+
+		$bucket_contents = $this->get_bucket( $this->bucket_id, true );
+
+		if( empty( $bucket_contents ) ) {
+			return;
+		}
+
+		// Remove files from bucket list that are not BoldGrid Backup backups.
+		foreach( $bucket_contents as $key => $item ) {
+			if( empty( $item['Headers']['Metadata']['is_boldgrid_backup'] ) || 'true' !== $item['Headers']['Metadata']['is_boldgrid_backup'] ) {
+				unset( $bucket_contents[$key] );
+			}
+		}
+
+		// Sort by timestamp desc.
+		usort( $bucket_contents, function( $a, $b ){
+			return $a['Headers']['Metadata']['last_modified'] < $b['Headers']['Metadata']['last_modified'] ? 1 : -1;
+		});
+
+		// Do the deleting.
+		$count = 0;
+		foreach( $bucket_contents as $item ) {
+			$count++;
+			if( $count <= $this->retention_count ) {
+				continue;
+			}
+
+			$this->client->deleteObject( array(
+				'Bucket' => $this->bucket_id,
+				'Key'    => $item['Key'],
+			));
+		}
+	}
+
+	/**
 	 * Get the contents of a bucket.
 	 *
 	 * @since 1.5.2
 	 *
 	 * @param  string $bucket_id
+	 * @param  bool   $include_headers
 	 * @return array  https://pastebin.com/uVkx8t5A
 	 */
-	public function get_bucket( $bucket_id ) {
+	public function get_bucket( $bucket_id, $include_headers = false ) {
 		$this->set_client();
 		$this->set_bucket_id( $bucket_id );
 
@@ -172,6 +227,10 @@ class Boldgrid_Backup_Admin_Remote_Amazon_S3 {
 			));
 
 			foreach( $iterator as $object ) {
+				if( $include_headers ) {
+					$object['Headers'] = $this->get_headers( $object['Key'] );
+				}
+
 				$bucket_contents[] = $object;
 			}
 		} catch( Aws\S3\Exception\NoSuchBucketException $e ) {
@@ -196,6 +255,24 @@ class Boldgrid_Backup_Admin_Remote_Amazon_S3 {
 			'is_setup' => $this->is_setup(),
 			'enabled' => ! empty( $settings['remote']['amazon_s3']['enabled'] ) && $settings['remote']['amazon_s3']['enabled'] && $this->is_setup(),
 		);
+	}
+
+	/**
+	 * Get the headers of an object.
+	 *
+	 * @since 1.5.2
+	 *
+	 * @param string $key
+	 */
+	public function get_headers( $key ) {
+		$params = array(
+			'Bucket' => $this->bucket_id,
+			'Key' => $key,
+		);
+
+		$headers = $this->client->headObject( $params );
+
+		return $headers->toArray();
 	}
 
 	/**
@@ -284,6 +361,7 @@ class Boldgrid_Backup_Admin_Remote_Amazon_S3 {
 		$key = ! empty( $settings['remote']['amazon_s3']['key'] ) ? $settings['remote']['amazon_s3']['key'] : null;
 		$secret = ! empty( $settings['remote']['amazon_s3']['secret'] ) ? $settings['remote']['amazon_s3']['secret'] : null;
 		$bucket_id = ! empty( $settings['remote']['amazon_s3']['bucket_id'] ) ? $settings['remote']['amazon_s3']['bucket_id'] : $this->bucket_id;
+		$retention_count = ! empty( $settings['remote']['amazon_s3']['retention_count'] ) ? $settings['remote']['amazon_s3']['retention_count'] : $this->retention_count;
 
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/remote/amazon-s3.php';
 	}
@@ -318,6 +396,7 @@ class Boldgrid_Backup_Admin_Remote_Amazon_S3 {
 			$this->key = null;
 			$this->secret = null;
 			$this->bucket_id = null;
+			$this->retention_count = null;
 
 			do_action( 'boldgrid_backup_notice', __( 'Settings saved.', 'boldgrid-backup' ), 'notice updated is-dismissible' );
 			return;
@@ -328,6 +407,7 @@ class Boldgrid_Backup_Admin_Remote_Amazon_S3 {
 		$key =       ! empty( $_POST['key'] )       ? $_POST['key']       : null;
 		$secret =    ! empty( $_POST['secret'] )    ? $_POST['secret']    : null;
 		$bucket_id = ! empty( $_POST['bucket_id'] ) ? $_POST['bucket_id'] : null;
+		$retention_count = ! empty( $_POST['retention_count'] ) && is_numeric( $_POST['retention_count'] ) ? $_POST['retention_count'] : $this->retention_count;
 
 		$valid_credentials = $this->is_valid_credentials( $key, $secret );
 
@@ -356,6 +436,8 @@ class Boldgrid_Backup_Admin_Remote_Amazon_S3 {
 		} else {
 			$errors[] = __( 'Invalid Bucket ID. Please only use lowercase letters, numbers, and hypens. Bucket must also be between 3 and 63 characters long.', 'boldgrid-inspirations' );
 		}
+
+		$settings['remote']['amazon_s3']['retention_count'] = $retention_count;
 
 		if( ! empty( $errors ) ) {
 			do_action( 'boldgrid_backup_notice', implode( '<br /><br />', $errors ) );
@@ -397,6 +479,15 @@ class Boldgrid_Backup_Admin_Remote_Amazon_S3 {
 
 		$key = basename( $filepath );
 
+		/*
+		 * When files are uploaded to Amazon S3, the LastModified is the time
+		 * the file was uploaded, not the time the file was last modified. When
+		 * we enforce retention, we'll need to know when the backup archive was
+		 * created, not when it was uploaded to Amazon S3.
+		 */
+		$archive_data = $this->core->archive_log->get_by_zip( $filepath );
+		$last_modified = ! empty( $archive_data['lastmodunix'] ) ? $archive_data['lastmodunix'] : $this->core->wp_filesystem->mtime( $filepath );
+
 		// Poll the bucket until it is accessible.
 		$this->client->createBucket( array(
 			'Bucket' => $this->bucket_id,
@@ -412,6 +503,10 @@ class Boldgrid_Backup_Admin_Remote_Amazon_S3 {
 				->setBucket( $this->bucket_id )
 				->setKey( $key )
 				->setOption( 'ACL', 'private' )
+				->setOption( 'Metadata', array(
+					'is_boldgrid_backup' => 'true',
+					'last_modified' => $last_modified,
+				))
 				->setConcurrency(3)
 				->build();
 		} catch ( Exception $e ) {
@@ -420,6 +515,7 @@ class Boldgrid_Backup_Admin_Remote_Amazon_S3 {
 
 		try {
 			$uploader->upload();
+			$this->enforce_retention();
 		} catch( MultipartUploadException $e ) {
 			$uploader->abort();
 			return __( 'Failed to upload.', 'boldgrid-inspirations' );

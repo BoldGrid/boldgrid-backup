@@ -28,6 +28,10 @@
 			<th><?php echo __( 'Bucket ID', 'boldgrid-backup' ); ?></th>
 			<td><input type="text" name="bucket_id" value="<?php echo $bucket_id; ?>" /></td>
 		</tr>
+		<tr>
+			<th><?php echo __( 'Retention (Number of backup archives to retain)', 'boldgrid-backup') ?></th>
+			<td><input type="text" name="retention_count" value="<?php echo $retention_count; ?>" /></td>
+		</tr>
 	</table>
 
 	<input class="button button-primary" type="submit" name="submit" value="<?php echo __( 'Save changes', 'boldgrid-backup' );?>" />
