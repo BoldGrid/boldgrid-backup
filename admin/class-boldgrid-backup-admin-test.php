@@ -201,6 +201,40 @@ class Boldgrid_Backup_Admin_Test {
 	}
 
 	/**
+	 * Recursively search for a folder.
+	 *
+	 * @since 1.5.2
+	 */
+	public function find_folder( $starting_dir, $folder_name ) {
+
+		if( empty( $starting_dir ) ) {
+			$starting_dir = ABSPATH;
+		}
+		$starting_dir = trailingslashit( $starting_dir );
+
+		$files = scandir( $starting_dir );
+
+		foreach( $files as $file ) {
+			$full_path =  $starting_dir . $file;
+
+			if( '.' === $file || '..' === $file || is_file( $full_path ) ) {
+				continue;
+			}
+
+			if( $file === $folder_name ) {
+				return $full_path;
+			}
+
+			$folder_found = $this->find_folder( $full_path, $folder_name );
+			if( false !== $folder_found ) {
+				return $folder_found;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Delete test files.
 	 *
 	 * When given a $dir, we'll scan and delete all files that begin with
@@ -280,6 +314,52 @@ class Boldgrid_Backup_Admin_Test {
 		}
 
 		$this->core->wp_filesystem->delete( $random_filename );
+		return true;
+	}
+
+	/**
+	 * Display a warning if the user's account has a node_modules folder.
+	 *
+	 * This can cause a timeout when checking the size of the WordPress directory.
+	 * # It is not possible to catch a "max execution time" fatal error.
+	 * # It is not possible to skip certain folders when using recurse_dirsize
+	 *   to calculate a directory size.
+	 *
+	 * @since 1.5.2
+	 *
+	 * @return bool True when a node_modules folder is found.
+	 */
+	public function node_modules_warning() {
+		/*
+		 * Initial test of find_folder call shows it took 0.02 seconds to run in
+		 * a setup with ~15,000 files.
+		 */
+		$node_modules_folder = $this->find_folder( null, 'node_modules' );
+
+		if( false === $node_modules_folder ) {
+			return false;
+		}
+
+		if( $this->core->doing_ajax ) {
+			return true;
+		}
+
+		$folders_found = __( 'The following node_modules folder was found in your account:', 'boldgrid-backup' );
+		$possible_issues = __( 'Due to possible issues node_modules folders can cause when calculating disk space, your WordPress directory size was not calculated.', 'boldgrid-backup' );
+		$ignore_warning = __( 'To ignore this warning and try again, please <a href="%1$s">click here</a>', 'boldgrid-backup' );
+
+		$warning = sprintf(
+			'<strong>%1$s</strong><br />
+			<em>%2$s</em><br />
+			%3$s %4$s',
+			$folders_found,
+			$node_modules_folder,
+			$possible_issues,
+			sprintf( $ignore_warning, '?page=boldgrid-backup-test&skip_node_modules=1' )
+		);
+
+		do_action( 'boldgrid_backup_notice', $warning );
+
 		return true;
 	}
 
@@ -507,12 +587,23 @@ class Boldgrid_Backup_Admin_Test {
 	 * @access private
 	 *
 	 * @see get_filtered_filelist
-	 * @global object $wp_filesystem
 	 *
 	 * @return int|bool The total size for the WordPress file system in bytes, or FALSE on error.
 	 */
 	private function get_wp_size() {
-		global $wp_filesystem;
+
+		// Save time, use transients.
+		if ( false !== ( $transient = get_transient( 'boldgrid_backup_wp_size' ) ) ) {
+			return $transient;
+		}
+
+		// Avoid timeout caused when node_modules exist. Return 0 bytes.
+		if( empty( $_GET['skip_node_modules'] ) ) {
+			$node_modules_found = $this->node_modules_warning();
+			if( true === $node_modules_found ) {
+				return 0;
+			}
+		}
 
 		// Perform functionality tests.
 		$is_functional = $this->run_functionality_tests();
@@ -533,11 +624,6 @@ class Boldgrid_Backup_Admin_Test {
 			require_once ABSPATH . 'wp-includes/ms-functions.php';
 		}
 
-		// Save time, use transients.
-		if ( false !== ( $transient = get_transient( 'boldgrid_backup_wp_size' ) ) ) {
-			return $transient;
-		}
-
 		// Get the filtered file list.
 		$filelist = $this->core->get_filelist_filter();
 
@@ -555,7 +641,7 @@ class Boldgrid_Backup_Admin_Test {
 			if ( is_dir( $file_path ) ) {
 				$size += recurse_dirsize( $file_path );
 			} else {
-				$size += $wp_filesystem->size( $file_path );
+				$size += $this->core->wp_filesystem->size( $file_path );
 			}
 		}
 
@@ -645,6 +731,10 @@ class Boldgrid_Backup_Admin_Test {
 			'requires_upgrade' => esc_html__( 'Requires Upgrade', 'boldgrid-backup' ),
 			// Supported.
 			'supported' => esc_html__( 'Supported', 'boldgrid-backup' ),
+			'see_preflight' => sprintf(
+				__( 'Please review <a href="%1$s">preflight check</a> for warnings'),
+				'?page=boldgrid-backup-test'
+			),
 		);
 
 		// Determine if we have maxed our disk or db size.
@@ -681,6 +771,8 @@ class Boldgrid_Backup_Admin_Test {
 			} elseif ( $disk_space[3] > $this->core->config->get_max_disk_low() ) {
 				$return['disk'] = $messages['issues_may_occur'];
 				$return['diskUsageClass'] = 'warning';
+			} elseif ( 0 === $disk_space[3] ) {
+				$return['disk'] = $messages['see_preflight'];
 			} else {
 				$return['disk'] = $messages['supported'];
 				$return['diskUsageClass'] = 'success';

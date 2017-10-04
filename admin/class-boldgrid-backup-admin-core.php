@@ -55,6 +55,15 @@ class Boldgrid_Backup_Admin_Core {
 	public $configs;
 
 	/**
+	 * Whether or not we're in ajax.
+	 *
+	 * @since  1.5.2
+	 * @access public
+	 * @var    bool
+	 */
+	public $doing_ajax;
+
+	/**
 	 * Whether or not we're doing cron.
 	 *
 	 * @since  1.5.1
@@ -255,6 +264,7 @@ class Boldgrid_Backup_Admin_Core {
 		global $wp_filesystem;
 
 		$this->doing_cron = ( defined( 'DOING_CRON' ) && DOING_CRON );
+		$this->doing_ajax = is_admin() && defined( 'DOING_AJAX' ) && DOING_AJAX;
 
 		$this->wp_filesystem = $wp_filesystem;
 
