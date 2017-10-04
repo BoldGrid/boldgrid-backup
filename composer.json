@@ -1,6 +1,5 @@
 {
     "require": {
-        "ifsnop/mysqldump-php": "2.*",
-        "aws/aws-sdk-php": "2.*"
+        "ifsnop/mysqldump-php": "2.*"
     }
 }

@@ -18,16 +18,6 @@
  * @since 1.0
  */
 class Boldgrid_Backup_Admin_Core {
-
-	/**
-	 * Amazon S3 class.
-	 *
-	 * @since  1.5.2
-	 * @access public
-	 * @var    Boldgrid_Backup_Admin_Remote_Amazon_S3
-	 */
-	public $amazon_s3;
-
 	/**
 	 * Auto Rollback class.
 	 *
@@ -316,8 +306,6 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->auto_rollback = new Boldgrid_Backup_Admin_Auto_Rollback( $this );
 
-		$this->amazon_s3 = new Boldgrid_Backup_Admin_Remote_Amazon_S3( $this );
-
 		$this->remote = new Boldgrid_Backup_Admin_Remote( $this );
 
 		$this->jobs = new Boldgrid_Backup_Admin_Jobs( $this );
@@ -399,6 +387,22 @@ class Boldgrid_Backup_Admin_Core {
 		update_site_option( 'boldgrid_backup_id', $backup_identifier );
 
 		return $backup_identifier;
+	}
+
+	/**
+	 * Initialize the premium version of the plugin.
+	 *
+	 * @since 1.5.2
+	 */
+	public function init_premium() {
+		$premium_class = 'Boldgrid_Backup_Premium';
+
+		if( ! class_exists( $premium_class) ) {
+			return;
+		}
+
+		$this->premium = new $premium_class( $this );
+		$this->premium->run();
 	}
 
 	/**
@@ -727,18 +731,6 @@ class Boldgrid_Backup_Admin_Core {
 			array(
 				$this->archive_details,
 				'render_archive',
-			)
-		);
-
-		add_submenu_page(
-			null,
-			__( 'Amazon S3 Settings', 'boldgrid-backup' ),
-			__( 'Amazon S3 Settings', 'boldgrid-backup' ),
-			$capability,
-			'boldgrid-backup-amazon-s3',
-			array(
-				$this->amazon_s3,
-				'submenu_page',
 			)
 		);
 

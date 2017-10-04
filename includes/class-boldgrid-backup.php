@@ -186,8 +186,6 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-auto-rollback.php';
 
-		require_once BOLDGRID_BACKUP_PATH . '/admin/remote/amazon_s3.php';
-
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-jobs.php';
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-remote.php';
@@ -310,17 +308,11 @@ class Boldgrid_Backup {
 
 		$this->loader->add_action( 'boldgrid_backup_archive_files_init', $plugin_admin_core->archive_fail, 'archive_files_init' );
 
-		$this->loader->add_action( 'wp_ajax_boldgrid_backup_remote_storage_upload', $plugin_admin_core->amazon_s3, 'ajax_upload' );
-		$this->loader->add_filter( 'boldgrid_backup_single_archive_remote_options', $plugin_admin_core->amazon_s3, 'single_archive_remote_option', 10, 2 );
-		$this->loader->add_filter( 'boldgrid_backup_is_setup_amazon_s3', $plugin_admin_core->amazon_s3, 'is_setup' );
-		$this->loader->add_action( 'wp_ajax_boldgrid_backup_is_setup_amazon_s3',  $plugin_admin_core->amazon_s3, 'is_setup_ajax' );
-		$this->loader->add_filter( 'boldgrid_backup_register_storage_location', $plugin_admin_core->amazon_s3, 'register_storage_location' );
-		$this->loader->add_action( 'boldgrid-backup-post-archive-files', $plugin_admin_core->amazon_s3, 'post_archive_files' );
-		$this->loader->add_filter( 'boldgrid_backup_amazon_s3_upload_post_archive', $plugin_admin_core->amazon_s3, 'upload_post_archiving' );
-
 		$this->loader->add_action( 'boldgrid_backup_wp_cron_run_jobs', $plugin_admin_core->jobs, 'run' );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core, 'admin_enqueue_scripts' );
+
+		$this->loader->add_filter( 'plugins_loaded', $plugin_admin_core, 'init_premium' );
 
 		return;
 	}
