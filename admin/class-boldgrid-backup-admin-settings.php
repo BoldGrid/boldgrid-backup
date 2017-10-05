@@ -705,6 +705,18 @@ class Boldgrid_Backup_Admin_Settings {
 	}
 
 	/**
+	 * Save our settings.
+	 *
+	 * @since 1.5.2
+	 *
+	 * @param  array $settings
+	 * @return bool True on success.
+	 */
+	public function save( $settings ) {
+		return update_site_option( 'boldgrid_backup_settings', $settings );
+	}
+
+	/**
 	 * Update BoldGrid general settings.
 	 *
 	 * @since 1.3.11

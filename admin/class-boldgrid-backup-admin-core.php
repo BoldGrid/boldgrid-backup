@@ -953,6 +953,12 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return array A single-dimension filelist array for use in this class.
 	 */
 	public function get_filelist( $dirpath ) {
+
+		// If this is a node_modules folder, do not iterate through it.
+		if( false !== strpos( $dirpath, '/node_modules' ) ) {
+			return array();
+		}
+
 		// Connect to the WordPress Filesystem API.
 		global $wp_filesystem;
 
@@ -1359,6 +1365,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// If enabled, send email notification for backup completed.
 		if ( ! empty( $settings['notifications']['backup'] ) ) {
+
 			// Create a site identifier.
 			$site_id = Boldgrid_Backup_Admin_Utility::create_site_id();
 

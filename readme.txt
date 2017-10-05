@@ -35,6 +35,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 * Bug fix:      JIRA WPB-3524   Cannot connect to database on plesk.
 * New feature:  JIRA WPB-3539   Amazon S3 basic retention.
 * Bug fix:      JIRA WPB-3534   Avoid node_modules timeout when calculating disk space.
+* Bug fix:      JIRA BGBKUP-36  PclZip fails on broken symlinks.
 
 = 1.5.1 =
 * Update		JIRA WPB-3480	Use wp filesystem when extracting backups.

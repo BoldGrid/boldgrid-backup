@@ -84,6 +84,24 @@ class Boldgrid_Backup_Admin_Compressors {
 	}
 
 	/**
+	 * Set php_zip (ZipArchive) as our compressor/extractor.
+	 *
+	 * @since 1.5.2
+	 *
+	 * @return bool True on success.
+	 */
+	public function set_php_zip() {
+		if( extension_loaded( 'zip' ) && class_exists( 'ZipArchive' ) ) {
+			$settings = $this->core->settings->get_settings();
+			$settings['compressor'] = 'php_zip';
+			$settings['extractor'] = 'php_zip';
+			return $this->core->settings->save( $settings );
+		}
+
+		return false;
+	}
+
+	/**
 	 * Hook into WordPress' filter: unzip_file_use_ziparchive
 	 *
 	 * @since 1.5.1

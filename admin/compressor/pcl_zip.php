@@ -104,8 +104,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 		 * @return int    Return 0 to skip adding the file to the archive.
 		 */
 		function pre_add( $p_event, &$p_header) {
-
-			$in_node_modules = false !== strpos( $p_header['stored_filename'], '/node_modules/');
+			$in_node_modules = false !== strpos( $p_header['stored_filename'], '/node_modules/' );
 			$in_backup_directory = apply_filters( 'boldgrid_backup_file_in_dir', $p_header['stored_filename'] );
 
 			if( $in_node_modules || $in_backup_directory ) {
@@ -132,9 +131,19 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 			PCLZIP_OPT_REMOVE_PATH, ABSPATH
 		);
 		if( 0 === $status ) {
-			return array(
-				'error' => sprintf( 'Cannot add files to ZIP archive file: %1$s', $archive->errorInfo() ),
-			);
+			$error_info = $archive->errorInfo();
+
+			$custom_error = $this->parse_error_info( $error_info );
+
+			if( false === $custom_error ) {
+				return array(
+					'error' => sprintf( 'Cannot add files to ZIP archive file: %1$s', $archive->errorInfo() ),
+				);
+			} else {
+				return array(
+					'error' => $custom_error,
+				);
+			}
 		}
 
 		$status = $archive->add( $dump_file, PCLZIP_OPT_REMOVE_ALL_PATH );
@@ -147,6 +156,46 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 		$this->wp_filesystem->chdir( $cwd );
 
 		return true;
+	}
+
+	/**
+	 * Parse the error message and take appropriate action.
+	 *
+	 * @since 1.5.2
+	 *
+	 * @param string $error_info
+	 * @return mixed False when no messages should be displayed, String when
+	 *               returning a message to the user.
+	 */
+	public function parse_error_info( $error_info ) {
+		$parts = explode( '\'', $error_info );
+		$force_php_zip = false;
+		$messages = array();
+
+		// Does not exist [code -4].
+		if( ! empty( $parts[2] ) && false !== strpos( $parts[2], 'code -4' ) ) {
+			$path = ABSPATH . $parts[1];
+
+			// Check for broken symlink.
+			if( is_link( $path ) && ! $this->core->wp_filesystem->exists( $path ) ) {
+				$force_php_zip = true;
+				$messages[] = sprintf( __( 'PclZip encountered the following broken symlink and is unable to create a backup:<br />%1$s', 'boldgrid-backup' ), $parts[1] );
+			}
+		}
+
+		/*
+		 * If we have flagged that ZipArchive should be used instead of PclZip,
+		 * then update the settings.
+		 */
+		if( $force_php_zip ) {
+			$php_zip_set = $this->core->compressors->set_php_zip();
+
+			if( $php_zip_set ) {
+				$messages[] = __( 'We have changed your compressor from PclZip to ZipArchive. Please try to create a backup again.' );
+			}
+		}
+
+		return empty( $messages ) ? false : implode( '<br />', $messages );
 	}
 
 	/**
