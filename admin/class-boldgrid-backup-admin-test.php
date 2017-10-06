@@ -204,28 +204,30 @@ class Boldgrid_Backup_Admin_Test {
 	 * Recursively search for a folder.
 	 *
 	 * @since 1.5.2
+	 *
+	 * @param  string $folder_name
+	 * @param  string $starting_dir
+	 * @return bool True if folder name found.
 	 */
-	public function find_folder( $starting_dir, $folder_name ) {
-
-		if( empty( $starting_dir ) ) {
-			$starting_dir = ABSPATH;
-		}
+	public function find_folder( $folder_name, $starting_dir = ABSPATH ) {
 		$starting_dir = trailingslashit( $starting_dir );
 
-		$files = scandir( $starting_dir );
+		$files = $this->core->wp_filesystem->dirlist( $starting_dir );
+		$files = is_array( $files ) ? $files : array();
 
 		foreach( $files as $file ) {
-			$full_path =  $starting_dir . $file;
 
-			if( '.' === $file || '..' === $file || is_file( $full_path ) ) {
+			if( 'd' !== $file['type'] ) {
 				continue;
 			}
 
-			if( $file === $folder_name ) {
+			$full_path =  $starting_dir . $file['name'];
+
+			if( $file['name'] === $folder_name ) {
 				return $full_path;
 			}
 
-			$folder_found = $this->find_folder( $full_path, $folder_name );
+			$folder_found = $this->find_folder( $folder_name, $full_path );
 			if( false !== $folder_found ) {
 				return $folder_found;
 			}
@@ -334,7 +336,7 @@ class Boldgrid_Backup_Admin_Test {
 		 * Initial test of find_folder call shows it took 0.02 seconds to run in
 		 * a setup with ~15,000 files.
 		 */
-		$node_modules_folder = $this->find_folder( null, 'node_modules' );
+		$node_modules_folder = $this->find_folder( 'node_modules' );
 
 		if( false === $node_modules_folder ) {
 			return false;
