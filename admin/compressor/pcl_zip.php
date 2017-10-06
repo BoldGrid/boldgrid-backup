@@ -70,16 +70,15 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 	 * }
 	 */
 	public function archive_files( $filelist, &$info ) {
-		$cwd = $this->wp_filesystem->cwd();
-
 		$info['filepath'] = $this->core->generate_archive_path( 'zip' );
 
-		$dump_file = $filelist[0][0];
-
 		if( $info['dryrun'] ) {
-			$info['total_size'] += $this->core->filelist->get_total_size( $filelist );
 			return true;
 		}
+
+		$cwd = $this->wp_filesystem->cwd();
+
+		$dump_file = $filelist[0][0];
 
 		$archive = new PclZip( $info['filepath'] );
 		if ( 0 === $archive ) {

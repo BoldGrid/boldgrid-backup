@@ -1330,6 +1330,8 @@ class Boldgrid_Backup_Admin_Core {
 				break;
 		}
 
+		$info['total_size'] += $this->filelist->get_total_size( $filelist );
+
 		if ( true === $status && ! $wp_filesystem->exists( $info['filepath'] ) ) {
 			$status = array(
 				'error' => 'The archive file "' . $info['filepath'] . '" was not written.',

@@ -109,7 +109,6 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 		$info['filepath'] = $this->core->generate_archive_path( 'zip' );
 
 		if( $info['dryrun'] ) {
-			$info['total_size'] += $this->core->filelist->get_total_size( $filelist );
 			return true;
 		}
 
@@ -129,7 +128,6 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 
 		foreach ( $filelist as $fileinfo ) {
 			$this->zip->addFile( $fileinfo[0], $fileinfo[1] );
-			$info['total_size'] += $fileinfo[2];
 		}
 
 		if ( ! $this->zip->close() ) {
