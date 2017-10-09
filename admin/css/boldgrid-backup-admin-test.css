@@ -20,12 +20,12 @@
 	padding: 15px 0px 10px 11px;
 }
 
-span.error {
+.functionality-test-section .error {
 	color: #dc3232;
 	font-weight: bold;
 }
 
-span.warning {
+.functionality-test-section .warning {
 	color: #ffba00;
 	font-weight: bold;
 }
