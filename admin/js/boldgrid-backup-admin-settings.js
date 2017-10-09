@@ -149,6 +149,22 @@ BoldGrid.Settings = function( $ ) {
 	};
 
 	/**
+	 * @summary Toggle cron warnings.
+	 *
+	 * @since 1.5.2
+	 */
+	self.toggleCronWarnings = function() {
+		var $wpCronNotice = $( '.wp-cron-notice' ),
+			scheduler = $( '#scheduler' ).val();
+
+		if( 'wp-cron' === scheduler ) {
+			$wpCronNotice.show();
+		} else {
+			$wpCronNotice.hide();
+		}
+	}
+
+	/**
 	 * @summary Toogle the move backups message.
 	 *
 	 * @since 1.3.6
@@ -227,25 +243,6 @@ BoldGrid.Settings = function( $ ) {
 		}
 	}
 
-	/**
-	 * @summary Toggle timezone.
-	 *
-	 * @since 1.5.1
-	 */
-	self.toggleTimezone = function() {
-		var $scheduler = $( '#scheduler' ),
-			$wp_cron_timezone = $( '#wp_cron_timezone' );
-
-		switch( $scheduler.val() ) {
-			case 'cron':
-				$wp_cron_timezone.hide();
-				break;
-			case 'wp-cron':
-				$wp_cron_timezone.show();
-				break;
-		}
-	}
-
 	// Onload event listener.
 	$( function() {
 		// Check if any days or the week are checked, toggle notice.
@@ -264,8 +261,8 @@ BoldGrid.Settings = function( $ ) {
 		 * When the page loads AND when the user changes the scheduler, toggle
 		 * the timezone settings.
 		 */
-		self.toggleTimezone();
-		$( '#scheduler' ).on( 'change', self.toggleTimezone );
+		self.toggleCronWarnings();
+		$( '#scheduler' ).on( 'change', self.toggleCronWarnings );
 
 		$( window ).on( 'tb_unload', self.on_tb_unload );
 

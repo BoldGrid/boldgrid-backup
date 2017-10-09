@@ -42,7 +42,7 @@
 				),
 				esc_url( $url )
 			);
-			printf( '<div id="use-sparingly"><p><span class="dashicons dashicons-warning yellow"></span> %s</p></div>', $link );
+			printf( '<div id="use-sparingly" class="hidden"><p><span class="dashicons dashicons-warning yellow"></span> %s</p></div>', $link );
 		?>
 	</td>
 </tr>
@@ -99,6 +99,6 @@
 				?>>PM</option>
 		</select>
 
-		<p id="wp_cron_timezone"><em>WP Cron runs on GMT time, which is currently <?php echo date( 'l g:i a e')?>.</em></p>
+		<p class="wp-cron-notice hidden"><em>WP Cron runs on GMT time, which is currently <?php echo date( 'l g:i a e')?>.</em></p>
 	</td>
 </tr>
