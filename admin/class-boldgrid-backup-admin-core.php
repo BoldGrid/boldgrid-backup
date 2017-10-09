@@ -245,6 +245,15 @@ class Boldgrid_Backup_Admin_Core {
 	public $home_dir;
 
 	/**
+	 * Local storage.
+	 *
+	 * @since  1.5.2
+	 * @access public
+	 * @var    Boldgrid_Backup_Admin_Storage_Local
+	 */
+	public $local;
+
+	/**
 	 * The scheduler class object.
 	 *
 	 * @since  1.5.1
@@ -319,6 +328,8 @@ class Boldgrid_Backup_Admin_Core {
 		$this->remote = new Boldgrid_Backup_Admin_Remote( $this );
 
 		$this->jobs = new Boldgrid_Backup_Admin_Jobs( $this );
+
+		$this->local = new Boldgrid_Backup_Admin_Storage_Local( $this );
 
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
@@ -1478,7 +1489,9 @@ class Boldgrid_Backup_Admin_Core {
 		 *     @type bool   $mail_success
 		 * }
 		 */
-		do_action( 'boldgrid-backup-post-archive-files', $info );
+		do_action( 'boldgrid_backup_post_archive_files', $info );
+
+		$this->local->post_archive_files( $info );
 
 		// Return the array of archive information.
 		return $info;
