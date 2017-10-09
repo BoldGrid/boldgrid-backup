@@ -8,11 +8,15 @@
  * @param $ The jQuery object.
  */
 
-( function( $ ) {
+var BOLDGRID = BOLDGRID || {};
+BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
+
+BOLDGRID.BACKUP.HOME = function( $ ) {
 	'use strict';
 
 	// General Variables.
-	var self = {};
+	var self = this,
+		$fileInput = $( 'input:file' );
 
 	/*
 	 * This script is passed "localizeScriptData" {"archiveNonce", "accessType", "restoreConfirmText",
@@ -22,8 +26,6 @@
 
 	// Onload event listener.
 	$( function() {
-		// Declare vars.
-		var $fileInput = $( 'input:file' );
 
 		// On click action for download buttons.
 		$( '.action-download' )
@@ -55,21 +57,13 @@
 				.find( 'input:submit' )
 					.attr( 'disabled', true );
 
-		$fileInput
-			.change(
-				function(){
-					if ( $(this).val() ) {
-						$( 'input:submit' )
-							.attr( 'disabled', false );
-					}
-				}
-		);
-
 		// On click action for toggling a help section.
 		$( '.dashicons-editor-help' ).on( 'click', self.toggleHelp );
 
 		// Remove restoration notice.
 		self.hideRestoreNotice();
+
+		$fileInput.on( 'change', self.onChangeInput );
 	} );
 
 	/**
@@ -160,6 +154,61 @@
 		// Hide the restore notice.
 		$( '.restoration-in-progress' ).hide();
 	};
+
+	/**
+	 * @summary Take action when a backup file is selected for upload.
+	 *
+	 * This includes checking the filesize and showing applicable warnings.
+	 *
+	 * @since 1.5.2
+	 */
+	self.onChangeInput = function() {
+		var $badExtension = $( '#bad_extension' ),
+			$fileSizeWarning = $( '[data-id="upload-backup"]:not(span)' ),
+			$fileTooLarge = $( '#file_too_large' ),
+			$submit = $( 'input:submit' ),
+			extension,
+			isBadExtension,
+			isTooBig,
+			maxSize = parseInt( $( '[name="MAX_FILE_SIZE"]' ).val() ),
+			name,
+			size;
+
+		if( ! $fileInput.val() ) {
+			$fileSizeWarning.slideUp();
+			$fileTooLarge.slideUp();
+			$badExtension.slideUp();
+			$submit.attr( 'disabled', true );
+			return;
+		}
+
+		name = $fileInput[0].files[0].name;
+		size = $fileInput[0].files[0].size;
+		extension = name.substr( ( name.lastIndexOf( '.' ) +1 ) );
+
+		isTooBig = 0 > maxSize - size;
+		isBadExtension = 'zip' !== extension;
+
+		if( isBadExtension ) {
+			$badExtension.slideDown();
+		} else {
+			$badExtension.slideUp();
+		}
+
+		if( isTooBig ) {
+			$fileSizeWarning.slideDown();
+			$fileTooLarge.slideDown();
+		} else {
+			$fileSizeWarning.slideUp();
+			$fileTooLarge.slideUp();
+		}
+
+		if( isTooBig || isBadExtension ) {
+			$submit.attr( 'disabled', true );
+		} else {
+			$submit.attr( 'disabled', false );
+		}
+	}
 
 	/**
 	 * Confirm to restore a selected backup archive file.
@@ -388,4 +437,6 @@
 	self.toggleHelp = function() {
 		$( this ).next( '.help' ).toggle();
 	};
-} )( jQuery );
+}
+
+BOLDGRID.BACKUP.HOME( jQuery );

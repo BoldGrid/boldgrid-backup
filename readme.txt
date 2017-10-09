@@ -38,6 +38,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 * Bug fix:      JIRA BGBKUP-36  PclZip fails on broken symlinks.
 * Bug fix:      JIRA WPB-3526   Total size: 0.00 B.
 * Bug fix:      JIRA BGBKUP-37  Warning: scandir - Permission denied.
+* Bug fix:      JIRA WPB-3512   Show error when user tries to upload file larger than what is accepted.
 
 = 1.5.1 =
 * Update		JIRA WPB-3480	Use wp filesystem when extracting backups.
