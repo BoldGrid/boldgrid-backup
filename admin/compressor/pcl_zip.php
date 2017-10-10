@@ -158,6 +158,47 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 	}
 
 	/**
+	 * Get a list of all sql dumps in an archive's root.
+	 *
+	 * When restoring an archive, this method is helpful in determining which
+	 * sql dump to restore. We're expecting only 1 to be found.
+	 *
+	 * @since 1.5.2
+	 *
+	 * @param  string $filepath Full path to zip file.
+	 * @return array An array of sql dumps found in the root.
+	 */
+	public function get_sqls( $filepath ) {
+		$sqls = array();
+
+		$zip = new PclZip( $filepath );
+
+		$list = $zip->listContent();
+
+		if( empty( $list ) ) {
+			return $sqls;
+		}
+
+		foreach( $list as $key => $file ) {
+			$filename = $file['filename'];
+
+			// If it's not in the root, skip it.
+			if( false !== strpos( $filename, '/' ) || false !== strpos( $filename, '\\' ) ) {
+				continue;
+			}
+
+			// If it's not in this format, skip it - Format: *.########-######.sql
+			if ( 1 !== preg_match( '/\.[\d]+-[\d]+\.sql$/', $filename ) ) {
+				continue;
+			}
+
+			$sqls[] = $filename;
+		}
+
+		return $sqls;
+	}
+
+	/**
 	 * Parse the error message and take appropriate action.
 	 *
 	 * @since 1.5.2

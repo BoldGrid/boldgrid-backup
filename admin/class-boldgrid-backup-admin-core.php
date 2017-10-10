@@ -896,9 +896,6 @@ class Boldgrid_Backup_Admin_Core {
 			// Display an error notice.
 			$this->notice->functionality_fail_notice();
 
-			// Delete the dump file.
-			$wp_filesystem->delete( $db_dump_filepath, false, 'f' );
-
 			return false;
 		}
 
@@ -920,9 +917,9 @@ class Boldgrid_Backup_Admin_Core {
 
 		$importer = new Boldgrid_Backup_Admin_Db_Import();
 		$status = $importer->import( $db_dump_filepath );
+
 		if( ! empty( $status['error'] ) ) {
 			do_action( 'boldgrid_backup_notice', $status['error'], 'notice notice-error is-dismissible' );
-			$wp_filesystem->delete( $db_dump_filepath, false, 'f' );
 			return false;
 		}
 
@@ -1671,17 +1668,43 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
+	 * @param  string $filepath The full filepath to the file .zip archive.
 	 * @return string File path to the database dump file.
 	 */
-	private function get_dump_file() {
-		// Connect to the WordPress Filesystem API.
-		global $wp_filesystem;
+	private function get_dump_file( $filepath ) {
+
+		if( empty( $filepath ) || ! $this->wp_filesystem->exists( $filepath ) ) {
+			return '';
+		}
+
+		/*
+		 * Get the sql file to restore.
+		 *
+		 * These few lines below are new to the get_dump_file method.
+		 * Historically we searched the ABSPATH for a filename matching
+		 * ########-######.sql and returned the first one we found. Well, what
+		 * if there were more than one matching file, which .sql file do we
+		 * restore?
+		 *
+		 * $pcl_zip->get_sqls Searches the zip file and finds a list of all
+		 * .sql files that match the pattern we're looking for and returns them.
+		 * We should only get 1 back, and that is the appropriate dump file.
+		 *
+		 * These few lines should do the trick. If not, the original code is
+		 * still in place to take the initial approach and find a dump file to
+		 * restore (the first applicable one it can find).
+		 */
+		$pcl_zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this );
+		$sqls = $pcl_zip->get_sqls( $filepath );
+		if( 1 === count( $sqls ) ) {
+			return ABSPATH . $sqls[0];
+		}
 
 		// Initialize $db_dump_filepath.
 		$db_dump_filepath = '';
 
 		// Find all backups.
-		$dirlist = $wp_filesystem->dirlist( ABSPATH, false, false );
+		$dirlist = $this->core->wp_filesystem->dirlist( ABSPATH, false, false );
 
 		// If no files were found, then return an empty array.
 		if ( empty( $dirlist ) ) {
@@ -1996,7 +2019,7 @@ class Boldgrid_Backup_Admin_Core {
 			// Restore database.
 			if ( ! $dryrun && $restore_ok ) {
 				// Get the database dump file path.
-				$db_dump_filepath = $this->get_dump_file();
+				$db_dump_filepath = $this->get_dump_file( $filepath );
 
 				// Initialize database table prefix.
 				$db_prefix = null;
@@ -2019,8 +2042,9 @@ class Boldgrid_Backup_Admin_Core {
 					}
 				}
 
-				// Restore the database.
+				// Restore the database and then delete the dump.
 				$restore_ok = $this->restore_database( $db_dump_filepath, $db_prefix );
+				$this->wp_filesystem->delete( $db_dump_filepath, false, 'f' );
 
 				// Display notice of deletion status.
 				if ( ! $restore_ok ) {
