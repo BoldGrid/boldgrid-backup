@@ -57,6 +57,9 @@ class Boldgrid_Backup_Admin_Core {
 	/**
 	 * Whether or not we're in ajax.
 	 *
+	 * When we're on the archives page and click "Backup Site Now", when
+	 * this->archive_files runs, it reports doing_ajax as true.
+	 *
 	 * @since  1.5.2
 	 * @access public
 	 * @var    bool
@@ -66,11 +69,23 @@ class Boldgrid_Backup_Admin_Core {
 	/**
 	 * Whether or not we're doing cron.
 	 *
+	 * When we're generating a backup, both via cron and wpcron, doing_cron is
+	 * true.
+	 *
 	 * @since  1.5.1
 	 * @access public
 	 * @var    bool
 	 */
 	public $doing_cron;
+
+	/**
+	 * Email.
+	 *
+	 * @since  1.5.2
+	 * @access public
+	 * @var    Boldgrid_Backup_Admin_Email
+	 */
+	public $email;
 
 	/**
 	 * The functionality test class object.
@@ -330,6 +345,8 @@ class Boldgrid_Backup_Admin_Core {
 		$this->jobs = new Boldgrid_Backup_Admin_Jobs( $this );
 
 		$this->local = new Boldgrid_Backup_Admin_Storage_Local( $this );
+
+		$this->email = new Boldgrid_Backup_Admin_Email( $this );
 
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
@@ -1194,7 +1211,7 @@ class Boldgrid_Backup_Admin_Core {
 			if( DOING_CRON ) {
 				$body = sprintf( $email_templates['fail_size']['body'], $size_data['messages']['notSupported'] );
 				$subject = sprintf( $email_templates['fail_size']['subject'], get_site_url() );
-				$this->send_notification( $subject, $body );
+				$this->email->send( $subject, $body );
 			}
 
 			return array(
@@ -1373,103 +1390,14 @@ class Boldgrid_Backup_Admin_Core {
 		$info['duration'] = number_format( ( $time_stop - $time_start ), 2, '.', '' );
 		$info['db_duration'] = number_format( ( $db_time_stop - $time_start ), 2, '.', '' );
 
-		// Get settings.
-		$settings = $this->settings->get_settings();
-
-		// If enabled, send email notification for backup completed.
-		if ( ! empty( $settings['notifications']['backup'] ) ) {
-
-			// Create a site identifier.
-			$site_id = Boldgrid_Backup_Admin_Utility::create_site_id();
-
-			// Create subject.
-			$subject = sprintf(
-				__( 'Backup completed for %s', 'boldgrid-backup' ),
-				$site_id
-			);
-
-			// Create message.
-			$body = esc_html__( 'Hello', 'boldgrid-backup' ) . ",\n\n";
-
-			if ( $dryrun ) {
-				$body .= esc_html__( 'THIS OPERATION WAS A DRY-RUN TEST', 'boldgrid-backup' ) . ".\n\n";
-			}
-
-			$body .= sprintf(
-				esc_html__( 'A backup archive has been created for %s', 'boldgrid-backup' ),
-				$site_id
-			) . ".\n\n";
-
-			$body .= esc_html__( 'Backup details', 'boldgrid-backup' ) . ":\n";
-
-			// Show how long the website was paused for.
-			$body .= sprintf( $this->configs['lang']['est_pause'], $info['db_duration'] ) . "\n";
-
-			$body .= sprintf(
-				esc_html__( 'Duration: %s seconds', 'boldgrid-backup' ),
-				$info['duration']
-			) . "\n";
-
-			$body .= sprintf(
-				esc_html__( 'Total size: %s', 'boldgrid-backup' ),
-				Boldgrid_Backup_Admin_Utility::bytes_to_human( $info['total_size'] )
-			) . "\n";
-
-			$body .= sprintf(
-				esc_html__( 'Archive file path: %s', 'boldgrid-backup' ),
-				$info['filepath']
-			) . "\n";
-
-			$body .= sprintf(
-				esc_html__( 'Archive file size: %s', 'boldgrid-backup' ),
-				Boldgrid_Backup_Admin_Utility::bytes_to_human( $info['filesize'] )
-			) . "\n";
-
-			$body .= sprintf(
-				esc_html__( 'Compressor used: %s', 'boldgrid-backup' ),
-				$info['compressor']
-			) . "\n\n";
-
-			if ( defined( 'DOING_CRON' ) ) {
-				$body .= esc_html__(
-					'The backup request was made via CRON (task scheduler)', 'boldgrid-backup'
-				) . ".\n\n";
-			}
-
-			$body .= esc_html__(
-				'You can manage notifications in your WordPress admin panel, under BoldGrid Backup Settings',
-				'boldgrid-backup'
-			) . ".\n\n";
-
-			$body .= sprintf(
-				esc_html__(
-					'For help with restoring a BoldGrid Backup archive file, please visit: %s',
-					'boldgrid-backup'
-				),
-				esc_url( $this->configs['urls']['restore'] )
-			) . "\n\n";
-
-			$body .= esc_html__( 'Best regards', 'boldgrid-backup' ) . ",\n\n";
-
-			$body .= esc_html__( 'The BoldGrid Backup plugin', 'boldgrid-backup' ) . "\n\n";
-
-			// Send the notification.
-			$info['mail_success'] = $this->send_notification( $subject, $body );
-		}
-
-		// If not a dry-run test, update the last backup option and enforce retention.
-		if ( ! $dryrun ) {
-			// Update WP option for "boldgrid_backup_last_backup".
-			update_site_option( 'boldgrid_backup_last_backup', time() );
-
-			$this->archive_log->write( $info );
-
-			// Enforce retention setting.
-			$this->enforce_retention();
-		}
-
 		/**
 		 * Actions to take after a backup has been created.
+		 *
+		 * At priority 100, we delete the local backup file if the user does
+		 * not want to keep it.
+		 *
+		 * At priority 200, we send an email to the user with a summary of the
+		 * backup and the jobs.
 		 *
 		 * @since 1.5.2
 		 *
@@ -1491,7 +1419,23 @@ class Boldgrid_Backup_Admin_Core {
 		 */
 		do_action( 'boldgrid_backup_post_archive_files', $info );
 
-		$this->local->post_archive_files( $info );
+		// Send an email.
+		if( $this->email->user_wants_notification( 'backup' ) && $this->doing_ajax ) {
+			$email_parts = $this->email->post_archive_parts( $info );
+			$email_body = $email_parts['body']['main'] . $email_parts['body']['signature'];
+			$info['mail_success'] = $this->email->send( $email_parts['subject'], $email_body );
+		}
+
+		// If not a dry-run test, update the last backup option and enforce retention.
+		if ( ! $dryrun ) {
+			// Update WP option for "boldgrid_backup_last_backup".
+			update_site_option( 'boldgrid_backup_last_backup', time() );
+
+			$this->archive_log->write( $info );
+
+			// Enforce retention setting.
+			$this->enforce_retention();
+		}
 
 		// Return the array of archive information.
 		return $info;
@@ -2106,7 +2050,7 @@ class Boldgrid_Backup_Admin_Core {
 
 			// Send the notification.
 			// Parameters come from the included mail template file.
-			$info['mail_success'] = $this->send_notification( $subject, $body );
+			$info['mail_success'] = $this->email->send( $subject, $body );
 		}
 
 		// Update status.
@@ -2474,42 +2418,6 @@ class Boldgrid_Backup_Admin_Core {
 			BOLDGRID_BACKUP_VERSION,
 			false
 		);
-	}
-
-	/**
-	 * Send a notification email to the admin email address.
-	 *
-	 * @since 1.0
-	 * @access private
-	 *
-	 * @param string $subject The email subject.
-	 * @param string $body The email body.
-	 *
-	 * @return bool Whether or not the notification email was sent.
-	 */
-	private function send_notification( $subject, $body ) {
-		// Abort if subject or body is empty.
-		if ( empty( $subject ) || empty( $body ) ) {
-			return false;
-		}
-
-		// Get settings, for the notification email address.
-		$settings = $this->settings->get_settings();
-
-		$admin_email = $settings['notification_email'];
-
-		// Get the site title.
-		$site_title = get_bloginfo( 'name' );
-
-		// Configure mail headers.
-		$headers = 'From: ' . $site_title . ' <' . $admin_email . '>' . "\r\n" . 'X-Mailer: PHP/' .
-			 phpversion() . "\r\n";
-
-		// Send mail.
-		$status = mail( $admin_email, $subject, $body, $headers );
-
-		// Return status.
-		return $status;
 	}
 
 	/**

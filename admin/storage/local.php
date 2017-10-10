@@ -68,6 +68,17 @@ class Boldgrid_Backup_Admin_Storage_Local {
 	 * @param array $info
 	 */
 	public function post_archive_files( $info ) {
+
+		/*
+		 * We only want to add this to the jobs queue if we're in the middle of
+		 * an automatic backup. If the user simply clicked on "Backup site now",
+		 * we don't want to automatically delete the backup, there's a button
+		 * for that.
+		 */
+		if( ! $this->core->doing_cron ) {
+			return;
+		}
+
 		if( $this->core->remote->is_enabled( 'local' ) ) {
 			return;
 		}
@@ -76,6 +87,7 @@ class Boldgrid_Backup_Admin_Storage_Local {
 			'filepath' => $info['filepath'],
 			'action' => 'boldgrid_backup_delete_local',
 			'action_data' => $info['filepath'],
+			'action_title' => __( 'Delete local copy of backup', 'boldgrid-backup' ),
 		);
 
 		$this->core->jobs->add( $args );

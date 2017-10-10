@@ -192,6 +192,8 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/storage/local.php';
 
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-email.php';
+
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
 
@@ -317,6 +319,10 @@ class Boldgrid_Backup {
 		$this->loader->add_filter( 'plugins_loaded', $plugin_admin_core, 'init_premium' );
 
 		$this->loader->add_action( 'boldgrid_backup_delete_local', $plugin_admin_core->local, 'delete_local' );
+
+		$this->loader->add_action( 'boldgrid_backup_post_archive_files', $plugin_admin_core->local, 'post_archive_files', 100 );
+		$this->loader->add_action( 'boldgrid_backup_post_archive_files', $plugin_admin_core->jobs, 'post_archive_files', 200 );
+		$this->loader->add_action( 'boldgrid_backup_post_jobs_email', $plugin_admin_core->jobs, 'post_jobs_email' );
 
 		return;
 	}
