@@ -44,6 +44,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 * Update:       JIRA BGBKUP-35  As a user, I can receive an email after Amazon S3 upload.
 * Bug fix:      JIRA BGBKUP-21  Wrong sql file is restored.
 * Update:       JIRA WPB-3529   Send email if backup fails via cron.
+* Update:       JIRA WPB-3529   Use ZipArchive by default.
 
 = 1.5.1 =
 * Update		JIRA WPB-3480	Use wp filesystem when extracting backups.
