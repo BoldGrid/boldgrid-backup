@@ -324,6 +324,7 @@ class Boldgrid_Backup {
 		$this->loader->add_action( 'boldgrid_backup_post_archive_files', $plugin_admin_core->jobs, 'post_archive_files', 200 );
 		$this->loader->add_action( 'boldgrid_backup_post_jobs_email', $plugin_admin_core->jobs, 'post_jobs_email' );
 
+		$this->loader->add_action( 'boldgrid_backup_cron_fail_email', $plugin_admin_core->archive_fail, 'cron_fail_email' );
 		return;
 	}
 

@@ -40,6 +40,25 @@ class Boldgrid_Backup_Admin_Email {
 	}
 
 	/**
+	 * Create a generic email body.
+	 *
+	 * @since 1.5.2
+	 *
+	 * @param  string $message
+	 * @return string
+	 */
+	public function fill_generic_template( $message ) {
+		$email_body = __( 'Hello', 'boldgrid-backup' ) . ",\n\n";
+
+		$email_body .= trim( $message ) . "\n\n";
+
+		$email_body .= __( 'Best regards', 'boldgrid-backup' ) . ",\n\n";
+		$email_body .= __( 'The BoldGrid Backup plugin', 'boldgrid-backup' ) . "\n\n";
+
+		return $email_body;
+	}
+
+	/**
 	 * Get the email to send after a backup has been generated.
 	 *
 	 * @since 1.5.2
