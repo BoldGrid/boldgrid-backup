@@ -219,12 +219,7 @@ class Boldgrid_Backup_Admin_Cron {
 
 		// Check if crontab is available.
 		$is_crontab_available = $this->core->test->is_crontab_available();
-
-		// Check if wp-cron is available.
-		$is_wpcron_available = $this->core->test->wp_cron_enabled();
-
-		// If crontab or wp-cron is not available, then return an empty array.
-		if ( ! $is_crontab_available && ! $is_wpcron_available ) {
+		if ( ! $is_crontab_available ) {
 			return array();
 		}
 
@@ -245,83 +240,76 @@ class Boldgrid_Backup_Admin_Cron {
 		// Set a search pattern to match for our cron jobs.
 		$pattern = dirname( dirname( __FILE__ ) ) . '/boldgrid-backup-cron.php" mode=' . $mode;
 
-		// Use either crontab or wp-cron.
-		if ( $is_crontab_available ) {
-			$crontab_exploded = $this->get_all();
+		$crontab_exploded = $this->get_all();
 
-			// Initialize $entry.
-			$entry = '';
+		// Initialize $entry.
+		$entry = '';
 
-			foreach ( $crontab_exploded as $line ) {
-				if ( false !== strpos( $line, $pattern ) ) {
-					// Found a matching entry.
-					$entry = trim( $line );
+		foreach ( $crontab_exploded as $line ) {
+			if ( false !== strpos( $line, $pattern ) ) {
+				// Found a matching entry.
+				$entry = trim( $line );
 
-					break;
-				}
+				break;
+			}
+		}
+
+		// If a match was found, then get the schedule.
+		if ( ! empty( $entry ) ) {
+			// Parse cron schedule.
+			preg_match_all( '/([0-9*]+)(,([0-9*])+)*? /', $entry, $matches );
+
+			// Minute.
+			if ( isset( $matches[1][0] ) && is_numeric( $matches[1][0] ) ) {
+				$schedule['tod_m'] = intval( $matches[1][0] );
+			} else {
+				return array();
 			}
 
-			// If a match was found, then get the schedule.
-			if ( ! empty( $entry ) ) {
-				// Parse cron schedule.
-				preg_match_all( '/([0-9*]+)(,([0-9*])+)*? /', $entry, $matches );
+			// Hour.
+			if ( isset( $matches[1][1] ) && is_numeric( $matches[1][1] ) ) {
+				$schedule['tod_h'] = intval( $matches[1][1] );
+			} else {
+				return array();
+			}
 
-				// Minute.
-				if ( isset( $matches[1][0] ) && is_numeric( $matches[1][0] ) ) {
-					$schedule['tod_m'] = intval( $matches[1][0] );
-				} else {
-					return array();
-				}
+			// Convert from 24H to 12H time format.
+			$unix_time = strtotime( $schedule['tod_h'] . ':' . $schedule['tod_m'] );
 
-				// Hour.
-				if ( isset( $matches[1][1] ) && is_numeric( $matches[1][1] ) ) {
-					$schedule['tod_h'] = intval( $matches[1][1] );
-				} else {
-					return array();
-				}
+			$schedule['tod_h'] = intval( date( 'g', $unix_time ) );
+			$schedule['tod_a'] = date( 'A', $unix_time );
 
-				// Convert from 24H to 12H time format.
-				$unix_time = strtotime( $schedule['tod_h'] . ':' . $schedule['tod_m'] );
-
-				$schedule['tod_h'] = intval( date( 'g', $unix_time ) );
-				$schedule['tod_a'] = date( 'A', $unix_time );
-
-				// Days of the week.
-				if ( isset( $matches[0][4] ) ) {
-					$days = explode( ',', $matches[0][4] );
-
+			// Days of the week.
+			if ( isset( $matches[0][4] ) ) {
+				$days = explode( ',', $matches[0][4] );
 					foreach ( $days as $day ) {
-						switch ( $day ) {
-							case 0 :
-								$schedule['dow_sunday'] = 1;
-								break;
-							case 1 :
-								$schedule['dow_monday'] = 1;
-								break;
-							case 2 :
-								$schedule['dow_tuesday'] = 1;
-								break;
-							case 3 :
-								$schedule['dow_wednesday'] = 1;
-								break;
-							case 4 :
-								$schedule['dow_thursday'] = 1;
-								break;
-							case 5 :
-								$schedule['dow_friday'] = 1;
-								break;
-							case 6 :
-								$schedule['dow_saturday'] = 1;
-								break;
-							default :
-								break;
-						}
+					switch ( $day ) {
+						case 0 :
+							$schedule['dow_sunday'] = 1;
+							break;
+						case 1 :
+							$schedule['dow_monday'] = 1;
+							break;
+						case 2 :
+							$schedule['dow_tuesday'] = 1;
+							break;
+						case 3 :
+							$schedule['dow_wednesday'] = 1;
+							break;
+						case 4 :
+							$schedule['dow_thursday'] = 1;
+							break;
+						case 5 :
+							$schedule['dow_friday'] = 1;
+							break;
+						case 6 :
+							$schedule['dow_saturday'] = 1;
+							break;
+						default :
+							break;
 					}
 				}
 			}
-		} else {
-			// Use wp-cron.
-			// @todo Write wp-cron code here.
 		}
 
 		return $schedule;
