@@ -189,6 +189,11 @@ class Boldgrid_Backup_Admin_Settings {
 			$settings['remote'] = array();
 		}
 
+		// For consistency, untrailingslashit the backup dir.
+		if( isset( $settings['backup_directory'] ) ) {
+			$settings['backup_directory'] = untrailingslashit( $settings['backup_directory'] );
+		}
+
 		// Return the settings array.
 		return $settings;
 	}
@@ -200,13 +205,13 @@ class Boldgrid_Backup_Admin_Settings {
 	 *
 	 * @param string $old_dir
 	 * @param string $new_dir
+	 * @return bool True on success / no backups needed to be moved.
 	 */
 	private function move_backups( $old_dir, $new_dir ) {
-		$any_failed = false;
+		$fail_count = 0;
 
-		// Don't assume paths end in '/'. First remove forward slashes at the end, then add back.
-		$old_dir = rtrim( $old_dir, '/' ) . '/';
-		$new_dir = rtrim( $new_dir, '/' ) . '/';
+		$old_dir = Boldgrid_Backup_Admin_Utility::trailingslashit( $old_dir );
+		$new_dir = Boldgrid_Backup_Admin_Utility::trailingslashit( $new_dir );
 
 		$archives = $this->core->get_archive_list( null, $old_dir );
 
@@ -220,11 +225,11 @@ class Boldgrid_Backup_Admin_Settings {
 			$success = @$this->core->wp_filesystem->move( $source, $destination );
 
 			if( ! $success ) {
-				$any_failed = true;
+				$fail_count++;
 			}
 		}
 
-		return $any_failed;
+		return 0 === $fail_count;
 	}
 
 	/**
@@ -422,6 +427,12 @@ class Boldgrid_Backup_Admin_Settings {
 			$backup_dir_changed = false;
 			$original_backup_directory = ! empty( $settings['backup_directory'] ) ? $settings['backup_directory'] : false;
 
+			if( ! empty( $_POST['backup_directory'] ) ) {
+				$post_backup_directory = trim( $_POST['backup_directory'] );
+				$post_backup_directory = untrailingslashit( $post_backup_directory );
+				$post_backup_directory = str_replace( '\\\\', '\\', $post_backup_directory );
+			}
+
 			/*
 			 * Create the backup directory.
 			 *
@@ -434,27 +445,34 @@ class Boldgrid_Backup_Admin_Settings {
 				$backup_directory = $this->core->backup_dir->get();
 
 				$backup_dir_changed = true;
-			} elseif( trim( $_POST['backup_directory'] ) !== $original_backup_directory ) {
-				$backup_directory = trim( $_POST['backup_directory'] );
-				$backup_directory = str_replace( '\\\\', '\\', $backup_directory );
+			} elseif( $post_backup_directory !== $original_backup_directory ) {
+				$backup_directory = $post_backup_directory;
 
+				/*
+				 * The user can enter whatever they'd like as the backup dir. If
+				 * it doesn't exist, let's try to create it.
+				 */
+				if( ! $this->core->wp_filesystem->exists( $backup_directory ) ) {
+					$backup_directory = $this->core->backup_dir->create( $backup_directory );
+				}
+
+				// Make sure that the backup directory has proper permissions.
 				$valid = $this->core->backup_dir->is_valid( $backup_directory );
 				if( ! $valid ) {
 					$backup_directory = false;
 				}
 
-				if( $valid ) {
-					$backup_directory = $this->core->backup_dir->create( $backup_directory );
-				}
-
 				$backup_dir_changed = true;
 			}
 
-			// If we tried to create a backup directory but failed, adjust errors.
-			if( $backup_dir_changed && false === $backup_directory ) {
-				$update_error = true;
-				$backup_dir_changed = false;
-				$update_errors = array_merge( $update_errors, $this->core->backup_dir->errors );
+			if( $backup_dir_changed ) {
+				if( false === $backup_directory ) {
+					$update_error = true;
+					$backup_dir_changed = false;
+					$update_errors = array_merge( $update_errors, $this->core->backup_dir->errors );
+				} else {
+					$settings['backup_directory'] = $backup_directory;
+				}
 			}
 
 			// Move backups to the new directory.
@@ -463,7 +481,7 @@ class Boldgrid_Backup_Admin_Settings {
 
 				if( ! $backups_moved ) {
 					$update_error = true;
-					$update_errors[] = printf( __( 'Unable to move backups from %1$s to %2$s.', 'boldgrid-backup' ), $original_backup_directory, $backup_directory );
+					$update_errors[] = sprintf( __( 'Unable to move backups from %1$s to %2$s', 'boldgrid-backup' ), $original_backup_directory, $backup_directory );
 				}
 			}
 
@@ -713,6 +731,12 @@ class Boldgrid_Backup_Admin_Settings {
 	 * @return bool True on success.
 	 */
 	public function save( $settings ) {
+
+		// For consistency, untrailingslashit the backup dir.
+		if( isset( $settings['backup_directory'] ) ) {
+			$settings['backup_directory'] = untrailingslashit( $settings['backup_directory'] );
+		}
+
 		return update_site_option( 'boldgrid_backup_settings', $settings );
 	}
 

@@ -71,7 +71,7 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	 * @since 1.5.1
 	 *
 	 * @param  string $backup_dir
-	 * @return string
+	 * @return mixed False on failure, trailingslashed $backup_dir on success.
 	 */
 	public function create( $backup_dir ) {
 		$check_permissions = __( 'Please ensure your backup directory exists and has the proper read, write, and modify permissions.', 'boldgrid-backup' );
@@ -79,11 +79,11 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 		$cannot_create = __( 'Unable to create necessary file: %1$s<br />%2$s', 'boldgrid-backup' );
 		$cannot_write = __( 'Unable to write to necessary file: %1$s<br />%2$s', 'boldgrid-backup' );
 
-		$backup_dir = Boldgrid_Backup_Admin_Utility::trailingslashit( $backup_dir );
+		$backup_dir = untrailingslashit( $backup_dir );
 
-		$htaccess_path = $backup_dir . '.htaccess';
-		$index_html_path = $backup_dir . 'index.html';
-		$index_php_path = $backup_dir . 'index.php';
+		$htaccess_path = $backup_dir . DIRECTORY_SEPARATOR . '.htaccess';
+		$index_html_path = $backup_dir . DIRECTORY_SEPARATOR . 'index.html';
+		$index_php_path = $backup_dir . DIRECTORY_SEPARATOR . 'index.php';
 
 		$files = array(
 			array(
@@ -166,7 +166,7 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 			}
 
 			// Create /parent_directory/boldgrid-backup.
-			$possible_dir .= DIRECTORY_SEPARATOR . 'boldgrid-backup';
+			$possible_dir .= DIRECTORY_SEPARATOR . 'boldgrid_backup';
 			if( ! $this->core->wp_filesystem->exists( $possible_dir ) ) {
 				$created = $this->core->wp_filesystem->mkdir( $possible_dir );
 				if( ! $created ) {
@@ -202,7 +202,7 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 		 */
 		if( empty( $settings['backup_directory'] ) || $settings['backup_directory'] !== $backup_directory ) {
 			$settings['backup_directory'] = $backup_directory;
-			update_site_option( 'boldgrid_backup_settings', $settings );
+			$this->core->settings->save( $settings );
 		}
 
 		/*
@@ -281,8 +281,16 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	 * Validate backup directory.
 	 *
 	 * Make sure it exists, it's writable, etc.
+	 *
+	 * @param  string $backup_dir
+	 * @return bool
 	 */
 	public function is_valid( $backup_dir ) {
+
+		if( empty( $backup_dir ) ) {
+			return false;
+		}
+
 		$perms = $this->core->test->extensive_dir_test( $backup_dir );
 
 		if( ! $perms['exists'] ) {

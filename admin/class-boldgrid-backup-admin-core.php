@@ -828,8 +828,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Create a file path for the dump file.
-		$db_dump_filepath = $backup_directory . DB_NAME . '.' . date( 'Ymd-His' ) .
-			 '.sql';
+		$db_dump_filepath = $backup_directory . DIRECTORY_SEPARATOR . DB_NAME . '.' . date( 'Ymd-His' ) . '.sql';
 
 		// Save the file path.
 		$this->db_dump_filepath = $db_dump_filepath;
@@ -898,9 +897,6 @@ class Boldgrid_Backup_Admin_Core {
 
 			return false;
 		}
-
-		// Get the backup directory path.
-		$backup_directory = $this->backup_dir->get();
 
 		// Connect to the WordPress Filesystem API.
 		global $wp_filesystem;
@@ -1147,7 +1143,7 @@ class Boldgrid_Backup_Admin_Core {
 		$filename = sanitize_file_name( $filename );
 
 		// Create a file path with no extension (added later).
-		$filepath = $backup_directory . $filename;
+		$filepath = $backup_directory . DIRECTORY_SEPARATOR . $filename;
 
 		// If specified, add an extension.
 		if ( ! empty( $extension ) ) {

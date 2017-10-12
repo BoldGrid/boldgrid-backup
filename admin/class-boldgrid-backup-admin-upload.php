@@ -249,7 +249,7 @@ class Boldgrid_Backup_Admin_Upload {
 		$file_basename = preg_replace( '#-+#', '-', $file_basename );
 
 		// Create the file save path.
-		$file_save_path = $backup_directory . '/' . $file_basename;
+		$file_save_path = $backup_directory . DIRECTORY_SEPARATOR . $file_basename;
 
 		// Update the base filename.
 		$_FILES['file']['name'] = $file_basename;

@@ -45,6 +45,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 * Bug fix:      JIRA BGBKUP-21  Wrong sql file is restored.
 * Update:       JIRA WPB-3529   Send email if backup fails via cron.
 * Update:       JIRA WPB-3529   Use ZipArchive by default.
+* Bug fix:      JIRA WPB-3528   Backup: Cannot change backup directory.
 
 = 1.5.1 =
 * Update		JIRA WPB-3480	Use wp filesystem when extracting backups.
