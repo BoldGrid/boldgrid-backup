@@ -34,3 +34,7 @@
 	border: 0px;
 	background: transparent;
 }
+
+.functionality-test-section pre {
+	white-space: pre-line;
+}

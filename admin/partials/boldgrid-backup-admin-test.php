@@ -36,6 +36,7 @@ $allowed_tags = array(
 		)
 	),
 	'br' => array(),
+	'pre' => array(),
 );
 
 $backup_dir_perms = $this->test->extensive_dir_test( $backup_directory );
@@ -215,6 +216,11 @@ $tests[] = array(
 $tests[] = array(
 	'k' => __( 'System crontab available?', 'boldgrid-backup' ),
 	'v' => ( $this->test->is_crontab_available() ? $lang['yes'] : sprintf( $warning_span, $lang['no'], '' ) ),
+);
+
+$tests[] = array(
+	'k' => __( 'Cron jobs', 'boldgrid-backup' ),
+	'v' => '<pre>' . implode( '<br /><br />', $our_crons ) . '</pre>',
 );
 
 $tests[] = array(

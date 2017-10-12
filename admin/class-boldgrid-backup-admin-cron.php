@@ -502,6 +502,33 @@ class Boldgrid_Backup_Admin_Cron {
 	}
 
 	/**
+	 * Get all of our cron jobs.
+	 *
+	 * Similar to self::get_all, except only returns crons belonging to this
+	 * installation.
+	 *
+	 * @since 1.5.2
+	 *
+	 * @return array
+	 */
+	public function get_our_crons() {
+		$our = array();
+		$all = $this->get_all();
+
+		if( empty( $all ) ) {
+			return $our;
+		}
+
+		foreach( $all as $cron ) {
+			if( false !== strpos( $cron, BOLDGRID_BACKUP_PATH ) ) {
+				$our[] = $cron;
+			}
+		}
+
+		return $our;
+	}
+
+	/**
 	 * Read a line from the cron and return the schedule.
 	 *
 	 * @since 1.5.2

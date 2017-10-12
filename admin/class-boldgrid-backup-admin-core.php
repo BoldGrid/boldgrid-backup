@@ -2414,6 +2414,12 @@ class Boldgrid_Backup_Admin_Core {
 
 		$disk_space = $this->test->get_disk_space();
 
+		// Get our crons and ready them for display.
+		$our_crons = $this->cron->get_our_crons();
+		foreach( $our_crons as &$cron ) {
+			$cron = esc_html( $cron );
+		}
+
 		// Enqueue CSS for the test page.
 		wp_enqueue_style( 'boldgrid-backup-admin-test',
 			plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-test.css', array(),
