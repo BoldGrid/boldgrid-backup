@@ -247,24 +247,7 @@ class Boldgrid_Backup_Admin_Cron {
 
 		// Use either crontab or wp-cron.
 		if ( $is_crontab_available ) {
-			// Use crontab.
-			// Read crontab.
-			$command = 'crontab -l';
-
-			$crontab = $this->core->execute_command( $command, null, $success );
-
-			// If the command to retrieve crontab failed, then return an empty array.
-			if ( ! $success ) {
-				return array();
-			}
-
-			// If no entries exist, then return an empty array.
-			if ( false === strpos( $crontab, $pattern ) ) {
-				return array();
-			}
-
-			// Explode the crontab into an array.
-			$crontab_exploded = explode( "\n", $crontab );
+			$crontab_exploded = $this->get_all();
 
 			// Initialize $entry.
 			$entry = '';
@@ -570,6 +553,34 @@ class Boldgrid_Backup_Admin_Cron {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Get all entries in cron.
+	 *
+	 * @since 1.5.2
+	 *
+	 * @return array
+	 */
+	public function get_all() {
+		$is_crontab_available = $this->core->test->is_crontab_available();
+
+		if( ! $is_crontab_available ) {
+			return array();
+		}
+
+		$command = 'crontab -l';
+		$crontab = $this->core->execute_command( $command, null, $success );
+
+		// If the command to retrieve crontab failed, then return an empty array.
+		if ( ! $success ) {
+			return array();
+		}
+
+		// Explode the crontab into an array.
+		$crontab_exploded = explode( "\n", $crontab );
+
+		return $crontab_exploded;
 	}
 
 	/**
