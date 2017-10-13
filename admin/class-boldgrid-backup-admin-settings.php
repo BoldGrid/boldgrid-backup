@@ -437,14 +437,13 @@ class Boldgrid_Backup_Admin_Settings {
 			 * Create the backup directory.
 			 *
 			 * Allow the user to submit a blank backup directory if they want
-			 * to set the backup directory to the default, which is
-			 * wp-content/boldgrid-backup.
+			 * to set the backup directory to the default.
 			 */
 			if( empty( $_POST['backup_directory'] ) ) {
 				// The get method validates and creates the backup directory.
-				$backup_directory = $this->core->backup_dir->get();
+				$backup_directory = $this->core->backup_dir->guess_and_set();
 
-				$backup_dir_changed = true;
+				$backup_dir_changed = $original_backup_directory !== $backup_directory;
 			} elseif( $post_backup_directory !== $original_backup_directory ) {
 				$backup_directory = $post_backup_directory;
 
