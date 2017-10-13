@@ -227,6 +227,12 @@ class Boldgrid_Backup_Admin_Cron {
 		$pattern = dirname( dirname( __FILE__ ) ) . '/boldgrid-backup-cron.php" mode=' . $mode;
 
 		$crontab_exploded = $this->get_all();
+		$crontab = implode( "", $crontab_exploded );
+
+		// If there's no cron jobs matching our pattern, abort.
+		if( empty( $crontab_exploded ) || false === strpos( $crontab, $pattern ) ) {
+			return array();
+		}
 
 		// Initialize $entry.
 		$entry = '';

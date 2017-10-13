@@ -228,6 +228,11 @@ $tests[] = array(
 	'v' => ( $this->test->wp_cron_enabled() ? 'Yes' : 'No' ),
 );
 
+$tests[] = array(
+	'k' => __( 'WP Cron jobs', 'boldgrid-backup' ),
+	'v' => '<pre>' . implode( '<br /><br />', $our_wp_crons ) . '</pre>',
+);
+
 // Run only these tests if the server is compatible.
 if ( $is_functional ) {
 	$tests[] = array(

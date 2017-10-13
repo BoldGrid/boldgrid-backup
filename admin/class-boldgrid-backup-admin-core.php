@@ -2419,6 +2419,10 @@ class Boldgrid_Backup_Admin_Core {
 		foreach( $our_crons as &$cron ) {
 			$cron = esc_html( $cron );
 		}
+		$our_wp_crons = $this->wp_cron->get_our_crons();
+		foreach( $our_wp_crons as &$cron ) {
+			$cron = esc_html( $cron );
+		}
 
 		// Enqueue CSS for the test page.
 		wp_enqueue_style( 'boldgrid-backup-admin-test',
