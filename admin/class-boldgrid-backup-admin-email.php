@@ -84,10 +84,13 @@ class Boldgrid_Backup_Admin_Email {
 		$parts['body']['main'] .= sprintf( esc_html__( 'Total size: %s', 'boldgrid-backup' ), Boldgrid_Backup_Admin_Utility::bytes_to_human( $info['total_size'] ) ) . "\n";
 		$parts['body']['main'] .= sprintf( esc_html__( 'Archive file path: %s', 'boldgrid-backup' ), $info['filepath'] ) . "\n";
 		$parts['body']['main'] .= sprintf( esc_html__( 'Archive file size: %s', 'boldgrid-backup' ), Boldgrid_Backup_Admin_Utility::bytes_to_human( $info['filesize'] ) ) . "\n";
-		$parts['body']['main'] .= sprintf( esc_html__( 'Compressor used: %s', 'boldgrid-backup' ), $info['compressor'] ) . "\n\n";
-		if ( defined( 'DOING_CRON' ) ) {
-			$parts['body']['main'] .= esc_html__( 'The backup request was made via CRON (task scheduler)', 'boldgrid-backup' ) . ".\n\n";
+		$parts['body']['main'] .= sprintf( esc_html__( 'Compressor used: %s', 'boldgrid-backup' ), $info['compressor'] ) . "\n";
+
+		if( ! empty( $info['trigger'] ) ) {
+			$parts['body']['main'] .= sprintf( esc_html__( 'Backup triggered by: %1$s', 'boldgrid-backup' ), $info['trigger'] ) . "\n";
 		}
+
+		$parts['body']['main'] .= "\n";
 
 		$parts['body']['signature'] = esc_html__( 'You can manage notifications in your WordPress admin panel, under BoldGrid Backup Settings', 'boldgrid-backup' ) . ".\n\n";
 		$parts['body']['signature'] .= sprintf( esc_html__( 'For help with restoring a BoldGrid Backup archive file, please visit: %s', 'boldgrid-backup' ), esc_url( $this->core->configs['urls']['restore'] ) ) . "\n\n";
