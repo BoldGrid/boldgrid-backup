@@ -1225,8 +1225,17 @@ class Boldgrid_Backup_Admin_Core {
 			'total_size' => 0,
 		);
 
-		if( $this->doing_cron ) {
+		// Determine how this backup was triggered.
+		$sapi_type = php_sapi_name();
+		if( $this->doing_ajax ) {
+			$current_user = wp_get_current_user();
+			$info['trigger'] = $current_user->user_login . ' (' . $current_user->user_email . ')';
+		} elseif( $this->doing_cron && substr( $sapi_type, 0, 3 ) === 'cli' ) {
+			$info['trigger'] = 'Cron';
+		} elseif( $this->doing_cron ) {
 			$info['trigger'] = 'WP cron';
+		} else {
+			$info['trigger'] = __( 'Unknown', 'boldgrid-backup' );
 		}
 
 		$info['compressor'] = $this->compressors->get();
