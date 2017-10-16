@@ -56,7 +56,7 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 	 * @since 1.5.2
 	 *
 	 * @param  array $data
-	 * @retrun bool True on success
+	 * @return bool True on success
 	 */
 	public function cron_fail_email( $data ) {
 		$subject = __( 'Backup failed for', 'boldgrid-backup' ) . ' ' . get_site_url();
