@@ -36,6 +36,7 @@ $allowed_tags = array(
 		)
 	),
 	'br' => array(),
+	'pre' => array(),
 );
 
 $backup_dir_perms = $this->test->extensive_dir_test( $backup_directory );
@@ -218,8 +219,18 @@ $tests[] = array(
 );
 
 $tests[] = array(
+	'k' => __( 'Cron jobs', 'boldgrid-backup' ),
+	'v' => '<pre>' . implode( '<br /><br />', $our_crons ) . '</pre>',
+);
+
+$tests[] = array(
 	'k' => __( 'Is WP-CRON enabled?', 'boldgrid-backup' ),
 	'v' => ( $this->test->wp_cron_enabled() ? 'Yes' : 'No' ),
+);
+
+$tests[] = array(
+	'k' => __( 'WP Cron jobs', 'boldgrid-backup' ),
+	'v' => '<pre>' . implode( '<br /><br />', $our_wp_crons ) . '</pre>',
 );
 
 // Run only these tests if the server is compatible.

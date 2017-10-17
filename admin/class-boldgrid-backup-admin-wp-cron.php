@@ -189,6 +189,34 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	}
 
 	/**
+	 * Get all of our wp crons.
+	 *
+	 * @since 1.5.2
+	 *
+	 * @return array
+	 */
+	public function get_our_crons() {
+		$ours = array();
+
+		$crons = _get_cron_array();
+		$crons = is_array( $crons ) ? $crons : array();
+
+		foreach( $crons as $time => $cron ) {
+			$action = key( $cron );
+
+			if( empty( $action ) || 0 !== strpos( $action, 'boldgrid_backup_' ) ) {
+				continue;
+			}
+
+			$action_key = key( $cron[$action] );
+
+			$ours[] = sprintf( '%1$s (%2$s %3$s %4$s)', $action, $cron[$action][$action_key]['schedule'], __( 'starting','boldgrid-backup' ), date( 'Y.m.d h:i:s a e', $time ) );
+		}
+
+		return $ours;
+	}
+
+	/**
 	 * Restore via wp cron.
 	 *
 	 * @since 1.5.2

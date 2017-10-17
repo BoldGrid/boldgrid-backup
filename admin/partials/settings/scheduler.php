@@ -17,6 +17,11 @@ if( 1 === $schedulers_count ) {
 	return;
 }
 
+$wp_cron_warning = sprintf(
+	'<p class="wp-cron-notice hidden"><span class="dashicons dashicons-warning yellow"></span> %1$s</p>',
+	__( 'When using WP Cron, we cannot guarantee that backups will be created at the times you specify. Cron is the recommended scheduler.', 'boldgrid-backup' )
+);
+
 $scheduler_options = '';
 foreach( $schedulers_available as $key => $scheduler_data ) {
 	$scheduler_options .= sprintf(
@@ -32,10 +37,14 @@ $scheduler_select = sprintf( '<select name="scheduler" id="scheduler">%1$s</sele
 printf( '
 	<tr>
 		<th>%1$s</th>
-		<td>%2$s</td>
+		<td>
+			%2$s
+			%3$s
+		</td>
 	</tr>',
 	__( 'Scheduler', 'boldgrid-backup' ),
-	$scheduler_select
+	$scheduler_select,
+	$wp_cron_warning
 );
 
 ?>

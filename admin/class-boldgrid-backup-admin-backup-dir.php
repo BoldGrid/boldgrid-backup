@@ -71,7 +71,7 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	 * @since 1.5.1
 	 *
 	 * @param  string $backup_dir
-	 * @return string
+	 * @return mixed False on failure, trailingslashed $backup_dir on success.
 	 */
 	public function create( $backup_dir ) {
 		$check_permissions = __( 'Please ensure your backup directory exists and has the proper read, write, and modify permissions.', 'boldgrid-backup' );
@@ -79,11 +79,11 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 		$cannot_create = __( 'Unable to create necessary file: %1$s<br />%2$s', 'boldgrid-backup' );
 		$cannot_write = __( 'Unable to write to necessary file: %1$s<br />%2$s', 'boldgrid-backup' );
 
-		$backup_dir = Boldgrid_Backup_Admin_Utility::trailingslashit( $backup_dir );
+		$backup_dir = untrailingslashit( $backup_dir );
 
-		$htaccess_path = $backup_dir . '.htaccess';
-		$index_html_path = $backup_dir . 'index.html';
-		$index_php_path = $backup_dir . 'index.php';
+		$htaccess_path = $backup_dir . DIRECTORY_SEPARATOR . '.htaccess';
+		$index_html_path = $backup_dir . DIRECTORY_SEPARATOR . 'index.html';
+		$index_php_path = $backup_dir . DIRECTORY_SEPARATOR . 'index.php';
 
 		$files = array(
 			array(
@@ -147,73 +147,21 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	 * @return string|bool The backup directory path, or FALSE on error.
 	 */
 	public function get() {
+
+		// If we've already set the backup directory, return it.
 		if( ! empty( $this->backup_directory ) ) {
 			return $this->backup_directory;
 		}
 
-		$possible_dirs = $this->get_possible_dirs();
-
+		// If we have it in the settings, then use it.
 		$settings = $this->core->settings->get_settings();
 		if( ! empty( $settings['backup_directory'] ) ) {
-			$parent_from_settings = dirname( $settings['backup_directory'] );
-			array_unshift( $possible_dirs, $parent_from_settings );
+			$this->set( $settings['backup_directory'] );
+			return $this->backup_directory;
 		}
 
-		foreach( $possible_dirs as $possible_dir ) {
-			// Ensure /parent_directory exists.
-			if( ! $this->core->wp_filesystem->exists( $possible_dir ) ) {
-				continue;
-			}
 
-			// Create /parent_directory/boldgrid-backup.
-			$possible_dir .= DIRECTORY_SEPARATOR . 'boldgrid-backup';
-			if( ! $this->core->wp_filesystem->exists( $possible_dir ) ) {
-				$created = $this->core->wp_filesystem->mkdir( $possible_dir );
-				if( ! $created ) {
-					continue;
-				}
-			}
-
-			// Validate read/write/modify/ect. permissions of /parent_directory/boldgrid-backup.
-			$valid = $this->is_valid( $possible_dir );
-			if( ! $valid ) {
-				continue;
-			}
-
-			// Create necessary files, such as /parent_directory/boldgrid-backup/.htaccess
-			$created = $this->create( $possible_dir );
-			if( ! $created ) {
-				continue;
-			}
-
-			$backup_directory = $created;
-			$this->backup_directory = $backup_directory;
-			break;
-		}
-
-		if( empty( $backup_directory ) ) {
-			return false;
-		}
-
-		/*
-		 * If there is not a valid backup directory stored in the settings, then
-		 * we'll need to add / overwrite the value in the settings with a dir
-		 * that we create.
-		 */
-		if( empty( $settings['backup_directory'] ) || $settings['backup_directory'] !== $backup_directory ) {
-			$settings['backup_directory'] = $backup_directory;
-			update_site_option( 'boldgrid_backup_settings', $settings );
-		}
-
-		/*
-		 * Even in a Windows environment, wp_filesystem->dirlist retrieves paths
-		 * with a / instead of \. Fix $without_abspath so we can properly check
-		 * if files are in the backup directory.
-		 */
-		$this->without_abspath = str_replace( ABSPATH, '', $this->backup_directory );
-		$this->without_abspath = str_replace( '\\', '/', $this->without_abspath );
-
-		return $this->backup_directory;
+		return $this->guess_and_set();
 	}
 
 	/**
@@ -255,6 +203,60 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	}
 
 	/**
+	 * Set our backup directory.
+	 *
+	 * Based on the environment, determine where best backup dir should be and
+	 * then create it.
+	 *
+	 * @since 1.5.2
+	 *
+	 * @return mixed Backup directory on success, false on failure.
+	 */
+	public function guess_and_set() {
+		$possible_dirs = $this->get_possible_dirs();
+
+		foreach( $possible_dirs as $possible_dir ) {
+
+			$possible_dir = untrailingslashit( $possible_dir );
+
+			// Ensure /parent_directory exists.
+			if( ! $this->core->wp_filesystem->exists( $possible_dir ) ) {
+				continue;
+			}
+
+			/*
+			 * Create the directory and all applicable files needed within for security,
+			 * such as .htaccess / etc.
+			 */
+			$possible_dir .= DIRECTORY_SEPARATOR . 'boldgrid_backup';
+			$backup_directory = $this->create( $possible_dir );
+			if( ! $backup_directory ) {
+				continue;
+			}
+
+			// Validate read/write/modify/ect. permissions of directory.
+			$valid = $this->is_valid( $backup_directory );
+			if( ! $valid ) {
+				continue;
+			}
+
+			// If we've gotten this far, we've got our new backup directory.
+			break;
+		}
+
+		if( empty( $backup_directory ) ) {
+			return false;
+		}
+
+		$this->set( $backup_directory );
+
+		$settings['backup_directory'] = $backup_directory;
+		$this->core->settings->save( $settings );
+
+		return $this->backup_directory;
+	}
+
+	/**
 	 * Determine if a file is in the backup directory.
 	 *
 	 * Pass in a filepath (relative to ABSPATH) and this method will determine
@@ -281,8 +283,16 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	 * Validate backup directory.
 	 *
 	 * Make sure it exists, it's writable, etc.
+	 *
+	 * @param  string $backup_dir
+	 * @return bool
 	 */
 	public function is_valid( $backup_dir ) {
+
+		if( empty( $backup_dir ) ) {
+			return false;
+		}
+
 		$perms = $this->core->test->extensive_dir_test( $backup_dir );
 
 		if( ! $perms['exists'] ) {
@@ -306,5 +316,22 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 		}
 
 		return $perms['exists'] && $perms['read'] && $perms['write'] && $perms['rename'] && $perms['delete'] && $perms['dirlist'];
+	}
+
+	/**
+	 * Even in a Windows environment, wp_filesystem->dirlist retrieves paths
+	 * with a / instead of \. Fix $without_abspath so we can properly check if
+	 * files are in the backup directory.
+	 */
+	public function set( $backup_directory ) {
+
+		if( empty( $backup_directory ) ) {
+			return false;
+		}
+
+		$this->backup_directory = $backup_directory;
+
+		$this->without_abspath = str_replace( ABSPATH, '', $this->backup_directory );
+		$this->without_abspath = str_replace( '\\', '/', $this->without_abspath );
 	}
 }

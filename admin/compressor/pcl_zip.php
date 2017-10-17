@@ -70,16 +70,15 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 	 * }
 	 */
 	public function archive_files( $filelist, &$info ) {
-		$cwd = $this->wp_filesystem->cwd();
-
 		$info['filepath'] = $this->core->generate_archive_path( 'zip' );
 
-		$dump_file = $filelist[0][0];
-
 		if( $info['dryrun'] ) {
-			$info['total_size'] += $this->core->filelist->get_total_size( $filelist );
 			return true;
 		}
+
+		$cwd = $this->wp_filesystem->cwd();
+
+		$dump_file = $filelist[0][0];
 
 		$archive = new PclZip( $info['filepath'] );
 		if ( 0 === $archive ) {
@@ -104,8 +103,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 		 * @return int    Return 0 to skip adding the file to the archive.
 		 */
 		function pre_add( $p_event, &$p_header) {
-
-			$in_node_modules = false !== strpos( $p_header['stored_filename'], '/node_modules/');
+			$in_node_modules = false !== strpos( $p_header['stored_filename'], '/node_modules/' );
 			$in_backup_directory = apply_filters( 'boldgrid_backup_file_in_dir', $p_header['stored_filename'] );
 
 			if( $in_node_modules || $in_backup_directory ) {
@@ -132,9 +130,19 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 			PCLZIP_OPT_REMOVE_PATH, ABSPATH
 		);
 		if( 0 === $status ) {
-			return array(
-				'error' => sprintf( 'Cannot add files to ZIP archive file: %1$s', $archive->errorInfo() ),
-			);
+			$error_info = $archive->errorInfo();
+
+			$custom_error = $this->parse_error_info( $error_info );
+
+			if( false === $custom_error ) {
+				return array(
+					'error' => sprintf( 'Cannot add files to ZIP archive file: %1$s', $archive->errorInfo() ),
+				);
+			} else {
+				return array(
+					'error' => $custom_error,
+				);
+			}
 		}
 
 		$status = $archive->add( $dump_file, PCLZIP_OPT_REMOVE_ALL_PATH );
@@ -147,6 +155,141 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 		$this->wp_filesystem->chdir( $cwd );
 
 		return true;
+	}
+
+	/**
+	 *
+	 * @param unknown $filepath
+	 *
+	 *  [1] => Array
+        (
+            [filename] => .htaccess.bgb
+            [stored_filename] => .htaccess.bgb
+            [size] => 260
+            [compressed_size] => 159
+            [mtime] => 1505997198
+            [comment] =>
+            [folder] =>
+            [index] => 1
+            [status] => ok
+            [crc] => 2743574654
+        )
+	 */
+	public function browse( $filepath, $in_dir = '.' ) {
+
+		$in_dir = untrailingslashit( $in_dir );
+
+		$contents = array();
+
+		$zip = new PclZip( $filepath );
+
+		$list = $zip->listContent();
+
+		if( empty( $list ) ) {
+			return $contents;
+		}
+
+		foreach( $list as $key => $file ) {
+
+			/*
+			 * Calculate the parent directory this file / folder belongs to.
+			 *
+			 * Examples:
+			 * * readme.html                     = .
+			 * * wp-admin/press-this.php         = wp-admin
+			 * * wp-admin/js/user-profile.min.js = wp-admin/js
+			 */
+			$parent_dir = dirname( $file['filename'] );
+
+			if( $parent_dir !== $in_dir ) {
+				continue;
+			}
+
+			$contents[] = $file;
+		}
+
+		return $contents;
+	}
+
+	/**
+	 * Get a list of all sql dumps in an archive's root.
+	 *
+	 * When restoring an archive, this method is helpful in determining which
+	 * sql dump to restore. We're expecting only 1 to be found.
+	 *
+	 * @since 1.5.2
+	 *
+	 * @param  string $filepath Full path to zip file.
+	 * @return array An array of sql dumps found in the root.
+	 */
+	public function get_sqls( $filepath ) {
+		$sqls = array();
+
+		$zip = new PclZip( $filepath );
+
+		$list = $zip->listContent();
+
+		if( empty( $list ) ) {
+			return $sqls;
+		}
+
+		foreach( $list as $key => $file ) {
+			$filename = $file['filename'];
+
+			// If it's not in the root, skip it.
+			if( false !== strpos( $filename, '/' ) || false !== strpos( $filename, '\\' ) ) {
+				continue;
+			}
+
+			// If it's not in this format, skip it - Format: *.########-######.sql
+			if ( 1 !== preg_match( '/\.[\d]+-[\d]+\.sql$/', $filename ) ) {
+				continue;
+			}
+
+			$sqls[] = $filename;
+		}
+
+		return $sqls;
+	}
+
+	/**
+	 * Parse the error message and take appropriate action.
+	 *
+	 * @since 1.5.2
+	 *
+	 * @param string $error_info
+	 * @return mixed False when no messages should be displayed, String when
+	 *               returning a message to the user.
+	 */
+	public function parse_error_info( $error_info ) {
+		$parts = explode( '\'', $error_info );
+		$force_php_zip = false;
+		$messages = array();
+
+		// Does not exist [code -4].
+		if( ! empty( $parts[2] ) && false !== strpos( $parts[2], 'code -4' ) ) {
+			$path = ABSPATH . $parts[1];
+
+			// Check for broken symlink.
+			if( is_link( $path ) && ! $this->core->wp_filesystem->exists( $path ) ) {
+				$force_php_zip = true;
+				$messages[] = sprintf( __( 'PclZip encountered the following broken symlink and is unable to create a backup:<br />%1$s', 'boldgrid-backup' ), $parts[1] );
+			}
+		}
+
+		/*
+		 * If we have flagged that ZipArchive should be used instead of PclZip,
+		 * then update the settings.
+		 */
+		if( $force_php_zip ) {
+			$php_zip_set = $this->core->compressors->set_php_zip();
+
+			if( $php_zip_set ) {
+				$messages[] = __( 'We have changed your compressor from PclZip to ZipArchive. Please try to create a backup again.' );
+			}
+		}
+
+		return empty( $messages ) ? false : implode( '<br />', $messages );
 	}
 
 	/**
@@ -168,7 +311,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 		$test_file_contents = $str = __( 'This is a test file from BoldGrid Backup. You can delete this file.', 'boldgrid-backup' );
 		$safe_to_delete = __( 'safe-to-delete', 'boldgrid-backup' );
 		$test_zip_file = $this->core->test->test_prefix . '-zip';
-		$test_filename = sprintf( '%1$s%2$s-%3$s-%4$s', $backup_dir, $test_zip_file, mt_rand(), $safe_to_delete );
+		$test_filename = sprintf( '%1$s%5$s%2$s-%3$s-%4$s', $backup_dir, $test_zip_file, mt_rand(), $safe_to_delete, DIRECTORY_SEPARATOR );
 		$zip_filepath = $test_filename . '.zip';
 		$random_filename = $test_filename . '.txt';
 

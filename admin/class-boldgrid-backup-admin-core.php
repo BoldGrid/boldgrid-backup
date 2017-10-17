@@ -18,16 +18,6 @@
  * @since 1.0
  */
 class Boldgrid_Backup_Admin_Core {
-
-	/**
-	 * Amazon S3 class.
-	 *
-	 * @since  1.5.2
-	 * @access public
-	 * @var    Boldgrid_Backup_Admin_Remote_Amazon_S3
-	 */
-	public $amazon_s3;
-
 	/**
 	 * Auto Rollback class.
 	 *
@@ -65,13 +55,37 @@ class Boldgrid_Backup_Admin_Core {
 	public $configs;
 
 	/**
+	 * Whether or not we're in ajax.
+	 *
+	 * When we're on the archives page and click "Backup Site Now", when
+	 * this->archive_files runs, it reports doing_ajax as true.
+	 *
+	 * @since  1.5.2
+	 * @access public
+	 * @var    bool
+	 */
+	public $doing_ajax;
+
+	/**
 	 * Whether or not we're doing cron.
+	 *
+	 * When we're generating a backup, both via cron and wpcron, doing_cron is
+	 * true.
 	 *
 	 * @since  1.5.1
 	 * @access public
 	 * @var    bool
 	 */
 	public $doing_cron;
+
+	/**
+	 * Email.
+	 *
+	 * @since  1.5.2
+	 * @access public
+	 * @var    Boldgrid_Backup_Admin_Email
+	 */
+	public $email;
 
 	/**
 	 * The functionality test class object.
@@ -126,6 +140,15 @@ class Boldgrid_Backup_Admin_Core {
 	 * @var    WP_Filesystem
 	 */
 	public $wp_filesystem;
+
+	/**
+	 * An instance of the Boldgrid_Backup_Admin_Archive_Browser class.
+	 *
+	 * @since  1.5.2
+	 * @access public
+	 * @var    Boldgrid_Backup_Admin_Archive_Browser
+	 */
+	public $archive_browser;
 
 	/**
 	 * An instance of the Archive Log class.
@@ -246,6 +269,15 @@ class Boldgrid_Backup_Admin_Core {
 	public $home_dir;
 
 	/**
+	 * Local storage.
+	 *
+	 * @since  1.5.2
+	 * @access public
+	 * @var    Boldgrid_Backup_Admin_Storage_Local
+	 */
+	public $local;
+
+	/**
 	 * The scheduler class object.
 	 *
 	 * @since  1.5.1
@@ -265,6 +297,7 @@ class Boldgrid_Backup_Admin_Core {
 		global $wp_filesystem;
 
 		$this->doing_cron = ( defined( 'DOING_CRON' ) && DOING_CRON );
+		$this->doing_ajax = is_admin() && defined( 'DOING_AJAX' ) && DOING_AJAX;
 
 		$this->wp_filesystem = $wp_filesystem;
 
@@ -304,6 +337,8 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->compressors = new Boldgrid_Backup_Admin_Compressors( $this );
 
+		$this->archive_browser = new Boldgrid_Backup_Admin_Archive_Browser( $this );
+
 		$this->archive_log = new Boldgrid_Backup_Admin_Archive_Log( $this );
 
 		$this->archive_details = new Boldgrid_Backup_Admin_Archive_Details( $this );
@@ -316,11 +351,13 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->auto_rollback = new Boldgrid_Backup_Admin_Auto_Rollback( $this );
 
-		$this->amazon_s3 = new Boldgrid_Backup_Admin_Remote_Amazon_S3( $this );
-
 		$this->remote = new Boldgrid_Backup_Admin_Remote( $this );
 
 		$this->jobs = new Boldgrid_Backup_Admin_Jobs( $this );
+
+		$this->local = new Boldgrid_Backup_Admin_Storage_Local( $this );
+
+		$this->email = new Boldgrid_Backup_Admin_Email( $this );
 
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
@@ -399,6 +436,22 @@ class Boldgrid_Backup_Admin_Core {
 		update_site_option( 'boldgrid_backup_id', $backup_identifier );
 
 		return $backup_identifier;
+	}
+
+	/**
+	 * Initialize the premium version of the plugin.
+	 *
+	 * @since 1.5.2
+	 */
+	public function init_premium() {
+		$premium_class = 'Boldgrid_Backup_Premium';
+
+		if( ! class_exists( $premium_class) ) {
+			return;
+		}
+
+		$this->premium = new $premium_class( $this );
+		$this->premium->run();
 	}
 
 	/**
@@ -730,18 +783,6 @@ class Boldgrid_Backup_Admin_Core {
 			)
 		);
 
-		add_submenu_page(
-			null,
-			__( 'Amazon S3 Settings', 'boldgrid-backup' ),
-			__( 'Amazon S3 Settings', 'boldgrid-backup' ),
-			$capability,
-			'boldgrid-backup-amazon-s3',
-			array(
-				$this->amazon_s3,
-				'submenu_page',
-			)
-		);
-
 		return;
 	}
 
@@ -798,8 +839,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Create a file path for the dump file.
-		$db_dump_filepath = $backup_directory . DB_NAME . '.' . date( 'Ymd-His' ) .
-			 '.sql';
+		$db_dump_filepath = $backup_directory . DIRECTORY_SEPARATOR . DB_NAME . '.' . date( 'Ymd-His' ) . '.sql';
 
 		// Save the file path.
 		$this->db_dump_filepath = $db_dump_filepath;
@@ -866,14 +906,8 @@ class Boldgrid_Backup_Admin_Core {
 			// Display an error notice.
 			$this->notice->functionality_fail_notice();
 
-			// Delete the dump file.
-			$wp_filesystem->delete( $db_dump_filepath, false, 'f' );
-
 			return false;
 		}
-
-		// Get the backup directory path.
-		$backup_directory = $this->backup_dir->get();
 
 		// Connect to the WordPress Filesystem API.
 		global $wp_filesystem;
@@ -890,9 +924,9 @@ class Boldgrid_Backup_Admin_Core {
 
 		$importer = new Boldgrid_Backup_Admin_Db_Import();
 		$status = $importer->import( $db_dump_filepath );
+
 		if( ! empty( $status['error'] ) ) {
 			do_action( 'boldgrid_backup_notice', $status['error'], 'notice notice-error is-dismissible' );
-			$wp_filesystem->delete( $db_dump_filepath, false, 'f' );
 			return false;
 		}
 
@@ -951,6 +985,12 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return array A single-dimension filelist array for use in this class.
 	 */
 	public function get_filelist( $dirpath ) {
+
+		// If this is a node_modules folder, do not iterate through it.
+		if( false !== strpos( $dirpath, '/node_modules' ) ) {
+			return array();
+		}
+
 		// Connect to the WordPress Filesystem API.
 		global $wp_filesystem;
 
@@ -1114,7 +1154,7 @@ class Boldgrid_Backup_Admin_Core {
 		$filename = sanitize_file_name( $filename );
 
 		// Create a file path with no extension (added later).
-		$filepath = $backup_directory . $filename;
+		$filepath = $backup_directory . DIRECTORY_SEPARATOR . $filename;
 
 		// If specified, add an extension.
 		if ( ! empty( $extension ) ) {
@@ -1175,7 +1215,7 @@ class Boldgrid_Backup_Admin_Core {
 			if( DOING_CRON ) {
 				$body = sprintf( $email_templates['fail_size']['body'], $size_data['messages']['notSupported'] );
 				$subject = sprintf( $email_templates['fail_size']['subject'], get_site_url() );
-				$this->send_notification( $subject, $body );
+				$this->email->send( $subject, $body );
 			}
 
 			return array(
@@ -1196,8 +1236,17 @@ class Boldgrid_Backup_Admin_Core {
 			'total_size' => 0,
 		);
 
-		if( $this->doing_cron ) {
+		// Determine how this backup was triggered.
+		$sapi_type = php_sapi_name();
+		if( $this->doing_ajax ) {
+			$current_user = wp_get_current_user();
+			$info['trigger'] = $current_user->user_login . ' (' . $current_user->user_email . ')';
+		} elseif( $this->doing_cron && substr( $sapi_type, 0, 3 ) === 'cli' ) {
+			$info['trigger'] = 'Cron';
+		} elseif( $this->doing_cron ) {
 			$info['trigger'] = 'WP cron';
+		} else {
+			$info['trigger'] = __( 'Unknown', 'boldgrid-backup' );
 		}
 
 		$info['compressor'] = $this->compressors->get();
@@ -1322,6 +1371,8 @@ class Boldgrid_Backup_Admin_Core {
 				break;
 		}
 
+		$info['total_size'] += $this->filelist->get_total_size( $filelist );
+
 		if ( true === $status && ! $wp_filesystem->exists( $info['filepath'] ) ) {
 			$status = array(
 				'error' => 'The archive file "' . $info['filepath'] . '" was not written.',
@@ -1352,102 +1403,14 @@ class Boldgrid_Backup_Admin_Core {
 		$info['duration'] = number_format( ( $time_stop - $time_start ), 2, '.', '' );
 		$info['db_duration'] = number_format( ( $db_time_stop - $time_start ), 2, '.', '' );
 
-		// Get settings.
-		$settings = $this->settings->get_settings();
-
-		// If enabled, send email notification for backup completed.
-		if ( ! empty( $settings['notifications']['backup'] ) ) {
-			// Create a site identifier.
-			$site_id = Boldgrid_Backup_Admin_Utility::create_site_id();
-
-			// Create subject.
-			$subject = sprintf(
-				__( 'Backup completed for %s', 'boldgrid-backup' ),
-				$site_id
-			);
-
-			// Create message.
-			$body = esc_html__( 'Hello', 'boldgrid-backup' ) . ",\n\n";
-
-			if ( $dryrun ) {
-				$body .= esc_html__( 'THIS OPERATION WAS A DRY-RUN TEST', 'boldgrid-backup' ) . ".\n\n";
-			}
-
-			$body .= sprintf(
-				esc_html__( 'A backup archive has been created for %s', 'boldgrid-backup' ),
-				$site_id
-			) . ".\n\n";
-
-			$body .= esc_html__( 'Backup details', 'boldgrid-backup' ) . ":\n";
-
-			// Show how long the website was paused for.
-			$body .= sprintf( $this->configs['lang']['est_pause'], $info['db_duration'] ) . "\n";
-
-			$body .= sprintf(
-				esc_html__( 'Duration: %s seconds', 'boldgrid-backup' ),
-				$info['duration']
-			) . "\n";
-
-			$body .= sprintf(
-				esc_html__( 'Total size: %s', 'boldgrid-backup' ),
-				Boldgrid_Backup_Admin_Utility::bytes_to_human( $info['total_size'] )
-			) . "\n";
-
-			$body .= sprintf(
-				esc_html__( 'Archive file path: %s', 'boldgrid-backup' ),
-				$info['filepath']
-			) . "\n";
-
-			$body .= sprintf(
-				esc_html__( 'Archive file size: %s', 'boldgrid-backup' ),
-				Boldgrid_Backup_Admin_Utility::bytes_to_human( $info['filesize'] )
-			) . "\n";
-
-			$body .= sprintf(
-				esc_html__( 'Compressor used: %s', 'boldgrid-backup' ),
-				$info['compressor']
-			) . "\n\n";
-
-			if ( defined( 'DOING_CRON' ) ) {
-				$body .= esc_html__(
-					'The backup request was made via CRON (task scheduler)', 'boldgrid-backup'
-				) . ".\n\n";
-			}
-
-			$body .= esc_html__(
-				'You can manage notifications in your WordPress admin panel, under BoldGrid Backup Settings',
-				'boldgrid-backup'
-			) . ".\n\n";
-
-			$body .= sprintf(
-				esc_html__(
-					'For help with restoring a BoldGrid Backup archive file, please visit: %s',
-					'boldgrid-backup'
-				),
-				esc_url( $this->configs['urls']['restore'] )
-			) . "\n\n";
-
-			$body .= esc_html__( 'Best regards', 'boldgrid-backup' ) . ",\n\n";
-
-			$body .= esc_html__( 'The BoldGrid Backup plugin', 'boldgrid-backup' ) . "\n\n";
-
-			// Send the notification.
-			$info['mail_success'] = $this->send_notification( $subject, $body );
-		}
-
-		// If not a dry-run test, update the last backup option and enforce retention.
-		if ( ! $dryrun ) {
-			// Update WP option for "boldgrid_backup_last_backup".
-			update_site_option( 'boldgrid_backup_last_backup', time() );
-
-			$this->archive_log->write( $info );
-
-			// Enforce retention setting.
-			$this->enforce_retention();
-		}
-
 		/**
 		 * Actions to take after a backup has been created.
+		 *
+		 * At priority 100, we delete the local backup file if the user does
+		 * not want to keep it.
+		 *
+		 * At priority 200, we send an email to the user with a summary of the
+		 * backup and the jobs.
 		 *
 		 * @since 1.5.2
 		 *
@@ -1467,7 +1430,25 @@ class Boldgrid_Backup_Admin_Core {
 		 *     @type bool   $mail_success
 		 * }
 		 */
-		do_action( 'boldgrid-backup-post-archive-files', $info );
+		do_action( 'boldgrid_backup_post_archive_files', $info );
+
+		// Send an email.
+		if( $this->email->user_wants_notification( 'backup' ) && $this->doing_ajax ) {
+			$email_parts = $this->email->post_archive_parts( $info );
+			$email_body = $email_parts['body']['main'] . $email_parts['body']['signature'];
+			$info['mail_success'] = $this->email->send( $email_parts['subject'], $email_body );
+		}
+
+		// If not a dry-run test, update the last backup option and enforce retention.
+		if ( ! $dryrun ) {
+			// Update WP option for "boldgrid_backup_last_backup".
+			update_site_option( 'boldgrid_backup_last_backup', time() );
+
+			$this->archive_log->write( $info );
+
+			// Enforce retention setting.
+			$this->enforce_retention();
+		}
 
 		// Return the array of archive information.
 		return $info;
@@ -1703,17 +1684,43 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
+	 * @param  string $filepath The full filepath to the file .zip archive.
 	 * @return string File path to the database dump file.
 	 */
-	private function get_dump_file() {
-		// Connect to the WordPress Filesystem API.
-		global $wp_filesystem;
+	private function get_dump_file( $filepath ) {
+
+		if( empty( $filepath ) || ! $this->wp_filesystem->exists( $filepath ) ) {
+			return '';
+		}
+
+		/*
+		 * Get the sql file to restore.
+		 *
+		 * These few lines below are new to the get_dump_file method.
+		 * Historically we searched the ABSPATH for a filename matching
+		 * ########-######.sql and returned the first one we found. Well, what
+		 * if there were more than one matching file, which .sql file do we
+		 * restore?
+		 *
+		 * $pcl_zip->get_sqls Searches the zip file and finds a list of all
+		 * .sql files that match the pattern we're looking for and returns them.
+		 * We should only get 1 back, and that is the appropriate dump file.
+		 *
+		 * These few lines should do the trick. If not, the original code is
+		 * still in place to take the initial approach and find a dump file to
+		 * restore (the first applicable one it can find).
+		 */
+		$pcl_zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this );
+		$sqls = $pcl_zip->get_sqls( $filepath );
+		if( 1 === count( $sqls ) ) {
+			return ABSPATH . $sqls[0];
+		}
 
 		// Initialize $db_dump_filepath.
 		$db_dump_filepath = '';
 
 		// Find all backups.
-		$dirlist = $wp_filesystem->dirlist( ABSPATH, false, false );
+		$dirlist = $this->core->wp_filesystem->dirlist( ABSPATH, false, false );
 
 		// If no files were found, then return an empty array.
 		if ( empty( $dirlist ) ) {
@@ -2028,7 +2035,7 @@ class Boldgrid_Backup_Admin_Core {
 			// Restore database.
 			if ( ! $dryrun && $restore_ok ) {
 				// Get the database dump file path.
-				$db_dump_filepath = $this->get_dump_file();
+				$db_dump_filepath = $this->get_dump_file( $filepath );
 
 				// Initialize database table prefix.
 				$db_prefix = null;
@@ -2051,8 +2058,9 @@ class Boldgrid_Backup_Admin_Core {
 					}
 				}
 
-				// Restore the database.
+				// Restore the database and then delete the dump.
 				$restore_ok = $this->restore_database( $db_dump_filepath, $db_prefix );
+				$this->wp_filesystem->delete( $db_dump_filepath, false, 'f' );
 
 				// Display notice of deletion status.
 				if ( ! $restore_ok ) {
@@ -2082,7 +2090,7 @@ class Boldgrid_Backup_Admin_Core {
 
 			// Send the notification.
 			// Parameters come from the included mail template file.
-			$info['mail_success'] = $this->send_notification( $subject, $body );
+			$info['mail_success'] = $this->email->send( $subject, $body );
 		}
 
 		// Update status.
@@ -2108,8 +2116,9 @@ class Boldgrid_Backup_Admin_Core {
 	public function page_archives() {
 		global $pagenow;
 
-		add_thickbox();
-		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
+		// Do this if opening archive details in a modal.
+		// add_thickbox();
+		// wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
 
 		// Run the functionality tests.
 		$is_functional = $this->test->run_functionality_tests();
@@ -2426,6 +2435,16 @@ class Boldgrid_Backup_Admin_Core {
 
 		$disk_space = $this->test->get_disk_space();
 
+		// Get our crons and ready them for display.
+		$our_crons = $this->cron->get_our_crons();
+		foreach( $our_crons as &$cron ) {
+			$cron = esc_html( $cron );
+		}
+		$our_wp_crons = $this->wp_cron->get_our_crons();
+		foreach( $our_wp_crons as &$cron ) {
+			$cron = esc_html( $cron );
+		}
+
 		// Enqueue CSS for the test page.
 		wp_enqueue_style( 'boldgrid-backup-admin-test',
 			plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-test.css', array(),
@@ -2450,42 +2469,6 @@ class Boldgrid_Backup_Admin_Core {
 			BOLDGRID_BACKUP_VERSION,
 			false
 		);
-	}
-
-	/**
-	 * Send a notification email to the admin email address.
-	 *
-	 * @since 1.0
-	 * @access private
-	 *
-	 * @param string $subject The email subject.
-	 * @param string $body The email body.
-	 *
-	 * @return bool Whether or not the notification email was sent.
-	 */
-	private function send_notification( $subject, $body ) {
-		// Abort if subject or body is empty.
-		if ( empty( $subject ) || empty( $body ) ) {
-			return false;
-		}
-
-		// Get settings, for the notification email address.
-		$settings = $this->settings->get_settings();
-
-		$admin_email = $settings['notification_email'];
-
-		// Get the site title.
-		$site_title = get_bloginfo( 'name' );
-
-		// Configure mail headers.
-		$headers = 'From: ' . $site_title . ' <' . $admin_email . '>' . "\r\n" . 'X-Mailer: PHP/' .
-			 phpversion() . "\r\n";
-
-		// Send mail.
-		$status = mail( $admin_email, $subject, $body, $headers );
-
-		// Return status.
-		return $status;
 	}
 
 	/**

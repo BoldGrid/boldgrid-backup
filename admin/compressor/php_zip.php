@@ -109,7 +109,6 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 		$info['filepath'] = $this->core->generate_archive_path( 'zip' );
 
 		if( $info['dryrun'] ) {
-			$info['total_size'] += $this->core->filelist->get_total_size( $filelist );
 			return true;
 		}
 
@@ -129,7 +128,6 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 
 		foreach ( $filelist as $fileinfo ) {
 			$this->zip->addFile( $fileinfo[0], $fileinfo[1] );
-			$info['total_size'] += $fileinfo[2];
 		}
 
 		if ( ! $this->zip->close() ) {
@@ -139,6 +137,15 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 		}
 
 		return true;
+	}
+
+	/**
+	 * Determine if ZipArchive is available.
+	 *
+	 * @since 1.5.2
+	 */
+	public static function is_available() {
+		return extension_loaded( 'zip' ) && class_exists( 'ZipArchive' );
 	}
 
 	/**
@@ -160,7 +167,7 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 		$cannot_close_zip = __( 'When testing ZipArchive functionality, we are able to create a zip file and add files to it, but we were unable to close the zip file.<br /><strong>Please be sure the following backup directory has modify permissions</strong>:<br />%1$s', 'boldgrid-backup' );
 		$safe_to_delete = __( 'safe-to-delete', 'boldgrid-backup' );
 		$test_zip_file = $test_zip_file = $this->core->test->test_prefix . '-zip';
-		$test_filename = sprintf( '%1$s%2$s-%3$s-%4$s', $backup_dir, $test_zip_file, mt_rand(), $safe_to_delete );
+		$test_filename = sprintf( '%1$s%5$s%2$s-%3$s-%4$s', $backup_dir, $test_zip_file, mt_rand(), $safe_to_delete, DIRECTORY_SEPARATOR );
 
 		$zip_filepath = $test_filename . '.zip';
 		$random_filename = $test_filename . '.txt';

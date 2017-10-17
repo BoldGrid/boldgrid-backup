@@ -56,9 +56,13 @@ wp_nonce_field( 'boldgrid_backup_remote_storage_upload' );
 
 ?>
 
-<img src="//repo.boldgrid.com/assets/banner-backup-772x250.png" id="header_banner" />
+<!--  <img src="//repo.boldgrid.com/assets/banner-backup-772x250.png" id="header_banner" /> -->
+
+<div class="wrap">
 
 <h1><?php echo __( 'Backup Archive Details', 'boldgrid-backup' )?></h1>
+
+<?php include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php'; ?>
 
 <?php
 foreach( $datas as $data ) {
@@ -90,4 +94,8 @@ foreach( $datas as $data ) {
 }
 
 include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/remote-storage.php';
+
+include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/browser.php';
 ?>
+
+</div>

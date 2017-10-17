@@ -59,6 +59,8 @@ class Boldgrid_Backup_Admin_Utility {
 
 		$return = number_format( $bytes, $decimals, '.', '' ) . ' ' . $type[ $index ];
 
+		$return = str_replace( '.00', '', $return );
+
 		return $return;
 	}
 

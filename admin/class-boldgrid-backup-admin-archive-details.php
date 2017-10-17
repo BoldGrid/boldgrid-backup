@@ -53,7 +53,16 @@ class Boldgrid_Backup_Admin_Archive_Details {
 			'all'
 		);
 
-		wp_enqueue_style( 'boldgrid-backup-admin-hide-all' );
+		wp_enqueue_style(
+			'boldgrid-backup-admin-zip-browser',
+			plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-zip-browser.css',
+			array(),
+			BOLDGRID_BACKUP_VERSION,
+			'all'
+		);
+
+		// Do this if showing archive details in a modal.
+		// wp_enqueue_style( 'boldgrid-backup-admin-hide-all' );
 
 		wp_register_script(
 			'boldgrid-backup-admin-archive-details',
@@ -68,6 +77,19 @@ class Boldgrid_Backup_Admin_Archive_Details {
 		);
 		wp_localize_script( 'boldgrid-backup-admin-archive-details', 'boldgrid_backup_archive_details', $translations );
 		wp_enqueue_script( 'boldgrid-backup-admin-archive-details' );
+
+		wp_register_script(
+			'boldgrid-backup-admin-zip-browser',
+			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-zip-browser.js',
+			array( 'jquery', ),
+			BOLDGRID_BACKUP_VERSION
+		);
+		$translations = array(
+			'loading' => __( 'Loading', 'boldgrid-backup' ),
+			'home' => __( 'Home', 'boldgrid-backup' ),
+		);
+		wp_localize_script( 'boldgrid-backup-admin-zip-browser', 'boldgrid_backup_zip_browser', $translations );
+		wp_enqueue_script( 'boldgrid-backup-admin-zip-browser' );
 
 		$md5 = ! empty( $_GET['md5'] ) ? $_GET['md5'] : false;
 		$archive_found = false;

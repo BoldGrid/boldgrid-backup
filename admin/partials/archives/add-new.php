@@ -67,6 +67,14 @@ $backup_id_notice = sprintf(
 			<input class="button" type="submit" value="Upload" />
 			<span class='spinner'></span>
 		</form>
+
+		<p id="file_too_large" class="hidden">
+			<span class="dashicons dashicons-warning yellow"></span> <?php echo __( 'The file you selected is too large.', 'boldgrid-bacup' ); ?>
+		</p>
+
+		<p id="bad_extension" class="hidden">
+			<span class="dashicons dashicons-warning yellow"></span> <?php echo __( 'Invalid file format. Please choose a .zip file.', 'boldgrid-bacup' ); ?>
+		</p>
 	</div>
 
 	<p class="install-help">
