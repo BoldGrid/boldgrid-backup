@@ -1,19 +1,13 @@
 <?php
-
-/*  [1] => Array
-(
-	[filename] => .htaccess.bgb
-	[stored_filename] => .htaccess.bgb
-	[size] => 260
-	[compressed_size] => 159
-	[mtime] => 1505997198
-	[comment] =>
-	[folder] =>
-	[index] => 1
-	[status] => ok
-	[crc] => 2743574654
-)
-*/
+/**
+ * Create the <tr> for each file in the archilve.
+ *
+ * @link  http://www.boldgrid.com
+ * @since 1.5.3
+ *
+ * @package    Boldgrid_Backup
+ * @subpackage Boldgrid_Backup/admin/partials/archive-details
+ */
 
 $class = $file['folder'] ? 'folder' : 'file';
 

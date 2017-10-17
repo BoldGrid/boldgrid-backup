@@ -158,33 +158,19 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 	}
 
 	/**
+	 * Get the contents of a zip file.
 	 *
-	 * @param unknown $filepath
-	 *
-	 *  [1] => Array
-        (
-            [filename] => .htaccess.bgb
-            [stored_filename] => .htaccess.bgb
-            [size] => 260
-            [compressed_size] => 159
-            [mtime] => 1505997198
-            [comment] =>
-            [folder] =>
-            [index] => 1
-            [status] => ok
-            [crc] => 2743574654
-        )
+	 * @param  string  $filepath
+	 * @param  string  $in_dir
+	 * @return array
 	 */
 	public function browse( $filepath, $in_dir = '.' ) {
-
 		$in_dir = untrailingslashit( $in_dir );
-
 		$contents = array();
 
 		$zip = new PclZip( $filepath );
 
 		$list = $zip->listContent();
-
 		if( empty( $list ) ) {
 			return $contents;
 		}
@@ -209,6 +195,85 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 		}
 
 		return $contents;
+	}
+
+	/**
+	 * Extract one file from an archive.
+	 *
+	 * @since 1.5.3
+	 *
+	 * @param  string $filepath /home/user/boldgrid_backup/archive.zip
+	 * @param  string $file     wp-content/index.php
+	 *
+	 */
+	public function extract_one( $filepath, $file ) {
+		if( ! $this->core->archive->is_archive( $filepath ) ) {
+			return false;
+		}
+
+		if( empty( $file ) ) {
+			return false;
+		}
+
+		$file_contents = $this->get_file( $filepath, $file );
+
+		return $this->core->wp_filesystem->put_contents( ABSPATH . $file, $file_contents[0]['content'] );
+	}
+
+	/**
+	 * Extract 1 file from a zip archive.
+	 *
+	 * @since 1.5.3
+	 *
+	 * @param  string $filepath /home/user/boldgrid_backup/archive.zip
+	 * @param  string $file     wp-content/index.php
+	 * @return mixed False on failure, array on success {
+	 *     Accessed via $file_contentws[0].
+	 *
+	 *     @type string $filename        wp-content/index.php
+	 *     @type string $stored_filename wp-content/index.php
+	 *     @type int    $size            28
+	 *     @type int    $compressed_size 30
+	 *     @type int    $mtime           1505997200
+	 *     @type string $comment
+	 *     @type bool   $folder
+	 *     @type int    $index           25054
+	 *     @type string $status          ok
+	 *     @type int    $crc             4212199498
+	 *     @type string $content
+	 * }
+	 */
+	public function get_file( $filepath, $file ) {
+		if( ! $this->core->archive->is_archive( $filepath ) ) {
+			return false;
+		}
+
+		if( empty( $file ) ) {
+			return false;
+		}
+
+		$zip = new PclZip( $filepath );
+
+		$list = $zip->listContent();
+		if( empty( $list ) ) {
+			return false;
+		}
+
+		$file_index = false;
+
+		foreach( $list as $index => $filedata ) {
+			if( $file === $filedata['filename'] ) {
+				$file_index = $index;
+			}
+		}
+
+		if( ! $file_index ) {
+			return false;
+		}
+
+		$file_contents = $zip->extractByIndex( $file_index, PCLZIP_OPT_EXTRACT_AS_STRING );
+
+		return $file_contents;
 	}
 
 	/**

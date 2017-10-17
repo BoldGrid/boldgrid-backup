@@ -40,7 +40,11 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 	}
 
 	/**
+	 * Allow the user to browse an archive file.
 	 *
+	 * Returns a formatted table to the browser.
+	 *
+	 * @since 1.5.3
 	 */
 	public function wp_ajax_browse_archive() {
 		if ( ! current_user_can( 'update_plugins' ) ) {
@@ -89,5 +93,41 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 		$table .= '</tbody></table>';
 
 		wp_send_json_success( $table );
+	}
+
+	/**
+	 * Show available actions for a single file.
+	 *
+	 * When the user clicks on a single file in a backup archive, show them
+	 * what options they have available.
+	 *
+	 * @since 1.5.3
+	 */
+	public function wp_ajax_file_actions() {
+		if ( ! current_user_can( 'update_plugins' ) ) {
+			wp_send_json_error( __( 'Permission denied.', 'boldgrid-backup' ) );
+		}
+
+		if( ! check_ajax_referer( 'boldgrid_backup_remote_storage_upload', 'security', false ) ) {
+			wp_send_json_error( __( 'Invalid nonce.', 'boldgrid-backup' ) );
+		}
+
+		$filepath = ! empty( $_POST['filepath'] ) ? $_POST['filepath'] : false;
+		if( empty( $filepath ) ) {
+			wp_send_json_error( __( 'Invalid filepath.', 'boldgrid-backup' ) );
+		}
+
+		$upgrade_message = __( 'With BoldGrid Backup Premium, you can view and restore files from here.', 'boldgrid-backup' );
+
+		/**
+		 * Allow other plugins to add functionality.
+		 *
+		 * @since 1.5.3
+		 *
+		 * @param string $upgrade_message
+		 */
+		$upgrade_message = apply_filters( 'boldgrid_backup_file_actions', $upgrade_message );
+
+		wp_send_json_success( $upgrade_message );
 	}
 }

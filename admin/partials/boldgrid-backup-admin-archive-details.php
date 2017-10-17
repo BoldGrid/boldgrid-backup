@@ -56,46 +56,44 @@ wp_nonce_field( 'boldgrid_backup_remote_storage_upload' );
 
 ?>
 
-<!--  <img src="//repo.boldgrid.com/assets/banner-backup-772x250.png" id="header_banner" /> -->
-
 <div class="wrap">
 
-<h1><?php echo __( 'Backup Archive Details', 'boldgrid-backup' )?></h1>
+	<h1><?php echo __( 'Backup Archive Details', 'boldgrid-backup' )?></h1>
 
-<?php include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php'; ?>
+	<?php include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php'; ?>
 
-<?php
-foreach( $datas as $data ) {
-	if( ! isset( $archive[ $data['key'] ] ) ) {
-		continue;
-	}
-
-	$value = $archive[ $data['key'] ];
-	if( ! empty( $data['presentation'] ) ) {
-		switch( $data['presentation'] ) {
-			case 'bytes_to_human':
-				$value = Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive[ $data['key'] ] );
-				break;
-			case 'bool':
-				$value = $archive[ $data['key'] ] ? __( 'yes', 'boldgrid-backup' ) : __( 'no', 'boldgrid-backup' );
-				break;
+	<?php
+	foreach( $datas as $data ) {
+		if( ! isset( $archive[ $data['key'] ] ) ) {
+			continue;
 		}
+
+		$value = $archive[ $data['key'] ];
+		if( ! empty( $data['presentation'] ) ) {
+			switch( $data['presentation'] ) {
+				case 'bytes_to_human':
+					$value = Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive[ $data['key'] ] );
+					break;
+				case 'bool':
+					$value = $archive[ $data['key'] ] ? __( 'yes', 'boldgrid-backup' ) : __( 'no', 'boldgrid-backup' );
+					break;
+			}
+		}
+
+		if( ! empty( $data['suffix'] ) ) {
+			$value .= $data['suffix'];
+		}
+
+		if( ! empty( $data['hidden_input' ] ) ) {
+			$value .= sprintf( '<input type="hidden" id="%1$s" value="%2$s" />', $data['key'], $archive[ $data['key'] ] );
+		}
+
+		printf( $attribute, $data['title'], $value );
 	}
 
-	if( ! empty( $data['suffix'] ) ) {
-		$value .= $data['suffix'];
-	}
+	include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/remote-storage.php';
 
-	if( ! empty( $data['hidden_input' ] ) ) {
-		$value .= sprintf( '<input type="hidden" id="%1$s" value="%2$s" />', $data['key'], $archive[ $data['key'] ] );
-	}
-
-	printf( $attribute, $data['title'], $value );
-}
-
-include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/remote-storage.php';
-
-include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/browser.php';
-?>
+	include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/browser.php';
+	?>
 
 </div>
