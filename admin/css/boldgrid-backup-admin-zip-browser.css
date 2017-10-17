@@ -1,0 +1,20 @@
+.listing .dashicons.dashicons-portfolio {
+	color: #c4963d;
+}
+
+.listing .dashicons.dashicons-media-default {
+	color: #0073aa;
+}
+
+.listing a,
+.breadcrumbs a {
+	cursor: pointer;
+}
+
+.breadcrumbs .dashicons.dashicons-admin-home {
+	vertical-align: text-bottom;	
+}
+
+.file-actions td {
+	padding-left:35px;
+}

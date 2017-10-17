@@ -174,6 +174,7 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-backup-dir.php';
 
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archive-browser.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archive-log.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archive-details.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archive-fail.php';
@@ -325,6 +326,8 @@ class Boldgrid_Backup {
 		$this->loader->add_action( 'boldgrid_backup_post_jobs_email', $plugin_admin_core->jobs, 'post_jobs_email' );
 
 		$this->loader->add_action( 'boldgrid_backup_cron_fail_email', $plugin_admin_core->archive_fail, 'cron_fail_email' );
+
+		$this->loader->add_action( 'wp_ajax_boldgrid_backup_browse_archive', $plugin_admin_core->archive_browser, 'wp_ajax_browse_archive' );
 		return;
 	}
 

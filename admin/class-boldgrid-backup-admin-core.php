@@ -142,6 +142,15 @@ class Boldgrid_Backup_Admin_Core {
 	public $wp_filesystem;
 
 	/**
+	 * An instance of the Boldgrid_Backup_Admin_Archive_Browser class.
+	 *
+	 * @since  1.5.2
+	 * @access public
+	 * @var    Boldgrid_Backup_Admin_Archive_Browser
+	 */
+	public $archive_browser;
+
+	/**
 	 * An instance of the Archive Log class.
 	 *
 	 * @since  1.5.1
@@ -327,6 +336,8 @@ class Boldgrid_Backup_Admin_Core {
 		$this->home_dir = new Boldgrid_Backup_Admin_Home_Dir( $this );
 
 		$this->compressors = new Boldgrid_Backup_Admin_Compressors( $this );
+
+		$this->archive_browser = new Boldgrid_Backup_Admin_Archive_Browser( $this );
 
 		$this->archive_log = new Boldgrid_Backup_Admin_Archive_Log( $this );
 
@@ -2105,8 +2116,9 @@ class Boldgrid_Backup_Admin_Core {
 	public function page_archives() {
 		global $pagenow;
 
-		add_thickbox();
-		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
+		// Do this if opening archive details in a modal.
+		// add_thickbox();
+		// wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
 
 		// Run the functionality tests.
 		$is_functional = $this->test->run_functionality_tests();

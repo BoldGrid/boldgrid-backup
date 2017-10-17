@@ -158,6 +158,60 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 	}
 
 	/**
+	 *
+	 * @param unknown $filepath
+	 *
+	 *  [1] => Array
+        (
+            [filename] => .htaccess.bgb
+            [stored_filename] => .htaccess.bgb
+            [size] => 260
+            [compressed_size] => 159
+            [mtime] => 1505997198
+            [comment] =>
+            [folder] =>
+            [index] => 1
+            [status] => ok
+            [crc] => 2743574654
+        )
+	 */
+	public function browse( $filepath, $in_dir = '.' ) {
+
+		$in_dir = untrailingslashit( $in_dir );
+
+		$contents = array();
+
+		$zip = new PclZip( $filepath );
+
+		$list = $zip->listContent();
+
+		if( empty( $list ) ) {
+			return $contents;
+		}
+
+		foreach( $list as $key => $file ) {
+
+			/*
+			 * Calculate the parent directory this file / folder belongs to.
+			 *
+			 * Examples:
+			 * * readme.html                     = .
+			 * * wp-admin/press-this.php         = wp-admin
+			 * * wp-admin/js/user-profile.min.js = wp-admin/js
+			 */
+			$parent_dir = dirname( $file['filename'] );
+
+			if( $parent_dir !== $in_dir ) {
+				continue;
+			}
+
+			$contents[] = $file;
+		}
+
+		return $contents;
+	}
+
+	/**
 	 * Get a list of all sql dumps in an archive's root.
 	 *
 	 * When restoring an archive, this method is helpful in determining which
