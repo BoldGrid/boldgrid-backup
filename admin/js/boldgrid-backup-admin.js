@@ -11,7 +11,8 @@
 var BoldGrid = BoldGrid || {};
 
 BoldGrid.Backup = function( $ ) {
-	var self = this;
+	var self = this,
+		$includeTables;
 
 	/**
 	 * @summary Handle the click of help buttons.
@@ -32,17 +33,25 @@ BoldGrid.Backup = function( $ ) {
 		});
 	};
 
-	/**
-	 * @summary Init.
-	 *
-	 * @since 1.3.1
-	 */
-	this.init = function() {
-		self.bindHelpClick();
-	};
-
 	$( function() {
-		self.init();
+		$includeTables = $( '.include-tables [type="checkbox"]' );
+
+		self.bindHelpClick();
+
+		$( '#include_all_tables' ).on( 'click', function() {
+			$includeTables.attr( 'checked', true );
+			return false;
+		} );
+
+		$( '#exclude_all_tables' ).on( 'click', function() {
+			$includeTables.attr( 'checked', false );
+			return false;
+		} );
+
+		$( '#configure_include_tables' ).on( 'click', function() {
+			$( '#tables_to_include .tables' ).slideToggle();
+			return false;
+		})
 	});
 };
 

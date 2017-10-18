@@ -205,6 +205,15 @@ class Boldgrid_Backup_Admin_Core {
 	public $db_dump_filepath = '';
 
 	/**
+	 * An instance of Boldgrid_Backup_Admin_Db_Omit.
+	 *
+	 * @since  1.5.3
+	 * @access public
+	 * @var    Boldgrid_Backup_Admin_Db_Omit
+	 */
+	public $db_omit;
+
+	/**
 	 * An instance of the Boldgrid Backup Admin Filelist Class.
 	 *
 	 * @since 1.5.1
@@ -369,6 +378,8 @@ class Boldgrid_Backup_Admin_Core {
 		$this->local = new Boldgrid_Backup_Admin_Storage_Local( $this );
 
 		$this->email = new Boldgrid_Backup_Admin_Email( $this );
+
+		$this->db_omit = new Boldgrid_Backup_Admin_Db_Omit( $this );
 
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();

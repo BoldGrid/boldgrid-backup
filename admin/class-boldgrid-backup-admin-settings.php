@@ -194,6 +194,10 @@ class Boldgrid_Backup_Admin_Settings {
 			$settings['backup_directory'] = untrailingslashit( $settings['backup_directory'] );
 		}
 
+		if( empty( $settings['exclude_tables'] ) ) {
+			$settings['exclude_tables'] = array();
+		}
+
 		// Return the settings array.
 		return $settings;
 	}
@@ -576,6 +580,21 @@ class Boldgrid_Backup_Admin_Settings {
 			foreach( $storage_locations_save as $storage_location => $storage_location_enabled ) {
 				$settings['remote'][$storage_location]['enabled'] = true;
 			}
+
+			/*
+			 * Save tables to include.
+			 *
+			 * @since 1.5.3
+			 */
+			$exclude_tables = array();
+			$include_tables = ! empty( $_POST['include_tables'] ) ? $_POST['include_tables'] : array();
+			$all_tables = $this->core->db_omit->get_prefixed_tables();
+			foreach( $all_tables as $table ) {
+				if( ! in_array( $table, $include_tables ) ) {
+					$exclude_tables[] = $table;
+				}
+			}
+			$settings['exclude_tables'] = $exclude_tables;
 
 			// If no errors, then save the settings.
 			if ( ! $update_error ) {
