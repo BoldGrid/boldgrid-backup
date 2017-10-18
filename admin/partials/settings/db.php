@@ -24,14 +24,15 @@ $tables_class = $all_included ? 'hidden' : '';
 
 			<div class="<?php echo $summary_class; ?>">
 				<?php
-					echo __( 'All database tables will be included in your backup.', 'boldgrid-backup' ) . ' ';
+					esc_html_e( 'All database tables will be included in your backup.', 'boldgrid-backup' );
+					echo ' ';
 					printf( '<a id="configure_include_tables" href="">%1$s</a>', __( 'Configure', 'boldgrid-backup' ) );
 				?>
 			</div>
 
 			<div class="tables <?php echo $tables_class; ?>">
-				<button id="include_all_tables" class="button button-primary">Include all</button>
-				<button id="exclude_all_tables" class="button button">Exclude all</button>
+				<button id="include_all_tables" class="button button-primary"><?php esc_html_e( 'Include all', 'boldgrid-backup' ); ?></button>
+				<button id="exclude_all_tables" class="button button"><?php esc_html_e( 'Exclude all', 'boldgrid-backup' ); ?></button>
 
 				<div class='include-tables'>
 					<?php echo $tables;?>
