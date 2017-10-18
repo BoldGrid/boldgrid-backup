@@ -51,10 +51,17 @@ BoldGrid.ZipBrowser = function( $ ) {
 				.insertAfter( $tr );
 			$dummyTr.insertAfter( $newTr );
 
-			$.post(ajaxurl, data, function(response) {
-				$newTr.find( 'td' ).html( response.data );
-				$tr.attr( 'data-expanded', '1' );
-			});
+			$tr.attr( 'data-expanded', '1' );
+
+			$.post( ajaxurl, data, function( response ) {
+				if( response.success !== undefined ) {
+					$newTr.find( 'td' ).html( response.data );
+				} else {
+					$newTr.find( 'td' ).html( boldgrid_backup_zip_browser.unknownError );
+				}
+			} ).error( function() {
+				$newTr.find( 'td' ).html( boldgrid_backup_zip_browser.unknownError );
+			} );
 		} else {
 			$tr
 				.next( 'tr' ).remove().end()
@@ -127,9 +134,15 @@ BoldGrid.ZipBrowser = function( $ ) {
 
 		$listing.find( 'tbody' ).html( '<tr><td colspan="' + colspan + '">' + loading + '</td></tr>'  );
 
-		$.post(ajaxurl, data, function(response) {
-			$listing.html( response.data );
-		});
+		$.post( ajaxurl, data, function( response ) {
+			if( response.success !== undefined ) {
+				$listing.html( response.data );
+			} else {
+				$listing.html( boldgrid_backup_zip_browser.unknownBrowseError );
+			}
+		} ).error( function() {
+			$listing.html( boldgrid_backup_zip_browser.unknownBrowseError );
+		} );
 	};
 
 	/**

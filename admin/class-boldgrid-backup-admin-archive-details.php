@@ -76,6 +76,8 @@ class Boldgrid_Backup_Admin_Archive_Details {
 		$translations = array(
 			'loading' => __( 'Loading', 'boldgrid-backup' ),
 			'home' => __( 'Home', 'boldgrid-backup' ),
+			'unknownBrowseError' => __( 'An unknown error has occurred when trying to get a listing of the files in this archive.', 'boldgrid-backup' ),
+			'unknownError' => __( 'An unknown error has occurred.', 'boldgrid-backup' ),
 		);
 		wp_localize_script( 'boldgrid-backup-admin-zip-browser', 'boldgrid_backup_zip_browser', $translations );
 		wp_enqueue_script( 'boldgrid-backup-admin-zip-browser' );

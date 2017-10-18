@@ -47,17 +47,19 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 	 * @since 1.5.3
 	 */
 	public function wp_ajax_browse_archive() {
+		$error = __( 'Unable to get contents of archive file:', 'boldgrid-backup' );
+
 		if ( ! current_user_can( 'update_plugins' ) ) {
-			wp_send_json_error( __( 'Permission denied.', 'boldgrid-backup' ) );
+			wp_send_json_error( $error . ' ' . __( 'Permission denied.', 'boldgrid-backup' ) );
 		}
 
 		if( ! check_ajax_referer( 'boldgrid_backup_remote_storage_upload', 'security', false ) ) {
-			wp_send_json_error( __( 'Invalid nonce.', 'boldgrid-backup' ) );
+			wp_send_json_error( $error . ' ' . __( 'Invalid nonce.', 'boldgrid-backup' ) );
 		}
 
 		$filepath = ! empty( $_POST['filepath'] ) ? $_POST['filepath'] : false;
 		if( empty( $filepath ) || ! $this->core->wp_filesystem->exists( $filepath ) ) {
-			wp_send_json_error( __( 'Invalid archive filepath.', 'boldgrid-backup' ) );
+			wp_send_json_error( $error . ' ' . __( 'Invalid archive filepath.', 'boldgrid-backup' ) );
 		}
 
 		$dir = ! empty( $_POST['dir'] ) ? $_POST['dir'] : null;
