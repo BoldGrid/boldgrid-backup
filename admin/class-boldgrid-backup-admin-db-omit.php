@@ -104,4 +104,20 @@ class Boldgrid_Backup_Admin_Db_Omit {
 
 		return $return;
 	}
+
+	/**
+	 * Determine if we are omitting all tables from the backup.
+	 *
+	 * @since 1.5.3
+	 *
+	 * @return bool
+	 */
+	public function is_omit_all() {
+		$exclude_tables = $this->get_excluded_tables();
+		$prefixed_tables = $this->core->db_get->prefixed();
+
+		$diff = array_diff( $prefixed_tables, $exclude_tables );
+
+		return empty( $diff );
+	}
 }

@@ -78,14 +78,14 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 
 		$cwd = $this->wp_filesystem->cwd();
 
-		$dump_file = $filelist[0][0];
-
 		$archive = new PclZip( $info['filepath'] );
 		if ( 0 === $archive ) {
 			return array(
 				'error' => sprintf( 'Cannot create ZIP archive file %1$s. %2$s.', $info['filepath'], $archive->errorInfo() ),
 			);
 		}
+
+		$db_dump = $filelist[0][0];
 
 		/**
 		 * Filter to run before adding a file to the archive.
@@ -145,11 +145,19 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 			}
 		}
 
-		$status = $archive->add( $dump_file, PCLZIP_OPT_REMOVE_ALL_PATH );
-		if( 0 === $status ) {
-			return array(
-					'error' => sprintf( 'Cannot add database dump to ZIP archive file: %1$s', $archive->errorInfo() ),
-			);
+		/*
+		 * Add our database dump to the zip.
+		 *
+		 * The check for ! empty is here because the user may have opted not
+		 * to backup their database.
+		 */
+		if( ! empty( $this->core->db_dump_filepath ) ) {
+			$status = $archive->add( $db_dump, PCLZIP_OPT_REMOVE_ALL_PATH );
+			if( 0 === $status ) {
+				return array(
+						'error' => sprintf( 'Cannot add database dump to ZIP archive file: %1$s', $archive->errorInfo() ),
+				);
+			}
 		}
 
 		$this->wp_filesystem->chdir( $cwd );

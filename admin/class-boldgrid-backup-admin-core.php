@@ -864,6 +864,10 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return bool Status of the operation.
 	 */
 	private function backup_database() {
+		if( $this->db_omit->is_omit_all() ) {
+			return true;
+		}
+
 		// Check if functional.
 		if ( ! $this->test->run_functionality_tests() ) {
 			// Display an error notice.
@@ -893,8 +897,7 @@ class Boldgrid_Backup_Admin_Core {
 		// Create a dump of our database.
 		$status = $this->db_dump->dump( $db_dump_filepath );
 		if( ! empty( $status['error'] ) ) {
-			do_action( 'boldgrid_backup_notice', $status['error'], 'notice notice-error is-dismissible' );
-			return false;
+			return array( 'error' => $status['error'] );
 		}
 
 		// Ensure file is written and is over 100 bytes.
@@ -1215,7 +1218,6 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @since 1.0
 	 *
-	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 * @see Boldgrid_Backup_Admin_Core::backup_database().
 	 *
 	 * @param bool $save A switch to save the archive file. Default is FALSE.
@@ -1314,9 +1316,9 @@ class Boldgrid_Backup_Admin_Core {
 		if ( $save && ! $dryrun ) {
 			$status = $this->backup_database();
 
-			if ( ! empty( $status['error'] ) ) {
+			if ( false === $status || ! empty( $status['error'] ) ) {
 				return array(
-					'error' => $status['error'],
+					'error' => ! empty( $status['error'] ) ? $status['error'] : __( 'An unknown error occurred when backing up the database.', 'boldgrid-backup' ),
 				);
 			}
 		}
@@ -1343,25 +1345,21 @@ class Boldgrid_Backup_Admin_Core {
 		// Get the backup directory path.
 		$backup_directory = $this->backup_dir->get();
 
-		// Connect to the WordPress Filesystem API.
-		global $wp_filesystem;
-
 		// Check if the backup directory is writable.
-		if ( ! $wp_filesystem->is_writable( $backup_directory ) ) {
+		if ( ! $this->wp_filesystem->is_writable( $backup_directory ) ) {
 			return false;
 		}
 
-		// Add the database dump file to the file list.
-		$db_relative_path = substr( $this->db_dump_filepath, strlen( $backup_directory ) + 1 );
+		// Add the database dump file to the beginning of file list.
+		if( ! empty( $this->db_dump_filepath ) ) {
+			$db_file_array = array(
+				$this->db_dump_filepath,
+				substr( $this->db_dump_filepath, strlen( $backup_directory ) + 1 ),
+				$this->wp_filesystem->size( $this->db_dump_filepath ),
+			);
 
-		$db_file_array = array(
-			$this->db_dump_filepath,
-			$db_relative_path,
-			$wp_filesystem->size( $this->db_dump_filepath ),
-		);
-
-		// Prepend the $db_file_array element to the beginning of the $filelist array.
-		array_unshift( $filelist, $db_file_array );
+			array_unshift( $filelist, $db_file_array );
+		}
 
 		$this->set_time_limit();
 
@@ -1416,7 +1414,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		$info['total_size'] += $this->filelist->get_total_size( $filelist );
 
-		if ( true === $status && ! $wp_filesystem->exists( $info['filepath'] ) ) {
+		if ( true === $status && ! $this->wp_filesystem->exists( $info['filepath'] ) ) {
 			$status = array(
 				'error' => 'The archive file "' . $info['filepath'] . '" was not written.',
 			);
@@ -1426,17 +1424,17 @@ class Boldgrid_Backup_Admin_Core {
 			return $status;
 		}
 
-		$info['lastmodunix'] = $wp_filesystem->mtime( $info['filepath'] );
+		$info['lastmodunix'] = $this->wp_filesystem->mtime( $info['filepath'] );
 
 		if ( $save && ! $dryrun ) {
 			// Modify the archive file permissions to help protect from public access.
-			$wp_filesystem->chmod( $info['filepath'], 0600 );
+			$this->wp_filesystem->chmod( $info['filepath'], 0600 );
 
 			// Add some statistics to the return.
-			$info['filesize'] = $wp_filesystem->size( $info['filepath'] );
+			$info['filesize'] = $this->wp_filesystem->size( $info['filepath'] );
 
 			// Delete the temporary database dump file.
-			$wp_filesystem->delete( $this->db_dump_filepath, false, 'f' );
+			$this->wp_filesystem->delete( $this->db_dump_filepath, false, 'f' );
 		}
 
 		// Stop timer.
