@@ -90,43 +90,55 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		$return = array();
 
 		$tables = $this->get_insert_tables( $filepath, $file );
+
 		$file_contents = $this->core->archive->get_file( $file );
 
 		foreach( $tables as $table ) {
-			// Grab the exact insert statement.
-			$expression = sprintf( '/INSERT INTO \`%1$s\` VALUES(.*)/', $table );
-			preg_match( $expression, $file_contents[0]['content'], $matches );
+			/*
+			 * Grab the exact insert statement.
+			 *
+			 * We have to use preg_match_all because some tables may have
+			 * multiple INSERT INTO commands.
+			 */
+			$expression = sprintf( '/INSERT INTO \`%1$s\` VALUES(.*);/', $table );
+			preg_match_all( $expression, $file_contents[0]['content'], $matches );
 
 			if( empty( $matches[1] ) ) {
 				$return[$table] = 0;
 				continue;
 			}
 
-			/*
-			 * Ultimately what we're trying to do below is get the number of
-			 * records in the INSERT statement.
-			 *
-			 * We cannot simply count the number of items between ()'s, as there
-			 * could be a text entry like this ('()'),(), that would trigger a
-			 * false positive.
-			 *
-			 * What we're doing is converting:
-			 * 'some text goes \' () here ' to
-			 * 'text'
-			 * ... so we can simply count the number of ('s to find the number
-			 * of records.
-			 */
-			$insert_command = $matches[1];
-			$insert_command = str_replace( '\\\'', '', $insert_command );
-			$exploded = explode( '\'', $insert_command );
-			foreach( $exploded as $k => $v ) {
-				// Odd numbers are what was between quotes.
-				if( 0 !== $k % 2 ) {
-					$exploded[$k] = 'text';
+			$count = 0;
+
+			foreach( $matches[1] as $line ) {
+				/*
+				 * Ultimately what we're trying to do below is get the number of
+				 * records in the INSERT statement.
+				 *
+				 * We cannot simply count the number of items between ()'s, as there
+				 * could be a text entry like this ('()'),(), that would trigger a
+				 * false positive.
+				 *
+				 * What we're doing is converting:
+				 * 'some text goes \' () here ' to
+				 * 'text'
+				 * ... so we can simply count the number of ('s to find the number
+				 * of records.
+				 */
+				$insert_command = str_replace( '\\\'', '', $line );
+				$exploded = explode( '\'', $insert_command );
+				foreach( $exploded as $k => $v ) {
+					// Odd numbers are what was between quotes.
+					if( 0 !== $k % 2 ) {
+						$exploded[$k] = '';
+					}
 				}
+				$insert_command = implode( '\'', $exploded );
+
+				$count += substr_count( $insert_command, '(' );
 			}
-			$insert_command = implode( '\'', $exploded );
-			$return[$table] = substr_count( $insert_command, '(' );
+
+			$return[$table] = $count;
 		}
 
 		return $return;
@@ -164,6 +176,9 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		foreach( $exploded as $table ) {
 			$tables[] = strstr( $table, '`', true );
 		}
+
+		// Tables may have more than one INSERT INTO statement.
+		$tables = array_unique( $tables );
 
 		return $tables;
 	}
