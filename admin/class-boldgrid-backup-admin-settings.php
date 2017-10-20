@@ -588,7 +588,7 @@ class Boldgrid_Backup_Admin_Settings {
 			 */
 			$exclude_tables = array();
 			$include_tables = ! empty( $_POST['include_tables'] ) ? $_POST['include_tables'] : array();
-			$all_tables = $this->core->db_omit->get_prefixed_tables();
+			$all_tables = $this->core->db_get->prefixed();
 			foreach( $all_tables as $table ) {
 				if( ! in_array( $table, $include_tables ) ) {
 					$exclude_tables[] = $table;

@@ -49,6 +49,26 @@ class Boldgrid_Backup_Admin_Archive {
 	}
 
 	/**
+	 * Get one file from an archive.
+	 *
+	 * @since 1.5.3
+	 *
+	 * @param  string $file The file to get.
+	 * @return array
+	 */
+	public function get_file( $file ) {
+		if( empty( $this->filepath ) || ! $this->is_archive() ) {
+			return false;
+		}
+
+		$zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this->core );
+
+		$file_contents = $zip->get_file( $this->filepath, $file );
+
+		return $file_contents;
+	}
+
+	/**
 	 * Determine if a zip file is in our archive.
 	 *
 	 * @since 1.5.3
@@ -72,7 +92,7 @@ class Boldgrid_Backup_Admin_Archive {
 		}
 
 		foreach( $archives as $archive ) {
-			if( $filepath === $archive['filepath'] ) {
+			if( $this->filepath === $archive['filepath'] ) {
 				return true;
 			}
 		}

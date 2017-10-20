@@ -40,28 +40,42 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	}
 
 	/**
-	 * Get a list of all tables based on system prefix.
+	 * Get our exluded tables list.
 	 *
 	 * @since 1.5.3
 	 *
-	 * @global $wpdb;
+	 * @return array
+	 */
+	public function get_excluded_tables() {
+		$settings = $this->core->settings->get_settings();
+
+		$excluded_tables = $settings['exclude_tables'];
+
+		return $excluded_tables;
+	}
+
+	/**
+	 * Get the tables we need to backup.
+	 *
+	 * We first get all the prefixed tables, and then we remove the tables from
+	 * that list that the user specifically set not to backup.
+	 *
+	 * @since 1.5.3
 	 *
 	 * @return array
 	 */
-	public function get_prefixed_tables() {
-		global $wpdb;
+	public function get_filtered_tables() {
+		$prefixed_tables = $this->core->db_get->prefixed();
 
-		$sql = sprintf( 'SHOW TABLES LIKE "%1$s%%"', $wpdb->prefix );
+		$exclude_tables = $this->get_excluded_tables();
 
-		$results = $wpdb->get_results( $sql, ARRAY_N );
-
-		$prefix_tables = array();
-
-		foreach( $results as $k => $v ) {
-			$prefix_tables[] = $v[0];
+		foreach( $prefixed_tables as $key => $table ) {
+			if( in_array( $table, $exclude_tables ) ) {
+				unset( $prefixed_tables[$key] );
+			}
 		}
 
-		return $prefix_tables;
+		return $prefixed_tables;
 	}
 
 	/**
@@ -74,10 +88,9 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	 * @return string
 	 */
 	public function format_prefixed_tables() {
-		$settings = $this->core->settings->get_settings();
-		$exclude_tables = $settings['exclude_tables'];
+		$exclude_tables = $this->get_excluded_tables();
 
-		$tables = $this->get_prefixed_tables();
+		$tables = $this->core->db_get->prefixed();
 		$return = '';
 
 		foreach( $tables as $table ) {

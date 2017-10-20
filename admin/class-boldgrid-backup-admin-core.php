@@ -196,6 +196,15 @@ class Boldgrid_Backup_Admin_Core {
 	private $available_exec_functions = null;
 
 	/**
+	 * Db Dump.
+	 *
+	 * @since  1.5.3
+	 * @access public
+	 * @var    Boldgrid_Backup_Admin_Db_Dump
+	 */
+	public $db_dump;
+
+	/**
 	 * Database backup file path.
 	 *
 	 * @since 1.0
@@ -203,6 +212,15 @@ class Boldgrid_Backup_Admin_Core {
 	 * @var string
 	 */
 	public $db_dump_filepath = '';
+
+	/**
+	 * Db Get.
+	 *
+	 * @since  1.5.3
+	 * @access public
+	 * @var    Boldgrid_Backup_Admin_Db_Dump
+	 */
+	public $db_get;
 
 	/**
 	 * An instance of Boldgrid_Backup_Admin_Db_Omit.
@@ -380,6 +398,10 @@ class Boldgrid_Backup_Admin_Core {
 		$this->email = new Boldgrid_Backup_Admin_Email( $this );
 
 		$this->db_omit = new Boldgrid_Backup_Admin_Db_Omit( $this );
+
+		$this->db_dump = new Boldgrid_Backup_Admin_Db_Dump( $this );
+
+		$this->db_get = new Boldgrid_Backup_Admin_Db_get( $this );
 
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
@@ -869,8 +891,7 @@ class Boldgrid_Backup_Admin_Core {
 		$this->set_time_limit();
 
 		// Create a dump of our database.
-		$dumper = new Boldgrid_Backup_Admin_Db_Dump();
-		$status = $dumper->dump( $db_dump_filepath );
+		$status = $this->db_dump->dump( $db_dump_filepath );
 		if( ! empty( $status['error'] ) ) {
 			do_action( 'boldgrid_backup_notice', $status['error'], 'notice notice-error is-dismissible' );
 			return false;

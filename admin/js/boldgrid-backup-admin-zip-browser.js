@@ -42,7 +42,8 @@ BoldGrid.ZipBrowser = function( $ ) {
 			data = {
 				'action': 'boldgrid_backup_browse_archive_file_actions',
 				'security' : $( '#_wpnonce' ).val(),
-				'filepath' : $tr.attr( 'data-dir' ),
+				'filepath' : $( '#filepath' ).val(),
+				'file' : $tr.attr( 'data-dir' ),
 			};
 
 		if( ! expanded ) {

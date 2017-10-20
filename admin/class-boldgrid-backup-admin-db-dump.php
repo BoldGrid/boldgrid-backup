@@ -22,6 +22,26 @@ use Ifsnop\Mysqldump as IMysqldump;
 class Boldgrid_Backup_Admin_Db_Dump {
 
 	/**
+	 * The core class object.
+	 *
+	 * @since  1.5.3
+	 * @access private
+	 * @var    Boldgrid_Backup_Admin_Core
+	 */
+	private $core;
+
+	/**
+	 * Constructor.
+	 *
+	 * @since 1.5.3
+	 *
+	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
+	 */
+	public function __construct( $core ) {
+		$this->core = $core;
+	}
+
+	/**
 	 * Create a MySQL dump of the database.
 	 *
 	 * @since 1.5.1
@@ -30,7 +50,7 @@ class Boldgrid_Backup_Admin_Db_Dump {
 	 * @return bool   True on success.
 	 */
 	public function dump( $file ) {
-		$include_tables = $this->get_tables();
+		$include_tables = $this->core->db_omit->get_filtered_tables();
 		if ( empty( $include_tables ) ) {
 			return array( 'error' => esc_html__( 'No tables selected to backup.', 'boldgrid-backup' ) );
 		}
@@ -58,51 +78,93 @@ class Boldgrid_Backup_Admin_Db_Dump {
 	}
 
 	/**
-	 * Get an array of tables that we should backup.
+	 * Get data on all tables and the number of records in the backup file.
 	 *
-	 * @since 1.5.1
+	 * @since 1.5.3
 	 *
-	 * @global $wpdb.
-	 *
+	 * @param  string $filepath Path to zip file.
+	 * @param  string $file     Path to file in zip.
 	 * @return array
 	 */
-	public function get_tables() {
-		global $wpdb;
+	public function get_insert_count( $filepath, $file ) {
+		$return = array();
 
-		$include_tables = array();
+		$tables = $this->get_insert_tables( $filepath, $file );
+		$file_contents = $this->core->archive->get_file( $file );
 
-		$query = $wpdb->prepare(
-			'SELECT `TABLE_NAME` FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA`=%s AND `TABLE_NAME` LIKE %s ORDER BY `TABLE_NAME`;',
-			DB_NAME, $wpdb->get_blog_prefix( is_multisite() ) . '%'
-		);
+		foreach( $tables as $table ) {
+			// Grab the exact insert statement.
+			$expression = sprintf( '/INSERT INTO \`%1$s\` VALUES(.*)/', $table );
+			preg_match( $expression, $file_contents[0]['content'], $matches );
 
-		// Check query.
-		if ( empty( $query ) ) {
-			do_action( 'boldgrid_backup_notice', esc_html__( 'Could not determine mysql tables names.', 'boldgrid-backup' ), 'notice notice-error is-dismissible' );
-			return false;
+			if( empty( $matches[1] ) ) {
+				$return[$table] = 0;
+				continue;
+			}
+
+			/*
+			 * Ultimately what we're trying to do below is get the number of
+			 * records in the INSERT statement.
+			 *
+			 * We cannot simply count the number of items between ()'s, as there
+			 * could be a text entry like this ('()'),(), that would trigger a
+			 * false positive.
+			 *
+			 * What we're doing is converting:
+			 * 'some text goes \' () here ' to
+			 * 'text'
+			 * ... so we can simply count the number of ('s to find the number
+			 * of records.
+			 */
+			$insert_command = $matches[1];
+			$insert_command = str_replace( '\\\'', '', $insert_command );
+			$exploded = explode( '\'', $insert_command );
+			foreach( $exploded as $k => $v ) {
+				// Odd numbers are what was between quotes.
+				if( 0 !== $k % 2 ) {
+					$exploded[$k] = 'text';
+				}
+			}
+			$insert_command = implode( '\'', $exploded );
+			$return[$table] = substr_count( $insert_command, '(' );
 		}
 
-		$tables = $wpdb->get_results( $query, ARRAY_N );
+		return $return;
+	}
 
-		if ( empty( $tables ) ) {
-			do_action( 'boldgrid_backup_notice', esc_html__( 'No results when getting mysql table names.', 'boldgrid-backup' ), 'notice notice-error is-dismissible' );
-			return false;
-		}
+	/**
+	 * Get a list of all tables a .sql file has insert commands for.
+	 *
+	 * @since 1.5.3
+	 *
+	 * @param  string $filepath Path to zip file.
+	 * @param  string $file     Path to file in zip.
+	 * @return array
+	 */
+	public function get_insert_tables( $filepath, $file ) {
+		$this->core->archive->set( $filepath );
+		$file_contents = $this->core->archive->get_file( $file );
 
-		foreach ( $tables as $table ) {
-			$include_tables[] = $table[0];
-		}
-
-		/**
-		 * Filter the tables that we will backup.
+		/*
+		 * Get a list of all tables within the dump that we are inserting
+		 * records into.
 		 *
-		 * @since 1.5.1
+		 * We initially did this taking a preg_match_all approach, but it fails
+		 * for really long tables / fails with really long strings.
+		 * # preg_match_all('/INSERT INTO \`(.*)\` VALUES(.*)/', $file_contents[0]['content'], $matches );
+		 * # $tables = ! empty( $matches[1] ) ? $matches[1] : array();
 		 *
-		 * @param array $include_tables
-		 */
-		$include_tables = apply_filters( 'boldgrid_backup_backup_tables', $include_tables );
+		 * @link https://stackoverflow.com/questions/3021316/preg-match-and-long-strings
+		 *
+		 * For now, we'll go with the handy explode technique.
+		*/
+		$tables = array();
+		$exploded = explode( 'INSERT INTO `', $file_contents[0]['content'] );
+		unset( $exploded[0] );
+		foreach( $exploded as $table ) {
+			$tables[] = strstr( $table, '`', true );
+		}
 
-		return $include_tables;
+		return $tables;
 	}
 }
-

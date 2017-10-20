@@ -40,6 +40,60 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 	}
 
 	/**
+	 * Render html markup for a .sql file.
+	 *
+	 * When a user is browsing an archive and they click on a .sql file, this
+	 * method will create a table showing all the tables in that backup.
+	 *
+	 * @since 1.5.3
+	 *
+	 * @param  string $filepath Zip file.
+	 * @param  string $file     Sql file name.
+	 * @return string
+	 */
+	public function file_actions_sql( $filepath, $file ) {
+		$tables_with_records = $this->core->db_dump->get_insert_count( $filepath, $file );
+		$prefixed_tables = $this->core->db_get->prefixed_count();
+
+		$intro = sprintf( __( 'This file, %1$s, is a database dump. The following data is found within:', 'boldgrid-backup' ), $file );
+		$in_backup = __( '# Records in this backup', 'boldgrid-backup' );
+		$in_current = __( '# Records in current database', 'boldgrid-backup' );
+
+		$return = sprintf( '
+			<p>%1$s</p>
+			<table class="wp-list-table fixed striped widefat">
+			<thead>
+				<tr>
+					<th>Table</th>
+					<th>%2$s</th>
+					<th>%3$s</th>
+				</tr>
+			</thead>
+			<tbody>',
+			$intro,
+			$in_backup,
+			$in_current
+		);
+
+		foreach( $prefixed_tables as $table => $record_count ) {
+			$return .= sprintf(
+				'<tr>
+					<td>%1$s</td>
+					<td>%2$s</td>
+					<td>%3$s</td>
+				</tr>',
+				esc_html( $table ),
+				isset( $tables_with_records[$table] ) ? $tables_with_records[$table] : '0',
+				esc_html( $record_count )
+			);
+		}
+
+		$return .= '</tbody></table>';
+
+		return $return;
+	}
+
+	/**
 	 * Allow the user to browse an archive file.
 	 *
 	 * Returns a formatted table to the browser.
@@ -115,11 +169,22 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 		}
 
 		$filepath = ! empty( $_POST['filepath'] ) ? $_POST['filepath'] : false;
-		if( empty( $filepath ) ) {
-			wp_send_json_error( __( 'Invalid filepath.', 'boldgrid-backup' ) );
+		$file = ! empty( $_POST['file'] ) ? $_POST['file'] : false;
+		if( empty( $filepath ) || empty( $file ) ) {
+			wp_send_json_error( __( 'Invalid file / filepath.', 'boldgrid-backup' ) );
 		}
 
+		$parts = pathinfo( $file );
+
+		// Here's the default message.
 		$upgrade_message = __( 'With BoldGrid Backup Premium, you can view and restore files from here.', 'boldgrid-backup' );
+
+		// For other file types, we can do more.
+		switch( $parts['extension'] ) {
+			case 'sql':
+				$upgrade_message = $this->file_actions_sql( $filepath, $file );
+				break;
+		}
 
 		/**
 		 * Allow other plugins to add functionality.
