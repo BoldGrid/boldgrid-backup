@@ -89,6 +89,7 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 			array(
 				'type' => 'dir',
 				'path' => $backup_dir,
+				'chmod' => 0700,
 			),
 			array(
 				'type' => 'file',
@@ -105,11 +106,22 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 			),
 		);
 
+		/**
+		 * Allow other plugins to modify our config.
+		 *
+		 * @since 1.5.3
+		 *
+		 * @param array  $files
+		 * @param string $backup_dir
+		 */
+		$files = apply_filters( 'boldgrid_backup_create_dir_config', $files, $backup_dir );
+
 		foreach( $files as $file ) {
 			switch( $file['type'] ) {
 				case 'dir':
 					if( ! $this->core->wp_filesystem->exists( $file['path'] ) ) {
-						$created = $this->core->wp_filesystem->mkdir( $file['path'] );
+						$chmod = ! empty( $file['chmod'] ) ? $file['chmod'] : false;
+						$created = $this->core->wp_filesystem->mkdir( $file['path'], $chmod );
 						if( ! $created ) {
 							$this->errors[] = sprintf( $cannot_create, $file['path'], $check_permissions );
 							return false;
@@ -326,6 +338,11 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	public function set( $backup_directory ) {
 
 		if( empty( $backup_directory ) ) {
+			return false;
+		}
+
+		$created = $this->create( $backup_directory );
+		if( ! $created ) {
 			return false;
 		}
 
