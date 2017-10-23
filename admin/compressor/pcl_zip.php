@@ -225,7 +225,12 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 
 		$file_contents = $this->get_file( $filepath, $file );
 
-		return $this->core->wp_filesystem->put_contents( ABSPATH . $file, $file_contents[0]['content'] );
+		// Write the file and adjust the timestamp.
+		$written = $this->core->wp_filesystem->put_contents( ABSPATH . $file, $file_contents[0]['content'] );
+		if( ! $written ) {
+			return false;
+		}
+		return $this->core->wp_filesystem->touch( ABSPATH . $file, $file_contents[0]['mtime'] );
 	}
 
 	/**
