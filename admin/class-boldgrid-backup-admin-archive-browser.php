@@ -192,8 +192,9 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 		 * @since 1.5.3
 		 *
 		 * @param string $upgrade_message
+		 * @param string $file            Example: wp-admin/import.php
 		 */
-		$upgrade_message = apply_filters( 'boldgrid_backup_file_actions', $upgrade_message );
+		$upgrade_message = apply_filters( 'boldgrid_backup_file_actions', $upgrade_message, $file );
 
 		wp_send_json_success( $upgrade_message );
 	}

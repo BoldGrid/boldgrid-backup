@@ -15,6 +15,6 @@
 	vertical-align: text-bottom;	
 }
 
-.file-actions td {
+.file-actions > td {
 	padding-left:35px;
 }

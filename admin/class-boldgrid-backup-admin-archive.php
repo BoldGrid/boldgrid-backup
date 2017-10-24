@@ -53,10 +53,11 @@ class Boldgrid_Backup_Admin_Archive {
 	 *
 	 * @since 1.5.3
 	 *
-	 * @param  string $file The file to get.
+	 * @param  string $file      The file to get.
+	 * @param  bool   $meta_only Whether to include the content of the file.
 	 * @return array
 	 */
-	public function get_file( $file ) {
+	public function get_file( $file, $meta_only = false ) {
 		if( empty( $this->filepath ) || ! $this->is_archive() ) {
 			return false;
 		}
@@ -64,6 +65,11 @@ class Boldgrid_Backup_Admin_Archive {
 		$zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this->core );
 
 		$file_contents = $zip->get_file( $this->filepath, $file );
+
+		// If we only want the meta data, unset the content of the file.
+		if( $meta_only && ! empty( $file_contents[0]['content'] ) ) {
+			unset( $file_contents[0]['content'] );
+		}
 
 		return $file_contents;
 	}
