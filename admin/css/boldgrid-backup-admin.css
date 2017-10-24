@@ -33,6 +33,10 @@ a[disabled] {
 	color: #ffb900;
 }
 
+div .dashicons {
+	vertical-align: bottom;
+}
+
 /* The table of size data. */
 #size-data table tr td {
 	vertical-align: top;

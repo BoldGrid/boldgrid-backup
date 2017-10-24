@@ -20,7 +20,7 @@ BoldGrid.Backup = function( $ ) {
 	 * @since 1.3.1
 	 */
 	this.bindHelpClick = function() {
-		$( '.dashicons-editor-help' ).on( 'click', function() {
+		$( 'body' ).on( 'click', '.dashicons-editor-help', function() {
 			var id = $( this ).attr( 'data-id' );
 
 			// If we don't have a data-id, abort.

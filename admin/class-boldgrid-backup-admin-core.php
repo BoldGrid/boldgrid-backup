@@ -305,6 +305,14 @@ class Boldgrid_Backup_Admin_Core {
 	public $home_dir;
 
 	/**
+	 * Common elements.
+	 *
+	 * @since 1.5.3
+	 * @var   array
+	 */
+	public $lang = array();
+
+	/**
 	 * Local storage.
 	 *
 	 * @since  1.5.2
@@ -407,6 +415,10 @@ class Boldgrid_Backup_Admin_Core {
 		$this->get_backup_identifier();
 
 		$this->configs = Boldgrid_Backup_Admin::get_configs();
+
+		$this->lang = array(
+			'icon_warning' => '<span class="dashicons dashicons-warning yellow"></span>',
+		);
 	}
 
 	/**
