@@ -814,6 +814,24 @@ class Boldgrid_Backup_Admin_Utility {
 	}
 
 	/**
+	 * Convert a unix time to user's local time.
+	 *
+	 * @since 1.5.3
+	 *
+	 * @param  int $time
+	 * @return int
+	 */
+	public function time( $time ) {
+		$gmt_offset = get_option('gmt_offset');
+
+		if( empty( $gmt_offset ) || ! is_numeric( $gmt_offset ) ) {
+			return $time;
+		}
+
+		return $time + ( $gmt_offset * HOUR_IN_SECONDS );
+	}
+
+	/**
 	 * Alternative to WordPress' trailingslashit function.
 	 *
 	 * WordPress' native function does not take into account Windows / the

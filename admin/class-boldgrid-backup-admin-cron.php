@@ -148,11 +148,11 @@ class Boldgrid_Backup_Admin_Cron {
 		$this->delete_cron_entries( 'restore' );
 
 		// Get the unix time for 5 minutes from now.
-		$time_5_minutes_later = strtotime( '+5 MINUTES' );
+		$time_5_minutes_later = strtotime( $this->core->auto_rollback->testing_time );
 
 		// Get the system's localized current time (HH:MM:SS), 5 minutes in the future.
 		$system_time = $this->core->execute_command(
-			'date "+%H|%M|%S|%a %d %b %Y %I:%M:00 %p %Z" -d "+5 minutes"'
+			'date "+%H|%M|%S|%a %d %b %Y %I:%M:00 %p %Z" -d "' . $this->core->auto_rollback->testing_time . '"'
 		);
 
 		// Split the time into hour, minute, and second.

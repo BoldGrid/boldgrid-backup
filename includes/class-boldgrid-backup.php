@@ -264,33 +264,33 @@ class Boldgrid_Backup {
 		);
 
 		// Add an action to display an admin notice for a pending rollback.
-		$this->loader->add_action( 'admin_notices', $plugin_admin_core,
-			'rollback_notice'
+		$this->loader->add_action( 'admin_notices', $plugin_admin_core->auto_rollback,
+			'notice_countdown_show'
 		);
 
 		// Add a custom action to handle AJAX callback for canceling a pending rollback.
-		$this->loader->add_action( 'wp_ajax_boldgrid_cancel_rollback', $plugin_admin_core,
-			'boldgrid_cancel_rollback_callback'
+		$this->loader->add_action( 'wp_ajax_boldgrid_cancel_rollback', $plugin_admin_core->auto_rollback,
+			'wp_ajax_cancel'
 		);
 
 		// Add an action to display an admin notice on the WordPress Updates page.
-		$this->loader->add_action( 'core_upgrade_preamble', $plugin_admin_core,
-			'backup_notice'
+		$this->loader->add_action( 'core_upgrade_preamble', $plugin_admin_core->auto_rollback,
+			'notice_backup_show'
 		);
 
 		// Add an action to display an admin notice on the WordPress Plugins page.
-		$this->loader->add_action( 'pre_current_active_plugins', $plugin_admin_core,
-			'backup_notice'
+		$this->loader->add_action( 'pre_current_active_plugins', $plugin_admin_core->auto_rollback,
+			'notice_backup_show'
 		);
 
 		// Add an action to add a cron job to restore after WordPress Updates, unless canceled.
-		$this->loader->add_action( 'upgrader_process_complete', $plugin_admin_core,
-			'upgrader_process_complete'
+		$this->loader->add_action( 'upgrader_process_complete', $plugin_admin_core->auto_rollback,
+			'notice_deadline_show', 10, 2
 		);
 
 		// Add a custom action to handle AJAX callback for getting the rollback deadline.
-		$this->loader->add_action( 'wp_ajax_boldgrid_backup_deadline', $plugin_admin_core,
-			'boldgrid_backup_deadline_callback'
+		$this->loader->add_action( 'wp_ajax_boldgrid_backup_deadline', $plugin_admin_core->auto_rollback,
+			'wp_ajax_get_deadline'
 		);
 
 		// Add a custom action to handle AJAX callback for getting size data.

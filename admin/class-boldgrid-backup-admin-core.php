@@ -88,6 +88,18 @@ class Boldgrid_Backup_Admin_Core {
 	public $email;
 
 	/**
+	 * Elements.
+	 *
+	 * Common elements used throughout admin pages. Usually a combination of
+	 * language strings.
+	 *
+	 * @since  1.5.3
+	 * @access public
+	 * @var    Boldgrid_Backup_Admin_Email
+	 */
+	public $elements = array();
+
+	/**
 	 * The functionality test class object.
 	 *
 	 * @since 1.0
@@ -95,6 +107,15 @@ class Boldgrid_Backup_Admin_Core {
 	 * @var Boldgrid_Backup_Admin_Test
 	 */
 	public $test;
+
+	/**
+	 * An instance of Boldgrid_Backup_Admin_Utility.
+	 *
+	 * @since  1.5.3
+	 * @access public
+	 * @var    Boldgrid_Backup_Admin_Utility
+	 */
+	public $utility;
 
 	/**
 	 * The admin notice class object.
@@ -411,14 +432,14 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->db_get = new Boldgrid_Backup_Admin_Db_get( $this );
 
+		$this->utility = new Boldgrid_Backup_Admin_Utility();
+
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
 
 		$this->configs = Boldgrid_Backup_Admin::get_configs();
 
-		$this->lang = array(
-			'icon_warning' => '<span class="dashicons dashicons-warning yellow"></span>',
-		);
+		$this->set_lang();
 	}
 
 	/**
@@ -2131,7 +2152,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Clear rollback information and restoration cron jobs that may be present.
-		$this->cancel_rollback();
+		$this->auto_rollback->cancel();
 
 		// Get settings.
 		$settings = $this->settings->get_settings();
@@ -2316,6 +2337,8 @@ class Boldgrid_Backup_Admin_Core {
 			);
 		}
 
+		$is_updating = ! empty( $_POST['is_updating'] ) && 'true' === $_POST['is_updating'];
+
 		// Perform the backup operation.
 		$archive_info = $this->archive_files( true );
 
@@ -2338,16 +2361,20 @@ class Boldgrid_Backup_Admin_Core {
 		// Create a nonce for archive operations.
 		$archive_nonce = wp_create_nonce( 'archive_auth' );
 
-		// Generate markup, using the backup page template.
-		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup.php';
-
-		// If updating WordPress, then queue a restoration cron job via WP option.
-		if ( isset( $_POST['is_updating'] ) && 'true' === $_POST['is_updating'] ) {
+		if( ! $is_updating ) {
+			ob_start();
+			include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup.php';
+			$message = ob_get_clean();
+			wp_send_json_success( array(
+				'callback' => 'message',
+				'message' => $message,
+			));
+		} else {
 			update_site_option( 'boldgrid_backup_pending_rollback', $archive_info );
+			wp_send_json_success( array(
+				'callback' => 'updateProtectionEnabled',
+			));
 		}
-
-		// End nicely.
-		wp_die();
 	}
 
 	/**
@@ -2521,6 +2548,24 @@ class Boldgrid_Backup_Admin_Core {
 	}
 
 	/**
+	 * Set lang strings.
+	 *
+	 * @since 1.5.3
+	 */
+	public function set_lang() {
+		$this->lang = array(
+			'backup_created' => __( 'Backup created successfully!', 'boldgrid-backup' ),
+			'icon_success' => '<span class="dashicons dashicons-yes green"></span>',
+			'icon_warning' => '<span class="dashicons dashicons-warning yellow"></span>',
+			'heading_update_protection' => __( 'BoldGrid Backup - Update Protection', 'boldgrid-backup' ),
+		);
+
+		$this->elements = array(
+			'update_protection_activated' => sprintf( '%1$s %2$s', $this->lang['icon_success'], __( 'Update protection activated!', 'boldgrid-backup' ) ),
+		);
+	}
+
+	/**
 	 * Set the PHP timeout limit to at least 15 minutes.
 	 *
 	 * Various places within this class use to set the timeout limit to 300 seconds. This timeout
@@ -2535,312 +2580,6 @@ class Boldgrid_Backup_Admin_Core {
 			$max_execution_time :
 			$time_limit
 		) );
-	}
-
-	/**
-	 * Show an admin notice on the WordPress Updates page.
-	 *
-	 * @since 1.0
-	 *
-	 * @global string $pagenow
-	 */
-	public function backup_notice() {
-		global $pagenow;
-
-		// Get pending rollback information.
-		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
-
-		// If there is a pending rollback, then abort.
-		if ( ! empty( $pending_rollback['lastmodunix'] ) ) {
-			return;
-		}
-
-		// Get archive list.
-		$archives = $this->get_archive_list();
-
-		// Get the archive count.
-		$archive_count = count( $archives );
-
-		// Initialize $listing.
-		$listing = 'None';
-
-		// Initialize $download_button.
-		$download_button = '';
-
-		// Get the most recent archive listing.
-		if ( $archive_count > 0 ) {
-			$key = 0;
-
-			$archive = $archives[ $key ];
-
-			$listing = $archive['filename'] . ' ' .
-			Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive['filesize'] ) . ' ' .
-			$archive['filedate'];
-
-			$download_button = "<a id='backup-archive-download-<?php echo $key; ?>'
-			class='button action-download' href='#'
-			data-key='" . $key . "' data-filepath='" . $archive['filepath'] . "'
-			data-filename='" . $archive['filename'] . "'>" .
-			esc_html__( 'Download ', 'boldgrid-backup' ) . '</a>';
-		}
-
-		// Enqueue CSS.
-		wp_enqueue_style( 'boldgrid-backup-admin-home',
-			plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-home.css', array(),
-			BOLDGRID_BACKUP_VERSION, 'all'
-		);
-
-		// Register the JS.
-		wp_register_script( 'boldgrid-backup-admin-home',
-			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-home.js',
-			array(
-				'jquery',
-			), BOLDGRID_BACKUP_VERSION, false
-		);
-
-		// Get the current wp_filesystem access method.
-		$access_type = get_filesystem_method();
-
-		// Create a nonce for file downloads.
-		$archive_nonce = wp_create_nonce( 'archive_auth' );
-
-		// Create URL for backup now.
-		$backup_url = get_admin_url( null, 'admin.php?page=boldgrid-backup&backup_now=1' );
-
-		// Create an array of data to pass to JS.
-		$localize_script_data = array(
-			'archiveNonce' => $archive_nonce,
-			'accessType' => $access_type,
-			'backupUrl' => $backup_url,
-		);
-
-		// Add localize script data to the JS script.
-		wp_localize_script( 'boldgrid-backup-admin-home', 'localizeScriptData', $localize_script_data );
-
-		// Enqueue JS.
-		wp_enqueue_script( 'boldgrid-backup-admin-home' );
-		wp_enqueue_script( 'boldgrid-backup-now' );
-
-		// Create admin notice text.
-		$notice_text = sprintf(
-			__(	'BoldGrid Backup last created backup archive:<p>%1$s %2$s</p>
-				<p>It is recommended to backup your site before performing updates.
-				If you perform a backup here, before performing updates, then an automatic rollback is possible.
-				More information is available in the <a href="%3$s">Backup Archive</a> page.</p>',
-				'boldgrid-backup'
-			),
-			$listing,
-			$download_button,
-			admin_url( 'admin.php?page=boldgrid-backup' )
-		) . PHP_EOL;
-
-		$backup_button = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-button.php';
-
-		$size_data = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-size-data.php';
-
-		// Show admin notice.
-		do_action( 'boldgrid_backup_notice', $notice_text . $size_data . $backup_button, 'notice notice-warning is-dismissible' );
-
-		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-js-templates.php';
-	}
-
-	/**
-	 * Show an admin notice if there is a pending rollback.
-	 *
-	 * @since 1.0
-	 *
-	 * @return null
-	 */
-	public function rollback_notice() {
-		// Get pending rollback deadline.
-		$deadline = $this->get_rollback_deadline();
-
-		// If there is not a pending rollback, then abort.
-		if ( empty( $deadline ) ) {
-			return;
-		}
-
-		// Get archive list.
-		$archives = $this->get_archive_list();
-
-		// Get the archive count.
-		$archive_count = count( $archives );
-
-		// If the deadline has passed or no backup archives to restore, then remove the pending
-		// rollback information and cron.
-		if ( $deadline <= time() || 0 === $archive_count ) {
-			// Clear rollback information.
-			$this->cancel_rollback();
-
-			return;
-		}
-
-		// Enqueue CSS.
-		wp_enqueue_style( 'boldgrid-backup-admin-home',
-			plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-home.css', array(),
-			BOLDGRID_BACKUP_VERSION, 'all'
-		);
-
-		// Register the JS for the rollback notice.
-		wp_register_script( 'boldgrid-backup-admin-rollback',
-			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-rollback.js',
-			array(
-				'jquery',
-			), BOLDGRID_BACKUP_VERSION, false
-		);
-
-		// Create text for the restoration confirmation.
-		$restore_confirm_text = esc_html__(
-			'Please confirm the restoration of this WordPress installation from the archive file',
-			'boldgrid-backup'
-		);
-
-		// Create an array of data to pass to JS.
-		$localize_script_data = array(
-			'restoreConfirmText' => $restore_confirm_text,
-		);
-
-		// Include the time (in ISO 8601 format).
-		$localize_script_data['rolloutDeadline'] = date( 'c', $deadline );
-
-		// Add localize script data to the JS script.
-		wp_localize_script( 'boldgrid-backup-admin-rollback', 'localizeScriptData', $localize_script_data );
-
-		// Enqueue JS for the rollback notice.
-		wp_enqueue_script( 'boldgrid-backup-admin-rollback' );
-
-		// Get the most recent archive listing.
-		$key = 0;
-
-		$archive = $archives[ $key ];
-
-		// Create an array of arguments for the notice template.
-		$args['restore_key'] = $key;
-
-		$args['restore_filename'] = $archive['filename'];
-
-		// Create notice markup.
-		$notice_markup = $this->get_rollback_markup( $args );
-
-		// Display notice.
-		do_action( 'boldgrid_backup_notice', $notice_markup, 'notice notice-warning' );
-
-		return;
-	}
-
-	/**
-	 * Generate markup for the rollback notice.
-	 *
-	 * @since 1.2
-	 * @access private
-	 *
-	 * @param array $args {
-	 * 		An array of arguments.
-	 *
-	 * 		@type int $restore_key Key index used for restoration.
-	 * 		@type string $restore_filename Filename of the backup archive to be restored.
-	 * }
-	 * @return string The resulting markup.
-	 */
-	private function get_rollback_markup( $args ) {
-		$notice_markup = "<div id='cancel-rollback-section'>" . PHP_EOL .
-		esc_html__(
-			'There is a pending automatic rollback using the most recent backup archive.',
-			'boldgrid-backup'
-		) . PHP_EOL . '<p>' .
-		esc_html__(
-			'If you do not want to rollback, then you must cancel the action before the countdown timer elapses.',
-			'boldgrid-backup'
-		) . '</p>' . PHP_EOL .
-		'<p>' .
-		esc_html__( 'Countdown', 'boldgrid-backup' ) .
-		": <span id='rollback-countdown-timer'></span></p>
-		<form action='#' id='cancel-rollback-form' method='POST'>
-		" . wp_nonce_field( 'boldgrid_rollback_notice', 'cancel_rollback_auth', true, false ) . "
-		<p>
-		<a id='cancel-rollback-button' class='button'>" .
-		esc_html__( 'Cancel Rollback', 'boldgrid-backup' ) .
-		"</a>
-		<span class='spinner'></span>
-		</p>
-		</form>
-		</div>
-		<div id='restore-now-section'>
-		<p>" .
-		esc_html__(
-			'You can click the button below to rollback your site now.',
-			'boldgrid-backup'
-		) .
-		"</p>
-		<p>
-		<form action='" . get_admin_url( null, 'admin.php?page=boldgrid-backup' ) . "'
-		class='restore-now-form' method='POST'>
-			<input type='hidden' name='restore_now' value='1' />
-			<input type='hidden' name='archive_key' value='" . $args['restore_key'] . "' />
-			<input type='hidden' name='archive_filename' value='" . $args['restore_filename'] . "' />
-			" . wp_nonce_field( 'archive_auth', 'archive_auth', true, false ) . "
-			<input type='submit' class='button action-restore' data-key='" . $args['restore_key'] . "'
-			data-filename='" . $args['restore_filename'] . "'
-			value='" . esc_html__( 'Rollback Site Now', 'boldgrid-backup' ) . "' />
-			<span class='spinner'></span>
-		</form>
-		</p>
-		</div>
-		<div id='cancel-rollback-results'></div>
-";
-
-		return $notice_markup;
-	}
-
-	/**
-	 * Callback function for canceling a pending rollback.
-	 *
-	 * @since 1.0
-	 */
-	public function boldgrid_cancel_rollback_callback() {
-		// Check user capabilities.
-		if ( ! current_user_can( 'update_plugins' ) ) {
-			wp_die(
-				'<div class="error"><p>' .
-				esc_html__( 'Security violation (not authorized).', 'boldgrid-backup' ) .
-				'</p></div>'
-			);
-		}
-
-		// Verify nonce, or die with an error message.
-		if ( ! isset( $_POST['cancel_rollback_auth'] ) ||
-		1 !== check_ajax_referer( 'boldgrid_rollback_notice', 'cancel_rollback_auth', false ) ) {
-			wp_die(
-				'<div class="error"><p>' .
-				esc_html__( 'Security violation (invalid nonce).', 'boldgrid-backup' ) .
-				'</p></div>'
-			);
-		}
-
-		// Clear rollback information.
-		$this->cancel_rollback();
-
-		// Echo a success message.
-		echo '<p>Automatic rollback has been canceled.</p>';
-
-		// End nicely.
-		wp_die();
-	}
-
-	/**
-	 * Cancel rollback.
-	 *
-	 * @since 1.0.1
-	 *
-	 * @see Boldgrid_Backup_Admin_Cron::delete_cron_entries().
-	 * @see Boldgrid_Backup_Admin_Settings::delete_rollback_option().
-	 */
-	public function cancel_rollback() {
-		// Remove any cron jobs for restore actions.
-		$this->cron->delete_cron_entries( 'restore' );
-
-		// Remove WP option boldgrid_backup_pending_rollback.
-		$this->settings->delete_rollback_option();
 	}
 
 	/**
@@ -2934,52 +2673,6 @@ class Boldgrid_Backup_Admin_Core {
 	}
 
 	/**
-	 * Get the pending rollback deadline (in unix seconds).
-	 *
-	 * @since 1.2
-	 *
-	 * @return int The pending rollback deadline in unix seconds, or zero if not present.
-	 */
-	public function get_rollback_deadline() {
-		// Get pending rollback information.
-		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
-
-		// Return pending rollback deadline, or 0 if not present.
-		if ( empty( $pending_rollback['deadline'] ) ) {
-			return 0;
-		} else {
-			return $pending_rollback['deadline'];
-		}
-	}
-
-	/**
-	 * Callback for getting the rollback deadline.
-	 *
-	 * @since 1.2.1
-	 *
-	 * @see Boldgrid_Backup_Admin_Core::get_rollback_deadline().
-	 */
-	public function boldgrid_backup_deadline_callback() {
-		// Check user capabilities.
-		if ( ! current_user_can( 'update_plugins' ) ) {
-			wp_die();
-		}
-
-		// Get the rollback deadline.
-		$deadline = $this->get_rollback_deadline();
-
-		// If there is no deadline, then die.
-		if ( empty( $deadline ) ) {
-			wp_die();
-		}
-
-		// Convert the deadline to ISO time (in ISO 8601 format).
-		$iso_time = date( 'c', $deadline );
-
-		wp_die( $iso_time );
-	}
-
-	/**
 	 * Callback for getting size data.
 	 *
 	 * @since 1.3.1
@@ -3002,38 +2695,5 @@ class Boldgrid_Backup_Admin_Core {
 		echo json_encode( $return );
 
 		wp_die();
-	}
-
-	/**
-	 * Callback function for the hook "upgrader_process_complete".
-	 *
-	 * @since 1.2
-	 *
-	 * @link https://developer.wordpress.org/reference/hooks/upgrader_process_complete/
-	 * @see Boldgrid_Backup_Admin_Cron::add_restore_cron().
-	 * @see Boldgrid_Backup_Admin_Core::get_rollback_deadline().
-	 */
-	public function upgrader_process_complete() {
-		// Add/update restoration cron job.
-		$this->auto_rollback->add_cron();
-
-		// If not on an admin page, then abort.
-		if ( ! is_admin() ) {
-			return;
-		}
-
-		// Get pending rollback deadline.
-		$deadline = $this->get_rollback_deadline();
-
-		// If there is not a pending rollback, then abort.
-		if ( empty( $deadline ) ) {
-			return;
-		}
-
-		// Get the ISO time (in ISO 8601 format).
-		$iso_time = date( 'c', $deadline );
-
-		// Print a hidden div with the time, so that JavaScript can read it.
-		printf( '<div class="hidden" id="rollback-deadline">%1$s</div>', $iso_time );
 	}
 }

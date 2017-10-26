@@ -32,6 +32,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 * New feature:  JIRA BGBKUP-43  Allow browsing of archive.
 * New feature:  JIRA BGBKUP-46  Add setting for include tables to the settings page.
 * New feature:  JIRA BGBKUP-47  Omit tables during backup.
+* Bug fix:      JIRA BGBKUP-54  Auto rollback not working.
 
 = 1.5.2 =
 * New feature:  JIRA WPB-3516   Auto rollback via wp cron.

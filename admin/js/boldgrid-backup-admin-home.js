@@ -26,18 +26,15 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 
 	// Onload event listener.
 	$( function() {
-
 		// On click action for download buttons.
-		$( '.action-download' )
-			.on( 'click', self.downloadArchive );
+		$( 'body' ).on( 'click', '.action-download', self.downloadArchive );
 
 		// On form submit of restore buttons.  "document" works with buttons placed with AJAX.
 		$( document.body )
 			.on( 'submit', 'form.restore-now-form', self.restoreArchiveConfirm );
 
 		// On click action for delete buttons.
-		$( '.action-delete' )
-			.on( 'click', self.deleteArchiveConfirm );
+		$( 'body' ).on( 'click', '.action-delete', self.deleteArchiveConfirm );
 
 		// On click action for the Backup Site Now button.
 		$( '#backup-site-now' )
@@ -283,7 +280,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 	self.backupNow = function( e ) {
 		// Declare variables.
 		var $this, $backupSiteSection, $backupSiteResults, backupNonce, wpHttpReferer, isUpdating,
-		errorCallback, data, markup;
+		errorCallback, successCallback, data, markup;
 
 		// Assign the current jQuery object.
 		$this = $( this );
@@ -347,6 +344,38 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 			$backupSiteResults.html( markup );
 		};
 
+		/**
+		 * @summary backupNow success callback.
+		 *
+		 * @since 1.5.3
+		 */
+		successCallback = function( response ) {
+			var data = JSON.parse( response ),
+				success = data.success !== undefined && true === data.success,
+				callback = success && data.data !== undefined && data.data.callback !== undefined ? data.data.callback : null,
+				message = callback && data.data.message !== undefined ? data.data.message : null;
+
+			switch( callback ) {
+				case 'updateProtectionEnabled':
+					self.updateProtectionEnabled();
+					break;
+				case 'message':
+					// Insert markup.
+					$backupSiteResults.html( message );
+					// Update the archives count.
+					$( '#archives-count' ).html( $( '#archives-new-count' ) );
+					// Update the archives total size.
+					$( '#archives-size' ).html( $( '#archives-new-size' ) );
+					// Empty the current archive list.
+					$( '#backup-archive-list-body' ).empty();
+					// Replace the old list with the new.
+					$( '#backup-archive-list-body' ).html( $( '#archive-list-new tr' ) );
+					// Remove the hidden new list.
+					$( '#archive-list-new' ).remove();
+					break;
+			}
+		};
+
 		// Generate the data array.
 		data = {
 			'action' : 'boldgrid_backup_now',
@@ -362,39 +391,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 			data : data,
 			type : 'post',
 			dataType : 'text',
-			success : function( response ) {
-				// Insert markup.
-				$backupSiteResults.html( response );
-
-				// Update the archives count.
-				$( '#archives-count' )
-					.html( $( '#archives-new-count' ) );
-
-				// Update the archives total size.
-				$( '#archives-size' )
-					.html( $( '#archives-new-size' ) );
-
-				// Empty the current archive list.
-				$( '#backup-archive-list-body' )
-					.empty();
-
-				// Replace the old list with the new.
-				$( '#backup-archive-list-body' )
-					.html( $( '#archive-list-new tr' ) );
-
-				// Remove the hidden new list.
-				$( '#archive-list-new' )
-					.remove();
-
-				// Rebind the click events, to the updated list.
-				// On click action for download buttons.
-				$( '.action-download' )
-					.on( 'click', self.downloadArchive );
-
-				// On click action for delete buttons.
-				$( '.action-delete' )
-					.on( 'click', self.deleteArchiveConfirm );
-			},
+			success : successCallback,
 			error : errorCallback,
 			complete : function() {
 				// Hide the spinner.
@@ -407,6 +404,25 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 		// Prevent default browser action.
 		e.preventDefault();
 	};
+
+	/**
+	 * @summary Show notice after backup and upgrade protection now enabled.
+	 *
+	 * This updates the current notice rather than generates a new one.
+	 *
+	 * @since 1.5.3
+	 */
+	self.updateProtectionEnabled = function() {
+		var $notice = $( '#backup-site-now-results' ).closest( '.notice' ),
+			$status = $notice.find( '#protection_enabled' ),
+			$backupNow = $( '#backup-site-now-section' );
+
+		$notice.removeClass( 'notice-warning' ).addClass( 'notice-success' );
+
+		$status.html( localizeScriptData.updateProtectionActivated );
+
+		$backupNow.html( '<p>' + localizeScriptData.backupCreated + '</p>' );
+	}
 
 	/**
 	 * Confirm to delete a selected backup archive file.

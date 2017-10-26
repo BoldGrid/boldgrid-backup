@@ -68,7 +68,7 @@ $restore_form = sprintf(
 	<td class='backup-archive-list-date'>
 		<strong><?php echo __( 'Backup', 'boldgrid-backup' );?></strong>: <?php echo $archive['filedate']; ?>
 		<div class="row-actions">
-			<?php printf( '<a href="admin.php?page=boldgrid-backup-archive-details&md5=%1$s&TB_iframe=true&width=772&height=550" class="thickbox">%2$s</a>', $md5_id, __( 'View details', 'boldgrid-backup' ) ); ?> |
+			<?php printf( '<a href="admin.php?page=boldgrid-backup-archive-details&md5=%1$s">%2$s</a>', $md5_id, __( 'View details', 'boldgrid-backup' ) ); ?> |
 			<?php echo $delete_form; ?>
 		</div>
 	</td>

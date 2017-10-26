@@ -33,6 +33,21 @@ BoldGrid.Backup = function( $ ) {
 		});
 	};
 
+	/**
+	 * @summary Remove WordPress' important notice about backups.
+	 *
+	 * We're already adding our own notice, no need to have 2 notices.
+	 *
+	 * @since 1.5.3
+	 */
+	self.hideBackupNotice = function() {
+		if( pagenow === undefined || 'update-core' !== pagenow ) {
+			return;
+		}
+
+		$( 'a[href*="WordPress_Backups"]' ).closest( '.notice' ).remove();
+	}
+
 	$( function() {
 		$includeTables = $( '.include-tables [type="checkbox"]' );
 
@@ -52,6 +67,8 @@ BoldGrid.Backup = function( $ ) {
 			$( '#tables_to_include .tables' ).slideToggle();
 			return false;
 		})
+
+		self.hideBackupNotice();
 	});
 };
 

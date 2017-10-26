@@ -40,7 +40,14 @@ class Boldgrid_Backup_Admin_Notice {
 			return;
 		}
 
-		printf( '<div class="%1$s"><p>%2$s</p></div>', $class, $message );
+		// Determine if our message is already in a container (either div or p).
+		$in_container = false !== strpos( '<p', $message ) || false !== strpos( '<div', $message );
+
+		printf(
+			'<div class="%1$s">%2$s</div>',
+			$class,
+			$in_container ? $message : '<p>' . $message . '</p>'
+		);
 
 		$this->displayed_messages[] = $message;
 	}
