@@ -280,7 +280,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 			/* 13 */ esc_html__( 'Rollback Site Now', 'boldgrid-backup' ),
 			/* 14 */ ! empty( $update_trigger ) ? sprintf( '<p>%1$s</p>', $update_trigger ) : '',
 			/* 15 */ $this->core->lang['icon_warning'],
-			/* 16 */ ! empty( $pending_rollback['deadline'] ) ? sprintf( '(<em>%1$s</em>)', date( 'g:i a', $this->core->utility->time( $pending_rollback['deadline'] ) ) ) : __( 'n/a', 'boldgrid-backup' )
+			/* 16 */ ! empty( $pending_rollback['deadline'] ) ? sprintf( '(<em>%1$s</em>)', date( 'g:i a', $this->core->utility->time( $pending_rollback['deadline'] ) ) ) : ''
 		);
 
 		return $notice_markup;
@@ -396,8 +396,12 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 * Prior to @1.5.3 this method was in the core class.
 	 *
 	 * @since 1.0
+	 *
+	 * @global string $pagenow
 	 */
 	public function notice_backup_show() {
+		global $pagenow;
+
 		// Get pending rollback information.
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
 
@@ -445,7 +449,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		$backup_button = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-button.php';
 		$size_data = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-size-data.php';
 		$notice = $this->notice_backup_get();
-		do_action( 'boldgrid_backup_notice', $notice_text . $size_data . $backup_button, 'notice notice-warning is-dismissible' );
+		do_action( 'boldgrid_backup_notice', $notice . $size_data . $backup_button, 'notice notice-warning is-dismissible' );
 
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-js-templates.php';
 	}
