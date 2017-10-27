@@ -1850,7 +1850,9 @@ class Boldgrid_Backup_Admin_Core {
 
 		// If a restoration was not requested, then abort.
 		if ( empty( $_POST['restore_now'] ) ) {
-			return false;
+			return array(
+				'error' => esc_html__( 'Invalid restore_now value.', 'boldgrid-backup' ),
+			);
 		}
 
 		// If not DOING_CRON, then verify nonce, or die.

@@ -146,10 +146,16 @@ switch ( $input['mode'] ) {
 
 		echo '...';
 
-		// Set GET variables.
-		$_GET['restore_now'] = 1;
-		$_GET['archive_key'] = ( isset( $input['archive_key'] ) ? $input['archive_key'] : null );
-		$_GET['archive_filename'] = ( ! empty( $input['archive_filename'] ) ? $input['archive_filename'] : null );
+		/*
+		 * Set POST variables.
+		 *
+		 * Prior to @1.5.3 we were setting GET (rather than POST) variables. The
+		 * restore method however checks for POST. Any GET/POST restore issues
+		 * post @1.5.3 can be traced back here.
+		 */
+		$_POST['restore_now'] = 1;
+		$_POST['archive_key'] = ( isset( $input['archive_key'] ) ? $input['archive_key'] : null );
+		$_POST['archive_filename'] = ( ! empty( $input['archive_filename'] ) ? $input['archive_filename'] : null );
 
 		// Call the restore function.
 		$archive_info = $boldgrid_backup_core->restore_archive_file( $dry_run );
