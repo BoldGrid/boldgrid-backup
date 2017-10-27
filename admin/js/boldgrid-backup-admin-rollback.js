@@ -39,9 +39,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			.on( 'click', self.cancelRollback );
 
 		// On click action for restore buttons.
-		$( '.restore-now-form' )
-			.off( 'click' )
-			.on( 'click', self.restoreArchiveConfirm );
+		$( 'body' ).on( 'submit', '#rollback_now_form', self.restoreArchiveConfirm );
 	} );
 
 	/**
@@ -137,12 +135,11 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 	 */
 	self.restoreArchiveConfirm = function() {
 		// Declare variables.
-		var confirmResponse, archiveFilename, $restoreSpinner,
-			$this = $( this );
-
-		// Get the backup archive filename.
-		archiveFilename = $this
-			.data( 'filename' );
+		var confirmResponse, $restoreSpinner,
+			$form = $( this ),
+			$input = $form.find( '.action-restore' ),
+			archiveFilename = $input.attr( 'data-filename' ),
+			$spinner = $form.find( '.spinner' );
 
 		// Ask for confirmation.
 		confirmResponse = confirm( localizeScriptData.restoreConfirmText + ' "' + archiveFilename + '".' );
@@ -150,20 +147,11 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		// Handle response.
 		if ( true === confirmResponse ) {
 	        // Disable the restore Site Now link button.
-			$this
+			$input
 				.attr( 'disabled', 'disabled' )
 				.css( 'pointer-events', 'none' );
 
-			// Create a context selector for the restore spinner.
-			$restoreSpinner = $('#restore-now-section')
-				.find( '.spinner' );
-
-			// Show the spinner.
-			$restoreSpinner
-				.addClass( 'is-active' );
-
-			$restoreSpinner
-				.css( 'display', 'inline-block' );
+			$spinner.addClass( 'is-active inline' );
 
 			return true;
 		} else {

@@ -20,6 +20,11 @@
 	margin-left: 0px;
 }
 
+/* When the user clicks to rollback site, show the spinner. */
+#restore-now-section .spinner.is-active {
+	display: inline-block;
+}
+
 /* Prevent clicks on disabled links. */
 a[disabled] {
 	pointer-events: none;

@@ -155,6 +155,12 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		$deadline = ! empty( $pending_rollback['deadline'] ) ? $pending_rollback['deadline'] : null;
 		$deadline_passed = ! empty( $deadline ) && $deadline <= time();
 		$updated_and_pending = ! empty( $_GET['action'] ) && ! empty( $pending_rollback );
+		$restore_now = ! empty( $_POST['restore_now'] );
+
+		// If we're restoring a file, we don't need to show any notices.
+		if( $restore_now ) {
+			return;
+		}
 
 		// If there is not a pending rollback, then abort.
 		if ( empty( $deadline ) && ! $updated_and_pending ) {
@@ -253,10 +259,10 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 			</div>
 
 			<div id="restore-now-section">
-				<form action="%8$s" class="restore-now-form" method="POST">
+				<form action="%8$s" id="rollback_now_form" method="POST">
 					<input type="hidden" name="restore_now" value="1" />
 					<input type="hidden" name="archive_key" value="%9$s" />
-					<input type="hidden" name="archive_filename" value="%10%s" />
+					<input type="hidden" name="archive_filename" value="%10$s" />
 					%11$s
 					<input type="submit" class="button action-restore" data-key="%12$s" data-filename="%10$s" value="%13$s" />
 					<span class="spinner"></span>
