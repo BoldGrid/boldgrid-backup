@@ -333,26 +333,27 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 			return false;
 		}
 
-		if( 'core' === $trigger['type'] ) {
-			$wordpress_version = get_bloginfo( 'version' );
-			$notice = sprintf( __( 'WordPress was recently updated to version %1$s.', 'boldgrid-backup' ), $wordpress_version );
-		} elseif( 'theme' === $trigger['type'] ) {
-
-			foreach( $trigger['themes'] as $theme ) {
-				$data = wp_get_theme( $theme );
-				$li[] = sprintf( '<strong>%1$s</strong> to version %2$s', $data->get( 'Name' ), $data->get( 'Version' ) );
-			}
-			$notice = __( 'The following theme(s) were recently updated:', 'boldgrid-backup' ) . '<br />';
-			$notice .= implode( '<br />', $li );
-		} elseif( 'plugin' === $trigger['type'] ) {
-
-			foreach( $trigger['plugins'] as $plugin ) {
-				$path = dirname( BOLDGRID_BACKUP_PATH ) . DIRECTORY_SEPARATOR . $plugin;
-				$data = get_plugin_data( $path );
-				$li[] = sprintf( '<strong>%1$s</strong> to version %2$s', $data['Name'], $data['Version'] );
-			}
-			$notice = __( 'The following plugin(s) were recently updated:', 'boldgrid-backup' ) . '<br />';
-			$notice .= implode( '<br />', $li );
+		switch( $trigger['type'] ) {
+			case 'core':
+				$wordpress_version = get_bloginfo( 'version' );
+				$notice = sprintf( __( 'WordPress was recently updated to version %1$s.', 'boldgrid-backup' ), $wordpress_version );
+				break;
+			case 'theme':
+				foreach( $trigger['themes'] as $theme ) {
+					$data = wp_get_theme( $theme );
+					$li[] = sprintf( '<strong>%1$s</strong> to version %2$s', $data->get( 'Name' ), $data->get( 'Version' ) );
+				}
+				$notice = __( 'The following theme(s) were recently updated:', 'boldgrid-backup' ) . '<br />';
+				$notice .= implode( '<br />', $li );
+				break;
+			case 'plugin':
+				foreach( $trigger['plugins'] as $plugin ) {
+					$data = $this->core->utility->get_plugin_data( $plugin );
+					$li[] = sprintf( '<strong>%1$s</strong> to version %2$s', $data['Name'], $data['Version'] );
+				}
+				$notice = __( 'The following plugin(s) were recently updated:', 'boldgrid-backup' ) . '<br />';
+				$notice .= implode( '<br />', $li );
+				break;
 		}
 
 		return $notice;

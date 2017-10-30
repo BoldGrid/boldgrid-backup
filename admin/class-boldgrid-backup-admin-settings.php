@@ -627,6 +627,15 @@ class Boldgrid_Backup_Admin_Settings {
 			update_option( 'boldgrid_backup_is_premium', $_POST['is_premium'] );
 		}
 
+		if( ! $update_error ) {
+			/**
+			 * Take action when settings have been updated.
+			 *
+			 * @since 1.5.3
+			 */
+			do_action( 'boldgrid_backup_settings_updated' );
+		}
+
 		// Return success.
 		return ! $update_error;
 	}

@@ -1641,8 +1641,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * @since 1.0
 	 * @access private
 	 *
-	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
-	 *
 	 * @return bool Whether or not the archive file was deleted.
 	 */
 	private function delete_archive_file() {
@@ -1729,13 +1727,7 @@ class Boldgrid_Backup_Admin_Core {
 			$archives[ $archive_key ]['filepath'] : null
 		);
 
-		// Connect to the WordPress Filesystem API.
-		global $wp_filesystem;
-
-		// Delete the specified archive file.
-		if ( ! $wp_filesystem->delete( $filepath, false, 'f' ) ) {
-			$delete_ok = false;
-		}
+		$delete_ok = $this->archive->delete( $filepath );
 
 		// Display notice of deletion status.
 		if ( ! $delete_ok ) {
@@ -1745,6 +1737,16 @@ class Boldgrid_Backup_Admin_Core {
 				'notice notice-error is-dismissible'
 			);
 		}
+
+		/**
+		 * Take action after a user deletes a backup.
+		 *
+		 * @since 1.5.3
+		 *
+		 * @param string $filepath
+		 * @param bool   $delete_ok
+		 */
+		do_action( 'boldgrid_backup_user_deleted_backup', $filepath, $delete_ok );
 
 		// Return deletion status.
 		return $delete_ok;
@@ -2657,12 +2659,20 @@ class Boldgrid_Backup_Admin_Core {
 			);
 
 			// Delete the specified archive file.
-			if ( ! $filepath || ! $wp_filesystem->delete( $filepath, false, 'f' ) ) {
+			$deleted = $this->archive->delete( $filepath );
+			if( ! $deleted ) {
 				// Something went wrong.
 				break;
 			}
 
-			$this->archive_log->delete_by_zip( $filepath );
+			/**
+			 * Take action after a backup has been deleted due to retention.
+			 *
+			 * @since 1.5.3
+			 *
+			 * @param string $filepath
+			 */
+			do_action( 'boldgrid_backup_retention_deleted', $filepath );
 
 			// Decrease the archive count.
 			$archives_count --;

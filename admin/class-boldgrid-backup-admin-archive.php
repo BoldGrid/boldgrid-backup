@@ -49,6 +49,22 @@ class Boldgrid_Backup_Admin_Archive {
 	}
 
 	/**
+	 * Delete an archive file.
+	 *
+	 * @since 1.5.3
+	 *
+	 * @param  string $filepath Absolute path to a backup file.
+	 * @return bool
+	 */
+	public function delete( $filepath ) {
+		$deleted = $this->core->wp_filesystem->delete( $filepath, false, 'f' );
+
+		$this->core->archive_log->delete_by_zip( $filepath );
+
+		return $deleted;
+	}
+
+	/**
 	 * Get one file from an archive.
 	 *
 	 * @since 1.5.3

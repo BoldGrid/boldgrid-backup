@@ -306,6 +306,24 @@ class Boldgrid_Backup_Admin_Utility {
 	}
 
 	/**
+	 * Get plugin data.
+	 *
+	 * This is a wrapper function for WordPress' get_plugin_data function,
+	 * which requires the full path to a plugin. This method only requires
+	 * folder/file.php
+	 *
+	 * @since 1.5.3
+	 *
+	 * @param  string $plugin boldgrid-backup/boldgrid-backup.php
+	 * @return array
+	 */
+	public function get_plugin_data( $plugin ) {
+		$path = dirname( BOLDGRID_BACKUP_PATH ) . DIRECTORY_SEPARATOR . $plugin;
+		$data = get_plugin_data( $path );
+		return $data;
+	}
+
+	/**
 	 * Get the file upload limit.
 	 *
 	 * @since 1.2.2
