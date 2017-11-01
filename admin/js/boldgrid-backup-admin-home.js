@@ -359,19 +359,8 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 				case 'updateProtectionEnabled':
 					self.updateProtectionEnabled();
 					break;
-				case 'message':
-					// Insert markup.
-					$backupSiteResults.html( message );
-					// Update the archives count.
-					$( '#archives-count' ).html( $( '#archives-new-count' ) );
-					// Update the archives total size.
-					$( '#archives-size' ).html( $( '#archives-new-size' ) );
-					// Empty the current archive list.
-					$( '#backup-archive-list-body' ).empty();
-					// Replace the old list with the new.
-					$( '#backup-archive-list-body' ).html( $( '#archive-list-new tr' ) );
-					// Remove the hidden new list.
-					$( '#archive-list-new' ).remove();
+				case 'reload':
+					location.reload();
 					break;
 			}
 		};

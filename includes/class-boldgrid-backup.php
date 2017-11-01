@@ -177,6 +177,7 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-backup-dir.php';
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archive.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archives.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archive-browser.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archive-log.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archive-details.php';
@@ -247,6 +248,8 @@ class Boldgrid_Backup {
 		$this->loader->add_action( 'boldgrid_backup_notice', $plugin_admin_core->notice,
 			'boldgrid_backup_notice', 10, 2
 		);
+
+		$this->loader->add_action( 'admin_notices', $plugin_admin_core->notice, 'display_user_notice' );
 
 		// Add a custom action to handle AJAX callback for creating a backup archive file.
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_now', $plugin_admin_core,

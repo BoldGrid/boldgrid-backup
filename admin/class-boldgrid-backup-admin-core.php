@@ -172,6 +172,15 @@ class Boldgrid_Backup_Admin_Core {
 	public $archive;
 
 	/**
+	 * An instance of the Boldgrid_Backup_Admin_Archives class.
+	 *
+	 * @since  1.5.4
+	 * @access public
+	 * @var    Boldgrid_Backup_Admin_Archives
+	 */
+	public $archives;
+
+	/**
 	 * An instance of the Boldgrid_Backup_Admin_Archive_Browser class.
 	 *
 	 * @since  1.5.2
@@ -405,6 +414,8 @@ class Boldgrid_Backup_Admin_Core {
 		$this->archive_browser = new Boldgrid_Backup_Admin_Archive_Browser( $this );
 
 		$this->archive = new Boldgrid_Backup_Admin_Archive( $this );
+
+		$this->archives = new Boldgrid_Backup_Admin_Archives( $this );
 
 		$this->archive_log = new Boldgrid_Backup_Admin_Archive_Log( $this );
 
@@ -2290,6 +2301,8 @@ class Boldgrid_Backup_Admin_Core {
 			$settings['backup_directory'] = $this->backup_dir->get();
 		}
 
+		$table = $this->archives->get_table();
+
 		// Include the home page template.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-home.php';
 
@@ -2322,56 +2335,33 @@ class Boldgrid_Backup_Admin_Core {
 	 * @see Boldgrid_Backup_Admin_Core::archive_files()
 	 */
 	public function boldgrid_backup_now_callback() {
+		$is_updating = ! empty( $_POST['is_updating'] ) && 'true' === $_POST['is_updating'];
+
 		// Verify nonce.
-		if ( ! isset( $_POST['backup_auth'] ) ||
-			1 !== check_ajax_referer( 'boldgrid_backup_now', 'backup_auth', false ) ) {
-				wp_die(
-					'<div class="error"><p>' .
-					esc_html__( 'Security violation (invalid nonce).', 'boldgrid-backup' ) .
-					'</p></div>'
-				);
+		if ( ! isset( $_POST['backup_auth'] ) || 1 !== check_ajax_referer( 'boldgrid_backup_now', 'backup_auth', false ) ) {
+			$this->notice->add_user_notice(
+				'<p>' . esc_html__( 'Security violation (invalid nonce).', 'boldgrid-backup' ) . '</p>',
+				'error'
+			);
+			wp_die();
 		}
 
 		// Check user capabilities.
 		if ( ! current_user_can( 'update_plugins' ) ) {
-			wp_die(
-				'<div class="error"><p>' .
-				esc_html__( 'Security violation (not authorized).', 'boldgrid-backup' ) .
-				'</p></div>'
+			$this->notice->add_user_notice(
+				'<p>' . esc_html__( 'Security violation (not authorized).', 'boldgrid-backup' ) . '</p>',
+				'error'
 			);
+			wp_die();
 		}
 
-		$is_updating = ! empty( $_POST['is_updating'] ) && 'true' === $_POST['is_updating'];
-
-		// Perform the backup operation.
 		$archive_info = $this->archive_files( true );
 
-		// Get archive list.
-		$archives = $this->get_archive_list();
-
-		// Get the archives file count.
-		$archives_count = count( $archives );
-
-		// Get the total size for all archives.
-		$archives_size = 0;
-
-		foreach ( $archives as $archive ) {
-			$archives_size += $archive['filesize'];
-		}
-
-		// Make the archives total size human-readable.
-		$archives_size = Boldgrid_Backup_Admin_Utility::bytes_to_human( $archives_size );
-
-		// Create a nonce for archive operations.
-		$archive_nonce = wp_create_nonce( 'archive_auth' );
-
 		if( ! $is_updating ) {
-			ob_start();
-			include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup.php';
-			$message = ob_get_clean();
+			$message = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup.php';
+			$this->notice->add_user_notice( $message['message'], $message['class'] );
 			wp_send_json_success( array(
-				'callback' => 'message',
-				'message' => $message,
+				'callback' => 'reload',
 			));
 		} else {
 			update_site_option( 'boldgrid_backup_pending_rollback', $archive_info );
@@ -2559,6 +2549,7 @@ class Boldgrid_Backup_Admin_Core {
 	public function set_lang() {
 		$this->lang = array(
 			'backup_created' => __( 'Backup created successfully!', 'boldgrid-backup' ),
+			'checkmark' => '&#10003;',
 			'icon_success' => '<span class="dashicons dashicons-yes green"></span>',
 			'icon_warning' => '<span class="dashicons dashicons-warning yellow"></span>',
 			'heading_update_protection' => __( 'BoldGrid Backup - Update Protection', 'boldgrid-backup' ),

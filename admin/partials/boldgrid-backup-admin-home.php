@@ -34,41 +34,13 @@
 <h1 class="wp-heading-inline"><?php esc_html_e( 'Backup Archives', 'boldgrid-backup' ); ?></h1>
 <a class="page-title-action add-new"><?php echo __( 'Upload Backup', 'boldgrid-backup' ); ?></a>
 
-<?php include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php'; ?>
-
-<?php include BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php'; ?>
-
-<p>
-	<?php esc_html_e( 'Archive Count', 'boldgrid-backup' ); ?> (<?php echo $archives_count; ?>) |
-	<?php esc_html_e( 'Total Size', 'boldgrid-backup' ); ?> (<?php echo Boldgrid_Backup_Admin_Utility::bytes_to_human( $archives_size );?>)
-</p>
-
-<table class='wp-list-table widefat fixed striped pages'>
-	<tbody id='backup-archive-list-body'>
 <?php
+	include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
 
-// Print the list of archive files.
-if ( ! empty( $archives ) ) {
-	foreach ( $archives as $key => $archive ) {
-		include dirname( __FILE__ ) . '/boldgrid-backup-admin-archives.php';
-	}
-} else {
+	include BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
+
+	echo $table;
 ?>
-	<tr>
-		<td>
-			<?php
-			esc_html_e(
-				'There are no archives for this site in the backup directory.',
-				'boldgrid-backup'
-			);
-			?>
-		</td>
-	</tr>
-<?php
-}
-?>
-	</tbody>
-</table>
 
 <?php if( ! empty( $archives ) ) { ?>
 <p>

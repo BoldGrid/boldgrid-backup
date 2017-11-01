@@ -172,7 +172,6 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 			return $this->backup_directory;
 		}
 
-
 		return $this->guess_and_set();
 	}
 
@@ -212,6 +211,21 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 		$dirs[] = WP_CONTENT_DIR;
 
 		return $dirs;
+	}
+
+	/**
+	 * Get the full path to a file in the backup dir.
+	 *
+	 * Returns backup_dir/$file.
+	 *
+	 * @since 1.5.4
+	 *
+	 * @param  string $file
+	 * @return string
+	 */
+	public function get_path_to( $file ) {
+		$backup_dir = $this->get();
+		return Boldgrid_Backup_Admin_Utility::trailingslashit( $backup_dir ) . DIRECTORY_SEPARATOR . $file;
 	}
 
 	/**
