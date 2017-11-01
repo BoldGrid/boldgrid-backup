@@ -29,9 +29,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 		// On click action for download buttons.
 		$( 'body' ).on( 'click', '.action-download', self.downloadArchive );
 
-		// On form submit of restore buttons.  "document" works with buttons placed with AJAX.
-		$( document.body )
-			.on( 'submit', 'form.restore-now-form', self.restoreArchiveConfirm );
+		$( 'body' ).on( 'click', '.restore-now', self.restoreArchiveConfirm );
 
 		// On click action for delete buttons.
 		$( 'body' ).on( 'click', '.action-delete', self.deleteArchiveConfirm );
@@ -123,21 +121,6 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 	};
 
 	/**
-	 * Show the restore archive spinner and disable action buttons.
-	 *
-	 * @since 1.2.3
-	 */
-	self.showRestoreSpinner = function( $this ) {
-		// Disable the Backup Site Now and all Restore and Delete buttons.
-		$( '#backup-site-now, .action-restore, .action-delete' )
-			.prop( 'disabled', true )
-			.css( 'pointer-events', 'none' );
-
-		// Show the spinner.
-		$this.find( '.spinner' ).addClass( 'is-active' ).css( 'display', 'inline-block' );
-	};
-
-	/**
 	 * Hide the restore archive notice and enable action buttons.
 	 *
 	 * @since 1.2.3
@@ -212,32 +195,40 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 	 *
 	 * @since 1.0
 	 */
-	self.restoreArchiveConfirm = function( e ) {
-		// Declare variables.
-		var confirmResponse, ArchiveFilename, restoreConfirmText,
-		$this = $( this );
+	self.restoreArchiveConfirm = function() {
+		var confirmResponse,
+			restoreConfirmText,
+			$this = $( this ),
+			filename = $this.attr( 'data-archive-filename' ),
+			data = {
+				'action' : 'boldgrid_backup_restore_archive',
+				'restore_now' : $this.attr( 'data-restore-now' ),
+				'archive_key' : $this.attr( 'data-archive-key' ),
+				'archive_filename' : filename,
+				'archive_auth' : $this.attr( 'data-nonce' ),
+			};
 
-		// Get the backup archive filename.
-		ArchiveFilename = $this.find( 'input[name=archive_filename]' ).val();
-
-		// Format the restoreConfirmText string, to add the ArchiveFilename.
-		restoreConfirmText = localizeScriptData.restoreConfirmText
-			.replace( '%s', ArchiveFilename );
-
-		// Ask for confirmation.
+		restoreConfirmText = localizeScriptData.restoreConfirmText.replace( '%s', filename );
 		confirmResponse = confirm( restoreConfirmText );
 
-		// Handle response.
 		if ( true === confirmResponse ) {
 			// Disable the Backup Site Now and all Restore and Delete buttons.
-			self.showRestoreSpinner( $this );
+			$( '#backup-site-now, .restore-now, .action-delete' )
+				.prop( 'disabled', true )
+				.css( 'pointer-events', 'none' );
 
-			// Proceed with restoration.
-			return true;
-		} else {
-			// Prevent default browser action.
-			e.preventDefault();
+			$this
+				.after( '<span class="spinner inline"></span> ' + localizeScriptData.restoring + '...' )
+				.remove();
+
+			jQuery.post( ajaxurl, data, function( response ) {
+				location.reload();
+			}).error( function() {
+				location.reload();
+			});
 		}
+
+		return false;
 	};
 
 	/**

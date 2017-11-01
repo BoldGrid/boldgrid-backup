@@ -48,22 +48,23 @@ if ( ! empty( $archive_info ) ) {
 		$message = array(
 			'class' => 'notice notice-success',
 			'message' => sprintf( '
-				<h2>%1$s</h2>
+				<h2>%9$s - %1$s</h2>
 				<p>%2$s</p>
 				%3$s
 				%4$s
 				%5$s
 				%6$s
 				%7$s
-				%8$s',
-				/* 1 */ esc_html__( 'Backup Results', 'boldgrid-backup' ),
+				<p>%8$s</p>',
+				/* 1 */ ! empty( $_POST['restore_now'] ) ? __( 'Restoration complete', 'boldgrid-backup' ) : __( 'Backup complete', 'boldgrid-backup' ),
 				/* 2 */ ! empty( $_POST['restore_now'] ) ? esc_html__( 'The selected archive file has been successfully restored', 'boldgrid-backup' ) : esc_html__( 'A backup archive file has been created successfully', 'boldgrid-backup' ),
 				/* 3 */ ! empty( $archive_info['filepath'] ) ? '<p>' . sprintf( esc_html__( 'File Path: %s', 'boldgrid-backup' ), $archive_info['filepath'] ) . '</p>' : '',
 				/* 4 */ ! empty( $archive_info['filesize'] ) ? '<p>' . sprintf( esc_html__( 'File Size: %s', 'boldgrid-backup' ), Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['filesize'] ) ) . '</p>' : '',
 				/* 5 */ ! empty( $archive_info['total_size'] ) ? '<p>' . sprintf( esc_html__( 'Total size: %s', 'boldgrid-backup' ), Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] ) ) . '</p>' : '',
 				/* 6 */ isset( $archive_info['db_duration'] ) ? '<p>' . sprintf( $this->configs['lang']['est_pause'], $archive_info['db_duration'] ) . '</p>' : '',
 				/* 7 */ isset( $archive_info['duration'] ) ? '<p>' . sprintf( esc_html__( 'Duration: %s seconds', 'boldgrid-backup' ), $archive_info['duration'] ) . '</p>' : '',
-				/* 8 */ $settings_page_link
+				/* 8 */ $settings_page_link,
+				/* 9 */ __( 'BoldGrid Backup', 'boldgrid-backup' )
 			),
 		);
 	}

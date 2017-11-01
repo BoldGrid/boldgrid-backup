@@ -43,20 +43,22 @@ $download_button = sprintf(
 	__( 'Download', 'boldgrid-backup' )
 );
 
-$restore_form = sprintf(
-	'<form action="%1$s" class="restore-now-form" method="POST">
-		<input type="hidden" name="restore_now" value="1" />
-		<input type="hidden" name="archive_key" value="%2$s" />
-		<input type="hidden" name="archive_filename" value="%3$s" />
-		%4$s
-		<input type="submit" class="button action-restore" value="%5$s" disabled="disabled" />
-		<span class="spinner"></span>
-	</form>',
-	get_admin_url( null, 'admin.php?page=boldgrid-backup' ),
-	$key,
-	$archive['filename'],
-	wp_nonce_field( 'archive_auth', 'archive_auth', true, false ),
-	__( 'Restore', 'boldgrid-backup' )
+$restore_form = sprintf('
+	<a
+		data-restore-now="1"
+		data-archive-key="%2$s"
+		data-archive-filename="%3$s"
+		data-nonce="%4$s"
+		class="button restore-now"
+		href="">
+		%5$s
+	</a>
+	',
+	/* 1 */ get_admin_url( null, 'admin.php?page=boldgrid-backup' ),
+	/* 2 */ $key,
+	/* 3 */ $archive['filename'],
+	/* 4 */ wp_create_nonce( 'boldgrid_backup_restore_archive'),
+	/* 5 */ __( 'Restore', 'boldgrid-backup' )
 );
 
 $locations = array( __( 'Local backup', 'boldgrid-backup' ) );

@@ -335,6 +335,8 @@ class Boldgrid_Backup {
 
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_browse_archive', $plugin_admin_core->archive_browser, 'wp_ajax_browse_archive' );
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_browse_archive_file_actions', $plugin_admin_core->archive_browser, 'wp_ajax_file_actions' );
+
+		$this->loader->add_action( 'wp_ajax_boldgrid_backup_restore_archive', $plugin_admin_core, 'wp_ajax_restore' );
 		return;
 	}
 
