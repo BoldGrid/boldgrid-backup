@@ -70,7 +70,7 @@ $locations = array( __( 'Local backup', 'boldgrid-backup' ) );
  * @param string $filename
  * @param array  $locations
  */
-$locations = apply_filters( 'boldgrid_backup_backup_locations', $archive['filename'], $locations );
+$locations = apply_filters( 'boldgrid_backup_backup_locations', $locations, $archive['filename'] );
 
 return sprintf( '
 		<tr data-timestamp="%1$s">
