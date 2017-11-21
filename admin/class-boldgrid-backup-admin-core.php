@@ -1806,7 +1806,7 @@ class Boldgrid_Backup_Admin_Core {
 		$db_dump_filepath = '';
 
 		// Find all backups.
-		$dirlist = $this->core->wp_filesystem->dirlist( ABSPATH, false, false );
+		$dirlist = $this->wp_filesystem->dirlist( ABSPATH, false, false );
 
 		// If no files were found, then return an empty array.
 		if ( empty( $dirlist ) ) {
