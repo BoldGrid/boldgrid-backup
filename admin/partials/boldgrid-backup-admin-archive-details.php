@@ -89,9 +89,17 @@ wp_nonce_field( 'boldgrid_backup_remote_storage_upload' );
 		printf( $attribute, $data['title'], $value );
 	}
 
+	echo '<hr class="separator">';
+
 	include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/remote-storage.php';
 
+	echo '<hr class="separator">';
+
 	include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/browser.php';
+
+	echo '<hr class="separator">';
+
+	include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/db.php';
 	?>
 
 </div>

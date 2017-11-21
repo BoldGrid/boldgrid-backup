@@ -73,11 +73,15 @@ class Boldgrid_Backup_Admin_Archive_Details {
 			array( 'jquery', ),
 			BOLDGRID_BACKUP_VERSION
 		);
+		$unknown_error = __( 'An unknown error has occurred.', 'boldgrid-backup' );
 		$translations = array(
 			'loading' => __( 'Loading', 'boldgrid-backup' ),
 			'home' => __( 'Home', 'boldgrid-backup' ),
+			'restoring' => __( 'Restoring', 'boldgrid-backup' ),
+			'confirmDbRestore' => __( 'Are you sure you want to restore this database backup?', 'boldgrid-backup' ),
 			'unknownBrowseError' => __( 'An unknown error has occurred when trying to get a listing of the files in this archive.', 'boldgrid-backup' ),
-			'unknownError' => __( 'An unknown error has occurred.', 'boldgrid-backup' ),
+			'unknownError' => $unknown_error,
+			'unknownErrorNotice' => sprintf( '<div class="%1$s"><p>%2$s</p></div>', $this->core->notice->lang['dis_error'], $unknown_error ),
 		);
 		wp_localize_script( 'boldgrid-backup-admin-zip-browser', 'boldgrid_backup_zip_browser', $translations );
 		wp_enqueue_script( 'boldgrid-backup-admin-zip-browser' );
@@ -116,6 +120,8 @@ class Boldgrid_Backup_Admin_Archive_Details {
 			echo __( 'Archive not found.', 'boldgrid-backup' );
 			return;
 		}
+
+		$dump_file = $this->core->get_dump_file( $archive['filepath'] );
 
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-archive-details.php';
 	}

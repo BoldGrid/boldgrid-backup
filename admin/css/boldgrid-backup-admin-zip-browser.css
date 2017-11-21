@@ -7,6 +7,9 @@
 }
 
 .listing a,
+a.restore-db,
+a.view-db,
+a.load-browser,
 .breadcrumbs a {
 	cursor: pointer;
 }
@@ -17,4 +20,13 @@
 
 .file-actions > td {
 	padding-left:35px;
+}
+
+/* Mimic postbox toggle arrows. These generally are in the last thead th. */
+.bulk-action-notice .toggle-indicator {
+	float: right;
+	cursor: pointer;
+}
+.bulk-action-notice .toggle-indicator.closed:before {
+	content: "\f140";
 }

@@ -1767,14 +1767,13 @@ class Boldgrid_Backup_Admin_Core {
 	 * Get the newest database dump file path from a restored archive.
 	 *
 	 * @since 1.0
-	 * @access private
 	 *
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
 	 * @param  string $filepath The full filepath to the file .zip archive.
 	 * @return string File path to the database dump file.
 	 */
-	private function get_dump_file( $filepath ) {
+	public function get_dump_file( $filepath ) {
 
 		if( empty( $filepath ) || ! $this->wp_filesystem->exists( $filepath ) ) {
 			return '';

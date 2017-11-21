@@ -82,3 +82,7 @@ div .dashicons {
 .notice .header-notice {
 	margin-top: 0px;
 }
+
+hr.separator {
+	margin: 30px 0px;
+}

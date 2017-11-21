@@ -40,39 +40,57 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 	}
 
 	/**
-	 * Render html markup for a .sql file.
+	 * Authorize an ajax request.
 	 *
-	 * When a user is browsing an archive and they click on a .sql file, this
+	 * Many of the ajax handlers in this method require the same
+	 * current_user_can() and check_ajax_referer() checks.
+	 *
+	 * @since 1.5.4
+	 */
+	public function authorize() {
+		if ( ! current_user_can( 'update_plugins' ) ) {
+			wp_send_json_error( __( 'Permission denied.', 'boldgrid-backup' ) );
+		}
+
+		if( ! check_ajax_referer( 'boldgrid_backup_remote_storage_upload', 'security', false ) ) {
+			wp_send_json_error( __( 'Invalid nonce.', 'boldgrid-backup' ) );
+		}
+	}
+
+	/**
+	 * Render and return html markup for a .sql file.
+	 *
+	 * When a user clicks to "View details" of a database dump, this
 	 * method will create a table showing all the tables in that backup.
 	 *
-	 * @since 1.5.3
+	 * @since 1.5.4
 	 *
 	 * @param  string $filepath Zip file.
 	 * @param  string $file     Sql file name.
 	 * @return string
 	 */
-	public function file_actions_sql( $filepath, $file ) {
+	public function get_sql_details( $filepath, $file ) {
 		$tables_with_records = $this->core->db_dump->get_insert_count( $filepath, $file );
 		$prefixed_tables = $this->core->db_get->prefixed_count();
 
-		$intro = sprintf( __( 'This file, %1$s, is a database dump. The following data is found within:', 'boldgrid-backup' ), $file );
 		$in_backup = __( '# Records in this backup', 'boldgrid-backup' );
 		$in_current = __( '# Records in current database', 'boldgrid-backup' );
 
 		$return = sprintf( '
-			<p>%1$s</p>
 			<table class="wp-list-table fixed striped widefat">
 			<thead>
 				<tr>
 					<th>Table</th>
-					<th>%2$s</th>
-					<th>%3$s</th>
+					<th>%1$s</th>
+					<th class="bulk-action-notice">
+						%2$s
+						<span class="toggle-indicator"></span>
+					</th>
 				</tr>
 			</thead>
 			<tbody>',
-			$intro,
-			$in_backup,
-			$in_current
+			/* 1 */ $in_backup,
+			/* 2 */ $in_current
 		);
 
 		foreach( $prefixed_tables as $table => $record_count ) {
@@ -103,18 +121,14 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 	public function wp_ajax_browse_archive() {
 		$error = __( 'Unable to get contents of archive file:', 'boldgrid-backup' );
 
-		if ( ! current_user_can( 'update_plugins' ) ) {
-			wp_send_json_error( $error . ' ' . __( 'Permission denied.', 'boldgrid-backup' ) );
-		}
-
-		if( ! check_ajax_referer( 'boldgrid_backup_remote_storage_upload', 'security', false ) ) {
-			wp_send_json_error( $error . ' ' . __( 'Invalid nonce.', 'boldgrid-backup' ) );
-		}
+		$this->authorize();
 
 		$filepath = ! empty( $_POST['filepath'] ) ? $_POST['filepath'] : false;
 		if( empty( $filepath ) || ! $this->core->wp_filesystem->exists( $filepath ) ) {
 			wp_send_json_error( $error . ' ' . __( 'Invalid archive filepath.', 'boldgrid-backup' ) );
 		}
+
+		$dump_file = $this->core->get_dump_file( $filepath );
 
 		$dir = ! empty( $_POST['dir'] ) ? $_POST['dir'] : null;
 
@@ -130,7 +144,10 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 					<tr>
 						<th>%1$s</th>
 						<th>%2$s</th>
-						<th>%3$s</th>
+						<th class="bulk-action-notice">
+							%3$s
+							<span class="toggle-indicator"></span>
+						</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -141,6 +158,16 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 		);
 
 		foreach( $contents as $file ) {
+
+			/*
+			 * If this is our database dump file, skip over it. We have another
+			 * section of the archive details page that will help with restoring
+			 * a dump file.
+			 */
+			if( basename( $file['filename'] ) === basename( $dump_file ) ) {
+				continue;
+			}
+
 			$tr .= include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/browser-entry.php';
 		}
 
@@ -160,13 +187,7 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 	 * @since 1.5.3
 	 */
 	public function wp_ajax_file_actions() {
-		if ( ! current_user_can( 'update_plugins' ) ) {
-			wp_send_json_error( __( 'Permission denied.', 'boldgrid-backup' ) );
-		}
-
-		if( ! check_ajax_referer( 'boldgrid_backup_remote_storage_upload', 'security', false ) ) {
-			wp_send_json_error( __( 'Invalid nonce.', 'boldgrid-backup' ) );
-		}
+		$this->authorize();
 
 		$filepath = ! empty( $_POST['filepath'] ) ? $_POST['filepath'] : false;
 		$file = ! empty( $_POST['file'] ) ? $_POST['file'] : false;
@@ -174,17 +195,8 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 			wp_send_json_error( __( 'Invalid file / filepath.', 'boldgrid-backup' ) );
 		}
 
-		$parts = pathinfo( $file );
-
 		// Here's the default message.
 		$upgrade_message = __( 'With BoldGrid Backup Premium, you can view and restore files from here.', 'boldgrid-backup' );
-
-		// For other file types, we can do more.
-		switch( $parts['extension'] ) {
-			case 'sql':
-				$upgrade_message = $this->file_actions_sql( $filepath, $file );
-				break;
-		}
 
 		/**
 		 * Allow other plugins to add functionality.
@@ -197,5 +209,65 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 		$upgrade_message = apply_filters( 'boldgrid_backup_file_actions', $upgrade_message, $file );
 
 		wp_send_json_success( $upgrade_message );
+	}
+
+	/**
+	 * Restore a database dump.
+	 *
+	 * This handles an ajax call for restoring a dump from the archive details
+	 * page.
+	 *
+	 * @since 1.5.4
+	 */
+	public function wp_ajax_restore_db() {
+		$this->authorize();
+
+		$filepath = ! empty( $_POST['filepath'] ) ? $_POST['filepath'] : false;
+		$file = ! empty( $_POST['file'] ) ? $_POST['file'] : false;
+		if( empty( $filepath ) || empty( $file ) ) {
+			wp_send_json_error( __( 'Invalid file / filepath.', 'boldgrid-backup' ) );
+		}
+
+		$importer = new Boldgrid_Backup_Admin_Db_Import( $this->core );
+		$success = $importer->import_from_archive( $filepath, $file );
+
+		if( ! $success ) {
+			$this->core->notice->add_user_notice(
+				sprintf( __( 'Error, unable to import database %1$s from %2$s.', 'boldgrid-backup' ), $file, $filepath ),
+				$this->core->notice->lang['dis_error']
+			);
+		} else {
+			$this->core->notice->add_user_notice(
+				sprintf( __( 'Success! Database %1$s imported from %2$s.', 'boldgrid-backup' ), $file, $filepath ),
+				$this->core->notice->lang['dis_success']
+			);
+		}
+	}
+
+	/**
+	 * View the details of a database.
+	 *
+	 * This method handles the ajax call of "View details" for a database on the
+	 * archive details page.
+	 *
+	 * @since 1.5.4
+	 */
+	public function wp_ajax_view_db() {
+		$this->authorize();
+
+		$filepath = ! empty( $_POST['filepath'] ) ? $_POST['filepath'] : false;
+		$file = ! empty( $_POST['file'] ) ? $_POST['file'] : false;
+		if( empty( $filepath ) || empty( $file ) ) {
+			wp_send_json_error( __( 'Invalid file / filepath.', 'boldgrid-backup' ) );
+		}
+
+		$table = $this->get_sql_details( $filepath, $file );
+
+		if( empty( $table ) ) {
+			$error = $this->core->notice->get_notice_markup( 'notice notice-error is-dismissible', __( 'Error, unable to get details from this database backup.', 'boldgrid-backup' ) );
+			wp_send_json_error( $error );
+		} else {
+			wp_send_json_success( $table );
+		}
 	}
 }

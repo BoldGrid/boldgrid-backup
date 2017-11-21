@@ -13,8 +13,11 @@ var BoldGrid = BoldGrid || {};
 BoldGrid.ZipBrowser = function( $ ) {
 
 	var self = this,
-		$listing = $( '#zip_browser .listing' ),
-		loading = '<span class="spinner inline"></span> ' + boldgrid_backup_zip_browser.loading + '...';
+		$zipBrowser = $( '#zip_browser' ),
+		$listing = $zipBrowser.find( '.listing' ),
+		spinner = '<span class="spinner inline"></span> ',
+		loading = spinner + boldgrid_backup_zip_browser.loading + '...',
+		restoring = spinner + boldgrid_backup_zip_browser.restoring + '...';
 
 	/**
 	 * @summary Handle the click of a breadcrumb.
@@ -85,6 +88,106 @@ BoldGrid.ZipBrowser = function( $ ) {
 	};
 
 	/**
+	 * @summary Handle the click of the "load archive browser" button.
+	 *
+	 * @since 1.5.4
+	 */
+	self.onClickLoadBrowser = function() {
+		$( this ).attr( 'disabled', 'disabled' );
+
+		self.renderBrowser( '.' );
+	}
+
+	/**
+	 * @summary Handle the click of the "restore this database" button.
+	 *
+	 * @since 1.5.4
+	 */
+	self.onClickRestoreDb = function() {
+		var $a = $( this ),
+			$p = $a.closest( 'p' ),
+			data = {
+				'action': 'boldgrid_backup_browse_archive_restore_db',
+				'security' : $( '#_wpnonce' ).val(),
+				'filepath' : $( '#filepath' ).val(),
+				'file' : $a.closest( 'p' ).attr( 'data-file' ),
+			},
+			confirmation,
+			status = '<span class="spinner inline"></span> Restoring';
+
+		confirmation = confirm( boldgrid_backup_zip_browser.confirmDbRestore );
+
+		if( ! confirmation ) {
+			return false;
+		}
+
+		$p.empty().html( status );
+
+		$.post( ajaxurl, data, function( response ) {
+			location.reload();
+		} ).error( function() {
+			location.reload();
+		} );
+
+		return false;
+	};
+
+	/**
+	 * @summary Handle the postbox-like toggle on thead th's that hide a table.
+	 *
+	 * @since 1.5.4
+	 */
+	self.onClickToggle = function() {
+		var $toggle = $( this ),
+			$tbody = $toggle.closest( 'table' ).find( 'tbody' );
+
+		$toggle.toggleClass( 'closed' );
+
+		if( $toggle.hasClass( 'closed' ) ) {
+			$tbody.hide();
+		} else {
+			$tbody.show();
+		}
+	}
+
+	/**
+	 * @summary Handle the click of the "View details" button for a database.
+	 *
+	 * @since 1.5.4
+	 */
+	self.onClickViewDb = function() {
+		var $a = $( this ),
+			$p = $a.closest( 'p' ),
+			data = {
+				'action': 'boldgrid_backup_browse_archive_view_db',
+				'security' : $( '#_wpnonce' ).val(),
+				'filepath' : $( '#filepath' ).val(),
+				'file' : $a.closest( 'p' ).attr( 'data-file' ),
+			},
+			$details = $( '#db_details' ),
+			errorCallback;
+
+		$a.attr( 'disabled', 'disabled' );
+
+		$details.html( loading );
+
+		errorCallback = function() {
+			$details.html( boldgrid_backup_zip_browser.unknownErrorNotice );
+		};
+
+		$.post( ajaxurl, data, function( response ) {
+			var success = response.success !== undefined && true === response.success,
+				fail = response.success !== undefined && false === response.success;
+
+			if( success || fail ) {
+				$details.html( response.data );
+			} else {
+				errorCallback();
+			}
+		} ).error( errorCallback );
+	};
+
+	/**
 	 * @summary Render breadcrumbs.
 	 *
 	 * @since 1.5.3
@@ -93,7 +196,7 @@ BoldGrid.ZipBrowser = function( $ ) {
 	 */
 	self.renderBreadcrumbs = function( dir ) {
 		var split,
-			$container = $( '#zip_browser .breadcrumbs' ),
+			$container = $zipBrowser.find( '.breadcrumbs' ),
 			html = '<span class="dashicons dashicons-admin-home"></span> <a data-dir-".">' + boldgrid_backup_zip_browser.home + '</a> ',
 			dataDir = '';
 
@@ -124,6 +227,8 @@ BoldGrid.ZipBrowser = function( $ ) {
 
 		dir = typeof dir !== 'undefined' ? dir : '.';
 
+		$zipBrowser.show();
+
 		data = {
 			'action': 'boldgrid_backup_browse_archive',
 			'security' : $( '#_wpnonce' ).val(),
@@ -152,11 +257,13 @@ BoldGrid.ZipBrowser = function( $ ) {
 	 * @since 1.5.3
 	 */
 	$( function() {
-		self.renderBrowser();
-
 		$( 'body' ).on( 'click', '.listing .folder', self.onClickFolder );
 		$( 'body' ).on( 'click', '.listing .file', self.onClickFile );
 		$( 'body' ).on( 'click', '.breadcrumbs a', self.onClickBreadcrumb );
+		$( 'body' ).on( 'click', '.restore-db', self.onClickRestoreDb );
+		$( 'body' ).on( 'click', '.view-db', self.onClickViewDb );
+		$( 'body' ).on( 'click', 'th .toggle-indicator', self.onClickToggle );
+		$( 'body' ).on( 'click', '.load-browser', self.onClickLoadBrowser );
 	});
 };
 

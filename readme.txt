@@ -28,6 +28,9 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 
 == Changelog ==
 
+= 1.5.4 In progress =
+* New feature:  JIRA BGBKUP-72  Restore only a database from a backup.
+
 = 1.5.3 =
 * New feature:  JIRA BGBKUP-43  Allow browsing of archive.
 * New feature:  JIRA BGBKUP-46  Add setting for include tables to the settings page.

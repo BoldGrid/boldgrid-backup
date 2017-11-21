@@ -20,6 +20,17 @@
 class Boldgrid_Backup_Admin_Notice {
 
 	/**
+	 * Common strings used in notices.
+	 *
+	 * @since 1.5.4
+	 * @var   array
+	 */
+	public $lang = array(
+		'dis_error' => 'notice notice-error is-dismissible',
+		'dis_success' => 'notice notice-success is-dismissible',
+	);
+
+	/**
 	 * Add a notice for a user.
 	 *
 	 * @since 1.5.4
@@ -31,6 +42,8 @@ class Boldgrid_Backup_Admin_Notice {
 		$option = $this->get_user_option();
 
 		$notices = get_option( $option, array() );
+
+		$message = $this->add_container( $message );
 
 		$notices[] = array(
 			'message' => $message,
@@ -82,16 +95,22 @@ class Boldgrid_Backup_Admin_Notice {
 			return;
 		}
 
-		// Determine if our message is already in a container (either div or p).
-		$in_container = false !== strpos( '<p', $message ) || false !== strpos( '<div', $message );
+		$markup = $this->get_notice_markup( $class, $message );
 
-		printf(
-			'<div class="%1$s">%2$s</div>',
-			$class,
-			$in_container ? $message : '<p>' . $message . '</p>'
-		);
+		echo $markup;
 
 		$this->displayed_messages[] = $message;
+	}
+
+	/**
+	 *
+	 */
+	public function get_notice_markup( $class, $message ) {
+		return sprintf(
+			'<div class="%1$s">%2$s</div>',
+			$class,
+			$this->add_container( $message )
+		);
 	}
 
 	/**
@@ -126,5 +145,23 @@ class Boldgrid_Backup_Admin_Notice {
 	public function get_user_option() {
 		$user_id = get_current_user_id();
 		return 'boldgrid_backup_user_notices_' . $user_id;
+	}
+
+	/**
+	 * Ensure a message is within a container and return it.
+	 *
+	 * If it is not within a p or div, wrap it in a p tag.
+	 *
+	 * @since 1.5.4
+	 *
+	 * @param  string $message
+	 * @return string
+	 */
+	public function add_container( $message ) {
+		$in_container = false !== strpos( '<p', $message ) || false !== strpos( '<div', $message );
+
+		$message = ! $in_container ? '<p>' . $message . '</p>' : $message;
+
+		return $message;
 	}
 }
