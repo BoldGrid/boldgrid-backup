@@ -210,15 +210,17 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 			return $this->$property;
 		}
 
-		if( false === $settings ) {
-			$settings = $this->core->settings->get_settings();
+		/*
+		 * If we passed in settings and there's already a value there, then
+		 * simply return it.
+		 *
+		 * Otherwise, return the default value.
+		 */
+		if( ! empty( $settings[$key] ) && is_string( $settings[$key] ) ) {
+			$this->$property = $settings[$key];
+		} else {
+			$this->$property = $this->$default;
 		}
-
-		if( ! isset( $settings[$key] ) || ! is_string( $settings[$key] ) ) {
-			$settings[$key] = $this->$default;
-		}
-
-		$this->$property = $settings[$key];
 
 		return $this->$property;
 	}
