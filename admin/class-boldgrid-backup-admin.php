@@ -135,10 +135,13 @@ class Boldgrid_Backup_Admin {
 			false
 		);
 
+		$spinner = '<span class="spinner inline"></span> ';
+		$dots = ' ...';
 		$translation = array(
 			'is_premium' => ( true === $this->config->get_is_premium() ? 'true' : 'false' ),
 			'max_dow' => $this->config->get_max_dow(),
 			'lang' => $this->config->lang,
+			'spinner_loading' => $spinner . __( 'Loading', 'boldgrid-backup' ) . $dots,
 		);
 
 		wp_localize_script( 'boldgrid-backup-admin', 'BoldGridBackupAdmin', $translation );

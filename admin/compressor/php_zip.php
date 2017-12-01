@@ -57,38 +57,6 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 	}
 
 	/**
-	 * Add all directories to our zip archive.
-	 *
-	 * Empty directories are not naturally added to our archive, this method
-	 * adds them.
-	 *
-	 * @since 1.5.1
-	 *
-	 * @param string $dir The directory to scan for folders.
-	 */
-	public function add_dirs( $dir ) {
-		$dir_list = $this->wp_filesystem->dirlist( $dir );
-
-		foreach( $dir_list as $name => $data ) {
-			if( 'd' !== $data['type'] ) {
-				continue;
-			}
-
-			$relative_dir = str_replace( ABSPATH, '', $dir );
-
-			$dir_to_add = empty( $relative_dir ) ? $name : $relative_dir . '/' . $name;
-
-			// Do not add node_modules. @todo Allow for more sophisitcated exclusions.
-			if( false !== strpos( $dir_to_add, '/node_modules/' ) ) {
-				continue;
-			}
-
-			$this->zip->addEmptyDir( $dir_to_add );
-			$this->add_dirs( trailingslashit( $dir ) . $name );
-		}
-	}
-
-	/**
 	 * Archive files.
 	 *
 	 * @since 1.5.1
@@ -124,10 +92,14 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 			);
 		}
 
-		$this->add_dirs( ABSPATH );
-
 		foreach ( $filelist as $fileinfo ) {
-			$this->zip->addFile( $fileinfo[0], $fileinfo[1] );
+			$is_dir = ! empty( $fileinfo[3] ) && 'd' === $fileinfo[3];
+
+			if( $is_dir ) {
+				$this->zip->addEmptyDir( $fileinfo[1] );
+			} else {
+				$this->zip->addFile( $fileinfo[0], $fileinfo[1] );
+			}
 		}
 
 		if ( ! $this->zip->close() ) {

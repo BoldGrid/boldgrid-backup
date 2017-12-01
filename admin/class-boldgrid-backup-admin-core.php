@@ -55,6 +55,15 @@ class Boldgrid_Backup_Admin_Core {
 	public $configs;
 
 	/**
+	 * Core Files class.
+	 *
+	 * @since  1.5.4
+	 * @access public
+	 * @var    Boldgrid_Backup_Admin_Core_Files
+	 */
+	public $core_files;
+
+	/**
 	 * Whether or not we're in ajax.
 	 *
 	 * When we're on the archives page and click "Backup Site Now", when
@@ -310,6 +319,14 @@ class Boldgrid_Backup_Admin_Core {
 	);
 
 	/**
+	 * An instance of the Boldgrid_Backup_Admin_Folder_Exclusion class.
+	 *
+	 * @since 1.5.4
+	 * @var   Boldgrid_Backup_Admin_Folder_Exclusion
+	 */
+	public $folder_exclusion;
+
+	/**
 	 * An instance of the Boldgrid Backup Admin Backup Dir class.
 	 *
 	 * @since 1.5.1
@@ -444,6 +461,10 @@ class Boldgrid_Backup_Admin_Core {
 		$this->db_get = new Boldgrid_Backup_Admin_Db_get( $this );
 
 		$this->utility = new Boldgrid_Backup_Admin_Utility();
+
+		$this->folder_exclusion = new Boldgrid_Backup_Admin_Folder_Exclusion( $this );
+
+		$this->core_files = new Boldgrid_Backup_Admin_Core_Files( $this );
 
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
@@ -1100,6 +1121,31 @@ class Boldgrid_Backup_Admin_Core {
 		// Get the non-recursive directory listing for the specified path.
 		$dirlist = $wp_filesystem->dirlist( $dirpath, true, false );
 
+		// Initialize $filelist.
+		$filelist = array();
+
+		/*
+		 * Add empty directory.
+		 *
+		 * If this is an empty directory, add the directory itself to the
+		 * $filelist.
+		 *
+		 * Previously we used Boldgrid_Backup_Admin_Compressor_Php_Zip::add_dirs
+		 * to add all empty directories, but that method is no longer needed.
+		 */
+		if( empty( $dirlist ) ) {
+			$filelist[] = array(
+				$dirpath,
+				str_replace( ABSPATH, '', $dirpath ),
+				0,
+				/*
+				 * @since 1.5.4, this 4th key represetnts 'type', as in a file
+				 * or a directory.
+				 */
+				'd'
+			);
+		}
+
 		// Sort the dirlist array by filename.
 		uasort( $dirlist,
 			function ( $a, $b ) {
@@ -1114,9 +1160,6 @@ class Boldgrid_Backup_Admin_Core {
 				return 0;
 			}
 		);
-
-		// Initialize $filelist.
-		$filelist = array();
 
 		// Perform conversion.
 		foreach ( $dirlist as $fileinfo ) {
@@ -1155,17 +1198,15 @@ class Boldgrid_Backup_Admin_Core {
 	 * @since 1.0
 	 *
 	 * @see Boldgrid_Backup_Admin_Core::get_filelist().
-	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
 	 * @param string $dirpath A directory path, defaults to ABSPATH.
 	 * @return array An array of absolute file paths, relative paths, and file sizes.
+	 *               Example: https://pastebin.com/QiquHdcC
 	 */
 	public function get_filtered_filelist( $dirpath = ABSPATH ) {
-		// Connect to the WordPress Filesystem API.
-		global $wp_filesystem;
 
 		// Validate input.
-		if ( empty( $dirpath ) || ! $wp_filesystem->is_readable( $dirpath ) ) {
+		if ( empty( $dirpath ) || ! $this->wp_filesystem->is_readable( $dirpath ) ) {
 			return array();
 		}
 
@@ -1191,12 +1232,11 @@ class Boldgrid_Backup_Admin_Core {
 				continue;
 			}
 
-			foreach ( $this->filelist_filter as $pattern ) {
-				if ( 0 === strpos( $fileinfo[1], $pattern ) ) {
-					$new_filelist[] = $fileinfo;
-					break;
-				}
+			if( ! $this->folder_exclusion->allow_file( $fileinfo[1] ) ) {
+				continue;
 			}
+
+			$new_filelist[] = $fileinfo;
 		}
 
 		// Replace filelist.
@@ -2171,6 +2211,7 @@ class Boldgrid_Backup_Admin_Core {
 	 * @see Boldgrid_Backup_Admin_Core::archive_files()
 	 */
 	public function boldgrid_backup_now_callback() {
+
 		$is_updating = ! empty( $_POST['is_updating'] ) && 'true' === $_POST['is_updating'];
 
 		// Verify nonce.

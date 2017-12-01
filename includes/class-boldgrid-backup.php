@@ -199,6 +199,10 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-email.php';
 
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-folder-exclusion.php';
+
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-core-files.php';
+
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
 
@@ -339,6 +343,8 @@ class Boldgrid_Backup {
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_browse_archive_view_db', $plugin_admin_core->archive_browser, 'wp_ajax_view_db' );
 
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_restore_archive', $plugin_admin_core, 'wp_ajax_restore' );
+
+		$this->loader->add_action( 'wp_ajax_boldgrid_backup_exclude_folders_preview', $plugin_admin_core->folder_exclusion, 'wp_ajax_preview' );
 		return;
 	}
 

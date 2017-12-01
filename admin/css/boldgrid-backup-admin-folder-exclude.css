@@ -1,0 +1,18 @@
+.folder_exclude_help {
+	
+}
+
+.folder_exclude_help tr th {
+	vertical-align: top;
+	width: 70px;
+}
+
+.folder_exclude_help tr th,
+.folder_exclude_help tr td {
+	padding: 5px 5px;
+}
+
+.folder_exclude_help .example {
+	font-style: italic;
+	color: #696969;
+}

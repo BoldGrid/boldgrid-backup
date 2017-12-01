@@ -268,7 +268,6 @@ BoldGrid.Settings = function( $ ) {
 
 		$( '#storage_locations .thickbox' ).on( 'click', self.on_click_provider );
 	} );
-
 }
 
 BoldGrid.Settings( jQuery );

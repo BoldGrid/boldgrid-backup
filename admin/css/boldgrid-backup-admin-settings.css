@@ -15,3 +15,7 @@
 	overflow: hidden;
 	margin-right: 10px;
 }
+
+.form-table th h2 {
+	display: inline;
+}
