@@ -48,6 +48,15 @@ $datas = array(
 		'title' => __( 'Email sent after backup', 'boldgrid-backup' ),
 		'presentation' => 'bool',
 	),
+	array(
+		'key' => 'folder_include',
+		'title' => __( 'Included', 'boldgrid-backup' ),
+		'heading' => __( 'Files and Folders', 'boldgrid-backup' ),
+	),
+	array(
+		'key' => 'folder_exclude',
+		'title' => __( 'Excluded', 'boldgrid-backup' ),
+	),
 );
 
 wp_nonce_field( 'boldgrid_backup_remote_storage_upload' );
@@ -64,6 +73,10 @@ wp_nonce_field( 'boldgrid_backup_remote_storage_upload' );
 	foreach( $datas as $data ) {
 		if( ! isset( $archive[ $data['key'] ] ) ) {
 			continue;
+		}
+
+		if( ! empty( $data['heading'] ) ) {
+			printf( '<h2>%1$s:</h2>', $data['heading'] );
 		}
 
 		$value = $archive[ $data['key'] ];

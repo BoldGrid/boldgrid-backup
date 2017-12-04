@@ -1363,6 +1363,8 @@ class Boldgrid_Backup_Admin_Core {
 			'filesize' => 0,
 			'save' => $save,
 			'total_size' => 0,
+			'folder_include' => $this->folder_exclusion->from_settings( 'include' ),
+			'folder_exclude' => $this->folder_exclusion->from_settings( 'exclude' ),
 		);
 
 		// Determine how this backup was triggered.
