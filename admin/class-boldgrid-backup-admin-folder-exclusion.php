@@ -206,6 +206,15 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 		$key = 'folder_exclusion_' . $property;
 		$default = 'default_' . $property;
 
+		/*
+		 * If we are in the middle of creating a backup file for update
+		 * protection, force default values (which backup both core files and
+		 * wp-content files).
+		 */
+		if( $this->core->is_archiving_update_protection ) {
+			return $this->$default;
+		}
+
 		if( ! is_null( $this->$property ) ) {
 			return $this->$property;
 		}

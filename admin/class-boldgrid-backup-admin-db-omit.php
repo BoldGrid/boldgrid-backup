@@ -67,6 +67,11 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	public function get_filtered_tables() {
 		$prefixed_tables = $this->core->db_get->prefixed();
 
+		// If we're creating a backup for update protection, backup all tables.
+		if( $this->core->is_archiving_update_protection ) {
+			return $prefixed_tables;
+		}
+
 		$exclude_tables = $this->get_excluded_tables();
 
 		foreach( $prefixed_tables as $key => $table ) {

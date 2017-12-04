@@ -352,6 +352,15 @@ class Boldgrid_Backup_Admin_Core {
 	public $home_dir;
 
 	/**
+	 * Value indicating whether or not we're creating a backup for update
+	 * protection.
+	 *
+	 * @since 1.5.4
+	 * @var   bool
+	 */
+	public $is_archiving_update_protection = false;
+
+	/**
 	 * Common elements.
 	 *
 	 * @since 1.5.3
@@ -2214,8 +2223,6 @@ class Boldgrid_Backup_Admin_Core {
 	 */
 	public function boldgrid_backup_now_callback() {
 
-		$is_updating = ! empty( $_POST['is_updating'] ) && 'true' === $_POST['is_updating'];
-
 		// Verify nonce.
 		if ( ! isset( $_POST['backup_auth'] ) || 1 !== check_ajax_referer( 'boldgrid_backup_now', 'backup_auth', false ) ) {
 			$this->notice->add_user_notice(
@@ -2234,9 +2241,11 @@ class Boldgrid_Backup_Admin_Core {
 			wp_die();
 		}
 
+		$this->is_archiving_update_protection = ! empty( $_POST['is_updating'] ) && 'true' === $_POST['is_updating'];
+
 		$archive_info = $this->archive_files( true );
 
-		if( ! $is_updating ) {
+		if( ! $this->is_archiving_update_protection ) {
 			$message = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup.php';
 			$this->notice->add_user_notice( $message['message'], $message['class'] );
 			wp_send_json_success( array(
