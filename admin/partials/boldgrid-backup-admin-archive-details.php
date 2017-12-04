@@ -57,6 +57,12 @@ $datas = array(
 		'key' => 'folder_exclude',
 		'title' => __( 'Excluded', 'boldgrid-backup' ),
 	),
+	array(
+		'key' => 'table_exclude',
+		'title' => __( 'Tables excluded', 'boldgrid-backup' ),
+		'heading' => __( 'Database', 'boldgrid-backup' ),
+		'presentation' => 'comma_implode',
+	),
 );
 
 wp_nonce_field( 'boldgrid_backup_remote_storage_upload' );
@@ -87,6 +93,9 @@ wp_nonce_field( 'boldgrid_backup_remote_storage_upload' );
 					break;
 				case 'bool':
 					$value = $archive[ $data['key'] ] ? __( 'yes', 'boldgrid-backup' ) : __( 'no', 'boldgrid-backup' );
+					break;
+				case 'comma_implode':
+					$value = empty( $value ) ? __( 'n/a', 'boldgrid-backup' ) : implode( ', ', $value );
 					break;
 			}
 		}
