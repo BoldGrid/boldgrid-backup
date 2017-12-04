@@ -28,6 +28,15 @@ class Boldgrid_Backup_Admin_Settings {
 	private $core;
 
 	/**
+	 * Whether or not we're in the middle of saving settings from $_POST.
+	 *
+	 * @since  1.5.4
+	 * @access public
+	 * @var    bool
+	 */
+	public $is_saving_settings = false;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.0
@@ -37,6 +46,8 @@ class Boldgrid_Backup_Admin_Settings {
 	public function __construct( $core ) {
 		// Save the Boldgrid_Backup_Admin_Core object as a class property.
 		$this->core = $core;
+
+		$this->is_saving_settings = isset( $_POST['save_time'] );
 	}
 
 	/**
@@ -672,9 +683,7 @@ class Boldgrid_Backup_Admin_Settings {
 		add_thickbox();
 		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
 
-		$is_saving_settings = isset( $_POST['save_time'] );
-
-		if( ! $is_saving_settings ) {
+		if( ! $this->is_saving_settings ) {
 			$is_functional = $this->core->test->run_functionality_tests();
 		}
 
@@ -720,7 +729,7 @@ class Boldgrid_Backup_Admin_Settings {
 		}
 
 		// Check for settings update.
-		if ( $is_saving_settings ) {
+		if ( $this->is_saving_settings ) {
 			// Verify nonce.
 			check_admin_referer( 'boldgrid-backup-settings', 'settings_auth' );
 
