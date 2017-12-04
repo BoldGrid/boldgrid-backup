@@ -20,6 +20,15 @@
 class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Compressor {
 
 	/**
+	 * An array of directories we've added to the zip.
+	 *
+	 * @since  1.5.4
+	 * @access public
+	 * @var    array
+	 */
+	public $dirs = array();
+
+	/**
 	 * The status of our test result.
 	 *
 	 * @since  1.5.1
@@ -54,6 +63,35 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 	 */
 	public function __construct( $core ) {
 		parent::__construct( $core );
+	}
+
+	/**
+	 * Add a file's directories to the zip.
+	 *
+	 * When you add a file, the parent directories are not always explicitly
+	 * created. For example, if you add wp-content/themes/pavilion/index.php the
+	 * wp-content directory (and so forth) is not explicity added to the zip.
+	 *
+	 * @since 1.5.4
+	 *
+	 * @param string $file
+	 */
+	public function add_dir( $file ) {
+		$add_directory = '';
+		$dirs = explode( DIRECTORY_SEPARATOR, dirname( $file ) );
+
+		foreach( $dirs as $key => $dir ) {
+			if( 0 === $key ) {
+				$add_directory = $dir;
+			} else {
+				$add_directory .= '/' . $dir;
+			}
+
+			if( ! in_array( $add_directory, $this->dirs, true ) ) {
+				$this->zip->addEmptyDir( $add_directory );
+				$this->dirs[] = $add_directory;
+			}
+		}
 	}
 
 	/**
@@ -99,6 +137,7 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 				$this->zip->addEmptyDir( $fileinfo[1] );
 			} else {
 				$this->zip->addFile( $fileinfo[0], $fileinfo[1] );
+				$this->add_dir( $fileinfo[1] );
 			}
 		}
 

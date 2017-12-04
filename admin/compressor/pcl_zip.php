@@ -183,8 +183,11 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 			return $contents;
 		}
 
+		/*
+		 * Each $file is an array. Several example $file's can be seen here:
+		 * https://pastebin.com/bjQZYcAt
+		 */
 		foreach( $list as $key => $file ) {
-
 			/*
 			 * Calculate the parent directory this file / folder belongs to.
 			 *

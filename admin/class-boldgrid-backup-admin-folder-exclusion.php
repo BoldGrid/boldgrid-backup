@@ -206,18 +206,22 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 		$key = 'folder_exclusion_' . $property;
 		$default = 'default_' . $property;
 
-		/*
-		 * If we're in the middle of saving the settings, get from $_POST.
-		 *
-		 * Else, if we passed in $settings, just return the value there.
-		 *
-		 * Else, we've exhausted our checks and should just return the default.
-		 */
+		if( ! is_null( $this->$property ) ) {
+			return $this->$property;
+		}
+
 		if( $this->core->settings->is_saving_settings ) {
 			$this->$property = $this->from_post( $type );
 		} elseif( ! empty( $settings[$key] ) && is_string( $settings[$key] ) ) {
 			$this->$property = $settings[$key];
-		} else {
+		} elseif( ! $settings ) {
+			$settings = $this->core->settings->get_settings();
+			if( ! empty( $settings[$key] ) && is_string( $settings[$key] ) ) {
+				$this->$property = $settings[$key];
+			}
+		}
+
+		if( is_null( $this->$property ) ) {
 			$this->$property = $this->$default;
 		}
 
