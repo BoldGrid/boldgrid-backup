@@ -283,7 +283,11 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 			}
 		}
 
-		if( ! $file_index ) {
+		/*
+		 * We use to check if(! $file_index) however sometimes the file we want
+		 * is at the 0 index.
+		 */
+		if( false === $file_index ) {
 			return false;
 		}
 
