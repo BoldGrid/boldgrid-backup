@@ -80,7 +80,7 @@ div .dashicons {
 
 /* Clean up headers we place in any admin notices. */
 .notice .header-notice {
-	margin-top: 0px;
+	margin-top: 10px;
 }
 
 hr.separator {

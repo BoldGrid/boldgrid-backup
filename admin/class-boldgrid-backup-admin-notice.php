@@ -105,7 +105,7 @@ class Boldgrid_Backup_Admin_Notice {
 				</div>',
 				/* 1 */ $notice['class'],
 				/* 2 */ $this->add_container( $notice['message'] ),
-				/* 3 */ ! empty( $notice['heading'] ) ? sprintf( '<h2>%1$s</h2>', $notice['heading'] ) : ''
+				/* 3 */ ! empty( $notice['heading'] ) ? sprintf( '<h2 class="header-notice">%1$s</h2>', $notice['heading'] ) : ''
 			);
 		}
 
@@ -188,7 +188,7 @@ class Boldgrid_Backup_Admin_Notice {
 	 * @return string
 	 */
 	public function add_container( $message ) {
-		$in_container = false !== strpos( '<p', $message ) || false !== strpos( '<div', $message );
+		$in_container = false !== strpos( $message, '<p' ) || false !== strpos( $message, '<div' );
 
 		$message = ! $in_container ? '<p>' . $message . '</p>' : $message;
 

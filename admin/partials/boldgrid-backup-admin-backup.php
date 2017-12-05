@@ -48,7 +48,7 @@ if ( ! empty( $archive_info ) ) {
 		$message = array(
 			'class' => 'notice notice-success',
 			'message' => sprintf( '
-				<h2>%9$s - %1$s</h2>
+				<h2 class="header-notice">%9$s - %1$s</h2>
 				<p>%2$s</p>
 				%3$s
 				%4$s
