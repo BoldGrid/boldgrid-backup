@@ -54,7 +54,9 @@
 	include BOLDGRID_BACKUP_PATH . '/admin/partials/archives/premium-message.php';
 
 	echo( include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-size-data.php' );
-	echo( include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-button.php' );
+
+	$modal = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-modal.php';
+	echo $modal;
 
 	include BOLDGRID_BACKUP_PATH . '/admin/partials/archives/note-pre-backup.php';
 ?>

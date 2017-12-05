@@ -1,7 +1,7 @@
-.folder_exclude_help {
-	
-}
-
+/**
+* This section contains code for the "Exclude Folder" interface on the Settings
+* page.
+*/
 .folder_exclude_help tr th {
 	vertical-align: top;
 	width: 70px;
@@ -15,4 +15,70 @@
 .folder_exclude_help .example {
 	font-style: italic;
 	color: #696969;
+}
+
+.form-table th h2 {
+	display: inline;
+}
+
+/**
+* This section contains the css for the "Exclude Folder" interface within a
+* modal, such as the "Backup Site Now" modal.
+*/
+#TB_ajaxContent .form-table {
+	margin-top: 0px;
+}
+#TB_ajaxContent .form-table tr:first-of-type th,
+#TB_ajaxContent .form-table tr:first-of-type td {
+	padding-top: 10px;
+	vertical-align:top;
+}
+#TB_ajaxContent .form-table td {
+	padding-bottom: 0px;
+}
+#TB_ajaxContent .form-table td p:first-of-type {
+	padding-top: 0px;
+	margin-top: 0px;
+}
+#TB_ajaxContent #exclude_folders_preview {
+	max-width: 420px;
+}
+#TB_ajaxContent .form-table th {
+	width: 100px;
+}
+
+/**
+* This section includes code for the "include tables" database setting.
+*/
+.include-tables,
+#tables_to_include .tables {
+	margin-top: 15px;
+}
+.include-tables div {
+	float: left;
+	width: 300px;
+	white-space: nowrap;
+	overflow: hidden;
+	margin-right: 10px;
+}
+
+/**
+* This section contains misc. code for the "Backup Site Now" modal.
+*/
+.setting-section {
+	background:#efefef;
+	border:1px solid #ddd;
+	padding:0px 15px;
+	margin-bottom: 15px;
+}
+.setting-section.last {
+	margin-bottom: 65px;
+}
+#TB_ajaxContent .plugin-card-bottom {
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+	padding: 0px 10px;
+	text-align: right;
 }

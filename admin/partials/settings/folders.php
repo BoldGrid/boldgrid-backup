@@ -13,10 +13,10 @@ $tags = array(
 	'strong' => array(),
 );
 
+// $core will vary based on how this file is included.
+$core = isset( $this->core ) ? $this->core : $this;
+
 $markup = sprintf( '
-
-	<hr />
-
 	<input type="hidden" name="folder_exclusion_nonce" value="%2$s" />
 
 	<table class="form-table">
@@ -25,7 +25,7 @@ $markup = sprintf( '
 				<h2>%1$s</h2>
 				<span class="dashicons dashicons-editor-help" data-id="folder_exclude_inputs"></span>
 			</th>
-			<td style="vertical-align:top;padding-top:20px;">
+			<td>
 				<p>%8$s</p>
 					<div class="help" data-id="folder_exclude_inputs" style="padding:20px 0px 20px 20px;margin:15px 0px 0px 0px;">
 
@@ -107,10 +107,10 @@ $markup = sprintf( '
 			<th></th>
 			<td>
 				<p>
-					<button id="exclude_folders_button" class="button button-primary">%18$s</button>
+					<button id="exclude_folders_button" class="button">%18$s</button>
 				</p>
 
-				<div id="exclude_folders_preview" style="margin-top: 20px;">
+				<div id="exclude_folders_preview">
 					<p class="status hidden"></p>
 					<div class="tablenav hidden">
 						<div class="tablenav-pages"></div>
@@ -152,11 +152,11 @@ $markup = sprintf( '
 	/* 28 */ wp_kses( __( 'For example, <strong>wp-admin,wp-includes</strong> will backup both the wp-admin folder and the wp-includes folder.', 'boldgrid-backup' ), $tags ),
 	/* 29 */ wp_kses( __( 'Default', 'boldgrid-backup' ), $tags ),
 	/* 30 */ wp_kses( __( 'These are the <strong>default</strong> settings. Include all core WordPress files and the wp-content folder (which includes your plugins, themes, and uploads).', 'boldgrid-backup' ), $tags ),
-	/* 31 */ $this->core->folder_exclusion->default_include,
-	/* 32 */ $this->core->folder_exclusion->default_exclude,
+	/* 31 */ $core->folder_exclusion->default_include,
+	/* 32 */ $core->folder_exclusion->default_exclude,
 	/* 33 */ wp_kses( __( 'The following special characters can be used in your <strong>include</strong> and <strong>exclude</strong> filters:', 'boldgrid-backup' ), $tags )
 );
 
-echo $markup;
+return $markup;
 
 ?>

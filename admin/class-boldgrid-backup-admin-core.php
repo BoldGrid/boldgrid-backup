@@ -344,6 +344,25 @@ class Boldgrid_Backup_Admin_Core {
 	private $backup_identifier = null;
 
 	/**
+	 * Value indicating we are in the Backup Site Now callback and the user is
+	 * choosing a full backup.
+	 *
+	 * @since  1.5.4
+	 * @access public
+	 * @var    bool
+	 */
+	public $is_backup_full = false;
+
+	/**
+	 * Value indicating we are in the Backup Site Now callback.
+	 *
+	 * @since  1.5.4
+	 * @access public
+	 * @var    bool
+	 */
+	public $is_backup_now = false;
+
+	/**
 	 * An instance of the Boldgrid Backup Admin Home Dir class.
 	 *
 	 * @since 1.5.1
@@ -2107,6 +2126,10 @@ class Boldgrid_Backup_Admin_Core {
 	public function page_archives() {
 		global $pagenow;
 
+		// Thickbox used for Backup Site Now modal.
+		add_thickbox();
+		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
+
 		// Run the functionality tests.
 		$is_functional = $this->test->run_functionality_tests();
 
@@ -2126,6 +2149,8 @@ class Boldgrid_Backup_Admin_Core {
 		);
 
 		wp_enqueue_script( 'boldgrid-backup-now' );
+
+		$this->folder_exclusion->enqueue_scripts();
 
 		// Get the current wp_filesystem access method.
 		$access_type = get_filesystem_method();
@@ -2241,6 +2266,10 @@ class Boldgrid_Backup_Admin_Core {
 			);
 			wp_die();
 		}
+
+		$this->is_backup_now = true;
+
+		$this->is_backup_full = isset( $_POST['type'] ) && 'full' === $_POST['type'];
 
 		$this->is_archiving_update_protection = ! empty( $_POST['is_updating'] ) && 'true' === $_POST['is_updating'];
 

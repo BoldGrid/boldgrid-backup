@@ -189,6 +189,36 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	}
 
 	/**
+	 * Enqueue scripts.
+	 *
+	 * @since 1.5.4
+	 */
+	public function enqueue_scripts() {
+		$handle = 'boldgrid-backup-admin-folder-exclude';
+		wp_register_script( $handle,
+			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-folder-exclude.js',
+			array( 'jquery' ),
+			BOLDGRID_BACKUP_VERSION,
+			false
+		);
+		$translation = array(
+			'default_include' => $this->default_include,
+			'default_exclude' => $this->default_exclude,
+			'items' => __( 'items', 'boldgrid-backup' ),
+			'of' => __( 'of', 'boldgrid-backup' ),
+		);
+		wp_localize_script( $handle, 'BoldGridBackupAdminFolderExclude', $translation );
+		wp_enqueue_script( $handle );
+
+		// Enqueue CSS for folder exclude functionality.
+		wp_enqueue_style(
+			$handle,
+			plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-folder-exclude.css', array(),
+			BOLDGRID_BACKUP_VERSION
+		);
+	}
+
+	/**
 	 * Get our include or exclude value from the settings.
 	 *
 	 * @since 1.5.4
@@ -208,11 +238,20 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 
 		/*
 		 * If we are in the middle of creating a backup file for update
-		 * protection, force default values (which backup both core files and
-		 * wp-content files).
+		 * protection OR we are creating a 'full' backup, force default values
+		 * (which backup both core files and all wp-content files).
 		 */
-		if( $this->core->is_archiving_update_protection ) {
+		if( $this->core->is_archiving_update_protection || $this->core->is_backup_full ) {
 			return $this->$default;
+		}
+
+		/*
+		 * If we are backing up a site now (not for update protection) and
+		 * we've posted folder settings, use those.
+		 */
+		if( $this->core->is_backup_now && isset( $_POST[$key] ) ) {
+			$this->$property = $this->from_post( $type );
+			return $this->$property;
 		}
 
 		if( ! is_null( $this->$property ) ) {

@@ -75,7 +75,10 @@ wp_nonce_field( 'boldgrid_backup_settings' );
 
 		echo '</table>';
 
-		include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/folders.php';
+		echo '</hr>';
+
+		$folders_include = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/folders.php';
+		echo $folders_include;
 
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/db.php';
 

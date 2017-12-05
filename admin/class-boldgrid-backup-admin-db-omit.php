@@ -47,9 +47,17 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	 * @return array
 	 */
 	public function get_excluded_tables() {
-		$settings = $this->core->settings->get_settings();
 
-		$excluded_tables = $settings['exclude_tables'];
+		if( $this->core->is_archiving_update_protection || $this->core->is_backup_full ) {
+			$excluded_tables = array();
+		} elseif( $this->core->is_backup_now && isset( $_POST['include_tables'] ) ) {
+			$excluded_tables = $this->get_from_post();
+		} else {
+			$settings = $this->core->settings->get_settings();
+			$excluded_tables = $settings['exclude_tables'];
+		}
+
+		$excluded_tables = is_array( $excluded_tables ) ? $excluded_tables : array();
 
 		return $excluded_tables;
 	}
@@ -81,6 +89,35 @@ class Boldgrid_Backup_Admin_Db_Omit {
 		}
 
 		return $prefixed_tables;
+	}
+
+	/**
+	 * From post, get an array of tables to exlucde.
+	 *
+	 * We are submitting via post "include_tables", however we use this data to
+	 * then calculate "exclude_tables".
+	 *
+	 * @since 1.5.4
+	 *
+	 * @return array
+	 */
+	public function get_from_post() {
+		$exclude_tables = array();
+		$include_tables = ! empty( $_POST['include_tables'] ) ? $_POST['include_tables'] : array();
+		$all_tables = $this->core->db_get->prefixed();
+
+		/*
+		 * Loop through every table we have.
+		 *
+		 * If the table we want to
+		 */
+		foreach( $all_tables as $table ) {
+			if( ! in_array( $table, $include_tables ) ) {
+				$exclude_tables[] = $table;
+			}
+		}
+
+		return $exclude_tables;
 	}
 
 	/**

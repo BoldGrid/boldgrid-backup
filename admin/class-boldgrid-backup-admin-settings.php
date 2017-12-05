@@ -601,15 +601,7 @@ class Boldgrid_Backup_Admin_Settings {
 			 *
 			 * @since 1.5.3
 			 */
-			$exclude_tables = array();
-			$include_tables = ! empty( $_POST['include_tables'] ) ? $_POST['include_tables'] : array();
-			$all_tables = $this->core->db_get->prefixed();
-			foreach( $all_tables as $table ) {
-				if( ! in_array( $table, $include_tables ) ) {
-					$exclude_tables[] = $table;
-				}
-			}
-			$settings['exclude_tables'] = $exclude_tables;
+			$settings['exclude_tables'] = $this->core->db_omit->get_from_post();
 
 			/*
 			 * Save folder exclusion settings.
@@ -750,29 +742,7 @@ class Boldgrid_Backup_Admin_Settings {
 			false
 		);
 
-		// Enqueue JS for folder exclude functionality.
-		$handle = 'boldgrid-backup-admin-folder-exclude';
-		wp_register_script( $handle,
-			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-folder-exclude.js',
-			array( 'jquery' ),
-			BOLDGRID_BACKUP_VERSION,
-			false
-		);
-		$translation = array(
-			'default_include' => $this->core->folder_exclusion->default_include,
-			'default_exclude' => $this->core->folder_exclusion->default_exclude,
-			'items' => __( 'items', 'boldgrid-backup' ),
-			'of' => __( 'of', 'boldgrid-backup' ),
-		);
-		wp_localize_script( $handle, 'BoldGridBackupAdminFolderExclude', $translation );
-		wp_enqueue_script( $handle );
-
-		// Enqueue CSS for folder exclude functionality.
-		wp_enqueue_style(
-			$handle,
-			plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-folder-exclude.css', array(),
-			BOLDGRID_BACKUP_VERSION
-		);
+		$this->core->folder_exclusion->enqueue_scripts();
 
 		wp_enqueue_script( 'boldgrid-backup-now' );
 

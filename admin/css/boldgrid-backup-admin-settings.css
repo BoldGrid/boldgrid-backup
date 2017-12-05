@@ -2,20 +2,3 @@
 .schedule-dow input[type='checkbox'][disabled]:hover {
 	cursor: not-allowed;
 }
-
-.include-tables,
-#tables_to_include .tables {
-	margin-top: 15px;
-}
-
-.include-tables div {
-	float: left;
-	width: 300px;
-	white-space: nowrap;
-	overflow: hidden;
-	margin-right: 10px;
-}
-
-.form-table th h2 {
-	display: inline;
-}

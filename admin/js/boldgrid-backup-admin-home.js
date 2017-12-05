@@ -16,7 +16,8 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 
 	// General Variables.
 	var self = this,
-		$fileInput = $( 'input:file' );
+		$fileInput = $( 'input:file' ),
+		$backupNowType = $( '[name="backup_now_type"]' );
 
 	/*
 	 * This script is passed "localizeScriptData" {"archiveNonce", "accessType", "restoreConfirmText",
@@ -59,6 +60,8 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 		self.hideRestoreNotice();
 
 		$fileInput.on( 'change', self.onChangeInput );
+
+		$backupNowType.on( 'change', self.onChangeType );
 	} );
 
 	/**
@@ -191,6 +194,22 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 	}
 
 	/**
+	 * @summary Action to take when user changes Backup Site Now type.
+	 *
+	 * @since 1.5.4
+	 */
+	self.onChangeType = function() {
+		var type = $backupNowType.filter( ':checked' ).val(),
+			$settings = $( '#customize_backup_now' );
+
+		if( 'full' === type ) {
+			$settings.slideUp();
+		} else {
+			$settings.slideDown();
+		}
+	};
+
+	/**
 	 * Confirm to restore a selected backup archive file.
 	 *
 	 * @since 1.0
@@ -271,7 +290,20 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 	self.backupNow = function( e ) {
 		// Declare variables.
 		var $this, $backupSiteSection, $backupSiteResults, backupNonce, wpHttpReferer, isUpdating,
-		errorCallback, successCallback, data, markup;
+		errorCallback, successCallback, data, markup,
+		$folderExclude = $( '[name="folder_exclusion_exclude"]' ),
+		$folderInclude = $( '[name="folder_exclusion_include"]' ),
+		$tableInclude = $( '[name="include_tables[]"]' ),
+		includeTables = [],
+		type = 'full';
+
+		/*
+		 * If we are in a Backup Site Now modal and there is a "type" value set,
+		 * grab it.
+		 */
+		if( 1 === $backupNowType.filter( ':checked' ).length ) {
+			type = $backupNowType.filter( ':checked' ).val();
+		}
 
 		// Assign the current jQuery object.
 		$this = $( this );
@@ -286,6 +318,10 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 
 		// Create a context selector for the Backup Site Now results.
 		$backupSiteResults = $( '#backup-site-now-results' );
+
+		$( '#TB_ajaxContent' )
+			.find( 'input' ).attr( 'disabled', true ).end()
+			.find( 'button' ).attr( 'disabled', true ).end();
 
 		// Get the wpnonce and referer values.
 		backupNonce = $backupSiteSection.find( '#backup_auth' )
@@ -363,7 +399,28 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 			'_wp_http_referer' : wpHttpReferer,
 			'is_updating' : isUpdating,
 			'backup_now' : '1',
+			'type' : type,
 		};
+
+		/*
+		 * The next 3 conditionals are used in the Backup Site Now modal. If we
+		 * are doing a customized backup, send appropriate "include / exclude"
+		 * settings for "folder / database".
+		 */
+		if( 'custom' === type && 1 === $folderInclude.length ) {
+			data.folder_exclusion_include = $folderInclude.val();
+		}
+
+		if( 'custom' === type && 1 === $folderExclude.length ) {
+			data.folder_exclusion_exclude = $folderExclude.val();
+		}
+
+		if( 'custom' === type && $tableInclude.length ) {
+			$tableInclude.filter( ':checked' ).each( function(){
+				includeTables.push( $(this).val() );
+			});
+			data.include_tables = includeTables;
+		}
 
 		// Make the call.
 		$.ajax( {

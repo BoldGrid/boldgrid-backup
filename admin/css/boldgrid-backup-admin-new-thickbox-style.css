@@ -21,3 +21,6 @@ body #TB_window,
 	font: normal 30px/30px dashicons;
 	color: #eee;
 }
+#TB_ajaxContent {
+	background: #fff;
+}
