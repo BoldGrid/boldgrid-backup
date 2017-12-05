@@ -14,6 +14,9 @@ return sprintf(
 	'<div id="backup-site-now-section">
 		<form action="#" id="backup-site-now-form" method="POST">
 			%1$s
+			<p id="you_may_leave" class="hidden">
+				%4$s
+			</p>
 			<p>
 				<a id="backup-site-now" class="button button-primary" disabled="disabled" %3$s >
 					%2$s
@@ -25,7 +28,8 @@ return sprintf(
 	<div id="backup-site-now-results"></div>',
 	wp_nonce_field( 'boldgrid_backup_now', 'backup_auth' ),
 	esc_html( 'Backup Site Now', 'boldgrid-backup' ),
-	in_array( $pagenow, $pagenow_enqueue_rollback, true ) ? 'data-updating="true"' : ''
+	in_array( $pagenow, $pagenow_enqueue_rollback, true ) ? 'data-updating="true"' : '',
+	/* 4 */ __( 'You may leave this page, doing so will not stop your backup.', 'boldgrid-backup' )
 );
 
 ?>

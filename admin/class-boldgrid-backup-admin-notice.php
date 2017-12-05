@@ -20,6 +20,15 @@
 class Boldgrid_Backup_Admin_Notice {
 
 	/**
+	 * The core class object.
+	 *
+	 * @since  1.5.4
+	 * @access private
+	 * @var    Boldgrid_Backup_Admin_Core
+	 */
+	private $core;
+
+	/**
 	 * Common strings used in notices.
 	 *
 	 * @since 1.5.4
@@ -29,6 +38,17 @@ class Boldgrid_Backup_Admin_Notice {
 		'dis_error' => 'notice notice-error is-dismissible',
 		'dis_success' => 'notice notice-success is-dismissible',
 	);
+
+	/**
+	 * Constructor.
+	 *
+	 * @since 1.5.4
+	 *
+	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
+	 */
+	public function __construct( $core ) {
+		$this->core = $core;
+	}
 
 	/**
 	 * Add a notice for a user.
@@ -71,12 +91,22 @@ class Boldgrid_Backup_Admin_Notice {
 
 		$notices = get_option( $option, array() );
 
+		$notices = $this->core->in_progress->add_notice( $notices );
+
 		if( empty( $notices ) ) {
 			return;
 		}
 
 		foreach( $notices as $notice ) {
-			printf( '<div class="%1$s is-dismissible">%2$s</div>', $notice['class'], $notice['message'] );
+			printf( '
+				<div class="%1$s is-dismissible">
+					%3$s
+					%2$s
+				</div>',
+				/* 1 */ $notice['class'],
+				/* 2 */ $this->add_container( $notice['message'] ),
+				/* 3 */ ! empty( $notice['heading'] ) ? sprintf( '<h2>%1$s</h2>', $notice['heading'] ) : ''
+			);
 		}
 
 		delete_option( $option );

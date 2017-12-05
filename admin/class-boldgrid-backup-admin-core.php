@@ -371,6 +371,14 @@ class Boldgrid_Backup_Admin_Core {
 	public $home_dir;
 
 	/**
+	 * An instance of the In Progress class.
+	 *
+	 * @since 1.5.4
+	 * @var   Boldgrid_Backup_Admin_In_Progress object.
+	 */
+	public $in_progress;
+
+	/**
 	 * Value indicating whether or not we're creating a backup for update
 	 * protection.
 	 *
@@ -432,7 +440,7 @@ class Boldgrid_Backup_Admin_Core {
 		$this->test = new Boldgrid_Backup_Admin_Test( $this );
 
 		// Instantiate Boldgrid_Backup_Admin_Notice.
-		$this->notice = new Boldgrid_Backup_Admin_Notice();
+		$this->notice = new Boldgrid_Backup_Admin_Notice( $this );
 
 		// Instantiate Boldgrid_Backup_Admin_Cron.
 		$this->cron = new Boldgrid_Backup_Admin_Cron( $this );
@@ -493,6 +501,8 @@ class Boldgrid_Backup_Admin_Core {
 		$this->folder_exclusion = new Boldgrid_Backup_Admin_Folder_Exclusion( $this );
 
 		$this->core_files = new Boldgrid_Backup_Admin_Core_Files( $this );
+
+		$this->in_progress = new Boldgrid_Backup_Admin_In_Progress( $this );
 
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
@@ -1337,6 +1347,7 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return array An array of archive file information.
 	 */
 	public function archive_files( $save = false, $dryrun = false ) {
+		$this->in_progress->set();
 
 		/**
 		 * Actions to take before any archiving begins.
@@ -1355,6 +1366,7 @@ class Boldgrid_Backup_Admin_Core {
 				$this->notice->functionality_fail_notice();
 			}
 
+			$this->in_progress->end();
 			return array(
 				'error' => 'Functionality tests fail.',
 			);
@@ -1375,6 +1387,7 @@ class Boldgrid_Backup_Admin_Core {
 				$this->email->send( $subject, $body );
 			}
 
+			$this->in_progress->end();
 			return array(
 				'error' => $size_data['messages']['notSupported'],
 			);
@@ -1413,6 +1426,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// If there is no available compressor, then fail.
 		if ( null === $info['compressor'] ) {
+			$this->in_progress->end();
 			return array(
 				'error' => 'No available compressor.',
 			);
@@ -1432,6 +1446,7 @@ class Boldgrid_Backup_Admin_Core {
 			$status = $this->backup_database();
 
 			if ( false === $status || ! empty( $status['error'] ) ) {
+				$this->in_progress->end();
 				return array(
 					'error' => ! empty( $status['error'] ) ? $status['error'] : __( 'An unknown error occurred when backing up the database.', 'boldgrid-backup' ),
 				);
@@ -1454,6 +1469,7 @@ class Boldgrid_Backup_Admin_Core {
 				$info['total_size'] += $fileinfo[2];
 			}
 
+			$this->in_progress->end();
 			return $info;
 		}
 
@@ -1462,6 +1478,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Check if the backup directory is writable.
 		if ( ! $this->wp_filesystem->is_writable( $backup_directory ) ) {
+			$this->in_progress->end();
 			return false;
 		}
 
@@ -1536,6 +1553,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		if( ! empty( $status['error'] ) ) {
+			$this->in_progress->end();
 			return $status;
 		}
 
@@ -1607,6 +1625,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Return the array of archive information.
+		$this->in_progress->end();
 		return $info;
 	}
 

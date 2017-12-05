@@ -82,3 +82,7 @@
 	padding: 0px 10px;
 	text-align: right;
 }
+.plugin-card-bottom #you_may_leave {
+	float: left;
+	margin-top: 5px;
+}

@@ -323,6 +323,8 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 			.find( 'input' ).attr( 'disabled', true ).end()
 			.find( 'button' ).attr( 'disabled', true ).end();
 
+		$( '#you_may_leave' ).fadeIn();
+
 		// Get the wpnonce and referer values.
 		backupNonce = $backupSiteSection.find( '#backup_auth' )
 			.val();

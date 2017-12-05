@@ -88,6 +88,9 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 			return;
 		}
 
+		// If we had a fatal error, tell the system we're no longer backing up.
+		$this->core->in_progress->end();
+
 		$unable_to_backup = __( 'We were unable to create a backup of your website due to the following:', 'boldgrid-backup' );
 		$error_text = __( 'We were unable to create a backup of your website due to the following:', 'boldgrid-backup' ) . '<br />';
 
