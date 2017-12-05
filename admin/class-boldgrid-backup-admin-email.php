@@ -90,6 +90,10 @@ class Boldgrid_Backup_Admin_Email {
 			$parts['body']['main'] .= sprintf( esc_html__( 'Backup triggered by: %1$s', 'boldgrid-backup' ), $info['trigger'] ) . "\n";
 		}
 
+		$parts['body']['main'] .= $this->core->folder_exclusion->email_part( $info );
+
+		$parts['body']['main'] .= $this->core->db_omit->email_part( $info );
+
 		$parts['body']['main'] .= "\n";
 
 		$parts['body']['signature'] = esc_html__( 'You can manage notifications in your WordPress admin panel, under BoldGrid Backup Settings', 'boldgrid-backup' ) . ".\n\n";

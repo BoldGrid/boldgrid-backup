@@ -40,6 +40,29 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	}
 
 	/**
+	 * Generate a section for email alerts including information about tables
+	 * excluded.
+	 *
+	 * @since 1.5.4
+	 *
+	 * @param  array $info
+	 * @return string
+	 */
+	public function email_part( $info ) {
+		$body = '';
+
+		// Include database tables excluded.
+		if( isset( $info['table_exclude'] ) ) {
+			$body .= "\n" . __( 'DATABASE SETTINGS', 'boldgrid-backup' ) . "\n";
+
+			$tables_excluded = empty( $info['table_exclude'] ) ? __( 'None', 'boldgrid-backup' ) : implode( ',', $info['table_exclude'] );
+			$body .= sprintf( esc_html__( 'Tables Excluded: %1$s', 'boldgrid-backup' ), $tables_excluded ) . "\n";
+		}
+
+		return $body;
+	}
+
+	/**
 	 * Get our exluded tables list.
 	 *
 	 * @since 1.5.3

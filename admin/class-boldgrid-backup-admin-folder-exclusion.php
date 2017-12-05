@@ -132,6 +132,36 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	}
 
 	/**
+	 * Generate a section for email alerts including information about files and
+	 * folders excluded.
+	 *
+	 * @since 1.5.4
+	 *
+	 * @param  array $info
+	 * @return string
+	 */
+	public function email_part( $info ) {
+		$body = '';
+
+		$has_folder_included = isset( $info['folder_include'] );
+		$has_folder_excluded = isset( $info['folder_exclude'] );
+
+		if( $has_folder_included || $has_folder_excluded ) {
+			$body .= "\n" . __( 'FILE AND FOLDER SETTINGS', 'boldgrid-backup' ) . "\n";
+		}
+
+		if( $has_folder_included ) {
+			$body .= sprintf( esc_html__( 'Included: %1$s', 'boldgrid-backup' ), $info['folder_include'] ) . "\n";
+		}
+
+		if( $has_folder_excluded ) {
+			$body .= sprintf( esc_html__( 'Excluded: %1$s', 'boldgrid-backup' ), $info['folder_exclude'] ) . "\n";
+		}
+
+		return $body;
+	}
+
+	/**
 	 * Create our regex pattern.
 	 *
 	 * If the user enters wp-* for their include / exclude value, then we need
