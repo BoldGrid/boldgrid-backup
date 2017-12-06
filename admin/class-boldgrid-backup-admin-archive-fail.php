@@ -28,6 +28,16 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 	private $core;
 
 	/**
+	 * A string that will hold memory for emergency purposes.
+	 *
+	 * @since  1.5.2
+	 * @access public
+	 * @var    string
+	 * @see    archive_files_init
+	 */
+	public $memory = '';
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.5.2
@@ -48,6 +58,24 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 	 */
 	public function archive_files_init() {
 		add_action( 'shutdown', array( $this, 'shutdown' ) );
+
+		/*
+		 * Store ~0.35 MB of memory for use in an emergency.
+		 *
+		 * If there's a fatal error, our shutdown method will need enough
+		 * memory to complete a few tasks. 0.25 MB seems sufficient, but we'll
+		 * save 0.35 to be on the safe side.
+		 *
+		 * Tests have shown the following memory limits are sufficient enough
+		 * for executing our shutdown function:
+		 * # YES   1 MB
+		 * # YES  .5 MB
+		 * # YES .25 MB
+		 * #  NO .10 MB shutdown function fails early on when calling
+		 *              error_get_last().
+		 */
+		$mb = 1000000;
+		$this->memory = str_repeat( '0', ( 0.35 * $mb ) );
 	}
 
 	/**
@@ -69,6 +97,13 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 	 * @since 1.5.2
 	 */
 	public function shutdown() {
+
+		// Free up memory so we have enough to complete this method.
+		$this->memory = null;
+
+		// If we had a fatal error, tell the system we're no longer backing up.
+		$this->core->in_progress->end();
+
 		/*
 		 * If an archive fails, there may be a rogue db dump sitting out there.
 		 * If it exists, delete it, it should be in the archive file.
@@ -88,9 +123,6 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 			return;
 		}
 
-		// If we had a fatal error, tell the system we're no longer backing up.
-		$this->core->in_progress->end();
-
 		$unable_to_backup = __( 'We were unable to create a backup of your website due to the following:', 'boldgrid-backup' );
 		$error_text = __( 'We were unable to create a backup of your website due to the following:', 'boldgrid-backup' ) . '<br />';
 
@@ -103,29 +135,26 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 		);
 
 		/*
-		 * If we're backing up via cron, we may have hit a memory limit or
-		 * something else disastrous. It's too dangerous to send an email now,
-		 * we're in an unreliable state. Instead, schedule a warning email for
-		 * the future.
+		 * Send an email indicating failure.
+		 *
+		 * We may have hit a memory limit or something else disastrous. It's too
+		 * dangerous to send an email now, we're in an unreliable state.
+		 * Instead, schedule a warning email for the future.
 		 */
-		if( $this->core->doing_cron ) {
-			$message = $unable_to_backup . "\n\n" . strip_tags( $error_message );
-			$email_body = $this->core->email->fill_generic_template( $message );
+		$message = $unable_to_backup . "\n\n" . strip_tags( $error_message );
+		$email_body = $this->core->email->fill_generic_template( $message );
+		$args = array(
+			'action' => 'boldgrid_backup_cron_fail_email',
+			'action_data' => array(
+				'message' => $email_body,
+			),
+			'action_title' => __( 'Send warning email because backup failed', 'boldgrid-backup' ),
+		);
+		$this->core->jobs->add( $args );
 
-			$args = array(
-				'action' => 'boldgrid_backup_cron_fail_email',
-				'action_data' => array(
-					'message' => $email_body,
-				),
-				'action_title' => __( 'Send warning email because backup failed', 'boldgrid-backup' ),
-			);
-			$this->core->jobs->add( $args );
-
-			return;
+		if( ! $this->core->doing_cron ) {
+			$data['errorText'] = $unable_to_backup . '<br />' . $error_message;
+			wp_send_json_error( $data );
 		}
-
-		$data['errorText'] = $unable_to_backup . '<br />' . $error_message;
-
-		wp_send_json_error( $data );
 	}
 }
