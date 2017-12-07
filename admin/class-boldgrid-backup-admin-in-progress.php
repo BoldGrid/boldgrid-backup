@@ -85,7 +85,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 	 * @since 1.5.4
 	 */
 	public function end() {
-		$settings = $this->core->settings->get_settings();
+		$settings = $this->core->settings->get_settings( true );
 
 		unset( $settings['in_progress'] );
 
@@ -102,7 +102,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 	 * @return int
 	 */
 	public function get() {
-		$settings = $this->core->settings->get_settings();
+		$settings = $this->core->settings->get_settings( true );
 
 		$in_progress = ! empty( $settings['in_progress'] ) ? $settings['in_progress'] : null;
 
@@ -115,7 +115,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 	 * @since 1.5.4
 	 */
 	public function set() {
-		$settings = $this->core->settings->get_settings();
+		$settings = $this->core->settings->get_settings( true );
 
 		$settings['in_progress'] = time();
 

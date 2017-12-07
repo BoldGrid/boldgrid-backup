@@ -82,11 +82,18 @@ class Boldgrid_Backup_Admin_Settings {
 	 *
 	 * @since 1.0
 	 *
-	 * @return array An array of settings.
+	 * @param  bool $raw Return the raw settings. This would happen very early
+	 *                   on in this method, before all of the other checks
+	 *                   happen.
+	 * @return array     An array of settings.
 	 */
-	public function get_settings() {
+	public function get_settings( $raw = false ) {
 		// Get settings.
-		$settings = get_site_option( 'boldgrid_backup_settings' );
+		$settings = get_site_option( 'boldgrid_backup_settings', array() );
+
+		if( $raw ) {
+			return $settings;
+		}
 
 		// Parse settings.
 		if ( ! empty( $settings['schedule'] ) ) {
