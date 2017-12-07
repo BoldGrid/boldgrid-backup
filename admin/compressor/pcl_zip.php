@@ -53,6 +53,84 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 	}
 
 	/**
+	 * Add empty directories to current directory we're browsing.
+	 *
+	 * This method is used by this->browse, and it's whole reason for existence
+	 * is because ZipArchive gives you the ability to simply add a directory to
+	 * the archive, but PclZip does not.
+	 *
+	 * If PclZip archive only includes one file, such as
+	 * wp-content/plugins/boldgrid/index.php, we need to "artificially" create
+	 * these directories for the zip browser:
+	 * # wp-content/
+	 * # wp-content/plugins/
+	 * # wp-content/plugins/boldgrid/
+	 *
+	 * @since 1.5.4
+	 *
+	 * @param  array  $list
+	 * @param  array  $contents
+	 * @param  array  $filenames
+	 * @param  string $in_dir
+	 * @return array  An updated $contents.
+	 */
+	public function browse_add_dirs( $list, $contents, $filenames, $in_dir ) {
+		foreach( $list as $key => $file ) {
+
+			// These variables are very similar, both exist for readability.
+			$top_dir = null;
+			$next_dir = null;
+
+			if( '.' === $in_dir ) {
+				$top_dir = explode( '/', $file['filename'] );
+				$top_dir = $top_dir[0];
+
+				if( empty( $top_dir ) || in_array( $top_dir, $filenames ) ) {
+					continue;
+				}
+			} else {
+
+				/*
+				 * Determine if file is in directory.
+				 *
+				 * For example, We want to know if file wp-admin/user/about is
+				 * in wp-content/
+				 */
+				$file_in_dir = 0 === strpos( $file['filename'], $in_dir . '/' );
+				if( ! $file_in_dir ) {
+					continue;
+				}
+
+				/*
+				 * Calcular our next directory.
+				 *
+				 * If we're looking for all folders within wp-content/plugins
+				 * and we're given a filename of
+				 * wp-content/plugins/boldgrid/index.php, then we can say that
+				 * wp-content/plugins/boldgrid exists in wp-content/plugins.
+				 */
+				$next_dir = str_replace( $in_dir . '/', '', $file['filename'] );
+				$next_dir = explode( '/', $next_dir );
+				$next_dir = $in_dir . '/' . $next_dir[0];
+
+				if( $next_dir === $file['filename'] || in_array( $next_dir, $filenames ) ) {
+					continue;
+				}
+			}
+
+			$dir = ! empty( $top_dir ) ? $top_dir : $next_dir;
+			$sudo_file = array(
+				'filename' => $dir,
+				'folder' => true,
+			);
+			$contents[] = $sudo_file;
+			$filenames[] = $dir;
+		}
+
+		return $contents;
+	}
+
+	/**
 	 * Archive files.
 	 *
 	 * @since 1.5.1
@@ -85,50 +163,28 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 			);
 		}
 
-		$db_dump = $filelist[0][0];
-
-		/**
-		 * Filter to run before adding a file to the archive.
+		/*
+		 * Create our $new_filelist.
 		 *
-		 * While we only pass a small array to the add method, every single file
-		 * added to the archive is passed through this method.
-		 *
-		 * @since 1.5.1
-		 *
-		 * @link http://www.phpconcept.net/pclzip/user-guide/50
-		 *
-		 * @param  string $p_event  The identity of the call-back argument
-		 * @param  array  $p_header The description of the file that will be
-		 *                          added. https://pastebin.com/MTMGwaZ2
-		 * @return int    Return 0 to skip adding the file to the archive.
+		 * We can pass $archive->add() an array of files to archive. $filelist
+		 * is an array of arrays, so we need to convert to simply an array of
+		 * strings (filenames to archive).
 		 */
-		function pre_add( $p_event, &$p_header) {
-			$in_node_modules = false !== strpos( $p_header['stored_filename'], '/node_modules/' );
-			$in_backup_directory = apply_filters( 'boldgrid_backup_file_in_dir', $p_header['stored_filename'] );
+		$new_filelist = array();
+		foreach( $filelist as $key => $file ) {
 
-			if( $in_node_modules || $in_backup_directory ) {
-				return 0;
+			// Don't add the database dump at this time, it will be added later.
+			if( ! empty( $this->core->db_dump_filepath ) && $file[0] === $this->core->db_dump_filepath ) {
+				continue;
 			}
 
-			return 1;
+			$new_filelist[] =  $file[0];
 		}
 
-		/*
-		 * Add files to the archive.
-		 *
-		 * ZipArchive takes the approach of looping through each file and
-		 * individually adding it to the archive. When Pcl Zip takes this
-		 * approach, the archiving takes too long and never completes. When
-		 * adding instead only folders and top level files to the archive, the
-		 * archiving completes much faster.
-		 */
-		$filelist = $this->core->get_filelist_filter( true );
-		$this->wp_filesystem->chdir( ABSPATH );
-
-		$status = $archive->add( $filelist,
-			PCLZIP_CB_PRE_ADD, 'pre_add',
+		$status = $archive->add( $new_filelist,
 			PCLZIP_OPT_REMOVE_PATH, ABSPATH
 		);
+
 		if( 0 === $status ) {
 			$error_info = $archive->errorInfo();
 
@@ -152,7 +208,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 		 * to backup their database.
 		 */
 		if( ! empty( $this->core->db_dump_filepath ) ) {
-			$status = $archive->add( $db_dump, PCLZIP_OPT_REMOVE_ALL_PATH );
+			$status = $archive->add( $this->core->db_dump_filepath, PCLZIP_OPT_REMOVE_ALL_PATH );
 			if( 0 === $status ) {
 				return array(
 						'error' => sprintf( 'Cannot add database dump to ZIP archive file: %1$s', $archive->errorInfo() ),
@@ -174,7 +230,24 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 	 */
 	public function browse( $filepath, $in_dir = '.' ) {
 		$in_dir = untrailingslashit( $in_dir );
+
+		/*
+		 * Keep track of the contents of the directory we're trying to browse.
+		 *
+		 * This variable is different than the below $filenames variable because
+		 * $contents contains an array arrays (info ABOUT each filename) while
+		 * $filenames just contains either the file or folder name.
+		 */
 		$contents = array();
+
+		/*
+		 * Keep track of just file and folder names added to the $contents. For
+		 * example:
+		 *
+		 * [0] wp-content (folder)
+		 * [1] wp-content/index.php (file)
+		 */
+		$filenames = array();
 
 		$zip = new PclZip( $filepath );
 
@@ -188,6 +261,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 		 * https://pastebin.com/bjQZYcAt
 		 */
 		foreach( $list as $key => $file ) {
+
 			/*
 			 * Calculate the parent directory this file / folder belongs to.
 			 *
@@ -203,7 +277,10 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 			}
 
 			$contents[] = $file;
+			$filenames[] = rtrim( $file['filename'], '/' );
 		}
+
+		$contents = $this->browse_add_dirs( $list, $contents, $filenames, $in_dir );
 
 		return $contents;
 	}

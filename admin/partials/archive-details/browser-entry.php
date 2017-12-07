@@ -33,7 +33,7 @@ return sprintf(
 	basename( $file['filename'] ),
 	$icon,
 	$size,
-	date( 'M j, Y h:i:s a', $file['mtime'] )
+	isset( $file['mtime'] ) ? date( 'M j, Y h:i:s a', $file['mtime'] ) : ''
 );
 
 ?>

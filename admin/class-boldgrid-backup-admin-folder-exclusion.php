@@ -96,6 +96,12 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	 * @return bool
 	 */
 	public function allow_file( $file ) {
+
+		// If this file is in our backup directory, do not allow it.
+		if( $this->core->backup_dir->file_in_dir( ABSPATH . $file, true ) ) {
+			return false;
+		}
+
 		$include = $this->in_ajax_preview ? $_POST['include'] : $this->from_settings( 'include' );
 		$exclude = $this->in_ajax_preview ? $_POST['exclude'] : $this->from_settings( 'exclude' );
 

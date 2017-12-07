@@ -299,10 +299,16 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	 * @since 1.5.1
 	 *
 	 * @param  string $file
+	 * @param  bool   $use_abspath Bool determining whether or not to use the
+	 *                             backup directory in its absolute path.
 	 * @return bool
 	 */
-	public function file_in_dir( $file ) {
-		return false !== strpos( $file, $this->without_abspath );
+	public function file_in_dir( $file, $use_abspath = false ) {
+		if( ! $use_abspath ) {
+			return false !== strpos( $file, $this->without_abspath );
+		} else {
+			return false !== strpos( $file, $this->backup_directory );
+		}
 	}
 
 	/**
