@@ -21,7 +21,8 @@ BoldGrid.FolderExclude = function( $ ) {
 		$container = $( '#folder_exclusion' ),
 		$excludeFoldersPreview = $container.find( '#exclude_folders_preview' ),
 		$inputInclude = $container.find( '[name="folder_exclusion_include"]' ),
-		$inputExclude = $container.find( '[name="folder_exclusion_exclude"]' );
+		$inputExclude = $container.find( '[name="folder_exclusion_exclude"]' ),
+		$status = $excludeFoldersPreview.find( '.status' );
 
 	/**
 	 * @summary Handle the click of the pagination button.s
@@ -74,16 +75,16 @@ BoldGrid.FolderExclude = function( $ ) {
 			}
 
 			if( success ) {
-				$excludeFoldersPreview.find( '.status' ).empty();
+				$status.empty();
 				exclusionList = response.data;
 				self.renderList( 1 );
 			} else if( false === success ) {
-				$excludeFoldersPreview.find( '.status' ).html( response.data );
+				$status.html( response.data );
 			} else {
-				$excludeFoldersPreview.find( '.status' ).html( 'Unknown error' );
+				$status.html( 'Unknown error' );
 			}
 		} ).error( function() {
-			$excludeFoldersPreview.find( '.status' ).html( 'Unknown error' );
+			$status.html( 'Unknown error' );
 		} );
 
 		return false;
