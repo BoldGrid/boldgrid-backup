@@ -17,9 +17,7 @@ $tags = array(
 $core = isset( $this->core ) ? $this->core : $this;
 
 $markup = sprintf( '
-	<input type="hidden" name="folder_exclusion_nonce" value="%2$s" />
-
-	<table class="form-table">
+	<table class="form-table" id="folder_exclusion">
 		<tr>
 			<th>
 				<h2>%1$s</h2>
@@ -107,6 +105,7 @@ $markup = sprintf( '
 			<th></th>
 			<td>
 				<p>
+					<input type="hidden" name="folder_exclusion_nonce" value="%2$s" />
 					<button id="exclude_folders_button" class="button">%18$s</button>
 				</p>
 

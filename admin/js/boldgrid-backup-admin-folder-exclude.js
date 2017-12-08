@@ -17,8 +17,11 @@ BoldGrid.FolderExclude = function( $ ) {
 
 	var self = this,
 		exclusionList = null,
-		$excludeFoldersPreview = $( '#exclude_folders_preview' ),
-		lang = BoldGridBackupAdminFolderExclude;
+		lang = BoldGridBackupAdminFolderExclude,
+		$container = $( '#folder_exclusion' ),
+		$excludeFoldersPreview = $container.find( '#exclude_folders_preview' ),
+		$inputInclude = $container.find( '[name="folder_exclusion_include"]' ),
+		$inputExclude = $container.find( '[name="folder_exclusion_exclude"]' );
 
 	/**
 	 * @summary Handle the click of the pagination button.s
@@ -52,9 +55,9 @@ BoldGrid.FolderExclude = function( $ ) {
 	self.onClickPreview = function() {
 		var data = {
 				'action': 'boldgrid_backup_exclude_folders_preview',
-				'security' : $( '[name="folder_exclusion_nonce"]' ).val(),
-				'include' : $( '[name="folder_exclusion_include"]' ).val(),
-				'exclude' : $( '[name="folder_exclusion_exclude"]' ).val(),
+				'security' : $container.find( '[name="folder_exclusion_nonce"]' ).val(),
+				'include' : $inputInclude.val(),
+				'exclude' : $inputExclude.val(),
 			};
 
 		$excludeFoldersPreview
@@ -96,8 +99,8 @@ BoldGrid.FolderExclude = function( $ ) {
 			include = $button.attr( 'data-include' ),
 			exclude = $button.attr( 'data-exclude' );
 
-		$( '[name="folder_exclusion_include"]' ).val( include );
-		$( '[name="folder_exclusion_exclude"]' ).val( exclude );
+		$inputInclude.val( include );
+		$inputExclude.val( exclude );
 
 		return false;
 	};
