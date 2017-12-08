@@ -252,9 +252,9 @@ BoldGrid.FolderExclude = function( $ ) {
 	$( function() {
 		$( '#exclude_folders_button' ).on( 'click', self.onClickPreview );
 
-		$( 'body' ).on( 'click', '#exclude_folders_preview .pagination-links a', self.onClickPagination );
-
-		$( 'body').keydown( self.onKeyDown );
+		$( 'body' )
+			.on( 'click', '#exclude_folders_preview .pagination-links a', self.onClickPagination )
+			.keydown( self.onKeyDown );
 
 		$( '.folder_exclude_sample' ).on( 'click', self.onClickSample );
 	} );
