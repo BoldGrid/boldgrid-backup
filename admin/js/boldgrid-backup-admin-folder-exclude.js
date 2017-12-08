@@ -17,12 +17,15 @@ BoldGrid.FolderExclude = function( $ ) {
 
 	var self = this,
 		exclusionList = null,
+		filteredList = [],
 		lang = BoldGridBackupAdminFolderExclude,
 		$container = $( '#folder_exclusion' ),
 		$excludeFoldersPreview = $container.find( '#exclude_folders_preview' ),
 		$inputInclude = $container.find( '[name="folder_exclusion_include"]' ),
 		$inputExclude = $container.find( '[name="folder_exclusion_exclude"]' ),
-		$status = $excludeFoldersPreview.find( '.status' );
+		$status = $container.find( '.status' ),
+		$filter = $container.find( '#folder_exclusion_filter' ),
+		$ul = $excludeFoldersPreview.find( 'ul' );
 
 	/**
 	 * @summary Handle the click of the pagination button.s
@@ -61,12 +64,16 @@ BoldGrid.FolderExclude = function( $ ) {
 				'exclude' : $inputExclude.val(),
 			};
 
-		$excludeFoldersPreview
+		exclusionList = [];
+		$filter.val( '' );
+
+		// Show the status area and indicate we're loading.
+		$status
 			.removeClass( 'hidden' )
-			// Show the status.
-			.find( '.status' ).removeClass( 'hidden' ).html( BoldGridBackupAdmin.spinner_loading ).end()
-			.find( 'ul' ).empty().addClass( 'hidden' ).end()
-			.find( '.tablenav-pages' ).empty();
+			.html( BoldGridBackupAdmin.spinner_loading );
+
+		// Hide the preview area.
+		$excludeFoldersPreview.addClass( 'hidden' );
 
 		$.post( ajaxurl, data, function( response ) {
 			var success = null;
@@ -137,9 +144,10 @@ BoldGrid.FolderExclude = function( $ ) {
 	 * @since 1.5.4
 	 */
 	self.onSubmitPagination = function() {
-		var page = parseInt( $excludeFoldersPreview.find( '.current-page' ).val() );
+		var page = parseInt( $excludeFoldersPreview.find( '.current-page' ).val() ),
+			totalPages = parseInt( $container.find( '.total-pages' ).html() );
 
-		page = page < 1 ? 1 : page;
+		page = page < 1 || page > totalPages ? 1 : page;
 
 		self.renderList( page );
 
@@ -149,6 +157,11 @@ BoldGrid.FolderExclude = function( $ ) {
 	/**
 	 * @summary Render the list of files that will be backed up.
 	 *
+	 * Please note that there may be two lists involved. exclusionList is the
+	 * main list involved, this is the list we get from the server. If the user
+	 * has typed into the filter box though, filteredList will be genereated
+	 * based on the filtered values.
+	 *
 	 * @since 1.5.4
 	 *
 	 * @todo Possibly move this toward a template system. For now, it works.
@@ -157,12 +170,28 @@ BoldGrid.FolderExclude = function( $ ) {
 	 */
 	self.renderList = function( page ) {
 		var startKey,
-			// The number of results per page.
 			perPage = 100,
 			lastRecordKey,
 			lastAvailableKey = exclusionList.length - 1,
 			markup = '',
-			x;
+			x,
+			filterVal = $filter.val(),
+			filteredNoResults,
+			file;
+
+		page = isNaN( page ) ? 1 : page;
+
+		// If the user has typed in a filter, then filter our list.
+		filteredList = []
+		if( '' !== filterVal ) {
+			exclusionList.forEach( function( file ) {
+				if( file.indexOf( filterVal ) !== -1 ) {
+					filteredList.push( file );
+				}
+			});
+
+			lastAvailableKey = filteredList.length - 1;
+		}
 
 		startKey = page * perPage - perPage;
 		lastRecordKey = startKey + perPage - 1;
@@ -181,14 +210,18 @@ BoldGrid.FolderExclude = function( $ ) {
 			startKey = 0;
 		}
 
-		$excludeFoldersPreview.find( '.tablenav' ).removeClass( 'hidden' );
-
+		// Generate the markup for our list.
 		for( x = startKey; x <= lastRecordKey; x++ ) {
+			file = filteredList.length > 0 ? filteredList[x] : exclusionList[x];
+
 			markup += '<li>' +
 				'<strong>' + ( x + 1 ).toLocaleString('en') + '</strong>. ' +
-				exclusionList[x] + '</li>';
+				file + '</li>';
 		}
-		$excludeFoldersPreview.find( 'ul' ).html( markup ).removeClass( 'hidden' );
+		filteredNoResults = '' !== filterVal && 0 === filteredList.length;
+		markup = filteredNoResults ? lang.no_results : markup;
+
+		$ul.html( markup )
 
 		self.renderPagination( page, 100 );
 	};
@@ -205,15 +238,17 @@ BoldGrid.FolderExclude = function( $ ) {
 	 */
 	self.renderPagination = function( page, perPage ) {
 		var markup = '',
-			totalCount = exclusionList.length,
+			totalCount = '' !== $filter.val() ? filteredList.length : exclusionList.length,
 			totalPages = Math.ceil( totalCount / perPage );
+
+		page = 0 === totalCount ? 0 : page;
 
 		markup += '<span class="displaying-num">' +
 				'<span>' + totalCount.toLocaleString( 'en' ) + '</span> ' + lang.items +
 			'</span>' +
 			'<span class="pagination-links">';
 
-		if( 1 === page ) {
+		if( 1 >= page ) {
 			markup += '<span class="tablenav-pages-navspan">«</span> ';
 		} else {
 			markup += '<a class="first" href="#"><span>«</span></a> ';
@@ -245,7 +280,9 @@ BoldGrid.FolderExclude = function( $ ) {
 
 		markup += '</span>';
 
-		$excludeFoldersPreview.find( '.tablenav-pages' ).html( markup );
+		$excludeFoldersPreview
+			.find( '.tablenav-pages' ).html( markup ).end()
+			.removeClass( 'hidden' );
 	};
 
 	// Onload event listener.
@@ -257,6 +294,8 @@ BoldGrid.FolderExclude = function( $ ) {
 			.keydown( self.onKeyDown );
 
 		$( '.folder_exclude_sample' ).on( 'click', self.onClickSample );
+
+		$filter.on( 'keyup', self.renderList );
 	} );
 };
 

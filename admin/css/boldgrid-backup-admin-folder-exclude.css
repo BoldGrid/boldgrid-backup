@@ -20,6 +20,17 @@
 .form-table th h2 {
 	display: inline;
 }
+#folder_exclusion_filter {
+	margin: 3px 0px 0px 0px;
+}
+#exclude_folders_preview ul {
+	max-height: 300px;
+	overflow: auto;
+	background: #fff;
+	padding: 5px;
+	border: 1px solid #ddd;
+	clear: both;
+}
 
 /**
 * This section contains the css for the "Exclude Folder" interface within a

@@ -111,13 +111,16 @@ $markup = sprintf( '
 					<button id="exclude_folders_button" class="button">%18$s</button>
 				</p>
 
-				<div id="exclude_folders_preview">
-					<p class="status hidden"></p>
-					<div class="tablenav hidden">
+				<p class="status hidden"></p>
+
+				<div id="exclude_folders_preview" class="hidden">
+
+					<div class="tablenav">
+						<input type="text" id="folder_exclusion_filter" placeholder="%3$s" />
 						<div class="tablenav-pages"></div>
 					</div>
 
-					<ul class="hidden" style="max-height:300px;overflow:auto; background: #fff; padding:5px;border:1px solid #ddd;"></ul>
+					<ul></ul>
 				</div>
 			</td>
 		</tr>
@@ -125,7 +128,7 @@ $markup = sprintf( '
 	',
 	/* 1  */ esc_html__( 'Files and Folders', 'boldgrid-backup' ),
 	/* 2  */ $nonce,
-	/* 3  */ null,
+	/* 3  */ esc_attr( __( 'Filter below results', 'boldgrid-backup' ) ),
 	/* 4  */ null,
 	/* 5  */ esc_attr( $settings['folder_exclusion_include'] ),
 	/* 6  */ null,

@@ -241,6 +241,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 			'default_include' => $this->default_include,
 			'default_exclude' => $this->default_exclude,
 			'items' => __( 'items', 'boldgrid-backup' ),
+			'no_results' => __( 'No results', 'boldgrid-backup' ),
 			'of' => __( 'of', 'boldgrid-backup' ),
 		);
 		wp_localize_script( $handle, 'BoldGridBackupAdminFolderExclude', $translation );
