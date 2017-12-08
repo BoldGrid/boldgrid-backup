@@ -11,6 +11,8 @@
  * @subpackage Boldgrid_Backup/admin/partials
  */
 
+defined( 'WPINC' ) ? : die;
+
 /*
  * Variables passed by scope.
  *

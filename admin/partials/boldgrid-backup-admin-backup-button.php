@@ -8,6 +8,8 @@
  * @subpackage Boldgrid_Backup/admin/partials/archives
  */
 
+defined( 'WPINC' ) ? : die;
+
 $pagenow_enqueue_rollback = array( 'plugins.php', 'update-core.php' );
 
 return sprintf(

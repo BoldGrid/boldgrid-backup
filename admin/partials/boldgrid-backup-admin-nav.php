@@ -8,6 +8,8 @@
  * @subpackage Boldgrid_Backup/admin/partials
  */
 
+defined( 'WPINC' ) ? : die;
+
 $active = 'nav-tab-active';
 
 $navs = array(

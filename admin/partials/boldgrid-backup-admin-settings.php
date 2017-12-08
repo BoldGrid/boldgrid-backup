@@ -11,6 +11,8 @@
  * @subpackage Boldgrid_Backup/admin/partials
  */
 
+defined( 'WPINC' ) ? : die;
+
 // Check if settings are available, show an error notice if not.
 if ( empty( $settings ) ) {
 	add_action( 'admin_footer',

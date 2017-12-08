@@ -9,6 +9,8 @@
  * @subpackage Boldgrid_Backup/admin/partials/archive-details
  */
 
+defined( 'WPINC' ) ? : die;
+
 printf( '<h2>%1$s</h2>', __( 'Database', 'boldgrid-backup' ) );
 
 if( empty( $dump_file ) ) {

@@ -8,6 +8,8 @@
  * @subpackage Boldgrid_Backup/admin/partials
  */
 
+defined( 'WPINC' ) ? : die;
+
 $attribute = '<p><strong>%1$s</strong>: %2$s</p>';
 
 $datas = array(

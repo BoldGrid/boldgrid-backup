@@ -8,6 +8,8 @@
  * @subpackage Boldgrid_Backup/admin/partials/archives
  */
 
+defined( 'WPINC' ) ? : die;
+
 return sprintf(
 	'<div id="size-data">
 		%1$s

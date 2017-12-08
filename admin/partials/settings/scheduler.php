@@ -5,6 +5,8 @@
  * @since 1.5.1
  */
 
+defined( 'WPINC' ) ? : die;
+
 $schedulers_available = $this->core->scheduler->get_available();
 
 $schedulers_count = count( $schedulers_available );

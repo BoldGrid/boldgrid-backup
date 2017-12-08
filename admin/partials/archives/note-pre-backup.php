@@ -7,6 +7,8 @@
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin/partials/archives
  */
+
+defined( 'WPINC' ) ? : die;
 ?>
 
 <p id='note-pre-backup' class='hidden'>

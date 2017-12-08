@@ -8,6 +8,8 @@
  * @since 1.5.2
  */
 
+defined( 'WPINC' ) ? : die;
+
 $storage_locations = array(
 	array(
 		'title' => __( 'Local storage', 'boldgrid-backup' ),

@@ -7,6 +7,8 @@
  * @since 1.3.1
  */
 
+defined( 'WPINC' ) ? : die;
+
 if( $this->core->config->get_is_premium() ) {
 	?><p><?php
 	/*

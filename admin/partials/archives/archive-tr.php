@@ -8,6 +8,8 @@
  * @since 1.5.4
  */
 
+defined( 'WPINC' ) ? : die;
+
 $md5_id = md5( $archive['filepath'] );
 
 $delete_form = sprintf(

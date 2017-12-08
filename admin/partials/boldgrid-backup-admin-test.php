@@ -9,6 +9,8 @@
  * @subpackage Boldgrid_Backup/admin/partials
  */
 
+defined( 'WPINC' ) ? : die;
+
 // Setup our lang.
 $lang = array(
 	'yes' =>  __( 'Yes', 'boldgrid-backup' ),

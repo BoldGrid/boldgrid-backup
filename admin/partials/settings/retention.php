@@ -7,6 +7,8 @@
  * @since 1.3.1
  */
 
+defined( 'WPINC' ) ? : die;
+
 $is_retention_set = ( isset( $settings['retention_count'] ) );
 ?>
 

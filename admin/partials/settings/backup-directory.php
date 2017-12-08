@@ -4,6 +4,8 @@
  *
  * @since 1.3.1
  */
+
+defined( 'WPINC' ) ? : die;
 ?>
 <h2>
 	<?php esc_html_e( 'Backup Directory', 'boldgrid-backup' ); ?>

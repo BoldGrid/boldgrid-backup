@@ -1,5 +1,7 @@
 <?php
 
+defined( 'WPINC' ) ? : die;
+
 printf( '<h2>%1$s</h2>', __( 'Remote Storage', 'boldgrid-backup' ) );
 
 $remote_storage_li = array();

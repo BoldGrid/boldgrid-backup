@@ -4,6 +4,8 @@
  *
  * @since 1.5.1
  */
+
+defined( 'WPINC' ) ? : die;
 ?>
 
 <tr class="schedule-dow">

@@ -7,6 +7,8 @@
  * @since 1.5.4
  */
 
+defined( 'WPINC' ) ? : die;
+
 $nonce = wp_create_nonce( 'folder_exclusion_preview' );
 
 $tags = array(

@@ -8,6 +8,8 @@
  * @subpackage Boldgrid_Backup/admin/partials
  */
 
+defined( 'WPINC' ) ? : die;
+
 return sprintf('
 	<a href="#TB_inline?width=800&height=600&inlineId=backup_now_content" class="thickbox button button-primary">%1$s</a>
 

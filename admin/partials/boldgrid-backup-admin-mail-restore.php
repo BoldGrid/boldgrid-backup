@@ -8,6 +8,8 @@
  * @subpackage Boldgrid_Backup/admin/partials
  */
 
+defined( 'WPINC' ) ? : die;
+
 /**
  * This template uses inherited variables.
  *

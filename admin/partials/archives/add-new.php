@@ -10,6 +10,8 @@
  * @subpackage Boldgrid_Backup/admin/partials/archives
  */
 
+defined( 'WPINC' ) ? : die;
+
 $max_file_size = Boldgrid_Backup_Admin_Utility::get_upload_limit();
 
 $size_limit = esc_html__( 'File size limit', 'boldgrid-backup' ) . ': ' .

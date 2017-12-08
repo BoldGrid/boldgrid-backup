@@ -22,6 +22,8 @@
  * @return string
  */
 
+defined( 'WPINC' ) ? : die;
+
 $configure_link = '<a href="%1$s&TB_iframe=true&width=600&height=550" class="thickbox">%2$s</a>';
 
 if( $location['is_setup'] && ! empty( $location['configure'] ) ) {

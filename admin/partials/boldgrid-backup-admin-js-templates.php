@@ -6,6 +6,8 @@
  *
  * @since 1.3.1
  */
+
+defined( 'WPINC' ) ? : die;
 ?>
 
 <script type="text/html" id="tmpl-boldgrid-backup-sizes">

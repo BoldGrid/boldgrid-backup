@@ -9,6 +9,8 @@
  * @subpackage Boldgrid_Backup/admin/partials/archive-details
  */
 
+defined( 'WPINC' ) ? : die;
+
 $intro_message = $this->core->lang['icon_warning'] . ' ' . __( 'Please note that most functionality for the Archive Browser, such as one click file restorations, is contained within the <a href="%2$s" target="_blank">Premium version</a>. For help with restoring a single file without this one click feature, please <a href="%1$s" target="_blank">click here</a>.', 'boldgrid-backup' );
 $intro = sprintf( $intro_message, 'https://www.boldgrid.com/support', 'https://www.boldgrid.com/wordpress-backup-plugin' );
 

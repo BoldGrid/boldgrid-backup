@@ -4,6 +4,8 @@
  *
  * @since 1.5.1
  */
+
+defined( 'WPINC' ) ? : die;
 ?>
 
 <h2><?php esc_html_e( 'Notifications', 'boldgrid-backup' ); ?></h2>

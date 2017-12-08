@@ -9,6 +9,8 @@
  * @subpackage Boldgrid_Backup/admin/partials/archive-details
  */
 
+defined( 'WPINC' ) ? : die;
+
 $class = $file['folder'] ? 'folder' : 'file';
 
 $icon = 'folder' === $class ? 'dashicons dashicons-portfolio' : 'dashicons dashicons-media-default';

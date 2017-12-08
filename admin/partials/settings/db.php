@@ -5,6 +5,8 @@
  * @since 1.5.3
  */
 
+defined( 'WPINC' ) ? : die;
+
 // $core will vary based on how this file is included.
 $core = isset( $this->core ) ? $this->core : $this;
 

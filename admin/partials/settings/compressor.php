@@ -3,16 +3,12 @@
  * Compressor on settings page.
  *
  * @since 1.5.1
- */
-
-/**
- * Compressor on settings page.
- *
- * @since 1.5.1
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin/partials/settings
  */
+
+defined( 'WPINC' ) ? : die;
 
 $selected = 'selected="selected"';
 

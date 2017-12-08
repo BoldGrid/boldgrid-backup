@@ -11,6 +11,8 @@
  * @subpackage Boldgrid_Backup/admin/partials
  */
 
+defined( 'WPINC' ) ? : die;
+
 /**
  * If data exists in the $archive_info array, then print results, else show an error message.
  *
