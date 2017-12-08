@@ -331,7 +331,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 
 		// Handle filtering of core WordPress files.
 		if( 'WPCORE' === $value ) {
-			return $this->core->core_files->in( $file );
+			return $this->core->core_files->is_core_file( $file );
 		}
 
 		/*

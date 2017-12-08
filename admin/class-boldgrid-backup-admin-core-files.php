@@ -81,7 +81,7 @@ class Boldgrid_Backup_Admin_Core_Files {
 	 * @param  string $file
 	 * @return bool
 	 */
-	public function in( $file ) {
+	public function is_core_file( $file ) {
 		if( ! is_string( $file ) || empty( $file ) ) {
 			return false;
 		}
