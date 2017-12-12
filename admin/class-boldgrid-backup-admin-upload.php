@@ -327,27 +327,6 @@ class Boldgrid_Backup_Admin_Upload {
 			return false;
 		}
 
-		// Check ZIP file for required file patterns.
-		$zip_patterns_exist = Boldgrid_Backup_Admin_Utility::zip_patterns_exist(
-			$_FILES['file']['tmp_name'],
-			$this->core->get_filelist_filter()
-		);
-
-		// Abort if the required file patterns do not all exist.
-		if ( ! $zip_patterns_exist ) {
-			// Display an error notice.
-			do_action(
-				'boldgrid_backup_notice',
-				esc_html__(
-					'The required directories and files were not found in the uploaded ZIP archive file.',
-					'boldgrid-backup'
-				),
-				'notice notice-error is-dismissible'
-			);
-
-			return false;
-		}
-
 		// Create the file save path, and update the destination base filename..
 		$file_save_path = $this->get_save_path();
 

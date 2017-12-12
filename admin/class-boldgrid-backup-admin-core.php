@@ -288,37 +288,6 @@ class Boldgrid_Backup_Admin_Core {
 	private $filelist_basedir = null;
 
 	/**
-	 * The filelist filter array.
-	 *
-	 * @since 1.0
-	 * @access private
-	 * @var array
-	 */
-	private $filelist_filter = array(
-		'.htaccess',
-		'.htaccess.bgb',
-		'index.php',
-		'license.txt',
-		'readme.html',
-		'wp-activate.php',
-		'wp-admin',
-		'wp-blog-header.php',
-		'wp-comments-post.php',
-		'wp-config.php',
-		'wp-content',
-		'wp-cron.php',
-		'wp-includes',
-		'wp-links-opml.php',
-		'wp-load.php',
-		'wp-login.php',
-		'wp-mail.php',
-		'wp-settings.php',
-		'wp-signup.php',
-		'wp-trackback.php',
-		'xmlrpc.php',
-	);
-
-	/**
 	 * An instance of the Boldgrid_Backup_Admin_Folder_Exclusion class.
 	 *
 	 * @since 1.5.4
@@ -456,7 +425,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->restore_git = new Boldgrid_Backup_Admin_Restore_Git();
 
-		$this->filelist = new Boldgrid_Backup_Admin_Filelist();
+		$this->filelist = new Boldgrid_Backup_Admin_Filelist( $this );
 
 		$this->backup_dir = new Boldgrid_Backup_Admin_Backup_Dir( $this );
 
@@ -510,30 +479,6 @@ class Boldgrid_Backup_Admin_Core {
 		$this->configs = Boldgrid_Backup_Admin::get_configs();
 
 		$this->set_lang();
-	}
-
-	/**
-	 * Get the class property $this->filelist_filter.
-	 *
-	 * @since 1.2.2
-	 *
-	 * @param  bool  $exclude_not_exists Remove files that don't exist.
-	 * @return array
-	 */
-	public function get_filelist_filter( $exclude_not_exists = false ) {
-		$filelist_filter = $this->filelist_filter;
-
-		if( ! $exclude_not_exists ) {
-			return $filelist_filter;
-		}
-
-		foreach( $filelist_filter as $key => $filename ) {
-			if( ! $this->wp_filesystem->exists( ABSPATH . $filename ) ) {
-				unset( $filelist_filter[$key] );
-			}
-		}
-
-		return $filelist_filter;
 	}
 
 	/**
@@ -1347,7 +1292,9 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return array An array of archive file information.
 	 */
 	public function archive_files( $save = false, $dryrun = false ) {
-		$this->in_progress->set();
+		if( $save && ! $dryrun ) {
+			$this->in_progress->set();
+		}
 
 		/**
 		 * Actions to take before any archiving begins.
@@ -2001,13 +1948,6 @@ class Boldgrid_Backup_Admin_Core {
 			);
 		}
 
-		$zip_patterns_exist = Boldgrid_Backup_Admin_Utility::zip_patterns_exist( $filepath, $this->filelist_filter );
-		if ( ! $zip_patterns_exist ) {
-			return array(
-				'error' => esc_html__( 	'The required directories and files were not found in the ZIP archive file.', 'boldgrid-backup' ),
-			);
-		}
-
 		// Populate $info.
 		$info = array(
 			'mode' => 'restore',
@@ -2068,9 +2008,15 @@ class Boldgrid_Backup_Admin_Core {
 		 */
 		do_action( 'boldgrid_backup_post_restore', $info );
 
-		// Restore database.
-		if ( ! $dryrun ) {
-			$db_dump_filepath = $this->get_dump_file( $filepath );
+		/*
+		 * Restore database.
+		 *
+		 * As of 1.5.4, we are checking to see if the backup archive contains a
+		 * database dump before running the below conditional. Not all archives
+		 * will contain a database dump, so we may be able to skip this step.
+		 */
+		$db_dump_filepath = $this->get_dump_file( $filepath );
+		if ( ! $dryrun && ! empty( $db_dump_filepath ) ) {
 			$db_prefix = null;
 
 			// Get the database table prefix from the new "wp-config.php" file, if exists.
@@ -2537,7 +2483,7 @@ class Boldgrid_Backup_Admin_Core {
 		// Generate markup, using the restore page template.
 		$message = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup.php';
 		if( is_array( $message ) ) {
-			$this->notice->add_user_notice( $message['message'], $message['class'] );
+			$this->notice->add_user_notice( $message['message'], $message['class'], $message['header'] );
 		}
 
 		wp_send_json_success();

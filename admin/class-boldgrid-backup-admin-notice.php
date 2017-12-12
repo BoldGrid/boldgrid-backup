@@ -57,8 +57,9 @@ class Boldgrid_Backup_Admin_Notice {
 	 *
 	 * @param string $message
 	 * @param string $class
+	 * @param string $heading
 	 */
-	public function add_user_notice( $message, $class ) {
+	public function add_user_notice( $message, $class, $heading = null ) {
 		$option = $this->get_user_option();
 
 		$notices = get_option( $option, array() );
@@ -68,6 +69,7 @@ class Boldgrid_Backup_Admin_Notice {
 		$notices[] = array(
 			'message' => $message,
 			'class' => $class,
+			'heading' => $heading,
 		);
 
 		update_option( $option, $notices );

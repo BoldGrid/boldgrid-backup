@@ -615,37 +615,7 @@ class Boldgrid_Backup_Admin_Test {
 			return false;
 		}
 
-		/*
-		 * Include wp-includes/ms-functions.php.
-		 *
-		 * This method uses WordPress' recurse_dirsize function, which is loaded on multisite
-		 * installations. If the recurse_dirsize function does not exist, include the necessary
-		 * file.
-		 */
-		if ( ! function_exists( 'recurse_dirsize' ) ) {
-			require_once ABSPATH . 'wp-includes/ms-functions.php';
-		}
-
-		// Get the filtered file list.
-		$filelist = $this->core->get_filelist_filter();
-
-		// If nothing was found, then return 0.
-		if ( empty( $filelist ) ) {
-			return 0;
-		}
-
-		// Initialize total_size.
-		$size = 0;
-
-		foreach ( $filelist as $file ) {
-			$file_path = ABSPATH . $file;
-
-			if ( is_dir( $file_path ) ) {
-				$size += recurse_dirsize( $file_path );
-			} else {
-				$size += $this->core->wp_filesystem->size( $file_path );
-			}
-		}
+		$size = $this->core->filelist->get_size();
 
 		// Save time, use transients.
 		set_transient( 'boldgrid_backup_wp_size', $size, $this->transient_time );

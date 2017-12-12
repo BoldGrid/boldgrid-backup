@@ -69,6 +69,16 @@ if ( ! empty( $archive_info ) ) {
 				/* 9 */ __( 'BoldGrid Backup', 'boldgrid-backup' )
 			),
 		);
+	} else {
+		$message = array(
+			'class' => 'notice notice-error',
+			'message' => esc_html( $archive_info['error'] ),
+			'header' => sprintf(
+				'%1$s - %2$s',
+				__( 'BoldGrid Backup', 'boldgrid-backup' ),
+				empty( $_POST['restore_now'] ) ? __( 'Error creating archive', 'boldgrid-backup' ) : __( 'Error restoring archive', 'boldgrid-backup' )
+			),
+		);
 	}
 } else {
 	$message = array(
@@ -86,5 +96,15 @@ if ( ! empty( $archive_info ) ) {
 		),
 	);
 }
+
+if( ! isset( $message ) ) {
+	$message = array(
+		'class' => 'notice notice-error',
+		'message' => __( 'Unknown error.', 'boldgrid-backup' ),
+		'header' => __( 'BoldGrid Backup', 'boldgrid-backup' ),
+	);
+}
+
+$message['header'] = isset( $message['header'] ) ? $message['header'] : null;
 
 return $message;
