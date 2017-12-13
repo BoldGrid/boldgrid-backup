@@ -63,6 +63,32 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	}
 
 	/**
+	 * Enqueue scripts.
+	 *
+	 * @since 1.5.4
+	 */
+	public function enqueue_scripts() {
+		$handle = 'boldgrid-backup-admin-table-include';
+		wp_register_script( $handle,
+			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-table-include.js',
+			array( 'jquery' ),
+			BOLDGRID_BACKUP_VERSION,
+			false
+		);
+		$translation = array(
+		);
+		wp_localize_script( $handle, 'BoldGridBackupAdminTableInclude', $translation );
+		wp_enqueue_script( $handle );
+
+// 		// Enqueue CSS for folder exclude functionality.
+// 		wp_enqueue_style(
+// 			$handle,
+// 			plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-folder-exclude.css', array(),
+// 			BOLDGRID_BACKUP_VERSION
+// 		);
+	}
+
+	/**
 	 * Get our exluded tables list.
 	 *
 	 * @since 1.5.3

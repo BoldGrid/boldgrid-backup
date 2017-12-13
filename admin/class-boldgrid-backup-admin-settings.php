@@ -750,6 +750,7 @@ class Boldgrid_Backup_Admin_Settings {
 		);
 
 		$this->core->folder_exclusion->enqueue_scripts();
+		$this->core->db_omit->enqueue_scripts();
 
 		wp_enqueue_script( 'boldgrid-backup-now' );
 

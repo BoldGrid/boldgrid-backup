@@ -49,27 +49,35 @@ BoldGrid.Backup = function( $ ) {
 	}
 
 	$( function() {
-		$includeTables = $( '.include-tables [type="checkbox"]' );
-
 		self.bindHelpClick();
-
-		$( '#include_all_tables' ).on( 'click', function() {
-			$includeTables.attr( 'checked', true );
-			return false;
-		} );
-
-		$( '#exclude_all_tables' ).on( 'click', function() {
-			$includeTables.attr( 'checked', false );
-			return false;
-		} );
-
-		$( '#configure_include_tables' ).on( 'click', function() {
-			$( '#tables_to_include .tables' ).slideToggle();
-			return false;
-		})
-
 		self.hideBackupNotice();
 	});
 };
 
 BoldGrid.Backup( jQuery );
+
+/**
+ * @summary Draw attention to an element.
+ *
+ * @since 1.5.4
+ */
+jQuery.fn.bgbuDrawAttention = function() {
+	if( this.is( 'input' ) ) {
+		this
+			.css( 'background', '#ddd' )
+			.animate( {backgroundColor: '#fff'}, 500 );
+		return;
+	}
+
+	if( this.is( '.dashicons-editor-help')) {
+		this.effect( 'bounce', { times:2 }, 'normal' );
+	}
+};
+
+jQuery.fn.bgbuSetStatus = function( status ) {
+	var color = 'yes' === status ? 'green' : 'yellow';
+
+	this
+		.removeClass( 'dashicons-warning dashicons-yes green yellow' )
+		.addClass( 'dashicons-' + status + ' ' + color );
+}

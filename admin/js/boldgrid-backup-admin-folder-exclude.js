@@ -27,6 +27,43 @@ BoldGrid.FolderExclude = function( $ ) {
 		$filter = $container.find( '#folder_exclusion_filter' ),
 		$ul = $excludeFoldersPreview.find( 'ul' );
 
+	console.log( self );
+
+	/**
+	 *
+	 */
+	self.bounceHelp = function() {
+		var $icon = $container.find( '.dashicons-editor-help' );
+
+		$icon.bgbuDrawAttention();
+	}
+
+	/**
+	 *
+	 */
+	self.isUsingDefaults = function() {
+		return $inputInclude.val().trim() === lang.default_include && $inputExclude.val().trim() === lang.default_exclude;
+	}
+
+	/**
+	 *
+	 */
+	self.onClickConfigure = function() {
+		var $a = $(this),
+			$table = $a.closest( 'table' ),
+			$icon = $a.siblings( '.dashicons' ),
+			status;
+
+		status = self.isUsingDefaults() ? 'yes' : 'warning';
+		$icon.bgbuSetStatus( status );
+
+		$icon.toggle();
+
+		$table.children( 'tbody' ).children( 'tr:not(:first)' ).toggle();
+
+		return false;
+	}
+
 	/**
 	 * @summary Handle the click of the pagination button.s
 	 *
@@ -107,8 +144,15 @@ BoldGrid.FolderExclude = function( $ ) {
 			include = $button.attr( 'data-include' ),
 			exclude = $button.attr( 'data-exclude' );
 
-		$inputInclude.val( include );
-		$inputExclude.val( exclude );
+		$inputInclude
+			.val( include )
+			.bgbuDrawAttention();
+
+		$inputExclude
+			.val( exclude )
+			.bgbuDrawAttention();
+
+		self.toggleStatus();
 
 		return false;
 	};
@@ -285,6 +329,23 @@ BoldGrid.FolderExclude = function( $ ) {
 			.removeClass( 'hidden' );
 	};
 
+	/**
+	 *
+	 */
+	self.toggleStatus = function() {
+		var usingDefaults = $inputInclude.val().trim() === lang.default_include && $inputExclude.val().trim() === lang.default_exclude,
+			$yesDefault = $container.find( '.yes-default' ),
+			$noDefault = $container.find( '.no-default' );
+
+		if( usingDefaults ) {
+			$yesDefault.show();
+			$noDefault.hide();
+		} else {
+			$yesDefault.hide();
+			$noDefault.show();
+		}
+	}
+
 	// Onload event listener.
 	$( function() {
 		$( '#exclude_folders_button' ).on( 'click', self.onClickPreview );
@@ -296,7 +357,19 @@ BoldGrid.FolderExclude = function( $ ) {
 		$( '.folder_exclude_sample' ).on( 'click', self.onClickSample );
 
 		$filter.on( 'keyup', self.renderList );
+
+		$( '#configure_folder_exclude' ).on( 'click', self.onClickConfigure );
+
+		self.toggleStatus();
+
+		$inputInclude
+			.on( 'input', self.toggleStatus )
+			.on( 'focusin', self.bounceHelp );
+
+		$inputExclude
+			.on( 'input', self.toggleStatus )
+			.on( 'focusin', self.bounceHelp );
 	} );
 };
 
-BoldGrid.FolderExclude( jQuery );
+new BoldGrid.FolderExclude( jQuery );

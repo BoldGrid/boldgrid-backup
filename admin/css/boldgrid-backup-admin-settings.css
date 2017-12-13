@@ -2,3 +2,8 @@
 .schedule-dow input[type='checkbox'][disabled]:hover {
 	cursor: not-allowed;
 }
+
+.form-table tr td p {
+	padding: 5px 0px;
+	margin: 0px;
+}
