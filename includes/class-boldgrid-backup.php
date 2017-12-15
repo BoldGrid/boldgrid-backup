@@ -205,6 +205,9 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-in-progress.php';
 
+		require_once BOLDGRID_BACKUP_PATH . '/admin/remote/ftp.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/remote/ftp-hooks.php';
+
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
 
@@ -347,6 +350,25 @@ class Boldgrid_Backup {
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_restore_archive', $plugin_admin_core, 'wp_ajax_restore' );
 
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_exclude_folders_preview', $plugin_admin_core->folder_exclusion, 'wp_ajax_preview' );
+
+		/*
+		 * Ftp
+		 */
+		// Allow one click upload.
+		$this->loader->add_action( 'boldgrid_backup_single_archive_remote_options', $plugin_admin_core->ftp->hooks, 'single_archive_remote_option' );
+		// Process upload via ajax.
+		$this->loader->add_filter( 'wp_ajax_boldgrid_backup_remote_storage_upload_ftp', $plugin_admin_core->ftp->hooks, 'wp_ajax_upload' );
+		// Add to the settings page.
+		$this->loader->add_filter( 'boldgrid_backup_register_storage_location',  $plugin_admin_core->ftp->hooks, 'register_storage_location' );
+		// Add our "configure ftp" page.
+		$this->loader->add_action( 'admin_menu', $plugin_admin_core->ftp->hooks, 'add_menu_items' );
+		// After updating settings on the settings page, check if we have valid credentials.
+		$this->loader->add_action( 'wp_ajax_boldgrid_backup_is_setup_ftp', $plugin_admin_core->ftp->hooks, 'is_setup_ajax' );
+		// After a backup file has been created, add remote provider to jobs queue.
+		$this->loader->add_action( 'boldgrid_backup_post_archive_files', $plugin_admin_core->ftp->hooks, 'post_archive_files' );
+		// This is the filter executed by the jobs queue.
+		$this->loader->add_filter( 'boldgrid_backup_ftp_upload_post_archive', $plugin_admin_core->ftp->hooks, 'upload_post_archiving' );
+
 		return;
 	}
 

@@ -24,6 +24,8 @@
 
 defined( 'WPINC' ) ? : die;
 
+$configure = '';
+
 $configure_link = '<a href="%1$s&TB_iframe=true&width=600&height=550" class="thickbox">%2$s</a>';
 
 if( $location['is_setup'] && ! empty( $location['configure'] ) ) {
@@ -31,8 +33,6 @@ if( $location['is_setup'] && ! empty( $location['configure'] ) ) {
 	$configure .= ' (' . sprintf( $configure_link, $location['configure'], __( 'update', 'boldgrid-backup' ) ) . ')';
 } elseif ( ! empty( $location['configure' ] ) ) {
 	$configure .= sprintf( $configure_link, $location['configure'], __( 'Configure', 'boldgrid-backup' ) );
-} else {
-	$configure = '';
 }
 
 $disabled = $location['is_setup'] ? '' : 'disabled';

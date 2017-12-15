@@ -29,6 +29,15 @@ class Boldgrid_Backup_Admin_Archive_Details {
 	private $core;
 
 	/**
+	 * An array of remote storage locations.
+	 *
+	 * @since  1.5.4
+	 * @access public
+	 * @var    array
+	 */
+	public $remote_storage_li = array();
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.5.1

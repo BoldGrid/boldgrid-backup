@@ -1,20 +1,25 @@
 <?php
+/**
+ * Render remote provider's table on archive details page.
+ *
+ * This file is included by admin/partials/boldgrid-backup-admin-archive-details.php
+ * whis is included by      admin/class-boldgrid-backup-admin-archive-details.php
+ */
 
 defined( 'WPINC' ) ? : die;
 
 printf( '<h2>%1$s</h2>', __( 'Remote Storage', 'boldgrid-backup' ) );
 
-$remote_storage_li = array();
-$remote_storage_li = apply_filters( 'boldgrid_backup_single_archive_remote_options', $remote_storage_li, $archive['filepath'] );
+do_action( 'boldgrid_backup_single_archive_remote_options', $archive['filepath'] );
 
-if( empty( $remote_storage_li ) ) {
+if( empty( $this->remote_storage_li ) ) {
 	echo __( 'No remote storage options available.', 'boldgrid-backup' );
 	return;
 }
 
 echo '<table class="wp-list-table widefat fixed striped remote-storage">';
 
-foreach( $remote_storage_li as $provider ) {
+foreach( $this->remote_storage_li as $provider ) {
 
 	if( $provider['uploaded'] ) {
 		$upload = '&#10003; ' . __( 'Uploaded', 'boldgrid-backup' );

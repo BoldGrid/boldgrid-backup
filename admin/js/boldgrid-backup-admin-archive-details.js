@@ -22,10 +22,10 @@ BoldGrid.ArchiveDetails = function( $ ) {
 		var $a = $(this),
 			$td = $a.closest( 'td' ),
 			$tr = $a.closest( 'tr' ),
+			provider = $tr.attr( 'data-remote-provider' ),
 			data = {
-				'action' : 'boldgrid_backup_remote_storage_upload',
+				'action' : 'boldgrid_backup_remote_storage_upload_' + provider,
 				'filepath' : $( '#filepath' ).val(),
-				'remote_provider' : $tr.attr( 'data-remote-provider' ),
 				'security' : $( '#_wpnonce' ).val(),
 			},
 			failUpload = function() {

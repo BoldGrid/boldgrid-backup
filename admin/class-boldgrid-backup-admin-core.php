@@ -296,6 +296,14 @@ class Boldgrid_Backup_Admin_Core {
 	public $folder_exclusion;
 
 	/**
+	 * An instance of the Boldgrid_Backup_Admin_Ftp class.
+	 *
+	 * @since 1.5.4
+	 * @var   Boldgrid_Backup_Admin_Ftp
+	 */
+	public $ftp;
+
+	/**
 	 * An instance of the Boldgrid Backup Admin Backup Dir class.
 	 *
 	 * @since 1.5.1
@@ -472,6 +480,8 @@ class Boldgrid_Backup_Admin_Core {
 		$this->core_files = new Boldgrid_Backup_Admin_Core_Files( $this );
 
 		$this->in_progress = new Boldgrid_Backup_Admin_In_Progress( $this );
+
+		$this->ftp = new Boldgrid_Backup_Admin_Ftp( $this );
 
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
