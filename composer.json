@@ -1,5 +1,6 @@
 {
     "require": {
-        "ifsnop/mysqldump-php": "2.*"
+        "ifsnop/mysqldump-php": "2.*",
+        "phpseclib/phpseclib": "~2.0"
     }
 }
