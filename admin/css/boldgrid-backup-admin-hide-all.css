@@ -17,6 +17,7 @@
 #wpwrap #wpcontent {
 	margin: 0px; !important;
 	padding-left: 10px; !important;
+	padding-right: 10px; !important;
 }
 #wpbody-content {
 	padding-bottom: 0px;

@@ -73,3 +73,21 @@ BoldGrid.Backup = function( $ ) {
 };
 
 BoldGrid.Backup( jQuery );
+
+/**
+ * @summary Draw attention to an element.
+ *
+ * @since 1.5.4
+ */
+jQuery.fn.bgbuDrawAttention = function() {
+	if( this.is( 'input' ) ) {
+		this
+			.css( 'background', '#ddd' )
+			.animate( {backgroundColor: '#fff'}, 500 );
+		return;
+	}
+
+	if( this.is( '.dashicons-editor-help')) {
+		this.effect( 'bounce', { times:2 }, 'normal' );
+	}
+};

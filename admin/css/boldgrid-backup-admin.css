@@ -19,6 +19,12 @@
 	vertical-align: bottom;
 	margin-left: 0px;
 }
+.spinner.inline.middle {
+	vertical-align: middle;
+}
+.spinner.hidden {
+	display: none;
+}
 
 /* When the user clicks to rollback site, show the spinner. */
 #restore-now-section .spinner.is-active {

@@ -434,6 +434,7 @@ class Boldgrid_Backup_Admin_Config {
 			'website_size' => esc_html__( 'Website Size:', 'boldgrid-backup' ),
 			'database_size' => esc_html__( 'Database Size:', 'boldgrid-backup' ),
 			'of' => esc_html__( 'of', 'boldgrid-backup' ),
+			'xmark' => '&#10007;',
 		);
 	}
 

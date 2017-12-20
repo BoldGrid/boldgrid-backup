@@ -207,6 +207,7 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/remote/ftp.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/remote/ftp-hooks.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/remote/ftp-page.php';
 
 		$this->loader = new Boldgrid_Backup_Loader();
 	}

@@ -148,6 +148,10 @@ class Boldgrid_Backup_Admin {
 
 		wp_enqueue_script( 'boldgrid-backup-admin' );
 
+		// Used by admin.js to highlight / bounce elements.
+		wp_enqueue_script( 'jquery-effects-core' );
+		wp_enqueue_script( 'jquery-effects-bounce' );
+
 		// Enqueue CSS for the home page.
 		if ( isset( $_REQUEST['page'] ) && 'boldgrid-backup' === $_REQUEST['page'] ) {
 			wp_enqueue_style( 'boldgrid-backup-admin-home',

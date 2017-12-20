@@ -58,8 +58,8 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 			$capability,
 			'boldgrid-backup-ftp',
 			array(
-				$this->core->ftp,
-				'submenu_page',
+				$this->core->ftp->page,
+				'settings',
 			)
 		);
 	}
@@ -190,7 +190,8 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 		if( $uploaded ) {
 			wp_send_json_success( 'uploaded!' );
 		} else {
-			wp_send_json_error( 'fail' );
+			$error = ! empty( $this->core->ftp->errors ) ? implode( '<br /><br />', $this->core->ftp->errors ) : '';
+			wp_send_json_error( $error );
 		}
 	}
 }

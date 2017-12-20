@@ -12,10 +12,11 @@ var BoldGrid = BoldGrid || {};
 
 BoldGrid.ArchiveDetails = function( $ ) {
 
-	var self = this;
+	var self = this,
+		lang = BoldGridBackupAdmin.lang;
 
 	/**
-	 *
+	 * @summary Handle the click of the Upload button.
 	 */
 	self.onClickUpload = function() {
 
@@ -28,11 +29,20 @@ BoldGrid.ArchiveDetails = function( $ ) {
 				'filepath' : $( '#filepath' ).val(),
 				'security' : $( '#_wpnonce' ).val(),
 			},
-			failUpload = function() {
-				$td
-					.empty()
-					.append( '&#10007; ' + boldgrid_backup_archive_details.failUpload )
-			};
+			failUpload;
+
+		/*
+		 * @summary Action to take when an upload fails.
+		 *
+		 * @param {Object} response Our ajax response.
+		 */
+		failUpload = function( response ) {
+			var defaultMessage = lang.xmark + ' ' + boldgrid_backup_archive_details.failUpload,
+				dataNotEmpty = response !== undefined && response.data !== undefined && response.data !== '',
+				message = dataNotEmpty ? response.data : defaultMessage;
+
+			$td.html( message );
+		};
 
 		$a
 			.attr( 'disabled', 'disabled' )
@@ -49,7 +59,7 @@ BoldGrid.ArchiveDetails = function( $ ) {
 			}
 
 			if( response.success === undefined || true !== response.success ) {
-				failUpload();
+				failUpload( response );
 			}
 		}).error( function( response ) {
 			failUpload();

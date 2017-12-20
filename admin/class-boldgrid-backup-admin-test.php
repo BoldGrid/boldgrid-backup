@@ -342,7 +342,7 @@ class Boldgrid_Backup_Admin_Test {
 			return false;
 		}
 
-		if( $this->core->doing_ajax ) {
+		if( $this->core->doing_ajax || $this->core->doing_cron ) {
 			return true;
 		}
 
