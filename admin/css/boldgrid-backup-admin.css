@@ -92,3 +92,6 @@ div .dashicons {
 hr.separator {
 	margin: 30px 0px;
 }
+hr.separator-small {
+	margin: 20px 0px;
+}

@@ -2118,6 +2118,7 @@ class Boldgrid_Backup_Admin_Core {
 		wp_enqueue_script( 'boldgrid-backup-now' );
 
 		$this->folder_exclusion->enqueue_scripts();
+		$this->db_omit->enqueue_scripts();
 
 		// Get the current wp_filesystem access method.
 		$access_type = get_filesystem_method();
@@ -2435,8 +2436,8 @@ class Boldgrid_Backup_Admin_Core {
 		$this->lang = array(
 			'backup_created' => __( 'Backup created successfully!', 'boldgrid-backup' ),
 			'checkmark' => '&#10003;',
-			'icon_success' => '<span class="dashicons dashicons-yes green"></span>',
-			'icon_warning' => '<span class="dashicons dashicons-warning yellow"></span>',
+			'icon_success' => '<span class="dashicons dashicons-yes green"></span> ',
+			'icon_warning' => '<span class="dashicons dashicons-warning yellow"></span> ',
 			'heading_update_protection' => __( 'BoldGrid Backup - Update Protection', 'boldgrid-backup' ),
 		);
 

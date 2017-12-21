@@ -49,25 +49,7 @@ BoldGrid.Backup = function( $ ) {
 	}
 
 	$( function() {
-		$includeTables = $( '.include-tables [type="checkbox"]' );
-
 		self.bindHelpClick();
-
-		$( '#include_all_tables' ).on( 'click', function() {
-			$includeTables.attr( 'checked', true );
-			return false;
-		} );
-
-		$( '#exclude_all_tables' ).on( 'click', function() {
-			$includeTables.attr( 'checked', false );
-			return false;
-		} );
-
-		$( '#configure_include_tables' ).on( 'click', function() {
-			$( '#tables_to_include .tables' ).slideToggle();
-			return false;
-		})
-
 		self.hideBackupNotice();
 	});
 };
@@ -91,3 +73,11 @@ jQuery.fn.bgbuDrawAttention = function() {
 		this.effect( 'bounce', { times:2 }, 'normal' );
 	}
 };
+
+jQuery.fn.bgbuSetStatus = function( status ) {
+	var color = 'yes' === status ? 'green' : 'yellow';
+
+	this
+		.removeClass( 'dashicons-warning dashicons-yes green yellow' )
+		.addClass( 'dashicons-' + status + ' ' + color );
+}

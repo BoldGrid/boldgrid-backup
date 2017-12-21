@@ -253,6 +253,9 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 			plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-folder-exclude.css', array(),
 			BOLDGRID_BACKUP_VERSION
 		);
+
+		wp_enqueue_script( 'jquery-effects-core' );
+		wp_enqueue_script( 'jquery-effects-bounce' );
 	}
 
 	/**
@@ -346,6 +349,16 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 		preg_match( $pattern, $file, $matches );
 
 		return ! empty( $matches );
+	}
+
+	/**
+	 *
+	 */
+	public function is_using_defaults() {
+		$include = $this->from_settings( 'include' );
+		$exclude = $this->from_settings( 'exclude' );
+
+		return $include === $this->default_include && $exclude === $this->default_exclude;
 	}
 
 	/**
