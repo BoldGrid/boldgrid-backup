@@ -10,9 +10,32 @@ defined( 'WPINC' ) ? : die;
 // $core will vary based on how this file is included.
 $core = isset( $this->core ) ? $this->core : $this;
 
+$in_modal = isset( $in_modal ) && true === $in_modal;
+
+// If we are in a modal, by default we want all tables to be backed up.
 $tables = $core->db_omit->format_prefixed_tables();
 
 $all_included = empty( $settings['exclude_tables'] );
+
+$checked = 'checked="checked"';
+
+$types = sprintf( '
+	<input type="radio" name="table_inclusion_type" value="full"   %3$s>%1$s<br>
+	<input type="radio" name="table_inclusion_type" value="custom" %4$s>%2$s
+	',
+	/* 1 */ __( 'Backup all tables (full backup)', 'boldgrid-backup' ),
+	/* 2 */ __( 'Custom Backup', 'boldgrid-backup' ),
+	/* 3 */ $in_modal || $all_included ? $checked : '',
+	/* 4 */ $in_modal || $all_included ? '' : $checked
+);
+
+$buttons = sprintf( '
+	<button id="include_all_tables" class="button button-primary">%1$s</button>
+	<button id="exclude_all_tables" class="button button">%2$s</button>
+	',
+	/* 1 */ esc_html__( 'Include all', 'boldgrid-backup' ),
+	/* 2 */ esc_html__( 'Exclude all', 'boldgrid-backup' )
+);
 
 $status = sprintf( '
 	<p class="yes-default">
@@ -34,20 +57,15 @@ return sprintf( '
 				<h2>%1$s</h2>
 			</th>
 			<td>
-				<p>
-					%2$s<a id="configure_include_tables" href="">%5$s</a>
-				</p>
+				<p>%2$s</p>
 
-				<div id="tables_to_include" class="hidden">
-					%10$s
+				<div id="table_inclusion_config">
+					%3$s
 
-					<p>
-						<button id="include_all_tables" class="button button-primary">%7$s</button>
-						<button id="exclude_all_tables" class="button button">%8$s</button>
-					</p>
+					<p>%4$s</p>
 
 					<div class="include-tables">
-						%9$s
+						%5$s
 					</div>
 				</div>
 			</td>
@@ -55,15 +73,10 @@ return sprintf( '
 	</table>
 	',
 	/* 1 */ esc_html__( 'Database', 'boldgrid-backup' ),
-	/* 2 */ ! $all_included ? $core->lang['icon_warning'] : $core->lang['icon_success'],
-	/* 3 */ null, //$all_included ? '' : 'hidden',
-	/* 4 */ null,
-	/* 5 */ esc_html__( 'Configure', 'boldgrid-backup' ),
-	/* 6 */ null, //$all_included ? 'hidden' : '',
-	/* 7 */ esc_html__( 'Include all', 'boldgrid-backup' ),
-	/* 8 */ esc_html__( 'Exclude all', 'boldgrid-backup' ),
-	/* 9 */ $tables,
-	/* 10 */ $status
+	/* 2 */ $types,
+	/* 3 */ $status,
+	/* 4 */ $buttons,
+	/* 5 */ $tables
 );
 
 ?>

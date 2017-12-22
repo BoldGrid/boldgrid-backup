@@ -64,6 +64,8 @@ wp_nonce_field( 'boldgrid_backup_settings' );
 
 		<?php
 
+		echo '<hr />';
+
 		printf( '<h2>%1$s</h2>', __( 'Backup Schedule', 'boldgrid-backup' ) );
 
 		echo '<table class="form-table">';
@@ -77,13 +79,11 @@ wp_nonce_field( 'boldgrid_backup_settings' );
 
 		echo '</table>';
 
-		echo '</hr>';
-
 		$folders_include = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/folders.php';
-		echo $folders_include;
+		echo '<hr />' . $folders_include;
 
 		$db = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/db.php';
-		echo $db;
+		echo '<hr />' . $db;
 
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/retention.php';
 

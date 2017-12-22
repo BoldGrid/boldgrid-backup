@@ -617,6 +617,7 @@ class Boldgrid_Backup_Admin_Settings {
 			 */
 			$settings['folder_exclusion_include'] = $this->core->folder_exclusion->from_post( 'include' );
 			$settings['folder_exclusion_exclude'] = $this->core->folder_exclusion->from_post( 'exclude' );
+			$settings['folder_exclusion_type'] = $this->core->folder_exclusion->from_post( 'type' );
 
 			// If no errors, then save the settings.
 			if ( ! $update_error ) {

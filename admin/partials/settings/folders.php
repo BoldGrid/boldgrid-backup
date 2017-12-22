@@ -22,31 +22,36 @@ $tags = array(
 // $core will vary based on how this file is included.
 $core = isset( $this->core ) ? $this->core : $this;
 
+$checked = 'checked="checked"';
+
 $using_defaults = $core->folder_exclusion->is_using_defaults();
 
 $markup = '<table class="form-table bulk-action-notice" id="folder_exclusion"><tbody>';
 
 // TR for the header and intro
-$markup .= sprintf( '
+$tr_header = sprintf( '
 		<tr>
 			<th>
 				<h2>%1$s</h2>
 			</th>
 			<td>
 				<p>
-					%3$s %2$s
+					<input type="radio" name="folder_exclusion_type" value="full" %4$s>%2$s<br>
+					<input type="radio" name="folder_exclusion_type" value="custom" %5$s>%3$s
 				</p>
 			</td>
 		</tr>
 	',
 	/* 1 */ esc_html__( 'Files and Folders', 'boldgrid-backup' ),
-	/* 2 */ wp_kses( __( '<a href="" id="configure_folder_exclude">Configure</a>', 'boldgrid-backup' ), $tags ),
-	/* 3 */ $using_defaults ? $core->lang['icon_success'] : $core->lang['icon_warning']
+	/* 2 */ esc_html__( 'Backup all files (full backup)', 'boldgrid-backup' ),
+	/* 3 */ esc_html__( 'Custom Backup', 'boldgrid-backup' ),
+	/* 4 */ $using_defaults ? $checked : '',
+	/* 5 */ $using_defaults ? '' : $checked
 );
 
 // This markup for the legend.
 // TR for the help text.
-$legend = sprintf( '
+$table_legend = sprintf( '
 	<table class="folder_exclude_help wp-list-table widefat fixed striped pages">
 		<tr>
 			<th>*</th>
@@ -89,7 +94,7 @@ $legend = sprintf( '
 );
 
 // Examples
-$examples = sprintf( '
+$table_examples = sprintf( '
 	<table class="folder_exclude_help wp-list-table widefat fixed striped pages">
 		<tr>
 			<th><a href="#" class="folder_exclude_sample" data-include="%1$s" data-exclude="%2$s">%3$s</a></th>
@@ -140,7 +145,7 @@ $status = sprintf( '
 );
 
 // TR for the help text.
-$markup .= sprintf( '
+$tr_help = sprintf( '
 	<tr class="%1$s">
 		<th></th>
 		<td style="padding-top:0px;">
@@ -169,14 +174,14 @@ $markup .= sprintf( '
 	/* 1 */ $using_defaults ? 'hidden' : '',
 	/* 2 */ wp_kses( __( 'Use the <strong>Include</strong> and <strong>Exclude</strong> settings to adjust which files are included in your backup. Click the <strong>Preview</strong> button to see which files will be included in your backup based on your settings.', 'boldgrid-backup' ), $tags ),
 	/* 3 */ wp_kses( __( 'The following special characters can be used in your <strong>include</strong> and <strong>exclude</strong> filters:', 'boldgrid-backup' ), $tags ),
-	/* 4 */ $legend,
+	/* 4 */ $table_legend,
 	/* 5 */ wp_kses( __( 'For help with creating a filter, click one of the examples. This will fill in the <strong>Include</strong> and <strong>Exclude</strong> settings below.', 'boldgrid-backup' ), $tags ),
-	/* 6 */ $examples,
+	/* 6 */ $table_examples,
 	/* 7 */ $status
 );
 
 // TR for the include
-$markup .= sprintf( '
+$tr_include = sprintf( '
 	<tr class="%3$s">
 		<th style="padding-top:0px;">
 			%1$s
@@ -192,7 +197,7 @@ $markup .= sprintf( '
 );
 
 // TR for the exclude.
-$markup .= sprintf( '
+$tr_exclude = sprintf( '
 	<tr class="%3$s">
 		<th>
 			%1$s
@@ -208,7 +213,7 @@ $markup .= sprintf( '
 );
 
 // TR for the preview
-$markup .= sprintf( '
+$tr_preview = sprintf( '
 		<tr class="%1$s">
 			<th></th>
 			<td>
@@ -237,7 +242,23 @@ $markup .= sprintf( '
 	/* 4 */ esc_attr( __( 'Filter below results', 'boldgrid-backup' ) )
 );
 
-$markup .= '</tbody></table>';
+$markup = sprintf( '
+	<table class="form-table bulk-action-notice" id="folder_exclusion">
+		<tbody>
+			%1$s
+			%2$s
+			%3$s
+			%4$s
+			%5$s
+		</tbody>
+	</table>
+	',
+	/* 1 */ $tr_header,
+	/* 2 */ $tr_help,
+	/* 3 */ $tr_include,
+	/* 4 */ $tr_exclude,
+	/* 5 */ $tr_preview
+);
 
 return $markup;
 

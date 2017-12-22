@@ -25,7 +25,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	 * @since 1.5.4
 	 * @var   string
 	 */
-	public $default_exclude = '.git';
+	public $default_exclude = '.git,node_modules';
 
 	/**
 	 * The default include value.
@@ -34,6 +34,14 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	 * @var   string
 	 */
 	public $default_include = 'WPCORE,/wp-content';
+
+	/**
+	 * By default, backup all files and folders (use default settings).
+	 *
+	 * @since 1.5.4
+	 * @var   string
+	 */
+	public $default_type = 'full';
 
 	/**
 	 * Our exclude value.
@@ -60,12 +68,30 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	public $in_ajax_preview = false;
 
 	/**
+	 * Determine the type of backup we are performing.
+	 *
+	 * Usually it will be 'full' or 'custom'.
+	 *
+	 * @since 1.5.4
+	 * @var   null|string
+	 */
+	public $type = null;
+
+	/**
 	 * Allowable types.
 	 *
 	 * @since 1.5.4
 	 * @var   array
 	 */
-	public $types = array( 'include', 'exclude' );
+	public $types = array( 'include', 'exclude', 'type' );
+
+	/**
+	 * Valid backup types.
+	 *
+	 * @since 1.5.4
+	 * @var   array
+	 */
+	public $valid_types = array( 'full', 'custom' );
 
 	/**
 	 * The core class object.
@@ -272,9 +298,8 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 			return false;
 		}
 
-		$property = 'include' === $type ? 'include' : 'exclude';
-		$key = 'folder_exclusion_' . $property;
-		$default = 'default_' . $property;
+		$key = 'folder_exclusion_' . $type;
+		$default = 'default_' . $type;
 
 		/*
 		 * If we are in the middle of creating a backup file for update
@@ -290,30 +315,30 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 		 * we've posted folder settings, use those.
 		 */
 		if( $this->core->is_backup_now && isset( $_POST[$key] ) ) {
-			$this->$property = $this->from_post( $type );
-			return $this->$property;
+			$this->$type = $this->from_post( $type );
+			return $this->$type;
 		}
 
-		if( ! is_null( $this->$property ) ) {
-			return $this->$property;
+		if( ! is_null( $this->$type ) ) {
+			return $this->$type;
 		}
 
 		if( $this->core->settings->is_saving_settings ) {
-			$this->$property = $this->from_post( $type );
+			$this->$type = $this->from_post( $type );
 		} elseif( ! empty( $settings[$key] ) && is_string( $settings[$key] ) ) {
-			$this->$property = $settings[$key];
+			$this->$type = $settings[$key];
 		} elseif( ! $settings ) {
 			$settings = $this->core->settings->get_settings();
 			if( ! empty( $settings[$key] ) && is_string( $settings[$key] ) ) {
-				$this->$property = $settings[$key];
+				$this->$type = $settings[$key];
 			}
 		}
 
-		if( is_null( $this->$property ) ) {
-			$this->$property = $this->$default;
+		if( is_null( $this->$type ) ) {
+			$this->$type = $this->$default;
 		}
 
-		return $this->$property;
+		return $this->$type;
 	}
 
 	/**
@@ -355,10 +380,9 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	 *
 	 */
 	public function is_using_defaults() {
-		$include = $this->from_settings( 'include' );
-		$exclude = $this->from_settings( 'exclude' );
+		$type = $this->from_settings( 'type' );
 
-		return $include === $this->default_include && $exclude === $this->default_exclude;
+		return 'full' === $type;
 	}
 
 	/**
@@ -374,8 +398,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 			return false;
 		}
 
-		$key = 'folder_exclusion_';
-		$key .= 'include' === $type ? 'include' : 'exclude';
+		$key = 'folder_exclusion_' . $type;
 
 		switch( $type ) {
 			case 'include':
@@ -391,6 +414,9 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 				 * you do not want to exclude anything.
 				 */
 				$value = empty( $_POST[$key] ) ? '' : $_POST[$key];
+				break;
+			case 'type':
+				$value = ! empty( $_POST[$key] ) && in_array( $_POST[$key], $this->valid_types, true ) ? $_POST[$key] : $this->default_type;
 				break;
 		}
 

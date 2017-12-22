@@ -8,6 +8,8 @@
 defined( 'WPINC' ) ? : die;
 ?>
 
+<hr />
+
 <h2><?php esc_html_e( 'Notifications', 'boldgrid-backup' ); ?></h2>
 
 <table class="form-table">

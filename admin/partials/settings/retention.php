@@ -12,6 +12,8 @@ defined( 'WPINC' ) ? : die;
 $is_retention_set = ( isset( $settings['retention_count'] ) );
 ?>
 
+<hr />
+
 <h2><?php esc_html_e( 'Retention', 'boldgrid-backup' ); ?></h2>
 
 <table class='form-table'>

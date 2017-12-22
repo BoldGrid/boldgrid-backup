@@ -25,9 +25,9 @@ BoldGrid.FolderExclude = function( $ ) {
 		$inputExclude = $container.find( '[name="folder_exclusion_exclude"]' ),
 		$status = $container.find( '.status' ),
 		$filter = $container.find( '#folder_exclusion_filter' ),
-		$ul = $excludeFoldersPreview.find( 'ul' );
-
-	console.log( self );
+		$ul = $excludeFoldersPreview.find( 'ul' ),
+		$type = $container.find( '[name="folder_exclusion_type"]' ),
+		$trs = $container.children( 'tbody' ).children( 'tr:not(:first)' );
 
 	/**
 	 *
@@ -155,6 +155,21 @@ BoldGrid.FolderExclude = function( $ ) {
 		self.toggleStatus();
 
 		return false;
+	};
+
+	/**
+	 * @summary Action to take when backup type has been changed.
+	 *
+	 * @since 1.5.4
+	 */
+	self.onChangeType = function() {
+		var type = $(this).val();
+
+		if( 'full' === type ) {
+			$trs.hide();
+		} else {
+			$trs.show();
+		}
 	};
 
 	/**
@@ -361,6 +376,8 @@ BoldGrid.FolderExclude = function( $ ) {
 		$( '#configure_folder_exclude' ).on( 'click', self.onClickConfigure );
 
 		self.toggleStatus();
+
+		$type.on( 'change', self.onChangeType );
 
 		$inputInclude
 			.on( 'input', self.toggleStatus )

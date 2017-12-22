@@ -57,7 +57,9 @@ defined( 'WPINC' ) ? : die;
 
 	echo( include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-size-data.php' );
 
+	$in_modal = true;
 	$modal = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-modal.php';
+	$in_modal = false;
 	echo $modal;
 
 	include BOLDGRID_BACKUP_PATH . '/admin/partials/archives/note-pre-backup.php';

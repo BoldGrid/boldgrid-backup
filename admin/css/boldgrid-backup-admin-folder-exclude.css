@@ -36,6 +36,9 @@
 * This section contains the css for the "Exclude Folder" interface within a
 * modal, such as the "Backup Site Now" modal.
 */
+#TB_ajaxContent {
+	background: #f1f1f1;
+}
 #TB_ajaxContent .form-table {
 	margin-top: 0px;
 }
