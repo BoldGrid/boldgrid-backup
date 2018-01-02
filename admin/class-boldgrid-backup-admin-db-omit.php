@@ -206,7 +206,7 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	 */
 	public function get_post_type() {
 		$key = 'table_inclusion_type';
-		return ! empty( $_POST[$key] ) && in_array( $_POST[$key], $this->valid_types, true ) ? $_POST[$key] : $this->default_type;
+		return ! empty( $_POST[$key] ) && in_array( $_POST[$key], $this->valid_types, true ) ? $_POST[$key] : null;
 	}
 
 	/**

@@ -163,13 +163,7 @@ BoldGrid.FolderExclude = function( $ ) {
 	 * @since 1.5.4
 	 */
 	self.onChangeType = function() {
-		var type = $(this).val();
-
-		if( 'full' === type ) {
-			$trs.hide();
-		} else {
-			$trs.show();
-		}
+		self.toggleConfig();
 	};
 
 	/**
@@ -347,6 +341,19 @@ BoldGrid.FolderExclude = function( $ ) {
 	/**
 	 *
 	 */
+	self.toggleConfig = function() {
+		var type = $type.filter( ':checked' ).val();
+
+		if( 'full' === type ) {
+			$trs.hide();
+		} else {
+			$trs.show();
+		}
+	}
+
+	/**
+	 *
+	 */
 	self.toggleStatus = function() {
 		var usingDefaults = $inputInclude.val().trim() === lang.default_include && $inputExclude.val().trim() === lang.default_exclude,
 			$yesDefault = $container.find( '.yes-default' ),
@@ -376,6 +383,7 @@ BoldGrid.FolderExclude = function( $ ) {
 		$( '#configure_folder_exclude' ).on( 'click', self.onClickConfigure );
 
 		self.toggleStatus();
+		self.toggleConfig();
 
 		$type.on( 'change', self.onChangeType );
 

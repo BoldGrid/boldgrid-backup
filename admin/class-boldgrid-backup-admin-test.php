@@ -593,7 +593,6 @@ class Boldgrid_Backup_Admin_Test {
 	 * @return int|bool The total size for the WordPress file system in bytes, or FALSE on error.
 	 */
 	private function get_wp_size() {
-
 		// Save time, use transients.
 		if ( false !== ( $transient = get_transient( 'boldgrid_backup_wp_size' ) ) ) {
 			return $transient;

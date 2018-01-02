@@ -24,6 +24,8 @@ $core = isset( $this->core ) ? $this->core : $this;
 
 $checked = 'checked="checked"';
 
+$in_modal = isset( $in_modal ) && true === $in_modal;
+
 $using_defaults = $core->folder_exclusion->is_using_defaults();
 
 $markup = '<table class="form-table bulk-action-notice" id="folder_exclusion"><tbody>';
@@ -45,8 +47,8 @@ $tr_header = sprintf( '
 	/* 1 */ esc_html__( 'Files and Folders', 'boldgrid-backup' ),
 	/* 2 */ esc_html__( 'Backup all files (full backup)', 'boldgrid-backup' ),
 	/* 3 */ esc_html__( 'Custom Backup', 'boldgrid-backup' ),
-	/* 4 */ $using_defaults ? $checked : '',
-	/* 5 */ $using_defaults ? '' : $checked
+	/* 4 */ $in_modal || $using_defaults ? $checked : '',
+	/* 5 */ ! $in_modal && ! $using_defaults ? $checked : ''
 );
 
 // This markup for the legend.
