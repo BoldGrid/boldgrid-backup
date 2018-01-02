@@ -609,6 +609,7 @@ class Boldgrid_Backup_Admin_Settings {
 			 * @since 1.5.3
 			 */
 			$settings['exclude_tables'] = $this->core->db_omit->get_from_post();
+			$settings['exclude_tables_type'] = $this->core->db_omit->get_post_type();
 
 			/*
 			 * Save folder exclusion settings.

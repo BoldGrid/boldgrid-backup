@@ -113,6 +113,12 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	/**
 	 * Get our exluded tables list.
 	 *
+	 * This method determines what tables to exclude based upon several
+	 * different scenarios. For example, if we are doing a backup for update
+	 * protection, we will not exclude any tables. If we are doing a backup via
+	 * a scheduled cron, the exlucded tables will be calculated based upon our
+	 * excluded_tables_type (full or custom).
+	 *
 	 * @since 1.5.3
 	 *
 	 * @return array
@@ -131,7 +137,10 @@ class Boldgrid_Backup_Admin_Db_Omit {
 			$excluded_tables = $this->get_from_post();
 		} else {
 			$settings = $this->core->settings->get_settings();
-			$excluded_tables = $settings['exclude_tables'];
+
+			$type = $this->get_settings_type( $settings );
+
+			$excluded_tables = 'full' === $type ? array() : $this->get_settings_excluded( $settings );
 		}
 
 		$excluded_tables = is_array( $excluded_tables ) ? $excluded_tables : array();
@@ -207,6 +216,49 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	public function get_post_type() {
 		$key = 'table_inclusion_type';
 		return ! empty( $_POST[$key] ) && in_array( $_POST[$key], $this->valid_types, true ) ? $_POST[$key] : null;
+	}
+
+	/**
+	 * From settings, get our exclude_tables.
+	 *
+	 * If no exclude_tables are set, return an empty array.
+	 *
+	 * @since 1.5.4
+	 *
+	 * @param  array $settings
+	 * @return bool
+	 */
+	public function get_settings_excluded( $settings = array() ) {
+		if( empty( $settings ) ) {
+			$settings = $this->core->settings->get_settings();
+		}
+
+		// Get the actual value stored in the settings. Set to an empty array if non existing.
+		$key = 'exclude_tables';
+		return ! isset( $settings[$key] ) || ! is_array( $settings[$key] ) ? array() : $settings[$key];
+	}
+
+	/**
+	 * From settings, get our type.
+	 *
+	 * In addition to getting the 'type' from settings, we can also get the type
+	 * from $_POST. Please see this->get_post_type.
+	 *
+	 * Return null if we do not have a type saved in the settings.
+	 *
+	 * @since 1.5.4
+	 *
+	 * @param  array $settings
+	 * @return bool
+	 */
+	public function get_settings_type( $settings = array() ) {
+		if( empty( $settings ) ) {
+			$settings = $this->core->settings->get_settings();
+		}
+
+		$key = 'exclude_tables_type';
+
+		return ! empty( $settings[$key] ) && in_array( $settings[$key], $this->valid_types, true ) ? $settings[$key] : null;
 	}
 
 	/**

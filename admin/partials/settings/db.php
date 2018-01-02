@@ -15,7 +15,10 @@ $in_modal = isset( $in_modal ) && true === $in_modal;
 // If we are in a modal, by default we want all tables to be backed up.
 $tables = $core->db_omit->format_prefixed_tables();
 
+// Determine if the "Backup all tables" option should be checked.
 $all_included = empty( $settings['exclude_tables'] );
+$type = $core->db_omit->get_settings_type();
+$full_checked = 'full' === $type || $all_included;
 
 $checked = 'checked="checked"';
 
@@ -25,8 +28,8 @@ $types = sprintf( '
 	',
 	/* 1 */ __( 'Backup all tables (full backup)', 'boldgrid-backup' ),
 	/* 2 */ __( 'Custom Backup', 'boldgrid-backup' ),
-	/* 3 */ $in_modal || $all_included ? $checked : '',
-	/* 4 */ $in_modal || $all_included ? '' : $checked
+	/* 3 */ $in_modal || $full_checked ? $checked : '',
+	/* 4 */ $in_modal || $full_checked ? '' : $checked
 );
 
 $buttons = sprintf( '
