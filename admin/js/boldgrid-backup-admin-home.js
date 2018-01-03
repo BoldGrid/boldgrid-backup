@@ -28,14 +28,6 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 
 	// Onload event listener.
 	$( function() {
-		// On click action for download buttons.
-		$( 'body' ).on( 'click', '.action-download', self.downloadArchive );
-
-		$( 'body' ).on( 'click', '.restore-now', self.restoreArchiveConfirm );
-
-		// On click action for delete buttons.
-		$( 'body' ).on( 'click', '.action-delete', self.deleteArchiveConfirm );
-
 		// On click action for the Backup Site Now button.
 		$( '#backup-site-now' )
 			.on( 'click', self.backupNow );
@@ -62,65 +54,6 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 
 		$fileInput.on( 'change', self.onChangeInput );
 	} );
-
-	/**
-	 * Download a selected backup archive file.
-	 *
-	 * @since 1.0
-	 */
-	self.downloadArchive = function( e ) {
-		// Declare variables.
-		var downloadKey, downloadFilename, downloadFilepath, data, form, $formDom,
-			$this = $( this );
-
-		// Get the backup archive file key.
-		downloadKey = $this.data( 'key' );
-
-		// Get the backup archive filename.
-		downloadFilename = $this.data( 'filename' );
-
-		// Get the backup archive file path.
-		downloadFilepath = $this.data( 'filepath' );
-
-		// If the wp_filesystem method is not "direct", then show a message and return.
-		if ( 'direct' !== localizeScriptData.accessType ) {
-			alert( "Wordpress filesystem access method is not direct; it is set to '" +
-				localizeScriptData.accessType +
-				"'.\n\nYou can download the archive file using another method, such as FTP.\n\n" +
-				"The backup archive file path is: " + downloadFilepath
-			);
-
-			e.preventDefault();
-			return;
-		}
-
-		// Generate a data array for the download request.
-		data = {
-		    'action' : 'download_archive_file',
-		    'download_key' : downloadKey,
-		    'download_filename' : downloadFilename,
-		    'wpnonce' : localizeScriptData.archiveNonce
-		};
-
-		// Create a hidden form to request the download.
-		form = "<form id='download-now-form' class='hidden' method='POST' action='" + ajaxurl + "' target='_blank'>";
-		_.each( data, function( value, key ) {
-			form += "<input type='hidden' name='" + key + "' value='" + value + "' />";
-		} );
-		form += '</form>';
-
-		// Enter the form markup into the DOM.
-		$formDom = $( form );
-
-		// Add the form to the current body.
-		$( 'body' ).append( $formDom );
-
-		// Submit the form.
-		$formDom.submit();
-
-		// Prevent default browser action.
-		e.preventDefault();
-	};
 
 	/**
 	 * Hide the restore archive notice and enable action buttons.
@@ -191,79 +124,6 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 			$submit.attr( 'disabled', false );
 		}
 	}
-
-	/**
-	 * Confirm to restore a selected backup archive file.
-	 *
-	 * @since 1.0
-	 */
-	self.restoreArchiveConfirm = function() {
-		var confirmResponse,
-			restoreConfirmText,
-			$this = $( this ),
-			filename = $this.attr( 'data-archive-filename' ),
-			data = {
-				'action' : 'boldgrid_backup_restore_archive',
-				'restore_now' : $this.attr( 'data-restore-now' ),
-				'archive_key' : $this.attr( 'data-archive-key' ),
-				'archive_filename' : filename,
-				'archive_auth' : $this.attr( 'data-nonce' ),
-			};
-
-		restoreConfirmText = localizeScriptData.restoreConfirmText.replace( '%s', filename );
-		confirmResponse = confirm( restoreConfirmText );
-
-		if ( true === confirmResponse ) {
-			// Disable the Backup Site Now and all Restore and Delete buttons.
-			$( '#backup-site-now, .restore-now, .action-delete' )
-				.prop( 'disabled', true )
-				.css( 'pointer-events', 'none' );
-
-			$this
-				.after( '<span class="spinner inline"></span> ' + localizeScriptData.restoring + '...' )
-				.remove();
-
-			jQuery.post( ajaxurl, data, function( response ) {
-				location.reload();
-			}).error( function() {
-				location.reload();
-			});
-		}
-
-		return false;
-	};
-
-	/**
-	 * Confirm to delete a selected backup archive file.
-	 *
-	 * @since 1.0
-	 */
-	self.deleteArchiveConfirm = function( e ) {
-		// Declare variables.
-		var confirmResponse, ArchiveFilename,
-			$this = $( this );
-
-		// Get the backup archive filename.
-		ArchiveFilename = $this.data( 'filename' );
-
-		// Ask for confirmation.
-		confirmResponse = confirm( localizeScriptData.deleteConfirmText + ' "' + ArchiveFilename + '"' );
-
-		if( ! confirmResponse ) {
-			return;
-		}
-
-		$this.closest( 'td' )
-			.find( '.row-actions' )
-				.removeClass( 'row-actions' )
-				.end()
-			.find( '.spinner' )
-				.addClass( 'is-active' )
-				.css( 'display', 'inline-block' )
-				.end()
-			.find( 'form' )
-				.submit();
-	};
 
 	/**
 	 * Perform a backup now.

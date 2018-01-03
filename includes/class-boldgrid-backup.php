@@ -177,6 +177,7 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-backup-dir.php';
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archive.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archive-actions.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archives.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archive-browser.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archive-log.php';

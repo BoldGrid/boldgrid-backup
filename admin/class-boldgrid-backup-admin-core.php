@@ -190,6 +190,15 @@ class Boldgrid_Backup_Admin_Core {
 	public $archives;
 
 	/**
+	 * An instance of the Boldgrid_Backup_Admin_Archive_Actions class.
+	 *
+	 * @since  1.5.4
+	 * @access public
+	 * @var    Boldgrid_Backup_Admin_Archive_Actions
+	 */
+	public $archive_actions;
+
+	/**
 	 * An instance of the Boldgrid_Backup_Admin_Archive_Browser class.
 	 *
 	 * @since  1.5.2
@@ -444,6 +453,8 @@ class Boldgrid_Backup_Admin_Core {
 		$this->archive_browser = new Boldgrid_Backup_Admin_Archive_Browser( $this );
 
 		$this->archive = new Boldgrid_Backup_Admin_Archive( $this );
+
+		$this->archive_actions = new Boldgrid_Backup_Admin_Archive_Actions( $this );
 
 		$this->archives = new Boldgrid_Backup_Admin_Archives( $this );
 
@@ -2120,42 +2131,16 @@ class Boldgrid_Backup_Admin_Core {
 		$this->folder_exclusion->enqueue_scripts();
 		$this->db_omit->enqueue_scripts();
 
-		// Get the current wp_filesystem access method.
-		$access_type = get_filesystem_method();
-
-		// Create a nonce for archive operations.
-		$archive_nonce = wp_create_nonce( 'archive_auth' );
-
-		// Create text for the restoration confirmation.
-		// This variable is passed to JavaScript that will use string replacement for "%s".
-		$restore_confirm_text = esc_html__(
-			'Please confirm the restoration of this WordPress installation from the archive file:' .
-			PHP_EOL . '"%s"' . PHP_EOL . PHP_EOL .
-			'Please be aware that you may get logged-out if your session token does not exist in the database restored.',
-			'boldgrid-backup'
-		);
-
-		// Create text for the deletion confirmation.
-		$delete_confirm_text = esc_html__(
-			'Please confirm the deletion of the archive file:' . PHP_EOL,
-			'boldgrid-backup'
-		);
-
 		// Create URL for backup now.
 		$backup_url = get_admin_url( null, 'admin.php?page=boldgrid-backup' );
 
 		// Create an array of data to pass to JS.
 		$localize_script_data = array(
-			'archiveNonce' => $archive_nonce,
-			'accessType' => $access_type,
-			'restoreConfirmText' => $restore_confirm_text,
-			'deleteConfirmText' => $delete_confirm_text,
 			'backupUrl' => $backup_url,
 			'errorText' => esc_html__(
 				'There was an error processing your request.  Please reload the page and try again.',
 				'boldgrid-backup'
 			),
-			'restoring' => __( 'Restoring', 'boldgrid-backup' ),
 		);
 
 		// Add localize script data to the JS script.

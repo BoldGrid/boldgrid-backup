@@ -65,6 +65,41 @@ class Boldgrid_Backup_Admin_Archive {
 	}
 
 	/**
+	 * Get an archive by name.
+	 *
+	 * Please see @return for more information on what an archive actually is.
+	 *
+	 * @since 1.5.4
+	 *
+	 * @param  string $filename
+	 * @return array {
+	 *     Details about an archive.
+	 *
+	 *     @type string $filepath    /home/user/boldgrid_backup/file.zip
+	 *     @type string $filename    file.zip
+	 *     @type string $filedate    1/2/2018 1:21 PM
+	 *     @type int    $filesize    99152247
+	 *     @type int    $lastmodunix 1514917311
+	 *     @type int    $key         0
+	 * }
+	 */
+	public function get_by_name( $filename ) {
+		$return_archive = false;
+
+		$archives = $this->core->get_archive_list();
+
+		foreach( $archives as $key => $archive ) {
+			if( $archive['filename'] === $filename ) {
+				$archive['key'] = $key;
+				$return_archive = $archive;
+				break;
+			}
+		}
+
+		return $return_archive;
+	}
+
+	/**
 	 * Get one file from an archive.
 	 *
 	 * @since 1.5.3
