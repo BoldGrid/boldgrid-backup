@@ -97,6 +97,35 @@ class Boldgrid_Backup_Admin_Archive_Log {
 	}
 
 	/**
+	 * Restore a log file by a zip's filepath.
+	 *
+	 * For example, if we just downloaded backup.zip from FTP, this method will
+	 * extract backup.log from backup.zip if it exists. This was, we have all
+	 * of the meta data about the backup.
+	 *
+	 * @since 1.5.4
+	 *
+	 * @param string $filepath
+	 */
+	public function restore_by_zip( $filepath ) {
+		$log_filepath = $this->path_from_zip( $filepath );
+		$log_filename = basename( $log_filepath );
+
+		if( $this->core->wp_filesystem->exists( $log_filepath ) ) {
+			return;
+		}
+
+		// Extract the log file to ABSPATH.
+		$zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this->core );
+		$status = $zip->extract_one( $filepath, $log_filename );
+
+		// Move the log file from the ABSPATH to the backup dir.
+		$old_path = ABSPATH . $log_filename;
+		$new_path = $this->core->backup_dir->get_path_to( $log_filename );
+		$this->core->wp_filesystem->move( $old_path, $new_path );
+	}
+
+	/**
 	 * Write info file.
 	 *
 	 * @since 1.5.1
@@ -118,6 +147,16 @@ class Boldgrid_Backup_Admin_Archive_Log {
 
 		$written = $this->core->wp_filesystem->put_contents( $log_filepath, json_encode( $info ) );
 		if( ! $written ) {
+			return false;
+		}
+
+		// Add the log file to the archive file, as of 1.5.4.
+		$archive = new PclZip( $info['filepath'] );
+		if ( 0 === $archive ) {
+			return false;
+		}
+		$status = $archive->add( $log_filepath, PCLZIP_OPT_REMOVE_ALL_PATH );
+		if( 0 === $status ) {
 			return false;
 		}
 

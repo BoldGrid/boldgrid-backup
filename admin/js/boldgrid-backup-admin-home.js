@@ -8,6 +8,8 @@
  * @param $ The jQuery object.
  */
 
+/* global ajaxurl,jQuery,localizeScriptData */
+
 var BOLDGRID = BOLDGRID || {};
 BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 
@@ -18,13 +20,9 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 	var self = this,
 		$fileInput = $( 'input:file' ),
 		$backupNowType = $( '[name="folder_exclusion_type"]' ),
+		lang = localizeScriptData,
+		$mineCount = $( '.mine' ),
 		$tablesType = $( '[name="table_inclusion_type"]' );
-
-	/*
-	 * This script is passed "localizeScriptData" {"archiveNonce", "accessType", "restoreConfirmText",
-	 * "deleteConfirmText", "backupUrl", "errorText"}
-	 * (via wp_localize_script() in "class-boldgrid-backup-admin-core.php").
-	 */
 
 	// Onload event listener.
 	$( function() {
@@ -53,6 +51,8 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 		self.hideRestoreNotice();
 
 		$fileInput.on( 'change', self.onChangeInput );
+
+		$mineCount.on( 'click', self.onClickCount );
 	} );
 
 	/**
@@ -123,7 +123,42 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 		} else {
 			$submit.attr( 'disabled', false );
 		}
-	}
+	};
+
+	/**
+	 * @summary Action to take when a user clicks on a mine count.
+	 *
+	 * @since 1.5.4
+	 */
+	self.onClickCount = function() {
+		var $anchor = $(this),
+			$p = $anchor.closest( 'p' ),
+			$trs = $( '#backup-archive-list-body tr' ),
+			type = $anchor.html().trim();
+
+		$p.find( '.mine' ).removeClass( 'current' );
+		$anchor.addClass( 'current' );
+
+		if( lang.All === type ) {
+			$trs.show();
+			return false;
+		}
+
+		$trs.each( function( index ) {
+			var $tr = $( this ),
+				$matches = $tr.find( '[data-location="' + type + '"]' ),
+				matchCount = $matches.length;
+
+			if( 0 === matchCount ) {
+				$tr.hide();
+			} else {
+				$tr.show();
+				$matches.bgbuDrawAttention();
+			}
+		});
+
+		return false;
+	};
 
 	/**
 	 * Perform a backup now.
@@ -229,8 +264,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 		successCallback = function( response ) {
 			var data = JSON.parse( response ),
 				success = data.success !== undefined && true === data.success,
-				callback = success && data.data !== undefined && data.data.callback !== undefined ? data.data.callback : null,
-				message = callback && data.data.message !== undefined ? data.data.message : null;
+				callback = success && data.data !== undefined && data.data.callback !== undefined ? data.data.callback : null;
 
 			switch( callback ) {
 				case 'updateProtectionEnabled':
@@ -314,7 +348,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 		$status.html( localizeScriptData.updateProtectionActivated );
 
 		$backupNow.html( '<p>' + localizeScriptData.backupCreated + '</p>' );
-	}
+	};
 
 	/**
 	 * Confirm to delete a selected backup archive file.
@@ -345,6 +379,6 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 	self.toggleHelp = function() {
 		$( this ).next( '.help' ).toggle();
 	};
-}
+};
 
 BOLDGRID.BACKUP.HOME( jQuery );

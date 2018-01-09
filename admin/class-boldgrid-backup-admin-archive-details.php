@@ -49,11 +49,11 @@ class Boldgrid_Backup_Admin_Archive_Details {
 	}
 
 	/**
-	 * Render the details page of an archive.
+	 * Enqueue scripts.
 	 *
-	 * @since 1.5.1
+	 * @since 1.5.4
 	 */
-	public function render_archive() {
+	public function enqueue_scripts() {
 		wp_enqueue_style(
 			'boldgrid-backup-admin-zip-browser',
 			plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-zip-browser.css',
@@ -95,45 +95,65 @@ class Boldgrid_Backup_Admin_Archive_Details {
 		wp_localize_script( 'boldgrid-backup-admin-zip-browser', 'boldgrid_backup_zip_browser', $translations );
 		wp_enqueue_script( 'boldgrid-backup-admin-zip-browser' );
 
-		$this->core->archive_actions->enqueue_scripts();
-
 		/**
 		 * Allow other plugins to enqueue scripts on this page.
 		 *
 		 * @since 1.5.3
 		 */
 		do_action( 'boldgrid_backup_enqueue_archive_details' );
+	}
 
-		$md5 = ! empty( $_GET['md5'] ) ? $_GET['md5'] : false;
+	/**
+	 * Render the details page of an archive.
+	 *
+	 * @since 1.5.1
+	 */
+	public function render_archive() {
+		if ( ! empty( $_POST['delete_now'] ) ) {
+			$this->core->delete_archive_file();
+		}
+
+		$this->enqueue_scripts();
+		$this->core->archive_actions->enqueue_scripts();
+
 		$archive_found = false;
 
-		if( ! $md5 ) {
+		$filename = ! empty( $_GET['filename'] ) ? $_GET['filename'] : false;
+		if( ! $filename ) {
 			echo __( 'No archive specified.', 'boldgrid-backup' );
 			return;
 		}
 
-		$archives = $this->core->get_archive_list();
-		if( empty( $archives ) ) {
-			echo __( 'No archives available. Is your backup directory configured correctly?', 'boldgrid-backup' );
-			return;
-		}
-
-		foreach( $archives as $archive ) {
-			if( $md5 === md5( $archive['filepath'] ) ) {
-				$log = $this->core->archive_log->get_by_zip( $archive['filepath'] );
-				$archive = array_merge( $log, $archive );
-				$archive_found = true;
-				break;
+		// Get our archive.
+		$archive = $this->core->archive->get_by_name( $filename );
+		if( $archive ) {
+			$log = $this->core->archive_log->get_by_zip( $archive['filepath'] );
+			$archive = array_merge( $log, $archive );
+			$archive_found = true;
+			$dump_file = $this->core->get_dump_file( $archive['filepath'] );
+		} else {
+			$archive = array();
+			if( ! empty( $_GET['filename'] ) ) {
+				$archive['filename'] = $_GET['filename'];
 			}
 		}
 
-		if( ! $archive_found ) {
-			echo __( 'Archive not found.', 'boldgrid-backup' );
-			return;
-		}
-
-		$dump_file = $this->core->get_dump_file( $archive['filepath'] );
-
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-archive-details.php';
+	}
+
+	/**
+	 * Validate the nonce on the Backup Archive Details page.
+	 *
+	 * On the backup archive page, there is a nonce used by several different
+	 * methods, boldgrid_backup_remote_storage_upload. This method is an easy
+	 * way to validate the nonce.
+	 *
+	 * The nonce can be added to an ajax request's data via:
+	 * 'security' : $( '#_wpnonce' ).val()
+	 *
+	 * @since 1.5.4
+	 */
+	public function validate_nonce() {
+		return check_ajax_referer( 'boldgrid_backup_remote_storage_upload', 'security', false );
 	}
 }

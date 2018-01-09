@@ -268,6 +268,39 @@ class Boldgrid_Backup_Admin_Ftp {
 	}
 
 	/**
+	 * Download a backup via FTP.
+	 *
+	 * @since 1.5.4
+	 *
+	 * @param  string $filename
+	 * @return bool
+	 */
+	public function download( $filename ) {
+		$this->connect();
+
+		$local_filepath = $this->core->backup_dir->get_path_to( $filename );
+		$server_filepath = $this->remote_dir . '/' . $filename;
+		$success = false;
+
+		$this->log_in();
+
+		switch( $this->type ) {
+			case 'ftp':
+				$success = ftp_get( $this->connection, $local_filepath, $server_filepath, FTP_BINARY );
+				break;
+			case 'sftp':
+				$success = $this->connection->get( $server_filepath, $local_filepath );
+				break;
+		}
+
+		if( $success ) {
+			$this->core->remote->post_download( $local_filepath );
+		}
+
+		return $success;
+	}
+
+	/**
 	 * Enforce retention.
 	 *
 	 * @since 1.5.4
@@ -406,8 +439,12 @@ class Boldgrid_Backup_Admin_Ftp {
 				$backups[] = array(
 					'time' => $item['mtime'],
 					'filename' => $filename,
+					'size' => $item['size'],
 				);
 			} else {
+				// Before exploding by space, replace multiple spaces with one space.
+				$item = preg_replace( '!\s+!', ' ', $item );
+
 				$exploded_item = explode( ' ', $item );
 				$count = count( $exploded_item );
 
@@ -425,6 +462,7 @@ class Boldgrid_Backup_Admin_Ftp {
 				$backups[] = array(
 					'time' => $time,
 					'filename' => $filename,
+					'size' => $exploded_item[ $count - 5 ],
 				);
 			}
 		}

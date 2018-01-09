@@ -40,6 +40,41 @@ class Boldgrid_Backup_Admin_Archives {
 	}
 
 	/**
+	 * Get a "mine count" of backup files.
+	 *
+	 * Returns a string such as:
+	 * All (5) | Local (4) | SFTP (2) | Amazon S3 (3)
+	 *
+	 * @since 1.5.4
+	 *
+	 * @return string
+	 */
+	public function get_mine_count() {
+		$this->core->archives_all->init();
+
+		// Create the "mine count" section above the table.
+		$locations = array();
+		foreach( $this->core->archives_all->location_count as $location => $count ) {
+
+			// The first locaion, "All", should have the "current" class.
+			$current = empty( $locations ) ? 'current' : '';
+
+			$locations[] = sprintf('
+				%3$s %1$s %4$s (%2$s)
+				',
+				/* 1 */ $location,
+				/* 2 */ $count,
+				/* 3 */ sprintf( '<a href="" class="mine %1$s">', $current ),
+				/* 4 */ '</a>'
+			);
+		}
+
+		$markup = '<p class="subsubsub">' . implode( ' | ', $locations ) . '</p>';
+
+		return $markup;
+	}
+
+	/**
 	 * Get a table containing a list of all backups.
 	 *
 	 * This table is displayed on the Backup Archives page.
@@ -49,52 +84,54 @@ class Boldgrid_Backup_Admin_Archives {
 	 * @return string
 	 */
 	public function get_table() {
-		$trs = array();
-		$archives = $this->core->get_archive_list();
+		$this->core->archives_all->init();
+		$backup = __( 'Backup', 'boldgrid-backup' );
+		$view_details = __( 'View details', 'boldgrid-backup' );
 
-		if ( ! empty( $archives ) ) {
-			foreach ( $archives as $key => $archive ) {
-				$trs[$archive['lastmodunix']] = include dirname( __FILE__ ) . '/partials/archives/archive-tr.php';
-			}
-		}
+		$table = $this->get_mine_count();
 
-		/**
-		 * Allow remote storage providers to add their backups to the list.
-		 *
-		 * @since 1.5.4
-		 *
-		 * @param array $trs The current list of backups.
-		 */
-		$trs = apply_filters ( 'boldgrid_backup_archive_tr', $trs );
-
-		// Show backups oldest to newest.
-		ksort( $trs );
-
-		$table = '
+		$table .= '
 			<table class="wp-list-table widefat fixed striped pages">
 				<tbody id="backup-archive-list-body">
-		';
+			';
 
-		foreach( $trs as $tr ) {
-			$table .= $tr;
-		}
+		foreach( $this->core->archives_all->all as $archive ) {
 
-		$table .= '</tbody></table>';
+			// Create the list of locations.
+			$locations = array();
+			foreach( $archive['locations'] as $location ) {
+				$locations[] = sprintf( '<span data-location="%1$s">%1$s</span>', $location );
+			}
+			$locations = implode( ', ', $locations );
 
-		$header = sprintf( '
-			<p>%1$s (%2$s)</p>',
-			/* 1 */ esc_html__( 'Archive Count', 'boldgrid-backup' ),
-			/* 2 */ count( $trs )
-		);
-
-		$table = $header . $table;
-
-		if( empty( $trs ) ) {
-			$table = sprintf( '
-				<p>%1$s</]>',
-				esc_html__( 'There are no archives for this site in the backup directory.', 'boldgrid-backup' )
+			$table .= sprintf( '
+				<tr>
+					<td>
+						<strong>%1$s</strong>: %2$s
+						<p class="description">%6$s</p>
+					</td>
+					<td>
+						%3$s
+					</td>
+					<td>
+						<a
+							class="button"
+							href="admin.php?page=boldgrid-backup-archive-details&filename=%4$s"
+						>%5$s</a>
+					</td>
+				</tr>
+				',
+				/* 1 */ $backup,
+				/* 2 */ date( 'M j, Y h:i a', $archive['last_modified'] ),
+				/* 3 */ Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive['size'] ),
+				/* 4 */ $archive['filename'],
+				/* 5 */ $view_details,
+				/* 6 */ $locations
 			);
 		}
+		$table .= '</tbody>
+			</table>
+		';
 
 		return $table;
 	}

@@ -190,6 +190,15 @@ class Boldgrid_Backup_Admin_Core {
 	public $archives;
 
 	/**
+	 * An instance of the Boldgrid_Backup_Admin_Archives_All class.
+	 *
+	 * @since  1.5.4
+	 * @access public
+	 * @var    Boldgrid_Backup_Admin_Archives_All
+	 */
+	public $archives_all;
+
+	/**
 	 * An instance of the Boldgrid_Backup_Admin_Archive_Actions class.
 	 *
 	 * @since  1.5.4
@@ -457,6 +466,8 @@ class Boldgrid_Backup_Admin_Core {
 		$this->archive_actions = new Boldgrid_Backup_Admin_Archive_Actions( $this );
 
 		$this->archives = new Boldgrid_Backup_Admin_Archives( $this );
+
+		$this->archives_all = new Boldgrid_Backup_Admin_Archives_All( $this );
 
 		$this->archive_log = new Boldgrid_Backup_Admin_Archive_Log( $this );
 
@@ -1704,7 +1715,8 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @return bool Whether or not the archive file was deleted.
 	 */
-	private function delete_archive_file() {
+	public function delete_archive_file() {
+
 		// If a deletion was not requested, then abort.
 		if ( empty( $_POST['delete_now'] ) ) {
 			return false;
@@ -2136,6 +2148,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Create an array of data to pass to JS.
 		$localize_script_data = array(
+			'All' => __( 'All', 'boldgrid-backup' ),
 			'backupUrl' => $backup_url,
 			'errorText' => esc_html__(
 				'There was an error processing your request.  Please reload the page and try again.',
@@ -2148,11 +2161,6 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Enqueue JS for the home page.
 		wp_enqueue_script( 'boldgrid-backup-admin-home' );
-
-		// If a delete operation is requested, then delete the selected backup now.
-		if ( ! empty( $_POST['delete_now'] ) ) {
-			$this->delete_archive_file();
-		}
 
 		// If uploading an archive file.
 		if ( ! empty( $_FILES['file'] ) ) {
@@ -2425,6 +2433,7 @@ class Boldgrid_Backup_Admin_Core {
 			'icon_success' => '<span class="dashicons dashicons-yes green"></span> ',
 			'icon_warning' => '<span class="dashicons dashicons-warning yellow"></span> ',
 			'heading_update_protection' => __( 'BoldGrid Backup - Update Protection', 'boldgrid-backup' ),
+			'spinner' => '<span class="spinner"></span>',
 		);
 
 		$this->elements = array(

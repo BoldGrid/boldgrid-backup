@@ -6,13 +6,12 @@
  * @since 1.3.1
  */
 
-/* global wp,ajaxurl,BoldGridBackupAdmin */
+/* global jQuery,pagenow */
 
 var BoldGrid = BoldGrid || {};
 
 BoldGrid.Backup = function( $ ) {
-	var self = this,
-		$includeTables;
+	var self = this;
 
 	/**
 	 * @summary Handle the click of help buttons.
@@ -46,7 +45,7 @@ BoldGrid.Backup = function( $ ) {
 		}
 
 		$( 'a[href*="WordPress_Backups"]' ).closest( '.notice' ).remove();
-	}
+	};
 
 	$( function() {
 		self.bindHelpClick();
@@ -62,6 +61,8 @@ BoldGrid.Backup( jQuery );
  * @since 1.5.4
  */
 jQuery.fn.bgbuDrawAttention = function() {
+	var currentColor;
+
 	if( this.is( 'input' ) ) {
 		this
 			.css( 'background', '#ddd' )
@@ -72,12 +73,32 @@ jQuery.fn.bgbuDrawAttention = function() {
 	if( this.is( '.dashicons-editor-help')) {
 		this.effect( 'bounce', { times:2 }, 'normal' );
 	}
+
+	if( this.is( 'span' ) ) {
+		/*
+		 * Get the original color to animate back to. This is needed because if
+		 * the user clicks on an element that is in the middle of an animation,
+		 * the current color will not be the original.
+		 */
+		if( ! this.attr( 'data-original-color' ) ) {
+			this.attr( 'data-original-color', this.css( 'color' ) );
+		}
+		currentColor = this.attr( 'data-original-color' );
+
+		this
+			.css( 'color', '#fff' )
+			.animate( { color: currentColor }, 500 );
+	}
 };
 
-jQuery.fn.bgbuSetStatus = function( status ) {
-	var color = 'yes' === status ? 'green' : 'yellow';
-
-	this
-		.removeClass( 'dashicons-warning dashicons-yes green yellow' )
-		.addClass( 'dashicons-' + status + ' ' + color );
-}
+/**
+ * @summary Disable all actions found within an element (a, buttons, etc).
+ *
+ * For example, if we click "restore" on a page, we want to disable all other
+ * actions within the wpwrap (IE can't restore and delete at the same time).
+ *
+ * @since 1.5.4
+ */
+jQuery.fn.bgbuDisableActions = function() {
+	this.find( 'a, [type="submit"]' ).attr( 'disabled', 'disabled' );
+};

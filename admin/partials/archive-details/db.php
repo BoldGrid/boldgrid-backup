@@ -11,17 +11,17 @@
 
 defined( 'WPINC' ) ? : die;
 
-printf( '<h2>%1$s</h2>', __( 'Database', 'boldgrid-backup' ) );
+$db = sprintf( '<h2>%1$s</h2>', __( 'Database', 'boldgrid-backup' ) );
 
 if( empty( $dump_file ) ) {
-	printf( '<p>%1$s</p>', __( 'This archive does not contain a database backup.', 'boldgrid-backup' ) );
+	$db .= sprintf( '<p>%1$s</p>', __( 'This archive does not contain a database backup.', 'boldgrid-backup' ) );
 	return;
 }
 
 $contains = __( 'This archive contains the following database backup: <strong>%1$s</strong>', 'boldgrid-backup' );
 $basename = basename( $dump_file );
 
-printf( '
+$db .= sprintf( '
 	<p>%1$s</p>
 	<p data-file="%4$s">
 		<a class="restore-db button button-primary">%2$s</a>
@@ -33,5 +33,7 @@ printf( '
 	/* 3 */ __( 'View details', 'boldgrid-backup' ),
 	/* 4 */ $basename
 );
+
+return $db;
 
 ?>
