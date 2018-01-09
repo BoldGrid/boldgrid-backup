@@ -90,17 +90,15 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 			$link = '';
 		} else {
 			$link = sprintf( '
-				<form action="%1$s" method="POST" class="delete-now-form" id="delete-link">
+				<form method="post" id="delete-link" >
 					<input type="hidden" name="delete_now" value="1" />
 					<input type="hidden" name="archive_key" value="%2$s" />
 					<input type="hidden" name="archive_filename" value="%3$s" />
 					%4$s
-					<span class="trash">
-						<a class="delete" data-key="%2$s" data-filename="%3$s" href="">%5$s</a>
-					</span>
+					<input class="button" type="submit" data-key="%2$s" data-filename="%3$s" value="%5$s" />
 					<span class="spinner"></span>
 				</form>',
-				get_admin_url( null, 'admin.php?page=boldgrid-backup' ),
+				get_admin_url( null, 'admin.php?page=boldgrid-backup-archive-details' ),
 				$archive['key'],
 				$archive['filename'],
 				wp_nonce_field( 'archive_auth', 'archive_auth', true, false ),
@@ -135,10 +133,10 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 					data-filename="%3$s" >
 					%4$s
 				</a>',
-				$archive['key'],
-				$archive['filepath'],
-				$archive['filename'],
-				__( 'Download', 'boldgrid-backup' )
+				/* 1 */ $archive['key'],
+				/* 2 */ $archive['filepath'],
+				/* 3 */ $archive['filename'],
+				/* 4 */ __( 'Download', 'boldgrid-backup' )
 			);
 		}
 
@@ -168,12 +166,14 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 					class="button restore-now"
 					href="">
 					%5$s
-				</a>',
+				</a>
+				%6$s',
 				/* 1 */ get_admin_url( null, 'admin.php?page=boldgrid-backup' ),
 				/* 2 */ $archive['key'],
 				/* 3 */ $filename,
 				/* 4 */ wp_create_nonce( 'boldgrid_backup_restore_archive'),
-				/* 5 */ __( 'Restore', 'boldgrid-backup' )
+				/* 5 */ __( 'Restore', 'boldgrid-backup' ),
+				/* 6 */ $this->core->lang['spinner']
 			);
 		}
 

@@ -65,6 +65,32 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 	}
 
 	/**
+	 * Hook into the filter to add all ftp backups to the full list of backups.
+	 *
+	 * @since 1.5.4
+	 */
+	public function filter_get_all() {
+		$contents = $this->core->ftp->get_contents( true, $this->core->ftp->remote_dir );
+		$contents = $this->core->ftp->format_raw_contents( $contents );
+
+		foreach( $contents as $item ) {
+			$filename = $item['filename'];
+
+			$backup = array(
+				'filename' => $filename,
+				'last_modified' => $item['time'],
+				'size' => $item['size'],
+				'locations' => array(
+					'SFTP',
+				),
+				'location' => 'SFTP',
+			);
+
+			$this->core->archives_all->add( $backup );
+		}
+	}
+
+	/**
 	 * Determine if FTP is setup.
 	 *
 	 * @since 1.5.4
@@ -150,6 +176,7 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 			'title' => $this->core->ftp->title,
 			'uploaded' => $uploaded,
 			'allow_upload' => $allow_upload,
+			'is_setup' => $this->core->ftp->is_setup(),
 		);
 	}
 
@@ -169,19 +196,73 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 	}
 
 	/**
+	 * Handle the ajax request to download an FTP backup locally.
+	 *
+	 * @since 1.5.4
+	 */
+	public function wp_ajax_download() {
+		$error = __( 'Unable to download backup from FTP', 'bolgrid-bakcup' );
+
+		// Validation, user role.
+		if ( ! current_user_can( 'update_plugins' ) ) {
+			$this->core->notice->add_user_notice(
+				sprintf( $error . ': ' . __( 'Permission denied.', 'boldgrid-backup' ) ),
+				'notice notice-error'
+			);
+			wp_send_json_error();
+		}
+
+		// Validation, nonce.
+		if( ! $this->core->archive_details->validate_nonce() ) {
+			$this->core->notice->add_user_notice(
+				sprintf( $error . ': ' . __( 'Invalid nonce.', 'boldgrid-backup' ) ),
+				'notice notice-error'
+			);
+			wp_send_json_error();
+		}
+
+		// Validation, $_POST data.
+		$filename = ! empty( $_POST['filename'] ) ? $_POST['filename'] : false;
+		if( empty( $filename ) ) {
+			$this->core->notice->add_user_notice(
+				sprintf( $error . ': ' . __( 'Invalid filename.', 'boldgrid-backup' ) ),
+				'notice notice-error'
+			);
+			wp_send_json_error();
+		}
+
+		$result = $this->core->ftp->download( $filename );
+
+		if( $result ) {
+			$this->core->notice->add_user_notice(
+				sprintf(
+					__( '<h2>%2$s</h2><p>Backup file <strong>%1$s</strong> successfully downloaded from FTP.</p>', 'boldgrid-backup' ),
+					/* 1 */ $filename,
+					/* 2 */ __( 'BoldGrid Backup Premium - FTP Download', 'boldgrid-backup' )
+				),
+				'notice notice-success'
+			);
+			wp_send_json_success();
+		}
+	}
+
+	/**
 	 * Upload a file (triggered by ajax).
+	 *
+	 * @since 1.5.4
 	 */
 	public function wp_ajax_upload() {
 		if ( ! current_user_can( 'update_plugins' ) ) {
 			wp_send_json_error( __( 'Permission denied.', 'boldgrid-backup' ) );
 		}
 
-		if( ! check_ajax_referer( 'boldgrid_backup_remote_storage_upload', 'security', false ) ) {
+		if( ! $this->core->archive_details->validate_nonce() ) {
 			wp_send_json_error( __( 'Invalid nonce.', 'boldgrid-backup' ) );
 		}
 
-		$filepath = ! empty( $_POST['filepath'] ) ? $_POST['filepath'] : false;
-		if( empty( $filepath ) || ! $this->core->wp_filesystem->exists( $filepath ) ) {
+		$filename = ! empty( $_POST['filename'] ) ? $_POST['filename'] : false;
+		$filepath = $this->core->backup_dir->get_path_to( $filename );
+		if( empty( $filename ) || ! $this->core->wp_filesystem->exists( $filepath ) ) {
 			wp_send_json_error( __( 'Invalid archive filepath.', 'boldgrid-backup' ) );
 		}
 

@@ -14,7 +14,8 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 	var self = this,
 		lang = BoldGridBackupAdminArchiveActions,
-		$body = $( 'body' );
+		$body = $( 'body' ),
+		$wpbody = $body.find( '#wpbody' );
 
 	/**
 	 * @summary Confirm to delete a selected backup archive file.
@@ -24,12 +25,11 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 	 *
 	 * @since 1.5.4
 	 */
-	self.deleteArchiveConfirm = function( e ) {
+	self.onClickDelete = function( e ) {
 		var confirmResponse,
-			archiveFilename,
-			$button = $( this );
-
-		archiveFilename = $button.attr( 'data-filename' );
+			$form = $( this ),
+			archiveFilename = $form.find( '[name="archive_filename"]' ).val(),
+			$spinner = $form.find( '.spinner' );
 
 		confirmResponse = confirm( lang.deleteConfirmText + ' "' + archiveFilename + '"' );
 
@@ -37,7 +37,10 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 			return false;
 		}
 
-		$button.closest( 'form' ).submit();
+		$spinner.addClass( 'inline' );
+		$wpbody.bgbuDisableActions();
+
+		return true;
 	};
 
 	/**
@@ -115,12 +118,16 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 				'archive_key' : $this.attr( 'data-archive-key' ),
 				'archive_filename' : filename,
 				'archive_auth' : $this.attr( 'data-nonce' ),
-			};
+			},
+			$spinner = $this.next( '.spinner' );
 
 		restoreConfirmText = lang.restoreConfirmText.replace( '%s', filename );
 		confirmResponse = confirm( restoreConfirmText );
 
 		if ( true === confirmResponse ) {
+			$spinner.addClass( 'inline' );
+			$wpbody.bgbuDisableActions();
+
 			$.post( ajaxurl, data, function( response ) {
 				location.reload();
 			}).error( function() {
@@ -134,7 +141,7 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 	$( function() {
 		$body.on( 'click', '.action-download', self.downloadArchive );
 		$body.on( 'click', '.restore-now', self.restoreArchiveConfirm );
-		$body.on( 'click', '.delete', self.deleteArchiveConfirm );
+		$body.on( 'submit', '#delete-link', self.onClickDelete );
 	});
 };
 

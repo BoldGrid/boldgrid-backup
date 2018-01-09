@@ -17,7 +17,7 @@ $delete_link = $this->core->archive_actions->get_delete_link( $archive['filename
 $download_button = $this->core->archive_actions->get_download_button( $archive['filename'] );
 $restore_button = $this->core->archive_actions->get_restore_button( $archive['filename'] );
 
-printf( '
+return sprintf( '
 	<h2>%1$s</h2>
 	<div style="float:right;">%4$s</div>
 	<p>

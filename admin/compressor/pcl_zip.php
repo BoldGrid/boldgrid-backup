@@ -20,6 +20,15 @@
 class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Compressor {
 
 	/**
+	 * An array of errors.
+	 *
+	 * @since  1.5.4
+	 * @access public
+	 * @var    array
+	 */
+	public $errors = array();
+
+	/**
 	 * The status of our test result.
 	 *
 	 * @since  1.5.1
@@ -296,10 +305,12 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 	 */
 	public function extract_one( $filepath, $file ) {
 		if( ! $this->core->archive->is_archive( $filepath ) ) {
+			$this->errors[] = __( 'Not an archive.', 'boldgrid-backup' );
 			return false;
 		}
 
 		if( empty( $file ) ) {
+			$this->errors[] = __( 'Empty file.', 'boldgrid-backup' );
 			return false;
 		}
 
@@ -308,6 +319,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 		// Write the file and adjust the timestamp.
 		$written = $this->core->wp_filesystem->put_contents( ABSPATH . $file, $file_contents[0]['content'] );
 		if( ! $written ) {
+			$this->errors[] = __( 'Not written.', 'boldgrid-backup' );
 			return false;
 		}
 		return $this->core->wp_filesystem->touch( ABSPATH . $file, $file_contents[0]['mtime'] );

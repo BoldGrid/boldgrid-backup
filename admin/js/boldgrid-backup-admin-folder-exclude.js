@@ -36,14 +36,14 @@ BoldGrid.FolderExclude = function( $ ) {
 		var $icon = $container.find( '.dashicons-editor-help' );
 
 		$icon.bgbuDrawAttention();
-	}
+	};
 
 	/**
 	 *
 	 */
 	self.isUsingDefaults = function() {
 		return $inputInclude.val().trim() === lang.default_include && $inputExclude.val().trim() === lang.default_exclude;
-	}
+	};
 
 	/**
 	 *
@@ -55,14 +55,13 @@ BoldGrid.FolderExclude = function( $ ) {
 			status;
 
 		status = self.isUsingDefaults() ? 'yes' : 'warning';
-		$icon.bgbuSetStatus( status );
 
 		$icon.toggle();
 
 		$table.children( 'tbody' ).children( 'tr:not(:first)' ).toggle();
 
 		return false;
-	}
+	};
 
 	/**
 	 * @summary Handle the click of the pagination button.s
@@ -235,7 +234,7 @@ BoldGrid.FolderExclude = function( $ ) {
 		page = isNaN( page ) ? 1 : page;
 
 		// If the user has typed in a filter, then filter our list.
-		filteredList = []
+		filteredList = [];
 		if( '' !== filterVal ) {
 			exclusionList.forEach( function( file ) {
 				if( file.indexOf( filterVal ) !== -1 ) {
@@ -274,7 +273,7 @@ BoldGrid.FolderExclude = function( $ ) {
 		filteredNoResults = '' !== filterVal && 0 === filteredList.length;
 		markup = filteredNoResults ? lang.no_results : markup;
 
-		$ul.html( markup )
+		$ul.html( markup );
 
 		self.renderPagination( page, 100 );
 	};
@@ -349,7 +348,7 @@ BoldGrid.FolderExclude = function( $ ) {
 		} else {
 			$trs.show();
 		}
-	}
+	};
 
 	/**
 	 *
@@ -366,7 +365,7 @@ BoldGrid.FolderExclude = function( $ ) {
 			$yesDefault.hide();
 			$noDefault.show();
 		}
-	}
+	};
 
 	// Onload event listener.
 	$( function() {

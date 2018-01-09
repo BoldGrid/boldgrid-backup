@@ -225,7 +225,7 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	 */
 	public function get_path_to( $file ) {
 		$backup_dir = $this->get();
-		return Boldgrid_Backup_Admin_Utility::trailingslashit( $backup_dir ) . DIRECTORY_SEPARATOR . $file;
+		return Boldgrid_Backup_Admin_Utility::trailingslashit( $backup_dir ) . $file;
 	}
 
 	/**

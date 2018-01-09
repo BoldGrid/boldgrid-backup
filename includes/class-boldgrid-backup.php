@@ -179,6 +179,7 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archive.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archive-actions.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archives.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archives-all.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archive-browser.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archive-log.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archive-details.php';
@@ -370,6 +371,9 @@ class Boldgrid_Backup {
 		$this->loader->add_action( 'boldgrid_backup_post_archive_files', $plugin_admin_core->ftp->hooks, 'post_archive_files' );
 		// This is the filter executed by the jobs queue.
 		$this->loader->add_filter( 'boldgrid_backup_ftp_upload_post_archive', $plugin_admin_core->ftp->hooks, 'upload_post_archiving' );
+		// Add ftp backups to the "Backups" tab.
+		$this->loader->add_action( 'boldgrid_backup_get_all', $plugin_admin_core->ftp->hooks, 'filter_get_all' );
+		$this->loader->add_action( 'wp_ajax_boldgrid_backup_remote_storage_download_ftp', $plugin_admin_core->ftp->hooks, 'wp_ajax_download' );
 
 		return;
 	}

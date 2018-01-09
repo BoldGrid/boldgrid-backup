@@ -16,8 +16,7 @@ BoldGrid.ZipBrowser = function( $ ) {
 		$zipBrowser = $( '#zip_browser' ),
 		$listing = $zipBrowser.find( '.listing' ),
 		spinner = '<span class="spinner inline"></span> ',
-		loading = spinner + boldgrid_backup_zip_browser.loading + '...',
-		restoring = spinner + boldgrid_backup_zip_browser.restoring + '...';
+		loading = spinner + boldgrid_backup_zip_browser.loading + '...';
 
 	/**
 	 * @summary Handle the click of a breadcrumb.
@@ -45,7 +44,7 @@ BoldGrid.ZipBrowser = function( $ ) {
 			data = {
 				'action': 'boldgrid_backup_browse_archive_file_actions',
 				'security' : $( '#_wpnonce' ).val(),
-				'filepath' : $( '#filepath' ).val(),
+				'filename' : $( '#filename' ).val(),
 				'file' : $tr.attr( 'data-dir' ),
 			};
 
@@ -96,7 +95,7 @@ BoldGrid.ZipBrowser = function( $ ) {
 		$( this ).attr( 'disabled', 'disabled' );
 
 		self.renderBrowser( '.' );
-	}
+	};
 
 	/**
 	 * @summary Handle the click of the "restore this database" button.
@@ -109,7 +108,7 @@ BoldGrid.ZipBrowser = function( $ ) {
 			data = {
 				'action': 'boldgrid_backup_browse_archive_restore_db',
 				'security' : $( '#_wpnonce' ).val(),
-				'filepath' : $( '#filepath' ).val(),
+				'filename' : $( '#filename' ).val(),
 				'file' : $a.closest( 'p' ).attr( 'data-file' ),
 			},
 			confirmation,
@@ -148,7 +147,7 @@ BoldGrid.ZipBrowser = function( $ ) {
 		} else {
 			$tbody.show();
 		}
-	}
+	};
 
 	/**
 	 * @summary Handle the click of the "View details" button for a database.
@@ -157,11 +156,10 @@ BoldGrid.ZipBrowser = function( $ ) {
 	 */
 	self.onClickViewDb = function() {
 		var $a = $( this ),
-			$p = $a.closest( 'p' ),
 			data = {
 				'action': 'boldgrid_backup_browse_archive_view_db',
 				'security' : $( '#_wpnonce' ).val(),
-				'filepath' : $( '#filepath' ).val(),
+				'filename' : $( '#filename' ).val(),
 				'file' : $a.closest( 'p' ).attr( 'data-file' ),
 			},
 			$details = $( '#db_details' ),
@@ -232,7 +230,7 @@ BoldGrid.ZipBrowser = function( $ ) {
 		data = {
 			'action': 'boldgrid_backup_browse_archive',
 			'security' : $( '#_wpnonce' ).val(),
-			'filepath' : $( '#filepath' ).val(),
+			'filename' : $( '#filename' ).val(),
 			'dir' : dir,
 		};
 

@@ -123,9 +123,10 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 
 		$this->authorize();
 
-		$filepath = ! empty( $_POST['filepath'] ) ? $_POST['filepath'] : false;
-		if( empty( $filepath ) || ! $this->core->wp_filesystem->exists( $filepath ) ) {
-			wp_send_json_error( $error . ' ' . __( 'Invalid archive filepath.', 'boldgrid-backup' ) );
+		$filename = ! empty( $_POST['filename'] ) ? $_POST['filename'] : false;
+		$filepath = $this->core->backup_dir->get_path_to( $filename );
+		if( empty( $filename ) || ! $this->core->wp_filesystem->exists( $filepath ) ) {
+			wp_send_json_error( $error . ' ' . __( 'Invalid archive filename.', 'boldgrid-backup' ) );
 		}
 
 		$dump_file = $this->core->get_dump_file( $filepath );

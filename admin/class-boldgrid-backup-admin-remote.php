@@ -52,4 +52,13 @@ class Boldgrid_Backup_Admin_Remote {
 
 		return ! empty( $settings['remote'][$id]['enabled'] ) && true === $settings['remote'][$id]['enabled'] ;
 	}
+
+	/**
+	 * Take action after a backup has been downloaded remotely.
+	 *
+	 * @since 1.5.4
+	 */
+	public function post_download( $filepath ) {
+		$this->core->archive_log->restore_by_zip( $filepath );
+	}
 }
