@@ -243,6 +243,34 @@ BoldGrid.Settings = function( $ ) {
 		}
 	}
 
+	/**
+	 * Handle click of the undismissBoldgridNotice link for the key prompt.
+	 *
+	 * @since 1.5.4
+	 */
+	self.undismissBoldgridNotice = function() {
+		var data, nonce, wpHttpReferer;
+
+		// Get the wpnonce and referer values.
+		nonce = $( '#set_key_auth' ).val();
+		wpHttpReferer = $( '[name="_wp_http_referer"]' ).val();
+
+		data = {
+			'action'  : 'undismissBoldgridNotice',
+			'notice' :  'bg-key-prompt',
+			'set_key_auth' : nonce,
+			'_wp_http_referer' : wpHttpReferer,
+		};
+
+		$.post(
+			ajaxurl,
+			data,
+			function() {
+				location.reload();
+			}
+		);
+	};
+
 	// Onload event listener.
 	$( function() {
 		// Check if any days or the week are checked, toggle notice.
@@ -267,6 +295,9 @@ BoldGrid.Settings = function( $ ) {
 		$( window ).on( 'tb_unload', self.on_tb_unload );
 
 		$( '#storage_locations .thickbox' ).on( 'click', self.on_click_provider );
+
+		/** Reverse dismiss action for the Conect Key prompt **/
+		$( '.undismissBoldgridNotice' ).on( 'click', self.undismissBoldgridNotice );
 	} );
 }
 

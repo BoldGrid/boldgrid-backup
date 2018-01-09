@@ -53,6 +53,8 @@ wp_nonce_field( 'boldgrid_backup_settings' );
 	</p>
 
 	<?php
+		include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/connect-key.php';
+
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/premium-message.php';
 
 		echo( include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-size-data.php' );

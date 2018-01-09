@@ -79,3 +79,17 @@ if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) || defined( 'WP_CLI
 	require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup.php';
 	run_boldgrid_backup();
 }
+
+// Include the autoloader to set plugin options and create instance.
+$loader = require plugin_dir_path( __FILE__ ) . 'vendor/autoload.php';
+
+// Load Library.
+$load = new Boldgrid\Library\Util\Load(
+	array(
+		'type' => 'plugin',
+		'file' => plugin_basename( __FILE__ ),
+		'loader' => $loader,
+		'keyValidate' => true,
+		'licenseActivate', false,
+	)
+);
