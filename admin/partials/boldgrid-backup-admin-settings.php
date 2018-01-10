@@ -224,20 +224,7 @@ wp_nonce_field( 'boldgrid_backup_settings' );
 			if( $show_compressor_options ) {
 				include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/compressor.php';
 			}
-
-		// This is a temporary section.
-		$is_premium = get_option( 'boldgrid_backup_is_premium', 'false' );
-		$premium_checked = ( 'true' === $is_premium ? 'checked' : '' );
-		$free_checked = ( 'true' !== $is_premium ? 'checked' : '' );
 		?>
-		<h2>Plugin version</h2>
-		<p>
-			This is a <strong>temporary</strong> section of the settings page, and provides an easy
-			way to toggle whether you're using the free or premium version of the plugin.<br />
-			<input type="radio" name="is_premium" value="true" <?php echo $premium_checked; ?> /> Premium version<br />
-			<input type="radio" name="is_premium" value="false" <?php echo $free_checked; ?> /> Free version
-		</p>
-
 		<div id='boldgrid-settings-submit-div'>
 			<p>
 				<input id='boldgrid-settings-submit' class='button button-primary'

@@ -186,10 +186,8 @@ class Boldgrid_Backup_Admin_Config {
 			$this->core = $core;
 		}
 
-		// Temporary, for testing only.
-		if( 'true' === get_option( 'boldgrid_backup_is_premium' ) ) {
-			$this->is_premium = true;
-		}
+		$license = new \Boldgrid\Library\Library\License();
+		$this->is_premium = $license->isPremium( 'boldgrid-backup' );
 
 		if( true === $this->is_premium ) {
 			$this->default_retention = 5;

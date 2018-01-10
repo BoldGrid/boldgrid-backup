@@ -646,11 +646,6 @@ class Boldgrid_Backup_Admin_Settings {
 			do_action( 'boldgrid_backup_notice', $failure_message );
 		}
 
-		// Temporary.
-		if( isset( $_POST['is_premium'] ) && in_array( $_POST['is_premium'], array( 'true', 'false' ) ) ) {
-			update_option( 'boldgrid_backup_is_premium', $_POST['is_premium'] );
-		}
-
 		if( ! $update_error ) {
 			/**
 			 * Take action when settings have been updated.

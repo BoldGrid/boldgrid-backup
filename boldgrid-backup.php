@@ -74,12 +74,6 @@ function run_boldgrid_backup() {
 	$plugin->run();
 }
 
-// Load the plugin only if on a wp-admin page or when DOING_CRON.
-if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) || defined( 'WP_CLI' ) && WP_CLI ) {
-	require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup.php';
-	run_boldgrid_backup();
-}
-
 // Include the autoloader to set plugin options and create instance.
 $loader = require plugin_dir_path( __FILE__ ) . 'vendor/autoload.php';
 
@@ -93,3 +87,9 @@ $load = new Boldgrid\Library\Util\Load(
 		'licenseActivate', false,
 	)
 );
+
+// Load the plugin only if on a wp-admin page or when DOING_CRON.
+if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) || defined( 'WP_CLI' ) && WP_CLI ) {
+	require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup.php';
+	run_boldgrid_backup();
+}
