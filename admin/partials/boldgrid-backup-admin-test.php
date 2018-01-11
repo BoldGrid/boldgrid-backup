@@ -354,7 +354,8 @@ $table .= '</table>';
 	<?php
 	printf( '<h1>%1$s</h1>', __( 'BoldGrid Backup Preflight Check', 'boldgrid-backup' ) );
 
-	include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
+	$nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
+	echo $nav;
 
 	echo $table;
 

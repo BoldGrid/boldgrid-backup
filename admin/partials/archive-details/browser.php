@@ -23,39 +23,21 @@ $intro = sprintf( $intro_message, 'https://www.boldgrid.com/support', 'https://w
 */
 $intro = apply_filters( 'boldgrid_backup_archive_browser_intro', $intro );
 
-$browser  = sprintf( '
-	<h2>%1$s</h2>
+$browser = sprintf( '
+	<div id="zip_browser" class="hidden" data-view-type="file">
 
-	<p>%2$s</p>
+		<div class="breadcrumbs" style="padding:8px 10px; background:#f5f5f5; border: 1px solid #e5e5e5; border-bottom:0px; border-top:0px;">
+		</div>
 
-	%4$s
-
-	<p>
-		<a class="load-browser button button-primary">%3$s</a>
-	</p>
-
-
-	',
-	/* 1 */ __( 'Archive Browser', 'boldgrid-backup' ),
-	/* 2 */ __( 'The Archive Browser allows you to look inside this backup and browse the files and folders within.', 'boldgrid-backup' ),
-	/* 3 */ __( 'Load archive browser', 'boldgrid-backup' ),
-	/* 4 */ empty( $intro ) ? '' : sprintf( '<p>%1$s</p>', $intro )
+		<div class="listing">
+			<table>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+	</div>',
+	empty( $intro ) ? '' : sprintf( '<p>%1$s</p>', $intro )
 );
-
-$browser .= '
-<div id="zip_browser" class="hidden">
-
-	<div class="breadcrumbs" style="padding:8px 10px;">
-	</div>
-
-	<div class="listing">
-		<table>
-			<tbody>
-			</tbody>
-		</table>
-	</div>
-</div>
-';
 
 return $browser;
 

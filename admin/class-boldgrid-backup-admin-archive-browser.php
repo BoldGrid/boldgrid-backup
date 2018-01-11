@@ -190,7 +190,8 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 	public function wp_ajax_file_actions() {
 		$this->authorize();
 
-		$filepath = ! empty( $_POST['filepath'] ) ? $_POST['filepath'] : false;
+		$filename = ! empty( $_POST['filename'] ) ? $_POST['filename'] : false;
+		$filepath = $this->core->backup_dir->get_path_to( $filename );
 		$file = ! empty( $_POST['file'] ) ? $_POST['file'] : false;
 		if( empty( $filepath ) || empty( $file ) ) {
 			wp_send_json_error( __( 'Invalid file / filepath.', 'boldgrid-backup' ) );
@@ -256,9 +257,10 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 	public function wp_ajax_view_db() {
 		$this->authorize();
 
-		$filepath = ! empty( $_POST['filepath'] ) ? $_POST['filepath'] : false;
+		$filename = ! empty( $_POST['filename'] ) ? $_POST['filename'] : false;
+		$filepath = $this->core->backup_dir->get_path_to( $filename );
 		$file = ! empty( $_POST['file'] ) ? $_POST['file'] : false;
-		if( empty( $filepath ) || empty( $file ) ) {
+		if( empty( $filename ) || empty( $filepath ) || empty( $file ) ) {
 			wp_send_json_error( __( 'Invalid file / filepath.', 'boldgrid-backup' ) );
 		}
 

@@ -47,9 +47,40 @@ BoldGrid.Backup = function( $ ) {
 		$( 'a[href*="WordPress_Backups"]' ).closest( '.notice' ).remove();
 	};
 
+	/**
+	 * @summary Handle the clicking of a show / hide toggle.
+	 *
+	 * In the example below, the show / hide link has a data-toggle-target attr
+	 * that helps to identify the element to toggle.
+	 * # <a href="" data-toggle-target="#more_info">Show</a>
+	 * # <div id="more_info" class="hidden">
+	 *
+	 * @since 1.5.4
+	 */
+	self.onClickToggle = function() {
+		var $e = $( this ),
+			show = 'Show',
+			hide = 'Hide',
+			target = $e.attr( 'data-toggle-target'),
+			$target = $( target ),
+			isVisible = $target.is( ':visible' );
+
+		if( isVisible ) {
+			$target.slideUp();
+			$e.html( show );
+		} else {
+			$target.slideDown();
+			$e.html( hide );
+		}
+
+		return false;
+	};
+
 	$( function() {
 		self.bindHelpClick();
 		self.hideBackupNotice();
+
+		$( 'body' ).on( 'click', '[data-toggle-target]', self.onClickToggle );
 	});
 };
 

@@ -39,17 +39,17 @@ $navs = array(
  */
 $navs = apply_filters( 'boldgrid_backup_navs', $navs );
 
-?>
-
-<h2 class="nav-tab-wrapper">
-<?php
+$markup = '<h2 class="nav-tab-wrapper">';
 foreach( $navs as $nav ) {
-	printf(
+	$markup .= sprintf(
 		'<a class="nav-tab %1$s" href="%2$s">%3$s</a>',
 		$nav['class'],
 		$nav['href'],
 		$nav['title']
 	);
 }
+$markup .= '</h2>';
+
+return $markup;
+
 ?>
-</h2>

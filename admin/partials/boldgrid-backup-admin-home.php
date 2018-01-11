@@ -29,15 +29,16 @@ defined( 'WPINC' ) ? : die;
  * @param string $backup_identifier The backup identifier for this installation.
  */
 
+$nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
+
 ?>
 <div class='wrap'>
-
 
 <h1 class="wp-heading-inline"><?php esc_html_e( 'Backup Archives', 'boldgrid-backup' ); ?></h1>
 <a class="page-title-action add-new"><?php echo __( 'Upload Backup', 'boldgrid-backup' ); ?></a>
 
 <?php
-	include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
+	echo $nav;
 
 	include BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
 

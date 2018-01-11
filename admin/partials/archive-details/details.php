@@ -18,20 +18,6 @@ $attribute = '<p><strong>%1$s</strong>: %2$s</p>';
 
 $datas = array(
 	array(
-		'key' => 'filename',
-		'title' => __( 'Filename', 'boldgrid-backup' ),
-		'hidden_input' => true,
-	),
-	array(
-		'key' => 'filesize',
-		'title' => __( 'File size', 'boldgrid-backup' ),
-		'presentation' => 'bytes_to_human',
-	),
-	array(
-		'key' => 'filedate',
-		'title' => __( 'Backup date', 'boldgrid-backup' ),
-	),
-	array(
 		'key' => 'trigger',
 		'title' => __( 'Backup triggered by', 'boldgrid-backup' ),
 	),
@@ -56,17 +42,15 @@ $datas = array(
 	),
 	array(
 		'key' => 'folder_include',
-		'title' => __( 'Included', 'boldgrid-backup' ),
-		'heading' => __( 'Files and Folders', 'boldgrid-backup' ),
+		'title' => __( 'Files included', 'boldgrid-backup' ),
 	),
 	array(
 		'key' => 'folder_exclude',
-		'title' => __( 'Excluded', 'boldgrid-backup' ),
+		'title' => __( 'Files excluded', 'boldgrid-backup' ),
 	),
 	array(
 		'key' => 'table_exclude',
-		'title' => __( 'Tables excluded', 'boldgrid-backup' ),
-		'heading' => __( 'Database', 'boldgrid-backup' ),
+		'title' => __( 'Database tables excluded', 'boldgrid-backup' ),
 		'presentation' => 'comma_implode',
 	),
 );

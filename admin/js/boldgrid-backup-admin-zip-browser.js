@@ -160,10 +160,16 @@ BoldGrid.ZipBrowser = function( $ ) {
 				'action': 'boldgrid_backup_browse_archive_view_db',
 				'security' : $( '#_wpnonce' ).val(),
 				'filename' : $( '#filename' ).val(),
-				'file' : $a.closest( 'p' ).attr( 'data-file' ),
+				'file' : $( '#dump_filename' ).val(),
 			},
 			$details = $( '#db_details' ),
 			errorCallback;
+
+		// Only render the view once.
+		if( 'true' === $details.attr( 'data-rendered' ) ) {
+			return;
+		}
+		$details.attr( 'data-rendered', 'true' );
 
 		$a.attr( 'disabled', 'disabled' );
 
@@ -262,7 +268,9 @@ BoldGrid.ZipBrowser = function( $ ) {
 		$( 'body' ).on( 'click', '.view-db', self.onClickViewDb );
 		$( 'body' ).on( 'click', 'th .toggle-indicator', self.onClickToggle );
 		$( 'body' ).on( 'click', '.load-browser', self.onClickLoadBrowser );
+
+		self.renderBrowser( '.' );
 	});
 };
 
-BoldGrid.ZipBrowser( jQuery );
+BoldGrid.ZipBrowser = new BoldGrid.ZipBrowser( jQuery );

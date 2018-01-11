@@ -13,6 +13,8 @@
 
 defined( 'WPINC' ) ? : die;
 
+$nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
+
 // Check if settings are available, show an error notice if not.
 if ( empty( $settings ) ) {
 	add_action( 'admin_footer',
@@ -29,7 +31,7 @@ wp_nonce_field( 'boldgrid_backup_settings' );
 <div class='wrap'>
 	<h1><?php esc_html_e( 'BoldGrid Backup and Restore Settings', 'boldgrid-backup' ); ?></h1>
 
-	<?php include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php'; ?>
+	<?php echo $nav; ?>
 
 	<p>
 		<?php

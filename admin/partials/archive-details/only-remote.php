@@ -14,10 +14,14 @@ defined( 'WPINC' ) ? : die;
 return sprintf( '
 	<p>
 		%1$s %2$s
+
 	</p>
+	%3$s %4$s
 	',
 	$this->core->lang['icon_warning'],
-	__( 'This backup file is not on the server, but it is on one of your remote storage providers. Before you can restore or review this backup file, please download it to your server using one of the download buttons below.', 'boldgrid-backup' )
+	__( 'This backup file is not on your web server, but it is saved to one or more of your remote storage providers. Before you can restore this backup file, please download it to your web server. After the backup is downloaded, you can then view more details about the backup and restore it if you\'d like.', 'boldgrid-backup' ),
+	'<a class="button button-primary" id="download_first">Download to web server</a>',
+	$this->core->lang['spinner']
 );
 
 ?>

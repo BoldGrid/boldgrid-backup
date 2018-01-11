@@ -27,7 +27,7 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 	 */
 	self.onClickDelete = function( e ) {
 		var confirmResponse,
-			$form = $( this ),
+			$form = $( this ).closest( 'form' ),
 			archiveFilename = $form.find( '[name="archive_filename"]' ).val(),
 			$spinner = $form.find( '.spinner' );
 
@@ -40,7 +40,8 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 		$spinner.addClass( 'inline' );
 		$wpbody.bgbuDisableActions();
 
-		return true;
+		$form.submit();
+		return false;
 	};
 
 	/**
@@ -141,7 +142,7 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 	$( function() {
 		$body.on( 'click', '.action-download', self.downloadArchive );
 		$body.on( 'click', '.restore-now', self.restoreArchiveConfirm );
-		$body.on( 'submit', '#delete-link', self.onClickDelete );
+		$body.on( 'click', '#delete-action a', self.onClickDelete );
 	});
 };
 

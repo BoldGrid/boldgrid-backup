@@ -14,6 +14,9 @@ BoldGrid.ArchiveDetails = function( $ ) {
 
 	var self = this,
 		$body = $( 'body' ),
+		$contentWrap = $( '#wp-content-wrap' ),
+		$downloadFirst = $body.find( '#download_first' );
+		$editorTabs = $body.find( '.wp-editor-tabs button' ),
 		adminLang = BoldGridBackupAdmin.lang,
 		lang = boldgrid_backup_archive_details;
 
@@ -25,7 +28,7 @@ BoldGrid.ArchiveDetails = function( $ ) {
 		var $a = $(this),
 			$td = $a.closest( 'td' ),
 			$tr = $a.closest( 'tr' ),
-			provider = $tr.attr( 'data-remote-provider' ),
+			provider = $a.attr( 'data-provider-id' ),
 			data = {
 				'action' : 'boldgrid_backup_remote_storage_upload_' + provider,
 				'filename' : $( '#filename' ).val(),
@@ -52,7 +55,7 @@ BoldGrid.ArchiveDetails = function( $ ) {
 			.after( ' <span class="spinner inline"></span>' );
 
 		$.post( ajaxurl, data, function( response ) {
-			$td.find( '.spinner' ).remove();
+			$a.next( '.spinner' ).remove();
 
 			if( response.success !== undefined && true === response.success ) {
 				$a
@@ -78,14 +81,14 @@ BoldGrid.ArchiveDetails = function( $ ) {
 	self.onClickDownload = function() {
 		var $button = $( this ),
 			$tr = $button.closest( 'tr' ),
-			provider = $tr.attr( 'data-remote-provider' ),
+			provider = $button.attr( 'data-provider-id' ),
 			data = {
 				'action' : 'boldgrid_backup_remote_storage_download_' + provider,
 				'filename' : $( '#filename' ).val(),
 				'security' : $( '#_wpnonce' ).val(),
 			},
-			$spinner = $tr.find( '.spinner' ),
-			$wpbody = $tr.closest( '#wpbody' );
+			$spinner = $button.next( '.spinner' ),
+			$wpbody = $body.find( '#wpbody' );
 
 		$spinner.addClass( 'inline' );
 
@@ -99,11 +102,64 @@ BoldGrid.ArchiveDetails = function( $ ) {
 	};
 
 	/**
+	 * @summary Action to take when the user clicks the "download remote" button.
+	 *
+	 * This method downloads the first remote archive it finds.
+	 *
+	 * @since 1.5.4
+	 */
+	self.onClickDownloadFirst = function() {
+		var $downloadToServer = $body.find( '.download-to-server' ),
+			$spinner = $( this ).next( '.spinner' );
+
+		$spinner.addClass( 'inline' );
+
+		$downloadToServer.first()
+			.click()
+			// Remvoe the spinner so we don't have two spinners going at same time.
+			.next( '.spinner' ).remove();
+	}
+
+	/**
+	 * @summary Action to take when a tab is clicked on.
+	 *
+	 * These are the "Files & Folders" and "Database" tabs.
+	 *
+	 * @since 1.5.4
+	 */
+	self.onClickTab = function() {
+		var $dbElements = $( '[data-view-type="db"]' ),
+			$fileElements = $( '[data-view-type="file"]' ),
+			view;
+
+		$contentWrap.toggleClass( 'html-active tmce-active' );
+
+		view = $contentWrap.hasClass( 'html-active' ) ? 'db' : 'file';
+
+		switch( view ) {
+			case 'file':
+				$dbElements.hide();
+				$fileElements.show();
+
+				break;
+			case 'db':
+				BoldGrid.ZipBrowser.onClickViewDb();
+
+				$dbElements.show();
+				$fileElements.hide();
+
+				break;
+		}
+	}
+
+	/**
 	 * Init.
 	 */
 	$( function() {
 		$body.on( 'click', '.remote-storage a.upload', self.onClickUpload );
 		$body.on( 'click', '.remote-storage .download-to-server', self.onClickDownload );
+		$editorTabs.on( 'click', self.onClickTab );
+		$downloadFirst.on( 'click', self.onClickDownloadFirst );
 	});
 };
 
