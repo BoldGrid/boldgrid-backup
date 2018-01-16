@@ -70,10 +70,21 @@ $sections = array(
 );
 
 /**
+ * Allow other plugins to modify the sections of the settings page.
  *
+ * @since 1.5.4
+ *
+ * @param array $sections
  */
 $sections = apply_filters( 'boldgrid_backup_settings_sections', $sections );
 
+/**
+ * Render the $sections into displayable markup.
+ *
+ * @since 1.5.4
+ *
+ * @param array $sections
+ */
 $col_container = apply_filters( 'Boldgrid\Library\Ui\render_col_container', $sections );
 
 // Check if settings are available, show an error notice if not.

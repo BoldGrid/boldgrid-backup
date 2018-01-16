@@ -140,15 +140,13 @@ $intro = $this->core->config->is_premium_done ? '' : sprintf( '
 		<strong>%1$s</strong>
 
 		<p>
+			%2$s
 			%3$s
-
-			Please note that most functionality for the Archive Browser, such as one click file restorations, is contained within the Premium version.
-	        For help with restoring a single file without this one click feature, please <a href="%2$s" target="_blank">click here</a>.
 		</p>
 	</div>',
 	/* 1 */ __( 'One click file restorations', 'boldgrid-backup' ),
-	/* 2 */ 'https://www.boldgrid.com/support',
-	/* 3 */ $this->core->go_pro->get_premium_button()
+	/* 2 */ $this->core->go_pro->get_premium_button(),
+	/* 3 */ __( 'Please note that most functionality for the Archive Browser, such as one click file restorations, is contained within the Premium version. For help with restoring a single file without this one click feature, please <a href="https://www.boldgrid.com/support" target="_blank">click here</a>.', 'boldgrid-backup' )
 );
 
 $main_content = sprintf( '
