@@ -59,7 +59,7 @@ foreach( $this->remote_storage_li as $provider ) {
 		%5$s
 		<div data-remote-provider="%3$s">
 			<span style="float:left;"><strong>%1$s</strong></span>
-			<span style="float:right;">%2$s</span>
+			<span style="float:right;max-width:50%%;">%2$s</span>
 
 			<div style="clear:both;"></div>
 

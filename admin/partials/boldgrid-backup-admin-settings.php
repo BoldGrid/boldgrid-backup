@@ -21,6 +21,7 @@ $retention = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/retention.
 $auto_updates = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/auto-updates.php';
 $notifications = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/notifications.php';
 $backup_directory = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/backup-directory.php';
+$connect_key = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/connect-key.php';
 
 $days_of_week = '';
 $time_of_day = '';
@@ -37,6 +38,11 @@ $sections = array(
 			'id' => 'section_schedule',
 			'title' => __( 'Scheduled Backups', 'boldgrid-backup' ),
 			'content' => $scheduler . $days_of_week . $time_of_day . $storage . $folders_include . $db,
+		),
+		array(
+			'id' => 'connect_key',
+			'title' => __( 'BoldGrid Connect Key', 'boldgrid-bacup' ),
+			'content' => $connect_key,
 		),
 		array(
 			'id' => 'section_retention',
@@ -122,8 +128,6 @@ wp_nonce_field( 'boldgrid_backup_settings' );
 		esc_url( $url )
 	);
 	echo '<p>' . $link . '</p>';
-
-	include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/connect-key.php';
 
 	include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/premium-message.php';
 
