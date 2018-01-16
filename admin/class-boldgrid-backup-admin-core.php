@@ -322,6 +322,14 @@ class Boldgrid_Backup_Admin_Core {
 	public $ftp;
 
 	/**
+	 * An instance of the Boldgrid_Backup_Admin_Go_Pro class.
+	 *
+	 * @since 1.5.4
+	 * @var   Boldgrid_Backup_Admin_Go_Pro
+	 */
+	public $go_pro;
+
+	/**
 	 * An instance of the Boldgrid Backup Admin Backup Dir class.
 	 *
 	 * @since 1.5.1
@@ -505,12 +513,17 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->ftp = new Boldgrid_Backup_Admin_Ftp( $this );
 
+		$this->go_pro = new Boldgrid_Backup_Admin_Go_Pro( $this );
+
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
 
 		$this->configs = Boldgrid_Backup_Admin::get_configs();
 
 		$this->set_lang();
+
+		// Need to construct class so necessary filters are added.
+		$ui = new \Boldgrid\Library\Library\Ui();
 	}
 
 	/**
@@ -2119,6 +2132,8 @@ class Boldgrid_Backup_Admin_Core {
 		// Thickbox used for Backup Site Now modal.
 		add_thickbox();
 		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
+
+		wp_enqueue_style( 'bglib-ui-css' );
 
 		// Run the functionality tests.
 		$is_functional = $this->test->run_functionality_tests();

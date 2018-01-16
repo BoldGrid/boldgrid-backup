@@ -9,19 +9,18 @@
 
 defined( 'WPINC' ) ? : die;
 
+ob_start();
+
 $is_retention_set = ( isset( $settings['retention_count'] ) );
 ?>
 
-<hr />
-
-<h2><?php esc_html_e( 'Retention', 'boldgrid-backup' ); ?></h2>
-
-<table class='form-table'>
-	<tr>
-		<th>
+<div class="bg-box">
+	<div class="bg-box-top">
+		<?php esc_html_e( 'Retention', 'boldgrid-backup' ); ?>
+	</div>
+	<div class="bg-box-bottom">
 			<?php esc_html_e( 'Number of backup archives to retain', 'boldgrid-backup' ); ?>
-		</th>
-		<td>
+
 			<select id='retention-count' name='retention_count'>
 			<?php
 			// Loop through each <option> and print it.
@@ -54,6 +53,11 @@ $is_retention_set = ( isset( $settings['retention_count'] ) );
 			}
 			?>
 			</select>
-		</td>
-	</tr>
-</table>
+	</div>
+</div>
+
+<?php
+$output = ob_get_contents();
+ob_end_clean();
+return $output;
+?>

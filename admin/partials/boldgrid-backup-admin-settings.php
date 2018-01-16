@@ -14,6 +14,67 @@
 defined( 'WPINC' ) ? : die;
 
 $nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
+$scheduler = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/scheduler.php';
+$folders_include = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/folders.php';
+$db = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/db.php';
+$retention = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/retention.php';
+$auto_updates = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/auto-updates.php';
+$notifications = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/notifications.php';
+$backup_directory = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/backup-directory.php';
+
+$days_of_week = '';
+$time_of_day = '';
+$storage = '';
+if( $this->core->scheduler->is_available( 'cron' ) || $this->core->scheduler->is_available( 'wp-cron' ) ) {
+	$days_of_week = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/days-of-week.php';
+	$time_of_day = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/time-of-day.php';
+	$storage = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/storage.php';
+}
+
+$sections = array(
+	'sections' => array(
+		array(
+			'id' => 'section_schedule',
+			'title' => __( 'Scheduled Backups', 'boldgrid-backup' ),
+			'content' => $scheduler . $days_of_week . $time_of_day . $storage . $folders_include . $db,
+		),
+		array(
+			'id' => 'section_retention',
+			'title' => __( 'Retention', 'boldgrid-backup' ),
+			'content' => $retention,
+		),
+		array(
+			'id' => 'section_updates',
+			'title' => __( 'Auto Updates & Rollback', 'boldgrid-backup' ),
+			'content' => $auto_updates,
+		),
+		array(
+			'id' => 'section_notifications',
+			'title' => __( 'Notifications', 'boldgrid-backup' ),
+			'content' => $notifications,
+		),
+		array(
+			'id' => 'section_directory',
+			'title' => __( 'Backup Directory', 'boldgrid-backup' ),
+			'content' => $backup_directory,
+		),
+	),
+	'post_col_right' => sprintf( '
+		<div id="boldgrid-settings-submit-div">
+			<p>
+				<input id="boldgrid-settings-submit" class="button button-primary" type="submit" name="submit" value="%1$s" />
+			</p>
+		</div>',
+		__( 'Save Changes', 'boldgrid-backup' )
+	),
+);
+
+/**
+ *
+ */
+$sections = apply_filters( 'boldgrid_backup_settings_sections', $sections );
+
+$col_container = apply_filters( 'Boldgrid\Library\Ui\render_col_container', $sections );
 
 // Check if settings are available, show an error notice if not.
 if ( empty( $settings ) ) {
@@ -31,208 +92,41 @@ wp_nonce_field( 'boldgrid_backup_settings' );
 <div class='wrap'>
 	<h1><?php esc_html_e( 'BoldGrid Backup and Restore Settings', 'boldgrid-backup' ); ?></h1>
 
-	<?php echo $nav; ?>
-
-	<p>
-		<?php
-		/*
-		 * Print this text:
-		 *
-		 * The BoldGrid Backup and Restore system allows you to upgrade your themes and plugins without
-		 * being afraid it will do something you cannot easily undo. We perform a Preflight Check to see
-		 * if the needed support is available on your web hosting account.
-		 */
-		$url = admin_url( 'admin.php?page=boldgrid-backup-test' );
-		$link = sprintf(
-			wp_kses(
-				__( 'The BoldGrid Backup and Restore system allows you to upgrade your themes and plugins without being afraid it will do something you cannot easily undo. We perform a <a href="%s">Preflight Check</a> to see if the needed support is available on your web hosting account.', 'boldgrid-backup' ),
-				array(  'a' => array( 'href' => array() ) )
-			),
-			esc_url( $url )
-		);
-		echo $link;
-		?>
-	</p>
-
 	<?php
-		include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/connect-key.php';
+	echo $nav;
 
-		include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/premium-message.php';
+	/*
+	 * Print this text:
+	 *
+	 * The BoldGrid Backup and Restore system allows you to upgrade your themes and plugins without
+	 * being afraid it will do something you cannot easily undo. We perform a Preflight Check to see
+	 * if the needed support is available on your web hosting account.
+	 */
+	$url = admin_url( 'admin.php?page=boldgrid-backup-test' );
+	$link = sprintf(
+		wp_kses(
+			__( 'The BoldGrid Backup and Restore system allows you to upgrade your themes and plugins without being afraid it will do something you cannot easily undo. We perform a <a href="%s">Preflight Check</a> to see if the needed support is available on your web hosting account.', 'boldgrid-backup' ),
+			array(  'a' => array( 'href' => array() ) )
+		),
+		esc_url( $url )
+	);
+	echo '<p>' . $link . '</p>';
 
-		echo( include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-size-data.php' );
+	include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/connect-key.php';
+
+	include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/premium-message.php';
+
+	echo( include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-size-data.php' );
 	?>
 
+	<hr />
+
 	<form id='schedule-form' method='post'>
-	<?php wp_nonce_field( 'boldgrid-backup-settings', 'settings_auth' ); ?>
-		<input type='hidden' name='save_time' value='<?php echo time(); ?>' />
-
-		<?php
-
-		echo '<hr />';
-
-		printf( '<h2>%1$s</h2>', __( 'Backup Schedule', 'boldgrid-backup' ) );
-
-		echo '<table class="form-table">';
-
-		include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/scheduler.php';
-
-		if( $this->core->scheduler->is_available( 'cron' ) || $this->core->scheduler->is_available( 'wp-cron' ) ) {
-			include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/cron.php';
-			include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/storage.php';
-		}
-
-		echo '</table>';
-
-		$folders_include = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/folders.php';
-		echo '<hr />' . $folders_include;
-
-		$db = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/db.php';
-		echo '<hr />' . $db;
-
-		include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/retention.php';
-
-		?>
-
-		<h2><?php echo __( 'Auto Updates and Rollback', 'boldgrid-inspirations' ); ?></h2>
-
-		<table class="form-table">
-			<tr>
-				<th>
-					<?php esc_html_e( 'Plugin Auto-Updates', 'boldgrid-backup' ); ?>
-		 			<span class="dashicons dashicons-editor-help" data-id="plugin-autoupdate"></span>
-
-		 			<p class="help" data-id="plugin-autoupdate">
-						<?php esc_html_e( 'Automatically perform all plugin updates when available.', 'boldgrid-backup' ); ?>
-					</p>
-		 		</th>
-		 		<td>
-		 			<input id="plugin-autoupdate-enabled" type="radio" name="plugin_autoupdate" value="1"
-					<?php
-					if ( isset( $settings['plugin_autoupdate'] ) &&
-						 1 === $settings['plugin_autoupdate'] ) {
-							?> checked<?php
-					}
-					?> /> <?php esc_html_e( 'Enabled', 'boldgrid-backup' ); ?> &nbsp; <input
-					id="plugin-autoupdate-disabled" type="radio" name="plugin_autoupdate" value="0"
-					<?php
-					if ( ! isset( $settings['plugin_autoupdate'] ) ||
-						! $settings['plugin_autoupdate'] ) {
-							?> checked<?php
-					}
-					?> /> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
-		 		</td>
-		 	</tr>
-
-		 	<tr>
-		 		<th>
-		 			<?php esc_html_e( 'Theme Auto-Updates', 'boldgrid-backup' ); ?>
-		 			<span class="dashicons dashicons-editor-help" data-id="theme-autoupdate"></span>
-
-		 			<p class="help" data-id="theme-autoupdate">
-						<?php esc_html_e( 'Automatically perform all theme updates when available.', 'boldgrid-backup' ); ?>
-					<p>
-		 		</th>
-		 		<td>
-			 		<input id="theme-autoupdate-enabled" type="radio" name="theme_autoupdate" value="1"
-					<?php
-					if ( isset( $settings['theme_autoupdate'] ) &&
-						 1 === $settings['theme_autoupdate'] ) {
-							?> checked<?php
-					}
-					?> /> <?php esc_html_e( 'Enabled', 'boldgrid-backup' ); ?> &nbsp; <input
-					id="theme-autoupdate-disabled" type="radio" name="theme_autoupdate" value="0"
-					<?php
-					if ( ! isset( $settings['theme_autoupdate'] ) ||
-						! $settings['theme_autoupdate'] ) {
-							?> checked<?php
-					}
-					?> /> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
-		 		</td>
-		 	</tr>
-
-		 	<tr>
-		 		<th>
-		 			<?php echo __( 'Auto Backup<br />Before Updates', 'boldgrid-backup' ); ?>
-		 			<span class='dashicons dashicons-editor-help' data-id='auto-backup'></span>
-
-		 			<p class='help' data-id='auto-backup'>
-						<?php esc_html_e( 'Automatically perform a backup before WordPress updates.', 'boldgrid-backup' ); ?>
-					<p>
-		 		</th>
-		 		<td>
-			 		<input id='auto-backup-enabled' type='radio' name='auto_backup'
-					value='1'
-					<?php
-					if ( ! isset( $settings['auto_backup'] ) ||
-						 1 === $settings['auto_backup'] ) {
-						echo ' checked';
-					}
-					?> /> <?php esc_html_e( 'Enabled', 'boldgrid-backup' ); ?> &nbsp; <input
-					id='auto-backup-disabled' type='radio' name='auto_backup' value='0'
-					<?php
-					if ( isset( $settings['auto_backup'] ) && 0 === $settings['auto_backup'] ) {
-						echo ' checked';
-					}
-					?> /> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
-		 		</td>
-		 	</tr>
-
-		 	<tr>
-		 		<th>
-		 			<?php esc_html_e( 'Auto Rollback', 'boldgrid-backup' ); ?><span class='dashicons dashicons-editor-help' data-id='auto-rollback'></span>
-
-		 			<p class='help' data-id='auto-rollback'>
-						<?php
-						esc_html_e(
-							'If something goes wrong while peforming WordPress updates, automatically restore the site using a backup made before updating WordPress.',
-							'boldgrid-backup'
-						);
-						?>
-					</p>
-		 		</th>
-		 		<td>
-			 		<input id='auto-rollback-enabled' type='radio' name='auto_rollback'
-					value='1'
-					<?php
-					if ( ! isset( $settings['auto_rollback'] ) ||
-						 1 === $settings['auto_rollback'] ) {
-						echo ' checked';
-					}
-					?> /> <?php esc_html_e( 'Enabled', 'boldgrid-backup' ); ?> &nbsp; <input
-					id='auto-rollback-disabled' type='radio' name='auto_rollback'
-					value='0'
-					<?php
-					if ( isset( $settings['auto_rollback'] ) && 0 === $settings['auto_rollback'] ) {
-						echo ' checked';
-					}
-					?> /> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
-		 		</td>
-		 	</tr>
-		</table>
-
-		<?php
-
-			include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/notifications.php';
-
-			include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/backup-directory.php';
-
-			/**
-			 * Allow the display of compressor options.
-			 *
-			 * @since 1.5.1
-			 */
-			$show_compressor_options = apply_filters( 'boldgrid_backup_show_compressor_options', false );
-
-			if( $show_compressor_options ) {
-				include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/compressor.php';
-			}
-		?>
-		<div id='boldgrid-settings-submit-div'>
-			<p>
-				<input id='boldgrid-settings-submit' class='button button-primary'
-					type='submit' name='submit'
-					value='<?php esc_html_e( 'Save Changes', 'boldgrid-backup' ); ?>' />
-			</p>
-		</div>
+	<?php
+		echo $col_container;
+		wp_nonce_field( 'boldgrid-backup-settings', 'settings_auth' );
+		printf( '<input type="hidden" name="save_time" value="%1$s" />', time() );
+	?>
 	</form>
+
 </div>

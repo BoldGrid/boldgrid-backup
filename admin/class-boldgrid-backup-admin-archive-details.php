@@ -95,6 +95,8 @@ class Boldgrid_Backup_Admin_Archive_Details {
 		wp_localize_script( 'boldgrid-backup-admin-zip-browser', 'boldgrid_backup_zip_browser', $translations );
 		wp_enqueue_script( 'boldgrid-backup-admin-zip-browser' );
 
+		wp_enqueue_style( 'bglib-ui-css' );
+
 		/**
 		 * Allow other plugins to enqueue scripts on this page.
 		 *

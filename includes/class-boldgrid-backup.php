@@ -211,6 +211,8 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/remote/ftp-hooks.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/remote/ftp-page.php';
 
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-go-pro.php';
+
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
 
@@ -353,6 +355,8 @@ class Boldgrid_Backup {
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_restore_archive', $plugin_admin_core, 'wp_ajax_restore' );
 
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_exclude_folders_preview', $plugin_admin_core->folder_exclusion, 'wp_ajax_preview' );
+
+		$this->loader->add_action( 'admin_init', $plugin_admin_core->config, 'admin_init' );
 
 		/*
 		 * Ftp

@@ -36,14 +36,16 @@ foreach( $schedulers_available as $key => $scheduler_data ) {
 
 $scheduler_select = sprintf( '<select name="scheduler" id="scheduler">%1$s</select>', $scheduler_options );
 
-printf( '
-	<tr>
-		<th>%1$s</th>
-		<td>
+return sprintf( '
+	<div class="bg-box">
+		<div class="bg-box-top">
+			%1$s
+		</div>
+		<div class="bg-box-bottom">
 			%2$s
 			%3$s
-		</td>
-	</tr>',
+		</div>
+	</div>',
 	__( 'Scheduler', 'boldgrid-backup' ),
 	$scheduler_select,
 	$wp_cron_warning

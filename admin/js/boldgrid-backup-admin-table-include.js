@@ -16,16 +16,16 @@ BoldGrid.TableInclude = function( $ ) {
 	'use strict';
 
 	var self = this,
-		$table = $( '#table_inclusion' ),
-		$includeTables   = $table.find( '.include-tables [type="checkbox"]' ),
-		$type            = $table.find( '[name="table_inclusion_type"]' ),
-		$configContainer = $table.find( '#table_inclusion_config' ),
+		$container = $( '#table_inclusion' ),
+		$includeTables   = $container.find( '.include-tables [type="checkbox"]' ),
+		$type            = $container.find( '[name="table_inclusion_type"]' ),
+		$configContainer = $container.find( '#table_inclusion_config' ),
 		// Buttons to include / exclude all.
-		$buttonAll       = $table.find( '#include_all_tables, .include-all' ),
-		$buttonNone      = $table.find( '#exclude_all_tables' ),
+		$buttonAll       = $container.find( '#include_all_tables, .include-all' ),
+		$buttonNone      = $container.find( '#exclude_all_tables' ),
 		// Defaults are the status messages indicating default settings used.
-		$yesDefault      = $table.find( '.yes-default' ),
-		$noDefault       = $table.find( '.no-default' );
+		$yesDefault      = $container.find( '.yes-default' ),
+		$noDefault       = $container.find( '.no-default' );
 
 	/**
 	 * @summary Action to take when the type (full / custom) has been changed.

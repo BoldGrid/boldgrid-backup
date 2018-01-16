@@ -27,7 +27,7 @@ BoldGrid.FolderExclude = function( $ ) {
 		$filter = $container.find( '#folder_exclusion_filter' ),
 		$ul = $excludeFoldersPreview.find( 'ul' ),
 		$type = $container.find( '[name="folder_exclusion_type"]' ),
-		$trs = $container.children( 'tbody' ).children( 'tr:not(:first)' );
+		$trs = $container.find( '.form-table tbody tr' );
 
 	/**
 	 *
@@ -338,15 +338,20 @@ BoldGrid.FolderExclude = function( $ ) {
 	};
 
 	/**
+	 * @summary Toggle display of everything after the "full" or "custom" options.
 	 *
+	 * @since 1.5.4
 	 */
 	self.toggleConfig = function() {
-		var type = $type.filter( ':checked' ).val();
+		var type = $type.filter( ':checked' ).val(),
+			$miscInfo = $( '#folder_misc_info' );
 
 		if( 'full' === type ) {
 			$trs.hide();
+			$miscInfo.hide();
 		} else {
 			$trs.show();
+			$miscInfo.show();
 		}
 	};
 
@@ -354,7 +359,7 @@ BoldGrid.FolderExclude = function( $ ) {
 	 *
 	 */
 	self.toggleStatus = function() {
-		var usingDefaults = $inputInclude.val().trim() === lang.default_include && $inputExclude.val().trim() === lang.default_exclude,
+		var usingDefaults = $inputInclude.val() && $inputInclude.val().trim() === lang.default_include && $inputExclude.val().trim() === lang.default_exclude,
 			$yesDefault = $container.find( '.yes-default' ),
 			$noDefault = $container.find( '.no-default' );
 

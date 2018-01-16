@@ -18,10 +18,8 @@ return sprintf('
 
 		<p>%4$s</p>
 
-		<hr />
 		%2$s
 
-		<hr />
 		%5$s
 
 		<div style="height:70px;"></div>

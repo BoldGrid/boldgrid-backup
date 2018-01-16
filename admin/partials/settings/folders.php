@@ -32,23 +32,14 @@ $markup = '<table class="form-table bulk-action-notice" id="folder_exclusion"><t
 
 // TR for the header and intro
 $tr_header = sprintf( '
-		<tr>
-			<th>
-				<h2>%1$s</h2>
-			</th>
-			<td>
-				<p>
-					<input type="radio" name="folder_exclusion_type" value="full" %4$s>%2$s<br>
-					<input type="radio" name="folder_exclusion_type" value="custom" %5$s>%3$s
-				</p>
-			</td>
-		</tr>
-	',
-	/* 1 */ esc_html__( 'Files and Folders', 'boldgrid-backup' ),
-	/* 2 */ esc_html__( 'Backup all files (full backup)', 'boldgrid-backup' ),
-	/* 3 */ esc_html__( 'Custom Backup', 'boldgrid-backup' ),
-	/* 4 */ $in_modal || $using_defaults ? $checked : '',
-	/* 5 */ ! $in_modal && ! $using_defaults ? $checked : ''
+	<p>
+		<input type="radio" name="folder_exclusion_type" value="full" %3$s>%1$s<br>
+		<input type="radio" name="folder_exclusion_type" value="custom" %4$s>%2$s
+	</p>',
+	/* 1 */ esc_html__( 'Backup all files (full backup)', 'boldgrid-backup' ),
+	/* 2 */ esc_html__( 'Custom Backup', 'boldgrid-backup' ),
+	/* 3 */ $in_modal || $using_defaults ? $checked : '',
+	/* 4 */ ! $in_modal && ! $using_defaults ? $checked : ''
 );
 
 // This markup for the legend.
@@ -148,30 +139,27 @@ $status = sprintf( '
 
 // TR for the help text.
 $tr_help = sprintf( '
-	<tr class="%1$s">
-		<th></th>
-		<td style="padding-top:0px;">
-			<p>
-				<span class="dashicons dashicons-editor-help" data-id="folder_exclude_inputs" style="float:left;margin-right:4px;"></span>
-				%2$s
-			</p>
+	<div id="folder_misc_info">
+		<p>
+			<span class="dashicons dashicons-editor-help" data-id="folder_exclude_inputs" style="float:left;margin-right:4px;"></span>
+			%2$s
+		</p>
 
-			<div class="help" data-id="folder_exclude_inputs" style="padding:20px 0px 20px 20px;margin:15px 0px 0px 0px;">
-				%3$s
-				%4$s
+		<div class="help" data-id="folder_exclude_inputs" style="padding:20px 0px 20px 20px;margin:15px 0px 0px 0px;">
+			%3$s
+			%4$s
 
-				<p>&nbsp;</p>
-				<p>&nbsp;</p>
+			<p>&nbsp;</p>
+			<p>&nbsp;</p>
 
-				%5$s
-				%6$s
-			</div>
+			%5$s
+			%6$s
+		</div>
 
-			<hr class="separator-small" />
+		<hr class="separator-small" />
 
-			%7$s
-		</td>
-	</tr>
+		%7$s
+	</div>
 	',
 	/* 1 */ $using_defaults ? 'hidden' : '',
 	/* 2 */ wp_kses( __( 'Use the <strong>Include</strong> and <strong>Exclude</strong> settings to adjust which files are included in your backup. Click the <strong>Preview</strong> button to see which files will be included in your backup based on your settings.', 'boldgrid-backup' ), $tags ),
@@ -245,21 +233,28 @@ $tr_preview = sprintf( '
 );
 
 $markup = sprintf( '
-	<table class="form-table bulk-action-notice" id="folder_exclusion">
-		<tbody>
+	<div class="bg-box" id="folder_exclusion">
+		<div class="bg-box-top">
 			%1$s
+		</div>
+		<div class="bg-box-bottom">
 			%2$s
 			%3$s
-			%4$s
-			%5$s
-		</tbody>
-	</table>
-	',
-	/* 1 */ $tr_header,
-	/* 2 */ $tr_help,
-	/* 3 */ $tr_include,
-	/* 4 */ $tr_exclude,
-	/* 5 */ $tr_preview
+			<table class="form-table">
+				<tbody>
+					%4$s
+					%5$s
+					%6$s
+				</tbody>
+			</table>
+		</div>
+	</div>',
+	/* 1 */ esc_html__( 'Files and Folders', 'boldgrid-backup' ),
+	/* 2 */ $tr_header,
+	/* 3 */ $tr_help,
+	/* 4 */ $tr_include,
+	/* 5 */ $tr_exclude,
+	/* 6 */ $tr_preview
 );
 
 return $markup;

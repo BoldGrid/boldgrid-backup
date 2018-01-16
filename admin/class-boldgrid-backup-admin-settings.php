@@ -679,6 +679,10 @@ class Boldgrid_Backup_Admin_Settings {
 		add_thickbox();
 		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
 
+		wp_enqueue_style( 'bglib-ui-css' );
+		wp_enqueue_script( 'bglib-ui-js' );
+		wp_enqueue_script( 'bglib-sticky' );
+
 		if( ! $this->is_saving_settings ) {
 			$is_functional = $this->core->test->run_functionality_tests();
 		}

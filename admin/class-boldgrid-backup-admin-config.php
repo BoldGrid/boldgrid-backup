@@ -73,6 +73,16 @@ class Boldgrid_Backup_Admin_Config {
 	private $is_premium = false;
 
 	/**
+	 * Whether or not we have a premium license and the premium extension is
+	 * installed.
+	 *
+	 * @since  1.5.4
+	 * @access public
+	 * @var    bool
+	 */
+	public $is_premium_done = false;
+
+	/**
 	 * Language.
 	 *
 	 * @since  1.3.1
@@ -517,6 +527,19 @@ class Boldgrid_Backup_Admin_Config {
 		}
 
 		return;
+	}
+
+	/**
+	 * Actions to take during the admin_init hook.
+	 *
+	 * @since 1.5.4
+	 */
+	public function admin_init() {
+
+		// Function is_plugin_active only available in and after admin_init.
+		$premium_active = is_plugin_active( 'boldgrid-backup-premium/boldgrid-backup-premium.php' );
+
+		$this->is_premium_done = $this->is_premium && $premium_active;
 	}
 
 	/**

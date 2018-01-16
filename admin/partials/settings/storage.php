@@ -10,6 +10,8 @@
 
 defined( 'WPINC' ) ? : die;
 
+ob_start();
+
 $storage_locations = array(
 	array(
 		'title' => __( 'Local storage', 'boldgrid-backup' ),
@@ -36,13 +38,27 @@ $storage_locations = array(
  */
 $storage_locations = apply_filters( 'boldgrid_backup_register_storage_location', $storage_locations );
 
+$premium_box = $this->core->config->is_premium_done ? '' : sprintf( '
+	<div class="bg-box-bottom premium">
+		<input type="checkbox" disabled="true" /> <strong>%1$s</strong>
+
+		<p>
+			%2$s
+			%3$s
+		</p>
+	</div>',
+	/* 1 */ __( 'Amazon S3', 'boldgrid-backup' ),
+	/* 2 */ $this->core->go_pro->get_premium_button(),
+	/* 3 */ __( 'Upgrade to premium for more Storage Locations!', 'boldgrid-backup' )
+);
+
 ?>
 
-<tr>
-	<th><?php echo __( 'Backup Storage', 'boldgrid-backup' ); ?></th>
-
-	<td>
-
+<div class='bg-box'>
+	<div class='bg-box-top'>
+		<?php echo __( 'Backup Storage', 'boldgrid-backup' ); ?>
+	</div>
+	<div class='bg-box-bottom'>
 		<table id="storage_locations">
 		<?php
 		foreach( $storage_locations as $location ) {
@@ -57,6 +73,12 @@ $storage_locations = apply_filters( 'boldgrid_backup_register_storage_location',
 			<span class="dashicons dashicons-warning yellow"></span>
 			<?php echo __( 'Backup will not occur if no storage locations are selected.', 'boldgrid-backup' ); ?>
 		</p>
+	</div>
+	<?php echo $premium_box; ?>
+</div>
 
-	</td>
-</tr>
+<?php
+$output = ob_get_contents();
+ob_end_clean();
+return $output;
+?>

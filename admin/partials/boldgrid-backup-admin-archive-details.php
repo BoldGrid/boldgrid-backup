@@ -98,18 +98,25 @@ $main_meta_box = sprintf( '
 );
 
 $remote_meta_box = sprintf( '
-	<div id="submitdiv" class="postbox remote-storage">
+	<div class="postbox remote-storage">
 		<h2 class="hndle ui-sortable-handle"><span>%1$s</span></h2>
 
 		<div class="inside">
-
-			<div class="misc-pub-section">
-				%2$s
-			</div>
+			%2$s
 		</div>
+
+		%3$s
 	</div>',
 	/* 1 */ __( 'Remote Storage', 'boldgrid-backup' ),
-	/* 2 */ $remote_storage['postbox']
+	/* 2 */ $remote_storage['postbox'],
+	/* 3 */ $this->core->config->is_premium_done ? '' : sprintf( '
+		<div class="inside premium wp-clearfix">
+			%1$s
+			%2$s
+		</div>',
+		/* 1 */ $this->core->go_pro->get_premium_button(),
+		/* 2 */ __( 'Upgrade to BoldGrid Backup Premium for more Storage Locations!', 'boldgrid-backup' )
+	)
 );
 
 $editor_tools = sprintf( '
@@ -126,6 +133,22 @@ $editor_tools = sprintf( '
 	/* 1 */ $db['buttons'],
 	/* 2 */ __( 'Files & Folders', 'boldgrid-backup' ),
 	/* 3 */ __( 'Database', 'boldgrid-backup')
+);
+
+$intro = $this->core->config->is_premium_done ? '' : sprintf( '
+	<div class="bg-box-bottom premium">
+		<strong>%1$s</strong>
+
+		<p>
+			%3$s
+
+			Please note that most functionality for the Archive Browser, such as one click file restorations, is contained within the Premium version.
+	        For help with restoring a single file without this one click feature, please <a href="%2$s" target="_blank">click here</a>.
+		</p>
+	</div>',
+	/* 1 */ __( 'One click file restorations', 'boldgrid-backup' ),
+	/* 2 */ 'https://www.boldgrid.com/support',
+	/* 3 */ $this->core->go_pro->get_premium_button()
 );
 
 $main_content = sprintf( '
@@ -145,6 +168,8 @@ $main_content = sprintf( '
 
 			<p>%9$s</p>
 
+			%10$s
+
 			%5$s
 
 		</div>
@@ -162,7 +187,8 @@ $main_content = sprintf( '
 	/* 6 */ $download_button,
 	/* 7 */ $restore_button,
 	/* 8 */ __( 'Backup Browser', 'boldgrid-backup' ),
-	/* 9 */ __( 'Use the File & Folders and Database tools below to browse the contents of this backup file.', 'boldgrid-backup' )
+	/* 9 */ __( 'Use the File & Folders and Database tools below to browse the contents of this backup file.', 'boldgrid-backup' ),
+	/* 10 */ $intro
 );
 
 if( ! $archive_found && count( $this->remote_storage_li ) > 0 ) {

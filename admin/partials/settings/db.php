@@ -54,26 +54,24 @@ $status = sprintf( '
 );
 
 return sprintf( '
-	<table class="form-table" id="table_inclusion">
-		<tr>
-			<th>
-				<h2>%1$s</h2>
-			</th>
-			<td>
-				<p>%2$s</p>
+	<div class="bg-box" id="table_inclusion">
+		<div class="bg-box-top">
+			%1$s
+		</div>
+		<div class="bg-box-bottom wp-clearfix">
+			<p>%2$s</p>
 
-				<div id="table_inclusion_config">
-					%3$s
+			<div id="table_inclusion_config">
+				%3$s
 
-					<p>%4$s</p>
+				<p>%4$s</p>
 
-					<div class="include-tables">
-						%5$s
-					</div>
+				<div class="include-tables">
+					%5$s
 				</div>
-			</td>
-		</tr>
-	</table>
+			</div>
+		</div>
+	</div>
 	',
 	/* 1 */ esc_html__( 'Database', 'boldgrid-backup' ),
 	/* 2 */ $types,
