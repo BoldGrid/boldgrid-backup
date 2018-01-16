@@ -131,6 +131,19 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 
 		$dump_file = $this->core->get_dump_file( $filepath );
 
+		$log_filepath = $this->core->archive_log->path_from_zip( $filepath );
+
+		// An array of files not to show in the archive browser.
+		$no_show = array(
+			/*
+			 * If this is our database dump file, skip over it. We have another
+			 * section of the archive details page that will help with restoring
+			 * a dump file.
+			 */
+			basename( $dump_file ),
+			basename( $log_filepath ),
+		);
+
 		$dir = ! empty( $_POST['dir'] ) ? $_POST['dir'] : null;
 
 		$zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this->core );
@@ -159,13 +172,7 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 		);
 
 		foreach( $contents as $file ) {
-
-			/*
-			 * If this is our database dump file, skip over it. We have another
-			 * section of the archive details page that will help with restoring
-			 * a dump file.
-			 */
-			if( basename( $file['filename'] ) === basename( $dump_file ) ) {
+			if( in_array( basename( $file['filename'] ), $no_show, true ) ) {
 				continue;
 			}
 
