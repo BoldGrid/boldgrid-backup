@@ -133,6 +133,13 @@ class Boldgrid_Backup_Admin_Archives {
 			</table>
 		';
 
+		if( empty( $this->core->archives_all->all ) ) {
+			$table = sprintf( '
+				<p>%1$s</p>',
+				__( 'You currently do not have any backups.', 'boldgrid-backup' )
+			);
+		}
+
 		return $table;
 	}
 }

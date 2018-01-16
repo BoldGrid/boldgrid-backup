@@ -27,6 +27,8 @@ defined( 'WPINC' ) ? : die;
  * 	@type int $lastmodunix The archive file modification time in unix seconds.
  * }
  * @param string $backup_identifier The backup identifier for this installation.
+ * @param string $table             Markup for a table of current backups. If no
+ *                                  backups, it's a p tag with appropriate message.
  */
 
 $nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
