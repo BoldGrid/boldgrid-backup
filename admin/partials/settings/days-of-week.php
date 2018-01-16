@@ -10,7 +10,7 @@ defined( 'WPINC' ) ? : die;
 ob_start();
 ?>
 
-<div class="bg-box">
+<div class="bg-box schedule-dow">
 	<div class="bg-box-top">
 		<?php esc_html_e( 'Days of the Week', 'boldgrid-backup' ); ?>
 	</div>
