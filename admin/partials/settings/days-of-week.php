@@ -31,12 +31,6 @@ ob_start();
 			?></p>
 		</div>
 
-		<div class='hidden' id='free-dow-limit'>
-			<p><span class="dashicons dashicons-warning yellow"></span> <?php
-				esc_html_e( 'Free Backup License supports only scheduling two days a week.', 'boldgrid-backup' );
-			?></p>
-		</div>
-
 		<?php
 			$url = $this->core->configs['urls']['resource_usage'];
 			$link = sprintf(

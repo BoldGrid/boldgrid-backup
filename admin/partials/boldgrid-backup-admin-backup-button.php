@@ -20,7 +20,7 @@ return sprintf(
 				%4$s
 			</p>
 			<p>
-				<a id="backup-site-now" class="button button-primary" disabled="disabled" %3$s >
+				<a id="backup-site-now" class="button button-primary" %3$s >
 					%2$s
 				</a>
 				<span class="spinner"></span>

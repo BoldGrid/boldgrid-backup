@@ -310,11 +310,6 @@ class Boldgrid_Backup {
 			'wp_ajax_get_deadline'
 		);
 
-		// Add a custom action to handle AJAX callback for getting size data.
-		$this->loader->add_action( 'wp_ajax_boldgrid_backup_sizes', $plugin_admin_core,
-			'boldgrid_backup_sizes_callback'
-		);
-
 		$this->loader->add_action( 'boldgrid_backup_pre_restore', $plugin_admin_core->restore_helper, 'pre_restore' );
 		$this->loader->add_action( 'boldgrid_backup_post_restore', $plugin_admin_core->restore_helper, 'post_restore' );
 		$this->loader->add_action( 'boldgrid_backup_post_restore_htaccess', $plugin_admin_core->restore_helper, 'post_restore_htaccess' );

@@ -454,11 +454,8 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 
 		// Show admin notice.
 		$backup_button = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-button.php';
-		$size_data = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-size-data.php';
 		$notice = $this->notice_backup_get();
-		do_action( 'boldgrid_backup_notice', $notice . $size_data . $backup_button, 'notice notice-warning is-dismissible' );
-
-		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-js-templates.php';
+		do_action( 'boldgrid_backup_notice', $notice . $backup_button, 'notice notice-warning is-dismissible' );
 	}
 
 	/**

@@ -36,7 +36,7 @@ $sections = array(
 	'sections' => array(
 		array(
 			'id' => 'section_schedule',
-			'title' => __( 'Scheduled Backups', 'boldgrid-backup' ),
+			'title' => __( 'Backup Schedule', 'boldgrid-backup' ),
 			'content' => $scheduler . $days_of_week . $time_of_day . $storage . $folders_include . $db,
 		),
 		array(
@@ -128,10 +128,6 @@ wp_nonce_field( 'boldgrid_backup_settings' );
 		esc_url( $url )
 	);
 	echo '<p>' . $link . '</p>';
-
-	include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/premium-message.php';
-
-	echo( include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-size-data.php' );
 	?>
 
 	<hr />

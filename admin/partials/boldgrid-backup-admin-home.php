@@ -37,6 +37,9 @@ $nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav
 <div class='wrap'>
 
 <h1 class="wp-heading-inline"><?php esc_html_e( 'Backup Archives', 'boldgrid-backup' ); ?></h1>
+
+<a href="#TB_inline?width=800&amp;height=600&amp;inlineId=backup_now_content" class="thickbox page-title-action page-title-action-primary"><?php echo __( 'Backup Site Now', 'boldgrid-backup' ); ?></a>
+
 <a class="page-title-action add-new"><?php echo __( 'Upload Backup', 'boldgrid-backup' ); ?></a>
 
 <?php
@@ -45,20 +48,6 @@ $nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav
 	include BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
 
 	echo $table;
-?>
-
-<?php if( ! empty( $archives ) ) { ?>
-<p>
-<?php esc_html_e( 'These backups are stored on your server. You should occasionally download them to your local computer.', 'boldgrid-backup' ); ?>
-</p>
-<?php } ?>
-
-<hr />
-
-<?php
-	include BOLDGRID_BACKUP_PATH . '/admin/partials/archives/premium-message.php';
-
-	echo( include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-size-data.php' );
 
 	$in_modal = true;
 	$modal = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-modal.php';

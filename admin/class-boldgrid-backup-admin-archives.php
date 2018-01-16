@@ -90,10 +90,16 @@ class Boldgrid_Backup_Admin_Archives {
 
 		$table = $this->get_mine_count();
 
-		$table .= '
+		$table .= sprintf( '
 			<table class="wp-list-table widefat fixed striped pages">
-				<tbody id="backup-archive-list-body">
-			';
+				<thead>
+					<td>%1$s</td>
+					<td>%2$s</td>
+					<td></td>
+				<tbody id="backup-archive-list-body">',
+			__( 'Date', 'boldgrid-backup'),
+			__( 'Size', 'boldgrid-backup')
+		);
 
 		foreach( $this->core->archives_all->all as $archive ) {
 

@@ -61,7 +61,7 @@ class Boldgrid_Backup_Admin_Config {
 	 * @access private
 	 * @var    int
 	 */
-	private $default_retention = 4;
+	private $default_retention = 5;
 
 	/**
 	 * This is the premium version of the plugin.
@@ -92,98 +92,6 @@ class Boldgrid_Backup_Admin_Config {
 	public $lang = array();
 
 	/**
-	 * Max db space (high end) that can be backed up.
-	 *
-	 * Between $this->max_db_low and $this->max_db_high.
-	 *
-	 * 1GB.
-	 *
-	 * @since  1.3.1
-	 * @access private
-	 * @var    int
-	 */
-	private $max_db_high = 1073741824;
-
-	/**
-	 * Max db space (low end) that can be backed up.
-	 *
-	 * Between $this->max_db_low and $this->max_db_high.
-	 *
-	 * 100MB.
-	 *
-	 * @since  1.3.1
-	 * @access private
-	 * @var    int
-	 */
-	private $max_db_low = 104857600;
-
-	/**
-	 * Max disk space (low end) that can be backed up without running into issues.
-	 *
-	 * Between $this->max_disk_low and $this->max_disk_high.
-	 *
-	 * 1GB.
-	 *
-	 * @since  1.3.1
-	 * @access private
-	 * @var    int
-	 */
-	private $max_disk_low = 1073741824;
-
-	/**
-	 * Max disk space (high end) that can be backed up without running into issues.
-	 *
-	 * Between $this->max_disk_low and $this->max_disk_high.
-	 *
-	 * 10GB.
-	 *
-	 * @since  1.3.1
-	 * @access private
-	 * @var    int
-	 */
-	private $max_disk_high = 10737418240;
-
-	/**
-	 * Free plugin: Max days of the week backups can be scheduled for.
-	 *
-	 * @since  1.3.1
-	 * @access private
-	 * @var    int
-	 */
-	private $max_dow = 2;
-
-	/**
-	 * Free plugin: Max db space that can be backed up.
-	 *
-	 * 100MB.
-	 *
-	 * @since  1.3.1
-	 * @access private
-	 * @var    int
-	 */
-	private $max_free_db = 104857600;
-
-	/**
-	 * Free plugin: Max disk space that can be backed up.
-	 *
-	 * 1GB.
-	 *
-	 * @since  1.3.1
-	 * @access private
-	 * @var    int
-	 */
-	private $max_free_disk = 1073741824;
-
-	/**
-	 * Free plugin: Max number of archives to retain.
-	 *
-	 * @since  1.3.1
-	 * @access private
-	 * @var    int
-	 */
-	private $max_retention = 4;
-
-	/**
 	 * Constructor.
 	 *
 	 * @since 1.0
@@ -198,10 +106,6 @@ class Boldgrid_Backup_Admin_Config {
 
 		$license = new \Boldgrid\Library\Library\License();
 		$this->is_premium = $license->isPremium( 'boldgrid-backup' );
-
-		if( true === $this->is_premium ) {
-			$this->default_retention = 5;
-		}
 
 		$this->set_lang();
 	}
@@ -304,120 +208,6 @@ class Boldgrid_Backup_Admin_Config {
 	 */
 	public function get_is_premium() {
 		return $this->is_premium;
-	}
-
-	/**
-	 * Return max db size that can be backed up.
-	 *
-	 * This method takes into consideration whether you have a premium account or not.
-	 *
-	 * @since 1.3.3
-	 *
-	 * @return int
-	 */
-	public function get_max_db() {
-		return ( $this->is_premium ? $this->max_db_high : $this->max_free_db );
-	}
-
-	/**
-	 * Get max_db_low.
-	 *
-	 * @since 1.3.1
-	 *
-	 * @return int
-	 */
-	public function get_max_db_low() {
-		return $this->max_db_low;
-	}
-
-	/**
-	 * Return max disk space that can be backed up.
-	 *
-	 * This method takes into consideration whether you have a premium account or not.
-	 *
-	 * @since 1.3.3
-	 *
-	 * @return int
-	 */
-	public function get_max_disk() {
-		return ( $this->is_premium ? $this->max_disk_high : $this->max_free_disk );
-	}
-
-	/**
-	 * Get max_db_high.
-	 *
-	 * @since 1.3.1
-	 *
-	 * @return int
-	 */
-	public function get_max_db_high() {
-		return $this->max_db_high;
-	}
-
-	/**
-	 * Get max_disk_high.
-	 *
-	 * @since 1.3.1
-	 *
-	 * @return int
-	 */
-	public function get_max_disk_high() {
-		return $this->max_disk_high;
-	}
-
-	/**
-	 * Get max_disk_low.
-	 *
-	 * @since 1.3.1
-	 *
-	 * @return int
-	 */
-	public function get_max_disk_low() {
-		return $this->max_disk_low;
-	}
-
-	/**
-	 * Get max_dow.
-	 *
-	 * @since 1.3.1
-	 *
-	 * @return int
-	 */
-	public function get_max_dow() {
-		return $this->max_dow;
-	}
-
-	/**
-	 * Get max_free_db.
-	 *
-	 * @since 1.3.1
-	 *
-	 * @return int.
-	 */
-	public function get_max_free_db() {
-		return $this->max_free_db;
-	}
-
-	/**
-	 * Get max_free_disk.
-	 *
-	 * @since 1.3.1
-	 *
-	 * @return int.
-	 */
-	public function get_max_free_disk() {
-		return $this->max_free_disk;
-	}
-
-	/**
-	 * Get max_retention.
-	 *
-	 * @since 1.3.1
-	 *
-	 * @return int
-	 */
-	public function get_max_retention() {
-		return $this->max_retention;
 	}
 
 	/**

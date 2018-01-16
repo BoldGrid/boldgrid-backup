@@ -19,7 +19,6 @@ BoldGrid.Settings = function( $ ) {
 	var self = this,
 		$scheduleDow,
 		$noBackupDays,
-		$freeDowLimit,
 		$useSparingly,
 		$backupDir,
 		tb_unload_count,
@@ -37,13 +36,6 @@ BoldGrid.Settings = function( $ ) {
 
 	// Define a context selector for no-backup-days.
 	$noBackupDays = $( '#no-backup-days' );
-
-	/**
-	 * Message describing dow limitations.
-	 *
-	 * @since 1.3.1
-	 */
-	$freeDowLimit = $( '#free-dow-limit' );
 
 	/**
 	 * Message asking user if we should move their backups.
@@ -185,28 +177,6 @@ BoldGrid.Settings = function( $ ) {
 	self.toggleNoBackupDays = function() {
 		// How many days of the week are checked?
 		var daysCount = $scheduleDow.find( ':checked' ).length;
-
-		/*
-		 * If this is not the premium version of the plugin, enforce a limit to the days of the week
-		 * selection.
-		 *
-		 * @since 1.3.1
-		 */
-		if( 'false' === BoldGridBackupAdmin.is_premium ) {
-			if( daysCount >= BoldGridBackupAdmin.max_dow ) {
-				// Disable all checkboxes not currently selected.
-				$scheduleDow.find( ':checkbox:not(:checked)' ).prop( 'disabled', true );
-
-				// Show a message.
-				$freeDowLimit.show();
-			} else {
-				// Enable all checkboxes.
-				$scheduleDow.find( ':checkbox' ).prop( 'disabled', false );
-
-				// Hide the message.
-				$freeDowLimit.hide();
-			}
-		}
 
 		/*
 		 * If the user has selected more than 1 day under "Days of the Week", show a message about

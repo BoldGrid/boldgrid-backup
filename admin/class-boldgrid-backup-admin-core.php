@@ -431,8 +431,6 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->wp_filesystem = $wp_filesystem;
 
-		add_action( 'admin_enqueue_scripts', array( $this, 'register_scripts' ) );
-
 		// Instantiate Boldgrid_Backup_Admin_Settings.
 		$this->settings = new Boldgrid_Backup_Admin_Settings( $this );
 
@@ -1363,26 +1361,6 @@ class Boldgrid_Backup_Admin_Core {
 			);
 		}
 
-		/*
-		 * Check if disk and db are within limits of backup.
-		 *
-		 * For example, are they trying to backup 20G of disk when the plugin only supports 10? If
-		 * check fails, abort with appropriate message.
-		 */
-		$size_data = $this->test->get_size_data();
-		if( ! empty( $size_data['messages']['notSupported'] ) ) {
-			// If we're backing up via cron, send email.
-			if( DOING_CRON ) {
-				$body = sprintf( $email_templates['fail_size']['body'], $size_data['messages']['notSupported'] );
-				$subject = sprintf( $email_templates['fail_size']['subject'], get_site_url() );
-				$this->email->send( $subject, $body );
-			}
-
-			return array(
-				'error' => $size_data['messages']['notSupported'],
-			);
-		}
-
 		// Close any PHP session, so that another session can open during the backup operation.
 		session_write_close();
 
@@ -2210,9 +2188,6 @@ class Boldgrid_Backup_Admin_Core {
 		// Include the home page template.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-home.php';
 
-		// Include our js templates.
-		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-js-templates.php';
-
 		return;
 	}
 
@@ -2423,20 +2398,6 @@ class Boldgrid_Backup_Admin_Core {
 	}
 
 	/**
-	 * Register scripts.
-	 *
-	 * @since 1.3.3.
-	 */
-	public function register_scripts() {
-		wp_register_script( 'boldgrid-backup-now',
-			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-now.js',
-			array( 'jquery', 'wp-util' ),
-			BOLDGRID_BACKUP_VERSION,
-			false
-		);
-	}
-
-	/**
 	 * Set lang strings.
 	 *
 	 * @since 1.5.3
@@ -2606,30 +2567,5 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		return;
-	}
-
-	/**
-	 * Callback for getting size data.
-	 *
-	 * @since 1.3.1
-	 */
-	public function boldgrid_backup_sizes_callback() {
-		session_write_close();
-
-		// Check user capabilities.
-		if ( ! current_user_can( 'update_plugins' ) ) {
-			wp_die( 'unauthorized' );
-		}
-
-		// Check nonce.
-		if( ! check_ajax_referer( 'boldgrid_backup_sizes', 'sizes_auth', false ) ) {
-			wp_die( 'unauthorized' );
-		}
-
-		$return = $this->test->get_size_data();
-
-		echo json_encode( $return );
-
-		wp_die();
 	}
 }

@@ -281,30 +281,6 @@ class Boldgrid_Backup_Admin_Settings {
 			$retention_count = $this->core->config->get_default_retention();
 		}
 
-		/*
-		 * If we're on the free version of the plugin and the scheduled "Days of the Week"
-		 * limitation has been reached, show an error and abort.
-		 */
-		if( ! $this->core->config->get_is_premium() && $this->get_dow_count() > $this->core->config->get_max_dow() ) {
-			printf( '<div class="notice notice-error is-dismissible"><p>%s %d<p></div>',
-					esc_html__( 'Error: You have scheduled backups to run during too many days of the week. The free version of BoldGrid Backup supports:', 'boldgrid-backup' ),
-					$this->core->config->get_max_dow()
-			);
-			return;
-		}
-
-		/*
-		 * If we're on the free version of the plugin and the retention count is set higher than the
-		 * limitation, show an error and abort.
-		 */
-		if( ! $this->core->config->get_is_premium() && $retention_count > $this->core->config->get_max_retention() ) {
-			printf( '<div class="notice notice-error is-dismissible"><p>%s %d<p></div>',
-				esc_html__( 'Error: You tried setting the backup archive count more than which the free version supports:', 'boldgrid-backup' ),
-				$this->core->config->get_max_retention()
-			);
-			return;
-		}
-
 		// Check for settings update.
 		if ( ! empty( $_POST['save_time'] ) ) {
 			// Get settings.
@@ -766,9 +742,6 @@ class Boldgrid_Backup_Admin_Settings {
 
 		// Include the page template.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-settings.php';
-
-		// Include our js templates.
-		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-js-templates.php';
 
 		return;
 	}
