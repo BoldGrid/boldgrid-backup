@@ -835,12 +835,17 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @since 1.0
 	 *
+	 * @global array $submenu
+	 *
 	 * @return null
 	 */
 	public function add_menu_items() {
+		global $submenu;
+
 		$lang = array(
 			'backup_archive' =>  __( 'Backup Archive', 'boldgrid-backup' ),
 			'boldgrid_backup' => __( 'BoldGrid Backup', 'boldgrid-backup' ),
+			'get_premium' => __( 'Get Premium', 'boldgrid-bacukp' ),
 			'preflight_check' => __( 'Preflight Check', 'boldgrid-backup' ),
 			'settings' =>        __( 'Settings', 'boldgrid-backup' ),
 		);
@@ -917,6 +922,24 @@ class Boldgrid_Backup_Admin_Core {
 				'render_archive',
 			)
 		);
+
+		// Add our "Get Premium" link to the navigation.
+		if( ! $this->config->is_premium_done ) {
+			add_submenu_page(
+				$main_slug,
+				$lang['get_premium'],
+				'<span class="dashicons dashicons-dashboard"></span> <span class="get-premium">' . $lang['get_premium'] . '</span>',
+				$capability,
+				'get-premium'
+			);
+
+			// Change the url (2 is key of the menu item's slug / url).
+			foreach( $submenu[$main_slug] as &$item ) {
+				if( 'get-premium' === $item[2] ) {
+					$item[2] = $this->go_pro->url;
+				}
+			}
+		}
 
 		return;
 	}

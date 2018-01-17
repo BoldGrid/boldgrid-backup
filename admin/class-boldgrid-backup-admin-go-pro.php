@@ -29,6 +29,15 @@ class Boldgrid_Backup_Admin_Go_Pro {
 	private $core;
 
 	/**
+	 * Generic upgrade link.
+	 *
+	 * @since  1.5.4
+	 * @access public
+	 * @var    string
+	 */
+	public $url = 'https://boldgrid.com/update-backup';
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.5.4

@@ -20,6 +20,15 @@
 class Boldgrid_Backup_Admin_Email {
 
 	/**
+	 * An array of ads.
+	 *
+	 * @since  1.5.4
+	 * @access private
+	 * @var    array
+	 */
+	private $ads = array();
+
+	/**
 	 * The core class object.
 	 *
 	 * @since  1.5.2
@@ -48,14 +57,32 @@ class Boldgrid_Backup_Admin_Email {
 	 * @return string
 	 */
 	public function fill_generic_template( $message ) {
+		$this->init_ads();
+
 		$email_body = __( 'Hello', 'boldgrid-backup' ) . ",\n\n";
 
 		$email_body .= trim( $message ) . "\n\n";
+
+		$email_body .= $this->ads['generic'];
 
 		$email_body .= __( 'Best regards', 'boldgrid-backup' ) . ",\n\n";
 		$email_body .= __( 'The BoldGrid Backup plugin', 'boldgrid-backup' ) . "\n\n";
 
 		return $email_body;
+	}
+
+	/**
+	 * Init our ads.
+	 *
+	 * @since 1.5.4
+	 */
+	public function init_ads() {
+		$this->ads = array(
+			'generic' => $this->core->config->is_premium_done ? '' : sprintf(
+				__( 'Want to store your backups on Amazon S3, restore individual files with just a click, and have access to more tools? Get BoldGrid Backup Premium! - %1$s', 'boldgrid-backup' ),
+				$this->core->go_pro->url
+			) . "\n\n",
+		);
 	}
 
 	/**
@@ -67,6 +94,8 @@ class Boldgrid_Backup_Admin_Email {
 	 * @return array
 	 */
 	public function post_archive_parts( $info ) {
+		$this->init_ads();
+
 		$parts = array();
 
 		$site_id = Boldgrid_Backup_Admin_Utility::create_site_id();
@@ -98,6 +127,9 @@ class Boldgrid_Backup_Admin_Email {
 
 		$parts['body']['signature'] = esc_html__( 'You can manage notifications in your WordPress admin panel, under BoldGrid Backup Settings', 'boldgrid-backup' ) . ".\n\n";
 		$parts['body']['signature'] .= sprintf( esc_html__( 'For help with restoring a BoldGrid Backup archive file, please visit: %s', 'boldgrid-backup' ), esc_url( $this->core->configs['urls']['restore'] ) ) . "\n\n";
+
+		$parts['body']['signature'] .= $this->ads['generic'];
+
 		$parts['body']['signature'] .= esc_html__( 'Best regards', 'boldgrid-backup' ) . ",\n\n";
 		$parts['body']['signature'] .= esc_html__( 'The BoldGrid Backup plugin', 'boldgrid-backup' ) . "\n\n";
 

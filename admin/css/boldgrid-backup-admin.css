@@ -95,3 +95,9 @@ hr.separator {
 hr.separator-small {
 	margin: 20px 0px;
 }
+
+/* Get Premium link in the left nav. */
+.toplevel_page_boldgrid-backup-settings .get-premium,
+.toplevel_page_boldgrid-backup-settings .dashicons-dashboard {
+	color: #ffb900;
+}

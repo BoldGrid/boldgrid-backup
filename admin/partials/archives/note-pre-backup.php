@@ -11,7 +11,7 @@
 defined( 'WPINC' ) ? : die;
 ?>
 
-<p id='note-pre-backup' class='hidden'>
+<p id='note-pre-backup'>
 <?php
 	/*
 	 * Print this text:

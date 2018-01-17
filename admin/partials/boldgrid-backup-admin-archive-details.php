@@ -115,7 +115,7 @@ $remote_meta_box = sprintf( '
 			%2$s
 		</div>',
 		/* 1 */ $this->core->go_pro->get_premium_button(),
-		/* 2 */ __( 'Upgrade to BoldGrid Backup Premium for more Storage Locations!', 'boldgrid-backup' )
+		/* 2 */ __( 'Upgrade to <strong>BoldGrid Backup Premium</strong> for more Storage Locations!', 'boldgrid-backup' )
 	)
 );
 

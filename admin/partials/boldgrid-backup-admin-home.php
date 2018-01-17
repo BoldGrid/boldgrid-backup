@@ -33,28 +33,42 @@ defined( 'WPINC' ) ? : die;
 
 $nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
 
+// Premium advertisement on the bottom of the archives page.
+$ad = $this->config->is_premium_done ? '' : sprintf( '
+	<div class="bg-box-bottom premium wp-clearfix">
+		%1$s
+		%2$s
+	</div>',
+	$this->go_pro->get_premium_button(),
+	__( 'Want to store your backups on Amazon S3, restore individual files with just a click, and have access to more tools? Get <strong>BoldGrid Backup Premium</strong>!', 'boldgrid-backup' )
+);
+
+// Backup now modal.
+$in_modal = true;
+$modal = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-modal.php';
+$in_modal = false;
+
 ?>
 <div class='wrap'>
 
-<h1 class="wp-heading-inline"><?php esc_html_e( 'Backup Archives', 'boldgrid-backup' ); ?></h1>
+	<h1 class="wp-heading-inline"><?php esc_html_e( 'Backup Archives', 'boldgrid-backup' ); ?></h1>
 
-<a href="#TB_inline?width=800&amp;height=600&amp;inlineId=backup_now_content" class="thickbox page-title-action page-title-action-primary"><?php echo __( 'Backup Site Now', 'boldgrid-backup' ); ?></a>
+	<a href="#TB_inline?width=800&amp;height=600&amp;inlineId=backup_now_content" class="thickbox page-title-action page-title-action-primary"><?php echo __( 'Backup Site Now', 'boldgrid-backup' ); ?></a>
 
-<a class="page-title-action add-new"><?php echo __( 'Upload Backup', 'boldgrid-backup' ); ?></a>
+	<a class="page-title-action add-new"><?php echo __( 'Upload Backup', 'boldgrid-backup' ); ?></a>
 
-<?php
+	<?php
 	echo $nav;
 
 	include BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
 
 	echo $table;
 
-	$in_modal = true;
-	$modal = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-modal.php';
-	$in_modal = false;
 	echo $modal;
 
 	include BOLDGRID_BACKUP_PATH . '/admin/partials/archives/note-pre-backup.php';
-?>
+
+	echo $ad;
+	?>
 
 </div>
