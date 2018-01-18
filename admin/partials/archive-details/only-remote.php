@@ -13,15 +13,20 @@ defined( 'WPINC' ) ? : die;
 
 return sprintf( '
 	<p>
-		%1$s %2$s
-
+		%1$s <span class="dashicons dashicons-editor-help" data-id="help-web-server"></span>
 	</p>
-	%3$s %4$s
+	<p class="help" data-id="help-web-server">
+		%4$s
+	</p>
+	%2$s %3$s
 	',
-	$this->core->lang['icon_warning'],
-	__( 'This backup file is not on your web server, but it is saved to one or more of your remote storage providers. Before you can restore this backup file, please download it to your web server. After the backup is downloaded, you can then view more details about the backup and restore it if you\'d like.', 'boldgrid-backup' ),
+	__( 'This backup file is not on your <strong>web server</strong>, but it is saved to one or more of your <strong>remote storage providers</strong>. If you would like to restore this backup or review the contents of this backup, you will first need to download it to your web server.', 'boldgrid-backup' ),
 	'<a class="button button-primary" id="download_first">Download to web server</a>',
-	$this->core->lang['spinner']
+	$this->core->lang['spinner'],
+	sprintf(
+		__( 'After your backup has been downloaded to the web server, this page will refresh and you will see more options available. To learn more about your web server vs. remote storage providers, <a href="%1$s">click here</a>.', 'boldgrid-backup' ),
+		'admin.php?page=boldgrid-backup-tools&section=section_locations'
+	)
 );
 
 ?>

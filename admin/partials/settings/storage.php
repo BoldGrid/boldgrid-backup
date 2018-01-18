@@ -14,7 +14,7 @@ ob_start();
 
 $storage_locations = array(
 	array(
-		'title' => __( 'Local storage', 'boldgrid-backup' ),
+		'title' => __( 'Web Server', 'boldgrid-backup' ),
 		'key' => 'local',
 		'is_setup' => true,
 		'enabled' => ! empty( $settings['remote']['local']['enabled'] ) && true === $settings['remote']['local']['enabled'],
@@ -57,8 +57,13 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf( '
 <div class='bg-box'>
 	<div class='bg-box-top'>
 		<?php echo __( 'Backup Storage', 'boldgrid-backup' ); ?>
+		<?php echo '<span class="dashicons dashicons-editor-help" data-id="remote_storage"></span>'; ?>
 	</div>
 	<div class='bg-box-bottom'>
+		<p class="help" data-id="remote_storage">
+			<?php echo __( 'The following is a list of storage locations available to store your backup archives on. It is recommended to store your backups on at least 2 different storage locations. You can find more information <a href="admin.php?page=boldgrid-backup-tools&section=section_locations">here</a>.', 'boldgrid-backup' ); ?>
+		</p>
+
 		<table id="storage_locations">
 		<?php
 		foreach( $storage_locations as $location ) {

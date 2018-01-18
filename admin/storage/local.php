@@ -87,7 +87,7 @@ class Boldgrid_Backup_Admin_Storage_Local {
 			'filepath' => $info['filepath'],
 			'action' => 'boldgrid_backup_delete_local',
 			'action_data' => $info['filepath'],
-			'action_title' => __( 'Delete local copy of backup', 'boldgrid-backup' ),
+			'action_title' => __( 'Delete backup from Web Server', 'boldgrid-backup' ),
 		);
 
 		$this->core->jobs->add( $args );

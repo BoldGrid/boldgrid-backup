@@ -22,6 +22,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 		$backupNowType = $( '[name="folder_exclusion_type"]' ),
 		lang = localizeScriptData,
 		$mineCount = $( '.mine' ),
+		$mineCountHelp = $( '.subsubsub' ).find( '.dashicons' ),
 		$tablesType = $( '[name="table_inclusion_type"]' );
 
 	// Onload event listener.
@@ -52,7 +53,11 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 
 		$fileInput.on( 'change', self.onChangeInput );
 
-		$mineCount.on( 'click', self.onClickCount );
+		$mineCount
+			.on( 'click', self.onClickCount )
+			.on( 'mouseover', function() {
+				$mineCountHelp.bgbuDrawAttention();
+			});
 	} );
 
 	/**

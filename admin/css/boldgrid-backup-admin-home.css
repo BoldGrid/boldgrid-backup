@@ -40,3 +40,8 @@ table.wp-list-table td.auto-width {
 	width: 1px;
     white-space: nowrap;
 }
+
+/* Disable floating of mine count so help section displays nicely. */
+.subsubsub {
+	float: none;
+}

@@ -69,7 +69,16 @@ class Boldgrid_Backup_Admin_Archives {
 			);
 		}
 
+		$locations[] = '<span class="dashicons dashicons-editor-help" data-id="mine-count"></span>';
+
 		$markup = '<p class="subsubsub">' . implode( ' | ', $locations ) . '</p>';
+
+		$markup .= sprintf('
+			<p class="help" data-id="mine-count">
+				%1$s
+			</p>',
+			__( 'This list shows on which computers your backup archives are being stored. They can be saved to more than one location. Please <a href="admin.php?page=boldgrid-backup-tools&section=section_locations">click here</a> for more information on what <strong>Web Server</strong> and other terms mean.', 'boldgrid-backup' )
+		);
 
 		return $markup;
 	}

@@ -92,20 +92,32 @@ BoldGrid.Backup( jQuery );
  * @since 1.5.4
  */
 jQuery.fn.bgbuDrawAttention = function() {
-	var currentColor;
+	var currentColor,
+		// In seconds, minimum time between each animation.
+		animateInterval = 1 * 1000,
+		d = new Date(),
+		lastAnimation = this.attr( 'data-last-animation' );
+
+	this.attr( 'data-last-animation', d.getTime() );
+
+	// If we are currently animating this element, return.
+	if( this.parent().hasClass( 'ui-effects-wrapper' ) ) {
+		return;
+	}
+
+
+	// If enough time hasn't passed yet since the last animation, return.
+	if( lastAnimation && ( d.getTime() - lastAnimation ) < animateInterval ) {
+		return;
+	}
 
 	if( this.is( 'input' ) ) {
 		this
 			.css( 'background', '#ddd' )
 			.animate( {backgroundColor: '#fff'}, 500 );
-		return;
-	}
-
-	if( this.is( '.dashicons-editor-help')) {
+	} else if( this.is( '.dashicons-editor-help')) {
 		this.effect( 'bounce', { times:2 }, 'normal' );
-	}
-
-	if( this.is( 'span' ) ) {
+	} else if( this.is( 'span' ) ) {
 		/*
 		 * Get the original color to animate back to. This is needed because if
 		 * the user clicks on an element that is in the middle of an animation,

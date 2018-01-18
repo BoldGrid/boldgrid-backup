@@ -35,7 +35,7 @@ foreach( $this->remote_storage_li as $provider ) {
 			<a class="button download-to-server" data-provider-id="%3$s">%1$s</a>
 			%2$s
 			',
-			__( 'Download to server', 'boldgrid-backup' ),
+			__( 'Download to web server', 'boldgrid-backup' ),
 			$this->core->lang['spinner'],
 			$provider['id']
 		);

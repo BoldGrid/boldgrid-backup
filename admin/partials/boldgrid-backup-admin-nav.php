@@ -28,6 +28,11 @@ $navs = array(
 		'href' => 'admin.php?page=boldgrid-backup-test',
 		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup-test' === $_GET['page'] ? $active : '',
 	),
+	array(
+		'title' => __( 'Tools', 'boldgrid-backup' ),
+		'href' => 'admin.php?page=boldgrid-backup-tools',
+		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup-tools' === $_GET['page'] ? $active : '',
+	),
 );
 
 /**

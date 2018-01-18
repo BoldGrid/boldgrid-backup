@@ -118,6 +118,15 @@ class Boldgrid_Backup_Admin_Core {
 	public $test;
 
 	/**
+	 * An instance of Boldgrid_Backup_Admin_Tools.
+	 *
+	 * @since  1.5.4
+	 * @access public
+	 * @var    Boldgrid_Backup_Admin_Tools
+	 */
+	public $tools;
+
+	/**
 	 * An instance of Boldgrid_Backup_Admin_Utility.
 	 *
 	 * @since  1.5.3
@@ -513,6 +522,8 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->go_pro = new Boldgrid_Backup_Admin_Go_Pro( $this );
 
+		$this->tools = new Boldgrid_Backup_Admin_Tools( $this );
+
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
 
@@ -845,9 +856,10 @@ class Boldgrid_Backup_Admin_Core {
 		$lang = array(
 			'backup_archive' =>  __( 'Backup Archive', 'boldgrid-backup' ),
 			'boldgrid_backup' => __( 'BoldGrid Backup', 'boldgrid-backup' ),
-			'get_premium' => __( 'Get Premium', 'boldgrid-bacukp' ),
+			'get_premium' =>     __( 'Get Premium', 'boldgrid-bacukp' ),
 			'preflight_check' => __( 'Preflight Check', 'boldgrid-backup' ),
 			'settings' =>        __( 'Settings', 'boldgrid-backup' ),
+			'tools' =>           __( 'Tools', 'boldgrid-backup' ),
 		);
 
 		// The main slug all sub menu items are children of.
@@ -923,7 +935,24 @@ class Boldgrid_Backup_Admin_Core {
 			)
 		);
 
-		// Add our "Get Premium" link to the navigation.
+		// Add "Preflight Check" page, formally know as "Functionality Test".
+		add_submenu_page(
+			$main_slug,
+			$lang['boldgrid_backup'] . ' ' . $lang['tools'],
+			$lang['tools'],
+			$capability,
+			'boldgrid-backup-tools',
+			array(
+				$this->tools,
+				'page',
+			)
+		);
+
+		/*
+		 * Add our "Get Premium" link to the navigation.
+		 *
+		 * Leave this as the last menu item.
+		 */
 		if( ! $this->config->is_premium_done ) {
 			add_submenu_page(
 				$main_slug,

@@ -52,6 +52,11 @@ div .dashicons {
 	vertical-align: bottom;
 }
 
+/* Dashicon in "mine count". */
+.subsubsub .dashicons {
+	vertical-align: text-top;
+}
+
 /* The table of size data. */
 #size-data table tr td {
 	vertical-align: top;
@@ -100,4 +105,14 @@ hr.separator-small {
 .toplevel_page_boldgrid-backup-settings .get-premium,
 .toplevel_page_boldgrid-backup-settings .dashicons-dashboard {
 	color: #ffb900;
+}
+
+/* Needed style for bouncing help icon in mine count. */
+.subsubsub .ui-effects-wrapper {
+	display: inline-block;	
+}
+
+/* WordPress by default has both the h2 and h3 tags set to the same font size. */
+h3 {
+	font-size: 1.2em;
 }

@@ -47,6 +47,15 @@ class Boldgrid_Backup_Admin_Archives_All {
 	public $is_init = false;
 
 	/**
+	 * Local server title, such as "Web server".
+	 *
+	 * @since  1.5.4
+	 * @access public
+	 * @var    string
+	 */
+	public $local_title;
+
+	/**
 	 * An array of data about remote locations and how many backups at each.
 	 *
 	 * @since  1.5.4
@@ -64,6 +73,8 @@ class Boldgrid_Backup_Admin_Archives_All {
 	 */
 	public function __construct( $core ) {
 		$this->core = $core;
+
+		$this->local_title = __( 'Web Server', 'BoldGrid Backup' );
 	}
 
 	/**
@@ -130,7 +141,7 @@ class Boldgrid_Backup_Admin_Archives_All {
 				'last_modified' => $archive['lastmodunix'],
 				'size' => $archive['filesize'],
 				'locations' => array(
-					'Local',
+					$this->local_title,
 				),
 			);
 		}

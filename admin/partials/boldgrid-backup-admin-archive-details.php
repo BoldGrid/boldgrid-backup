@@ -99,9 +99,15 @@ $main_meta_box = sprintf( '
 
 $remote_meta_box = sprintf( '
 	<div class="postbox remote-storage">
-		<h2 class="hndle ui-sortable-handle"><span>%1$s</span></h2>
+		<h2 class="hndle ui-sortable-handle">
+			<span>%1$s</span>
+			<span class="dashicons dashicons-editor-help" data-id="remote-storage-help"></span>
+		</h2>
 
 		<div class="inside">
+
+			<p class="help" data-id="remote-storage-help">%4$s</p>
+
 			%2$s
 		</div>
 
@@ -116,7 +122,8 @@ $remote_meta_box = sprintf( '
 		</div>',
 		/* 1 */ $this->core->go_pro->get_premium_button(),
 		/* 2 */ __( 'Upgrade to <strong>BoldGrid Backup Premium</strong> for more Storage Locations!', 'boldgrid-backup' )
-	)
+	),
+	/* 4 */ __( 'Secure your backups by keeping copies of them on <a href="admin.php?page=boldgrid-backup-tools&section=section_locations">remote storage</a>.', 'boldgrid-backup' )
 );
 
 $editor_tools = sprintf( '
@@ -136,7 +143,7 @@ $editor_tools = sprintf( '
 );
 
 $intro = $this->core->config->is_premium_done ? '' : sprintf( '
-	<div class="bg-box-bottom premium">
+	<div class="bg-box-bottom premium" style="margin-bottom:15px;">
 		<strong>%1$s</strong>
 
 		<p>
@@ -149,45 +156,39 @@ $intro = $this->core->config->is_premium_done ? '' : sprintf( '
 	/* 3 */ __( 'Please note that most functionality for the Archive Browser, such as one click file restorations, is contained within the Premium version. For help with restoring a single file without this one click feature, please <a href="https://www.boldgrid.com/support" target="_blank">click here</a>.', 'boldgrid-backup' )
 );
 
-$main_content = sprintf( '
+$main_content = '
 	<div id="postdivrich" class="postarea wp-editor-expand">
 
 		<div id="wp-content-wrap" class="wp-core-ui wp-editor-wrap tmce-active has-dfw">
 
-			<h2 style="font-size:initial; padding:0px;">%1$s</h2>
+			<h2 style="font-size:initial; padding:0px;">
+				' . __( 'Download & Restore', 'boldgrid-backup' ) . '
+				<span class="dashicons dashicons-editor-help" data-id="download_and_restore"></span>
+			</h2>
 
-			<p>%3$s</p>
+			<p class="help" data-id="download_and_restore">
+				<strong>' . __( 'Download to Local Machine', 'boldgrid-backup' ) . '</strong><br />
+				' . __( 'Backup archives generally should be stored in more locations than just your <strong>web server</strong>. Be sure to keep copies on your <strong>local machine</strong> and / or a <strong>remote storage</strong> provider. Learn more about these different locations <a href="admin.php?page=boldgrid-backup-tools&section=section_locations">here</a>.', 'boldgrid-backup' ) . '<br /><br />
+				<strong>' . __( 'Restore', 'boldgrid-backup' ) . '</strong><br />
+				' . __( 'Restore this backup. This will restore all the files and the database in this backup. Use the <strong>Backup Browser</strong> below to look at the backup archive and see what will be restored.', 'boldgrid-backup' ) . '
+			</p>
 
-			%6$s %7$s
+			<p>
+				' . $download_button . ' ' . $restore_button . '
+			</p>
 
 			<hr class="separator" />
 
-			<h2 style="font-size:initial; padding:0px;">%8$s</h2>
+			<h2 style="font-size:initial; padding:0px;">' . __( 'Backup Browser', 'boldgrid-backup' ) . '</h2>
 
-			<p>%9$s</p>
+			<p>
+				' . __( 'Use the File & Folders and Database tools below to browse the contents of this backup file.', 'boldgrid-backup' ) . '
+			</p>
 
-			%10$s
-
-			%5$s
-
+			' . $intro . $editor_tools . $browser . $db['browser'] . '
 		</div>
 	</div>
-
-	%2$s
-
-	%4$s
-	',
-	/* 1 */ __( 'Download & Restore', 'boldgrid-backup' ),
-	/* 2 */ $browser,
-	/* 3 */ __( 'Click Restore to restore this backup file, or click Download to download this backup to your computer.', 'boldgrid-backup' ),
-	/* 4 */ $db['browser'],
-	/* 5 */ $editor_tools,
-	/* 6 */ $download_button,
-	/* 7 */ $restore_button,
-	/* 8 */ __( 'Backup Browser', 'boldgrid-backup' ),
-	/* 9 */ __( 'Use the File & Folders and Database tools below to browse the contents of this backup file.', 'boldgrid-backup' ),
-	/* 10 */ $intro
-);
+';
 
 if( ! $archive_found && count( $this->remote_storage_li ) > 0 ) {
 	$main_content = $only_remote;

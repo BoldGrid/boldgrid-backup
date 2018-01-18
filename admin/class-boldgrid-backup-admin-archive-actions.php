@@ -136,7 +136,7 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 				/* 1 */ $archive['key'],
 				/* 2 */ $archive['filepath'],
 				/* 3 */ $archive['filename'],
-				/* 4 */ __( 'Download', 'boldgrid-backup' )
+				/* 4 */ __( 'Download to Local Machine', 'boldgrid-backup' )
 			);
 		}
 
