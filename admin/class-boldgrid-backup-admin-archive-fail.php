@@ -38,6 +38,15 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 	public $memory = '';
 
 	/**
+	 * Generic lang string stating unable to backup.
+	 *
+	 * @since  1.5.4
+	 * @access public
+	 * @var    string
+	 */
+	public $unable_to_backup;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.5.2
@@ -46,6 +55,8 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 	 */
 	public function __construct( $core ) {
 		$this->core = $core;
+
+		$this->unable_to_backup = __( 'We were unable to create a backup of your website due to the following:', 'boldgrid-backup' );
 	}
 
 	/**
@@ -92,6 +103,32 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 	}
 
 	/**
+	 * Create a "backup failed" email and schedule it to be sent via jobs.
+	 *
+	 * @since 1.5.4
+	 *
+	 * @param string $message Error message.
+	 */
+	public function schedule_fail_email( $message ) {
+		$message = sprintf(
+			$this->unable_to_backup . "\n\n%1\$s",
+			strip_tags( $message )
+		);
+
+		$email_body = $this->core->email->fill_generic_template( $message, false );
+
+		$args = array(
+			'action' => 'boldgrid_backup_cron_fail_email',
+			'action_data' => array(
+				'message' => $email_body,
+			),
+			'action_title' => __( 'Send warning email because backup failed', 'boldgrid-backup' ),
+		);
+
+		$this->core->jobs->add( $args );
+	}
+
+	/**
 	 * Hook into shutdown.
 	 *
 	 * @since 1.5.2
@@ -123,9 +160,6 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 			return;
 		}
 
-		$unable_to_backup = __( 'We were unable to create a backup of your website due to the following:', 'boldgrid-backup' );
-		$error_text = __( 'We were unable to create a backup of your website due to the following:', 'boldgrid-backup' ) . '<br />';
-
 		$error_message = sprintf(
 			'<strong>%1$s</strong>: %2$s in %3$s on line %4$s',
 			__( 'Fatal error', 'boldgrid-backup' ),
@@ -134,26 +168,10 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 			$last_error['line']
 		);
 
-		/*
-		 * Send an email indicating failure.
-		 *
-		 * We may have hit a memory limit or something else disastrous. It's too
-		 * dangerous to send an email now, we're in an unreliable state.
-		 * Instead, schedule a warning email for the future.
-		 */
-		$message = $unable_to_backup . "\n\n" . strip_tags( $error_message );
-		$email_body = $this->core->email->fill_generic_template( $message );
-		$args = array(
-			'action' => 'boldgrid_backup_cron_fail_email',
-			'action_data' => array(
-				'message' => $email_body,
-			),
-			'action_title' => __( 'Send warning email because backup failed', 'boldgrid-backup' ),
-		);
-		$this->core->jobs->add( $args );
+		$this->schedule_fail_email( $error_message );
 
 		if( ! $this->core->doing_cron ) {
-			$data['errorText'] = $unable_to_backup . '<br />' . $error_message;
+			$data['errorText'] = $this->unable_to_backup . '<br />' . $error_message;
 			wp_send_json_error( $data );
 		}
 	}

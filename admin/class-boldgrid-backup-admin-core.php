@@ -1391,14 +1391,29 @@ class Boldgrid_Backup_Admin_Core {
 			$this->in_progress->set();
 		}
 
+		/*
+		 * If this is a scheduled backup and no location is selected to save the
+		 * backup to, abort.
+		 *
+		 * While we could prevent he user from setting this up in the first place,
+		 * at the moment the settings page saves all settings. So, if the user
+		 * wanted to change their retention settings but did not want to schedule
+		 * backups, validating storage locations would be problematic.
+		 */
+		if( $this->doing_cron && ! $this->remote->any_enabled() ) {
+			$error = __( 'No backup locations selected! While we could create a backup archive, you have not selected where the backup archive should be saved to. Please choose a storage location in your BoldGrid Backup Settings to save this backup archive to.', 'boldgrid-backup' );
+			$this->archive_fail->schedule_fail_email( $error );
+			return array(
+				'error' => $error,
+			);
+		}
+
 		/**
 		 * Actions to take before any archiving begins.
 		 *
 		 * @since 1.5.2
 		 */
 		do_action( 'boldgrid_backup_archive_files_init' );
-
-		$email_templates = include BOLDGRID_BACKUP_PATH . '/includes/config/email-templates.php';
 
 		// Check if functional.
 		if ( ! $this->test->run_functionality_tests() ) {

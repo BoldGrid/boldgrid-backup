@@ -54,16 +54,21 @@ class Boldgrid_Backup_Admin_Email {
 	 * @since 1.5.2
 	 *
 	 * @param  string $message
+	 * @param  bool   $add_ad  Allow ads to be added to the email. In some cases,
+	 *                         like when we have bad news (something failed), we
+	 *                         may not want to ask the user to upgrade (bad timing).
 	 * @return string
 	 */
-	public function fill_generic_template( $message ) {
+	public function fill_generic_template( $message, $add_ad = true ) {
 		$this->init_ads();
 
 		$email_body = __( 'Hello', 'boldgrid-backup' ) . ",\n\n";
 
 		$email_body .= trim( $message ) . "\n\n";
 
-		$email_body .= $this->ads['generic'];
+		if( $add_ad ) {
+			$email_body .= $this->ads['generic'];
+		}
 
 		$email_body .= __( 'Best regards', 'boldgrid-backup' ) . ",\n\n";
 		$email_body .= __( 'The BoldGrid Backup plugin', 'boldgrid-backup' ) . "\n\n";

@@ -40,6 +40,29 @@ class Boldgrid_Backup_Admin_Remote {
 	}
 
 	/**
+	 * Determine if any storage locations are enabled.
+	 *
+	 * @since 1.5.4
+	 *
+	 * @return bool
+	 */
+	public function any_enabled() {
+		$settings = $this->core->settings->get_settings();
+
+		if( empty( $settings ) || empty( $settings['remote'] ) ) {
+			return false;
+		}
+
+		foreach( $settings['remote'] as $remote ) {
+			if( isset( $remote['enabled'] ) && true === $remote['enabled'] ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Return whether or not a remote storage provider is enabled.
 	 *
 	 * @since 1.5.2
