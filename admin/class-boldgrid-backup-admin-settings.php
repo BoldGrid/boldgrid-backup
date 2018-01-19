@@ -450,12 +450,13 @@ class Boldgrid_Backup_Admin_Settings {
 				$backup_directory = $post_backup_directory;
 
 				/*
-				 * The user can enter whatever they'd like as the backup dir. If
-				 * it doesn't exist, let's try to create it.
+				 * Create the backup directory.
+				 *
+				 * Even if the backup directory already exists, we still want to
+				 * run the create method so that the necessary .htaccess and other
+				 * files are created to protect the directory.
 				 */
-				if( ! $this->core->wp_filesystem->exists( $backup_directory ) ) {
-					$backup_directory = $this->core->backup_dir->create( $backup_directory );
-				}
+				$backup_directory = $this->core->backup_dir->create( $backup_directory );
 
 				// Make sure that the backup directory has proper permissions.
 				$valid = $this->core->backup_dir->is_valid( $backup_directory );

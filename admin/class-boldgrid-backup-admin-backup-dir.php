@@ -347,7 +347,24 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 			$this->errors[] = sprintf( __( 'Backup Directory does not have permission to retrieve directory listing: %1$s', 'boldgrid-backup' ), $backup_dir );
 		}
 
-		return $perms['exists'] && $perms['read'] && $perms['write'] && $perms['rename'] && $perms['delete'] && $perms['dirlist'];
+		/*
+		 * Do not allow the ABSPATH (/home/user/wordpress) to be within the
+		 * backup directory (/home/user).
+		 *
+		 * In the above example, we will create /home/user/.htaccess to prevent
+		 * browsing of backups, and this would prevent all traffic to the ABSPATH.
+		 */
+		$backup_dir = Boldgrid_Backup_Admin_Utility::trailingslashit( $backup_dir );
+		$abspath_in_dir = 0 === strpos( ABSPATH, $backup_dir );
+		if( $abspath_in_dir ) {
+			$this->errors[] = sprintf(
+				__( 'Your <strong>WordPress directory</strong> <em>%1$s</em> cannot be within your <strong>backup directory</strong> %2$s.', 'boldgrid-backup' ),
+				ABSPATH,
+				$backup_dir
+			);
+		}
+
+		return $perms['exists'] && $perms['read'] && $perms['write'] && $perms['rename'] && $perms['delete'] && $perms['dirlist'] && ! $abspath_in_dir;
 	}
 
 	/**
