@@ -79,17 +79,33 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 		$this->enqueue_scripts();
 		wp_enqueue_style( 'boldgrid-backup-admin-hide-all' );
 
+		// Blank data, used when deleting settings.
+		$type = $this->core->ftp->default_type;
+		$blank_data = array(
+			'type' => $type,
+			'host' => null,
+			'port' => $this->core->ftp->default_port[$type],
+			'user' => null,
+			'pass' => null,
+			'retention_count' => $this->core->ftp->retention_count,
+		);
+
+		// Post data, used by default or when updating settings.
+		$post_data = $this->core->ftp->get_from_post();
+
 		$action = ! empty( $_POST['action'] ) ? $_POST['action'] : null;
 		switch( $action ) {
 			case 'save':
 				$this->settings_save();
+				$data = $post_data;
 				break;
 			case 'delete':
 				$this->settings_delete();
+				$data = $blank_data;
 				break;
+			default:
+				$data = $post_data;
 		}
-
-		$data = $this->core->ftp->get_from_post();
 
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/remote/ftp.php';
 	}
@@ -114,12 +130,7 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 		$settings['remote'][$ftp->key] = array();
 		update_site_option( 'boldgrid_backup_settings', $settings );
 
-		$ftp->host = null;
-		$ftp->user = null;
-		$ftp->set_pass( null );
-		$ftp->port = $this->default_port['ftp'];
-		$ftp->retention_count = null;
-		$ftp->type = $ftp->default_type;
+		$ftp->reset();
 		$ftp->disconnect();
 
 		do_action( 'boldgrid_backup_notice', __( 'Settings saved.', 'boldgrid-backup' ), 'notice updated is-dismissible' );

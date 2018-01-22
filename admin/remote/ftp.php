@@ -646,6 +646,23 @@ class Boldgrid_Backup_Admin_Ftp {
 	}
 
 	/**
+	 * Reset class properties.
+	 *
+	 * If the user wants to delete all FTP settings, after we clear the data from
+	 * the options, run this method to clear the properties.
+	 *
+	 * @since 1.5.4
+	 */
+	public function reset() {
+		$this->host = null;
+		$this->user = null;
+		$this->set_pass( null );
+		$this->port = $this->default_port['ftp'];
+		$this->retention_count = null;
+		$this->type = $this->default_type;
+	}
+
+	/**
 	 * Set our ftp password.
 	 *
 	 * @since 1.5.4
