@@ -242,10 +242,10 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 
 		$nonce = wp_nonce_field( 'boldgrid_rollback_notice', 'cancel_rollback_auth', true, false );
 
-		$args = array(
+		$button_args = array(
 			'button_text' => __( 'Rollback Site Now', 'boldgrid-backup' ),
 		);
-		$restore_button = $this->core->archive_actions->get_restore_button( $args['restore_filename'], $args );
+		$restore_button = $this->core->archive_actions->get_restore_button( $args['restore_filename'], $button_args );
 
 		$notice_markup = '
 			<div id="cancel-rollback-section">
