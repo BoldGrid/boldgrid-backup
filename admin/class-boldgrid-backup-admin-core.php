@@ -547,7 +547,9 @@ class Boldgrid_Backup_Admin_Core {
 		$this->set_lang();
 
 		// Need to construct class so necessary filters are added.
-		$ui = new \Boldgrid\Library\Library\Ui();
+		if( class_exists( '\Boldgrid\Library\Library\Ui' ) ) {
+			$ui = new \Boldgrid\Library\Library\Ui();
+		}
 	}
 
 	/**
