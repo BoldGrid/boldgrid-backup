@@ -14,10 +14,10 @@
 /*
  * Abort if not being ran from the command line.
  *
- * https://stackoverflow.com/questions/190759/can-php-detect-if-its-run-from-a-cron-job-or-from-the-command-line
+ * http://www.binarytides.com/php-check-running-cli/
  */
-$sapi_type = php_sapi_name();
-if( substr( $sapi_type, 0, 3 ) !== 'cli' || ! empty($_SERVER['REMOTE_ADDR'] ) ) {
+$is_cli = empty( $_SERVER['REMOTE_ADDR'] ) && ! isset( $_SERVER['HTTP_USER_AGENT'] ) && count( $_SERVER['argv'] ) > 0;
+if( ! $is_cli ) {
     return;
 }
 
