@@ -149,9 +149,16 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 	 * @since 1.5.4
 	 *
 	 * @param  string $filename
+	 * @param  array  $args
 	 * @return string
 	 */
-	public function get_restore_button( $filename ) {
+	public function get_restore_button( $filename, $args ) {
+		$defaults = array(
+			'button_text' => __( 'Rollback' ),
+		);
+
+		$args = wp_parse_args( $args, $defaults );
+
 		$archive = $this->core->archive->get_by_name( $filename );
 
 		if( empty( $archive ) ) {
@@ -172,7 +179,7 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 				/* 2 */ $archive['key'],
 				/* 3 */ $filename,
 				/* 4 */ wp_create_nonce( 'boldgrid_backup_restore_archive'),
-				/* 5 */ __( 'Restore', 'boldgrid-backup' ),
+				/* 5 */ $args['button_text'],
 				/* 6 */ $this->core->lang['spinner']
 			);
 		}

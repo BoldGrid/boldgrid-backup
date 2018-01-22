@@ -179,6 +179,12 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 			return;
 		}
 
+		/*
+		 * Enqueue the "archive actions" scripts, they are needed to handle the
+		 * "Rollback Site Now" button (handled like a typical restore).
+		 */
+		$this->core->archive_actions->enqueue_scripts();
+
 		wp_enqueue_style(
 			'boldgrid-backup-admin-home',
 			plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-home.css', array(),
@@ -194,7 +200,6 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 			false
 		);
 		$localize_script_data = array(
-			'restoreConfirmText' => esc_html__( 'Please confirm the restoration of this WordPress installation from the archive file', 'boldgrid-backup' ),
 			// Include the time (in ISO 8601 format).
 			'rolloutDeadline' => date( 'c', $deadline ),
 		);
@@ -229,65 +234,51 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 * @return string The resulting markup.
 	 */
 	public function notice_countdown_get( $args ) {
-
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
+		$deadline = ! empty( $pending_rollback['deadline'] ) ? sprintf( '(<em>%1$s</em>)', date( 'g:i a', $this->core->utility->time( $pending_rollback['deadline'] ) ) ) : '';
 
 		$update_trigger = $this->notice_trigger_get();
+		$update_trigger = ! empty( $update_trigger ) ? sprintf( '<p>%1$s</p>', $update_trigger ) : '';
 
-		$notice_markup = sprintf( '
+		$nonce = wp_nonce_field( 'boldgrid_rollback_notice', 'cancel_rollback_auth', true, false );
+
+		$args = array(
+			'button_text' => __( 'Rollback Site Now', 'boldgrid-backup' ),
+		);
+		$restore_button = $this->core->archive_actions->get_restore_button( $args['restore_filename'], $args );
+
+		$notice_markup = '
 			<div id="cancel-rollback-section">
-				<h2 class="header-notice">%1$s</h2>
-
-				<p>%15$s %2$s</p>
-
-				%14$s
-
-				<p>%3$s</p>
+				<h2 class="header-notice">' . $this->core->lang['heading_update_protection'] . '</h2>
 
 				<p>
-					<strong>%4$s</strong>:
+					' . $this->core->lang['icon_warning'] . ' ' . __( 'There is a pending automatic rollback using the most recent backup archive.', 'boldgrid-backup' ) . '
+				</p>
+
+				' . $update_trigger . '
+
+				<p>
+					' . __( 'Now is the time to test your website to ensure the upgrade did not break anything. If the upgrade did cause problems, you can click <strong>Rollback Site Now</strong> to restore your site to just before the update. If the update was a success, click <strong>Cancel Rollback</strong> so a backup is not automatically restored at the end of the countdown.', 'boldgrid-backup' ) . '
+				</p>
+
+				<p>
+					<strong>' . __( 'Countdown', 'boldgrid-backup' ) . '</strong>:
 					<span id="rollback-countdown-timer"></span>
-					%16$s
+					' . $deadline . '
 				</p>
 
 				<form action="#" id="cancel-rollback-form" method="POST">
-					%5$s
+					' . $nonce . '
 					<p>
-						<a id="cancel-rollback-button" class="button button-primary">%6$s</a> <span class="spinner"></span>
+						<a id="cancel-rollback-button" class="button button-primary">' . __( 'Cancel Rollback', 'boldgrid-backup' ) . '</a> <span class="spinner"></span>
 					</p>
 				</form>
 			</div>
 
-			<div id="restore-now-section">
-				<form action="%8$s" id="rollback_now_form" method="POST">
-					<input type="hidden" name="restore_now" value="1" />
-					<input type="hidden" name="archive_key" value="%9$s" />
-					<input type="hidden" name="archive_filename" value="%10$s" />
-					%11$s
-					<input type="submit" class="button action-restore" data-key="%12$s" data-filename="%10$s" value="%13$s" />
-					<span class="spinner"></span>
-				</form>
-			</div>
+			' . $restore_button . '
 
 			<div id="cancel-rollback-results"></div>
-			',
-			/* 1 */ $this->core->lang['heading_update_protection'],
-			/* 2 */ esc_html__( 'There is a pending automatic rollback using the most recent backup archive.', 'boldgrid-backup' ),
-			/* 3 */ __( 'Now is the time to test your website to ensure the upgrade did not break anything. If the upgrade did cause problems, you can click <strong>Rollback Site Now</strong> to restore your site to just before the update. If the update was a success, click <strong>Cancel Rollback</strong> so a backup is not automatically restored at the end of the countdown.', 'boldgrid-backup' ),
-			/* 4 */ esc_html__( 'Countdown', 'boldgrid-backup' ),
-			/* 5 */ wp_nonce_field( 'boldgrid_rollback_notice', 'cancel_rollback_auth', true, false ),
-			/* 6 */ esc_html__( 'Cancel Rollback', 'boldgrid-backup' ),
-			/* 7 */ esc_html__( 'You can click the button below to rollback your site now.', 'boldgrid-backup' ),
-			/* 8 */ get_admin_url( null, 'admin.php?page=boldgrid-backup' ),
-			/* 9 */ $args['restore_key'],
-			/* 10 */ $args['restore_filename'],
-			/* 11 */ wp_nonce_field( 'archive_auth', 'archive_auth', true, false ),
-			/* 12 */ $args['restore_key'],
-			/* 13 */ esc_html__( 'Rollback Site Now', 'boldgrid-backup' ),
-			/* 14 */ ! empty( $update_trigger ) ? sprintf( '<p>%1$s</p>', $update_trigger ) : '',
-			/* 15 */ $this->core->lang['icon_warning'],
-			/* 16 */ ! empty( $pending_rollback['deadline'] ) ? sprintf( '(<em>%1$s</em>)', date( 'g:i a', $this->core->utility->time( $pending_rollback['deadline'] ) ) ) : ''
-		);
+			';
 
 		return $notice_markup;
 	}

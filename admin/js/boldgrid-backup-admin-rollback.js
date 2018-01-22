@@ -6,6 +6,8 @@
  * @since 1.0
  */
 
+/* global ajaxurl,localizeScriptData,jQuery */
+
 // Declare namespace.
 var BOLDGRID = BOLDGRID || {};
 
@@ -37,9 +39,6 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		// On click action for the Cancel Rollback button.
 		$( '#cancel-rollback-button' )
 			.on( 'click', self.cancelRollback );
-
-		// On click action for restore buttons.
-		$( 'body' ).on( 'submit', '#rollback_now_form', self.restoreArchiveConfirm );
 	} );
 
 	/**
@@ -84,7 +83,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		// Create an error callback function.
 		errorCallback = function() {
 			// Show error message.
-			markup = '<div class="notice notice-error"><p>There was an error processing your request.  Please reload the page and try again.</p></div>';
+			var markup = '<div class="notice notice-error"><p>There was an error processing your request.  Please reload the page and try again.</p></div>';
 
 			$cancelRollbackResults.html( markup );
 		};
@@ -129,37 +128,6 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 	};
 
 	/**
-	 * Confirm to restore a selected backup archive file.
-	 *
-	 * @since 1.0.1
-	 */
-	self.restoreArchiveConfirm = function() {
-		// Declare variables.
-		var confirmResponse, $restoreSpinner,
-			$form = $( this ),
-			$input = $form.find( '.action-restore' ),
-			archiveFilename = $input.attr( 'data-filename' ),
-			$spinner = $form.find( '.spinner' );
-
-		// Ask for confirmation.
-		confirmResponse = confirm( localizeScriptData.restoreConfirmText + ' "' + archiveFilename + '".' );
-
-		// Handle response.
-		if ( true === confirmResponse ) {
-	        // Disable the restore Site Now link button.
-			$input
-				.attr( 'disabled', 'disabled' )
-				.css( 'pointer-events', 'none' );
-
-			$spinner.addClass( 'is-active inline' );
-
-			return true;
-		} else {
-			return false;
-		}
-	};
-
-	/**
 	 * Namespace BOLDGRID.BACKUP.RollbackTimer.
 	 *
 	 * @since 1.0
@@ -175,7 +143,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		 */
 		getTimeRemaining : function( endTime ) {
 			// Declare variables.
-			var totalSeconds, seconds, minutes, hours, days;
+			var totalSeconds, seconds, minutes;
 
 			// Parse data into seconds from now.
 			totalSeconds = Date.parse( endTime ) - Date.parse( new Date() );
