@@ -88,6 +88,20 @@ class Boldgrid_Backup_Admin_Core {
 	public $doing_cron;
 
 	/**
+	 * Whether or not we're doing wp_cron.
+	 *
+	 * In WordPress' wp-cron.php DOING_CRON is defined as true. In several of
+	 * our files, we define DOING_CRON as well. When we want to tell the
+	 * difference between (1)wp-cron.php and (2)cron / cli, it's difficult. This
+	 * property is soley to know if we're in wp-cron.php
+	 *
+	 * @todo Within our plugins, DOING_CRON should be cleaned up.
+	 *
+	 * @since 1.5.4
+	 */
+	public $doing_wp_cron;
+
+	/**
 	 * Email.
 	 *
 	 * @since  1.5.2
@@ -437,6 +451,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->doing_cron = ( defined( 'DOING_CRON' ) && DOING_CRON );
 		$this->doing_ajax = is_admin() && defined( 'DOING_AJAX' ) && DOING_AJAX;
+		$this->doing_wp_cron = ! empty( $_SERVER['SCRIPT_FILENAME'] ) && $_SERVER['SCRIPT_FILENAME'] === trailingslashit( ABSPATH ) . 'wp-cron.php';
 
 		$this->wp_filesystem = $wp_filesystem;
 
@@ -1445,14 +1460,13 @@ class Boldgrid_Backup_Admin_Core {
 		);
 
 		// Determine how this backup was triggered.
-		$sapi_type = php_sapi_name();
 		if( $this->doing_ajax ) {
 			$current_user = wp_get_current_user();
 			$info['trigger'] = $current_user->user_login . ' (' . $current_user->user_email . ')';
-		} elseif( $this->doing_cron && substr( $sapi_type, 0, 3 ) === 'cli' ) {
-			$info['trigger'] = 'Cron';
-		} elseif( $this->doing_cron ) {
+		} elseif( $this->doing_wp_cron ) {
 			$info['trigger'] = 'WP cron';
+		} elseif( $this->doing_cron ) {
+			$info['trigger'] = 'Cron';
 		} else {
 			$info['trigger'] = __( 'Unknown', 'boldgrid-backup' );
 		}
