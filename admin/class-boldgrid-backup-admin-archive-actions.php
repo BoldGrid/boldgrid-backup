@@ -152,9 +152,9 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 	 * @param  array  $args
 	 * @return string
 	 */
-	public function get_restore_button( $filename, $args ) {
+	public function get_restore_button( $filename, $args = array() ) {
 		$defaults = array(
-			'button_text' => __( 'Rollback' ),
+			'button_text' => __( 'Restore' ),
 		);
 
 		$args = wp_parse_args( $args, $defaults );
