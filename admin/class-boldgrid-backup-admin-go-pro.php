@@ -60,7 +60,7 @@ class Boldgrid_Backup_Admin_Go_Pro {
 
 		// If the premium plugin is installed and all is good, abort!
 		if( $this->core->config->is_premium_done ) {
-			//return;
+			return;
 		}
 
 		// Check user role.
