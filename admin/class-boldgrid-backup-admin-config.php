@@ -73,6 +73,15 @@ class Boldgrid_Backup_Admin_Config {
 	private $is_premium = false;
 
 	/**
+	 * Whether or not the premium plugin is activated.
+	 *
+	 * @since  1.5.4
+	 * @access public
+	 * @var    bool
+	 */
+	public $is_premium_active = false;
+
+	/**
 	 * Whether or not we have a premium license and the premium extension is
 	 * installed.
 	 *
@@ -81,6 +90,16 @@ class Boldgrid_Backup_Admin_Config {
 	 * @var    bool
 	 */
 	public $is_premium_done = false;
+
+	/**
+	 * Whether or not the premium extension is installed (we didn't say activated,
+	 * just installed, the files exist on the server).
+	 *
+	 * @since  1.5.4
+	 * @access public
+	 * @var    bool
+	 */
+	public $is_premium_installed = false;
 
 	/**
 	 * Language.
@@ -325,11 +344,15 @@ class Boldgrid_Backup_Admin_Config {
 	 * @since 1.5.4
 	 */
 	public function admin_init() {
+		$relative_path = 'boldgrid-backup-premium/boldgrid-backup-premium.php';
+		$abs_path = dirname( BOLDGRID_BACKUP_PATH ) . '/' . $relative_path;
 
 		// Function is_plugin_active only available in and after admin_init.
-		$premium_active = is_plugin_active( 'boldgrid-backup-premium/boldgrid-backup-premium.php' );
+		$this->is_premium_active = is_plugin_active( $relative_path );
 
-		$this->is_premium_done = $this->is_premium && $premium_active;
+		$this->is_premium_installed = $this->core->wp_filesystem->exists( $abs_path );
+
+		$this->is_premium_done = $this->is_premium && $this->is_premium_active;
 	}
 
 	/**

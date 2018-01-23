@@ -376,6 +376,8 @@ class Boldgrid_Backup {
 		$this->loader->add_action( 'boldgrid_backup_get_all', $plugin_admin_core->ftp->hooks, 'filter_get_all' );
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_remote_storage_download_ftp', $plugin_admin_core->ftp->hooks, 'wp_ajax_download' );
 
+		$this->loader->add_action( 'admin_notices', $plugin_admin_core->go_pro, 'admin_notice_setup' );
+
 		return;
 	}
 

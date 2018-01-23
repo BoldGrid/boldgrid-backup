@@ -20,12 +20,12 @@
 	padding: 15px 0px 10px 11px;
 }
 
-.functionality-test-section .error {
+/* Highlight errors and warnings. */
+.wp-list-table .error {
 	color: #dc3232;
 	font-weight: bold;
 }
-
-.functionality-test-section .warning {
+.wp-list-table .warning {
 	color: #ffba00;
 	font-weight: bold;
 }
