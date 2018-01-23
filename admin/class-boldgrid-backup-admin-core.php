@@ -613,7 +613,7 @@ class Boldgrid_Backup_Admin_Core {
 		 * Only initialize premium if both the plugin exists, is activated, and
 		 * we have a premium key.
 		 */
-		if( ! class_exists( $premium_class ) || ! $this->config->is_premium_done ) {
+		if( ! class_exists( $premium_class ) || ! $this->config->get_is_premium() ) {
 			return;
 		}
 
