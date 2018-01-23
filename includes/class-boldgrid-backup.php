@@ -334,7 +334,16 @@ class Boldgrid_Backup {
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core, 'admin_enqueue_scripts' );
 
-		$this->loader->add_filter( 'plugins_loaded', $plugin_admin_core, 'init_premium' );
+		/*
+		 * In initial development, init_premium was ran during plugins_loaded.
+		 * We're changing it to admin_init with a priority of 11 so that it runs
+		 * after we check if the premium extension is activiated (this check
+		 * requires we're at least in admin_init hook).
+		 *
+		 * If init_premium needs to load sooner, please review timing of when we
+		 * set is_premium_done.
+		 */
+		$this->loader->add_filter( 'admin_init', $plugin_admin_core, 'init_premium', 11 );
 
 		$this->loader->add_action( 'boldgrid_backup_delete_local', $plugin_admin_core->local, 'delete_local' );
 
