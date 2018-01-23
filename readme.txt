@@ -28,7 +28,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 
 == Changelog ==
 
-= 1.5.4 In progress =
+= 1.6.0 =
 * New feature:  JIRA BGBKUP-70  Premium is now detected from the Connect Key license data.
 * New feature:  JIRA BGBKUP-75  Added plugin framework library for the Connect Key prompt/notice.
 * New feature:  JIRA BGBKUP-72  Restore only a database from a backup.

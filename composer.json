@@ -1,6 +1,6 @@
 {
     "require": {
-        "boldgrid/library": "dev-dev",
+        "boldgrid/library": "^2.0.0",
         "ifsnop/mysqldump-php" : "2.*",
         "phpseclib/phpseclib" : "~2.0",
         "cbschuld/browser.php" : "~1.0-dev"
