@@ -101,7 +101,14 @@ class Boldgrid_Backup_Admin_Archives {
 
 			$data_attr = sprintf( 'data-%1$s="true"', $location_type );
 
-			$locations[] = sprintf( '<span %2$s>%1$s</span>', $location['title'], $data_attr );
+			$title_attr = ! empty( $location['title_attr'] ) ? sprintf( 'title="%1$s"', esc_attr( $location['title_attr'] ) ) : '';
+
+			$locations[] = sprintf(
+				'<span %2$s %3$s>%1$s</span>',
+				esc_html( $location['title'] ),
+				$data_attr,
+				$title_attr
+			);
 		}
 
 		$locations = implode( ', ', $locations );

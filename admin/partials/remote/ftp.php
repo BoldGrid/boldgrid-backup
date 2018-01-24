@@ -63,6 +63,13 @@ $sftp_selected = 'sftp' === $data['type'] ? $selected : '';
 			</td>
 			<td></td>
 		</tr>
+		<tr>
+			<td>
+				<?php echo __( 'Nickname (If you would like to refer to this account as something other than FTP)', 'boldgrid-backup') ?><br />
+				<input type="text" name="nickname" value="<?php echo esc_attr( $data['nickname'] ); ?>" />
+			</td>
+			<td></td>
+		</tr>
 	</table>
 
 	<p>

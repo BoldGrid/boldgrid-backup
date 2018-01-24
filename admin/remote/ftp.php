@@ -95,6 +95,17 @@ class Boldgrid_Backup_Admin_Ftp {
 	public $logged_in = false;
 
 	/**
+	 * Nickname.
+	 *
+	 * So the user can refer to their ftp account as something other than ftp.
+	 *
+	 * @since  1.6.0
+	 * @access public
+	 * @var    string
+	 */
+	public $nickname;
+
+	/**
 	 * Our key / label for ftp.
 	 *
 	 * @since  1.5.4
@@ -147,6 +158,18 @@ class Boldgrid_Backup_Admin_Ftp {
 	 * @var    string
 	 */
 	public $title = 'FTP / SFTP';
+
+	/**
+	 * Title attribute.
+	 *
+	 * If you are using a nickname, hovering over the nickname should show this
+	 * more clear title.
+	 *
+	 * @since  1.6.0
+	 * @access public
+	 * @var    string
+	 */
+	public $title_attr;
 
 	/**
 	 * Our FTP type, ftp or sftp.
@@ -387,6 +410,11 @@ class Boldgrid_Backup_Admin_Ftp {
 				'key' => 'retention_count',
 				'default' => $this->retention_count,
 			),
+			array(
+				'key' => 'nickname',
+				'default' => '',
+				'stripslashes' => true,
+			),
 		);
 
 		foreach( $values as $value ) {
@@ -398,6 +426,10 @@ class Boldgrid_Backup_Admin_Ftp {
 				$data[$key] = $settings['remote'][$this->key][$key];
 			} else {
 				$data[$key] = $value['default'];
+			}
+
+			if( ! empty( $value['stripslashes'] ) && true === $value['stripslashes'] ) {
+				$data[$key] = stripslashes( $data[$key] );
 			}
 		}
 
@@ -537,11 +569,17 @@ class Boldgrid_Backup_Admin_Ftp {
 
 		$settings = $this->core->settings->get_settings();
 
-		$labels = array( 'user', 'pass', 'host', 'port', 'type', 'retention_count' );
+		$labels = array( 'user', 'pass', 'host', 'port', 'type', 'retention_count', 'nickname' );
 
 		foreach( $labels as $label ) {
 			$this->$label = ! empty( $settings['remote'][$this->key][$label] ) ? $settings['remote'][$this->key][$label] : null;
 		}
+
+		if( empty( $this->nickname ) ) {
+			$this->nickname = strtoupper( $this->type );
+		}
+
+		$this->title_attr = strtoupper( $this->type ) . ': ' . $this->host;
 	}
 
 	/**

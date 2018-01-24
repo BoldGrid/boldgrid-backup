@@ -82,8 +82,9 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 				'size' => $item['size'],
 				'locations' => array(
 					array(
-						'title' => 'SFTP',
+						'title' => $this->core->ftp->nickname,
 						'on_remote_server' => true,
+						'title_attr' => $this->core->ftp->title_attr,
 					),
 				),
 			);
@@ -175,7 +176,8 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 
 		$this->core->archive_details->remote_storage_li[] = array(
 			'id' => $this->core->ftp->key,
-			'title' => $this->core->ftp->title,
+			'title' => $this->core->ftp->nickname,
+			'title_attr' => $this->core->ftp->title_attr,
 			'uploaded' => $uploaded,
 			'allow_upload' => $allow_upload,
 			'is_setup' => $this->core->ftp->is_setup(),

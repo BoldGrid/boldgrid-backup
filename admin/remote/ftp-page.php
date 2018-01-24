@@ -88,6 +88,7 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 			'user' => null,
 			'pass' => null,
 			'retention_count' => $this->core->ftp->retention_count,
+			'nickname' => '',
 		);
 
 		// Post data, used by default or when updating settings.
@@ -171,6 +172,7 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 		}
 
 		$settings['remote'][$ftp->key]['retention_count'] = $data['retention_count'];
+		$settings['remote'][$ftp->key]['nickname'] = $data['nickname'];
 
 		if( ! empty( $ftp->errors ) ) {
 			do_action( 'boldgrid_backup_notice', implode( '<br /><br />', $ftp->errors ) );

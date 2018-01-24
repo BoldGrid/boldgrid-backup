@@ -58,7 +58,7 @@ foreach( $this->remote_storage_li as $provider ) {
 	$data['postbox'] .= sprintf( '
 		%5$s
 		<div data-remote-provider="%3$s">
-			<span style="float:left;"><strong>%1$s</strong></span>
+			<span style="float:left;" %6$s><strong>%1$s</strong></span>
 			<span style="float:right;max-width:50%%;">%2$s</span>
 
 			<div style="clear:both;"></div>
@@ -66,11 +66,12 @@ foreach( $this->remote_storage_li as $provider ) {
 			<p>%4$s</p>
 		</div>
 		',
-		/* 1 */ $provider['title'],
+		/* 1 */ esc_html( $provider['title'] ),
 		/* 2 */ $upload,
 		/* 3 */ $provider['id'],
 		/* 4 */ $download,
-		/* 5 */ 1 !== $count ? '<hr class="separator-small" />' : ''
+		/* 5 */ 1 !== $count ? '<hr class="separator-small" />' : '',
+		/* 6 */ empty( $provider['title_attr'] ) ? '' : sprintf( 'title="%1$s"', esc_attr( $provider['title_attr'] ) )
 	);
 }
 
