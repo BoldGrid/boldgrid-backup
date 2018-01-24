@@ -109,7 +109,7 @@ printf( '<h3>%1$s</h3>', __( 'Remote Storage', 'boldgrid-backup' ) );
 
 printf(
 	'<p>%1$s</p>',
-	__( '<strong>Remote Storage</strong> providers are servers other than your <em>Local Machine</em> and <em>Web Server</em> where you can store files. For example, <em>Amazon S3</em>, <em>DropBox</em>, and <em>Google Drive</em> are all considered Remote Storage Providers.', 'boldgrid-backup' )
+	__( '<strong>Remote Storage</strong> providers are servers other than your <em>Local Machine</em> and <em>Web Server</em> where you can store files. For example, <em>FTP</em>, <em>SFTP</em>, and <em>Amazon S3</em> are all considered Remote Storage Providers.', 'boldgrid-backup' )
 );
 
 if( ! $this->core->config->is_premium_done ) {
