@@ -2228,7 +2228,6 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Create an array of data to pass to JS.
 		$localize_script_data = array(
-			'All' => __( 'All', 'boldgrid-backup' ),
 			'backupUrl' => $backup_url,
 			'errorText' => esc_html__(
 				'There was an error processing your request.  Please reload the page and try again.',
@@ -2491,12 +2490,18 @@ class Boldgrid_Backup_Admin_Core {
 	 */
 	public function set_lang() {
 		$this->lang = array(
+			// Mine count, total number of backups.
+			'All' => __( 'All', 'boldgrid-backup' ),
 			'backup_created' => __( 'Backup created successfully!', 'boldgrid-backup' ),
 			'checkmark' => '&#10003;',
 			'icon_success' => '<span class="dashicons dashicons-yes green"></span> ',
 			'icon_warning' => '<span class="dashicons dashicons-warning yellow"></span> ',
 			'heading_update_protection' => __( 'BoldGrid Backup - Update Protection', 'boldgrid-backup' ),
+			// Mine count, number of backups on remote storage providers.
+			'Remote' => __( 'Remote', 'boldgrid-backup' ),
 			'spinner' => '<span class="spinner"></span>',
+			// Mine count, number of backups on local web server.
+			'Web_Server' => __( 'Web Server', 'boldgrid-backup' ),
 		);
 
 		$this->elements = array(

@@ -139,22 +139,23 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 		var $anchor = $(this),
 			$p = $anchor.closest( 'p' ),
 			$trs = $( '#backup-archive-list-body tr' ),
-			type = $anchor.html().trim();
+			// Type is either on_web_server or on_remote_server
+			type = $anchor.attr( 'data-count-type' );
 
+		// Highlight the count we just clicked on.
 		$p.find( '.mine' ).removeClass( 'current' );
 		$anchor.addClass( 'current' );
 
-		if( lang.All === type ) {
+		if( 'all' === type ) {
 			$trs.show();
 			return false;
 		}
 
 		$trs.each( function( index ) {
 			var $tr = $( this ),
-				$matches = $tr.find( '[data-location="' + type + '"]' ),
-				matchCount = $matches.length;
+				$matches = $tr.find( '[data-' + type + '="true"]' );
 
-			if( 0 === matchCount ) {
+			if( 0 === $matches.length ) {
 				$tr.hide();
 			} else {
 				$tr.show();

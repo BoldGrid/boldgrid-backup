@@ -81,9 +81,11 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 				'last_modified' => $item['time'],
 				'size' => $item['size'],
 				'locations' => array(
-					'SFTP',
+					array(
+						'title' => 'SFTP',
+						'on_remote_server' => true,
+					),
 				),
-				'location' => 'SFTP',
 			);
 
 			$this->core->archives_all->add( $backup );

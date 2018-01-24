@@ -40,10 +40,80 @@ class Boldgrid_Backup_Admin_Archives {
 	}
 
 	/**
+	 * Get the location type from a location.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param $location array {
+	 *     A location.
+	 *
+	 *     @type string $title    Such as "Web Server".
+	 *     @type bool   $location
+	 * }
+	 * @return mixed
+	 */
+	public function get_location_type( $location ) {
+		foreach( $this->core->archives_all->location_types as $type ) {
+			if( isset( $location[$type] ) && true === $location[$type] ) {
+				return $type;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get a location type's title.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param  string $type
+	 * @return string
+	 */
+	public function get_location_type_title( $type ) {
+		if( 'all' === $type ) {
+			$title = $this->core->lang['All'];
+		} elseif( 'on_web_server' === $type ) {
+			$title = $this->core->lang['Web_Server'];
+		} else {
+			$title = $this->core->lang['Remote'];
+		}
+
+		return $title;
+	}
+
+	/**
+	 * Create the list of locations.
+	 *
+	 * This method returns a list of locations (html markup), which will be
+	 * located under the backup, such as "Web Server, SFTP".
+	 *
+	 * @since 1.6.0
+	 *
+	 * @return string
+	 */
+	public function get_locations( $archive ) {
+		$locations = array();
+
+		foreach( $archive['locations'] as $location ) {
+
+			$location_type = $this->get_location_type( $location );
+
+			$data_attr = sprintf( 'data-%1$s="true"', $location_type );
+
+			$locations[] = sprintf( '<span %2$s>%1$s</span>', $location['title'], $data_attr );
+		}
+
+		$locations = implode( ', ', $locations );
+
+		return $locations;
+	}
+
+	/**
 	 * Get a "mine count" of backup files.
 	 *
 	 * Returns a string such as:
-	 * All (5) | Local (4) | SFTP (2) | Amazon S3 (3)
+	 * All (5) | Web Server (4) | Remote (2)
 	 *
 	 * @since 1.5.4
 	 *
@@ -52,27 +122,32 @@ class Boldgrid_Backup_Admin_Archives {
 	public function get_mine_count() {
 		$this->core->archives_all->init();
 
-		// Create the "mine count" section above the table.
+		// An array of locations, each array item simliar to: <a>All<a/> (5)
 		$locations = array();
+
 		foreach( $this->core->archives_all->location_count as $location => $count ) {
 
 			// The first locaion, "All", should have the "current" class.
-			$current = empty( $locations ) ? 'current' : '';
+			$current = 'all' === $location ? 'current' : '';
+
+			$title = $this->get_location_type_title( $location );
 
 			$locations[] = sprintf('
 				%3$s %1$s %4$s (%2$s)
 				',
-				/* 1 */ $location,
+				/* 1 */ $title,
 				/* 2 */ $count,
-				/* 3 */ sprintf( '<a href="" class="mine %1$s">', $current ),
+				/* 3 */ sprintf( '<a href="" class="mine %1$s" data-count-type="%2$s">', $current, $location ),
 				/* 4 */ '</a>'
 			);
 		}
 
+		// The last location, not really a "location", is the help icon.
 		$locations[] = '<span class="dashicons dashicons-editor-help" data-id="mine-count"></span>';
 
 		$markup = '<p class="subsubsub">' . implode( ' | ', $locations ) . '</p>';
 
+		// Create help text to go along with help icon.
 		$markup .= sprintf('
 			<p class="help" data-id="mine-count">
 				%1$s
@@ -111,18 +186,12 @@ class Boldgrid_Backup_Admin_Archives {
 		);
 
 		foreach( $this->core->archives_all->all as $archive ) {
-
-			// Create the list of locations.
-			$locations = array();
-			foreach( $archive['locations'] as $location ) {
-				$locations[] = sprintf( '<span data-location="%1$s">%1$s</span>', $location );
-			}
-			$locations = implode( ', ', $locations );
+			$locations = $this->get_locations( $archive );
 
 			$table .= sprintf( '
 				<tr>
 					<td>
-						<strong>%1$s</strong>: %2$s
+						%2$s
 						<p class="description">%6$s</p>
 					</td>
 					<td>
