@@ -2500,6 +2500,7 @@ class Boldgrid_Backup_Admin_Core {
 			// Mine count, number of backups on remote storage providers.
 			'Remote' => __( 'Remote', 'boldgrid-backup' ),
 			'spinner' => '<span class="spinner"></span>',
+			'want_to' => __( 'Want to store your backups on Amazon S3, restore individual files with just a click, and have access to more tools? Get <strong>BoldGrid Backup Premium</strong>!', 'boldgrid-backup' ),
 			// Mine count, number of backups on local web server.
 			'Web_Server' => __( 'Web Server', 'boldgrid-backup' ),
 		);

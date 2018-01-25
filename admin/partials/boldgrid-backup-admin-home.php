@@ -40,7 +40,7 @@ $ad = $this->config->is_premium_done ? '' : sprintf( '
 		%2$s
 	</div>',
 	$this->go_pro->get_premium_button(),
-	__( 'Want to store your backups on Amazon S3, restore individual files with just a click, and have access to more tools? Get <strong>BoldGrid Backup Premium</strong>!', 'boldgrid-backup' )
+	$this->lang['want_to']
 );
 
 // Backup now modal.
