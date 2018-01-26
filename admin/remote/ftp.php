@@ -571,15 +571,50 @@ class Boldgrid_Backup_Admin_Ftp {
 
 		$labels = array( 'user', 'pass', 'host', 'port', 'type', 'retention_count', 'nickname' );
 
-		foreach( $labels as $label ) {
-			$this->$label = ! empty( $settings['remote'][$this->key][$label] ) ? $settings['remote'][$this->key][$label] : null;
+		$configs = array(
+			array(
+				'property' => 'user',
+				'default' => null,
+			),
+			array(
+				'property' => 'pass',
+				'default' => null,
+			),
+			array(
+				'property' => 'host',
+				'default' => null,
+			),
+			array(
+				'property' => 'port',
+				'default' => $this->default_port,
+			),
+			array(
+				'property' => 'type',
+				'default' => $this->default_type,
+			),
+			array(
+				'property' => 'retention_count',
+				'default' => $this->retention_count,
+			),
+			array(
+				'property' => 'nickname',
+				'default' => $this->title,
+			),
+		);
+
+		foreach( $configs as $config ) {
+			$property = $config['property'];
+
+			if( ! empty( $settings['remote'][$this->key][$property] ) ) {
+				$this->$property = $settings['remote'][$this->key][$property];
+			} else {
+				$this->$property = $config['default'];
+			}
 		}
 
-		if( empty( $this->nickname ) ) {
-			$this->nickname = strtoupper( $this->type );
+		if( ! empty( $this->host ) ) {
+			$this->title_attr = strtoupper( $this->type ) . ': ' . $this->host;
 		}
-
-		$this->title_attr = strtoupper( $this->type ) . ': ' . $this->host;
 	}
 
 	/**
