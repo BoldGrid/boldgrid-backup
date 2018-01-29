@@ -73,9 +73,9 @@ class Boldgrid_Backup_Admin_Scheduler {
 
 		if( ! empty( $settings['scheduler'] ) ) {
 			return $settings['scheduler'];
-		} elseif( in_array( 'cron', $available, true ) ) {
+		} elseif( array_key_exists( 'cron', $available ) ) {
 			return 'cron';
-		} elseif( in_array( 'wp-cron', $available, true ) ) {
+		} elseif( array_key_exists( 'wp-cron', $available ) ) {
 			return 'wp-cron';
 		} else {
 			return false;
@@ -86,6 +86,16 @@ class Boldgrid_Backup_Admin_Scheduler {
 	 * Get available schedulers.
 	 *
 	 * @since 1.5.1
+	 *
+	 * @return array {
+	 *     An array of available schedulers.
+	 *
+	 *     cron array {
+	 *         @type string $title Cron
+	 *     }
+	 *     wp-cron array {
+	 *         @type string $title WP Cron
+	 *     }
 	 */
 	public function get_available() {
 		if( ! empty( $this->available ) ) {

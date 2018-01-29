@@ -6,7 +6,7 @@
  * @since 1.0
  */
 
-/* global ajaxurl,localizeScriptData,jQuery */
+/* global ajaxurl,boldgrid_backup_admin_rollback,jQuery */
 
 // Declare namespace.
 var BOLDGRID = BOLDGRID || {};
@@ -28,11 +28,6 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 
 	// General Variables.
 	var self = {};
-
-	/*
-	 * This script is passed "localizeScriptData" {"rolloutDeadline"}
-	 * (via wp_localize_script() in "class-boldgrid-backup-admin-core.php").
-	 */
 
 	// Onload event listener.
 	$( function() {
@@ -178,24 +173,21 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		 *
 		 * @see getTimeRemaining().
 		 * @see updateDeadline().
-		 *
-		 * @param string id A DOM id.
-		 * @param string endTime A data/time parsed with Date.parse().
 		 */
-		initializeClock : function( id ) {
+		initializeClock : function() {
 			// Define variables.
-			var clock, interval, totalSeconds,
+			var $clock, interval, totalSeconds,
 				self = this;
 
 			// Get the element for the clock display.
-			clock = document.getElementById( id );
+			$clock = $( '#rollback-countdown-timer' );
 
 			// Use an interval of 1 second to update the clock.
 			interval = setInterval( function() {
 				totalSeconds = self.getTimeRemaining( BOLDGRID.BACKUP.RollbackTimer.deadline );
 
 				// Update the clock display.
-				clock.innerHTML = totalSeconds.minutes + ':' + totalSeconds.seconds;
+				$clock.html( totalSeconds.minutes + ':' + totalSeconds.seconds );
 
 				// When the timer reaches zero, stop the countdown and disable the cancel button.
 				if( totalSeconds.total <= 0 ){
@@ -226,6 +218,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			// Update the rollback timer.
 			if ( $RollbackDeadline.length ) {
 				BOLDGRID.BACKUP.RollbackTimer.deadline = $RollbackDeadline.text();
+				BOLDGRID.BACKUP.RollbackTimer.initializeClock();
 			}
 		},
 
@@ -281,15 +274,22 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		 */
 		init : function() {
 			// Declare vars.
-			var $document = $( document );
+			var $document = $( document ),
+				haveDeadline;
+
+			// Determine whether or not we have a valid deadline.
+			haveDeadline = typeof boldgrid_backup_admin_rollback === 'object' &&
+				boldgrid_backup_admin_rollback.rolloutDeadline !== undefined &&
+				'1970' !== boldgrid_backup_admin_rollback.rolloutDeadline.slice( 0, 4 );
 
 			// If there is a defined rollout deadline, then initialize the timer.
-			if ( localizeScriptData.rolloutDeadline ) {
+			if ( haveDeadline ) {
+
 				// Set the end time/deadline.
-				BOLDGRID.BACKUP.RollbackTimer.deadline = localizeScriptData.rolloutDeadline;
+				BOLDGRID.BACKUP.RollbackTimer.deadline = boldgrid_backup_admin_rollback.rolloutDeadline;
 
 				// Initialize the clock/timer.
-				this.initializeClock( 'rollback-countdown-timer' );
+				this.initializeClock();
 			}
 
 			// When the update progress iframe loads, check for a new deadline.

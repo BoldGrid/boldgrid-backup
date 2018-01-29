@@ -199,11 +199,12 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 			BOLDGRID_BACKUP_VERSION,
 			false
 		);
+
 		$localize_script_data = array(
 			// Include the time (in ISO 8601 format).
 			'rolloutDeadline' => date( 'c', $deadline ),
 		);
-		wp_localize_script( 'boldgrid-backup-admin-rollback', 'localizeScriptData', $localize_script_data );
+		wp_localize_script( 'boldgrid-backup-admin-rollback', 'boldgrid_backup_admin_rollback', $localize_script_data );
 		wp_enqueue_script( 'boldgrid-backup-admin-rollback' );
 
 		// Create and display our notice.
@@ -263,7 +264,9 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 
 				<p>
 					<strong>' . __( 'Countdown', 'boldgrid-backup' ) . '</strong>:
-					<span id="rollback-countdown-timer"></span>
+					<span id="rollback-countdown-timer">
+						<span class="spinner inline"></span>
+					</span>
 					' . $deadline . '
 				</p>
 
@@ -460,6 +463,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 * @see Boldgrid_Backup_Admin_Cron::add_restore_cron().
 	 */
 	public function notice_deadline_show( $upgrader_object, $options ) {
+
 		// Add/update restoration cron job.
 		$this->add_cron();
 
