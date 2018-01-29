@@ -26,8 +26,6 @@ BoldGrid.ArchiveDetails = function( $ ) {
 	self.onClickUpload = function() {
 
 		var $a = $(this),
-			$td = $a.closest( 'td' ),
-			$tr = $a.closest( 'tr' ),
 			provider = $a.attr( 'data-provider-id' ),
 			data = {
 				'action' : 'boldgrid_backup_remote_storage_upload_' + provider,
@@ -44,9 +42,9 @@ BoldGrid.ArchiveDetails = function( $ ) {
 		failUpload = function( response ) {
 			var defaultMessage = adminLang.xmark + ' ' + lang.failUpload,
 				dataNotEmpty = response !== undefined && response.data !== undefined && response.data !== '',
-				message = dataNotEmpty ? response.data : defaultMessage;
+				message = dataNotEmpty ? defaultMessage + ' ' + response.data : defaultMessage;
 
-			$td.html( message );
+			$a.parent().html( message );
 		};
 
 		$a
@@ -80,7 +78,6 @@ BoldGrid.ArchiveDetails = function( $ ) {
 	 */
 	self.onClickDownload = function() {
 		var $button = $( this ),
-			$tr = $button.closest( 'tr' ),
 			provider = $button.attr( 'data-provider-id' ),
 			data = {
 				'action' : 'boldgrid_backup_remote_storage_download_' + provider,

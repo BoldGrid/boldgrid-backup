@@ -6,8 +6,3 @@ table [type="password"] {
 [type="number"] {
 	width: 75px;
 }
-
-
-input:invalid {
-  border: 1px solid red;
-}

@@ -116,3 +116,7 @@ hr.separator-small {
 h3 {
 	font-size: 1.2em;
 }
+
+input:invalid {
+  border: 1px solid red;
+}
