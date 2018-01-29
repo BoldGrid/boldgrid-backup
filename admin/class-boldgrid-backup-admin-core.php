@@ -974,7 +974,7 @@ class Boldgrid_Backup_Admin_Core {
 		 *
 		 * Leave this as the last menu item.
 		 */
-		if( ! $this->config->is_premium_done ) {
+		if( ! $this->config->get_is_premium() ) {
 			add_submenu_page(
 				$main_slug,
 				$lang['get_premium'],
