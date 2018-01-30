@@ -1736,24 +1736,12 @@ class Boldgrid_Backup_Admin_Core {
 			}
 		);
 
-		// Get backup identifier.
-		$backup_identifier = $this->get_backup_identifier();
-
-		// Create a site identifier.
-		$site_id = Boldgrid_Backup_Admin_Utility::create_site_id();
-
 		// Initialize $index.
 		$index = -1;
 
 		// Filter the array.
 		foreach ( $dirlist as $fileinfo ) {
-			if (
-				1 === preg_match(
-					'/^boldgrid-backup-(' . $site_id . '|.*?-?' . $backup_identifier .
-					')-.*\.(zip|tar\.gz|b2z|zlib|lzf)$/',
-					$fileinfo['name']
-				)
-			) {
+			if ( $this->archive->is_site_archive( $fileinfo['name'] ) ) {
 				// Increment the index.
 				$index++;
 

@@ -333,17 +333,15 @@ class Boldgrid_Backup_Admin_Ftp {
 			return;
 		}
 
-		$backups = array();
 		$contents = $this->get_contents( true, $this->remote_dir );
+		$backups = $this->format_raw_contents( $contents );
 
 		// The contents usually include . and .., so remove 2 from list.
-		$count_to_delete = count($contents) - $this->retention_count - 2;
+		$count_to_delete = count($backups) - $this->retention_count - 2;
 
-		if( ! is_array( $contents ) || $count_to_delete <= 0 ) {
+		if( empty( $backups ) || $count_to_delete <= 0 ) {
 			return false;
 		}
-
-		$backups = $this->format_raw_contents( $contents );
 
 		usort( $backups, function( $a, $b ){
 			return $a['time'] < $b['time'] ? -1 : 1;
@@ -457,7 +455,7 @@ class Boldgrid_Backup_Admin_Ftp {
 		$backups = array();
 
 		if( ! is_array( $contents ) ) {
-			return array();
+			return $backups;
 		}
 
 		foreach( $contents as $item ) {
@@ -498,6 +496,13 @@ class Boldgrid_Backup_Admin_Ftp {
 				);
 			}
 		}
+
+		foreach( $backups as $key => $backup ) {
+			if( ! $this->core->archive->is_site_archive( $backup['filename'] ) ) {
+				unset( $backups[$key] );
+			}
+		}
+		$backups = array_values( $backups );
 
 		return $backups;
 	}
