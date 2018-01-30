@@ -160,8 +160,8 @@ class Boldgrid_Backup_Admin_Archive {
 	/**
 	 * Determine if a backup belongs to this site.
 	 *
-	 * This method takes into account a site's $backup_identifier and $site_id,
-	 * and compares it to a backup's filename.
+	 * This method takes into account a site's $backup_identifier and compares
+	 * it to a backup's filename.
 	 *
 	 * @since 1.6.0
 	 *
@@ -170,14 +170,24 @@ class Boldgrid_Backup_Admin_Archive {
 	 */
 	public function is_site_archive( $filename ) {
 		$backup_identifier = $this->core->get_backup_identifier();
-		$site_id = Boldgrid_Backup_Admin_Utility::create_site_id();
 
-		$match = preg_match(
-			'/^boldgrid-backup-(' . $site_id . '|.*?-?' . $backup_identifier . ')-.*\.(zip|tar\.gz|b2z|zlib|lzf)$/',
-			$filename
-		);
+		// End in zip.
+		$extension = pathinfo( $filename, PATHINFO_EXTENSION );
+		if( 'zip' !== $extension ) {
+			return false;
+		}
 
-		return 1 === $match;
+		// Include the backup identifier.
+		if( false === strpos( $filename, $backup_identifier ) ) {
+			return false;
+		}
+
+		// Begin with 'boldgrid-backup-'.
+		if( 0 !== strpos( $filename, 'boldgrid-backup-' ) ) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
