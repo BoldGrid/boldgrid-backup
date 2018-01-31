@@ -21,6 +21,7 @@ BoldGrid.Settings = function( $ ) {
 		$noBackupDays,
 		$useSparingly,
 		$backupDir,
+		$body = $( 'body' ),
 		tb_unload_count,
 		$moveBackups;
 
@@ -76,6 +77,10 @@ BoldGrid.Settings = function( $ ) {
 
 		$table.find( 'tr' ).removeClass( 'active' );
 
+		/*
+		 * We add the active class so that we can identify the provider that is
+		 * being updated.
+		 */
 		$tr.addClass( 'active' );
 	}
 
@@ -105,7 +110,7 @@ BoldGrid.Settings = function( $ ) {
 	 * @since 1.5.2
 	 */
 	self.refresh_storage_configuration = function() {
-		var $tr = $( '#storage_locations tr.active' ),
+		var $tr = $( '#storage_locations tr.active:not(.refreshing)' ),
 			$td_configure = $tr.find( 'td.configure' ),
 			$nonce = $( '#_wpnonce' ),
 			data = {
@@ -114,10 +119,12 @@ BoldGrid.Settings = function( $ ) {
 			},
 			$new_tr;
 
+		$tr.addClass( 'refreshing' );
+
 		$td_configure.html( '<span class="spinner inline"></span>' );
 
 		$.post( ajaxurl, data, function( response ) {
-			$new_tr = $( response.data ).addClass( 'active' );
+			$new_tr = $( response.data );
 			$tr.replaceWith( $new_tr );
 
 			self.toggleNoStorage();
@@ -247,7 +254,7 @@ BoldGrid.Settings = function( $ ) {
 		self.toggleNoBackupDays();
 
 		self.toggleNoStorage();
-		$( 'body' ).on( 'click', '#storage_locations input[type="checkbox"]', self.toggleNoStorage );
+		$body.on( 'click', '#storage_locations input[type="checkbox"]', self.toggleNoStorage );
 
 		$backupDir.on( 'input', self.toggleMoveBackups );
 
@@ -264,7 +271,7 @@ BoldGrid.Settings = function( $ ) {
 
 		$( window ).on( 'tb_unload', self.on_tb_unload );
 
-		$( '#storage_locations .thickbox' ).on( 'click', self.on_click_provider );
+		$body.on( 'click', '#storage_locations .thickbox', self.on_click_provider );
 
 		/** Reverse dismiss action for the Conect Key prompt **/
 		$( '.undismissBoldgridNotice' ).on( 'click', self.undismissBoldgridNotice );
