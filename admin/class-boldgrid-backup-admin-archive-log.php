@@ -118,6 +118,9 @@ class Boldgrid_Backup_Admin_Archive_Log {
 		// Extract the log file to ABSPATH.
 		$zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this->core );
 		$status = $zip->extract_one( $filepath, $log_filename );
+		if( ! $status ) {
+			return;
+		}
 
 		// Move the log file from the ABSPATH to the backup dir.
 		$old_path = ABSPATH . $log_filename;
