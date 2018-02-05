@@ -195,6 +195,9 @@ class Boldgrid_Backup_Admin_Archives {
 		foreach( $this->core->archives_all->all as $archive ) {
 			$locations = $this->get_locations( $archive );
 
+			// dirlist -> lastmodunix -> mtime (last_modified in unix time).
+			$this->core->time->init( $archive['last_modified'], 'utc' );
+
 			$table .= sprintf( '
 				<tr>
 					<td>
@@ -213,7 +216,7 @@ class Boldgrid_Backup_Admin_Archives {
 				</tr>
 				',
 				/* 1 */ $backup,
-				/* 2 */ date( 'M j, Y h:i a', $archive['last_modified'] ),
+				/* 2 */ $this->core->time->get_span(),
 				/* 3 */ Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive['size'] ),
 				/* 4 */ $archive['filename'],
 				/* 5 */ $view_details,

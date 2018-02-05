@@ -17,6 +17,14 @@ $icon = 'folder' === $class ? 'dashicons dashicons-portfolio' : 'dashicons dashi
 
 $size = empty( $file['size'] ) ? '' : Boldgrid_Backup_Admin_Utility::bytes_to_human( $file['size'] );
 
+/*
+ * Get the last modified time for this file.
+ *
+ * ZipArchive uses the server's local time as a timestamp, while PclZip uses UTC.
+ */
+$mtime = ! empty( $file['mtime'] ) ? $file['mtime'] : null;
+$this->core->time->init( $mtime, $this->core->archive->compressor );
+
 return sprintf(
 	'<tr data-dir="%1$s">
 		<td>
@@ -35,7 +43,7 @@ return sprintf(
 	basename( $file['filename'] ),
 	$icon,
 	$size,
-	isset( $file['mtime'] ) ? date( 'M j, Y h:i:s a', $file['mtime'] ) : ''
+	$this->core->time->get_span()
 );
 
 ?>

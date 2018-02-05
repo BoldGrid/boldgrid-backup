@@ -129,9 +129,10 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 			wp_send_json_error( $error . ' ' . __( 'Invalid archive filename.', 'boldgrid-backup' ) );
 		}
 
+		$this->core->archive->init( $filepath );
+
 		$dump_file = $this->core->get_dump_file( $filepath );
 
-		$log_filepath = $this->core->archive_log->path_from_zip( $filepath );
 
 		// An array of files not to show in the archive browser.
 		$no_show = array(
@@ -141,12 +142,13 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 			 * a dump file.
 			 */
 			basename( $dump_file ),
-			basename( $log_filepath ),
+			basename( $this->core->archive->log_filepath ),
 		);
 
 		$dir = ! empty( $_POST['dir'] ) ? $_POST['dir'] : null;
 
 		$zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this->core );
+
 		$contents = $zip->browse( $filepath, $dir );
 
 		$tr = '';

@@ -112,20 +112,20 @@ class Boldgrid_Backup_Admin_Archive_Log {
 		$log_filename = basename( $log_filepath );
 
 		if( $this->core->wp_filesystem->exists( $log_filepath ) ) {
-			return;
+			return true;
 		}
 
 		// Extract the log file to ABSPATH.
 		$zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this->core );
 		$status = $zip->extract_one( $filepath, $log_filename );
 		if( ! $status ) {
-			return;
+			return false;
 		}
 
 		// Move the log file from the ABSPATH to the backup dir.
 		$old_path = ABSPATH . $log_filename;
 		$new_path = $this->core->backup_dir->get_path_to( $log_filename );
-		$this->core->wp_filesystem->move( $old_path, $new_path );
+		return $this->core->wp_filesystem->move( $old_path, $new_path );
 	}
 
 	/**

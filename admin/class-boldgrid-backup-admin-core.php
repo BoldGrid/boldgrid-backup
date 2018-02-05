@@ -132,6 +132,15 @@ class Boldgrid_Backup_Admin_Core {
 	public $test;
 
 	/**
+	 * The Time class object.
+	 *
+	 * @since 1.6.0
+	 * @access public
+	 * @var Boldgrid_Backup_Admin_Time
+	 */
+	public $time;
+
+	/**
 	 * An instance of Boldgrid_Backup_Admin_Tools.
 	 *
 	 * @since  1.5.4
@@ -538,6 +547,8 @@ class Boldgrid_Backup_Admin_Core {
 		$this->go_pro = new Boldgrid_Backup_Admin_Go_Pro( $this );
 
 		$this->tools = new Boldgrid_Backup_Admin_Tools( $this );
+
+		$this->time = new Boldgrid_Backup_Admin_Time( $this );
 
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();

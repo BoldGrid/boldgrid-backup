@@ -82,7 +82,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * @return bool
 	 */
 	public function import_from_archive( $archive_filepath, $file ) {
-		$this->core->archive->set( $archive_filepath );
+		$this->core->archive->init( $archive_filepath );
 		$file_from_archive = $this->core->archive->get_file( $file );
 
 		$sql = ! empty( $file_from_archive[0]['content'] ) ? $file_from_archive[0]['content'] : null;

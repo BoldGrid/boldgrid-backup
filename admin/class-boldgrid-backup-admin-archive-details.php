@@ -49,6 +49,18 @@ class Boldgrid_Backup_Admin_Archive_Details {
 	}
 
 	/**
+	 * Get a link for an archive's details page.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param  string $filename
+	 * @return string
+	 */
+	public function get_url( $filename ) {
+		return get_admin_url( null, 'admin.php?page=boldgrid-backup-archive-details&filename=' . $filename );
+	}
+
+	/**
 	 * Enqueue scripts.
 	 *
 	 * @since 1.5.4

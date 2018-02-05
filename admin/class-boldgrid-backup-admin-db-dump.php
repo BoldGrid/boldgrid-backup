@@ -154,7 +154,7 @@ class Boldgrid_Backup_Admin_Db_Dump {
 	 * @return array
 	 */
 	public function get_insert_tables( $filepath, $file ) {
-		$this->core->archive->set( $filepath );
+		$this->core->archive->init( $filepath );
 		$file_contents = $this->core->archive->get_file( $file );
 
 		/*

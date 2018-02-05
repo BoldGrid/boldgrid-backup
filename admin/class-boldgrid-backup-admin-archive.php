@@ -29,13 +29,51 @@ class Boldgrid_Backup_Admin_Archive {
 	private $core;
 
 	/**
+	 * Compressor used when creating archive.
+	 *
+	 * @since  1.6.0
+	 * @access public
+	 * @var    string
+	 */
+	public $compressor = null;
+
+	/**
 	 * Full filepath to the archive.
+	 *
+	 * Set in the init method.
 	 *
 	 * @since  1.5.3
 	 * @access public
 	 * @var    string
 	 */
 	public $filepath = null;
+
+	/**
+	 * The contents of the archive's log file.
+	 *
+	 * @since  1.6.0
+	 * @access public
+	 * @var    array
+	 */
+	public $log = array();
+
+	/**
+	 * The filename of this archive's log file.
+	 *
+	 * @since  1.6.0
+	 * @access public
+	 * @var    string
+	 */
+	public $log_filename = null;
+
+	/**
+	 * The filepath to this archive's log file.
+	 *
+	 * @since  1.6.0
+	 * @access public
+	 * @var    string
+	 */
+	public $log_filepath = null;
 
 	/**
 	 * Constructor.
@@ -109,7 +147,7 @@ class Boldgrid_Backup_Admin_Archive {
 	 * @return array
 	 */
 	public function get_file( $file, $meta_only = false ) {
-		if( empty( $this->filepath ) || ! $this->is_archive() ) {
+		if( empty( $this->filepath ) || ! $this->is_archive( $this->filepath ) ) {
 			return false;
 		}
 
@@ -126,6 +164,50 @@ class Boldgrid_Backup_Admin_Archive {
 	}
 
 	/**
+	 * Init.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param string $filepath
+	 */
+	public function init( $filepath ) {
+
+		if( ! empty( $this->filepath ) && $filepath === $this->filepath ) {
+			return;
+		}
+
+		$this->reset();
+
+		$zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this->core );
+
+		$this->filepath = $filepath;
+
+		$this->log_filepath = $this->core->archive_log->path_from_zip( $this->filepath );
+		$this->log_filename = basename( $this->log_filepath );
+
+		// If the archive's log file does not exist, extract it.
+		$have_log = $this->core->wp_filesystem->exists( $this->log_filepath );
+		if( ! $have_log ) {
+			$have_log = $this->core->archive_log->restore_by_zip( $this->filepath );
+		}
+
+		// Init our log.
+		if( $have_log ) {
+			$this->log = $this->core->archive_log->get_by_zip( $this->filepath );
+		}
+
+		/*
+		 * Init our compressor.
+		 *
+		 * If there is no log file, this archive was created with version < 1.6
+		 * and the only compressor was ZipArchive.
+		 */
+		$this->compressor = ! empty( $this->log['compressor'] ) ? $this->log['compressor'] : 'php_zip';
+
+		unset( $zip );
+	}
+
+	/**
 	 * Determine if a zip file is in our archive.
 	 *
 	 * @since 1.5.3
@@ -133,15 +215,7 @@ class Boldgrid_Backup_Admin_Archive {
 	 * @param  string $filepath
 	 * @return bool
 	 */
-	public function is_archive( $filepath = null ) {
-		if( ! empty( $filepath ) ) {
-			$this->set( $filepath );
-		}
-
-		if( is_null( $this->filepath ) ) {
-			return false;
-		}
-
+	public function is_archive( $filepath ) {
 		$archives = $this->core->get_archive_list();
 
 		if( empty( $archives ) ) {
@@ -149,7 +223,7 @@ class Boldgrid_Backup_Admin_Archive {
 		}
 
 		foreach( $archives as $archive ) {
-			if( $this->filepath === $archive['filepath'] ) {
+			if( $filepath === $archive['filepath'] ) {
 				return true;
 			}
 		}
@@ -191,11 +265,34 @@ class Boldgrid_Backup_Admin_Archive {
 	}
 
 	/**
-	 * Set the filepath.
+	 * Reset this class.
 	 *
-	 * @since 1.5.3
+	 * @since 1.6.0
 	 */
-	public function set( $filepath ) {
-		$this->filepath = $filepath;
+	public function reset() {
+		$this->filepath = null;
+		$this->log_filepath = null;
+		$this->log_filename = null;
+		$this->log = array();
+		$this->compressor = null;
+	}
+
+	/**
+	 * Update an archive's timestamp based on the time in the log.
+	 *
+	 * For example, if the archive was created at 10am and you uploaded it to
+	 * an FTP server at 12pm, the FTP server may set the timestamp to 12pm. Then
+	 * you download from FTP to web server at 2pm, and the archive's timestamp
+	 * is now 2pm. This is all confusing. This method will get the archive's
+	 * timestamp from the log and configure the last modified appropriately.
+	 */
+	public function update_timestamp() {
+
+		// If we don't have what we need, abort.
+		if( empty( $this->filepath ) || empty( $this->log['lastmodunix'] ) ) {
+			return false;
+		}
+
+		return $this->core->wp_filesystem->touch( $this->filepath, $this->log['lastmodunix'] );
 	}
 }

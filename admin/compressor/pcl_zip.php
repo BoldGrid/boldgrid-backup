@@ -299,9 +299,9 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 	 *
 	 * @since 1.5.3
 	 *
-	 * @param  string $filepath /home/user/boldgrid_backup/archive.zip
-	 * @param  string $file     wp-content/index.php
-	 *
+	 * @param  string $filepath    /home/user/boldgrid_backup/archive.zip
+	 * @param  string $file        wp-content/index.php
+	 * @return bool
 	 */
 	public function extract_one( $filepath, $file ) {
 		if( ! $this->core->archive->is_archive( $filepath ) ) {
@@ -324,6 +324,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 			$this->errors[] = __( 'Not written.', 'boldgrid-backup' );
 			return false;
 		}
+
 		return $this->core->wp_filesystem->touch( ABSPATH . $file, $file_contents[0]['mtime'] );
 	}
 
@@ -383,6 +384,16 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 		}
 
 		$file_contents = $zip->extractByIndex( $file_index, PCLZIP_OPT_EXTRACT_AS_STRING );
+
+		/*
+		 * Ensure the mtime is UTC.
+		 *
+		 * mtime can vary based upon how the archive was initially created (php_zip
+		 * or pcl_zip). Make sure it is in UTC.
+		 */
+		$this->core->archive->init( $filepath );
+		$this->core->time->init( $file_contents[0]['mtime'], $this->core->archive->compressor );
+		$file_contents[0]['mtime'] = $this->core->time->utc_time;
 
 		return $file_contents;
 	}

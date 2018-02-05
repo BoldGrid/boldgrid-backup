@@ -42,10 +42,12 @@ if( ! $archive_found ) {
 		Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive['filesize'] )
 	);
 
+	// dirlist -> lastmodunix -> mtime (last_modified in unix time).
+	$this->core->time->init( $archive['lastmodunix'], 'utc' );
 	$backup_date = sprintf(
 		'<div class="misc-pub-section">%1$s: <strong>%2$s</strong></div>',
 		__( 'Backup date', 'boldgrid-backup' ),
-		$archive['filedate']
+		$this->core->time->get_span()
 	);
 
 	$more_info = empty( $details ) ? '' : sprintf( '
