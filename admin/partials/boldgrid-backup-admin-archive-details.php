@@ -24,7 +24,10 @@ $details = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/detai
 $remote_storage = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/remote-storage.php';
 $browser = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/browser.php';
 $db = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/db.php';
+
+// Special situations where the backup file is not local and/or remote.
 $only_remote = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/only-remote.php';
+$not_found = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/not-found.php';
 
 $delete_link = $this->core->archive_actions->get_delete_link( $archive['filename'] );
 $download_button = $this->core->archive_actions->get_download_button( $archive['filename'] );
@@ -192,8 +195,14 @@ $main_content = '
 	</div>
 ';
 
-if( ! $archive_found && count( $this->remote_storage_li ) > 0 ) {
-	$main_content = $only_remote;
+if( ! $this->core->archive->is_stored_locally() ) {
+
+	if( $this->core->archive->is_stored_remotely() ) {
+		$main_content = $only_remote;
+	} else {
+		$main_content = $not_found;
+		$remote_meta_box = '';
+	}
 }
 
 $page = sprintf( '

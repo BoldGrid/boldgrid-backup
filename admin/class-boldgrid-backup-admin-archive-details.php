@@ -148,9 +148,13 @@ class Boldgrid_Backup_Admin_Archive_Details {
 		} else {
 			$archive = array();
 			if( ! empty( $_GET['filename'] ) ) {
-				$archive['filename'] = $_GET['filename'];
+				$archive['filename'] = strip_tags( $_GET['filename'] );
+				$archive['filepath'] = $this->core->backup_dir->get_path_to( $archive['filename'] );
 			}
 		}
+
+		// Initialize the archive. We will need it in our included template below.
+		$this->core->archive->init( $archive['filepath'] );
 
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-archive-details.php';
 	}

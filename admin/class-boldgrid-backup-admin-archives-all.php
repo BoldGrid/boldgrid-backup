@@ -77,6 +77,18 @@ class Boldgrid_Backup_Admin_Archives_All {
 	);
 
 	/**
+	 * An array of meta information about each archive.
+	 *
+	 * This array is initialized during init(). Each key of this array is an
+	 * archive filename.
+	 *
+	 * @since  1.6.0
+	 * @access public
+	 * @var    array
+	 */
+	public $archives = array();
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.5.4
@@ -98,6 +110,11 @@ class Boldgrid_Backup_Admin_Archives_All {
 	 */
 	public function add( $backup ) {
 		$in_all = false;
+
+		$is_remote = ! empty( $backup['locations'][0]['on_remote_server'] ) && true === $backup['locations'][0]['on_remote_server'];
+		if( $is_remote ) {
+			$this->archives[$backup['filename']]['on_remote_server'] = true;
+		}
 
 		// Loop through all of our existing backups to see if this one exists.
 		foreach( $this->all as &$all_backup ) {
@@ -189,6 +206,8 @@ class Boldgrid_Backup_Admin_Archives_All {
 					),
 				),
 			);
+
+			$this->archives[$archive['filename']]['on_web_server'] = true;
 		}
 
 		do_action( 'boldgrid_backup_get_all' );

@@ -38,6 +38,15 @@ class Boldgrid_Backup_Admin_Archive {
 	public $compressor = null;
 
 	/**
+	 * Filename of this archive.
+	 *
+	 * @since  1.6.0
+	 * @access public
+	 * @var    string
+	 */
+	public $filename = null;
+
+	/**
 	 * Full filepath to the archive.
 	 *
 	 * Set in the init method.
@@ -172,6 +181,8 @@ class Boldgrid_Backup_Admin_Archive {
 	 */
 	public function init( $filepath ) {
 
+		$filepath = strip_tags( $filepath );
+
 		if( ! empty( $this->filepath ) && $filepath === $this->filepath ) {
 			return;
 		}
@@ -181,6 +192,7 @@ class Boldgrid_Backup_Admin_Archive {
 		$zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this->core );
 
 		$this->filepath = $filepath;
+		$this->filename = basename( $this->filepath );
 
 		$this->log_filepath = $this->core->archive_log->path_from_zip( $this->filepath );
 		$this->log_filename = basename( $this->log_filepath );
@@ -265,11 +277,47 @@ class Boldgrid_Backup_Admin_Archive {
 	}
 
 	/**
+	 * Determine whether or not this archive is stored on the web server (local).
+	 *
+	 * This is similar to self::is_stored_remotely. While that method is an
+	 * expensive operation, this one is not. However, for consistency, this too
+	 * will be a method rather than a class property.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @return bool
+	 */
+	public function is_stored_locally() {
+		$this->core->archives_all->init();
+
+		return isset( $this->core->archives_all->archives[$this->filename]['on_web_server'] ) &&
+			true === $this->core->archives_all->archives[$this->filename]['on_web_server'];
+	}
+
+	/**
+	 * Determine whether or not this archive is stored remotely somewhere.
+	 *
+	 * This is an expensive operation, so we are not using this as a class
+	 * property / initializing during init.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @return bool
+	 */
+	public function is_stored_remotely() {
+		$this->core->archives_all->init();
+
+		return isset( $this->core->archives_all->archives[$this->filename]['on_remote_server'] ) &&
+			true === $this->core->archives_all->archives[$this->filename]['on_remote_server'];
+	}
+
+	/**
 	 * Reset this class.
 	 *
 	 * @since 1.6.0
 	 */
 	public function reset() {
+		$this->filename = null;
 		$this->filepath = null;
 		$this->log_filepath = null;
 		$this->log_filename = null;
