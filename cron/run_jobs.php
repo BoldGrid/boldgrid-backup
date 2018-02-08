@@ -31,5 +31,9 @@ if ( ! chdir( $abspath ) ) {
 }
 require_once $abspath . '/wp-load.php';
 
+if( ! class_exists( 'Boldgrid_Backup_Admin_Core' ) ) {
+	return;
+}
+
 $core = new Boldgrid_Backup_Admin_Core();
 $core->jobs->run();

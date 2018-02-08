@@ -75,6 +75,10 @@ echo PHP_EOL;
 // Load BoldGrid Backup.
 esc_html_e( 'Loading BoldGrid Backup... ', 'boldgrid-backup' );
 
+if( ! class_exists( 'Boldgrid_Backup_Admin_Core' ) ) {
+	die( 'Error: Boldgrid_Backup_Admin_Core class does not exist. Is the plugin activated?' . PHP_EOL );
+}
+
 $boldgrid_backup_core = new Boldgrid_Backup_Admin_Core();
 
 esc_html_e( 'Done.', 'boldgrid-backup' );

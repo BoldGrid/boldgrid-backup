@@ -123,8 +123,10 @@ class Boldgrid_Backup_Admin_Config {
 			$this->core = $core;
 		}
 
-		$license = new \Boldgrid\Library\Library\License();
-		$this->is_premium = $license->isPremium( 'boldgrid-backup' );
+		if( class_exists( '\Boldgrid\Library\Library\License' ) ) {
+			$license = new \Boldgrid\Library\Library\License();
+			$this->is_premium = $license->isPremium( 'boldgrid-backup' );
+		}
 
 		$this->set_lang();
 	}

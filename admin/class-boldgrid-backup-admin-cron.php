@@ -402,13 +402,16 @@ class Boldgrid_Backup_Admin_Cron {
 		 * As of @1.5.2, you can pass any other string to this method, such as
 		 * "cron/run_jobs.php", so that the pattern will become
 		 * /home/user/public_html/wp-content/plugins/boldgrid-backup/cron/run_jobs.php
+		 *
+		 * As of @1.6.0 you can pass true as the $mode so that nothing else is
+		 * added to the pattern and ALL crons for this site will be removed.
 		 */
-		$pattern = dirname( dirname( __FILE__ ) ) . '/';
+		$pattern = BOLDGRID_BACKUP_PATH . '/';
 		if( '' === $mode ) {
 			$pattern .= 'boldgrid-backup-cron.php" mode=';
 		} elseif( 'restore' === $mode ) {
 			$pattern .= 'boldgrid-backup-cron.php" mode=restore';
-		} else {
+		} elseif( true !== $mode ) {
 			$pattern .= $mode;
 		}
 

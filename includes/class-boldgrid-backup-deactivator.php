@@ -27,5 +27,9 @@ class Boldgrid_Backup_Deactivator {
 	 * @since 1.0
 	 */
 	public static function deactivate() {
+		$core = new Boldgrid_Backup_Admin_Core();
+
+		$core->cron->delete_cron_entries( true );
+		$core->wp_cron->clear_schedules();
 	}
 }

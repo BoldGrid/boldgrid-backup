@@ -92,6 +92,9 @@ $sections = apply_filters( 'boldgrid_backup_settings_sections', $sections );
  * @param array $sections
  */
 $col_container = apply_filters( 'Boldgrid\Library\Ui\render_col_container', $sections );
+if( is_array( $col_container ) ) {
+	$col_container = $this->core->lang['icon_warning'] . ' ' . __( 'Unable to display settings page. Unknown BoldGrid Library error.', 'boldgrid-backup' );
+}
 
 // Check if settings are available, show an error notice if not.
 if ( empty( $settings ) ) {
