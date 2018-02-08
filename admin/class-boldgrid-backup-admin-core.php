@@ -1471,6 +1471,11 @@ class Boldgrid_Backup_Admin_Core {
 			'filesize' => 0,
 			'save' => $save,
 			'total_size' => 0,
+			/*
+			 * As of 1.6.0, the folder include and exclude settings below are
+			 * for informational purposes only. This array cannot be filtered to
+			 * adjust which folders are actually included / excluded.
+			 */
 			'folder_include' => $this->folder_exclusion->from_settings( 'include' ),
 			'folder_exclude' => $this->folder_exclusion->from_settings( 'exclude' ),
 			'table_exclude' => $this->db_omit->get_excluded_tables(),

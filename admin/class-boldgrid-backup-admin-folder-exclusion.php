@@ -111,6 +111,24 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	 */
 	public function __construct( $core ) {
 		$this->core = $core;
+
+		/**
+		 * Allow the filtering of the default include and exclude settings.
+		 *
+		 * As of 1.6.0, the backup plugin is not yet "properly" designed to
+		 * allow for these settings to be filtered. Yes, these filters below are
+		 * being ran, however they're being ran in the constructor. The only
+		 * plugins we can guarantee that will be able to hook into these filters
+		 * are mu-plugins. One possible scenario this would be used is an mu-plugin
+		 * hooking into these filters to ensure "mu-plugins" are excluded from
+		 * backups.
+		 *
+		 * @since 1.6.0
+		 *
+		 * @param string $this->default_include Default include values.
+		 */
+		$this->default_include = apply_filters( 'boldgrid_backup_default_folder_include', $this->default_include );
+		$this->default_exclude = apply_filters( 'boldgrid_backup_default_folder_exclude', $this->default_exclude );
 	}
 
 	/**
