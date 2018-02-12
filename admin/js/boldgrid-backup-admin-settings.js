@@ -8,7 +8,7 @@
  * @param $ The jQuery object.
  */
 
-/* global BoldGridBackupAdmin */
+/* global ajaxurl,bglibLicense,BOLDGRID,jQuery */
 
 var BoldGrid = BoldGrid || {};
 
@@ -62,6 +62,49 @@ BoldGrid.Settings = function( $ ) {
 	 * @since 1.3.1
 	 */
 	$useSparingly = $( '#use-sparingly' );
+
+	/**
+	 * @summary Take action when the user clicks Check again.
+	 *
+	 * The user is checking their license status again.
+	 *
+	 * @since 1.6.0
+	 */
+	self.onClickCheckAgain = function() {
+		var $button = $( this ),
+			$parent = $button.parent(),
+			$licenseString = $parent.find( '#license_string' ),
+			$reloadMessage = $( '#license_reload_page' ),
+			$spinner = $parent.find( '.spinner' ),
+			successFunction,
+			errorFunction;
+
+		$spinner.show();
+		$licenseString.empty();
+
+		errorFunction = function() {
+			$spinner.hide();
+			$licenseString.html( bglibLicense.unknownError );
+		};
+
+		successFunction = function( response ) {
+			if( response.data === undefined || response.data.string === undefined ) {
+				errorFunction();
+				return;
+			}
+
+			$spinner.hide();
+			$licenseString.html( response.data.string );
+
+			if( response.data.isPremium ) {
+				$reloadMessage.removeClass( 'hidden' );
+			}
+		};
+
+		BOLDGRID.LIBRARY.License.clear( 'boldgrid-backup', successFunction, errorFunction );
+
+		return false;
+	}
 
 	/**
 	 * @summary Action to take when a remote storage provider has been clicked.
@@ -272,6 +315,8 @@ BoldGrid.Settings = function( $ ) {
 		$( window ).on( 'tb_unload', self.on_tb_unload );
 
 		$body.on( 'click', '#storage_locations .thickbox', self.on_click_provider );
+
+		$body.on( 'click', '#license_check_again', self.onClickCheckAgain );
 
 		/** Reverse dismiss action for the Conect Key prompt **/
 		$( '.undismissBoldgridNotice' ).on( 'click', self.undismissBoldgridNotice );

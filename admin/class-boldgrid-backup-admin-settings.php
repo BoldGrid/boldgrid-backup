@@ -660,6 +660,8 @@ class Boldgrid_Backup_Admin_Settings {
 		wp_enqueue_script( 'bglib-ui-js' );
 		wp_enqueue_script( 'bglib-sticky' );
 
+		wp_enqueue_script( 'bglib-license' );
+
 		if( ! $this->is_saving_settings ) {
 			$is_functional = $this->core->test->run_functionality_tests();
 		}

@@ -111,6 +111,15 @@ class Boldgrid_Backup_Admin_Config {
 	public $lang = array();
 
 	/**
+	 * License, an instance of \Boldgrid\Library\Library\License.
+	 *
+	 * @since  1.6.0
+	 * @access protected
+	 * @var    \Boldgrid\Library\Library\License
+	 */
+	protected $license;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.0
@@ -124,8 +133,8 @@ class Boldgrid_Backup_Admin_Config {
 		}
 
 		if( class_exists( '\Boldgrid\Library\Library\License' ) ) {
-			$license = new \Boldgrid\Library\Library\License();
-			$this->is_premium = $license->isPremium( 'boldgrid-backup' );
+			$this->license = new \Boldgrid\Library\Library\License();
+			$this->is_premium = $this->license->isPremium( 'boldgrid-backup' );
 		}
 
 		$this->set_lang();
@@ -229,6 +238,19 @@ class Boldgrid_Backup_Admin_Config {
 	 */
 	public function get_is_premium() {
 		return $this->is_premium;
+	}
+
+	/**
+	 * Get our license string, such as "Free" or "Premium".
+	 *
+	 * @since 1.6.0
+	 */
+	public function get_license_string() {
+		if( ! isset( $this->license ) ) {
+			return __( 'Unknown', 'boldgrid-backup' );
+		} else {
+			return $this->license->getLicenseString();
+		}
 	}
 
 	/**

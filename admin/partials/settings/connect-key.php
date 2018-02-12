@@ -12,8 +12,23 @@ defined( 'WPINC' ) ? : die;
 $is_dismissed = apply_filters( 'Boldgrid\Library\Notice\KeyPrompt\getIsDismissed', false );
 $is_displayed = apply_filters( 'Boldgrid\Library\Notice\KeyPrompt\getIsDisplayed', false );
 
+$has_key_entered = ! empty( $this->core->configs['api_key'] );
+
+// Check again button to refresh license status.
+$refresh_key = ! $has_key_entered || $this->core->config->get_is_premium() ? '' : '<p>' .
+	__( 'If you recently upgraded your BoldGrid Connect Key to Premium, click <strong>Check again</strong> to refresh the status of your license.', 'boldgrid-backup' ) .
+	'<br />' .
+	sprintf( '<a class="button" id="license_check_again">%1$s</a>', __( 'Check again', 'boldgrid-backup' ) ) .
+	' <strong>' . __( 'License type', 'boldgrid-backup' ) . '</strong>: <span id="license_string">' . $this->core->config->get_license_string() . '</span>' .
+	' <span class="spinner inline" style="display:none;vertical-align:text-bottom;"></span>' .
+	'</p>' .
+	'<p id="license_reload_page" class="hidden">' .
+	$this->core->lang['icon_warning'] .
+	__( 'Please reload this page for your new license status to take affect.', 'boldgrid-bakcup' ) .
+	'</p>';
+
 ob_start();
-if ( ! empty( $this->core->configs['api_key'] ) ) {
+if ( $has_key_entered ) {
 	printf(
 		__( 'You have entered a <strong>%1$s</strong> BoldGrid Connect Key.', 'boldgrid-backup' ),
 		$this->core->config->get_is_premium() ? __( 'Premium', 'boldgrid-backup' ) : __( 'Free', 'boldgrid-backup' )
@@ -40,18 +55,14 @@ if( ! $this->core->config->get_is_premium() && ! $is_displayed ) {
 		'</div>';
 }
 
-return sprintf( '
-	<div class="bg-box">
-		<div class="bg-box-top">
-			%1$s
-		</div>
-		<div class="bg-box-bottom">
-			%2$s
-		</div>
-		%3$s
-	</div>',
-	__( 'BoldGrid Connect Key', 'boldgrid-backup' ),
-	$output,
-	$bottom_box_premium
-);
+return '
+<div class="bg-box">
+	<div class="bg-box-top">
+		' . __( 'BoldGrid Connect Key', 'boldgrid-backup' ) . '
+	</div>
+	<div class="bg-box-bottom">
+		' . $output . $refresh_key . '
+	</div>
+	' . $bottom_box_premium . '
+</div>';
 ?>
