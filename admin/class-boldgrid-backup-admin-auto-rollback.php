@@ -146,16 +146,36 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 *
 	 * Prior to @1.5.3 this method was in the core class.
 	 *
+	 * This method is called in the admin_notices hook.
+	 *
 	 * @since 1.0
 	 *
 	 * @return null
 	 */
 	public function notice_countdown_show() {
+
+		// Process GET / POST info.
+		$action = ! empty( $_GET['action'] ) ? $_GET['action'] : null;
+		$is_uploading_plugin = 'upload-plugin' === $action;
+		$restore_now = ! empty( $_POST['restore_now'] );
+
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
 		$deadline = ! empty( $pending_rollback['deadline'] ) ? $pending_rollback['deadline'] : null;
 		$deadline_passed = ! empty( $deadline ) && $deadline <= time();
-		$updated_and_pending = ! empty( $_GET['action'] ) && ! empty( $pending_rollback );
-		$restore_now = ! empty( $_POST['restore_now'] );
+		$updated_and_pending = ! empty( $action ) && ! empty( $pending_rollback );
+
+		/*
+		 * If we're uploading a plugin, no need to show countdown notice.
+		 *
+		 * @see The large comment in the beginning of the notice_deadline_show
+		 * method.
+		 *
+		 * @todo There are many if statements below to determine whether or not
+		 * to show the countdown. Determine a cleaner approach.
+		 */
+		if( $is_uploading_plugin ) {
+			return;
+		}
 
 		// If we're restoring a file, we don't need to show any notices.
 		if( $restore_now ) {
@@ -461,8 +481,22 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 *
 	 * @link https://developer.wordpress.org/reference/hooks/upgrader_process_complete/
 	 * @see Boldgrid_Backup_Admin_Cron::add_restore_cron().
+	 *
+	 * @param object $upgrader_object Plugin_Upgrader Object
+	 * @param array  $options         See https://pastebin.com/ah4E048B
 	 */
 	public function notice_deadline_show( $upgrader_object, $options ) {
+
+		/*
+		 * This method is ran both when a plugin/theme/WP is updated, and when
+		 * a plugin is simply uploaded. As of 1.6.0, this plugin does not offer
+		 * update protection for plugin uploads and activation, only for updates.
+		 *
+		 * @todo Allow update protection for plugin activation.
+		 */
+		if( empty( $options['action'] ) || 'update' !== $options['action'] ) {
+			return;
+		}
 
 		// Add/update restoration cron job.
 		$this->add_cron();
