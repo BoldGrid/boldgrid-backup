@@ -68,6 +68,10 @@ class Boldgrid_Backup_Admin_Go_Pro {
 			return;
 		}
 
+		if( ! class_exists( '\Boldgrid\Library\Library\Notice' ) ) {
+			return;
+		}
+
 		$is_premium = $this->core->config->get_is_premium();
 
 		$notices = array(
@@ -99,14 +103,7 @@ class Boldgrid_Backup_Admin_Go_Pro {
 
 		foreach( $notices as $notice ) {
 			if( $notice['show'] ) {
-
-				/**
-				 * Display a user admin notice.
-				 *
-				 * @since 1.6.0
-				 */
-				do_action( 'Boldgrid\Libary\Notice\show', $notice['message'], $notice['id'] );
-
+				\Boldgrid\Library\Library\Notice::show( $notice['message'], $notice['id'] );
 				break;
 			}
 		}
