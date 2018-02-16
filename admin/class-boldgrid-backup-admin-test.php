@@ -385,14 +385,15 @@ class Boldgrid_Backup_Admin_Test {
 			return $this->is_crontab_available;
 		}
 
-		// Create the test command.
-		$command = 'crontab -l';
+		$test_entry = '# BoldGrid Backup Test Entry ' . time() . ' (You can delete this line).';
 
-		// Test to see if the crontab command is available.
-		$output = $this->core->execute_command( $command, null, $success, $return_var );
-
-		// Set class property.
-		$this->is_crontab_available = ( $success || (bool) $output || 1 === $return_var );
+		/*
+		 * To determine if crontab is available, we will BOTH write and remove
+		 * a test entry from the crontab.
+		 */
+		$entry_added = $this->core->cron->update_cron( $test_entry );
+		$entry_deleted = $this->core->cron->entry_delete( $test_entry );
+		$this->is_crontab_available = $entry_added && $entry_deleted;
 
 		return $this->is_crontab_available;
 	}

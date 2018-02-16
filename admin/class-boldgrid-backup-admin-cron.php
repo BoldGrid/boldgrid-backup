@@ -217,12 +217,6 @@ class Boldgrid_Backup_Admin_Cron {
 			return array();
 		}
 
-		// Check if crontab is available.
-		$is_crontab_available = $this->core->test->is_crontab_available();
-		if ( ! $is_crontab_available ) {
-			return array();
-		}
-
 		// Set a search pattern to match for our cron jobs.
 		$pattern = dirname( dirname( __FILE__ ) ) . '/boldgrid-backup-cron.php" mode=' . $mode;
 
@@ -280,20 +274,14 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @return bool Success.
 	 */
 	public function update_cron( $entry ) {
+
 		// If no entry was passed, then abort.
 		if ( empty( $entry ) ) {
 			return false;
 		}
 
-		// Check if crontab is available.
-		$is_crontab_available = $this->core->test->is_crontab_available();
-
-		// Check if wp-cron is available.
-		$is_wpcron_available = $this->core->test->wp_cron_enabled();
-
-		// If crontab or wp-cron is not available, then abort.
-		if ( ! $is_crontab_available && ! $is_wpcron_available ) {
-			return false;
+		if( $this->entry_exists( $entry ) ) {
+			return true;
 		}
 
 		// Check if the backup directory is configured.
@@ -301,67 +289,60 @@ class Boldgrid_Backup_Admin_Cron {
 			return false;
 		}
 
-		// Use either crontab or wp-cron.
-		if ( $is_crontab_available ) {
-			// Use crontab.
-			// Read crontab.
-			$command = 'crontab -l';
+		$crontab = $this->get_all( true );
 
-			$crontab = $this->core->execute_command( $command );
+		$crontab .= "\n" . $entry . "\n";
 
-			// Add entry to crontab to the end, if it does not already exist.
-			if ( false === strpos( $crontab, $entry ) ) {
-				$crontab .= "\n" . $entry . "\n";
-			}
+		$crontab_written = $this->write_crontab( $crontab );
 
-			// Strip extra line breaks.
-			$crontab = str_replace( "\n\n", "\n", $crontab );
+		return $crontab_written && $this->entry_exists( $entry );
+	}
 
-			// Trim the crontab.
-			$crontab = trim( $crontab );
+	/**
+	 * Write the crontab.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param  string $crontab A string of crons, similar to raw output of crontab -l.
+	 * @return bool
+	 */
+	public function write_crontab( $crontab ) {
+		// Strip extra line breaks.
+		$crontab = str_replace( "\n\n", "\n", $crontab );
 
-			// Add a line break at the end of the file.
-			$crontab .= "\n";
+		// Trim the crontab.
+		$crontab = trim( $crontab );
 
-			// Get the backup directory path.
-			$backup_directory = $this->core->backup_dir->get();
+		// Add a line break at the end of the file.
+		$crontab .= "\n";
 
-			// Connect to the WordPress Filesystem API.
-			global $wp_filesystem;
+		// Get the backup directory path.
+		$backup_directory = $this->core->backup_dir->get();
 
-			// Check if the backup directory is writable.
-			if ( ! $wp_filesystem->is_writable( $backup_directory ) ) {
-				return false;
-			}
-
-			// Save the temp crontab to file.
-			$temp_crontab_path = $backup_directory . '/crontab.' . microtime( true ) . '.tmp';
-
-			$wp_filesystem->put_contents( $temp_crontab_path, $crontab, 0600 );
-
-			// Check if the defaults file was written.
-			if ( ! $wp_filesystem->exists( $temp_crontab_path ) ) {
-				return false;
-			}
-
-			// Write crontab.
-			$command = 'crontab ' . $temp_crontab_path;
-
-			$crontab = $this->core->execute_command( $command, null, $success );
-
-			// Remove temp crontab file.
-			$wp_filesystem->delete( $temp_crontab_path, false, 'f' );
-
-			// Check for failure.
-			if ( false === $crontab || ! $success ) {
-				return false;
-			}
-		} else {
-			// Use wp-cron.
-			// @todo Write wp-cron code here.
+		// Check if the backup directory is writable.
+		if ( ! $this->core->wp_filesystem->is_writable( $backup_directory ) ) {
+			return false;
 		}
 
-		return true;
+		// Save the temp crontab to file.
+		$temp_crontab_path = $backup_directory . '/crontab.' . microtime( true ) . '.tmp';
+
+		$this->core->wp_filesystem->put_contents( $temp_crontab_path, $crontab, 0600 );
+
+		// Check if the defaults file was written.
+		if ( ! $this->core->wp_filesystem->exists( $temp_crontab_path ) ) {
+			return false;
+		}
+
+		// Write crontab.
+		$command = 'crontab ' . $temp_crontab_path;
+
+		$crontab = $this->core->execute_command( $command, null, $success );
+
+		// Remove temp crontab file.
+		$deleted = $this->core->wp_filesystem->delete( $temp_crontab_path, false, 'f' );
+
+		return $success && $deleted;
 	}
 
 	/**
@@ -483,31 +464,60 @@ class Boldgrid_Backup_Admin_Cron {
 	}
 
 	/**
+	 * Delete one entry from the crontab.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param  string $entry
+	 * @return bool   True if the entry does not exist or was deleted successfully.
+	 */
+	public function entry_delete( $entry ) {
+		if( ! $this->entry_exists( $entry ) ) {
+			return true;
+		}
+
+		$all_entries = $this->get_all();
+
+		if( ( $key = array_search( $entry, $all_entries ) ) !== false ) {
+			unset( $all_entries[$key] );
+		}
+
+		$all_entries = implode( "\n", $all_entries );
+
+		return $this->write_crontab( $all_entries ) && ! $this->entry_exists( $entry );
+	}
+
+	/**
+	 * Determine if an entry exists in the crontab.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param  string $entry
+	 * @return bool
+	 */
+	public function entry_exists( $entry ) {
+		$all_entries = $this->get_all();
+
+		return false !== array_search( $entry, $all_entries );
+	}
+
+	/**
 	 * Get all entries in cron.
 	 *
 	 * @since 1.5.2
 	 *
-	 * @return array
+	 * @param  bool  $raw Return a string of crons when true, an array when false.
+	 * @return mixed
 	 */
-	public function get_all() {
-		$is_crontab_available = $this->core->test->is_crontab_available();
-
-		if( ! $is_crontab_available ) {
-			return array();
-		}
-
+	public function get_all( $raw = false ) {
 		$command = 'crontab -l';
 		$crontab = $this->core->execute_command( $command, null, $success );
 
-		// If the command to retrieve crontab failed, then return an empty array.
 		if ( ! $success ) {
-			return array();
+			return false;
 		}
 
-		// Explode the crontab into an array.
-		$crontab_exploded = explode( "\n", $crontab );
-
-		return $crontab_exploded;
+		return $raw ? $crontab : explode( "\n", $crontab );
 	}
 
 	/**
