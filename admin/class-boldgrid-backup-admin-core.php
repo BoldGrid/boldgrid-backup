@@ -168,6 +168,15 @@ class Boldgrid_Backup_Admin_Core {
 	public $notice;
 
 	/**
+	 * WordPress' global pagenow.
+	 *
+	 * @since  1.6.0
+	 * @access public
+	 * @var    string
+	 */
+	public $pagenow;
+
+	/**
 	 * The admin cron class object.
 	 *
 	 * @since 1.0
@@ -457,12 +466,14 @@ class Boldgrid_Backup_Admin_Core {
 	 */
 	public function __construct() {
 		global $wp_filesystem;
+		global $pagenow;
 
 		$this->doing_cron = ( defined( 'DOING_CRON' ) && DOING_CRON );
 		$this->doing_ajax = is_admin() && defined( 'DOING_AJAX' ) && DOING_AJAX;
 		$this->doing_wp_cron = ! empty( $_SERVER['SCRIPT_FILENAME'] ) && $_SERVER['SCRIPT_FILENAME'] === trailingslashit( ABSPATH ) . 'wp-cron.php';
 
 		$this->wp_filesystem = $wp_filesystem;
+		$this->pagenow = $pagenow;
 
 		// Instantiate Boldgrid_Backup_Admin_Settings.
 		$this->settings = new Boldgrid_Backup_Admin_Settings( $this );

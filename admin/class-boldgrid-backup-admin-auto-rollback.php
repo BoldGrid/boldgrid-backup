@@ -156,26 +156,37 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 
 		// Process GET / POST info.
 		$action = ! empty( $_GET['action'] ) ? $_GET['action'] : null;
-		$is_uploading_plugin = 'upload-plugin' === $action;
 		$restore_now = ! empty( $_POST['restore_now'] );
 
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
 		$deadline = ! empty( $pending_rollback['deadline'] ) ? $pending_rollback['deadline'] : null;
 		$deadline_passed = ! empty( $deadline ) && $deadline <= time();
-		$updated_and_pending = ! empty( $action ) && ! empty( $pending_rollback );
 
 		/*
-		 * If we're uploading a plugin, no need to show countdown notice.
+		 * Updated and pending.
 		 *
-		 * @see The large comment in the beginning of the notice_deadline_show
-		 * method.
+		 * The initial implementation of this variable is not very well
+		 * documented. As of 1.6.0, this is the best interpretation.
 		 *
-		 * @todo There are many if statements below to determine whether or not
-		 * to show the countdown. Determine a cleaner approach.
+		 * It appears that this var is meant to tell us when we're on a page in
+		 * which a plugin/theme is being updated, such as:
+		 * wp-admin/update-core.php?action=do-plugin-upgrade
+		 * ... and we have a backup that is pending restoration.
+		 *
+		 * When you update a plugin via
+		 * wp-admin/update-core.php?action=do-plugin-upgrade
+		 * the $deadline won't be set until the iframe doing the upgrade completes.
+		 * Example iframe: update.php?action=update-selected&plugins=plugin.php&_wpnonce=1234
+		 *
+		 * As long as we know we're on a page upgrading a plugin AND we have a
+		 * pending rollback, we'll show the countdown (even though we don't have
+		 * a deadline). Once the iframe loads, we'll read the deadline from the
+		 * iframe and update the countdown.
+		 *
+		 * @todo Clean up the above comment in the future once determined this
+		 * is accurate.
 		 */
-		if( $is_uploading_plugin ) {
-			return;
-		}
+		$updated_and_pending = 'update-core.php' === $this->core->pagenow && ! empty( $action ) && ! empty( $pending_rollback );
 
 		// If we're restoring a file, we don't need to show any notices.
 		if( $restore_now ) {
