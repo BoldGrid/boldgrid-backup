@@ -38,8 +38,10 @@ $db = array(
 		$basename
 	),
 	'buttons' => sprintf(
-		'<a class="restore-db button button-primary" data-view-type="db" style="display:none;">%1$s</a>',
-		__( 'Restore this database', 'boldgrid-backup' )
+		'<a class="restore-db button button-primary" data-file="%2$s" data-view-type="db" style="display:none;">%1$s</a>%3$s',
+		__( 'Restore this database', 'boldgrid-backup' ),
+		esc_attr( $basename ),
+		$this->core->lang['spinner']
 	),
 );
 

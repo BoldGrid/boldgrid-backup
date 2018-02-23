@@ -105,11 +105,12 @@ BoldGrid.ZipBrowser = function( $ ) {
 	self.onClickRestoreDb = function() {
 		var $a = $( this ),
 			$p = $a.closest( 'p' ),
+			$spinner = $a.next(),
 			data = {
 				'action': 'boldgrid_backup_browse_archive_restore_db',
 				'security' : $( '#_wpnonce' ).val(),
 				'filename' : $( '#filename' ).val(),
-				'file' : $a.closest( 'p' ).attr( 'data-file' ),
+				'file' : $a.attr( 'data-file' ),
 			},
 			confirmation,
 			status = '<span class="spinner inline"></span> Restoring';
@@ -121,6 +122,8 @@ BoldGrid.ZipBrowser = function( $ ) {
 		}
 
 		$p.empty().html( status );
+		$a.attr( 'disabled', 'disabled' );
+		$spinner.addClass( 'inline middle' )
 
 		$.post( ajaxurl, data, function( response ) {
 			location.reload();
