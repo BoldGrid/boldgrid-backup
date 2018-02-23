@@ -343,7 +343,14 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 
 		if( $this->core->settings->is_saving_settings ) {
 			$this->$type = $this->from_post( $type );
-		} elseif( ! empty( $settings[$key] ) && is_string( $settings[$key] ) ) {
+		/*
+		 * Is there value for this in the settings?
+		 *
+		 * Initially, we checked to make sure $settings[$key] wasn't empty and
+		 * it was a string. Now, we'll simply see if it is set. This will allow
+		 * for the user to enter nothing in the exclude field.
+		 */
+		} elseif( isset( $settings[$key] ) ) {
 			$this->$type = $settings[$key];
 		} elseif( ! $settings ) {
 			$settings = $this->core->settings->get_settings();
