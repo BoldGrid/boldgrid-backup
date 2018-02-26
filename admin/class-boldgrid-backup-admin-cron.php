@@ -251,11 +251,15 @@ class Boldgrid_Backup_Admin_Cron {
 		// Set a search pattern to match for our cron jobs.
 		$pattern = dirname( dirname( __FILE__ ) ) . '/boldgrid-backup-cron.php" mode=' . $mode;
 
+		// Get our cron jobs.
 		$crontab_exploded = $this->get_all();
-		$crontab = implode( "", $crontab_exploded );
+		if( empty( $crontab_exploded ) ) {
+			return array();
+		}
 
 		// If there's no cron jobs matching our pattern, abort.
-		if( empty( $crontab_exploded ) || false === strpos( $crontab, $pattern ) ) {
+		$crontab = implode( "", $crontab_exploded );
+		if( false === strpos( $crontab, $pattern ) ) {
 			return array();
 		}
 
@@ -541,6 +545,17 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @return mixed
 	 */
 	public function get_all( $raw = false ) {
+
+		/*
+		 * Cron is not available on Windows.
+		 *
+		 * It would be clean to call is_crontab_available(), but that method
+		 * uses this method, and would result in an infinite loop.
+		 */
+		if( $this->core->test->is_windows() ) {
+			return false;
+		}
+
 		$command = 'crontab -l';
 		$crontab = $this->core->execute_command( $command, null, $success );
 
