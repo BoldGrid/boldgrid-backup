@@ -98,6 +98,35 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	}
 
 	/**
+	 * Add all cron jobs.
+	 *
+	 * This method first clears all crons, then adds all necessary crons based
+	 * upon our settings.
+	 *
+	 * This method is useful for when:
+	 * # User saves settings on settings page and crons need to be updated.
+	 * # User reactivates plugin and all crons need to be added again.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param  array $settings
+	 * @return bool
+	 */
+	public function add_all_crons( $settings = array() ) {
+		$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
+		$schedule = ! empty( $settings['schedule'] ) ? $settings['schedule'] : null;
+
+		if( 'wp-cron' === $scheduler && $this->core->scheduler->is_available( $scheduler ) && ! empty( $schedule ) ) {
+			$this->core->scheduler->clear_all_schedules();
+
+			$scheduled = $this->schedule( $settings['schedule'], $this->hooks['backup'] );
+			$jobs_scheduled = $this->schedule_jobs();
+
+			return $scheduled && $jobs_scheduled;
+		}
+	}
+
+	/**
 	 * Add cron to perform auto rollback.
 	 *
 	 * @since 1.5.1
@@ -255,14 +284,17 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param $schedule array BoldGrid Backup's $settings['schedule'].
-	 * @param $hook     string
+	 * @param  array  $schedule BoldGrid Backup's $settings['schedule'].
+	 * @param  string $hook
+	 * @return bool
 	 */
 	public function schedule( $schedule, $hook ) {
 		// Get hour, minute, and period.
 		$h = $schedule['tod_h'];
 		$m = $schedule['tod_m'];
 		$p = $schedule['tod_a'];
+
+		$success = true;
 
 		foreach( $this->days as $day ) {
 			if( 1 !== $schedule[ 'dow_' . $day ] ) {
@@ -271,8 +303,21 @@ class Boldgrid_Backup_Admin_WP_Cron {
 
 			$schedule_time = $this->get_next_time( $day, $h, $m, $p );
 
-			wp_schedule_event( $schedule_time, 'weekly', $hook );
+			/*
+			 * Schedule our event and track our success.
+			 *
+			 * As we may be scheduling multiple events via this loop, the
+			 * $success of this method is based on whether or not all items
+			 * are successfully scheduled. If we have 5 days to schedule and
+			 * only 4 are scheduled successfully, this method returns false.
+			 */
+			$scheduled = wp_schedule_event( $schedule_time, 'weekly', $hook );
+			if( false === $scheduled ) {
+				$success = false;
+			}
 		}
+
+		return $success;
 	}
 
 	/**
@@ -286,11 +331,18 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	 * the "run_jobs" wp-cron scheduled.
 	 *
 	 * @since 1.5.2
+	 *
+	 * @return bool
 	 */
 	public function schedule_jobs() {
+		$success = true;
+
 		if( ! wp_next_scheduled( $this->hooks['run_jobs'] ) ) {
-			wp_schedule_event( time(), 'every-5-minutes', $this->hooks['run_jobs'] );
+			$scheduled = wp_schedule_event( time(), 'every-5-minutes', $this->hooks['run_jobs'] );
+			$success = false !== $scheduled;
 		}
+
+		return $success;
 	}
 
 	/**

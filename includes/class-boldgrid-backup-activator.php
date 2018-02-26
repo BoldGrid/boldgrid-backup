@@ -27,5 +27,19 @@ class Boldgrid_Backup_Activator {
 	 * @since 1.0
 	 */
 	public static function activate() {
+		$core = new Boldgrid_Backup_Admin_Core();
+		$settings = $core->settings->get_settings();
+
+		/*
+		 * Add all previous crons.
+		 *
+		 * The add_all_crons methods called include proper checks to ensure
+		 * scheduler is available and $settings include a schedule.
+		 */
+		if( 'cron' === $settings['scheduler'] ) {
+			$core->cron->add_all_crons( $settings );
+		} elseif( 'wp-cron' === $settings['scheduler'] ) {
+			$core->wp_cron->add_all_crons( $settings );
+		}
 	}
 }

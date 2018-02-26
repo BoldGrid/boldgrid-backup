@@ -119,6 +119,37 @@ class Boldgrid_Backup_Admin_Cron {
 	}
 
 	/**
+	 * Add all cron jobs.
+	 *
+	 * This method first clears all crons, then adds all necessary crons based
+	 * upon our settings.
+	 *
+	 * This method is useful for when:
+	 * # User saves settings on settings page and crons need to be updated.
+	 * # User reactivates plugin and all crons need to be added again.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param  array $settings
+	 * @return bool
+	 */
+	public function add_all_crons( $settings ) {
+		$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
+		$schedule = ! empty( $settings['schedule'] ) ? $settings['schedule'] : null;
+
+		if( 'cron' === $scheduler && $this->core->scheduler->is_available( $scheduler ) && ! empty( $schedule ) ) {
+			$this->core->scheduler->clear_all_schedules();
+
+			$scheduled = $this->add_cron_entry( $settings );
+			$jobs_scheduled = $this->schedule_jobs();
+
+			return $scheduled && $jobs_scheduled;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Add a cron job to restore (rollback) using the last backup.
 	 *
 	 * @since 1.2

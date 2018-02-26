@@ -531,37 +531,23 @@ class Boldgrid_Backup_Admin_Settings {
 			$scheduler_changed = ! empty( $_POST['scheduler'] ) && $original_scheduler !== $_POST['scheduler'];
 			if( $scheduler_changed && array_key_exists( $_POST['scheduler'], $schedulers_available ) ) {
 				$settings['scheduler'] = $_POST['scheduler'];
-
-				$this->core->scheduler->clear_all_schedules();
 			}
 
 			/*
-			 * Save WP Cron settings.
+			 * Save WP Cron / Crons.
 			 *
 			 * @since 1.5.1
 			 */
-			if( ! empty( $settings['scheduler'] ) && 'wp-cron' === $settings['scheduler'] ) {
-				$this->core->wp_cron->clear_schedules();
-				$this->core->wp_cron->schedule( $settings['schedule'], $this->core->wp_cron->hooks['backup'] );
-				$this->core->wp_cron->schedule_jobs();
+			$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
+			if( 'wp-cron' === $scheduler ) {
+				$crons_added = $this->core->wp_cron->add_all_crons( $settings );
+			} elseif( 'cron' === $scheduler ) {
+				$crons_added = $this->core->cron->add_all_crons( $settings );
 			}
-
-
-			/*
-			 * Schedule cron jobs.
-			 *
-			 * If our scheduler is cron, then add the entries.
-			 *
-			 * @since 1.5.1
-			 */
-			if( ! empty( $settings['scheduler'] ) && 'cron' === $settings['scheduler'] ) {
-				$cron_updated = $this->core->cron->add_cron_entry( $settings );
-				$jobs_scheduled = $this->core->cron->schedule_jobs();
-
-				if( ! $cron_updated || ! $jobs_scheduled ) {
-					$update_error = true;
-					$update_errors[] = esc_html__( 'An error occurred when modifying cron jobs.  Please try again.', 'boldgrid-backup' );
-				}
+			// Take action if we tried and failed to add crons.
+			if( isset( $crons_added ) && ! $crons_added ) {
+				$update_error = true;
+				$update_errors[] = esc_html__( 'An error occurred when modifying cron jobs. Please try again.', 'boldgrid-backup' );
 			}
 
 			/*
