@@ -29,6 +29,18 @@ class Boldgrid_Backup_Admin_In_Progress {
 	private $core;
 
 	/**
+	 * A unix timestamp indicating when a backup was started.
+	 *
+	 * Currently this property is only used before and after a database is dumped,
+	 * see $this->pre_dump() and $this->post_dump().
+	 *
+	 * @since  1.6.0
+	 * @access protected
+	 * @var    int
+	 */
+	protected $in_progress;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.5.4
@@ -87,7 +99,9 @@ class Boldgrid_Backup_Admin_In_Progress {
 	public function end() {
 		$settings = $this->core->settings->get_settings( true );
 
-		unset( $settings['in_progress'] );
+		if( ! empty( $settings['in_progress'] ) ) {
+			unset( $settings['in_progress'] );
+		}
 
 		$this->core->settings->save( $settings );
 	}
@@ -110,14 +124,55 @@ class Boldgrid_Backup_Admin_In_Progress {
 	}
 
 	/**
+	 * Action to take before a database is dumped.
+	 *
+	 * @since 1.6.0
+	 */
+	public function post_dump() {
+
+		/*
+		 * After the database has been dumped, restore the flag stating a backup
+		 * is still in progress.
+		 *
+		 * @see documentation in $this->pre_dump().
+		 */
+		if( ! empty( $this->in_progress ) ) {
+			$this->set( $this->in_progress );
+		}
+	}
+
+	/**
+	 * Action to take after a database is dumped.
+	 *
+	 * @since 1.6.0
+	 */
+	public function pre_dump() {
+
+		/*
+		 * Cancel any "Backup in progress" statuses.
+		 *
+		 * Avoid this issue:
+		 * Before we begin creating a backup, we set a flag stating there is a
+		 * "Backup in progress". So, when we create a backup of the database,
+		 * that flag is in the backup. When we restore a backup, that flag will
+		 * be restored, even if we're not in the middle of making a backup, thus
+		 * giving us a false positive.
+		 */
+		$this->in_progress = $this->get();
+		$this->end();
+	}
+
+	/**
 	 * Set that we are in progress of backing up a website.
 	 *
 	 * @since 1.5.4
+	 *
+	 * @param int $time A unix timestamp indicating the time a backup started.
 	 */
-	public function set() {
+	public function set( $time = null ) {
 		$settings = $this->core->settings->get_settings( true );
 
-		$settings['in_progress'] = time();
+		$settings['in_progress'] = ! empty( $time ) ? $time : time();
 
 		$this->core->settings->save( $settings );
 	}

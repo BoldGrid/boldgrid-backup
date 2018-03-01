@@ -380,6 +380,9 @@ class Boldgrid_Backup {
 
 		$this->loader->add_action( 'admin_notices', $plugin_admin_core->go_pro, 'admin_notice_setup' );
 
+		$this->loader->add_action( 'boldgrid_backup_pre_dump', $plugin_admin_core->in_progress, 'pre_dump' );
+		$this->loader->add_action( 'boldgrid_backup_post_dump', $plugin_admin_core->in_progress, 'post_dump' );
+
 		return;
 	}
 

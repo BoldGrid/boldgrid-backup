@@ -55,6 +55,13 @@ class Boldgrid_Backup_Admin_Db_Dump {
 			return array( 'error' => esc_html__( 'No tables selected to backup.', 'boldgrid-backup' ) );
 		}
 
+		/**
+		 * Take action before a database is dumped.
+		 *
+		 * @since 1.6.0
+		 */
+		do_action( 'boldgrid_backup_pre_dump' );
+
 		// Some hosts may configure the DB_HOST as localhost:3306. Strip out the port.
 		$db_host = explode( ':', DB_HOST );
 
@@ -73,6 +80,13 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		} catch (\Exception $e) {
 			return array( 'error' => $e->getMessage() );
 		}
+
+		/**
+		 * Take action after a database is dumped.
+		 *
+		 * @since 1.6.0
+		 */
+		do_action( 'boldgrid_backup_post_dump' );
 
 		return true;
 	}
