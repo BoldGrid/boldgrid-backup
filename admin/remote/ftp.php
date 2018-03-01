@@ -336,8 +336,7 @@ class Boldgrid_Backup_Admin_Ftp {
 		$contents = $this->get_contents( true, $this->remote_dir );
 		$backups = $this->format_raw_contents( $contents );
 
-		// The contents usually include . and .., so remove 2 from list.
-		$count_to_delete = count($backups) - $this->retention_count - 2;
+		$count_to_delete = count($backups) - $this->retention_count;
 
 		if( empty( $backups ) || $count_to_delete <= 0 ) {
 			return false;
@@ -439,6 +438,11 @@ class Boldgrid_Backup_Admin_Ftp {
 	 *
 	 * This method takes in raw contents and returns an array of backups, with
 	 * keys defining timestamp and filename.
+	 *
+	 * The array of backups returned DO NOT include:
+	 * # . or .. (typical when getting a directory listing).
+	 * # Files / backups that do not belong to this site.
+	 *   See $this->core->archive->is_site_archive().
 	 *
 	 * @since 1.5.4
 	 *
