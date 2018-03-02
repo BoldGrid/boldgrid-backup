@@ -97,6 +97,31 @@ class Boldgrid_Backup_Admin_Archive_Log {
 	}
 
 	/**
+	 * Take action after an archive has been restored.
+	 *
+	 * This method hooks into the boldgrid_backup_post_restore action.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param array $info
+	 */
+	public function post_restore( $info ) {
+		$path_backup_dir = $this->path_from_zip( $info['filepath'] );
+		$path_abspath = ABSPATH . basename( $path_backup_dir );
+
+		// If this backup did not restore a log file to ABSPATH, then we can abort.
+		if( ! $this->core->wp_filesystem->exists( $path_abspath ) ) {
+			return;
+		}
+
+		// Move the abspath log file to the backup dir.
+		$this->core->wp_filesystem->move( $path_abspath, $path_backup_dir, true );
+
+		// We don't need the log file in the ABSPATH, remove it.
+		$this->core->wp_filesystem->delete( $path_abspath );
+	}
+
+	/**
 	 * Restore a log file by a zip's filepath.
 	 *
 	 * For example, if we just downloaded backup.zip from FTP, this method will
@@ -158,6 +183,12 @@ class Boldgrid_Backup_Admin_Archive_Log {
 		if ( 0 === $archive ) {
 			return false;
 		}
+		/*
+		 * The log file is being added to the root of the archive. If the user
+		 * restores the archive, the log will be restored to the ABSPATH. The
+		 * $this->post_restore() method will move the log file to the backup
+		 * directory and delete it from the ABSPATH.
+		 */
 		$status = $archive->add( $log_filepath, PCLZIP_OPT_REMOVE_ALL_PATH );
 		if( 0 === $status ) {
 			return false;

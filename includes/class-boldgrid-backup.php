@@ -316,6 +316,7 @@ class Boldgrid_Backup {
 
 		$this->loader->add_action( 'boldgrid_backup_pre_restore', $plugin_admin_core->restore_helper, 'pre_restore' );
 		$this->loader->add_action( 'boldgrid_backup_post_restore', $plugin_admin_core->restore_helper, 'post_restore' );
+		$this->loader->add_filter( 'boldgrid_backup_post_restore', $plugin_admin_core->archive_log, 'post_restore' );
 		$this->loader->add_action( 'boldgrid_backup_post_restore_htaccess', $plugin_admin_core->restore_helper, 'post_restore_htaccess' );
 		$this->loader->add_action( 'boldgrid_backup_post_restore_wpconfig', $plugin_admin_core->restore_helper, 'post_restore_wpconfig' );
 		$this->loader->add_filter( 'boldgrid_backup_restore_fail', $plugin_admin_core->restore_helper, 'restore_fail' );
