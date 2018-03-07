@@ -69,6 +69,18 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	public $testing_time = '+15 minutes';
 
 	/**
+	 * Whether or not we are in the middle of upgrading core.
+	 *
+	 * When we've clicked "Update Now" on Dashboards > Updates, we are redirected
+	 * to wp-admin/update-core.php?action=do-core-upgrade
+	 *
+	 * @since  1.6.0
+	 * @access public
+	 * @var    bool
+	 */
+	public $updating_core = false;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.5.1
@@ -77,6 +89,8 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 */
 	public function __construct( $core ) {
 		$this->core = $core;
+
+		$this->updating_core = 'update-core.php' === $this->core->pagenow && ! empty( $_GET['action'] ) && $_GET['action'] === 'do-core-upgrade';
 	}
 
 	/**
@@ -250,6 +264,20 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		}
 
 		/*
+		 * Abort if we are updating core.
+		 *
+		 * The update of core is different than the updating of plugins or themes
+		 * because instead of sitting on this page after the upgrade, the user
+		 * is redirected to about.php.
+		 *
+		 * Because we're redirecting, there's no need to show the countdown on
+		 * this page.
+		 */
+		if( $this->updating_core ) {
+			return;
+		}
+
+		/*
 		 * Enqueue the "archive actions" scripts, they are needed to handle the
 		 * "Rollback Site Now" button (handled like a typical restore).
 		 */
@@ -271,7 +299,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		 * uniquely identify this notice.
 		 */
 		$notice_markup = $this->notice_countdown_get();
-		do_action( 'boldgrid_backup_notice', $notice_markup, 'notice notice-warning boldgrid-backup-countdown' );
+		do_action( 'boldgrid_backup_notice', $notice_markup, 'notice notice-warning is-dismissible boldgrid-backup-countdown' );
 
 		return;
 	}
@@ -506,7 +534,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 			}
 		}
 
-		if( ! $display ) {
+		if( ! $display || $this->updating_core ) {
 			return;
 		}
 
