@@ -264,9 +264,14 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 
 		$this->enqueue_rollback_scripts( $deadline );
 
-		// Create and display our notice.
+		/*
+		 * Create and display our notice.
+		 *
+		 * The boldgrid-backup-countdown class was added as of 1.6.0 so we can
+		 * uniquely identify this notice.
+		 */
 		$notice_markup = $this->notice_countdown_get();
-		do_action( 'boldgrid_backup_notice', $notice_markup, 'notice notice-warning' );
+		do_action( 'boldgrid_backup_notice', $notice_markup, 'notice notice-warning boldgrid-backup-countdown' );
 
 		return;
 	}

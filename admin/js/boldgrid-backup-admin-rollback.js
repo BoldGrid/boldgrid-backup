@@ -32,6 +32,8 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 	// Onload event listener.
 	$( function() {
 		$( 'body' ).on( 'click', '#cancel-rollback-button', self.cancelRollback );
+
+		BOLDGRID.BACKUP.RollbackTimer.adjustOnAbout();
 	} );
 
 	/**
@@ -305,6 +307,27 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 					BOLDGRID.BACKUP.RollbackTimer.initializeClock( deadline );
 				}
 			});
+		},
+
+		/**
+		 * @summary Show the countdown notice on the about page.
+		 *
+		 * WordPress hides all admin notices on the wp-admin/about.php page. The
+		 * countdown notice is important enough to break this mold.
+		 *
+		 * @since 1.6.0
+		 */
+		adjustOnAbout : function() {
+
+			if( 'about' !== pagenow ) {
+				return;
+			}
+
+			var $notice = $( '.notice.boldgrid-backup-countdown' );
+
+			$notice
+				.css( 'display', 'block!important' )
+				.insertBefore( '.wrap' );
 		},
 
 		/**
