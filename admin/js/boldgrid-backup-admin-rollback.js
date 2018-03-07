@@ -96,16 +96,14 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			dataType : 'text',
 			success : function( response ) {
 				// Remove the restore now section.
-				$( '#restore-now-section' )
-					.empty();
+				$( '[data-restore-now]' ).parent().slideUp();
 
 				// Insert markup in the results section.
 				$cancelRollbackResults
 					.html( response );
 
 				// Hide the cancel rollback section.
-				$cancelRollbackSection
-					.hide();
+				$cancelRollbackSection.slideUp();
 			},
 			error : errorCallback,
 			complete : function() {
@@ -284,7 +282,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 
 			$.post( ajaxurl, data, function( response ) {
 				var deadline,
-					$headerEnd = $( '.wp-header-end' );
+					$headerEnd = $( '.wp-header-end' ),
 					$notice,
 					$wrap = $( '.wrap' ).first();
 

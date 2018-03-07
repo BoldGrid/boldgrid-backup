@@ -345,7 +345,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 				</form>
 			</div>
 
-			' . $restore_button . '
+			<p>' . $restore_button . '</p>
 
 			<div id="cancel-rollback-results"></div>
 			' . $rollback_deadline;
