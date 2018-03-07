@@ -142,6 +142,45 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	}
 
 	/**
+	 * Enqueue scripts required for the rollback functionality.
+	 *
+	 * The $deadline param may not always be passed in because there may not be
+	 * a deadline yet. Here's such a scenario:
+	 * # We're showing the "backup now for upgrade protection" notice.
+	 * # The user creates a backup.
+	 * # The user does an ajaxy theme update.
+	 * # After the update, we show the countdown via ajax.
+	 * These scripts were already enqueued on page load for the possiblity that
+	 * the user ajaxy updates. If they do, the countdown notice will be shown
+	 * and the button clicks need to be handled.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param int $deadline Auto rollback deadline (unix timestamp).
+	 */
+	public function enqueue_rollback_scripts( $deadline = null ) {
+		$handle = 'boldgrid-backup-admin-rollback';
+
+		wp_register_script(
+			$handle,
+			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-rollback.js',
+			array( 'jquery', ),
+			BOLDGRID_BACKUP_VERSION,
+			false
+		);
+
+		if( ! empty( $deadline ) ) {
+			$localize_script_data = array(
+				// Include the time (in ISO 8601 format).
+				'rolloutDeadline' => date( 'c', $deadline ),
+			);
+			wp_localize_script( $handle, 'boldgrid_backup_admin_rollback', $localize_script_data );
+		}
+
+		wp_enqueue_script( $handle );
+	}
+
+	/**
 	 * Show an admin notice if there is a pending rollback.
 	 *
 	 * Prior to @1.5.3 this method was in the core class.
@@ -223,27 +262,10 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 			'all'
 		);
 
-		wp_register_script(
-			'boldgrid-backup-admin-rollback',
-			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-rollback.js',
-			array( 'jquery', ),
-			BOLDGRID_BACKUP_VERSION,
-			false
-		);
-
-		$localize_script_data = array(
-			// Include the time (in ISO 8601 format).
-			'rolloutDeadline' => date( 'c', $deadline ),
-		);
-		wp_localize_script( 'boldgrid-backup-admin-rollback', 'boldgrid_backup_admin_rollback', $localize_script_data );
-		wp_enqueue_script( 'boldgrid-backup-admin-rollback' );
+		$this->enqueue_rollback_scripts( $deadline );
 
 		// Create and display our notice.
-		$key = 0;
-		$archive = $archives[ $key ];
-		$args['restore_key'] = $key;
-		$args['restore_filename'] = $archive['filename'];
-		$notice_markup = $this->notice_countdown_get( $args );
+		$notice_markup = $this->notice_countdown_get();
 		do_action( 'boldgrid_backup_notice', $notice_markup, 'notice notice-warning' );
 
 		return;
@@ -265,7 +287,18 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 * }
 	 * @return string The resulting markup.
 	 */
-	public function notice_countdown_get( $args ) {
+	public function notice_countdown_get( $args = array() ) {
+
+		// By default we will restore the newest backup.
+		if( empty( $args ) ) {
+			$key = 0;
+			$archives = $this->core->get_archive_list();
+			$args = array(
+				'restore_key' => $key,
+				'restore_filename' => $archives[$key]['filename'],
+			);
+		}
+
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
 		$deadline = ! empty( $pending_rollback['deadline'] ) ? sprintf( '(<em>%1$s</em>)', date( 'g:i a', $this->core->utility->time( $pending_rollback['deadline'] ) ) ) : '';
 
@@ -278,6 +311,9 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 			'button_text' => __( 'Rollback Site Now', 'boldgrid-backup' ),
 		);
 		$restore_button = $this->core->archive_actions->get_restore_button( $args['restore_filename'], $button_args );
+
+		$iso_time = ! empty( $pending_rollback['deadline'] ) ? date( 'c', $pending_rollback['deadline'] ) : null;
+		$rollback_deadline = sprintf( '<input type="hidden" id="rollback-deadline" value="%1$s" />', $iso_time );
 
 		$notice_markup = '
 			<div id="cancel-rollback-section">
@@ -312,7 +348,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 			' . $restore_button . '
 
 			<div id="cancel-rollback-results"></div>
-			';
+			' . $rollback_deadline;
 
 		return $notice_markup;
 	}
@@ -432,7 +468,42 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 * @global string $pagenow
 	 */
 	public function notice_backup_show() {
-		global $pagenow;
+		$display = false;
+
+		$configs = array(
+			array(
+				'pagenow' => 'plugins.php',
+				'check' => 'plugins',
+			),
+			array(
+				'pagenow' => 'themes.php',
+				'check' => 'themes',
+			),
+			array(
+				'pagenow' => 'update-core.php',
+				'check' => 'total',
+			)
+		);
+
+		/*
+		 * Based on our $configs, determine if we need to show a notice.
+		 *
+		 * The nested if's below are designed to save resources and only call
+		 * wp_get_update_data() if we are on a $pagenow that should show the
+		 * notice.
+		 */
+		foreach( $configs as $config ) {
+			if( $this->core->pagenow === $config['pagenow'] ) {
+				$update_data = ! isset( $update_data ) ? wp_get_update_data() : $update_data;
+				if( $update_data['counts'][$config['check']] ) {
+					$display = true;
+				}
+			}
+		}
+
+		if( ! $display ) {
+			return;
+		}
 
 		// Get pending rollback information.
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
@@ -477,10 +548,21 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 
 		wp_enqueue_script( 'boldgrid-backup-now' );
 
-		// Show admin notice.
+		// Needed to handle actions after an ajaxy theme / plugin upgrade.
+		$this->enqueue_rollback_scripts();
+
+		// Needed to handle click of restore button.
+		$this->core->archive_actions->enqueue_scripts();
+
+		/*
+		 * Show admin notice.
+		 *
+		 * The boldgrid-backup-protect-now class was added to the notice as of
+		 * 1.6.0 so that we can uniquely identify this notice on the page.
+		 */
 		$backup_button = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-button.php';
 		$notice = $this->notice_backup_get();
-		do_action( 'boldgrid_backup_notice', $notice . $backup_button, 'notice notice-warning is-dismissible' );
+		do_action( 'boldgrid_backup_notice', $notice . $backup_button, 'notice notice-warning is-dismissible boldgrid-backup-protect-now' );
 	}
 
 	/**
@@ -657,5 +739,29 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		$iso_time = date( 'c', $deadline );
 
 		wp_die( $iso_time );
+	}
+
+	/**
+	 * Get the countdown method via an ajax call.
+	 *
+	 * Useful when plugins are updated via ajaxy and we need to show the
+	 * countdown without refreshing the page.
+	 *
+	 * @since 1.6.0
+	 */
+	public function wp_ajax_get_countdown_notice() {
+		if ( ! current_user_can( 'update_plugins' ) ) {
+			wp_send_json_error();
+		}
+
+		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
+		if( empty( $pending_rollback ) ) {
+			wp_send_json_error();
+		}
+
+		$notice = $this->notice_countdown_get();
+		$notice = '<div class="notice notice-warning">' . $notice . '</div>';
+
+		wp_send_json_success( $notice );
 	}
 }

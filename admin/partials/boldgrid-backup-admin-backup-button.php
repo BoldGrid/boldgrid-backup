@@ -10,7 +10,9 @@
 
 defined( 'WPINC' ) ? : die;
 
-$pagenow_enqueue_rollback = array( 'plugins.php', 'update-core.php' );
+$pagenow_enqueue_rollback = array( 'plugins.php', 'update-core.php', 'themes.php' );
+
+$core = isset( $this->core ) ? $this->core : $this;
 
 return sprintf(
 	'<div id="backup-site-now-section">
@@ -30,7 +32,7 @@ return sprintf(
 	<div id="backup-site-now-results"></div>',
 	wp_nonce_field( 'boldgrid_backup_now', 'backup_auth' ),
 	esc_html( 'Backup Site Now', 'boldgrid-backup' ),
-	in_array( $pagenow, $pagenow_enqueue_rollback, true ) ? 'data-updating="true"' : '',
+	in_array( $core->pagenow, $pagenow_enqueue_rollback, true ) ? 'data-updating="true"' : '',
 	/* 4 */ __( 'You may leave this page, doing so will not stop your backup.', 'boldgrid-backup' )
 );
 

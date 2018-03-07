@@ -31,9 +31,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 
 	// Onload event listener.
 	$( function() {
-		// On click action for the Cancel Rollback button.
-		$( '#cancel-rollback-button' )
-			.on( 'click', self.cancelRollback );
+		$( 'body' ).on( 'click', '#cancel-rollback-button', self.cancelRollback );
 	} );
 
 	/**
@@ -173,11 +171,17 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		 *
 		 * @see getTimeRemaining().
 		 * @see updateDeadline().
+		 *
+		 * @param string deadline
 		 */
-		initializeClock : function() {
+		initializeClock : function( deadline ) {
 			// Define variables.
 			var $clock, interval, totalSeconds,
 				self = this;
+
+			if( deadline !== undefined ) {
+				BOLDGRID.BACKUP.RollbackTimer.deadline = deadline;
+			}
 
 			// Get the element for the clock display.
 			$clock = $( '#rollback-countdown-timer' );
@@ -266,6 +270,46 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		},
 
 		/**
+		 * @summary Show the countdown notice.
+		 *
+		 * This method makes an ajax request to get the countdown notice. Useful
+		 * when plugins / themes are updated via ajaxy.
+		 *
+		 * @since 1.6.0
+		 */
+		show : function() {
+			var data = {
+					'action' : 'boldgrid_backup_get_countdown_notice',
+				};
+
+			$.post( ajaxurl, data, function( response ) {
+				var deadline,
+					$headerEnd = $( '.wp-header-end' );
+					$notice,
+					$wrap = $( '.wrap' ).first();
+
+				if( response.success !== undefined && true === response.success ) {
+					$( '.boldgrid-backup-protect-now' ).slideUp();
+
+					$notice = $( response.data );
+					$notice.addClass( 'hidden' );
+
+					// Determine where to add the notice.
+					if( 1 === $headerEnd.length ) {
+						$notice.insertAfter( $headerEnd );
+					} else {
+						$notice.prependTo( $wrap );
+					}
+
+					$notice.slideDown();
+
+					deadline = $('#rollback-deadline').val();
+					BOLDGRID.BACKUP.RollbackTimer.initializeClock( deadline );
+				}
+			});
+		},
+
+		/**
 		 * If the rollback countdown timer is needed, then initialize the clock.
 		 *
 		 * @since 1.0
@@ -304,6 +348,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			$document
 				.on( 'wp-theme-update-success', this.getUpdatedDeadline );
 
+			$document.on( 'wp-plugin-update-success wp-theme-update-success', this.show );
 		}
 	};
 
