@@ -2225,36 +2225,11 @@ class Boldgrid_Backup_Admin_Core {
 			return;
 		}
 
-		// Register the JS for the home page.
-		wp_register_script( 'boldgrid-backup-admin-home',
-			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-home.js',
-			array(
-				'jquery',
-			), BOLDGRID_BACKUP_VERSION
-		);
-
-		wp_enqueue_script( 'boldgrid-backup-now' );
+		$this->auto_rollback->enqueue_home_scripts();
+		$this->auto_rollback->enqueue_backup_scripts();
 
 		$this->folder_exclusion->enqueue_scripts();
 		$this->db_omit->enqueue_scripts();
-
-		// Create URL for backup now.
-		$backup_url = get_admin_url( null, 'admin.php?page=boldgrid-backup' );
-
-		// Create an array of data to pass to JS.
-		$localize_script_data = array(
-			'backupUrl' => $backup_url,
-			'errorText' => esc_html__(
-				'There was an error processing your request.  Please reload the page and try again.',
-				'boldgrid-backup'
-			),
-		);
-
-		// Add localize script data to the JS script.
-		wp_localize_script( 'boldgrid-backup-admin-home', 'localizeScriptData', $localize_script_data );
-
-		// Enqueue JS for the home page.
-		wp_enqueue_script( 'boldgrid-backup-admin-home' );
 
 		// If uploading an archive file.
 		if ( ! empty( $_FILES['file'] ) ) {

@@ -6,7 +6,7 @@
  * @since 1.0
  */
 
-/* global ajaxurl,boldgrid_backup_admin_rollback,jQuery */
+/* global ajaxurl,boldgrid_backup_admin_rollback,pagenow,jQuery,wp */
 
 // Declare namespace.
 var BOLDGRID = BOLDGRID || {};
@@ -26,99 +26,12 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 ( function( $ ) {
 	'use strict';
 
-	// General Variables.
-	var self = {};
-
 	// Onload event listener.
 	$( function() {
-		$( 'body' ).on( 'click', '#cancel-rollback-button', self.cancelRollback );
+		$( 'body' ).on( 'click', '#cancel-rollback-button', BOLDGRID.BACKUP.RollbackTimer.cancelRollback );
 
 		BOLDGRID.BACKUP.RollbackTimer.adjustOnAbout();
 	} );
-
-	/**
-	 * Cancel pending rollback.
-	 *
-	 * @since 1.0
-	 */
-	self.cancelRollback = function() {
-		// Declare variables.
-		var data, cancelNonce, wpHttpReferer, errorCallback, $cancelRollbackSection,
-			$cancelRollbackResults, $rollbackSpinner,
-			$this = $( this );
-
-        // Disable the Cancel Rollback button.
-        $this.attr( 'disabled', 'disabled' )
-        	.css( 'pointer-events', 'none' );
-
-		// Create a context selector for the cancel rollback section.
-		$cancelRollbackSection = $( '#cancel-rollback-section' );
-
-		// Create a context selector for the cancel rollback results.
-		$cancelRollbackResults = $( '#cancel-rollback-results' );
-
-		// Create a context selector for the cancel rollback spinner.
-		$rollbackSpinner = $cancelRollbackSection
-			.find( '.spinner' );
-
-		// Show the spinner.
-		$rollbackSpinner
-			.addClass( 'is-active' );
-
-		$rollbackSpinner
-			.css( 'display', 'inline-block' );
-
-		// Get the wpnonce and referer values.
-		cancelNonce = $cancelRollbackSection.find( '#cancel_rollback_auth' )
-			.val();
-
-		wpHttpReferer = $cancelRollbackSection.find( '[name="_wp_http_referer"]' )
-			.val();
-
-		// Create an error callback function.
-		errorCallback = function() {
-			// Show error message.
-			var markup = '<div class="notice notice-error"><p>There was an error processing your request.  Please reload the page and try again.</p></div>';
-
-			$cancelRollbackResults.html( markup );
-		};
-
-		// Generate a data array for the download request.
-		data = {
-		    'action' : 'boldgrid_cancel_rollback',
-		    'cancel_rollback_auth' : cancelNonce,
-		    '_wp_http_referer' : wpHttpReferer,
-		};
-
-		// Make the call.
-		$.ajax( {
-			url : ajaxurl,
-			data : data,
-			type : 'post',
-			dataType : 'text',
-			success : function( response ) {
-				// Remove the restore now section.
-				$( '[data-restore-now]' ).parent().slideUp();
-
-				// Insert markup in the results section.
-				$cancelRollbackResults
-					.html( response );
-
-				// Hide the cancel rollback section.
-				$cancelRollbackSection.slideUp();
-			},
-			error : errorCallback,
-			complete : function() {
-				// Hide the spinner.
-				$cancelRollbackSection
-					.find( '.spinner' )
-					.removeClass( 'is-active' );
-			}
-		} );
-
-		// Return false so the page does not reload.
-		return false;
-	};
 
 	/**
 	 * Namespace BOLDGRID.BACKUP.RollbackTimer.
@@ -126,6 +39,105 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 	 * @since 1.0
 	 */
 	BOLDGRID.BACKUP.RollbackTimer = {
+
+		// When we show a global notice in the customizer, it is identified by this code.
+		countdownCode: 'boldgrid-backup-countdown',
+
+		/**
+		 * Cancel pending rollback.
+		 *
+		 * @since 1.0
+		 */
+		cancelRollback : function() {
+			// Declare variables.
+			var data, cancelNonce, wpHttpReferer, errorCallback, $cancelRollbackSection,
+				$cancelRollbackResults, $rollbackSpinner,
+				$this = $( this ),
+				successCallBack;
+
+	        // Disable the Cancel Rollback button.
+	        $this.attr( 'disabled', 'disabled' )
+	        	.css( 'pointer-events', 'none' );
+
+			// Create a context selector for the cancel rollback section.
+			$cancelRollbackSection = $( '#cancel-rollback-section' );
+
+			// Create a context selector for the cancel rollback results.
+			$cancelRollbackResults = $( '#cancel-rollback-results' );
+
+			// Create a context selector for the cancel rollback spinner.
+			$rollbackSpinner = $cancelRollbackSection
+				.find( '.spinner' );
+
+			// Show the spinner.
+			$rollbackSpinner
+				.addClass( 'is-active' );
+
+			$rollbackSpinner
+				.css( 'display', 'inline-block' );
+
+			// Get the wpnonce and referer values.
+			cancelNonce = $cancelRollbackSection.find( '#cancel_rollback_auth' )
+				.val();
+
+			wpHttpReferer = $cancelRollbackSection.find( '[name="_wp_http_referer"]' )
+				.val();
+
+			// Create an error callback function.
+			errorCallback = function() {
+				// Show error message.
+				var markup = '<div class="notice notice-error"><p>There was an error processing your request.  Please reload the page and try again.</p></div>';
+
+				$cancelRollbackResults.html( markup );
+			};
+
+			// Generate a data array for the download request.
+			data = {
+			    'action' : 'boldgrid_cancel_rollback',
+			    'cancel_rollback_auth' : cancelNonce,
+			    '_wp_http_referer' : wpHttpReferer,
+			};
+
+			/**
+			 * Action to take when we successfully canceled the rollback.
+			 *
+			 * @since 1.6.0
+			 */
+			successCallBack = function( response ) {
+				// Remove the restore now section.
+				$( '[data-restore-now]' ).parent().slideUp();
+
+				// Insert markup in the results section.
+				$cancelRollbackResults.html( response );
+
+				// Hide the cancel rollback section.
+				$cancelRollbackSection.slideUp();
+
+				if( 'customize' === pagenow ) {
+					wp.customize.notifications.remove( BOLDGRID.BACKUP.RollbackTimer.countdownCode );
+				}
+			};
+
+			// Make the call.
+			$.ajax( {
+				url : ajaxurl,
+				data : data,
+				type : 'post',
+				dataType : 'text',
+				success : successCallBack,
+				error : errorCallback,
+				complete : function() {
+					// Hide the spinner.
+					$cancelRollbackSection
+						.find( '.spinner' )
+						.removeClass( 'is-active' );
+				}
+			} );
+
+			// Return false so the page does not reload.
+			return false;
+		},
+
 		/**
 		 * Get the time remaining to an end time.
 		 *
@@ -174,14 +186,10 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		 *
 		 * @param string deadline
 		 */
-		initializeClock : function( deadline ) {
+		initializeClock : function() {
 			// Define variables.
 			var $clock, interval, totalSeconds,
 				self = this;
-
-			if( deadline !== undefined ) {
-				BOLDGRID.BACKUP.RollbackTimer.deadline = deadline;
-			}
 
 			// Get the element for the clock display.
 			$clock = $( '#rollback-countdown-timer' );
@@ -255,7 +263,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			};
 
 			// Make the call.
-			$.ajax( {
+			return $.ajax( {
 				url : ajaxurl,
 				data : data,
 				type : 'post',
@@ -265,8 +273,14 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 					if ( response.length ) {
 						BOLDGRID.BACKUP.RollbackTimer.deadline = response;
 					}
+
+					/*
+					 * Someone may be waiting to see if we have a deadline, let
+					 * them know we're done.
+					 */
+					$( 'body' ).trigger( 'boldgrid-backup-have-deadline' );
 				}
-			} );
+			});
 		},
 
 		/**
@@ -280,33 +294,58 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		show : function() {
 			var data = {
 					'action' : 'boldgrid_backup_get_countdown_notice',
-				};
+				},
+				successCallback;
 
-			$.post( ajaxurl, data, function( response ) {
-				var deadline,
-					$headerEnd = $( '.wp-header-end' ),
+			/**
+			 * Action to take after getting the countdown notice.
+			 *
+			 * @since 1.6.0
+			 */
+			successCallback = function( response ) {
+				var $headerEnd = $( '.wp-header-end' ),
 					$notice,
+					notification,
 					$wrap = $( '.wrap' ).first();
 
 				if( response.success !== undefined && true === response.success ) {
-					$( '.boldgrid-backup-protect-now' ).slideUp();
+					$( '.boldgrid-backup-protect-now, .boldgrid-backup-protected' ).slideUp();
 
 					$notice = $( response.data );
-					$notice.addClass( 'hidden' );
 
-					// Determine where to add the notice.
-					if( 1 === $headerEnd.length ) {
-						$notice.insertAfter( $headerEnd );
+					// Determine where and how to add the notice.
+					if( 'customize' === pagenow ) {
+						notification = new wp.customize.Notification( BOLDGRID.BACKUP.RollbackTimer.countdownCode, { 'message': $notice.removeClass( 'notice notice-warning' ).html(), type: 'warning' } );
+						wp.customize.notifications.add( notification );
 					} else {
-						$notice.prependTo( $wrap );
+						$notice.addClass( 'hidden' );
+
+						if( 1 === $headerEnd.length ) {
+							$notice.insertAfter( $headerEnd );
+						} else {
+							$notice.prependTo( $wrap );
+						}
+
+						$notice.slideDown();
 					}
 
-					$notice.slideDown();
-
-					deadline = $('#rollback-deadline').val();
-					BOLDGRID.BACKUP.RollbackTimer.initializeClock( deadline );
+					/*
+					 * Allow the countdown to render (especially in the
+					 * customizer) before initializing the clock.
+					 */
+					setTimeout( function(){
+						BOLDGRID.BACKUP.RollbackTimer.initializeClock();
+					}, 500 );
 				}
-			});
+			};
+
+			$.ajax( {
+				url : ajaxurl,
+				data : data,
+				type : 'post',
+				dataType : 'json',
+				success : successCallback,
+			} );
 		},
 
 		/**

@@ -156,6 +156,87 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	}
 
 	/**
+	 * Enqueue backup scripts.
+	 *
+	 * Backup scripts are those needed to handle any "Backup" buttons.
+	 *
+	 * @since 1.6.0
+	 */
+	public function enqueue_backup_scripts() {
+		$handle = 'boldgrid-backup-admin-backup-now';
+
+		wp_register_script(
+			$handle,
+			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-backup-now.js',
+			array( 'jquery', ),
+			BOLDGRID_BACKUP_VERSION,
+			false
+		);
+
+		$access_type = get_filesystem_method();
+		$archive_nonce = wp_create_nonce( 'archive_auth' );
+		$localize_script_data = array(
+			'archiveNonce' => $archive_nonce,
+			'accessType' => $access_type,
+			'updateProtectionActivated' => $this->core->elements['update_protection_activated'],
+			'backupCreated' => $this->core->lang['backup_created'],
+			'errorText' => esc_html__(
+				'There was an error processing your request.  Please reload the page and try again.',
+				'boldgrid-backup'
+			),
+		);
+		wp_localize_script( $handle, 'localizeScriptData', $localize_script_data );
+
+		wp_enqueue_script( $handle );
+	}
+
+	/**
+	 * Enqueue scripts within the customizer.
+	 *
+	 * Currently this includes adding Update Protection to the themes area where
+	 * users can upgrade themes.
+	 *
+	 * @since 1.6.0
+	 */
+	public function enqueue_customize_controls() {
+		$handle = 'boldgrid-backup-admin-customizer';
+
+		wp_enqueue_style(
+			$handle,
+			plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-customizer.css', array(),
+			BOLDGRID_BACKUP_VERSION,
+			'all'
+		);
+
+		wp_enqueue_script(
+			$handle,
+			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-customizer.js',
+			array( 'jquery', ),
+			BOLDGRID_BACKUP_VERSION,
+			false
+		);
+
+		$this->enqueue_backup_scripts();
+
+		$this->enqueue_rollback_scripts();
+	}
+
+	/**
+	 * Enqueue scripts needed for the home page (the archives page).
+	 *
+	 * @since 1.6.0
+	 */
+	public function enqueue_home_scripts() {
+		wp_enqueue_script(
+			'boldgrid-backup-admin-home',
+			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-home.js',
+			array( 'jquery', ),
+			BOLDGRID_BACKUP_VERSION,
+			false
+		);
+	}
+
+	/**
 	 * Enqueue scripts required for the rollback functionality.
 	 *
 	 * The $deadline param may not always be passed in because there may not be
@@ -214,6 +295,10 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
 		$deadline = ! empty( $pending_rollback['deadline'] ) ? $pending_rollback['deadline'] : null;
 		$deadline_passed = ! empty( $deadline ) && $deadline <= time();
+
+		if( in_array( $this->core->pagenow, array( 'update-core.php', 'plugins.php', 'themes.php' ), true ) ) {
+			$this->enqueue_rollback_scripts();
+		}
 
 		/*
 		 * Updated and pending.
@@ -458,18 +543,14 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 *
 	 * @since 1.5.3
 	 *
-	 * @global $pagenow
-	 *
 	 * @return string
 	 */
 	public function notice_backup_get() {
-		global $pagenow;
-
 		$notice_text = sprintf( '<h2 class="header-notice">%1$s</h2>', __( 'BoldGrid Backup - Update Protection', 'boldgrid-backup' ) );
 
 		$notice_text .= '<p>';
 
-		switch( $pagenow ) {
+		switch( $this->core->pagenow ) {
 			case 'update-core.php':
 				$notice_text .= __( 'On this page you are able to update WordPress, Plugins, and Themes.' ) . ' ';
 				break;
@@ -552,37 +633,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 			return;
 		}
 
-		// Enqueue CSS.
-		wp_enqueue_style( 'boldgrid-backup-admin-home',
-			plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-home.css', array(),
-			BOLDGRID_BACKUP_VERSION, 'all'
-		);
-
-		// Register the JS.
-		wp_register_script(
-			'boldgrid-backup-admin-home',
-			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-home.js',
-			array( 'jquery', ),
-			BOLDGRID_BACKUP_VERSION,
-			false
-		);
-		$access_type = get_filesystem_method();
-		$archive_nonce = wp_create_nonce( 'archive_auth' );
-		$backup_url = get_admin_url( null, 'admin.php?page=boldgrid-backup&backup_now=1' );
-		$localize_script_data = array(
-			'archiveNonce' => $archive_nonce,
-			'accessType' => $access_type,
-			'backupUrl' => $backup_url,
-			'updateProtectionActivated' => $this->core->elements['update_protection_activated'],
-			'backupCreated' => $this->core->lang['backup_created'],
-		);
-		wp_localize_script( 'boldgrid-backup-admin-home', 'localizeScriptData', $localize_script_data );
-		wp_enqueue_script( 'boldgrid-backup-admin-home' );
-
-		wp_enqueue_script( 'boldgrid-backup-now' );
-
-		// Needed to handle actions after an ajaxy theme / plugin upgrade.
-		$this->enqueue_rollback_scripts();
+		$this->enqueue_backup_scripts();
 
 		// Needed to handle click of restore button.
 		$this->core->archive_actions->enqueue_scripts();
@@ -673,18 +724,19 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	}
 
 	/**
-	 * Show a message that the user has backup protection.
+	 * Get our 'activated' notice.
 	 *
-	 * @since 1.5.3
+	 * This is the notice that says you're protected, go ahead and update.
 	 *
-	 * @param array $pending_rollback
+	 * @since 1.6.0
+	 *
+	 * @return array
 	 */
-	public function notice_activated_show( $pending_rollback = null ) {
-		global $pagenow;
+	public function notice_activated_get() {
 
-		if( is_null( $pending_rollback ) ) {
-			$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
-		}
+		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
+
+		$theme_message = __( 'If you update a theme on this page, an auto rollback will occur if anything goes wrong.', 'boldgrid-backup' );
 
 		$message = '<h2 class="header-notice">' . $this->core->lang['heading_update_protection'] . '</h2>';
 
@@ -697,17 +749,43 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 			human_time_diff( $pending_rollback['lastmodunix'], time() )
 		) . ' ';
 
-		switch( $pagenow ) {
+		switch( $this->core->pagenow ) {
 			case 'update-core.php':
 				$message .= __( 'If you update WordPress, any plugins, or any themes on this page, an auto rollback will occur if anything goes wrong.', 'boldgrid-backup' );
 				break;
 			case 'plugins.php':
 				$message .= __( 'If you update a plugin on this page, an auto rollback will occur if anything goes wrong.', 'boldgrid-backup' );
+				break;
+			case 'themes.php':
+				$message .= $theme_message;
+				break;
+		}
+
+		// Customize our message for the "update theme" feature within the customizer.
+		$path = parse_url( wp_get_referer(), PHP_URL_PATH );
+		if( defined('DOING_AJAX') && DOING_AJAX && 'customize.php' === substr( $path, -1 * strlen( 'customize.php' ) ) ) {
+			$message .= $theme_message;
 		}
 
 		$message .= '</p>';
 
-		do_action( 'boldgrid_backup_notice', $message, 'notice notice-success is-dismissible' );
+		$message = array(
+			'html' => $message,
+			'class' => 'notice notice-success is-dismissible boldgrid-backup-protected',
+		);
+
+		return $message;
+	}
+
+	/**
+	 * Show a message that the user has backup protection.
+	 *
+	 * @since 1.5.3
+	 */
+	public function notice_activated_show() {
+		$message = $this->notice_activated_get();
+
+		do_action( 'boldgrid_backup_notice', $message['html'], $message['class'] );
 	}
 
 	/**
@@ -794,6 +872,33 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 
 		$notice = $this->notice_countdown_get();
 		$notice = '<div class="notice notice-warning">' . $notice . '</div>';
+
+		wp_send_json_success( $notice );
+	}
+
+	/**
+	 * Get our "protect" notice.
+	 *
+	 * This will return either the "get protected" or "you are protected" notice.
+	 *
+	 * @since 1.6.0
+	 */
+	public function wp_ajax_get_protect_notice() {
+		if ( ! current_user_can( 'update_plugins' ) ) {
+			wp_send_json_error();
+		}
+
+		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
+		if( ! empty( $pending_rollback ) ) {
+			// You're protected, go ahead and update.
+			$message = $this->notice_activated_get();
+			$notice = sprintf( '<div class="%1$s">%2$s</div>', $message['class'], $message['html'] );
+		} else {
+			// You're not protected, make a backup first.
+			$notice = $this->notice_backup_get();
+			$backup_button = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-button.php';
+			$notice = '<div class="notice notice-warning is-dismissible boldgrid-backup-protect-now">' . $notice . $backup_button . '</div>';
+		}
 
 		wp_send_json_success( $notice );
 	}

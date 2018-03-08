@@ -1,18 +1,6 @@
-.delete-now-form {
-	display: inline;
-}
-
-#backup-site-now-section .spinner,
-.restore-now-form .spinner,
-.delete-now-form .spinner,
-#restore-now-section .spinner,
 #upload-archive-section .spinner {
 	display: none;
 	float: none !important;
-}
-
-.dashicons-editor-help {
-	cursor: pointer;
 }
 
 .upload-plugin .help {
@@ -20,25 +8,6 @@
     padding-top: 0px;
     padding-bottom: 0px;
     border: 0px;
-}
-
-.action-delete {
-	cursor: pointer;
-	color: #a00;
-}
-
-/**
-* Table styles.
-*
-* These styles adjust the width of the td's for "Download" and "Restore" so that
-* they display next to each other, without a wide gap between them.
-*/
-table.wp-list-table {
-	table-layout: auto;
-}
-table.wp-list-table td.auto-width {
-	width: 1px;
-    white-space: nowrap;
 }
 
 /* Disable floating of mine count so help section displays nicely. */

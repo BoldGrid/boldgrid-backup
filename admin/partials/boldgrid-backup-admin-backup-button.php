@@ -14,6 +14,10 @@ $pagenow_enqueue_rollback = array( 'plugins.php', 'update-core.php', 'themes.php
 
 $core = isset( $this->core ) ? $this->core : $this;
 
+// Are we loading the "protect now" form via ajax?
+$update_protection_ajax = ! empty( $_POST['action'] ) && 'boldgrid_backup_get_protect_notice' === $_POST['action'] && ! empty( $_POST['update_protection'] );
+$update_protection_page = in_array( $core->pagenow, $pagenow_enqueue_rollback, true );
+
 return sprintf(
 	'<div id="backup-site-now-section">
 		<form action="#" id="backup-site-now-form" method="POST">
@@ -30,9 +34,9 @@ return sprintf(
 		</form>
 	</div>
 	<div id="backup-site-now-results"></div>',
-	wp_nonce_field( 'boldgrid_backup_now', 'backup_auth' ),
+	wp_nonce_field( 'boldgrid_backup_now', 'backup_auth', true, false ),
 	esc_html( 'Backup Site Now', 'boldgrid-backup' ),
-	in_array( $core->pagenow, $pagenow_enqueue_rollback, true ) ? 'data-updating="true"' : '',
+	$update_protection_ajax || $update_protection_page ? 'data-updating="true"' : '',
 	/* 4 */ __( 'You may leave this page, doing so will not stop your backup.', 'boldgrid-backup' )
 );
 

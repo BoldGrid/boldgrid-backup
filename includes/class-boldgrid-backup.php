@@ -269,6 +269,7 @@ class Boldgrid_Backup {
 
 		$this->loader->add_action( 'admin_notices', $plugin_admin_core->notice, 'display_user_notice' );
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_get_countdown_notice', $plugin_admin_core->auto_rollback, 'wp_ajax_get_countdown_notice' );
+		$this->loader->add_action( 'wp_ajax_boldgrid_backup_get_protect_notice', $plugin_admin_core->auto_rollback, 'wp_ajax_get_protect_notice' );
 
 		// Add a custom action to handle AJAX callback for creating a backup archive file.
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_now', $plugin_admin_core,
@@ -376,6 +377,8 @@ class Boldgrid_Backup {
 
 		$this->loader->add_action( 'boldgrid_backup_pre_dump', $plugin_admin_core->in_progress, 'pre_dump' );
 		$this->loader->add_action( 'boldgrid_backup_post_dump', $plugin_admin_core->in_progress, 'post_dump' );
+
+		$this->loader->add_action( 'customize_controls_enqueue_scripts', $plugin_admin_core->auto_rollback, 'enqueue_customize_controls' );
 
 		return;
 	}
