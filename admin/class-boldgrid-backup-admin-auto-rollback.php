@@ -208,13 +208,18 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 			'all'
 		);
 
-		wp_enqueue_script(
+		wp_register_script(
 			$handle,
 			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-customizer.js',
 			array( 'jquery', ),
 			BOLDGRID_BACKUP_VERSION,
 			false
 		);
+		$translations = array(
+			'update_data' => wp_get_update_data(),
+		);
+		wp_localize_script( $handle, 'boldgridBackupCustomizer', $translations );
+		wp_enqueue_script( $handle );
 
 		$this->enqueue_backup_scripts();
 
@@ -848,7 +853,6 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 
 		// Convert the deadline to ISO time (in ISO 8601 format).
 		$iso_time = date( 'c', $deadline );
-
 		wp_die( $iso_time );
 	}
 
