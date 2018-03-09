@@ -292,6 +292,18 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		 * @since 1.6.0
 		 */
 		show : function() {
+
+			/*
+			 * Show only one countdown.
+			 *
+			 * If there is already a countdown showing, abort. The user may be
+			 * on the themes page updating themes, and if they update two themes,
+			 * we don't want to show two countdown notices.
+			 */
+			if( $( '.boldgrid-backup-countdown:visible' ).length > 0 ) {
+				return;
+			}
+
 			var data = {
 					'action' : 'boldgrid_backup_get_countdown_notice',
 				},

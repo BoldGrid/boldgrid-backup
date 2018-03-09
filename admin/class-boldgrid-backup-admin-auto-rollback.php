@@ -875,7 +875,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		}
 
 		$notice = $this->notice_countdown_get();
-		$notice = '<div class="notice notice-warning">' . $notice . '</div>';
+		$notice = '<div class="notice notice-warning is-dismissible boldgrid-backup-countdown">' . $notice . '</div>';
 
 		wp_send_json_success( $notice );
 	}
