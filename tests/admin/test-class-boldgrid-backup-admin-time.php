@@ -100,7 +100,7 @@ class Test_Boldgrid_Backup_Admin_Time extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test get_timezone_info.
+	 * Test get_timezone_info method.
 	 *
 	 * @since 1.6.0
 	 */
