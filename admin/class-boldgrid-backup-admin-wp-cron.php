@@ -289,10 +289,19 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	 * @return bool
 	 */
 	public function schedule( $schedule, $hook ) {
+
+		/*
+		 * WP Cron works off of UTC. Get our "local" time from our $settings and
+		 * convert it to UTC.
+		 */
+		$date = $this->core->time->get_settings_date();
+		$new_timezone = new DateTimeZone( 'UTC' );
+		$date->setTimezone( $new_timezone );
+
 		// Get hour, minute, and period.
-		$h = $schedule['tod_h'];
-		$m = $schedule['tod_m'];
-		$p = $schedule['tod_a'];
+		$h = $date->format( 'g' );
+		$m = $date->format( 'i' );
+		$p = $date->format( 'A' );
 
 		$success = true;
 

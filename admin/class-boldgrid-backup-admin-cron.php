@@ -96,13 +96,19 @@ class Boldgrid_Backup_Admin_Cron {
 		// Strip trailing comma.
 		$days_scheduled_list = rtrim( $days_scheduled_list, ',' );
 
+		// Convert our WordPress time to Server time.
+		$date = $this->core->time->get_settings_date( $settings );
+		if( false === $date ) {
+			return false;
+		}
+		$server_timezone = $this->core->time->get_server_timezone();
+		if( false === $date ) {
+			return false;
+		}
+		$date->setTimezone( $server_timezone );
+
 		// Build cron job line in crontab format.
-		$entry = date( 'i G',
-			strtotime(
-				$settings['schedule']['tod_h'] . ':' . $settings['schedule']['tod_m'] . ' ' .
-				$settings['schedule']['tod_a']
-			)
-		) . ' * * ';
+		$entry = $date->format( 'i G' ) . ' * * ';
 
 		$entry .= $days_scheduled_list . ' php -qf "' . dirname( dirname( __FILE__ ) ) .
 		'/boldgrid-backup-cron.php" mode=backup HTTP_HOST=' . $_SERVER['HTTP_HOST'];

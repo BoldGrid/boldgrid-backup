@@ -191,22 +191,6 @@ BoldGrid.Settings = function( $ ) {
 	};
 
 	/**
-	 * @summary Toggle cron warnings.
-	 *
-	 * @since 1.5.2
-	 */
-	self.toggleCronWarnings = function() {
-		var $wpCronNotice = $( '.wp-cron-notice' ),
-			scheduler = $( '#scheduler' ).val();
-
-		if( 'wp-cron' === scheduler ) {
-			$wpCronNotice.show();
-		} else {
-			$wpCronNotice.hide();
-		}
-	}
-
-	/**
 	 * @summary Toogle the move backups message.
 	 *
 	 * @since 1.3.6
@@ -304,13 +288,6 @@ BoldGrid.Settings = function( $ ) {
 		// On click action for days, check if any days or the week are checked,
 		// toggle notice.
 		$scheduleDow.on( 'click', self.toggleNoBackupDays );
-
-		/*
-		 * When the page loads AND when the user changes the scheduler, toggle
-		 * the timezone settings.
-		 */
-		self.toggleCronWarnings();
-		$( '#scheduler' ).on( 'change', self.toggleCronWarnings );
 
 		$( window ).on( 'tb_unload', self.on_tb_unload );
 

@@ -7,6 +7,8 @@
 
 defined( 'WPINC' ) ? : die;
 
+$tz_info = $this->core->time->get_timezone_info();
+
 ob_start();
 ?>
 
@@ -61,6 +63,10 @@ ob_start();
 					}
 				?>>PM</option>
 		</select>
+
+		<div style="vertical-align:middle;display:inline-block;">
+			<?php echo $tz_info['markup_timezone'] . ' <em>' . $tz_info['markup_change'] . '</em>' ?>
+		</div>
 
 		<p class="wp-cron-notice hidden"><em>WP Cron runs on GMT time, which is currently <?php echo date( 'l g:i a e')?>.</em></p>
 	</div>
