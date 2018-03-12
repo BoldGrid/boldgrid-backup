@@ -135,12 +135,14 @@ class Boldgrid_Backup_Admin_Time {
 			$wordpress_timezone = new DateTimeZone( $tz_info['abbr'] );
 		}
 
-		// H:m pm
 		$time_string = $settings['schedule']['tod_h'] . ':' . $settings['schedule']['tod_m'] . ' ' . $settings['schedule']['tod_a'];
 
-		$date = new DateTime( $time_string, $wordpress_timezone );
-
-		return $date;
+		try {
+			$date = new DateTime( $time_string, $wordpress_timezone );
+			return $date;
+		} catch( Exception $e ) {
+			return false;
+		}
 	}
 
 	/**
@@ -257,6 +259,15 @@ class Boldgrid_Backup_Admin_Time {
 	 * @return DateTimeZone
 	 */
 	public function offset_to_timezone( $offset ) {
+
+		if( '+0' === $offset ) {
+			return new DateTimeZone( 'UTC' );
+		}
+
+		if( ! is_numeric( $offset ) ) {
+			return false;
+		}
+
 		$zones = timezone_abbreviations_list();
 		$offset_seconds = 60 * 60 * $offset;
 

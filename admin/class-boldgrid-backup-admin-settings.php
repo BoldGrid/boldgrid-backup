@@ -95,6 +95,10 @@ class Boldgrid_Backup_Admin_Settings {
 			return $settings;
 		}
 
+		// Configure a random minute. 5:4am will fail, but 5:04am will pass.
+		$random_minute = mt_rand( 1, 59 );
+		$random_minute = 1 === strlen( $random_minute ) ? '0' . $random_minute : $random_minute;
+
 		// Parse settings.
 		if ( ! empty( $settings['schedule'] ) ) {
 			// Update schedule format.
@@ -128,7 +132,7 @@ class Boldgrid_Backup_Admin_Settings {
 			);
 			$settings['schedule']['tod_m'] = (
 				! empty( $settings['schedule']['tod_m'] ) ?
-				$settings['schedule']['tod_m'] : mt_rand( 1, 59 )
+				$settings['schedule']['tod_m'] : $random_minute
 			);
 			$settings['schedule']['tod_a'] = (
 				! empty( $settings['schedule']['tod_a'] ) ?
@@ -171,7 +175,7 @@ class Boldgrid_Backup_Admin_Settings {
 
 			// Time of day.
 			$settings['schedule']['tod_h'] = mt_rand( 1, 5 );
-			$settings['schedule']['tod_m'] = mt_rand( 1, 59 );
+			$settings['schedule']['tod_m'] = $random_minute;
 			$settings['schedule']['tod_a'] = 'AM';
 
 			// Other settings.
