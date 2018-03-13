@@ -49,6 +49,9 @@ $pcl_zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this );
 
 $valid_backup_dir = $backup_dir_perms['exists'] && $backup_dir_perms['read'] && $backup_dir_perms['write'] && $backup_dir_perms['rename'] && $backup_dir_perms['delete'] && $backup_dir_perms['dirlist'];
 
+$timezone = $this->time->get_server_timezone();
+$timezone = false === $timezone ? 'UTC' . $this->time->get_server_offset() : $timezone->getName() . ' / ' . $this->time->get_server_offset();
+
 // Run our tests.
 $tests = array(
 	array(
@@ -85,6 +88,10 @@ $tests = array(
 	array(
 		'k' => __( 'WordPress version:', 'boldgrid-backup' ),
 		'v' => $wp_version,
+	),
+	array(
+		'k' => __( 'Server time zone:', 'boldgrid-backup' ),
+		'v' => $timezone,
 	),
 );
 

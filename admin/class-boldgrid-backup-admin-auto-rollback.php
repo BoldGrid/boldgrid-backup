@@ -278,6 +278,12 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		}
 
 		wp_enqueue_script( $handle );
+
+		/*
+		 * If there is a countdown showing in the customizer, there's also a
+		 * rollback button, which is handled by the archive_actions class.
+		 */
+		$this->core->archive_actions->enqueue_scripts();
 	}
 
 	/**
@@ -366,12 +372,6 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		if( $this->updating_core ) {
 			return;
 		}
-
-		/*
-		 * Enqueue the "archive actions" scripts, they are needed to handle the
-		 * "Rollback Site Now" button (handled like a typical restore).
-		 */
-		$this->core->archive_actions->enqueue_scripts();
 
 		wp_enqueue_style(
 			'boldgrid-backup-admin-home',
@@ -639,9 +639,6 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		}
 
 		$this->enqueue_backup_scripts();
-
-		// Needed to handle click of restore button.
-		$this->core->archive_actions->enqueue_scripts();
 
 		/*
 		 * Show admin notice.

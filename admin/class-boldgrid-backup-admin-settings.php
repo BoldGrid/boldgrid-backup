@@ -187,6 +187,14 @@ class Boldgrid_Backup_Admin_Settings {
 			$settings['auto_rollback'] = 1;
 		}
 
+		/*
+		 * If a cron schedule was found, then merge the settings.
+		 *
+		 * @todo As of 1.6.0, this feature is on hold. We need to take into
+		 * account timezones, and possibly tell the user their settings don't
+		 * actually match what's in the crontab.
+		 */
+		/*
 		// If not updating the settings, then check cron for schedule.
 		if ( ! isset( $_POST['save_time'] ) ) {
 			$cron_schedule = $this->core->cron->read_cron_entry();
@@ -196,6 +204,7 @@ class Boldgrid_Backup_Admin_Settings {
 		if ( ! empty( $cron_schedule ) ) {
 			$settings['schedule'] = array_merge( $settings['schedule'], $cron_schedule );
 		}
+		*/
 
 		$boldgrid_settings = get_site_option( 'boldgrid_settings' );
 

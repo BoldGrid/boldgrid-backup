@@ -14,8 +14,8 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 	var self = this,
 		lang = BoldGridBackupAdminArchiveActions,
-		$body = $( 'body' ),
-		$wpbody = $body.find( '#wpbody' );
+		$body,
+		$wpbody;
 
 	/**
 	 * @summary Confirm to delete a selected backup archive file.
@@ -140,6 +140,9 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 	};
 
 	$( function() {
+		$body = $( 'body' ),
+		$wpbody = $body.find( '#wpbody' );
+
 		$body.on( 'click', '.action-download', self.downloadArchive );
 		$body.on( 'click', '.restore-now', self.restoreArchiveConfirm );
 		$body.on( 'click', '#delete-action a', self.onClickDelete );
