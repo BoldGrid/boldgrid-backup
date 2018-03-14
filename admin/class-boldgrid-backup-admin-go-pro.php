@@ -35,7 +35,7 @@ class Boldgrid_Backup_Admin_Go_Pro {
 	 * @access public
 	 * @var    string
 	 */
-	public $url = 'https://boldgrid.com/update-backup';
+	public static $url = 'https://boldgrid.com/update-backup';
 
 	/**
 	 * Constructor.
@@ -88,7 +88,7 @@ class Boldgrid_Backup_Admin_Go_Pro {
 				'show' => ! $is_premium && $this->core->config->is_premium_active,
 				'message' => '<p>' . sprintf(
 					__( 'Thank you for activating the <strong>BoldGrid Backup Premium Extension</strong>! Before you can begin using all of the premium features, please visit <a href="%1$s" target="_blank">BoldGrid Central</a> and upgrade your BoldGrid Connect Key.', 'boldgrid-backup' ),
-					$this->url
+					self::$url
 				) . '</p>',
 			),
 			array(

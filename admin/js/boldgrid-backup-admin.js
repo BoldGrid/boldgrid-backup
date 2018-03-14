@@ -79,9 +79,22 @@ BoldGrid.Backup = function( $ ) {
 	$( function() {
 		self.bindHelpClick();
 		self.hideBackupNotice();
+		self.updatePremiumLink();
 
 		$( 'body' ).on( 'click', '[data-toggle-target]', self.onClickToggle );
 	});
+
+	/**
+	 * @summary Open submenu "Get Premium" link in a new tab.
+	 *
+	 * WordPress does not have a way to configure dashboard menu items to open
+	 * in a new tab, so we'll handle it via js.
+	 *
+	 * @since 1.6.0
+	 */
+	self.updatePremiumLink = function() {
+		$( '#adminmenu' ).find( 'a[href="' + BoldGridBackupAdmin.get_premium_url + '"]' ).attr( 'target', '_blank' );
+	}
 };
 
 BoldGrid.Backup( jQuery );

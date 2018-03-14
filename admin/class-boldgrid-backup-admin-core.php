@@ -997,18 +997,20 @@ class Boldgrid_Backup_Admin_Core {
 		 * Leave this as the last menu item.
 		 */
 		if( ! $this->config->get_is_premium() ) {
+			$menu_slug = 'boldgrid-backup-get-premium';
+
 			add_submenu_page(
 				$main_slug,
 				$lang['get_premium'],
 				'<span class="dashicons dashicons-dashboard"></span> <span class="get-premium">' . $lang['get_premium'] . '</span>',
 				$capability,
-				'get-premium'
+				$menu_slug
 			);
 
 			// Change the url (2 is key of the menu item's slug / url).
 			foreach( $submenu[$main_slug] as &$item ) {
-				if( 'get-premium' === $item[2] ) {
-					$item[2] = $this->go_pro->url;
+				if( $menu_slug === $item[2] ) {
+					$item[2] = Boldgrid_Backup_Admin_Go_Pro::$url;
 				}
 			}
 		}
