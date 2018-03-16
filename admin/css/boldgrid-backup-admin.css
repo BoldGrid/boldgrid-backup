@@ -36,6 +36,10 @@ a[disabled] {
 	pointer-events: none;
 }
 
+.bgbu-wait {
+	cursor: wait !important;
+}
+
 .dashicons-warning.red {
 	color: #dc3232;
 }

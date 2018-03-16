@@ -85,6 +85,17 @@ class Boldgrid_Backup_Admin_Archive {
 	public $log_filepath = null;
 
 	/**
+	 * URL to the details page of this backup.
+	 *
+	 * This property is available after calling init().
+	 *
+	 * @since  1.6.0
+	 * @access protected
+	 * @var    string
+	 */
+	public $view_details_url = '';
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.5.3
@@ -215,6 +226,8 @@ class Boldgrid_Backup_Admin_Archive {
 		 * and the only compressor was ZipArchive.
 		 */
 		$this->compressor = ! empty( $this->log['compressor'] ) ? $this->log['compressor'] : 'php_zip';
+
+		$this->view_details_url = admin_url( 'admin.php?page=boldgrid-backup-archive-details&filename=' . $this->filename );
 
 		unset( $zip );
 	}

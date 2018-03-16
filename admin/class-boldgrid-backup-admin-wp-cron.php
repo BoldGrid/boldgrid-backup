@@ -143,14 +143,14 @@ class Boldgrid_Backup_Admin_WP_Cron {
 		// Remove existing restore cron jobs.
 		$this->clear_schedules( array( $this->hooks['restore'] ) );
 
-		// Get the unix time for 5 minutes from now.
-		$time_5_minutes_later = strtotime( '+5 MINUTES' );
+		// Cron has a 15 minute window for auto restoriations, and so will we (WP Cron).
+		$auto_restore_time = strtotime( '+15 MINUTES' );
 
-		$event_added = wp_schedule_event( $time_5_minutes_later, 'never', $this->hooks['restore'] );
+		$event_added = wp_schedule_event( $auto_restore_time, 'never', $this->hooks['restore'] );
 
 		// If cron job was added, then update the boldgrid_backup_pending_rollback option with time.
 		if ( false !== $event_added ) {
-			$pending_rollback['deadline'] = $time_5_minutes_later;
+			$pending_rollback['deadline'] = $auto_restore_time;
 			update_site_option( 'boldgrid_backup_pending_rollback', $pending_rollback );
 		}
 

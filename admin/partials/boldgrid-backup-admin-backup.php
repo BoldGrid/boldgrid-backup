@@ -13,6 +13,10 @@
 
 defined( 'WPINC' ) ? : die;
 
+$core = isset( $this->core ) ? $this->core : $this;
+
+$core->archive->init( $archive_info['filepath'] );
+
 /**
  * If data exists in the $archive_info array, then print results, else show an error message.
  *
@@ -41,37 +45,67 @@ if ( ! empty( $archive_info ) ) {
 
 	if ( ! empty( $archive_info['dryrun'] ) ) {
 		$message = array(
-			'class' => 'notice notice-info',
+			'class' => 'notice notice-info is-dismissible',
 			'message' => sprintf( '<p>%1$s</p>', esc_html__( 'This was a dry run test', 'boldgrid-backup' ) ),
 		);
 	}
 
+	/*
+	 * Get our success message.
+	 *
+	 * Initially, we had one sprintf intelligent enough to determine if we were
+	 * making a backup or restoring, and make us a nice message. However, having
+	 * such a fantastic beast in one sprintf made it a bit difficult to manage.
+	 * We've since split up the sprintf's into two, one for when a backup has
+	 * completed empty( $_POST['restore_now'] ), and one when a restoration has
+	 * been completed.
+	 *
+	 * @todo Read the above. For the time, we did a quick clean up. However, we
+	 *       may want to further organize this entire file.
+	 */
 	if ( empty( $archive_info['error'] ) ) {
-		$message = array(
-			'class' => 'notice notice-success',
-			'message' => sprintf( '
-				<h2 class="header-notice">%9$s - %1$s</h2>
-				<p>%2$s</p>
-				%3$s
-				%4$s
-				%5$s
-				%6$s
-				%7$s
-				<p>%8$s</p>',
-				/* 1 */ ! empty( $_POST['restore_now'] ) ? __( 'Restoration complete', 'boldgrid-backup' ) : __( 'Backup complete', 'boldgrid-backup' ),
-				/* 2 */ ! empty( $_POST['restore_now'] ) ? esc_html__( 'The selected archive file has been successfully restored', 'boldgrid-backup' ) : esc_html__( 'A backup archive file has been created successfully', 'boldgrid-backup' ),
-				/* 3 */ ! empty( $archive_info['filepath'] ) ? '<p>' . sprintf( esc_html__( 'File Path: %s', 'boldgrid-backup' ), $archive_info['filepath'] ) . '</p>' : '',
-				/* 4 */ ! empty( $archive_info['filesize'] ) ? '<p>' . sprintf( esc_html__( 'File Size: %s', 'boldgrid-backup' ), Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['filesize'] ) ) . '</p>' : '',
-				/* 5 */ ! empty( $archive_info['total_size'] ) ? '<p>' . sprintf( esc_html__( 'Total size: %s', 'boldgrid-backup' ), Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] ) ) . '</p>' : '',
-				/* 6 */ isset( $archive_info['db_duration'] ) ? '<p>' . sprintf( $this->configs['lang']['est_pause'], $archive_info['db_duration'] ) . '</p>' : '',
-				/* 7 */ isset( $archive_info['duration'] ) ? '<p>' . sprintf( esc_html__( 'Duration: %s seconds', 'boldgrid-backup' ), $archive_info['duration'] ) . '</p>' : '',
-				/* 8 */ $settings_page_link,
-				/* 9 */ __( 'BoldGrid Backup', 'boldgrid-backup' )
-			),
-		);
+
+		if( empty( $_POST['restore_now'] ) ) {
+			$message = array(
+				'class' => 'notice notice-success is-dismissible boldgrid-backup-complete',
+				'message' => sprintf( '
+						<h2 class="header-notice">%1$s - %2$s</h2>
+						<p>%3$s <a href="%4$s">%5$s</a></p>
+					',
+					/* 1 */ __( 'BoldGrid Backup', 'boldgrid-backup' ),
+					/* 2 */ __( 'Backup complete', 'boldgrid-backup' ),
+					/* 3 */ esc_html__( 'A backup archive file has been created successfully!', 'boldgrid-backup' ),
+					/* 4 */ $core->archive->view_details_url,
+					/* 5 */ __( 'View details', 'boldgrid-backup' )
+				),
+			);
+		} else {
+			$message = array(
+				'class' => 'notice notice-success is-dismissible',
+				'message' => sprintf( '
+					<h2 class="header-notice">%9$s - %1$s</h2>
+					<p>%2$s</p>
+					%3$s
+					%4$s
+					%5$s
+					%6$s
+					%7$s
+					<p>%8$s</p>',
+					/* 1 */ __( 'Restoration complete', 'boldgrid-backup' ),
+					/* 2 */ esc_html__( 'The selected archive file has been successfully restored', 'boldgrid-backup' ),
+					/* 3 */ ! empty( $archive_info['filepath'] ) ? '<p>' . sprintf( esc_html__( 'File Path: %s', 'boldgrid-backup' ), $archive_info['filepath'] ) . '</p>' : '',
+					/* 4 */ ! empty( $archive_info['filesize'] ) ? '<p>' . sprintf( esc_html__( 'File Size: %s', 'boldgrid-backup' ), Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['filesize'] ) ) . '</p>' : '',
+					/* 5 */ ! empty( $archive_info['total_size'] ) ? '<p>' . sprintf( esc_html__( 'Total size: %s', 'boldgrid-backup' ), Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] ) ) . '</p>' : '',
+					/* 6 */ isset( $archive_info['db_duration'] ) ? '<p>' . sprintf( $core->configs['lang']['est_pause'], $archive_info['db_duration'] ) . '</p>' : '',
+					/* 7 */ isset( $archive_info['duration'] ) ? '<p>' . sprintf( esc_html__( 'Duration: %s seconds', 'boldgrid-backup' ), $archive_info['duration'] ) . '</p>' : '',
+					/* 8 */ $settings_page_link,
+					/* 9 */ __( 'BoldGrid Backup', 'boldgrid-backup' )
+				),
+			);
+		}
 	} else {
 		$message = array(
-			'class' => 'notice notice-error',
+			'class' => 'notice notice-error is-dismissible',
 			'message' => esc_html( $archive_info['error'] ),
 			'header' => sprintf(
 				'%1$s - %2$s',
@@ -82,7 +116,7 @@ if ( ! empty( $archive_info ) ) {
 	}
 } else {
 	$message = array(
-		'class' => 'notice notice-error',
+		'class' => 'notice notice-error is-dismissible',
 		'message' => sprintf('
 			<p>%1$s</p>
 			%2$s
@@ -99,7 +133,7 @@ if ( ! empty( $archive_info ) ) {
 
 if( ! isset( $message ) ) {
 	$message = array(
-		'class' => 'notice notice-error',
+		'class' => 'notice notice-error is-dismissible',
 		'message' => __( 'Unknown error.', 'boldgrid-backup' ),
 		'header' => __( 'BoldGrid Backup', 'boldgrid-backup' ),
 	);

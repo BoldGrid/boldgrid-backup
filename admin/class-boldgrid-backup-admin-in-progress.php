@@ -66,14 +66,20 @@ class Boldgrid_Backup_Admin_In_Progress {
 			return $notices;
 		}
 
+		/*
+		 * If we are in the middle of a backup, we'll want to increase the rate
+		 * of the heartbeat so that we can more quickly update the user when
+		 * the backup has completed.
+		 */
+		wp_enqueue_script('heartbeat');
+
 		$elapsed = time() - $in_progress;
 		$limit = 15 * MINUTE_IN_SECONDS;
 
-		$notice= array(
-			'class' => 'notice notice-warning',
-			'message' => sprintf( __( 'BoldGrid Backup began archiving your website %1$s ago.', 'boldgrid-backup' ), human_time_diff( $in_progress, time() ) ),
-			'heading' => __( 'BoldGrid Backup - Backup in progress', 'boldgrid-backup' )
-		);
+		$notice = $this->get_notice();
+		if( false === $notice ) {
+			return $notices;
+		}
 
 		/*
 		 * @todo If the backup takes longer than 15 minutes, the user needs more
@@ -121,6 +127,76 @@ class Boldgrid_Backup_Admin_In_Progress {
 		$in_progress = ! empty( $settings['in_progress'] ) ? $settings['in_progress'] : null;
 
 		return $in_progress;
+	}
+
+	/**
+	 * Get our in progress notice.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @return mixed Array on success, false when there's no backup in progress.
+	 */
+	public function get_notice() {
+		$in_progress = $this->get();
+
+		if( empty( $in_progress ) ) {
+			return false;
+		}
+
+		$notice = array(
+			'class' => 'notice notice-warning boldgrid-backup-in-progress',
+			'message' => sprintf( __( 'BoldGrid Backup began archiving your website %1$s ago.', 'boldgrid-backup' ), human_time_diff( $in_progress, time() ) ),
+			'heading' => __( 'BoldGrid Backup - Backup in progress', 'boldgrid-backup' )
+		);
+
+		return $notice;
+	}
+
+	/**
+	 * Get our notice markup.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @return mixed Returns a string (html markup), a WordPress admin notice or
+	 *               false if we don't have a notice.
+	 */
+	public function get_notice_markup() {
+		$notice = $this->get_notice();
+		$markup = false;
+
+		if( $notice ) {
+			$markup = $this->core->notice->get_notice_markup( $notice['class'], $notice['message'], $notice['heading'] );
+		}
+
+		return $markup;
+	}
+
+	/**
+	 * Take action when the heartbeat is received.
+	 *
+	 * Include data in the heartbeat to let the user know if their backup is
+	 * still in progress, or it has finished.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param  array $response
+	 * @param  array $data
+	 * @return array
+	 */
+	public function heartbeat_received( $response, $data ) {
+		$key = 'boldgrid_backup_in_progress';
+
+		if( empty( $data[$key] ) ) {
+			return $response;
+		}
+
+		// An int specifiying when the current "in progress" backup started.
+		$response[$key] = $this->get();
+
+		// Our "backup complete!" admin notice.
+		$response[ 'boldgrid_backup_complete' ] = $this->core->notice->get_backup_complete();
+
+		return $response;
 	}
 
 	/**
@@ -175,5 +251,24 @@ class Boldgrid_Backup_Admin_In_Progress {
 		$settings['in_progress'] = ! empty( $time ) ? $time : time();
 
 		$this->core->settings->save( $settings );
+	}
+
+	/**
+	 * Via ajax, get our "in progress" admin notice.
+	 *
+	 * @since 1.6.0
+	 */
+	public function wp_ajax_get_progress_notice() {
+		if ( ! current_user_can( 'update_plugins' ) ) {
+			wp_send_json_error( __( 'Permission denied.', 'boldgrid-backup' ) );
+		}
+
+		if( ! check_ajax_referer( 'boldgrid_backup_customizer', 'nonce', false ) ) {
+			wp_send_json_error( __( 'Invalid nonce.', 'boldgrid-backup' ) );
+		}
+
+		$in_progress_markup = $this->get_notice_markup();
+
+		wp_send_json_success( $in_progress_markup );
 	}
 }

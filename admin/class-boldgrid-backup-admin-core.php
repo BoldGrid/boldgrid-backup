@@ -1701,6 +1701,8 @@ class Boldgrid_Backup_Admin_Core {
 
 			// Enforce retention setting.
 			$this->enforce_retention();
+
+			update_option( 'boldgrid_backup_latest_backup', $info );
 		}
 
 		// Return the array of archive information.

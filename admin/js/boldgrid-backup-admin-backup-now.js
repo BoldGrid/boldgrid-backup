@@ -24,6 +24,8 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 
 	$( function() {
 		$( 'body' ).on( 'click', '#backup-site-now', self.backupNow );
+
+		$( 'body' ).on( 'boldgrid_backup_complete', self.updateProtectionEnabled );
 	} );
 
 	/**
@@ -172,6 +174,10 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 			data.include_tables = includeTables;
 		}
 
+		if( undefined !== BOLDGRID.BACKUP.UpdateSelectors ) {
+			BOLDGRID.BACKUP.UpdateSelectors.disable();
+		}
+
 		// Make the call.
 		$.ajax( {
 			url : ajaxurl,
@@ -185,6 +191,10 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 				$backupSiteSection
 					.find('.spinner')
 						.removeClass( 'is-active' );
+
+				if( undefined !== BOLDGRID.BACKUP.UpdateSelectors ) {
+					BOLDGRID.BACKUP.UpdateSelectors.enable();
+				}
 			}
 		} );
 

@@ -135,13 +135,44 @@ class Boldgrid_Backup_Admin_Notice {
 	}
 
 	/**
+	 * Get our "backup complete!" admin notice.
 	 *
+	 * @since 1.6.0
+	 *
+	 * @return mixed String (html markup) of admin notice on success, false on failure.
 	 */
-	public function get_notice_markup( $class, $message ) {
-		return sprintf(
-			'<div class="%1$s">%2$s</div>',
-			$class,
-			$this->add_container( $message )
+	public function get_backup_complete() {
+
+		// Assume that this "backup complete!" notice is for the last backup made.
+		$archive_info = get_option( 'boldgrid_backup_latest_backup' );
+		if( empty( $archive_info ) ) {
+			return false;
+		}
+
+		$message = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup.php';
+
+		$markup = $this->get_notice_markup( $message['class'], $message['message'] );
+
+		return $markup;
+	}
+
+	/**
+	 * Get the entire html markup for a notice, including the .notice container.
+	 *
+	 * @param  string $class
+	 * @param  string $message
+	 * @param  string $heading
+	 * @return string
+	 */
+	public function get_notice_markup( $class, $message, $heading = null ) {
+		return sprintf( '
+				<div class="%1$s">
+					%2$s
+					%3$s
+				</div>',
+			/* 1 */ $class,
+			/* 2 */ ! empty( $heading ) ? sprintf( '<h2 class="header-notice">%1$s</h2>', $heading ) : '',
+			/* 3 */ $this->add_container( $message )
 		);
 	}
 

@@ -58,6 +58,18 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	private $core;
 
 	/**
+	 * Whether or not we are on an update page.
+	 *
+	 * An update page is a page that allows the user to update either WP, a plugin,
+	 * or a theme. Defined in the constructor.
+	 *
+	 * @since  1.6.0
+	 * @access protected
+	 * @var    bool
+	 */
+	protected $on_update_page = false;
+
+	/**
 	 * The amount of time before an auto rollback occurs.
 	 *
 	 * For example, allow 10 minutes for testing.
@@ -67,6 +79,21 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 * @var    string
 	 */
 	public $testing_time = '+15 minutes';
+
+	/**
+	 * An array of pagenow's in which the user has the option to update either
+	 * WP, a plugin, or a theme.
+	 *
+	 * @since  1.6.0
+	 * @access protected
+	 * @var    array
+	 */
+	protected $update_pages = array(
+		'customize.php',
+		'plugins.php',
+		'themes.php',
+		'update-core.php',
+	);
 
 	/**
 	 * Whether or not we are in the middle of upgrading core.
@@ -91,6 +118,8 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		$this->core = $core;
 
 		$this->updating_core = 'update-core.php' === $this->core->pagenow && ! empty( $_GET['action'] ) && $_GET['action'] === 'do-core-upgrade';
+
+		$this->on_update_page = in_array( $this->core->pagenow, $this->update_pages, true );
 	}
 
 	/**
@@ -215,8 +244,11 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 			BOLDGRID_BACKUP_VERSION,
 			false
 		);
+
 		$translations = array(
 			'update_data' => wp_get_update_data(),
+			'in_progress_notice' => $this->core->in_progress->get_notice_markup(),
+			'nonce' => wp_create_nonce( 'boldgrid_backup_customizer' ),
 		);
 		wp_localize_script( $handle, 'boldgridBackupCustomizer', $translations );
 		wp_enqueue_script( $handle );
@@ -224,6 +256,8 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		$this->enqueue_backup_scripts();
 
 		$this->enqueue_rollback_scripts();
+
+		$this->enqueue_update_selectors();
 	}
 
 	/**
@@ -284,6 +318,41 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		 * rollback button, which is handled by the archive_actions class.
 		 */
 		$this->core->archive_actions->enqueue_scripts();
+	}
+
+	/**
+	 * Enqueue update-selectors script.
+	 *
+	 * The update-selectors script is intended to help dynamically disable /
+	 * enable any "update" buttons or links on a page.
+	 *
+	 * For example, if you are in the middle of making a backup, you probably
+	 * shouldn't be performing any updates.
+	 *
+	 * @since 1.6.0
+	 */
+	public function enqueue_update_selectors() {
+		if( $this->on_update_page ) {
+			$handle = 'boldgrid-backup-admin-update-selectors';
+
+			wp_register_script(
+				$handle,
+				plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-update-selectors.js',
+				array( 'jquery', ),
+				BOLDGRID_BACKUP_VERSION,
+				false
+			);
+
+			$localize_script_data = array(
+				// Generally used as the title attr of a disable update button.
+				'backupInProgress' => __( 'Your website is currently being backed up. You can perform updates when the backup is complete.', 'boldgrid-backup' ),
+				'waitClass' => 'bgbu-wait',
+			);
+
+			wp_localize_script( $handle, 'boldgrid_backup_admin_update_selectors', $localize_script_data );
+
+			wp_enqueue_script( $handle );
+		}
 	}
 
 	/**
