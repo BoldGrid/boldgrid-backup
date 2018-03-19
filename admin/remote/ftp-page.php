@@ -97,6 +97,10 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 		$action = ! empty( $_POST['action'] ) ? $_POST['action'] : null;
 		switch( $action ) {
 			case 'save':
+				echo $this->core->elements['long_checking_creds'];
+				ob_flush();
+				flush();
+
 				$this->settings_save();
 				$data = $post_data;
 				break;
@@ -143,6 +147,7 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 	 * @since 1.5.4
 	 */
 	public function settings_save() {
+
 		// Readability.
 		$ftp = $this->core->ftp;
 

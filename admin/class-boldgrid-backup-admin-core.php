@@ -2487,6 +2487,7 @@ class Boldgrid_Backup_Admin_Core {
 			// Mine count, total number of backups.
 			'All' => __( 'All', 'boldgrid-backup' ),
 			'backup_created' => __( 'Backup created successfully!', 'boldgrid-backup' ),
+			'Checking_credentials' => __( 'Checking credentials', 'boldgrid-backup' ),
 			'checkmark' => '&#10003;',
 			'icon_success' => '<span class="dashicons dashicons-yes green"></span> ',
 			'icon_warning' => '<span class="dashicons dashicons-warning yellow"></span> ',
@@ -2494,6 +2495,7 @@ class Boldgrid_Backup_Admin_Core {
 			// Mine count, number of backups on remote storage providers.
 			'Remote' => __( 'Remote', 'boldgrid-backup' ),
 			'spinner' => '<span class="spinner"></span>',
+			'spinner_inline' => '<span class="spinner inline"></span>',
 			'want_to' => __( 'Want to store your backups on Amazon S3, restore individual files with just a click, and have access to more tools? Get <strong>BoldGrid Backup Premium</strong>!', 'boldgrid-backup' ),
 			// Mine count, number of backups on local web server.
 			'Web_Server' => __( 'Web Server', 'boldgrid-backup' ),
@@ -2502,6 +2504,8 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->elements = array(
 			'update_protection_activated' => sprintf( '%1$s %2$s', $this->lang['icon_success'], __( 'Update protection activated!', 'boldgrid-backup' ) ),
+			// Use on long loading pages. Javascript will remove this on page load.
+			'long_checking_creds' => sprintf( '<div class="bgbu-remove-load">%1$s %2$s</div>', $this->lang['Checking_credentials'], $this->lang['spinner_inline'] ),
 		);
 	}
 

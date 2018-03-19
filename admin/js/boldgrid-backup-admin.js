@@ -178,6 +178,16 @@ BoldGrid.Backup = function( $ ) {
 
 		$( 'body' ).on( 'click', '[data-toggle-target]', self.onClickToggle );
 		$( 'body' ).on( 'make_notices_dismissible', self.makeNoticesDismissible );
+
+		/*
+		 * Remove temporary "page loading" messages.
+		 *
+		 * Some pages may take a few moments to render. For example, when checking
+		 * ftp credentials, it may take ~3 seconds. We give the user a message,
+		 * "Checking credentials", and then remove this notices afterwards by
+		 * removing anything with a bgbu_remove_load class.
+		 */
+		$( '.bgbu-remove-load' ).remove();
 	});
 
 	/**
