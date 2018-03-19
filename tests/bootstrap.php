@@ -52,6 +52,7 @@ $files = array(
 	'/admin/class-boldgrid-backup-admin-go-pro.php',
 	'/admin/class-boldgrid-backup-admin-tools.php',
 	'/admin/class-boldgrid-backup-admin-time.php',
+	'/admin/class-boldgrid-backup-admin-crypt.php',
 	'/admin/storage/local.php',
 	'/admin/remote/ftp.php',
 	'/admin/remote/sftp.php',
@@ -62,6 +63,16 @@ $files = array(
 foreach( $files as $file ) {
 	require_once BOLDGRID_BACKUP_PATH . $file;
 }
+
+// Define keys / salts for crypt.
+define('AUTH_KEY',         'C=e+6NW`:pHp|;qT;d$U^OzC.UB34F<ZT=MV@M+n#6CnQ&u8^+H2h+l,<UuNlsl<');
+define('SECURE_AUTH_KEY',  '=}z=0#1k@}N#bD l]f!.|Pj2 o<i_$S^^&[2:dujku7lc4*lkE/[H_ng@G&6+`oS');
+define('LOGGED_IN_KEY',    '+#72T .$~UKko}8^`+n:(+;s|^t 8+%q|Gczwt-1!%$)3lG3OQ YPu5c[kEiO-&C');
+define('NONCE_KEY',        'd7jiN<_mBPxgH?wlNyw_*r>p% b2h?tS-lVyJb zzYq<.3u~sJ1F.h*]AV-nfL/K');
+define('AUTH_SALT',        'L{UY:O+zr$h>~upnj0$<ZFG|g^m|WW3Pn~+:h6ykDLRi+?0?f`(,ZI.y|=ASVs-e');
+define('SECURE_AUTH_SALT', '[T^dblNJ1+e-gX~!_>Ylada}vK|/ABT|TDKuyz3bteD7>w*Z(!orrJD2LZ{v0SFV');
+define('LOGGED_IN_SALT',   'dxk6&%y`yaZRi9RnYqUVT0 h@Q2oU/n~n`HfL/$q<+X-,xq/g[fteW:e+?m@}uYc');
+define('NONCE_SALT',       'V:#&Qvi>&-?)YUgClfdS^+7wsW21MV+e-UZ]=dCSOGh|x&9mOuXEqJO32N!H#d&m');
 
 /**
  * Debug to console.
