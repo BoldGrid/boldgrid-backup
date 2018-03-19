@@ -63,11 +63,14 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 * An update page is a page that allows the user to update either WP, a plugin,
 	 * or a theme. Defined in the constructor.
 	 *
+	 * Used by the backup now button to determine if the backup being made is
+	 * for update protection.
+	 *
 	 * @since  1.6.0
 	 * @access protected
 	 * @var    bool
 	 */
-	protected $on_update_page = false;
+	public $on_update_page = false;
 
 	/**
 	 * The amount of time before an auto rollback occurs.
@@ -91,6 +94,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	protected $update_pages = array(
 		'customize.php',
 		'plugins.php',
+		'plugin-install.php',
 		'themes.php',
 		'update-core.php',
 	);
@@ -376,7 +380,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		$deadline = ! empty( $pending_rollback['deadline'] ) ? $pending_rollback['deadline'] : null;
 		$deadline_passed = ! empty( $deadline ) && $deadline <= time();
 
-		if( in_array( $this->core->pagenow, array( 'update-core.php', 'plugins.php', 'themes.php' ), true ) ) {
+		if( $this->on_update_page ) {
 			$this->enqueue_rollback_scripts();
 		}
 
@@ -672,6 +676,15 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 				'check' => 'total',
 			)
 		);
+
+		/**
+		 * Allow other plugins to filter the pages the backup notice shows on.
+		 *
+		 * @since 1.6.0
+		 *
+		 * @param array $configs
+		 */
+		$configs = apply_filters( 'boldgrid_backup_notice_show_configs', $configs );
 
 		/*
 		 * Based on our $configs, determine if we need to show a notice.
