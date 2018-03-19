@@ -73,6 +73,12 @@ $sftp_selected = 'sftp' === $data['type'] ? $selected : '';
 	</table>
 
 	<p>
+	<?php
+	echo $this->core->lang['icon_warning'] . $this->core->lang['password_in_options'];
+	?>
+	</p>
+
+	<p>
 		<input type="hidden" name="action" />
 		<input class="button button-primary"   type="submit" name="submit" value="<?php echo __( 'Save changes', 'boldgrid-backup' );    ?>" />
 		<input class="button button-secondary" type="submit" name="submit" value="<?php echo __( 'Delete settings', 'boldgrid-backup' ); ?>" />

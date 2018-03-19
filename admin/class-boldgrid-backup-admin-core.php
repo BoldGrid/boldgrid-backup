@@ -2497,6 +2497,7 @@ class Boldgrid_Backup_Admin_Core {
 			'want_to' => __( 'Want to store your backups on Amazon S3, restore individual files with just a click, and have access to more tools? Get <strong>BoldGrid Backup Premium</strong>!', 'boldgrid-backup' ),
 			// Mine count, number of backups on local web server.
 			'Web_Server' => __( 'Web Server', 'boldgrid-backup' ),
+			'password_in_options' => __( 'These login credentials (username and password) are encrypted before they\'re saved to your database, and this will protect them from anyone who may gain access to your database. If anyone gains access to your files though, they will be able to decrypt these credentials. Because of this, we recommend you create a <em>throw away</em> account and use those credentials instead of your main credentials.', 'boldgrid-backup' ),
 		);
 
 		$this->elements = array(
