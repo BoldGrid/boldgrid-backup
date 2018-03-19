@@ -217,6 +217,8 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-time.php';
 
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-crypt.php';
+
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
 
@@ -383,6 +385,9 @@ class Boldgrid_Backup {
 		$this->loader->add_filter( 'heartbeat_received', $plugin_admin_core->in_progress, 'heartbeat_received', 10, 2 );
 
 		$this->loader->add_action( 'customize_controls_enqueue_scripts', $plugin_admin_core->auto_rollback, 'enqueue_customize_controls' );
+
+		add_filter( 'pre_update_option_boldgrid_backup_settings', array( 'Boldgrid_Backup_Admin_Crypt', 'pre_update_settings' ), 10, 3 );
+		add_filter( 'option_boldgrid_backup_settings', array( 'Boldgrid_Backup_Admin_Crypt', 'option_settings' ), 10, 2 );
 
 		return;
 	}
