@@ -93,6 +93,31 @@ class Boldgrid_Backup_Admin_Utility {
 	}
 
 	/**
+	 * Custom error handler.
+	 *
+	 * Catches everything (including warnings) and throws an excpetion.
+	 *
+	 * Can be used in this manner:
+	 * set_error_handler( array( 'Boldgrid_Backup_Admin_Utility', 'handle_error' ) );
+	 * try{
+	 * 		// Try something
+	 * } catch( Exception $e ) {
+			$e->getMessage();
+	 * }
+	 * restore_error_handler();
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param  int    $errno   Error number. (can be a PHP Error level constant)
+	 * @param  string $errstr  Error description.
+	 * @param  string $errfile File in which the error occurs.
+	 * @param  int    $errline Line number where the error is situated.
+	 */
+	public static function handle_error( $errno, $errstr, $errfile=false, $errline=false ) {
+		throw new ErrorException( $errstr, 0, $errno, $errfile, $errline );
+	}
+
+	/**
 	 * Translate a ZipArchive error code into a human-readable message.
 	 *
 	 * @since 1.0

@@ -659,9 +659,11 @@ class Boldgrid_Backup_Admin_Ftp {
 	public function is_valid_credentials( $host, $user, $pass, $port, $type ) {
 		$connection = false;
 		$logged_in = false;
+		$port = intval( $port );
 
 		// Avoid a really long timeout.
 		if( 21 === $port && 'sftp' === $type ) {
+			$this->errors[] = sprintf( __( 'Unable to connect to %1$s over port %2$s.', 'boldgrid-backup'), $host, $port );
 			return false;
 		}
 
@@ -670,7 +672,7 @@ class Boldgrid_Backup_Admin_Ftp {
 				$connection = @ftp_connect( $host, $port, $this->timeout );
 				break;
 			case 'sftp':
-				$connection = @new phpseclib\Net\SFTP( $host, $port );
+				$connection = @new phpseclib\Net\SFTP( $host, $port, $this->timeout );
 				break;
 		}
 		if( ! $connection ) {
@@ -678,17 +680,39 @@ class Boldgrid_Backup_Admin_Ftp {
 			return false;
 		}
 
-		switch( $type ) {
-			case 'ftp':
-				$logged_in = @ftp_login( $connection, $user, $pass );
-				ftp_close( $connection );
-				break;
-			case 'sftp':
-				$logged_in = @$connection->login( $user, $pass );
-				break;
+		/*
+		 * Try to login.
+		 *
+		 * When:
+		 * # Connecting over bad ports (like port FTP over port 22)
+		 * # Using invalid login credentials
+		 * Notices are thrown instead of catachable errors. This makes it difficult
+		 * to know if a connection failed because of of a bad port number or because
+		 * of bad credentials.
+		 *
+		 * If we have any trouble connecting, we'll use a custom error handler
+		 * and throw an Exception.
+		 */
+		$error_caught = false;
+		set_error_handler( array( 'Boldgrid_Backup_Admin_Utility', 'handle_error' ) );
+		try{
+			switch( $type ) {
+				case 'ftp':
+					$logged_in = ftp_login( $connection, $user, $pass );
+					ftp_close( $connection );
+					break;
+				case 'sftp':
+					$logged_in = $connection->login( $user, $pass );
+					break;
+			}
+		} catch( Exception $e ) {
+			$this->errors[] = $e->getMessage();
+			$error_caught = true;
 		}
-		if( ! $logged_in ) {
-			$this->errors[] = __( 'Invalid FTP username / password.', 'boldgrid-backup' );
+		restore_error_handler();
+
+		if( ! $error_caught && ! $logged_in ) {
+			$this->errors[] = __( 'Invalid username / password.', 'boldgrid-backup' );
 		}
 
 		return false !== $logged_in;
