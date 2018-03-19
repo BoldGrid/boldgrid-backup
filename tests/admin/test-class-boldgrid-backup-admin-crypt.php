@@ -22,19 +22,6 @@ class Test_Boldgrid_Backup_Admin_Crypt extends WP_UnitTestCase {
 	 * @since 1.6.0
 	 */
 	public function setUp() {
-		// $this->core = new Boldgrid_Backup_Admin_Core();
-		$this->settings = array(
-			'remote' => array(
-				'ftp' => array(
-					'address' => '742 Evergreen Terrace',
-					'city' => 'Springfield',
-				),
-				'amazon_s3' => array(
-					'address' => '31 Spooner Street',
-					'city' => 'Quahog',
-				)
-			),
-		);
 	}
 
 	/**
