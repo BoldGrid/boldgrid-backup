@@ -131,7 +131,7 @@ class Boldgrid_Backup_Admin_Db_Omit {
 		 */
 		$backup_now_full = $this->core->is_backup_now && 'full' === $this->get_post_type();
 
-		if( $this->core->is_archiving_update_protection || $backup_now_full ) {
+		if( $this->core->is_archiving_update_protection || $backup_now_full || $this->core->pre_auto_update ) {
 			$excluded_tables = array();
 		} elseif( $this->core->is_backup_now && isset( $_POST['include_tables'] ) ) {
 			$excluded_tables = $this->get_from_post();
@@ -162,7 +162,7 @@ class Boldgrid_Backup_Admin_Db_Omit {
 		$prefixed_tables = $this->core->db_get->prefixed();
 
 		// If we're creating a backup for update protection, backup all tables.
-		if( $this->core->is_archiving_update_protection ) {
+		if( $this->core->is_archiving_update_protection || $this->core->pre_auto_update ) {
 			return $prefixed_tables;
 		}
 

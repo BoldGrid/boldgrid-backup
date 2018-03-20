@@ -70,12 +70,17 @@ class Boldgrid_Backup_Admin_Storage_Local {
 	public function post_archive_files( $info ) {
 
 		/*
+		 * Do not "delete local copy" in the following scenarios:
+		 *
 		 * We only want to add this to the jobs queue if we're in the middle of
 		 * an automatic backup. If the user simply clicked on "Backup site now",
 		 * we don't want to automatically delete the backup, there's a button
 		 * for that.
+		 *
+		 * If we're doing a backup immediately before WordPress does an auto
+		 * update, we want to make sure this backup is not deleted.
 		 */
-		if( ! $this->core->doing_cron ) {
+		if( ! $this->core->doing_cron || $this->core->pre_auto_update ) {
 			return;
 		}
 

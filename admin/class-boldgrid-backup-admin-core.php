@@ -177,6 +177,17 @@ class Boldgrid_Backup_Admin_Core {
 	public $pagenow;
 
 	/**
+	 * A bool indicating at the time of archivign files whether or not the
+	 * current_filter() was pre_auto_update (the action ran immediately before
+	 * WordPress does an auto upgrade).
+	 *
+	 * @since  1.6.0
+	 * @access public
+	 * @var    bool
+	 */
+	public $pre_auto_update = false;
+
+	/**
 	 * The admin cron class object.
 	 *
 	 * @since 1.0
@@ -1052,6 +1063,11 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return bool Status of the operation.
 	 */
 	private function backup_database() {
+
+		/*
+		 * If we're omitting all the tables, we can skip trying to backup the
+		 * database.
+		 */
 		if( $this->db_omit->is_omit_all() ) {
 			return true;
 		}
@@ -1432,9 +1448,21 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return array An array of archive file information.
 	 */
 	public function archive_files( $save = false, $dryrun = false ) {
+
+		$this->pre_auto_update = 'pre_auto_update' === current_filter();
+
+		/**
+		 * Actions to take before any archiving begins.
+		 *
+		 * @since 1.5.2
+		 */
+		do_action( 'boldgrid_backup_archive_files_init' );
+
 		if( $save && ! $dryrun ) {
 			$this->in_progress->set();
 		}
+
+		$is_scheduled_backup = $this->doing_cron && ! $this->pre_auto_update;
 
 		/*
 		 * If this is a scheduled backup and no location is selected to save the
@@ -1445,20 +1473,13 @@ class Boldgrid_Backup_Admin_Core {
 		 * wanted to change their retention settings but did not want to schedule
 		 * backups, validating storage locations would be problematic.
 		 */
-		if( $this->doing_cron && ! $this->remote->any_enabled() ) {
+		if( $is_scheduled_backup && ! $this->remote->any_enabled() ) {
 			$error = __( 'No backup locations selected! While we could create a backup archive, you have not selected where the backup archive should be saved to. Please choose a storage location in your BoldGrid Backup Settings to save this backup archive to.', 'boldgrid-backup' );
 			$this->archive_fail->schedule_fail_email( $error );
 			return array(
 				'error' => $error,
 			);
 		}
-
-		/**
-		 * Actions to take before any archiving begins.
-		 *
-		 * @since 1.5.2
-		 */
-		do_action( 'boldgrid_backup_archive_files_init' );
 
 		// Check if functional.
 		if ( ! $this->test->run_functionality_tests() ) {
@@ -1495,7 +1516,9 @@ class Boldgrid_Backup_Admin_Core {
 		);
 
 		// Determine how this backup was triggered.
-		if( $this->doing_ajax ) {
+		if( $this->pre_auto_update ) {
+			$info['trigger'] = __( 'Auto update', 'boldgrid-bakcup' );
+		} elseif( $this->doing_ajax ) {
 			$current_user = wp_get_current_user();
 			$info['trigger'] = $current_user->user_login . ' (' . $current_user->user_email . ')';
 		} elseif( $this->doing_wp_cron ) {
@@ -2565,6 +2588,9 @@ class Boldgrid_Backup_Admin_Core {
 
 	/**
 	 * Creating a backup archive file now, before an auto-update occurs.
+	 *
+	 * This method is hooked into the pre_auto_update action, which fires
+	 * immediately prior to an auto-update.
 	 *
 	 * @since 1.0
 	 *

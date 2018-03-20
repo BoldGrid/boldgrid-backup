@@ -320,11 +320,14 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 		$default = 'default_' . $type;
 
 		/*
-		 * If we are in the middle of creating a backup file for update
-		 * protection OR we are creating a 'full' backup, force default values
-		 * (which backup both core files and all wp-content files).
+		 * Determine if we need to do a full backup.
+		 *
+		 * Scenarios include:
+		 * # We are in the middle of creating a backup file for update protection.
+		 * # We are creating a 'full' backup.
+		 * # We are creating a backup immediately before a WordPress auto update.
 		 */
-		if( $this->core->is_archiving_update_protection || $this->core->is_backup_full ) {
+		if( $this->core->is_archiving_update_protection || $this->core->is_backup_full || $this->core->pre_auto_update ) {
 			return $this->$default;
 		}
 
