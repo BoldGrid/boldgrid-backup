@@ -253,6 +253,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 			'update_data' => wp_get_update_data(),
 			'in_progress_notice' => $this->core->in_progress->get_notice_markup(),
 			'nonce' => wp_create_nonce( 'boldgrid_backup_customizer' ),
+			'is_rollback_enabled' => $this->is_enabled(),
 		);
 		wp_localize_script( $handle, 'boldgridBackupCustomizer', $translations );
 		wp_enqueue_script( $handle );
@@ -569,6 +570,19 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	}
 
 	/**
+	 * Return a bool indicating whether or not auto_rollback is enabled.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @return bool
+	 */
+	public function is_enabled() {
+		$settings = $this->core->settings->get_settings();
+
+		return isset( $settings['auto_rollback'] ) && 1 === $settings['auto_rollback'];
+	}
+
+	/**
 	 * Create markup to show what was updated.
 	 *
 	 * @since 1.5.3
@@ -660,6 +674,15 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 * @global string $pagenow
 	 */
 	public function notice_backup_show() {
+
+		/*
+		 * This method is hooked into admin_notices. If we don't have auto_rollback
+		 * enabled, then we can abort right now.
+		 */
+		if( ! $this->is_enabled() ) {
+			return;
+		}
+
 		$display = false;
 
 		$configs = array(

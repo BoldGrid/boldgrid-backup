@@ -94,7 +94,11 @@ BOLDGRID.BACKUP.CUSTOMIZER = function( $ ) {
 	};
 
 	$( function() {
-		var deadline = BOLDGRID.BACKUP.RollbackTimer.getUpdatedDeadline();
+		var deadline;
+
+		if( boldgridBackupCustomizer.is_rollback_enabled ) {
+			deadline = BOLDGRID.BACKUP.RollbackTimer.getUpdatedDeadline();
+		}
 
 		self.showProgressNotice();
 
