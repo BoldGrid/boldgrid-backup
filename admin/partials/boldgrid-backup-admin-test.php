@@ -30,6 +30,7 @@ if( $this->test->is_windows() ) {
 
 $error_span = '<span class="error">%1$s</span><br />%2$s';
 $warning_span = '<span class="warning">%1$s</span><br />%2$s';
+$success_span = '<span class="success">%1$s</span>';
 
 $allowed_tags = array(
 	'span' => array(
@@ -54,6 +55,11 @@ $timezone = false === $timezone ? 'UTC' . $this->time->get_server_offset() : $ti
 
 // Run our tests.
 $tests = array(
+	array(
+		'id' => 'pass',
+		'k' =>  __( 'Functionality test status:', 'boldgrid-backup' ),
+		'v' =>  ( $this->test->run_functionality_tests() ? sprintf( $success_span, $lang['PASS'] ) : sprintf( $error_span, $lang['FAIL'], '' ) ),
+	),
 	array(
 		'heading' => __( 'General tests', 'boldgrid-backup' ),
 	),
@@ -303,25 +309,19 @@ if ( $is_functional ) {
 		'v' => $db_charset,
 	);
 
-	$tests[] = array(
-		'k' => __( 'WordPress database collate:', 'boldgrid-backup' ),
-		'v' => $db_collate,
-	);
+	if( ! empty( $db_collate ) ) {
+		$tests[] = array(
+			'k' => __( 'WordPress database collate:', 'boldgrid-backup' ),
+			'v' => $db_collate,
+		);
+	}
 }
-
-// Create the final pass / fail entry.
-$tests[] = array(
-	'id' => 'pass',
-	'k' =>  __( 'Functionality test status:', 'boldgrid-backup' ),
-	'v' =>  ( $this->test->run_functionality_tests() ? $lang['PASS'] : sprintf( $error_span, $lang['FAIL'], '' ) ),
-);
 
 // If server is not compatible, create fail message.
 if ( $is_functional ) {
 	$fail_tips = '';
 } else {
 	$fail_tips = sprintf('
-		<hr />
 		<p>
 			%1$s<br />
 			<a href="%3$s" target="_blank" />%2$s</a>
@@ -364,9 +364,9 @@ $table .= '</table>';
 	$nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
 	echo $nav;
 
-	echo $table;
-
 	echo $fail_tips;
+
+	echo $table;
 	?>
 
 </div>

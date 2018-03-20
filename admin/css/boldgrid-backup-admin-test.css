@@ -10,14 +10,16 @@
 	padding: 5px 10px;
 }
 
-.functionality-test-section table tr:last-of-type {
-	border: 0px;
-	background: none;
-	font-weight: bold;	
+.functionality-test-section table tr td h2 {
+	margin-bottom: 5px;
+	margin-top: 30px;
 }
 
-.functionality-test-section table tr:last-of-type td {
-	padding: 15px 0px 10px 11px;
+/* The first tr will be the status (pass/fail) */
+.functionality-test-section table tr:first-of-type {
+	background: none;
+	border: none;
+	font-weight: bold;	
 }
 
 /* Highlight errors and warnings. */
@@ -27,6 +29,10 @@
 }
 .wp-list-table .warning {
 	color: #ffba00;
+	font-weight: bold;
+}
+.wp-list-table .success {
+	color: green;
 	font-weight: bold;
 }
 
