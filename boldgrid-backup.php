@@ -57,9 +57,6 @@ function deactivate_boldgrid_backup() {
 	Boldgrid_Backup_Deactivator::deactivate();
 }
 
-register_activation_hook( __FILE__, 'activate_boldgrid_backup' );
-register_deactivation_hook( __FILE__, 'deactivate_boldgrid_backup' );
-
 /**
  * Begins execution of the plugin.
  *
@@ -74,21 +71,62 @@ function run_boldgrid_backup() {
 	$plugin->run();
 }
 
-// Include the autoloader to set plugin options and create instance.
-$loader = require plugin_dir_path( __FILE__ ) . 'vendor/autoload.php';
+/**
+ * Load BoldGrid Backup.
+ *
+ * Before loading, ensure system meets minimium requirements:
+ * # vendor folder exists. This is not a system requirement, but we want to make
+ *   sure the user is NOT running a dev version with a missing vendor folder.
+ *
+ * @since 1.6.0
+ *
+ * @return bool
+ */
+function load_boldgrid_backup() {
 
-// Load Library.
-$load = new Boldgrid\Library\Util\Load(
-	array(
-		'type' => 'plugin',
-		'file' => plugin_basename( __FILE__ ),
-		'loader' => $loader,
-		'keyValidate' => true,
-		'licenseActivate', false,
-	)
-);
+	// Ensure we have our vendor/autoload.php file.
+	if( ! file_exists( BOLDGRID_BACKUP_PATH . '/vendor/autoload.php' ) ) {
+		add_action( 'admin_init', function() {
+			deactivate_plugins( 'boldgrid-backup/boldgrid-backup.php', true );
 
-// Load the plugin only if on a wp-admin page or when DOING_CRON.
+			add_action( 'admin_notices', function() {
+				?>
+				<div class="notice notice-error is-dismissible">
+					<p><?php _e( '<strong>BoldGrid Backup</strong> has been deactivated because the vendor folder is missing. Please run <strong>composer install</strong>, or contact your host for further assistance.', 'boldgrid-backup' ); ?></p>
+				</div>
+				<?php
+			});
+		});
+
+		return false;
+	}
+
+	register_activation_hook( __FILE__, 'activate_boldgrid_backup' );
+	register_deactivation_hook( __FILE__, 'deactivate_boldgrid_backup' );
+
+	// Include the autoloader to set plugin options and create instance.
+	$loader = require plugin_dir_path( __FILE__ ) . 'vendor/autoload.php';
+
+	// Load Library.
+	$load = new Boldgrid\Library\Util\Load(
+		array(
+			'type' => 'plugin',
+			'file' => plugin_basename( __FILE__ ),
+			'loader' => $loader,
+			'keyValidate' => true,
+			'licenseActivate', false,
+		)
+	);
+
+	return true;
+}
+
+// If we could not load boldgrid_backup (missing system requirements), abort.
+if( ! load_boldgrid_backup() ) {
+	return;
+}
+
+// Run the plugin only if on a wp-admin page or when DOING_CRON.
 if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) || defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup.php';
 	run_boldgrid_backup();
