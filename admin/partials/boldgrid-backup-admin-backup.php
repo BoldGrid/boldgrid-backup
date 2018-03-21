@@ -32,16 +32,12 @@ $is_success = ! empty( $archive_info ) && empty( $archive_info['error'] );
  * @since 1.6.0
  */
 if( $is_restore && $is_success ) {
-	if( wp_doing_ajax() ) {
-		return array(
-			'message' => esc_html__( 'The selected archive file has been successfully restored.', 'boldgrid-backup' ),
-			'class' => 'notice notice-success is-dismissible',
-			'header' => __( 'BoldGrid Backup - Restoration complete' ),
-		);
-	} else {
-		wp_redirect( admin_url( 'admin.php?page=boldgrid-backup' ) );
-		exit;
-	}
+	echo '<script type="text/javascript">location.reload();</script>';
+	return array(
+		'message' => esc_html__( 'The selected archive file has been successfully restored.', 'boldgrid-backup' ),
+		'class' => 'notice notice-success is-dismissible',
+		'header' => __( 'BoldGrid Backup - Restoration complete' ),
+	);
 }
 
 $core = isset( $this->core ) ? $this->core : $this;
