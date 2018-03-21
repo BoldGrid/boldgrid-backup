@@ -13,23 +13,35 @@
 
 defined( 'WPINC' ) ? : die;
 
+$is_restore = ! empty( $_POST['restore_now'] ) && '1' === $_POST['restore_now'];
+$is_success = ! empty( $archive_info ) && empty( $archive_info['error'] );
+
 /*
- * If we've just restored, return a simple message.
- *
- * This is done to avoid backwards compatibility issues .
+ * Avoid backwards compatibility issues when restoring.
  *
  * For example, let's say you're running "BoldGrid Backup 1.5" and you're
  * trying to restore a "BoldGrid Backup 1.6" archive. The restoration request
  * is being handled by 1.5, who's $core is a bit different than the 1.6 $core.
  * Elements in this file are calling upon $core, but we don't know if $core
  * exists or what characteristics it has.
+ *
+ * This problem occurs because both 1.5 and 1.6 will include this file after
+ * a restoration completes. The version of this file will be loaded from the
+ * archive that was just restored.
+ *
+ * @since 1.6.0
  */
-if( ! empty( $_POST['restore_now'] ) && '1' === $_POST['restore_now'] ) {
-	return array(
-		'message' => esc_html__( 'The selected archive file has been successfully restored.', 'boldgrid-backup' ),
-		'class' => 'notice notice-success is-dismissible',
-		'header' => __( 'BoldGrid Backup - Restoration complete' ),
-	);
+if( $is_restore && $is_success ) {
+	if( wp_doing_ajax() ) {
+		return array(
+			'message' => esc_html__( 'The selected archive file has been successfully restored.', 'boldgrid-backup' ),
+			'class' => 'notice notice-success is-dismissible',
+			'header' => __( 'BoldGrid Backup - Restoration complete' ),
+		);
+	} else {
+		wp_redirect( admin_url( 'admin.php?page=boldgrid-backup' ) );
+		exit;
+	}
 }
 
 $core = isset( $this->core ) ? $this->core : $this;
@@ -82,9 +94,9 @@ if ( ! empty( $archive_info ) ) {
 	 * @todo Read the above. For the time, we did a quick clean up. However, we
 	 *       may want to further organize this entire file.
 	 */
-	if ( empty( $archive_info['error'] ) ) {
+	if ( $is_success ) {
 
-		if( empty( $_POST['restore_now'] ) ) {
+		if( ! $is_restore ) {
 			$message = array(
 				'class' => 'notice notice-success is-dismissible boldgrid-backup-complete',
 				'message' => sprintf( '
