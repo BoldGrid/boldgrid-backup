@@ -130,7 +130,13 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 			$wpbody.bgbuDisableActions();
 
 			$.post( ajaxurl, data, function( response ) {
-				location.reload();
+				var redirectUrl = response.data !== undefined && response.data.redirect_url !== undefined ? response.data.redirect_url : false;
+
+				if( redirectUrl ) {
+					window.location.href = redirectUrl;
+				} else {
+					location.reload();
+				}
 			}).error( function() {
 				location.reload();
 			});

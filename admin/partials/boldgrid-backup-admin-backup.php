@@ -40,13 +40,17 @@ if( $is_restore && $is_success ) {
 	 * very well be restoring from this page. However, if we restored a backup
 	 * from an earlier version, that "Archive Details" page may not exists, and
 	 * the user will get an error.
+	 *
+	 * Prior to Backup 1.6, restorations were made by forms submitted via post.
+	 * In Backup 1.6, restorations are made via ajax.
+	 *
+	 * If we're not doing ajax, then the request came from Backup 1.5, and the
+	 * site is being restored within the new pageload. When the page finally loads,
+	 * you'll have a newer version of Backup, but you'll have to refresh the page
+	 * to see it. We'll take care of the refresh for the user.
 	 */
-	$redirect_url = admin_url( 'admin.php?page=boldgrid-backup' );
-	if( headers_sent() ) {
+	if( ! wp_doing_ajax() ) {
 		printf( '<script type="text/javascript">window.location.href = "%1$s";</script>', $redirect_url );
-	} else {
-		wp_redirect( $redirect_url );
-		exit;
 	}
 
 	return array(

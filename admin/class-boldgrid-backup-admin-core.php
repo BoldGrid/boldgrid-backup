@@ -2556,6 +2556,7 @@ class Boldgrid_Backup_Admin_Core {
 	 */
 	public function wp_ajax_restore() {
 		$error = __( 'Unable to restore backup: ', 'boldgrid-backup' );
+		$redirect_url = admin_url( 'admin.php?page=boldgrid-backup' );
 
 		// Validate user role.
 		if ( ! current_user_can( 'update_plugins' ) ) {
@@ -2583,7 +2584,9 @@ class Boldgrid_Backup_Admin_Core {
 			$this->notice->add_user_notice( $message['message'], $message['class'], $message['header'] );
 		}
 
-		wp_send_json_success();
+		wp_send_json_success( array(
+			'redirect_url' => $redirect_url,
+		));
 	}
 
 	/**
