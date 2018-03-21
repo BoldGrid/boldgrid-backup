@@ -24,7 +24,7 @@ defined( 'WPINC' ) ? : die;
  * Elements in this file are calling upon $core, but we don't know if $core
  * exists or what characteristics it has.
  */
-if( isset( $is_ajax_restore ) && true === $is_ajax_restore ) {
+if( ! empty( $_POST['restore_now'] ) && '1' === $_POST['restore_now'] ) {
 	return array(
 		'message' => esc_html__( 'The selected archive file has been successfully restored.', 'boldgrid-backup' ),
 		'class' => 'notice notice-success is-dismissible',
