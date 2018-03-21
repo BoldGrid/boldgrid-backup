@@ -2556,6 +2556,7 @@ class Boldgrid_Backup_Admin_Core {
 	 */
 	public function wp_ajax_restore() {
 		$error = __( 'Unable to restore backup: ', 'boldgrid-backup' );
+		$is_ajax_restore = true;
 
 		// Validate user role.
 		if ( ! current_user_can( 'update_plugins' ) ) {

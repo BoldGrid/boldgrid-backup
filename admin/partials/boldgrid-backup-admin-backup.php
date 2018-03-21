@@ -13,6 +13,25 @@
 
 defined( 'WPINC' ) ? : die;
 
+/*
+ * If we've just restored, return a simple message.
+ *
+ * This is done to avoid backwards compatibility issues .
+ *
+ * For example, let's say you're running "BoldGrid Backup 1.5" and you're
+ * trying to restore a "BoldGrid Backup 1.6" archive. The restoration request
+ * is being handled by 1.5, who's $core is a bit different than the 1.6 $core.
+ * Elements in this file are calling upon $core, but we don't know if $core
+ * exists or what characteristics it has.
+ */
+if( isset( $is_ajax_restore ) && true === $is_ajax_restore ) {
+	return array(
+		'message' => esc_html__( 'The selected archive file has been successfully restored.', 'boldgrid-backup' ),
+		'class' => 'notice notice-success is-dismissible',
+		'header' => __( 'BoldGrid Backup - Restoration complete' ),
+	);
+}
+
 $core = isset( $this->core ) ? $this->core : $this;
 
 $core->archive->init( $archive_info['filepath'] );
