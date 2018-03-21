@@ -32,7 +32,23 @@ $is_success = ! empty( $archive_info ) && empty( $archive_info['error'] );
  * @since 1.6.0
  */
 if( $is_restore && $is_success ) {
-	echo '<script type="text/javascript">location.reload();</script>';
+
+	/*
+	 * After restoration, redirect user to the backups page.
+	 *
+	 * In Backup 1.6, we introduced the "Archive Details" page. The user may
+	 * very well be restoring from this page. However, if we restored a backup
+	 * from an earlier version, that "Archive Details" page may not exists, and
+	 * the user will get an error.
+	 */
+	$redirect_url = admin_url( 'admin.php?page=boldgrid-backup' );
+	if( headers_sent() ) {
+		printf( '<script type="text/javascript">window.location.href = "%1$s";</script>', $redirect_url );
+	} else {
+		wp_redirect( $redirect_url );
+		exit;
+	}
+
 	return array(
 		'message' => esc_html__( 'The selected archive file has been successfully restored.', 'boldgrid-backup' ),
 		'class' => 'notice notice-success is-dismissible',
