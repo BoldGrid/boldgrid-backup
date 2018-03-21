@@ -15,6 +15,7 @@ defined( 'WPINC' ) ? : die;
 
 $is_restore = ! empty( $_POST['restore_now'] ) && '1' === $_POST['restore_now'];
 $is_success = ! empty( $archive_info ) && empty( $archive_info['error'] );
+$redirect_url = admin_url( 'admin.php?page=boldgrid-backup' );
 
 /*
  * Avoid backwards compatibility issues when restoring.
