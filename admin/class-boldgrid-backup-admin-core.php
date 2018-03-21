@@ -2578,8 +2578,17 @@ class Boldgrid_Backup_Admin_Core {
 
 		$archive_info = $this->restore_archive_file();
 
-		// Generate markup, using the restore page template.
-		$message = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup.php';
+		// Get message for user based on whether restoration was a success.
+		$is_success = ! empty( $archive_info ) && empty( $archive_info['error'] );
+		if( $is_success ) {
+			$message = array(
+				'message' => esc_html__( 'The selected archive file has been successfully restored.', 'boldgrid-backup' ),
+				'class' => 'notice notice-success is-dismissible',
+				'header' => __( 'BoldGrid Backup - Restoration complete' ),
+			);
+		} else {
+			$message = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup.php';
+		}
 		if( is_array( $message ) ) {
 			$this->notice->add_user_notice( $message['message'], $message['class'], $message['header'] );
 		}
