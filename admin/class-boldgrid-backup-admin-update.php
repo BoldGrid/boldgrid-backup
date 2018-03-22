@@ -34,6 +34,9 @@ class Boldgrid_Backup_Update {
 	 * @see self::wp_update_this_plugin()
 	 */
 	public function add_hooks() {
+
+
+
 		$is_cron = ( defined( 'DOING_CRON' ) && DOING_CRON );
 		$is_wpcli = ( defined( 'WP_CLI' ) && WP_CLI );
 
@@ -88,6 +91,10 @@ class Boldgrid_Backup_Update {
 
 	/**
 	 * Update the plugin transient.
+	 *
+	 * This method is hooked into the following:
+	 * # plugins_api
+	 * # pre_set_site_transient_update_plugins
 	 *
 	 * @see self::validate_configs()
 	 *
@@ -305,6 +312,8 @@ class Boldgrid_Backup_Update {
 
 	/**
 	 * Filter to check if this plugin should be auto-updated.
+	 *
+	 * This method is for forced updates, not auto updates.
 	 *
 	 * @param bool $update Whether or not this plugin is set to update.
 	 * @param object $item The plugin transient object.
