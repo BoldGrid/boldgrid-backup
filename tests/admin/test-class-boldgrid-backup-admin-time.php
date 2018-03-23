@@ -36,46 +36,36 @@ class Test_Boldgrid_Backup_Admin_Time extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test offset_to_timezone.
-	 *
-	 * @since 1.6.0
-	 */
-	public function test_offset_to_timezone() {
-		$timezone = $this->core->time->offset_to_timezone( '+5' );
-		$this->assertTrue( $timezone instanceof DateTimeZone );
-
-		$timezone = $this->core->time->offset_to_timezone( '-5' );
-		$this->assertTrue( $timezone instanceof DateTimeZone );
-
-		$timezone = $this->core->time->offset_to_timezone( '+0' );
-		$this->assertTrue( $timezone instanceof DateTimeZone );
-
-		$timezone = $this->core->time->offset_to_timezone( '' );
-		$this->assertSame( false, $timezone );
-
-		$timezone = $this->core->time->offset_to_timezone( 'catfish' );
-		$this->assertSame( false, $timezone );
-
-		$timezone = $this->core->time->offset_to_timezone( '+25' );
-		$this->assertSame( false, $timezone );
-
-		$timezone = $this->core->time->offset_to_timezone( array() );
-		$this->assertSame( false, $timezone );
-
-		$timezone = $this->core->time->offset_to_timezone( true );
-		$this->assertSame( false, $timezone );
-	}
-
-	/**
 	 * Test get_settings_date.
 	 *
 	 * @since 1.6.0
 	 */
 	public function test_get_settings_date() {
-		$tz_info = $this->core->time->get_timezone_info();
 
-		$settings_date = $this->core->time->get_settings_date();
-		$this->assertTrue( $settings_date instanceof DateTime );
+		$settings = array(
+			'schedule' => array(
+				'tod_h' => 6,
+				'tod_m' => 20,
+				'tod_a' => 'pm',
+			),
+		);
+
+		// UTC-4
+		$settings_date = $this->core->time->get_settings_date( $settings, array( 'abbr' => 'UTC-4', ) );
+		$this->assertEquals( -14400, $settings_date->getOffset() );
+
+		// UTC+4
+		$settings_date = $this->core->time->get_settings_date( $settings, array( 'abbr' => 'UTC+4', ) );
+		$this->assertEquals( 14400, $settings_date->getOffset() );
+
+		// UTC+0
+		$settings_date = $this->core->time->get_settings_date( $settings, array( 'abbr' => 'UTC+0', ) );
+		$this->assertEquals( 0, $settings_date->getOffset() );
+
+		// EDT (-4)
+		$settings_date = $this->core->time->get_settings_date( $settings, array( 'abbr' => 'EDT', ) );
+		$offset = $settings_date->getOffset();
+		$this->assertTrue( $offset === -14400 || $offset === -18000 );
 
 		// Pass bad data.
 		$settings_date = $this->core->time->get_settings_date( array(
@@ -97,6 +87,10 @@ class Test_Boldgrid_Backup_Admin_Time extends WP_UnitTestCase {
 			)
 		));
 		$this->assertFalse( $settings_date );
+
+		// Pass bad data.
+		$settings_date = $this->core->time->get_settings_date( 'car', 'boat' );
+		$this->assertTrue( $settings_date instanceof DateTime );
 	}
 
 	/**

@@ -120,25 +120,40 @@ class Boldgrid_Backup_Admin_Time {
 	 * @since 1.6.0
 	 *
 	 * @param  array    $settings
+	 * @param  array    $tz_info
 	 * @return DateTime
 	 */
-	public function get_settings_date( $settings = array() ) {
-		$settings = empty( $settings ) ? $this->core->settings->get_settings() : $settings;
+	public function get_settings_date( $settings = array(), $tz_info = array() ) {
+		$settings = ! is_array( $settings ) || empty( $settings ) ? $this->core->settings->get_settings() : $settings;
 
-		$tz_info = $this->get_timezone_info();
+		$tz_info = ! is_array( $tz_info ) || empty( $tz_info ) ? $this->get_timezone_info() : $tz_info;
 		$is_utc = 'UTC' === substr( $tz_info['abbr'], 0, 3  );
 
-		if( $is_utc ) {
-			$offset = substr( $tz_info['abbr'], 3  );
-			$wordpress_timezone = $this->offset_to_timezone( $offset );
-		} else {
-			$wordpress_timezone = new DateTimeZone( $tz_info['abbr'] );
-		}
+		$offset = $is_utc ? substr( $tz_info['abbr'], 3  ) : null;
+		$wordpress_timezone = ! $is_utc ? new DateTimeZone( $tz_info['abbr'] ) : null;
 
 		$time_string = $settings['schedule']['tod_h'] . ':' . $settings['schedule']['tod_m'] . ' ' . $settings['schedule']['tod_a'];
 
-		try {
-			$date = new DateTime( $time_string, $wordpress_timezone );
+		/*
+		 * DateTime Timezone types.
+		 *
+		 * I didn't comprehend this from:
+		 * http://php.net/manual/en/datetime.construct.php
+		 * ... However according to
+		 * https://stackoverflow.com/questions/17694894/different-timezone-types-on-datetime-object
+		 * ... DateTime objects with timezones can be constructed in the following ways:
+		 * # Type 1: A UTC offset            new DateTime( "17 July 2013 -0300" );
+		 * # Type 2: A timezone abbreviation new DateTime( "17 July 2013 GMT" );
+		 * # Type 3: A timezone identifier   new DateTime( "17 July 2013", new DateTimeZone( "Europe/London" ) );
+		 */
+		try{
+			if( $is_utc && '+0' === $offset ) {
+				$date = new DateTime( $time_string, new DateTimeZone( 'UTC' ) );
+			} elseif( $is_utc ) {
+				$date = new DateTime( $time_string . ' ' . $offset );
+			} else {
+				$date = new DateTime( $time_string, $wordpress_timezone );
+			}
 			return $date;
 		} catch( Exception $e ) {
 			return false;
@@ -248,43 +263,6 @@ class Boldgrid_Backup_Admin_Time {
 		);
 
 		return $timezone_info;
-	}
-
-	/**
-	 * Convert an offset UTC (-04) to a DateTimeZone object.
-	 *
-	 * @since 1.6.0
-	 *
-	 * @param  int          $offset
-	 * @return DateTimeZone
-	 */
-	public function offset_to_timezone( $offset ) {
-
-		if( '+0' === $offset ) {
-			return new DateTimeZone( 'UTC' );
-		}
-
-		if( ! is_numeric( $offset ) ) {
-			return false;
-		}
-
-		$zones = timezone_abbreviations_list();
-		$offset_seconds = 60 * 60 * $offset;
-
-		foreach( $zones as $zone_abbr => $locations ) {
-			foreach( $locations as $location ) {
-				if( $offset_seconds === $location['offset'] ) {
-					try {
-						return new DateTimeZone( $zone_abbr );
-					} catch( Exception $e ) {
-						return false;
-					}
-				}
-				break;
-			}
-		}
-
-		return false;
 	}
 
 	/**
