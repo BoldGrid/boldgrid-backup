@@ -527,6 +527,10 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 				</p>
 
 				<p>
+					' . sprintf( __( '<strong>Update Protection</strong> for <em>future updates</em> can be configured on your <a href="%1$s">Settings</a> page.', 'boldgrid-backup' ), admin_url( 'admin.php?page=boldgrid-backup-settings&section=section_updates' ) ) . '
+				</p>
+
+				<p>
 					<strong>' . __( 'Countdown', 'boldgrid-backup' ) . '</strong>:
 					<span id="rollback-countdown-timer">
 						<span class="spinner inline"></span>
