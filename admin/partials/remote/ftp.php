@@ -74,7 +74,7 @@ $sftp_selected = 'sftp' === $data['type'] ? $selected : '';
 
 	<p>
 	<?php
-	echo $this->core->lang['icon_warning'] . $this->core->lang['password_in_options'];
+	echo $this->core->lang['icon_warning'] . __( 'With automated FTP your credentials must be stored here in your WordPress. They will be encrypted in the database and this protects them significantly, but they could be decrypted in the unlikely event of a compromise. We recommended you use a separate FTP user and password specifically for backups.', 'boldgrid-backup' );
 	?>
 	</p>
 
