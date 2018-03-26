@@ -32,7 +32,7 @@ class Boldgrid_Backup_Admin_Restore_Git {
 	public function chmod_objects( $dir ) {
 		global $wp_filesystem;
 
-		$message = sprintf( __( 'A file permissions error was encountered when attempting to restore files in %1$s.', 'boldgrid-backup' ), ABSPATH . $dir ) ;
+		$message = sprintf( __( 'A file permissions error was encountered when attempting to restore files in "%1$s".', 'boldgrid-backup' ), ABSPATH . $dir ) ;
 
 		$chmodded = $wp_filesystem->chmod( ABSPATH . $dir, FS_CHMOD_FILE, true );
 
