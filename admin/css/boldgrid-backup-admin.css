@@ -11,6 +11,9 @@
 .help[data-id] {
 	display: none;
 }
+th .help[data-id] {
+	font-weight: normal;
+}
 
 /* Create an inline spinner. */
 .spinner.inline {

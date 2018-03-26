@@ -23,7 +23,12 @@ ob_start();
 		 			<span class="dashicons dashicons-editor-help" data-id="plugin-autoupdate"></span>
 
 		 			<p class="help" data-id="plugin-autoupdate">
-						<?php esc_html_e( 'Automatically perform all plugin updates when available.', 'boldgrid-backup' ); ?>
+						<?php
+						printf(
+							__( 'Automatically perform all plugin updates when available. Enabling this feature adds the <a target="_blank" href="%1$s">auto_update_plugin filter</a>, which enables automatic plugin updates when an update is available.', 'boldgrid-backup' ),
+							'https://codex.wordpress.org/Configuring_Automatic_Background_Updates#Plugin_.26_Theme_Updates_via_Filter'
+						);
+						?>
 					</p>
 		 		</th>
 		 		<td>
@@ -50,7 +55,12 @@ ob_start();
 		 			<span class="dashicons dashicons-editor-help" data-id="theme-autoupdate"></span>
 
 		 			<p class="help" data-id="theme-autoupdate">
-						<?php esc_html_e( 'Automatically perform all theme updates when available.', 'boldgrid-backup' ); ?>
+						<?php
+						printf(
+							__( 'Automatically perform all theme updates when available. Enabling this feature adds the <a target="_blank" href="%1$s">auto_update_theme filter</a>, which enables automatic theme updates when an update is available.', 'boldgrid-backup' ),
+							'https://codex.wordpress.org/Configuring_Automatic_Background_Updates#Plugin_.26_Theme_Updates_via_Filter'
+						);
+						?>
 					<p>
 		 		</th>
 		 		<td>
@@ -77,7 +87,12 @@ ob_start();
 		 			<span class='dashicons dashicons-editor-help' data-id='auto-backup'></span>
 
 		 			<p class='help' data-id='auto-backup'>
-						<?php esc_html_e( 'Automatically perform a backup before WordPress updates.', 'boldgrid-backup' ); ?>
+						<?php
+						printf(
+							__( 'Automatically perform a backup before WordPress updates. When this feature is enabled, a full backup will be made during the <a target="_blank" href="%1$s">pre_auto_update action</a>. ', 'boldgrid-backup' ),
+							'https://developer.wordpress.org/reference/hooks/pre_auto_update/'
+						);
+						?>
 					<p>
 		 		</th>
 		 		<td>
@@ -105,7 +120,7 @@ ob_start();
 		 			<p class='help' data-id='auto-rollback'>
 						<?php
 						esc_html_e(
-							'If something goes wrong while peforming WordPress updates, automatically restore the site using a backup made before updating WordPress.',
+							'If something goes wrong while performing WordPress updates, automatically restore the site using a backup made before updating WordPress. This feature does not apply to auto updates.',
 							'boldgrid-backup'
 						);
 						?>
