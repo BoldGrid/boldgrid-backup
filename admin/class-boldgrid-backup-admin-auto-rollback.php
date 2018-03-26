@@ -891,9 +891,25 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	/**
 	 * Show a message that the user has backup protection.
 	 *
+	 * If we have a pending $pending_rollback['lastmodunix'], tell the user,
+	 * "You're protected" rather than, "Create a backup and protect yourself".
+	 *
+	 * This method is called via:
+	 * action:admin_notices > self::notice_backup_show().
+	 *
 	 * @since 1.5.3
 	 */
 	public function notice_activated_show() {
+
+		/*
+		 * If we're in the middle of upgrading something, such as:
+		 * update-core.php?action=do-theme-upgrade
+		 * Then there's no need to show a message.
+		 */
+		if( ! empty( $_GET['action'] ) ) {
+			return;
+		}
+
 		$message = $this->notice_activated_get();
 
 		do_action( 'boldgrid_backup_notice', $message['html'], $message['class'] );
