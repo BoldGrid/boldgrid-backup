@@ -52,20 +52,24 @@ class Test_Boldgrid_Backup_Admin_Time extends WP_UnitTestCase {
 
 		// UTC-4
 		$settings_date = $this->core->time->get_settings_date( $settings, array( 'abbr' => 'UTC-4', ) );
-		$this->assertEquals( -14400, $settings_date->getOffset() );
+		$this->assertEquals( '1420', $settings_date->format( 'Hi') );
+
+		// UTC-4:30
+		$settings_date = $this->core->time->get_settings_date( $settings, array( 'abbr' => 'UTC-4', 'gmt_offset' => -4.5, ) );
+		$this->assertEquals( '1350', $settings_date->format( 'Hi') );
 
 		// UTC+4
 		$settings_date = $this->core->time->get_settings_date( $settings, array( 'abbr' => 'UTC+4', ) );
-		$this->assertEquals( 14400, $settings_date->getOffset() );
+		$this->assertEquals( '2220', $settings_date->format( 'Hi') );
 
 		// UTC+0
 		$settings_date = $this->core->time->get_settings_date( $settings, array( 'abbr' => 'UTC+0', ) );
-		$this->assertEquals( 0, $settings_date->getOffset() );
+		$this->assertEquals( '1820', $settings_date->format( 'Hi') );
 
-		// EDT (-4)
-		$settings_date = $this->core->time->get_settings_date( $settings, array( 'abbr' => 'EDT', ) );
-		$offset = $settings_date->getOffset();
-		$this->assertTrue( $offset === -14400 || $offset === -18000 );
+		// Get New York time (18:20) and convert to UTC (22:20).
+		$settings_date = $this->core->time->get_settings_date( $settings, array( 'name' => 'America/New_York', ) );
+		$settings_date->setTimezone( new DateTimeZone( 'UTC' ) );
+		$this->assertEquals( '2220', $settings_date->format( 'Hi') );
 
 		// Pass bad data.
 		$settings_date = $this->core->time->get_settings_date( array(
