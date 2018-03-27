@@ -99,7 +99,7 @@ class Test_Boldgrid_Backup_Admin_Time extends WP_UnitTestCase {
 
 		// Pass bad data.
 		$settings_date = $this->core->time->get_settings_date( 'car', 'boat' );
-		$this->assertTrue( $settings_date instanceof DateTime );
+		$this->assertFalse( $settings_date );
 	}
 
 	/**

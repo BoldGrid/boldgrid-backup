@@ -124,9 +124,15 @@ class Boldgrid_Backup_Admin_Time {
 	 * @return DateTime
 	 */
 	public function get_settings_date( $settings = array(), $tz_info = array() ) {
-		$settings = ! is_array( $settings ) || empty( $settings ) ? $this->core->settings->get_settings() : $settings;
 
-		$tz_info = ! is_array( $tz_info ) || empty( $tz_info ) ? $this->get_timezone_info() : $tz_info;
+		// Abort right away if bad data sent in.
+		if( ! is_array( $settings ) || ! is_array( $tz_info ) ) {
+			return false;
+		}
+
+		$settings = empty( $settings ) ? $this->core->settings->get_settings() : $settings;
+
+		$tz_info = empty( $tz_info ) ? $this->get_timezone_info() : $tz_info;
 		$is_utc = ! empty( $tz_info['abbr'] ) && 'UTC' === substr( $tz_info['abbr'], 0, 3  );
 
 		$time_string = $settings['schedule']['tod_h'] . ':' . $settings['schedule']['tod_m'] . ' ' . $settings['schedule']['tod_a'];
