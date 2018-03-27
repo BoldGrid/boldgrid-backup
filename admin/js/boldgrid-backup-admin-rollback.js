@@ -305,7 +305,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			}
 
 			var data = {
-					'action' : 'boldgrid_backup_get_countdown_notice',
+					'action' : 'boldgrid_backup_get_countdown_notice'
 				},
 				successCallback;
 
