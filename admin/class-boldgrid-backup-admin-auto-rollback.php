@@ -725,6 +725,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 				$update_data = ! isset( $update_data ) ? wp_get_update_data() : $update_data;
 				if( $update_data['counts'][$config['check']] ) {
 					$display = true;
+					break;
 				}
 			}
 		}
