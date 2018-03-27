@@ -146,12 +146,16 @@ class Boldgrid_Backup_Admin_Time {
 		try{
 			if( $is_utc ) {
 				$date = new DateTime( $time_string, new DateTimeZone( 'UTC' ) );
-				/*
-				 * If we have a gmt_offset (example: -4.5), use that, othewise
-				 * parse the -4 from UTC-4.
-				 */
+
+				// If we have a gmt_offset (example: -4.5), use that, otherwise parse the -4 from UTC-4.
 				$offset = ! empty( $tz_info['gmt_offset'] ) ? $tz_info['gmt_offset'] : substr( $tz_info['abbr'], 3 );
-				$date->modify( ( $offset * HOUR_IN_SECONDS ) . ' second' );
+
+				/*
+				 * The user may have set UTC-4, but the $date above is simply UTC.
+				 * Modify the $date to actually get UTC. So if the user wants
+				 * 10:20 am UTC-4 we'll give them 2:20 pm UTC.
+				 */
+				$date->modify( ( -1 * $offset * HOUR_IN_SECONDS ) . ' second' );
 			} else {
 				$date = new DateTime( $time_string, new DateTimeZone( $tz_info['name'] ) );
 			}
@@ -243,9 +247,9 @@ class Boldgrid_Backup_Admin_Time {
 	 * Array
 	 * (
 	 *     [gmt_offset] => -4.5
-	 *     [abbr] => UTC-4
-	 *     [description] => Timezone is UTC-4.
-	 *     [markup_timezone] => UTC-4
+	 *     [abbr] => UTC-4.5
+	 *     [description] => Timezone is UTC-4.5.
+	 *     [markup_timezone] => UTC-4.5
 	 *     [markup_change] => Change timezone
 	 * )
      *
@@ -286,7 +290,9 @@ class Boldgrid_Backup_Admin_Time {
 				$timezone_info['gmt_offset'] = $gmt_offset;
 			}
 
-			$formatted_gmt_offset = $this->format_gmt_offset( intval( $gmt_offset ) );
+			// Not sure why WordPress is doing this. If it is -4.5, show me -4.5 and not -4.
+			// $formatted_gmt_offset = $this->format_gmt_offset( intval( $gmt_offset ) );
+			$formatted_gmt_offset = $gmt_offset;
 			$timezone_info['abbr'] = sprintf( 'UTC%s', $formatted_gmt_offset );
 
 			/* translators: %s: UTC offset  */

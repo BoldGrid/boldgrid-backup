@@ -50,17 +50,22 @@ class Test_Boldgrid_Backup_Admin_Time extends WP_UnitTestCase {
 			),
 		);
 
-		// UTC-4
+		/*
+		 * UTC-4
+		 *
+		 * The returned time should be UTC. So, in our settings if we set:
+		 * 6:20 pm UTC-4, then actual UTC time should be 10:20 pm UTC.
+		 */
 		$settings_date = $this->core->time->get_settings_date( $settings, array( 'abbr' => 'UTC-4', ) );
-		$this->assertEquals( '1420', $settings_date->format( 'Hi') );
+		$this->assertEquals( '2220', $settings_date->format( 'Hi') );
 
 		// UTC-4:30
-		$settings_date = $this->core->time->get_settings_date( $settings, array( 'abbr' => 'UTC-4', 'gmt_offset' => -4.5, ) );
-		$this->assertEquals( '1350', $settings_date->format( 'Hi') );
+		$settings_date = $this->core->time->get_settings_date( $settings, array( 'abbr' => 'UTC-4.5', 'gmt_offset' => -4.5, ) );
+		$this->assertEquals( '2250', $settings_date->format( 'Hi') );
 
 		// UTC+4
 		$settings_date = $this->core->time->get_settings_date( $settings, array( 'abbr' => 'UTC+4', ) );
-		$this->assertEquals( '2220', $settings_date->format( 'Hi') );
+		$this->assertEquals( '1420', $settings_date->format( 'Hi') );
 
 		// UTC+0
 		$settings_date = $this->core->time->get_settings_date( $settings, array( 'abbr' => 'UTC+0', ) );
