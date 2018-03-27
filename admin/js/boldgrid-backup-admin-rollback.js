@@ -315,9 +315,8 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			 * @since 1.6.0
 			 */
 			successCallback = function( response ) {
-				var $headerEnd = $( '.wp-header-end' ),
-					$notice,
-					notification,
+				var $notice, notification,
+					$headerEnd = $( '.wp-header-end' ),
 					$wrap = $( '.wrap' ).first();
 
 				if( response.success !== undefined && true === response.success ) {
