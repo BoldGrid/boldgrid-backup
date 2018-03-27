@@ -30,6 +30,15 @@ class Boldgrid_Backup_Admin_Crypt {
 	 * @return string
 	 */
 	public static function crypt( $string, $action = 'e' ) {
+
+		/*
+		 * We are only encrypting strings and numbers. User beware, encrypt a
+		 * number, it will be a string when decrypted.
+		 */
+		if( ! is_string( $string ) && ! is_numeric( $string ) ) {
+			return $string;
+		}
+
 	    $output = false;
     	$encrypt_method = "AES-256-CBC";
     	$key = hash( 'sha256', AUTH_KEY );
