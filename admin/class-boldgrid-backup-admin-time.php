@@ -100,20 +100,41 @@ class Boldgrid_Backup_Admin_Time {
 	public function get_server_timezone() {
 
 		/*
-		 * Get the timezone from the command line.
+		 * Determine how we are going to get the server's timezone.
 		 *
-		 * Initially, we ran:
-		 * date +%Z
-		 * ... and got something like 'EDT'. When creating a new DateTimeZone( 'EDT' ),
-		 * problems existed between servers when using that DateTimeZone in
-		 * DateTime time zone conversions.
+		 * PHP time zone buffoonery (or my own).
 		 *
-		 * A more successfull approach has been to run:
-		 * date +%a
-		 * ... which gives us something like '-0400', and works much better when
-		 * converting dates.
+		 * php -r "new DateTimeZone( '-0400' );"
+		 * -------------						--------------
+		 * - PHP 5.3.3 -						- PHP 5.6.30 -
+		 * -------------						--------------
+		 * DateTimeZone::__construct():			Works as expected.
+		 * Unknown or bad timezone (-0400)
+		 *
+		 * php -r '$tz = new DateTimeZone( "EDT" ); echo $tz->getName();';
+		 * -------------						--------------
+		 * - PHP 5.3.3 -						- PHP 5.6.30 -
+		 * -------------						--------------
+		 * America/New_York						EDT
+		 *
+		 * php -r '$tz = new DateTimeZone( "EDT" ); echo $tz->getName();';
+		 * -------------						--------------
+		 * - PHP 5.3.3 -						- PHP 5.6.30 -
+		 * -------------						--------------
+		 * DateTimeZone Object					DateTimeZone Object
+		 * (									(
+    	 * )										[timezone_type] => 2
+    	 *											[timezone] => EDT
+		 *										)
 		 */
-		$timezone = $this->core->execute_command( 'date +%z' );
+		$timezone = new DateTimeZone( 'EDT' );
+		if( 'EDT' === $timezone->getName() ) {
+			// Example, get -0400.
+			$timezone = $this->core->execute_command( 'date +%z' );
+		} else {
+			// Example, get EDT.
+			$timezone = $this->core->execute_command( 'date +%Z' );
+		}
 
 		try {
 			$timezone = new DateTimeZone( $timezone );
