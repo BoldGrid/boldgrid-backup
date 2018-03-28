@@ -99,8 +99,21 @@ class Boldgrid_Backup_Admin_Time {
 	 */
 	public function get_server_timezone() {
 
-		// Will return something like EDT.
-		$timezone = $this->core->execute_command( 'date +%Z' );
+		/*
+		 * Get the timezone from the command line.
+		 *
+		 * Initially, we ran:
+		 * date +%Z
+		 * ... and got something like 'EDT'. When creating a new DateTimeZone( 'EDT' ),
+		 * problems existed between servers when using that DateTimeZone in
+		 * DateTime time zone conversions.
+		 *
+		 * A more successfull approach has been to run:
+		 * date +%a
+		 * ... which gives us something like '-0400', and works much better when
+		 * converting dates.
+		 */
+		$timezone = $this->core->execute_command( 'date +%z' );
 
 		try {
 			$timezone = new DateTimeZone( $timezone );
