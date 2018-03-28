@@ -82,14 +82,16 @@ BoldGrid.Settings = function( $ ) {
 		$spinner.show();
 		$licenseString.empty();
 
-		errorFunction = function() {
+		errorFunction = function( response ) {
+			var error = response !== undefined && response.data !== undefined && response.data.string !== undefined ? response.data.string : bglibLicense.unknownError;
+
 			$spinner.hide();
-			$licenseString.html( bglibLicense.unknownError );
+			$licenseString.html( error );
 		};
 
 		successFunction = function( response ) {
-			if( response.data === undefined || response.data.string === undefined ) {
-				errorFunction();
+			if( true !== response.success || response.data === undefined || response.data.string === undefined ) {
+				errorFunction( response );
 				return;
 			}
 
