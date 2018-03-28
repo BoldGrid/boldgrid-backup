@@ -114,6 +114,44 @@ class Boldgrid_Backup_Admin_Utility {
 	 * @param  int    $errline Line number where the error is situated.
 	 */
 	public static function handle_error( $errno, $errstr, $errfile=false, $errline=false ) {
+
+		// A set of errors to ignore.
+		$skips = array(
+
+			/*
+			 * Ignore mcrypt errors (DEPRECATED as of PHP 7.1.0).
+			 *
+			 * When using phpseclib for sftp, we're catching these warnings even
+			 * though the author used @suppression with their mcrypt calls. There's
+			 * a lot of information online about these errors within phpseclib,
+			 * but I'll reference the following:
+			 *
+			 * https://github.com/phpseclib/phpseclib/issues/1028
+			 * # mcrypt is only used if it's available. If mcrypt is not available
+			 *   either a pure-PHP implementation is used or OpenSSL is used. The
+			 *   prioritization is as follows: OpenSSL > mcrypt > pure-PHP. mcrypt
+			 *   and OpenSSL are loads faster than the pure-PHP implementation.
+			 * # So mcrypt offers a 45x speedup over the internal mode. OpenSSL
+			 *   offers a 6.5x speedup over mcrypt.
+			 *
+			 * https://github.com/phpseclib/phpseclib/issues/1229
+			 * # phpseclib (all branches) are unit tested on PHP 7.2:
+			 *   https://travis-ci.org/phpseclib/phpseclib
+			 *   They all pass in spite of using mcrypt. idk if you've ever used
+			 *   Travis CI / phpunit but an E_DEPRECATED notice will result in a
+			 *   failing unit test and yet the unit tests are all passing.
+			 */
+			'Function mcrypt_list_algorithms() is deprecated',
+			'Function mcrypt_module_open() is deprecated',
+			'Function mcrypt_generic_init() is deprecated',
+			'Function mcrypt_generic() is deprecated',
+			'Function mdecrypt_generic() is deprecated',
+		);
+
+		if( in_array( $errstr, $skips, true ) ) {
+			return;
+		}
+
 		throw new ErrorException( $errstr, 0, $errno, $errfile, $errline );
 	}
 
