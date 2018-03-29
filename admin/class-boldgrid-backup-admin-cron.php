@@ -102,7 +102,7 @@ class Boldgrid_Backup_Admin_Cron {
 			return false;
 		}
 		$server_timezone = $this->core->time->get_server_timezone();
-		if( false === $date ) {
+		if( false === $server_timezone ) {
 			return false;
 		}
 		$date->setTimezone( $server_timezone );
