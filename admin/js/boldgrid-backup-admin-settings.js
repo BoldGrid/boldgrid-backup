@@ -90,7 +90,7 @@ BoldGrid.Settings = function( $ ) {
 		};
 
 		successFunction = function( response ) {
-			if( true !== response.success || response.data === undefined || response.data.string === undefined ) {
+			if ( true !== response.success || response.data === undefined || response.data.string === undefined ) {
 				errorFunction( response );
 				return;
 			}
@@ -98,7 +98,7 @@ BoldGrid.Settings = function( $ ) {
 			$spinner.hide();
 			$licenseString.html( response.data.string );
 
-			if( response.data.isPremium ) {
+			if ( response.data.isPremium ) {
 				$reloadMessage.removeClass( 'hidden' );
 			}
 		};
@@ -106,7 +106,7 @@ BoldGrid.Settings = function( $ ) {
 		BOLDGRID.LIBRARY.License.clear( 'boldgrid-backup', successFunction, errorFunction );
 
 		return false;
-	}
+	};
 
 	/**
 	 * @summary Action to take when a remote storage provider has been clicked.
@@ -116,7 +116,7 @@ BoldGrid.Settings = function( $ ) {
 	 * @since 1.5.2
 	 */
 	self.on_click_provider = function() {
-		var $a = $(this),
+		var $a = $( this ),
 			$tr = $a.closest( 'tr' ),
 			$table = $a.closest( 'table' );
 
@@ -127,7 +127,7 @@ BoldGrid.Settings = function( $ ) {
 		 * being updated.
 		 */
 		$tr.addClass( 'active' );
-	}
+	};
 
 	/**
 	 * @summary Action to take when the thickbox is closed.
@@ -138,12 +138,12 @@ BoldGrid.Settings = function( $ ) {
 		tb_unload_count++;
 
 		// Only take action on the odd occurences of tb_unload.
-		if( 0 === tb_unload_count % 2 ) {
+		if ( 0 === tb_unload_count % 2 ) {
 			return;
 		}
 
 		self.refresh_storage_configuration();
-	}
+	};
 
 	/**
 	 * @summary Refresh remote storage provider summary.
@@ -159,8 +159,8 @@ BoldGrid.Settings = function( $ ) {
 			$td_configure = $tr.find( 'td.configure' ),
 			$nonce = $( '#_wpnonce' ),
 			data = {
-				'action' : 'boldgrid_backup_is_setup_' + $tr.attr( 'data-key' ),
-				'security' : $nonce.val(),
+				'action': 'boldgrid_backup_is_setup_' + $tr.attr( 'data-key' ),
+				'security': $nonce.val()
 			},
 			$new_tr;
 
@@ -173,8 +173,8 @@ BoldGrid.Settings = function( $ ) {
 			$tr.replaceWith( $new_tr );
 
 			self.toggleNoStorage();
-		});
-	}
+		} );
+	};
 
 	/**
 	 * @summary Check if any days of the week selected.
@@ -182,6 +182,7 @@ BoldGrid.Settings = function( $ ) {
 	 * @since 1.0
 	 */
 	self.scheduleDowChecked = function() {
+
 		// Define vars.
 		var isDowChecked = false;
 
@@ -198,7 +199,7 @@ BoldGrid.Settings = function( $ ) {
 	 * @since 1.3.6
 	 */
 	self.toggleMoveBackups = function() {
-		if( $backupDir.val() === $backupDir.prop( 'defaultValue' ) ) {
+		if ( $backupDir.val() === $backupDir.prop( 'defaultValue' ) ) {
 			$moveBackups.hide();
 		} else {
 			$moveBackups.show();
@@ -211,6 +212,7 @@ BoldGrid.Settings = function( $ ) {
 	 * @since 1.0
 	 */
 	self.toggleNoBackupDays = function() {
+
 		// How many days of the week are checked?
 		var daysCount = $scheduleDow.find( ':checked' ).length;
 
@@ -220,7 +222,7 @@ BoldGrid.Settings = function( $ ) {
 		 *
 		 * @since 1.3.1
 		 */
-		if( daysCount > 1 ) {
+		if ( 1 < daysCount ) {
 			$useSparingly.show();
 		} else {
 			$useSparingly.hide();
@@ -242,12 +244,12 @@ BoldGrid.Settings = function( $ ) {
 		var count_checked = $( '#storage_locations input[type="checkbox"]:checked' ).length,
 			$noStorage = $( '#no_storage' );
 
-		if( 0 === count_checked ) {
+		if ( 0 === count_checked ) {
 			$noStorage.show();
 		} else {
 			$noStorage.hide();
 		}
-	}
+	};
 
 	/**
 	 * Handle click of the undismissBoldgridNotice link for the key prompt.
@@ -262,10 +264,10 @@ BoldGrid.Settings = function( $ ) {
 		wpHttpReferer = $( '[name="_wp_http_referer"]' ).val();
 
 		data = {
-			'action'  : 'undismissBoldgridNotice',
-			'notice' :  'bg-key-prompt',
-			'set_key_auth' : nonce,
-			'_wp_http_referer' : wpHttpReferer,
+			'action': 'undismissBoldgridNotice',
+			'notice': 'bg-key-prompt',
+			'set_key_auth': nonce,
+			'_wp_http_referer': wpHttpReferer
 		};
 
 		$.post(
@@ -279,6 +281,7 @@ BoldGrid.Settings = function( $ ) {
 
 	// Onload event listener.
 	$( function() {
+
 		// Check if any days or the week are checked, toggle notice.
 		self.toggleNoBackupDays();
 
@@ -300,6 +303,6 @@ BoldGrid.Settings = function( $ ) {
 		/** Reverse dismiss action for the Conect Key prompt **/
 		$( '.undismissBoldgridNotice' ).on( 'click', self.undismissBoldgridNotice );
 	} );
-}
+};
 
 BoldGrid.Settings( jQuery );

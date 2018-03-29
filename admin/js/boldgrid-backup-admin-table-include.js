@@ -20,9 +20,11 @@ BoldGrid.TableInclude = function( $ ) {
 		$includeTables   = $container.find( '.include-tables [type="checkbox"]' ),
 		$type            = $container.find( '[name="table_inclusion_type"]' ),
 		$configContainer = $container.find( '#table_inclusion_config' ),
+
 		// Buttons to include / exclude all.
 		$buttonAll       = $container.find( '#include_all_tables, .include-all' ),
 		$buttonNone      = $container.find( '#exclude_all_tables' ),
+
 		// Defaults are the status messages indicating default settings used.
 		$yesDefault      = $container.find( '.yes-default' ),
 		$noDefault       = $container.find( '.no-default' );
@@ -57,7 +59,7 @@ BoldGrid.TableInclude = function( $ ) {
 	self.toggleConfig = function() {
 		var type = $type.filter( ':checked' ).val();
 
-		if( 'full' === type ) {
+		if ( 'full' === type ) {
 			$configContainer.hide();
 		} else {
 			$configContainer.show();
@@ -85,7 +87,7 @@ BoldGrid.TableInclude = function( $ ) {
 	self.toggleStatus = function() {
 		var allIncluded = $includeTables.length === $includeTables.filter( ':checked' ).length;
 
-		if( allIncluded ) {
+		if ( allIncluded ) {
 			$yesDefault.show();
 			$noDefault.hide();
 		} else {

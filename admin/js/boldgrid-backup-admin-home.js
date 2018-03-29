@@ -24,6 +24,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 
 	// Onload event listener.
 	$( function() {
+
 		// On click action for the Upload button.
 		$( '#upload-archive-form' )
 			.find( '.button' )
@@ -31,7 +32,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 
 		$( '.page-title-action.add-new' ).on( 'click', function() {
 			$( '#add_new' ).toggle();
-		});
+		} );
 
 		$fileInput
 			.parent()
@@ -50,7 +51,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 			.on( 'click', self.onClickCount )
 			.on( 'mouseover', function() {
 				$mineCountHelp.bgbuDrawAttention();
-			});
+			} );
 	} );
 
 	/**
@@ -59,6 +60,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 	 * @since 1.2.3
 	 */
 	self.hideRestoreNotice = function() {
+
 		// Enable the Backup Site Now and all Restore and Delete buttons.
 		$( '#backup-site-now, .action-restore, .action-delete' )
 			.prop( 'disabled', false )
@@ -87,7 +89,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 			name,
 			size;
 
-		if( ! $fileInput.val() ) {
+		if ( ! $fileInput.val() ) {
 			$fileSizeWarning.slideUp();
 			$fileTooLarge.slideUp();
 			$badExtension.slideUp();
@@ -97,18 +99,18 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 
 		name = $fileInput[0].files[0].name;
 		size = $fileInput[0].files[0].size;
-		extension = name.substr( ( name.lastIndexOf( '.' ) +1 ) );
+		extension = name.substr( ( name.lastIndexOf( '.' ) + 1 ) );
 
 		isTooBig = 0 > maxSize - size;
 		isBadExtension = 'zip' !== extension;
 
-		if( isBadExtension ) {
+		if ( isBadExtension ) {
 			$badExtension.slideDown();
 		} else {
 			$badExtension.slideUp();
 		}
 
-		if( isTooBig ) {
+		if ( isTooBig ) {
 			$fileSizeWarning.slideDown();
 			$fileTooLarge.slideDown();
 		} else {
@@ -116,7 +118,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 			$fileTooLarge.slideUp();
 		}
 
-		if( isTooBig || isBadExtension ) {
+		if ( isTooBig || isBadExtension ) {
 			$submit.attr( 'disabled', true );
 		} else {
 			$submit.attr( 'disabled', false );
@@ -129,9 +131,10 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 	 * @since 1.5.4
 	 */
 	self.onClickCount = function() {
-		var $anchor = $(this),
+		var $anchor = $( this ),
 			$p = $anchor.closest( 'p' ),
 			$trs = $( '#backup-archive-list-body tr' ),
+
 			// Type is either on_web_server or on_remote_server
 			type = $anchor.attr( 'data-count-type' );
 
@@ -139,7 +142,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 		$p.find( '.mine' ).removeClass( 'current' );
 		$anchor.addClass( 'current' );
 
-		if( 'all' === type ) {
+		if ( 'all' === type ) {
 			$trs.show();
 			return false;
 		}
@@ -148,13 +151,13 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 			var $tr = $( this ),
 				$matches = $tr.find( '[data-' + type + '="true"]' );
 
-			if( 0 === $matches.length ) {
+			if ( 0 === $matches.length ) {
 				$tr.hide();
 			} else {
 				$tr.show();
 				$matches.bgbuDrawAttention();
 			}
-		});
+		} );
 
 		return false;
 	};
@@ -165,6 +168,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 	 * @since 1.2.2
 	 */
 	self.uploadButtonClicked = function() {
+
 		// Declare variables.
 		var $this = $( this );
 

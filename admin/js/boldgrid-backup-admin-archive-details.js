@@ -25,12 +25,12 @@ BoldGrid.ArchiveDetails = function( $ ) {
 	 */
 	self.onClickUpload = function() {
 
-		var $a = $(this),
+		var $a = $( this ),
 			provider = $a.attr( 'data-provider-id' ),
 			data = {
-				'action' : 'boldgrid_backup_remote_storage_upload_' + provider,
-				'filename' : $( '#filename' ).val(),
-				'security' : $( '#_wpnonce' ).val(),
+				'action': 'boldgrid_backup_remote_storage_upload_' + provider,
+				'filename': $( '#filename' ).val(),
+				'security': $( '#_wpnonce' ).val()
 			},
 			failUpload;
 
@@ -41,7 +41,7 @@ BoldGrid.ArchiveDetails = function( $ ) {
 		 */
 		failUpload = function( response ) {
 			var defaultMessage = adminLang.xmark + ' ' + lang.failUpload,
-				dataNotEmpty = response !== undefined && response.data !== undefined && response.data !== '',
+				dataNotEmpty = response !== undefined && response.data !== undefined && '' !== response.data,
 				message = dataNotEmpty ? defaultMessage + ' ' + response.data : defaultMessage;
 
 			$a.parent().html( message );
@@ -55,18 +55,18 @@ BoldGrid.ArchiveDetails = function( $ ) {
 		$.post( ajaxurl, data, function( response ) {
 			$a.next( '.spinner' ).remove();
 
-			if( response.success !== undefined && true === response.success ) {
+			if ( response.success !== undefined && true === response.success ) {
 				$a
 					.after( '&#10003; ' + lang.uploaded )
 					.remove();
 			}
 
-			if( response.success === undefined || true !== response.success ) {
+			if ( response.success === undefined || true !== response.success ) {
 				failUpload( response );
 			}
-		}).error( function( response ) {
+		} ).error( function( response ) {
 			failUpload();
-		});
+		} );
 
 		return false;
 	};
@@ -80,9 +80,9 @@ BoldGrid.ArchiveDetails = function( $ ) {
 		var $button = $( this ),
 			provider = $button.attr( 'data-provider-id' ),
 			data = {
-				'action' : 'boldgrid_backup_remote_storage_download_' + provider,
-				'filename' : $( '#filename' ).val(),
-				'security' : $( '#_wpnonce' ).val(),
+				'action': 'boldgrid_backup_remote_storage_download_' + provider,
+				'filename': $( '#filename' ).val(),
+				'security': $( '#_wpnonce' ).val()
 			},
 			$spinner = $button.next( '.spinner' ),
 			$wpbody = $body.find( '#wpbody' );
@@ -93,9 +93,9 @@ BoldGrid.ArchiveDetails = function( $ ) {
 
 		$.post( ajaxurl, data, function( response ) {
 			location.reload();
-		}).error( function() {
+		} ).error( function() {
 			location.reload();
-		});
+		} );
 	};
 
 	/**
@@ -113,9 +113,10 @@ BoldGrid.ArchiveDetails = function( $ ) {
 
 		$downloadToServer.first()
 			.click()
+
 			// Remvoe the spinner so we don't have two spinners going at same time.
 			.next( '.spinner' ).remove();
-	}
+	};
 
 	/**
 	 * @summary Action to take when a tab is clicked on.
@@ -133,7 +134,7 @@ BoldGrid.ArchiveDetails = function( $ ) {
 
 		view = $contentWrap.hasClass( 'html-active' ) ? 'db' : 'file';
 
-		switch( view ) {
+		switch ( view ) {
 			case 'file':
 				$dbElements.hide();
 				$fileElements.show();
@@ -147,7 +148,7 @@ BoldGrid.ArchiveDetails = function( $ ) {
 
 				break;
 		}
-	}
+	};
 
 	/**
 	 * Init.
@@ -157,7 +158,7 @@ BoldGrid.ArchiveDetails = function( $ ) {
 		$body.on( 'click', '.remote-storage .download-to-server', self.onClickDownload );
 		$editorTabs.on( 'click', self.onClickTab );
 		$downloadFirst.on( 'click', self.onClickDownloadFirst );
-	});
+	} );
 };
 
 BoldGrid.ArchiveDetails( jQuery );

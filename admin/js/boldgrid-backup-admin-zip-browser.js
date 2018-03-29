@@ -35,7 +35,7 @@ BoldGrid.ZipBrowser = function( $ ) {
 	 * @since 1.5.3
 	 */
 	self.onClickFile = function() {
-		var $a = $(this),
+		var $a = $( this ),
 			$tr = $a.closest( 'tr' ),
 			expanded = '1' === $tr.attr( 'data-expanded' ),
 			colspan = $tr.find( 'td' ).length,
@@ -43,12 +43,12 @@ BoldGrid.ZipBrowser = function( $ ) {
 			$dummyTr = $( '<tr></tr>' ),
 			data = {
 				'action': 'boldgrid_backup_browse_archive_file_actions',
-				'security' : $( '#_wpnonce' ).val(),
-				'filename' : $( '#filename' ).val(),
-				'file' : $tr.attr( 'data-dir' ),
+				'security': $( '#_wpnonce' ).val(),
+				'filename': $( '#filename' ).val(),
+				'file': $tr.attr( 'data-dir' )
 			};
 
-		if( ! expanded ) {
+		if ( ! expanded ) {
 			$newTr
 				.css( 'background-color', $tr.css( 'background-color' ) )
 				.insertAfter( $tr );
@@ -57,7 +57,7 @@ BoldGrid.ZipBrowser = function( $ ) {
 			$tr.attr( 'data-expanded', '1' );
 
 			$.post( ajaxurl, data, function( response ) {
-				if( response.success !== undefined ) {
+				if ( response.success !== undefined ) {
 					$newTr.find( 'td' ).html( response.data );
 				} else {
 					$newTr.find( 'td' ).html( boldgrid_backup_zip_browser.unknownError );
@@ -79,7 +79,7 @@ BoldGrid.ZipBrowser = function( $ ) {
 	 * @since 1.5.3
 	 */
 	self.onClickFolder = function() {
-		var $a = $(this),
+		var $a = $( this ),
 			$tr = $a.closest( 'tr' ),
 			dir = $tr.attr( 'data-dir' );
 
@@ -108,22 +108,22 @@ BoldGrid.ZipBrowser = function( $ ) {
 			$spinner = $a.next(),
 			data = {
 				'action': 'boldgrid_backup_browse_archive_restore_db',
-				'security' : $( '#_wpnonce' ).val(),
-				'filename' : $( '#filename' ).val(),
-				'file' : $a.attr( 'data-file' ),
+				'security': $( '#_wpnonce' ).val(),
+				'filename': $( '#filename' ).val(),
+				'file': $a.attr( 'data-file' )
 			},
 			confirmation,
 			status = '<span class="spinner inline"></span> Restoring';
 
 		confirmation = confirm( boldgrid_backup_zip_browser.confirmDbRestore );
 
-		if( ! confirmation ) {
+		if ( ! confirmation ) {
 			return false;
 		}
 
 		$p.empty().html( status );
 		$a.attr( 'disabled', 'disabled' );
-		$spinner.addClass( 'inline middle' )
+		$spinner.addClass( 'inline middle' );
 
 		$.post( ajaxurl, data, function( response ) {
 			location.reload();
@@ -145,7 +145,7 @@ BoldGrid.ZipBrowser = function( $ ) {
 
 		$toggle.toggleClass( 'closed' );
 
-		if( $toggle.hasClass( 'closed' ) ) {
+		if ( $toggle.hasClass( 'closed' ) ) {
 			$tbody.hide();
 		} else {
 			$tbody.show();
@@ -161,15 +161,15 @@ BoldGrid.ZipBrowser = function( $ ) {
 		var $a = $( this ),
 			data = {
 				'action': 'boldgrid_backup_browse_archive_view_db',
-				'security' : $( '#_wpnonce' ).val(),
-				'filename' : $( '#filename' ).val(),
-				'file' : $( '#dump_filename' ).val(),
+				'security': $( '#_wpnonce' ).val(),
+				'filename': $( '#filename' ).val(),
+				'file': $( '#dump_filename' ).val()
 			},
 			$details = $( '#db_details' ),
 			errorCallback;
 
 		// Only render the view once.
-		if( 'true' === $details.attr( 'data-rendered' ) ) {
+		if ( 'true' === $details.attr( 'data-rendered' ) ) {
 			return;
 		}
 		$details.attr( 'data-rendered', 'true' );
@@ -186,7 +186,7 @@ BoldGrid.ZipBrowser = function( $ ) {
 			var success = response.success !== undefined && true === response.success,
 				fail = response.success !== undefined && false === response.success;
 
-			if( success || fail ) {
+			if ( success || fail ) {
 				$details.html( response.data );
 			} else {
 				errorCallback();
@@ -207,18 +207,18 @@ BoldGrid.ZipBrowser = function( $ ) {
 			html = '<span class="dashicons dashicons-admin-home"></span> <a data-dir-".">' + boldgrid_backup_zip_browser.home + '</a> ',
 			dataDir = '';
 
-		dir = typeof dir !== 'undefined' ? dir.trim() : '/';
+		dir = 'undefined' !== typeof dir ? dir.trim() : '/';
 		split = dir.split( '/' );
 
 		split.forEach( function( element ) {
-			if( '' === element || '.' === element ) {
+			if ( '' === element || '.' === element ) {
 				return;
 			}
 
 			dataDir += element + '/';
 
 			html += ' / <a data-dir="' + dataDir + '">' + element + '</a>';
-		});
+		} );
 
 		$container.html( html );
 	};
@@ -232,15 +232,15 @@ BoldGrid.ZipBrowser = function( $ ) {
 		var data,
 			colspan = $listing.find( 'thead th' ).length;
 
-		dir = typeof dir !== 'undefined' ? dir : '.';
+		dir = 'undefined' !== typeof dir ? dir : '.';
 
 		$zipBrowser.show();
 
 		data = {
 			'action': 'boldgrid_backup_browse_archive',
-			'security' : $( '#_wpnonce' ).val(),
-			'filename' : $( '#filename' ).val(),
-			'dir' : dir,
+			'security': $( '#_wpnonce' ).val(),
+			'filename': $( '#filename' ).val(),
+			'dir': dir
 		};
 
 		self.renderBreadcrumbs( dir );
@@ -248,7 +248,7 @@ BoldGrid.ZipBrowser = function( $ ) {
 		$listing.find( 'tbody' ).html( '<tr><td colspan="' + colspan + '">' + loading + '</td></tr>'  );
 
 		$.post( ajaxurl, data, function( response ) {
-			if( response.success !== undefined ) {
+			if ( response.success !== undefined ) {
 				$listing.html( response.data );
 			} else {
 				$listing.html( boldgrid_backup_zip_browser.unknownBrowseError );
@@ -273,7 +273,7 @@ BoldGrid.ZipBrowser = function( $ ) {
 		$( 'body' ).on( 'click', '.load-browser', self.onClickLoadBrowser );
 
 		self.renderBrowser( '.' );
-	});
+	} );
 };
 
 BoldGrid.ZipBrowser = new BoldGrid.ZipBrowser( jQuery );

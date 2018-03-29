@@ -30,10 +30,10 @@ BOLDGRID.BACKUP.CUSTOMIZER = function( $ ) {
 			// Actions to take when installed_themes section is opened.
             section.expanded.bind( function( ) {
 
-            	if( ! self.progressNoticeShow ) {
+            	if ( ! self.progressNoticeShow ) {
 	            	var data = {
-	            		'action' : 'boldgrid_backup_get_progress_notice',
-	            		'nonce' : boldgridBackupCustomizer.nonce
+	            		'action': 'boldgrid_backup_get_progress_notice',
+	            		'nonce': boldgridBackupCustomizer.nonce
 	            	},
 	            	successCallback;
 
@@ -43,7 +43,7 @@ BOLDGRID.BACKUP.CUSTOMIZER = function( $ ) {
 		             * @since 1.6.0
 		             */
 		            successCallback = function( response ) {
-		            	if( response.success !== undefined && true === response.success && false !== response.data ) {
+		            	if ( response.success !== undefined && true === response.success && false !== response.data ) {
 		            		$( '.customize-themes-notifications' ).prepend( response.data );
 		            		$( 'body' ).trigger( 'boldgrid_backup_progress_notice_added' );
 
@@ -53,11 +53,11 @@ BOLDGRID.BACKUP.CUSTOMIZER = function( $ ) {
 
 		            // Make a call to see if we have an "in progress" notice to show.
 		            $.ajax( {
-		            	url : ajaxurl,
-		            	data : data,
-		            	type : 'post',
-		            	dataType : 'json',
-		            	success : successCallback
+		            	url: ajaxurl,
+		            	data: data,
+		            	type: 'post',
+		            	dataType: 'json',
+		            	success: successCallback
 		            } );
             	}
             } );
@@ -76,18 +76,18 @@ BOLDGRID.BACKUP.CUSTOMIZER = function( $ ) {
             section.expanded.bind( function( ) {
 
             	// Show the "protect now" notice.
-            	if( ! self.protectNoticeShow ) {
+            	if ( ! self.protectNoticeShow ) {
             		var data = {
-            			'action' : 'boldgrid_backup_get_protect_notice',
-            			'update_protection' : true
+            			'action': 'boldgrid_backup_get_protect_notice',
+            			'update_protection': true
             		};
 
             		$.post( ajaxurl, data, function( response ) {
-            			if( response.success !== undefined && true === response.success ) {
+            			if ( response.success !== undefined && true === response.success ) {
             				$( '.customize-themes-notifications' ).append( response.data );
             				self.protectNoticeShow = true;
             			}
-            		});
+            		} );
             	}
             } );
         } );
@@ -96,7 +96,7 @@ BOLDGRID.BACKUP.CUSTOMIZER = function( $ ) {
 	$( function() {
 		var deadline;
 
-		if( boldgridBackupCustomizer.is_rollback_enabled ) {
+		if ( boldgridBackupCustomizer.is_rollback_enabled ) {
 			deadline = BOLDGRID.BACKUP.RollbackTimer.getUpdatedDeadline();
 		}
 
@@ -107,13 +107,13 @@ BOLDGRID.BACKUP.CUSTOMIZER = function( $ ) {
 			var haveDeadline = deadline !== undefined && deadline.responseText !== undefined && '' !== deadline.responseText,
 				haveUpdatesAvailable = 0 < boldgridBackupCustomizer.update_data.counts.themes;
 
-			if( haveDeadline ) {
+			if ( haveDeadline ) {
 				BOLDGRID.BACKUP.RollbackTimer.show();
-			} else if( haveUpdatesAvailable ) {
+			} else if ( haveUpdatesAvailable ) {
 				self.showProtectNotice();
 			}
-		});
-	});
+		} );
+	} );
 };
 
 BOLDGRID.BACKUP.CUSTOMIZER( jQuery );

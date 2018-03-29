@@ -49,7 +49,7 @@ BoldGrid.FolderExclude = function( $ ) {
 	 *
 	 */
 	self.onClickConfigure = function() {
-		var $a = $(this),
+		var $a = $( this ),
 			$table = $a.closest( 'table' ),
 			$icon = $a.siblings( '.dashicons' ),
 			status;
@@ -74,13 +74,13 @@ BoldGrid.FolderExclude = function( $ ) {
 			currentPage = parseInt( $links.find( '.current-page' ).val() ),
 			totalPages = parseInt( $links.find( '.total-pages' ).html() );
 
-		if( $a.hasClass( 'first' ) ) {
+		if ( $a.hasClass( 'first' ) ) {
 			self.renderList( 1 );
-		} else if( $a.hasClass( 'prev' ) ) {
+		} else if ( $a.hasClass( 'prev' ) ) {
 			self.renderList( currentPage - 1 );
-		} else if( $a.hasClass( 'next' ) ) {
+		} else if ( $a.hasClass( 'next' ) ) {
 			self.renderList( currentPage + 1 );
-		} else if( $a.hasClass( 'last' ) ) {
+		} else if ( $a.hasClass( 'last' ) ) {
 			self.renderList( totalPages );
 		}
 
@@ -95,9 +95,9 @@ BoldGrid.FolderExclude = function( $ ) {
 	self.onClickPreview = function() {
 		var data = {
 				'action': 'boldgrid_backup_exclude_folders_preview',
-				'security' : $container.find( '[name="folder_exclusion_nonce"]' ).val(),
-				'include' : $inputInclude.val(),
-				'exclude' : $inputExclude.val(),
+				'security': $container.find( '[name="folder_exclusion_nonce"]' ).val(),
+				'include': $inputInclude.val(),
+				'exclude': $inputExclude.val()
 			};
 
 		exclusionList = [];
@@ -113,15 +113,15 @@ BoldGrid.FolderExclude = function( $ ) {
 
 		$.post( ajaxurl, data, function( response ) {
 			var success = null;
-			if( response.success !== undefined ) {
+			if ( response.success !== undefined ) {
 				success = response.success;
 			}
 
-			if( success ) {
+			if ( success ) {
 				$status.empty();
 				exclusionList = response.data;
 				self.renderList( 1 );
-			} else if( false === success ) {
+			} else if ( false === success ) {
 				$status.html( response.data );
 			} else {
 				$status.html( 'Unknown error' );
@@ -181,7 +181,7 @@ BoldGrid.FolderExclude = function( $ ) {
 	self.onKeyDown = function( e ) {
 		var isCurrentPage = $( e.target ).hasClass( 'current-page' );
 
-		if( isCurrentPage && 13 === e.keyCode ) {
+		if ( isCurrentPage && 13 === e.keyCode ) {
 			self.onSubmitPagination();
 			e.preventDefault();
 			return false;
@@ -199,7 +199,7 @@ BoldGrid.FolderExclude = function( $ ) {
 		var page = parseInt( $excludeFoldersPreview.find( '.current-page' ).val() ),
 			totalPages = parseInt( $container.find( '.total-pages' ).html() );
 
-		page = page < 1 || page > totalPages ? 1 : page;
+		page = 1 > page || page > totalPages ? 1 : page;
 
 		self.renderList( page );
 
@@ -235,12 +235,12 @@ BoldGrid.FolderExclude = function( $ ) {
 
 		// If the user has typed in a filter, then filter our list.
 		filteredList = [];
-		if( '' !== filterVal ) {
+		if ( '' !== filterVal ) {
 			exclusionList.forEach( function( file ) {
-				if( file.indexOf( filterVal ) !== -1 ) {
+				if ( -1 !== file.indexOf( filterVal ) ) {
 					filteredList.push( file );
 				}
-			});
+			} );
 
 			lastAvailableKey = filteredList.length - 1;
 		}
@@ -252,22 +252,22 @@ BoldGrid.FolderExclude = function( $ ) {
 		 * Action to take if our last record is [99] and our last available
 		 * record is [50].
 		 */
-		if( lastRecordKey > lastAvailableKey ) {
+		if ( lastRecordKey > lastAvailableKey ) {
 			lastRecordKey = lastAvailableKey;
 			startKey = lastRecordKey - perPage;
 		}
 
 		// Configure our starting record.
-		if( startKey < 0 ) {
+		if ( 0 > startKey ) {
 			startKey = 0;
 		}
 
 		// Generate the markup for our list.
-		for( x = startKey; x <= lastRecordKey; x++ ) {
-			file = filteredList.length > 0 ? filteredList[x] : exclusionList[x];
+		for ( x = startKey; x <= lastRecordKey; x++ ) {
+			file = 0 < filteredList.length ? filteredList[x] : exclusionList[x];
 
 			markup += '<li>' +
-				'<strong>' + ( x + 1 ).toLocaleString('en') + '</strong>. ' +
+				'<strong>' + ( x + 1 ).toLocaleString( 'en' ) + '</strong>. ' +
 				file + '</li>';
 		}
 		filteredNoResults = '' !== filterVal && 0 === filteredList.length;
@@ -300,13 +300,13 @@ BoldGrid.FolderExclude = function( $ ) {
 			'</span>' +
 			'<span class="pagination-links">';
 
-		if( 1 >= page ) {
+		if ( 1 >= page ) {
 			markup += '<span class="tablenav-pages-navspan">«</span> ';
 		} else {
 			markup += '<a class="first" href="#"><span>«</span></a> ';
 		}
 
-		if( 1 >= page ) {
+		if ( 1 >= page ) {
 			markup += '<span class="tablenav-pages-navspan">‹</span> ';
 		} else {
 			markup += '<a class="prev" href="#"><span>‹</span></a> ';
@@ -318,13 +318,13 @@ BoldGrid.FolderExclude = function( $ ) {
 				'<span class="tablenav-paging-text"> ' + lang.of + ' <span class="total-pages">' + totalPages + '</span></span>' +
 			'</span> ';
 
-		if( page < totalPages ) {
+		if ( page < totalPages ) {
 			markup += '<a class="next" href="#"><span>›</span></a> ';
 		} else {
 			markup += '<span class="tablenav-pages-navspan">›</span> ';
 		}
 
-		if( page < totalPages ) {
+		if ( page < totalPages ) {
 			markup += '<a class="last" href="#"><span>»</span></a> ';
 		} else {
 			markup += '<span class="tablenav-pages-navspan">»</span> ';
@@ -346,7 +346,7 @@ BoldGrid.FolderExclude = function( $ ) {
 		var type = $type.filter( ':checked' ).val(),
 			$miscInfo = $( '#folder_misc_info' );
 
-		if( 'full' === type ) {
+		if ( 'full' === type ) {
 			$trs.hide();
 			$miscInfo.hide();
 		} else {
@@ -363,7 +363,7 @@ BoldGrid.FolderExclude = function( $ ) {
 			$yesDefault = $container.find( '.yes-default' ),
 			$noDefault = $container.find( '.no-default' );
 
-		if( usingDefaults ) {
+		if ( usingDefaults ) {
 			$yesDefault.show();
 			$noDefault.hide();
 		} else {

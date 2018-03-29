@@ -23,13 +23,13 @@ BoldGrid.Backup = function( $ ) {
 			var id = $( this ).attr( 'data-id' );
 
 			// If we don't have a data-id, abort.
-			if( id === undefined ) {
+			if ( id === undefined ) {
 				return;
 			}
 
 			// Toggle the help text.
 			$( '.help[data-id="' + id + '"]' ).slideToggle();
-		});
+		} );
 	};
 
 	/**
@@ -40,7 +40,7 @@ BoldGrid.Backup = function( $ ) {
 	 * @since 1.5.3
 	 */
 	self.hideBackupNotice = function() {
-		if( pagenow === undefined || 'update-core' !== pagenow ) {
+		if ( pagenow === undefined || 'update-core' !== pagenow ) {
 			return;
 		}
 
@@ -61,11 +61,11 @@ BoldGrid.Backup = function( $ ) {
 		var $e = $( this ),
 			show = 'Show',
 			hide = 'Hide',
-			target = $e.attr( 'data-toggle-target'),
+			target = $e.attr( 'data-toggle-target' ),
 			$target = $( target ),
 			isVisible = $target.is( ':visible' );
 
-		if( isVisible ) {
+		if ( isVisible ) {
 			$target.slideUp();
 			$e.html( show );
 		} else {
@@ -89,7 +89,7 @@ BoldGrid.Backup = function( $ ) {
 			$inProgressNotice = $( '.boldgrid-backup-in-progress' );
 
 		// If we're not actually showing an "in progress" notice, abort.
-		if( 1 !== $inProgressNotice.length ) {
+		if ( 1 !== $inProgressNotice.length ) {
 			return;
 		}
 
@@ -101,20 +101,20 @@ BoldGrid.Backup = function( $ ) {
 		 * on the in progress backup.
 		 */
 		$( document ).on( 'heartbeat-send', function( e, data ) {
-			if( ! complete ) {
+			if ( ! complete ) {
 				data['boldgrid_backup_in_progress'] = true;
 			}
-		});
+		} );
 
 		// When the heartbeat is received, check to see if the backup has completed.
 		$( document ).on( 'heartbeat-tick', function( e, data ) {
 			var $notice;
 
-			if( undefined === data.boldgrid_backup_in_progress ) {
+			if ( undefined === data.boldgrid_backup_in_progress ) {
 				return;
 			}
 
-			if( ! data.boldgrid_backup_in_progress ) {
+			if ( ! data.boldgrid_backup_in_progress ) {
 				$notice = $( data.boldgrid_backup_complete );
 				$notice
 					.css( 'display', 'none' )
@@ -129,7 +129,7 @@ BoldGrid.Backup = function( $ ) {
 				$( 'body' ).trigger( 'make_notices_dismissible' );
 				$( 'body' ).trigger( 'boldgrid_backup_complete' );
 			}
-		});
+		} );
 	};
 
 	/**
@@ -147,7 +147,7 @@ BoldGrid.Backup = function( $ ) {
         $( '.notice.is-dismissible' ).each( function() {
             var $el = $( this ),
                 $button = $( '<button type="button" class="notice-dismiss"><span class="screen-reader-text"></span></button>' ),
-                btnText = typeof commonL10n !== 'undefined' ? commonL10n.dismiss : wp.customize.l10n.close;
+                btnText = 'undefined' !== typeof commonL10n ? commonL10n.dismiss : wp.customize.l10n.close;
 
             // Ensure plain text
             $button.find( '.screen-reader-text' ).text( btnText );
@@ -156,12 +156,12 @@ BoldGrid.Backup = function( $ ) {
                 $el.fadeTo( 100, 0, function() {
                     $el.slideUp( 100, function() {
                         $el.remove();
-                    });
-                });
-            });
+                    } );
+                } );
+            } );
 
             $el.append( $button );
-        });
+        } );
     };
 
 	$( function() {
@@ -188,7 +188,7 @@ BoldGrid.Backup = function( $ ) {
 		 * removing anything with a bgbu_remove_load class.
 		 */
 		$( '.bgbu-remove-load' ).remove();
-	});
+	} );
 
 	/**
 	 * @summary Open submenu "Get Premium" link in a new tab.
@@ -200,7 +200,7 @@ BoldGrid.Backup = function( $ ) {
 	 */
 	self.updatePremiumLink = function() {
 		$( '#adminmenu' ).find( 'a[href="' + BoldGridBackupAdmin.get_premium_url + '"]' ).attr( 'target', '_blank' );
-	}
+	};
 };
 
 BoldGrid.Backup( jQuery );
@@ -212,6 +212,7 @@ BoldGrid.Backup( jQuery );
  */
 jQuery.fn.bgbuDrawAttention = function() {
 	var currentColor,
+
 		// In seconds, minimum time between each animation.
 		animateInterval = 1 * 1000,
 		d = new Date(),
@@ -220,29 +221,30 @@ jQuery.fn.bgbuDrawAttention = function() {
 	this.attr( 'data-last-animation', d.getTime() );
 
 	// If we are currently animating this element, return.
-	if( this.parent().hasClass( 'ui-effects-wrapper' ) ) {
+	if ( this.parent().hasClass( 'ui-effects-wrapper' ) ) {
 		return;
 	}
 
 
 	// If enough time hasn't passed yet since the last animation, return.
-	if( lastAnimation && ( d.getTime() - lastAnimation ) < animateInterval ) {
+	if ( lastAnimation && ( d.getTime() - lastAnimation ) < animateInterval ) {
 		return;
 	}
 
-	if( this.is( 'input' ) ) {
+	if ( this.is( 'input' ) ) {
 		this
 			.css( 'background', '#ddd' )
 			.animate( {backgroundColor: '#fff'}, 500 );
-	} else if( this.is( '.dashicons-editor-help')) {
-		this.effect( 'bounce', { times:2 }, 'normal' );
-	} else if( this.is( 'span' ) ) {
+	} else if ( this.is( '.dashicons-editor-help' ) ) {
+		this.effect( 'bounce', { times: 2 }, 'normal' );
+	} else if ( this.is( 'span' ) ) {
+
 		/*
 		 * Get the original color to animate back to. This is needed because if
 		 * the user clicks on an element that is in the middle of an animation,
 		 * the current color will not be the original.
 		 */
-		if( ! this.attr( 'data-original-color' ) ) {
+		if ( ! this.attr( 'data-original-color' ) ) {
 			this.attr( 'data-original-color', this.css( 'color' ) );
 		}
 		currentColor = this.attr( 'data-original-color' );

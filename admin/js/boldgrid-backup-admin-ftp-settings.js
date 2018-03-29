@@ -12,7 +12,7 @@
 
 var BoldGrid = BoldGrid || {};
 
-BoldGrid.FtpSettings= function( $ ) {
+BoldGrid.FtpSettings = function( $ ) {
 	'use strict';
 
 	var self = this,

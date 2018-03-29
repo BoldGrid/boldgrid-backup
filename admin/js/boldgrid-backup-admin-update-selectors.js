@@ -15,35 +15,43 @@
 var BOLDGRID = BOLDGRID || {};
 BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 
-( function ( $ ) {
+( function( $ ) {
 	BOLDGRID.BACKUP.UpdateSelectors = {
 
 		lang: boldgrid_backup_admin_update_selectors,
 
-		$selectors : null,
+		$selectors: null,
 
 		selectors: [
+
 			// Plugins > Installed Plugins > "Apply" button for "Bulk Actions".
 			'#doaction',
 			'#doaction2',
+
 			// Plugins > Installed Plugins > Inline "update now" link on Plugins > Installed Plugins.
 			'.update-link',
+
 			// Dashboard > Updates > "Update Plugins" button.
 			'#upgrade-plugins',
 			'#upgrade-plugins-2',
+
 			// Dashboard > Updates > "Update" and "Re-install" WordPress button.
 			'#upgrade',
+
 			// Dashboard > Updates > "Update Themes" button.
 			'#upgrade-themes',
 			'#upgrade-themes-2',
+
 			// Dashboard > Customize > Change Themes > Inline "Update now" link.
 			// Customizer > Installed themes > "Update now" link.
 			'.themes .update-message .button-link',
+
 			// Dashboard > Customize > Changes Themes > Click a theme > "update now" link.
 			// Customizer > Installed themes > click a theme > "update now" link.
 			'#update-theme',
+
 			// BoldGrid Backup - Update Protection > "Backup Site Now" button.
-			'#backup-site-now',
+			'#backup-site-now'
 		],
 
 		/**
@@ -67,7 +75,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 				$target
 					.attr( 'title', '' )
 					.removeClass( self.lang.waitClass );
-			});
+			} );
 		},
 
 		/**
@@ -102,7 +110,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 					$target
 						.attr( 'title', self.lang.backupInProgress )
 						.addClass( self.lang.waitClass );
-				});
+				} );
 			}, 250 );
 		},
 
@@ -124,7 +132,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		 * @since 1.6.0
 		 */
 		onInProgress: function() {
-			if( 1 === $( '.boldgrid-backup-in-progress' ).length ) {
+			if ( 1 === $( '.boldgrid-backup-in-progress' ).length ) {
 				this.disable();
 			}
 		},
@@ -136,11 +144,11 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		 */
 		setSelectors: function() {
 			this.$selectors = $( this.selectors.join( ', ' ) );
-		},
+		}
 	};
 
 	$( function() {
 		BOLDGRID.BACKUP.UpdateSelectors.init();
-	});
+	} );
 
 } )( jQuery );

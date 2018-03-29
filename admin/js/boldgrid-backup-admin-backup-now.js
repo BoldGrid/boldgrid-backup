@@ -34,6 +34,7 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 	 * @since 1.0
 	 */
 	self.backupNow = function( e ) {
+
 		// Declare variables.
 		var $this, $backupSiteSection, $backupSiteResults, backupNonce, wpHttpReferer, isUpdating,
 		errorCallback, successCallback, data, markup,
@@ -48,11 +49,11 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 		 * If we are in a Backup Site Now modal and there is a "type" value set,
 		 * grab it.
 		 */
-		if( 1 === $backupNowType.filter( ':checked' ).length ) {
+		if ( 1 === $backupNowType.filter( ':checked' ).length ) {
 			type = $backupNowType.filter( ':checked' ).val();
 		}
 
-		if( 1 === $tablesType.filter( ':checked' ).length ) {
+		if ( 1 === $tablesType.filter( ':checked' ).length ) {
 			tablesType = $tablesType.filter( ':checked' ).val();
 		}
 
@@ -65,7 +66,7 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 			.css( 'pointer-events', 'none' );
 
 		// Create a context selector for the Backup Site Now section.
-		$backupSiteSection = $('#backup-site-now-section');
+		$backupSiteSection = $( '#backup-site-now-section' );
 
 		// Create a context selector for the Backup Site Now results.
 		$backupSiteResults = $( '#backup-site-now-results' );
@@ -86,7 +87,7 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 		// Get the backup archive file key.
 		isUpdating = $this.data( 'updating' );
 
-		$backupSiteSection.find('.spinner').addClass( 'inline' );
+		$backupSiteSection.find( '.spinner' ).addClass( 'inline' );
 
 		/**
 		 * @summary backupNow error callback.
@@ -106,10 +107,10 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 			 * errors. If a fatal error is found, we will return that, rather
 			 * than the generic errorText defined above.
 			 */
-			if( jqXHR.responseText !== undefined && '{' === jqXHR.responseText.charAt( 0 ) ) {
+			if ( jqXHR.responseText !== undefined && '{' === jqXHR.responseText.charAt( 0 ) ) {
 				data = JSON.parse( jqXHR.responseText );
 
-				if( data !== undefined && data.data !== undefined && data.data.errorText !== undefined ) {
+				if ( data !== undefined && data.data !== undefined && data.data.errorText !== undefined ) {
 					errorText = data.data.errorText;
 				}
 			}
@@ -130,7 +131,7 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 				success = data.success !== undefined && true === data.success,
 				callback = success && data.data !== undefined && data.data.callback !== undefined ? data.data.callback : null;
 
-			switch( callback ) {
+			switch ( callback ) {
 				case 'updateProtectionEnabled':
 					self.updateProtectionEnabled();
 					break;
@@ -142,12 +143,12 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 
 		// Generate the data array.
 		data = {
-			'action' : 'boldgrid_backup_now',
-			'backup_auth' : backupNonce,
-			'_wp_http_referer' : wpHttpReferer,
-			'is_updating' : isUpdating,
-			'backup_now' : '1',
-			'folder_exclusion_type' : type,
+			'action': 'boldgrid_backup_now',
+			'backup_auth': backupNonce,
+			'_wp_http_referer': wpHttpReferer,
+			'is_updating': isUpdating,
+			'backup_now': '1',
+			'folder_exclusion_type': type
 		};
 
 		/*
@@ -155,44 +156,45 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 		 * are doing a customized backup, send appropriate "include / exclude"
 		 * settings for "folder / database".
 		 */
-		if( 'custom' === type && 1 === $folderInclude.length ) {
+		if ( 'custom' === type && 1 === $folderInclude.length ) {
 			data.folder_exclusion_include = $folderInclude.val();
 		}
 
-		if( 'custom' === type && 1 === $folderExclude.length ) {
+		if ( 'custom' === type && 1 === $folderExclude.length ) {
 			data.folder_exclusion_exclude = $folderExclude.val();
 		}
 
-		if( tablesType ) {
+		if ( tablesType ) {
 			data.table_inclusion_type = tablesType;
 		}
 
-		if( 'custom' === tablesType && $tableInclude.length ) {
-			$tableInclude.filter( ':checked' ).each( function(){
-				includeTables.push( $(this).val() );
-			});
+		if ( 'custom' === tablesType && $tableInclude.length ) {
+			$tableInclude.filter( ':checked' ).each( function() {
+				includeTables.push( $( this ).val() );
+			} );
 			data.include_tables = includeTables;
 		}
 
-		if( undefined !== BOLDGRID.BACKUP.UpdateSelectors ) {
+		if ( undefined !== BOLDGRID.BACKUP.UpdateSelectors ) {
 			BOLDGRID.BACKUP.UpdateSelectors.disable();
 		}
 
 		// Make the call.
 		$.ajax( {
-			url : ajaxurl,
-			data : data,
-			type : 'post',
-			dataType : 'text',
-			success : successCallback,
-			error : errorCallback,
-			complete : function() {
+			url: ajaxurl,
+			data: data,
+			type: 'post',
+			dataType: 'text',
+			success: successCallback,
+			error: errorCallback,
+			complete: function() {
+
 				// Hide the spinner.
 				$backupSiteSection
-					.find('.spinner')
+					.find( '.spinner' )
 						.removeClass( 'is-active' );
 
-				if( undefined !== BOLDGRID.BACKUP.UpdateSelectors ) {
+				if ( undefined !== BOLDGRID.BACKUP.UpdateSelectors ) {
 					BOLDGRID.BACKUP.UpdateSelectors.enable();
 				}
 			}
