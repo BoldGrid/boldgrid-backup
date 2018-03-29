@@ -1,6 +1,6 @@
 {
  "scripts": {
-  "js-lint": "eslint **/*.js",
+  "js-lint": "prettier-eslint **/*.js --list-different",
   "js-lint-fix": "prettier-eslint **/*.js --write"
  },
  "devDependencies": {
