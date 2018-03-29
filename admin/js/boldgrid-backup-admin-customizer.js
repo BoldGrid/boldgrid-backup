@@ -33,7 +33,7 @@ BOLDGRID.BACKUP.CUSTOMIZER = function( $ ) {
             	if( ! self.progressNoticeShow ) {
 	            	var data = {
 	            		'action' : 'boldgrid_backup_get_progress_notice',
-	            		'nonce' : boldgridBackupCustomizer.nonce,
+	            		'nonce' : boldgridBackupCustomizer.nonce
 	            	},
 	            	successCallback;
 
@@ -57,7 +57,7 @@ BOLDGRID.BACKUP.CUSTOMIZER = function( $ ) {
 		            	data : data,
 		            	type : 'post',
 		            	dataType : 'json',
-		            	success : successCallback,
+		            	success : successCallback
 		            } );
             	}
             } );
@@ -79,7 +79,7 @@ BOLDGRID.BACKUP.CUSTOMIZER = function( $ ) {
             	if( ! self.protectNoticeShow ) {
             		var data = {
             			'action' : 'boldgrid_backup_get_protect_notice',
-            			'update_protection' : true,
+            			'update_protection' : true
             		};
 
             		$.post( ajaxurl, data, function( response ) {
