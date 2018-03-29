@@ -36,14 +36,22 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 	self.backupNow = function( e ) {
 
 		// Declare variables.
-		var $this, $backupSiteSection, $backupSiteResults, backupNonce, wpHttpReferer, isUpdating,
-		errorCallback, successCallback, data, markup,
-		$folderExclude = $( '[name="folder_exclusion_exclude"]' ),
-		$folderInclude = $( '[name="folder_exclusion_include"]' ),
-		$tableInclude = $( '[name="include_tables[]"]' ),
-		includeTables = [],
-		type = 'full',
-		tablesType = null;
+		var $this,
+			$backupSiteSection,
+			$backupSiteResults,
+			backupNonce,
+			wpHttpReferer,
+			isUpdating,
+			errorCallback,
+			successCallback,
+			data,
+			markup,
+			$folderExclude = $( '[name="folder_exclusion_exclude"]' ),
+			$folderInclude = $( '[name="folder_exclusion_include"]' ),
+			$tableInclude = $( '[name="include_tables[]"]' ),
+			includeTables = [],
+			type = 'full',
+			tablesType = null;
 
 		/*
 		 * If we are in a Backup Site Now modal and there is a "type" value set,
@@ -60,10 +68,8 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 		// Assign the current jQuery object.
 		$this = $( this );
 
-        // Disable the Backup Site Now link button.
-		$this
-			.attr( 'disabled', 'disabled' )
-			.css( 'pointer-events', 'none' );
+		// Disable the Backup Site Now link button.
+		$this.attr( 'disabled', 'disabled' ).css( 'pointer-events', 'none' );
 
 		// Create a context selector for the Backup Site Now section.
 		$backupSiteSection = $( '#backup-site-now-section' );
@@ -72,17 +78,19 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 		$backupSiteResults = $( '#backup-site-now-results' );
 
 		$( '#TB_ajaxContent' )
-			.find( 'input' ).attr( 'disabled', true ).end()
-			.find( 'button' ).attr( 'disabled', true ).end();
+			.find( 'input' )
+			.attr( 'disabled', true )
+			.end()
+			.find( 'button' )
+			.attr( 'disabled', true )
+			.end();
 
 		$( '#you_may_leave' ).fadeIn();
 
 		// Get the wpnonce and referer values.
-		backupNonce = $backupSiteSection.find( '#backup_auth' )
-			.val();
+		backupNonce = $backupSiteSection.find( '#backup_auth' ).val();
 
-		wpHttpReferer = $backupSiteSection.find( '[name="_wp_http_referer"]' )
-			.val();
+		wpHttpReferer = $backupSiteSection.find( '[name="_wp_http_referer"]' ).val();
 
 		// Get the backup archive file key.
 		isUpdating = $this.data( 'updating' );
@@ -129,7 +137,10 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 		successCallback = function( response ) {
 			var data = JSON.parse( response ),
 				success = data.success !== undefined && true === data.success,
-				callback = success && data.data !== undefined && data.data.callback !== undefined ? data.data.callback : null;
+				callback =
+					success && data.data !== undefined && data.data.callback !== undefined ?
+						data.data.callback :
+						null;
 
 			switch ( callback ) {
 				case 'updateProtectionEnabled':
@@ -143,12 +154,12 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 
 		// Generate the data array.
 		data = {
-			'action': 'boldgrid_backup_now',
-			'backup_auth': backupNonce,
-			'_wp_http_referer': wpHttpReferer,
-			'is_updating': isUpdating,
-			'backup_now': '1',
-			'folder_exclusion_type': type
+			action: 'boldgrid_backup_now',
+			backup_auth: backupNonce,
+			_wp_http_referer: wpHttpReferer,
+			is_updating: isUpdating,
+			backup_now: '1',
+			folder_exclusion_type: type
 		};
 
 		/*
@@ -190,9 +201,7 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 			complete: function() {
 
 				// Hide the spinner.
-				$backupSiteSection
-					.find( '.spinner' )
-						.removeClass( 'is-active' );
+				$backupSiteSection.find( '.spinner' ).removeClass( 'is-active' );
 
 				if ( undefined !== BOLDGRID.BACKUP.UpdateSelectors ) {
 					BOLDGRID.BACKUP.UpdateSelectors.enable();

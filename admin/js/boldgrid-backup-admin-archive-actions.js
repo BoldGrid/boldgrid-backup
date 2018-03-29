@@ -14,8 +14,8 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 	var self = this,
 		lang = BoldGridBackupAdminArchiveActions,
-		$body,
-		$wpbody;
+		$body = $( 'body' ),
+		$wpbody = $body.find( '#wpbody' );
 
 	/**
 	 * @summary Confirm to delete a selected backup archive file.
@@ -67,10 +67,12 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 
 		// If the wp_filesystem method is not "direct", then show a message and return.
 		if ( 'direct' !== lang.accessType ) {
-			alert( 'Wordpress filesystem access method is not direct; it is set to \'' +
-				lang.accessType +
-				'\'.\n\nYou can download the archive file using another method, such as FTP.\n\n' +
-				'The backup archive file path is: ' + downloadFilepath
+			alert(
+				'Wordpress filesystem access method is not direct; it is set to \'' +
+					lang.accessType +
+					'\'.\n\nYou can download the archive file using another method, such as FTP.\n\n' +
+					'The backup archive file path is: ' +
+					downloadFilepath
 			);
 
 			e.preventDefault();
@@ -78,14 +80,17 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 		}
 
 		data = {
-		    'action': 'download_archive_file',
-		    'download_key': downloadKey,
-		    'download_filename': downloadFilename,
-		    'wpnonce': lang.archiveNonce
+			action: 'download_archive_file',
+			download_key: downloadKey,
+			download_filename: downloadFilename,
+			wpnonce: lang.archiveNonce
 		};
 
 		// Create a hidden form to request the download.
-		form = '<form id=\'download-now-form\' class=\'hidden\' method=\'POST\' action=\'' + ajaxurl + '\' target=\'_blank\'>';
+		form =
+			'<form id=\'download-now-form\' class=\'hidden\' method=\'POST\' action=\'' +
+			ajaxurl +
+			'\' target=\'_blank\'>';
 		Object.keys( data ).forEach( function( key ) {
 			form += '<input type=\'hidden\' name=\'' + key + '\' value=\'' + data[key] + '\' />';
 		} );
@@ -93,9 +98,7 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 
 		$formDom = $( form );
 
-		$formDom
-			.appendTo( 'body' )
-			.submit();
+		$formDom.appendTo( 'body' ).submit();
 
 		e.preventDefault();
 	};
@@ -114,11 +117,11 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 			$this = $( this ),
 			filename = $this.attr( 'data-archive-filename' ),
 			data = {
-				'action': 'boldgrid_backup_restore_archive',
-				'restore_now': $this.attr( 'data-restore-now' ),
-				'archive_key': $this.attr( 'data-archive-key' ),
-				'archive_filename': filename,
-				'archive_auth': $this.attr( 'data-nonce' )
+				action: 'boldgrid_backup_restore_archive',
+				restore_now: $this.attr( 'data-restore-now' ),
+				archive_key: $this.attr( 'data-archive-key' ),
+				archive_filename: filename,
+				archive_auth: $this.attr( 'data-nonce' )
 			},
 			$spinner = $this.next( '.spinner' );
 
@@ -130,7 +133,10 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 			$wpbody.bgbuDisableActions();
 
 			$.post( ajaxurl, data, function( response ) {
-				var redirectUrl = response.data !== undefined && response.data.redirect_url !== undefined ? response.data.redirect_url : false;
+				var redirectUrl =
+					response.data !== undefined && response.data.redirect_url !== undefined ?
+						response.data.redirect_url :
+						false;
 
 				if ( redirectUrl ) {
 					window.location.href = redirectUrl;
@@ -146,9 +152,6 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 	};
 
 	$( function() {
-		$body = $( 'body' ),
-		$wpbody = $body.find( '#wpbody' );
-
 		$body.on( 'click', '.action-download', self.downloadArchive );
 		$body.on( 'click', '.restore-now', self.restoreArchiveConfirm );
 		$body.on( 'click', '#delete-action a', self.onClickDelete );

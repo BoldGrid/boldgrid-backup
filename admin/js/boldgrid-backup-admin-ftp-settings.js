@@ -49,11 +49,9 @@ BoldGrid.FtpSettings = function( $ ) {
 	 * @since 1.5.4
 	 */
 	self.onTypeChange = function() {
-		var suggestedPort = lang.default_port[ $type.val() ];
+		var suggestedPort = lang.default_port[$type.val()];
 
-		$port
-			.val( suggestedPort )
-			.bgbuDrawAttention();
+		$port.val( suggestedPort ).bgbuDrawAttention();
 	};
 
 	$( function() {

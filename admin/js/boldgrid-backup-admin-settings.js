@@ -83,14 +83,21 @@ BoldGrid.Settings = function( $ ) {
 		$licenseString.empty();
 
 		errorFunction = function( response ) {
-			var error = response !== undefined && response.data !== undefined && response.data.string !== undefined ? response.data.string : bglibLicense.unknownError;
+			var error =
+				response !== undefined && response.data !== undefined && response.data.string !== undefined ?
+					response.data.string :
+					bglibLicense.unknownError;
 
 			$spinner.hide();
 			$licenseString.html( error );
 		};
 
 		successFunction = function( response ) {
-			if ( true !== response.success || response.data === undefined || response.data.string === undefined ) {
+			if (
+				true !== response.success ||
+				response.data === undefined ||
+				response.data.string === undefined
+			) {
 				errorFunction( response );
 				return;
 			}
@@ -159,8 +166,8 @@ BoldGrid.Settings = function( $ ) {
 			$td_configure = $tr.find( 'td.configure' ),
 			$nonce = $( '#_wpnonce' ),
 			data = {
-				'action': 'boldgrid_backup_is_setup_' + $tr.attr( 'data-key' ),
-				'security': $nonce.val()
+				action: 'boldgrid_backup_is_setup_' + $tr.attr( 'data-key' ),
+				security: $nonce.val()
 			},
 			$new_tr;
 
@@ -264,19 +271,15 @@ BoldGrid.Settings = function( $ ) {
 		wpHttpReferer = $( '[name="_wp_http_referer"]' ).val();
 
 		data = {
-			'action': 'undismissBoldgridNotice',
-			'notice': 'bg-key-prompt',
-			'set_key_auth': nonce,
-			'_wp_http_referer': wpHttpReferer
+			action: 'undismissBoldgridNotice',
+			notice: 'bg-key-prompt',
+			set_key_auth: nonce,
+			_wp_http_referer: wpHttpReferer
 		};
 
-		$.post(
-			ajaxurl,
-			data,
-			function() {
-				location.reload();
-			}
-		);
+		$.post( ajaxurl, data, function() {
+			location.reload();
+		} );
 	};
 
 	// Onload event listener.

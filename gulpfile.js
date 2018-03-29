@@ -1,8 +1,9 @@
-var gulp   = require( 'gulp' ),
+var gulp = require( 'gulp' ),
 	readme = require( 'gulp-readme-to-markdown' );
 
 gulp.task( 'readme', function() {
-	gulp.src( [ 'readme.txt' ] )
+	gulp
+		.src( [ 'readme.txt' ] )
 		.pipe( readme() )
 		.pipe( gulp.dest( '.' ) );
 } );

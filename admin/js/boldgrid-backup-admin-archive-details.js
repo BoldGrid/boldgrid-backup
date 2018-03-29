@@ -11,11 +11,10 @@
 var BoldGrid = BoldGrid || {};
 
 BoldGrid.ArchiveDetails = function( $ ) {
-
 	var self = this,
 		$body = $( 'body' ),
 		$contentWrap = $( '#wp-content-wrap' ),
-		$downloadFirst = $body.find( '#download_first' );
+		$downloadFirst = $body.find( '#download_first' ),
 		$editorTabs = $body.find( '.wp-editor-tabs button' ),
 		adminLang = BoldGridBackupAdmin.lang,
 		lang = boldgrid_backup_archive_details;
@@ -24,13 +23,12 @@ BoldGrid.ArchiveDetails = function( $ ) {
 	 * @summary Handle the click of the Upload button.
 	 */
 	self.onClickUpload = function() {
-
 		var $a = $( this ),
 			provider = $a.attr( 'data-provider-id' ),
 			data = {
-				'action': 'boldgrid_backup_remote_storage_upload_' + provider,
-				'filename': $( '#filename' ).val(),
-				'security': $( '#_wpnonce' ).val()
+				action: 'boldgrid_backup_remote_storage_upload_' + provider,
+				filename: $( '#filename' ).val(),
+				security: $( '#_wpnonce' ).val()
 			},
 			failUpload;
 
@@ -41,7 +39,8 @@ BoldGrid.ArchiveDetails = function( $ ) {
 		 */
 		failUpload = function( response ) {
 			var defaultMessage = adminLang.xmark + ' ' + lang.failUpload,
-				dataNotEmpty = response !== undefined && response.data !== undefined && '' !== response.data,
+				dataNotEmpty =
+					response !== undefined && response.data !== undefined && '' !== response.data,
 				message = dataNotEmpty ? defaultMessage + ' ' + response.data : defaultMessage;
 
 			$a.parent().html( message );
@@ -56,9 +55,7 @@ BoldGrid.ArchiveDetails = function( $ ) {
 			$a.next( '.spinner' ).remove();
 
 			if ( response.success !== undefined && true === response.success ) {
-				$a
-					.after( '&#10003; ' + lang.uploaded )
-					.remove();
+				$a.after( '&#10003; ' + lang.uploaded ).remove();
 			}
 
 			if ( response.success === undefined || true !== response.success ) {
@@ -80,9 +77,9 @@ BoldGrid.ArchiveDetails = function( $ ) {
 		var $button = $( this ),
 			provider = $button.attr( 'data-provider-id' ),
 			data = {
-				'action': 'boldgrid_backup_remote_storage_download_' + provider,
-				'filename': $( '#filename' ).val(),
-				'security': $( '#_wpnonce' ).val()
+				action: 'boldgrid_backup_remote_storage_download_' + provider,
+				filename: $( '#filename' ).val(),
+				security: $( '#_wpnonce' ).val()
 			},
 			$spinner = $button.next( '.spinner' ),
 			$wpbody = $body.find( '#wpbody' );
@@ -111,11 +108,13 @@ BoldGrid.ArchiveDetails = function( $ ) {
 
 		$spinner.addClass( 'inline' );
 
-		$downloadToServer.first()
+		$downloadToServer
+			.first()
 			.click()
 
 			// Remvoe the spinner so we don't have two spinners going at same time.
-			.next( '.spinner' ).remove();
+			.next( '.spinner' )
+			.remove();
 	};
 
 	/**

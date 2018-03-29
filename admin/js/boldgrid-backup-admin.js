@@ -44,7 +44,9 @@ BoldGrid.Backup = function( $ ) {
 			return;
 		}
 
-		$( 'a[href*="WordPress_Backups"]' ).closest( '.notice' ).remove();
+		$( 'a[href*="WordPress_Backups"]' )
+			.closest( '.notice' )
+			.remove();
 	};
 
 	/**
@@ -144,25 +146,27 @@ BoldGrid.Backup = function( $ ) {
 	 * @since 1.6.0
 	 */
 	self.makeNoticesDismissible = function() {
-        $( '.notice.is-dismissible' ).each( function() {
-            var $el = $( this ),
-                $button = $( '<button type="button" class="notice-dismiss"><span class="screen-reader-text"></span></button>' ),
-                btnText = 'undefined' !== typeof commonL10n ? commonL10n.dismiss : wp.customize.l10n.close;
+		$( '.notice.is-dismissible' ).each( function() {
+			var $el = $( this ),
+				$button = $(
+					'<button type="button" class="notice-dismiss"><span class="screen-reader-text"></span></button>'
+				),
+				btnText = 'undefined' !== typeof commonL10n ? commonL10n.dismiss : wp.customize.l10n.close;
 
-            // Ensure plain text
-            $button.find( '.screen-reader-text' ).text( btnText );
-            $button.on( 'click.wp-dismiss-notice', function( event ) {
-                event.preventDefault();
-                $el.fadeTo( 100, 0, function() {
-                    $el.slideUp( 100, function() {
-                        $el.remove();
-                    } );
-                } );
-            } );
+			// Ensure plain text
+			$button.find( '.screen-reader-text' ).text( btnText );
+			$button.on( 'click.wp-dismiss-notice', function( event ) {
+				event.preventDefault();
+				$el.fadeTo( 100, 0, function() {
+					$el.slideUp( 100, function() {
+						$el.remove();
+					} );
+				} );
+			} );
 
-            $el.append( $button );
-        } );
-    };
+			$el.append( $button );
+		} );
+	};
 
 	$( function() {
 		self.bindHelpClick();
@@ -199,7 +203,9 @@ BoldGrid.Backup = function( $ ) {
 	 * @since 1.6.0
 	 */
 	self.updatePremiumLink = function() {
-		$( '#adminmenu' ).find( 'a[href="' + BoldGridBackupAdmin.get_premium_url + '"]' ).attr( 'target', '_blank' );
+		$( '#adminmenu' )
+			.find( 'a[href="' + BoldGridBackupAdmin.get_premium_url + '"]' )
+			.attr( 'target', '_blank' );
 	};
 };
 
@@ -225,16 +231,13 @@ jQuery.fn.bgbuDrawAttention = function() {
 		return;
 	}
 
-
 	// If enough time hasn't passed yet since the last animation, return.
-	if ( lastAnimation && ( d.getTime() - lastAnimation ) < animateInterval ) {
+	if ( lastAnimation && d.getTime() - lastAnimation < animateInterval ) {
 		return;
 	}
 
 	if ( this.is( 'input' ) ) {
-		this
-			.css( 'background', '#ddd' )
-			.animate( {backgroundColor: '#fff'}, 500 );
+		this.css( 'background', '#ddd' ).animate( { backgroundColor: '#fff' }, 500 );
 	} else if ( this.is( '.dashicons-editor-help' ) ) {
 		this.effect( 'bounce', { times: 2 }, 'normal' );
 	} else if ( this.is( 'span' ) ) {
@@ -249,9 +252,7 @@ jQuery.fn.bgbuDrawAttention = function() {
 		}
 		currentColor = this.attr( 'data-original-color' );
 
-		this
-			.css( 'color', '#fff' )
-			.animate( { color: currentColor }, 500 );
+		this.css( 'color', '#fff' ).animate( { color: currentColor }, 500 );
 	}
 };
 

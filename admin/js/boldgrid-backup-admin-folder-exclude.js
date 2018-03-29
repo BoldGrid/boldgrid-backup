@@ -42,7 +42,10 @@ BoldGrid.FolderExclude = function( $ ) {
 	 *
 	 */
 	self.isUsingDefaults = function() {
-		return $inputInclude.val().trim() === lang.default_include && $inputExclude.val().trim() === lang.default_exclude;
+		return (
+			$inputInclude.val().trim() === lang.default_include &&
+			$inputExclude.val().trim() === lang.default_exclude
+		);
 	};
 
 	/**
@@ -58,7 +61,10 @@ BoldGrid.FolderExclude = function( $ ) {
 
 		$icon.toggle();
 
-		$table.children( 'tbody' ).children( 'tr:not(:first)' ).toggle();
+		$table
+			.children( 'tbody' )
+			.children( 'tr:not(:first)' )
+			.toggle();
 
 		return false;
 	};
@@ -94,19 +100,17 @@ BoldGrid.FolderExclude = function( $ ) {
 	 */
 	self.onClickPreview = function() {
 		var data = {
-				'action': 'boldgrid_backup_exclude_folders_preview',
-				'security': $container.find( '[name="folder_exclusion_nonce"]' ).val(),
-				'include': $inputInclude.val(),
-				'exclude': $inputExclude.val()
-			};
+			action: 'boldgrid_backup_exclude_folders_preview',
+			security: $container.find( '[name="folder_exclusion_nonce"]' ).val(),
+			include: $inputInclude.val(),
+			exclude: $inputExclude.val()
+		};
 
 		exclusionList = [];
 		$filter.val( '' );
 
 		// Show the status area and indicate we're loading.
-		$status
-			.removeClass( 'hidden' )
-			.html( BoldGridBackupAdmin.spinner_loading );
+		$status.removeClass( 'hidden' ).html( BoldGridBackupAdmin.spinner_loading );
 
 		// Hide the preview area.
 		$excludeFoldersPreview.addClass( 'hidden' );
@@ -143,13 +147,9 @@ BoldGrid.FolderExclude = function( $ ) {
 			include = $button.attr( 'data-include' ),
 			exclude = $button.attr( 'data-exclude' );
 
-		$inputInclude
-			.val( include )
-			.bgbuDrawAttention();
+		$inputInclude.val( include ).bgbuDrawAttention();
 
-		$inputExclude
-			.val( exclude )
-			.bgbuDrawAttention();
+		$inputExclude.val( exclude ).bgbuDrawAttention();
 
 		self.toggleStatus();
 
@@ -266,9 +266,7 @@ BoldGrid.FolderExclude = function( $ ) {
 		for ( x = startKey; x <= lastRecordKey; x++ ) {
 			file = 0 < filteredList.length ? filteredList[x] : exclusionList[x];
 
-			markup += '<li>' +
-				'<strong>' + ( x + 1 ).toLocaleString( 'en' ) + '</strong>. ' +
-				file + '</li>';
+			markup += '<li>' + '<strong>' + ( x + 1 ).toLocaleString( 'en' ) + '</strong>. ' + file + '</li>';
 		}
 		filteredNoResults = '' !== filterVal && 0 === filteredList.length;
 		markup = filteredNoResults ? lang.no_results : markup;
@@ -295,8 +293,12 @@ BoldGrid.FolderExclude = function( $ ) {
 
 		page = 0 === totalCount ? 0 : page;
 
-		markup += '<span class="displaying-num">' +
-				'<span>' + totalCount.toLocaleString( 'en' ) + '</span> ' + lang.items +
+		markup +=
+			'<span class="displaying-num">' +
+			'<span>' +
+			totalCount.toLocaleString( 'en' ) +
+			'</span> ' +
+			lang.items +
 			'</span>' +
 			'<span class="pagination-links">';
 
@@ -314,8 +316,14 @@ BoldGrid.FolderExclude = function( $ ) {
 
 		markup +=
 			'<span class="paging-input">' +
-				'<input class="current-page" type="text" value="' + page + '" size="1">' +
-				'<span class="tablenav-paging-text"> ' + lang.of + ' <span class="total-pages">' + totalPages + '</span></span>' +
+			'<input class="current-page" type="text" value="' +
+			page +
+			'" size="1">' +
+			'<span class="tablenav-paging-text"> ' +
+			lang.of +
+			' <span class="total-pages">' +
+			totalPages +
+			'</span></span>' +
 			'</span> ';
 
 		if ( page < totalPages ) {
@@ -333,7 +341,9 @@ BoldGrid.FolderExclude = function( $ ) {
 		markup += '</span>';
 
 		$excludeFoldersPreview
-			.find( '.tablenav-pages' ).html( markup ).end()
+			.find( '.tablenav-pages' )
+			.html( markup )
+			.end()
 			.removeClass( 'hidden' );
 	};
 
@@ -359,7 +369,10 @@ BoldGrid.FolderExclude = function( $ ) {
 	 *
 	 */
 	self.toggleStatus = function() {
-		var usingDefaults = $inputInclude.val() && $inputInclude.val().trim() === lang.default_include && $inputExclude.val().trim() === lang.default_exclude,
+		var usingDefaults =
+				$inputInclude.val() &&
+				$inputInclude.val().trim() === lang.default_include &&
+				$inputExclude.val().trim() === lang.default_exclude,
 			$yesDefault = $container.find( '.yes-default' ),
 			$noDefault = $container.find( '.no-default' );
 
@@ -391,13 +404,9 @@ BoldGrid.FolderExclude = function( $ ) {
 
 		$type.on( 'change', self.onChangeType );
 
-		$inputInclude
-			.on( 'input', self.toggleStatus )
-			.on( 'focusin', self.bounceHelp );
+		$inputInclude.on( 'input', self.toggleStatus ).on( 'focusin', self.bounceHelp );
 
-		$inputExclude
-			.on( 'input', self.toggleStatus )
-			.on( 'focusin', self.bounceHelp );
+		$inputExclude.on( 'input', self.toggleStatus ).on( 'focusin', self.bounceHelp );
 	} );
 };
 

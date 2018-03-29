@@ -28,7 +28,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 		// On click action for the Upload button.
 		$( '#upload-archive-form' )
 			.find( '.button' )
-				.on( 'click', self.uploadButtonClicked );
+			.on( 'click', self.uploadButtonClicked );
 
 		$( '.page-title-action.add-new' ).on( 'click', function() {
 			$( '#add_new' ).toggle();
@@ -36,8 +36,8 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 
 		$fileInput
 			.parent()
-				.find( 'input:submit' )
-					.attr( 'disabled', true );
+			.find( 'input:submit' )
+			.attr( 'disabled', true );
 
 		// On click action for toggling a help section.
 		$( '.dashicons-editor-help' ).on( 'click', self.toggleHelp );
@@ -47,11 +47,9 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 
 		$fileInput.on( 'change', self.onChangeInput );
 
-		$mineCount
-			.on( 'click', self.onClickCount )
-			.on( 'mouseover', function() {
-				$mineCountHelp.bgbuDrawAttention();
-			} );
+		$mineCount.on( 'click', self.onClickCount ).on( 'mouseover', function() {
+			$mineCountHelp.bgbuDrawAttention();
+		} );
 	} );
 
 	/**
@@ -99,7 +97,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 
 		name = $fileInput[0].files[0].name;
 		size = $fileInput[0].files[0].size;
-		extension = name.substr( ( name.lastIndexOf( '.' ) + 1 ) );
+		extension = name.substr( name.lastIndexOf( '.' ) + 1 );
 
 		isTooBig = 0 > maxSize - size;
 		isBadExtension = 'zip' !== extension;
@@ -172,16 +170,15 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 		// Declare variables.
 		var $this = $( this );
 
-        // Disable the Upload button.
-		$this
-			.css( 'pointer-events', 'none' );
+		// Disable the Upload button.
+		$this.css( 'pointer-events', 'none' );
 
 		// Show the spinner.
 		$this
 			.parent()
-				.find( '.spinner' )
-					.addClass( 'is-active' )
-					.css( 'display', 'inline-block' );
+			.find( '.spinner' )
+			.addClass( 'is-active' )
+			.css( 'display', 'inline-block' );
 	};
 
 	/**
@@ -190,7 +187,9 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 	 * @since 1.2.2
 	 */
 	self.toggleHelp = function() {
-		$( this ).next( '.help' ).toggle();
+		$( this )
+			.next( '.help' )
+			.toggle();
 	};
 };
 

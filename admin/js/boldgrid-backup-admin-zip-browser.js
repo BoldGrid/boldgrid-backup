@@ -11,7 +11,6 @@
 var BoldGrid = BoldGrid || {};
 
 BoldGrid.ZipBrowser = function( $ ) {
-
 	var self = this,
 		$zipBrowser = $( '#zip_browser' ),
 		$listing = $zipBrowser.find( '.listing' ),
@@ -39,19 +38,19 @@ BoldGrid.ZipBrowser = function( $ ) {
 			$tr = $a.closest( 'tr' ),
 			expanded = '1' === $tr.attr( 'data-expanded' ),
 			colspan = $tr.find( 'td' ).length,
-			$newTr = $( '<tr class="file-actions"><td colspan="' + colspan + '">' + loading + '</td></tr>' ),
+			$newTr = $(
+				'<tr class="file-actions"><td colspan="' + colspan + '">' + loading + '</td></tr>'
+			),
 			$dummyTr = $( '<tr></tr>' ),
 			data = {
-				'action': 'boldgrid_backup_browse_archive_file_actions',
-				'security': $( '#_wpnonce' ).val(),
-				'filename': $( '#filename' ).val(),
-				'file': $tr.attr( 'data-dir' )
+				action: 'boldgrid_backup_browse_archive_file_actions',
+				security: $( '#_wpnonce' ).val(),
+				filename: $( '#filename' ).val(),
+				file: $tr.attr( 'data-dir' )
 			};
 
 		if ( ! expanded ) {
-			$newTr
-				.css( 'background-color', $tr.css( 'background-color' ) )
-				.insertAfter( $tr );
+			$newTr.css( 'background-color', $tr.css( 'background-color' ) ).insertAfter( $tr );
 			$dummyTr.insertAfter( $newTr );
 
 			$tr.attr( 'data-expanded', '1' );
@@ -67,8 +66,12 @@ BoldGrid.ZipBrowser = function( $ ) {
 			} );
 		} else {
 			$tr
-				.next( 'tr' ).remove().end()
-				.next( 'tr' ).remove().end()
+				.next( 'tr' )
+				.remove()
+				.end()
+				.next( 'tr' )
+				.remove()
+				.end()
 				.attr( 'data-expanded', '0' );
 		}
 	};
@@ -107,10 +110,10 @@ BoldGrid.ZipBrowser = function( $ ) {
 			$p = $a.closest( 'p' ),
 			$spinner = $a.next(),
 			data = {
-				'action': 'boldgrid_backup_browse_archive_restore_db',
-				'security': $( '#_wpnonce' ).val(),
-				'filename': $( '#filename' ).val(),
-				'file': $a.attr( 'data-file' )
+				action: 'boldgrid_backup_browse_archive_restore_db',
+				security: $( '#_wpnonce' ).val(),
+				filename: $( '#filename' ).val(),
+				file: $a.attr( 'data-file' )
 			},
 			confirmation,
 			status = '<span class="spinner inline"></span> Restoring';
@@ -160,10 +163,10 @@ BoldGrid.ZipBrowser = function( $ ) {
 	self.onClickViewDb = function() {
 		var $a = $( this ),
 			data = {
-				'action': 'boldgrid_backup_browse_archive_view_db',
-				'security': $( '#_wpnonce' ).val(),
-				'filename': $( '#filename' ).val(),
-				'file': $( '#dump_filename' ).val()
+				action: 'boldgrid_backup_browse_archive_view_db',
+				security: $( '#_wpnonce' ).val(),
+				filename: $( '#filename' ).val(),
+				file: $( '#dump_filename' ).val()
 			},
 			$details = $( '#db_details' ),
 			errorCallback;
@@ -204,7 +207,10 @@ BoldGrid.ZipBrowser = function( $ ) {
 	self.renderBreadcrumbs = function( dir ) {
 		var split,
 			$container = $zipBrowser.find( '.breadcrumbs' ),
-			html = '<span class="dashicons dashicons-admin-home"></span> <a data-dir-".">' + boldgrid_backup_zip_browser.home + '</a> ',
+			html =
+				'<span class="dashicons dashicons-admin-home"></span> <a data-dir-".">' +
+				boldgrid_backup_zip_browser.home +
+				'</a> ',
 			dataDir = '';
 
 		dir = 'undefined' !== typeof dir ? dir.trim() : '/';
@@ -237,15 +243,15 @@ BoldGrid.ZipBrowser = function( $ ) {
 		$zipBrowser.show();
 
 		data = {
-			'action': 'boldgrid_backup_browse_archive',
-			'security': $( '#_wpnonce' ).val(),
-			'filename': $( '#filename' ).val(),
-			'dir': dir
+			action: 'boldgrid_backup_browse_archive',
+			security: $( '#_wpnonce' ).val(),
+			filename: $( '#filename' ).val(),
+			dir: dir
 		};
 
 		self.renderBreadcrumbs( dir );
 
-		$listing.find( 'tbody' ).html( '<tr><td colspan="' + colspan + '">' + loading + '</td></tr>'  );
+		$listing.find( 'tbody' ).html( '<tr><td colspan="' + colspan + '">' + loading + '</td></tr>' );
 
 		$.post( ajaxurl, data, function( response ) {
 			if ( response.success !== undefined ) {

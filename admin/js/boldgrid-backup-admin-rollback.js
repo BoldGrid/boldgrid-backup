@@ -51,14 +51,18 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		cancelRollback: function() {
 
 			// Declare variables.
-			var data, cancelNonce, wpHttpReferer, errorCallback, $cancelRollbackSection,
-				$cancelRollbackResults, $rollbackSpinner,
+			var data,
+				cancelNonce,
+				wpHttpReferer,
+				errorCallback,
+				$cancelRollbackSection,
+				$cancelRollbackResults,
+				$rollbackSpinner,
 				$this = $( this ),
 				successCallBack;
 
-	        // Disable the Cancel Rollback button.
-	        $this.attr( 'disabled', 'disabled' )
-	        	.css( 'pointer-events', 'none' );
+			// Disable the Cancel Rollback button.
+			$this.attr( 'disabled', 'disabled' ).css( 'pointer-events', 'none' );
 
 			// Create a context selector for the cancel rollback section.
 			$cancelRollbackSection = $( '#cancel-rollback-section' );
@@ -67,37 +71,33 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			$cancelRollbackResults = $( '#cancel-rollback-results' );
 
 			// Create a context selector for the cancel rollback spinner.
-			$rollbackSpinner = $cancelRollbackSection
-				.find( '.spinner' );
+			$rollbackSpinner = $cancelRollbackSection.find( '.spinner' );
 
 			// Show the spinner.
-			$rollbackSpinner
-				.addClass( 'is-active' );
+			$rollbackSpinner.addClass( 'is-active' );
 
-			$rollbackSpinner
-				.css( 'display', 'inline-block' );
+			$rollbackSpinner.css( 'display', 'inline-block' );
 
 			// Get the wpnonce and referer values.
-			cancelNonce = $cancelRollbackSection.find( '#cancel_rollback_auth' )
-				.val();
+			cancelNonce = $cancelRollbackSection.find( '#cancel_rollback_auth' ).val();
 
-			wpHttpReferer = $cancelRollbackSection.find( '[name="_wp_http_referer"]' )
-				.val();
+			wpHttpReferer = $cancelRollbackSection.find( '[name="_wp_http_referer"]' ).val();
 
 			// Create an error callback function.
 			errorCallback = function() {
 
 				// Show error message.
-				var markup = '<div class="notice notice-error"><p>There was an error processing your request.  Please reload the page and try again.</p></div>';
+				var markup =
+					'<div class="notice notice-error"><p>There was an error processing your request.  Please reload the page and try again.</p></div>';
 
 				$cancelRollbackResults.html( markup );
 			};
 
 			// Generate a data array for the download request.
 			data = {
-			    'action': 'boldgrid_cancel_rollback',
-			    'cancel_rollback_auth': cancelNonce,
-			    '_wp_http_referer': wpHttpReferer
+				action: 'boldgrid_cancel_rollback',
+				cancel_rollback_auth: cancelNonce,
+				_wp_http_referer: wpHttpReferer
 			};
 
 			/**
@@ -108,7 +108,9 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			successCallBack = function( response ) {
 
 				// Remove the restore now section.
-				$( '[data-restore-now]' ).parent().slideUp();
+				$( '[data-restore-now]' )
+					.parent()
+					.slideUp();
 
 				// Insert markup in the results section.
 				$cancelRollbackResults.html( response );
@@ -132,9 +134,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 				complete: function() {
 
 					// Hide the spinner.
-					$cancelRollbackSection
-						.find( '.spinner' )
-						.removeClass( 'is-active' );
+					$cancelRollbackSection.find( '.spinner' ).removeClass( 'is-active' );
 				}
 			} );
 
@@ -161,9 +161,9 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			// If totalSeconds is less than or equal to zero, then return zero array.
 			if ( 0 >= totalSeconds ) {
 				return {
-					'total': 0,
-					'minutes': '0',
-					'seconds': '00'
+					total: 0,
+					minutes: '0',
+					seconds: '00'
 				};
 			}
 
@@ -173,9 +173,9 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 
 			// Return the data in an array.
 			return {
-				'total': totalSeconds,
-				'minutes': minutes,
-				'seconds': ( '0' + seconds ).slice( -2 )
+				total: totalSeconds,
+				minutes: minutes,
+				seconds: ( '0' + seconds ).slice( -2 )
 			};
 		},
 
@@ -194,7 +194,9 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		initializeClock: function() {
 
 			// Define variables.
-			var $clock, interval, totalSeconds,
+			var $clock,
+				interval,
+				totalSeconds,
 				self = this;
 
 			// Get the element for the clock display.
@@ -232,7 +234,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			// Check for the deadline in the source (when completing updates in the admin section).
 			$RollbackDeadline = $( 'iframe' )
 				.contents()
-					.find( '#rollback-deadline' );
+				.find( '#rollback-deadline' );
 
 			// Update the rollback timer.
 			if ( $RollbackDeadline.length ) {
@@ -255,19 +257,17 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			$bulkActionForm = $( '#bulk-action-form' );
 
 			// Get the bulk-action-form wpnonce.
-			wpnonce = $bulkActionForm
-				.find( '#_wpnonce' ).val();
+			wpnonce = $bulkActionForm.find( '#_wpnonce' ).val();
 
 			// Get the bulk-action-form wpnonce.
-			wpHttpReferer = $bulkActionForm
-				.find( '[name="_wp_http_referer"]' ).val();
+			wpHttpReferer = $bulkActionForm.find( '[name="_wp_http_referer"]' ).val();
 
 			// Use adminajax to get the updated deadline.
 			// Generate the data array.
 			data = {
-				'action': 'boldgrid_backup_deadline',
-				'_wpnonce': wpnonce,
-				'_wp_http_referer': wpHttpReferer
+				action: 'boldgrid_backup_deadline',
+				_wpnonce: wpnonce,
+				_wp_http_referer: wpHttpReferer
 			};
 
 			// Make the call.
@@ -314,7 +314,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			}
 
 			var data = {
-					'action': 'boldgrid_backup_get_countdown_notice'
+					action: 'boldgrid_backup_get_countdown_notice'
 				},
 				successCallback;
 
@@ -324,7 +324,8 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			 * @since 1.6.0
 			 */
 			successCallback = function( response ) {
-				var $notice, notification,
+				var $notice,
+					notification,
 					$headerEnd = $( '.wp-header-end' ),
 					$wrap = $( '.wrap' ).first();
 
@@ -335,7 +336,10 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 
 					// Determine where and how to add the notice.
 					if ( 'customize' === pagenow ) {
-						notification = new wp.customize.Notification( BOLDGRID.BACKUP.RollbackTimer.countdownCode, { 'message': $notice.removeClass( 'notice notice-warning' ).html(), type: 'warning' } );
+						notification = new wp.customize.Notification(
+							BOLDGRID.BACKUP.RollbackTimer.countdownCode,
+							{ message: $notice.removeClass( 'notice notice-warning' ).html(), type: 'warning' }
+						);
 						wp.customize.notifications.add( notification );
 					} else {
 						$notice.addClass( 'hidden' );
@@ -377,16 +381,13 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		 * @since 1.6.0
 		 */
 		adjustOnAbout: function() {
-
 			if ( 'about' !== pagenow ) {
 				return;
 			}
 
 			var $notice = $( '.notice.boldgrid-backup-countdown' );
 
-			$notice
-				.css( 'display', 'block!important' )
-				.insertBefore( '.wrap' );
+			$notice.css( 'display', 'block!important' ).insertBefore( '.wrap' );
 		},
 
 		/**
@@ -403,7 +404,8 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 				haveDeadline;
 
 			// Determine whether or not we have a valid deadline.
-			haveDeadline = 'object' === typeof boldgrid_backup_admin_rollback &&
+			haveDeadline =
+				'object' === typeof boldgrid_backup_admin_rollback &&
 				boldgrid_backup_admin_rollback.rolloutDeadline !== undefined &&
 				'1970' !== boldgrid_backup_admin_rollback.rolloutDeadline.slice( 0, 4 );
 
@@ -418,16 +420,13 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			}
 
 			// When the update progress iframe loads, check for a new deadline.
-			$( 'iframe' )
-				.on( 'load', this.updateDeadline );
+			$( 'iframe' ).on( 'load', this.updateDeadline );
 
 			// When a plugin is updated via adminajax, then get the new deadline and update the timer.
-			$document
-				.on( 'wp-plugin-update-success', this.getUpdatedDeadline );
+			$document.on( 'wp-plugin-update-success', this.getUpdatedDeadline );
 
 			// When a theme is updated via adminajax, then get the new deadline and update the timer.
-			$document
-				.on( 'wp-theme-update-success', this.getUpdatedDeadline );
+			$document.on( 'wp-theme-update-success', this.getUpdatedDeadline );
 
 			$document.on( 'wp-plugin-update-success wp-theme-update-success', this.show );
 		}
@@ -438,5 +437,4 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 
 	// Initialize the rollback timer.
 	BOLDGRID.BACKUP.RollbackTimer.init();
-
 } )( jQuery );

@@ -17,7 +17,6 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 
 ( function( $ ) {
 	BOLDGRID.BACKUP.UpdateSelectors = {
-
 		lang: boldgrid_backup_admin_update_selectors,
 
 		$selectors: null,
@@ -72,9 +71,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 
 				// See comment in self::disable().
 				$target = $el.is( 'a' ) ? $el.parent() : $el;
-				$target
-					.attr( 'title', '' )
-					.removeClass( self.lang.waitClass );
+				$target.attr( 'title', '' ).removeClass( self.lang.waitClass );
 			} );
 		},
 
@@ -107,9 +104,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 					 * adjust the parent instead.
 					 */
 					$target = $el.is( 'a' ) ? $el.parent() : $el;
-					$target
-						.attr( 'title', self.lang.backupInProgress )
-						.addClass( self.lang.waitClass );
+					$target.attr( 'title', self.lang.backupInProgress ).addClass( self.lang.waitClass );
 				} );
 			}, 250 );
 		},
@@ -150,5 +145,4 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 	$( function() {
 		BOLDGRID.BACKUP.UpdateSelectors.init();
 	} );
-
 } )( jQuery );
