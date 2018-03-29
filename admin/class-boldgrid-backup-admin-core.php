@@ -2126,6 +2126,8 @@ class Boldgrid_Backup_Admin_Core {
 		 */
 		do_action( 'boldgrid_backup_pre_restore', $info );
 
+		$this->restore_helper->set_writable_permissions( $info['filepath'] );
+
 		$unzip_status = ! $dryrun ? unzip_file( $info['filepath'], ABSPATH ) : null;
 
 		if( is_wp_error( $unzip_status ) ) {
@@ -2577,7 +2579,17 @@ class Boldgrid_Backup_Admin_Core {
 
 		$archive_info = $this->restore_archive_file();
 
-		// Get message for user based on whether restoration was a success.
+		/*
+		 * Generate success message and add as a user notice.
+		 *
+		 * Historically our success / fail message was taken from this file:
+		 * admin/partials/boldgrid-backup-admin-backup.php'
+		 *
+		 * However, we cannot guarantee:
+		 * # What is in that file right now because we could have restored a
+		 *   backup from version 1.5 or 1.6.
+		 * # What the file is doing (either returning info or echoing it).
+		 */
 		$is_success = ! empty( $archive_info ) && empty( $archive_info['error'] );
 		if( $is_success ) {
 			$message = array(
@@ -2586,11 +2598,13 @@ class Boldgrid_Backup_Admin_Core {
 				'header' => __( 'BoldGrid Backup - Restoration complete' ),
 			);
 		} else {
-			$message = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup.php';
+			$message = array(
+				'message' => ! empty( $archive_info['error'] ) ? $archive_info['error'] : __( 'Unknown error when attempting to restore archive.', 'bolcgrid-backup' ),
+				'class' => 'notice notice-error is-dismissible',
+				'header' => __( 'BoldGrid Backup - Restoration failed' ),
+			);
 		}
-		if( is_array( $message ) ) {
-			$this->notice->add_user_notice( $message['message'], $message['class'], $message['header'] );
-		}
+		$this->notice->add_user_notice( $message['message'], $message['class'], $message['header'] );
 
 		wp_send_json_success( array(
 			'redirect_url' => $redirect_url,

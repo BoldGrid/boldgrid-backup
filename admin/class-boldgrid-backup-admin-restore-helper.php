@@ -163,6 +163,39 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 	}
 
 	/**
+	 * Update permissions so an archive is safe to restore.
+	 *
+	 * The most common failure thus for when extracting an archive is file
+	 * permissions related. If WordPress cannot restore a file because the current
+	 * file's permissions don't allow editing, then the restoration both (1) fails
+	 * and (2) gives us a half restored site.
+	 *
+	 * This method loops through all files in the archive and updates the actual
+	 * file's permissions in an attempt to avoid file permission issues.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param string $archive_filepath Full path to an archive file.
+	 */
+	public function set_writable_permissions( $archive_filepath ) {
+		global $wp_filesystem;
+
+		$zip = new ZipArchive();
+
+		if( $zip->open( $archive_filepath ) ) {
+			for ($i = 0; $i < $zip->numFiles; $i++) {
+				$data = $zip->statIndex( $i );
+
+				if( empty( $data['name'] ) ) {
+					continue;
+				}
+
+				$wp_filesystem->chmod( ABSPATH . $data['name'] );
+			}
+		}
+	}
+
+	/**
 	 * Action to take during shutdown hook.
 	 *
 	 * This method was written because many of the calls in
