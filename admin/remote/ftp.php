@@ -663,7 +663,7 @@ class Boldgrid_Backup_Admin_Ftp {
 
 		// Avoid a really long timeout.
 		if( 21 === $port && 'sftp' === $type ) {
-			$this->errors[] = sprintf( __( 'Unable to connect to %1$s over port %2$s.', 'boldgrid-backup'), $host, $port );
+			$this->errors[] = sprintf( __( 'Unable to connect to %1$s over port %2$u.', 'boldgrid-backup'), $host, $port );
 			return false;
 		}
 
@@ -676,7 +676,7 @@ class Boldgrid_Backup_Admin_Ftp {
 				break;
 		}
 		if( ! $connection ) {
-			$this->errors[] = sprintf( __( 'Unable to connect to %1$s over port %2$s.', 'boldgrid-backup'), $host, $port );
+			$this->errors[] = sprintf( __( 'Unable to connect to %1$s over port %2$u.', 'boldgrid-backup'), $host, $port );
 			return false;
 		}
 
