@@ -138,7 +138,7 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 		$ftp->reset();
 		$ftp->disconnect();
 
-		do_action( 'boldgrid_backup_notice', __( 'Settings saved.', 'boldgrid-backup' ), 'notice updated is-dismissible' );
+		do_action( 'boldgrid_backup_notice', __( 'Settings deleted.', 'boldgrid-backup' ), 'notice updated is-dismissible' );
 	}
 
 	/**

@@ -26,16 +26,21 @@ BoldGrid.FtpSettings = function( $ ) {
 		$spinner = $form.find( '.spinner' );
 
 	/**
+	 * @summary Take action when the delete button is clicked.
+	 *
+	 * @since 1.6.0
+	 */
+	self.onClickDelete = function() {
+		$action.val( 'delete' );
+		$form.submit();
+	}
+
+	/**
 	 * @summary Action to take when form has been submitted.
 	 *
 	 * @since 1.5.4
 	 */
 	self.onSubmit = function() {
-		var $clicked = $form.find( 'input[type=submit]:focus' ),
-			action = $clicked.hasClass( 'button-primary' ) ? 'save' : 'delete';
-
-		$action.val( action );
-
 		$saveButton.attr( 'disabled', true );
 
 		$deleteButton.attr( 'disabled', true );
@@ -57,6 +62,7 @@ BoldGrid.FtpSettings = function( $ ) {
 	$( function() {
 		$type.on( 'change', self.onTypeChange );
 		$form.on( 'submit', self.onSubmit );
+		$deleteButton.on( 'click', self.onClickDelete );
 	} );
 };
 

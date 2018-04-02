@@ -37,8 +37,8 @@ $sftp_selected = 'sftp' === $data['type'] ? $selected : '';
 			<td>
 				<?php echo __( 'FTP / SFTP', 'boldgrid-backup' ); ?><br />
 				<select name="type">
-					<option value='ftp'  <?php echo esc_attr( $ftp_selected );  ?>">FTP</option>
-					<option value='sftp' <?php echo esc_attr( $sftp_selected ); ?>">SFTP</option>
+					<option value='ftp' <?php echo esc_attr( $ftp_selected ); ?> >FTP</option>
+					<option value='sftp' <?php echo esc_attr( $sftp_selected ); ?> >SFTP</option>
 				</select>
 			</td>
 			<td>
@@ -79,9 +79,9 @@ $sftp_selected = 'sftp' === $data['type'] ? $selected : '';
 	</p>
 
 	<p>
-		<input type="hidden" name="action" />
-		<input class="button button-primary"   type="submit" name="submit" value="<?php echo __( 'Save changes', 'boldgrid-backup' );    ?>" />
-		<input class="button button-secondary" type="submit" name="submit" value="<?php echo __( 'Delete settings', 'boldgrid-backup' ); ?>" />
+		<input type="hidden" name="action" value="save" />
+		<input class="button button-primary" type="submit" value="<?php echo __( 'Save changes', 'boldgrid-backup' ); ?>" />
+		<button class="button button-secondary"><?php echo __( 'Delete settings', 'boldgrid-backup' ); ?></button>
 		<span class="spinner inline middle hidden"></span>
 	</p>
 
