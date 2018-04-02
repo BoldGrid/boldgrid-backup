@@ -33,7 +33,7 @@ BoldGrid.FtpSettings = function( $ ) {
 	self.onClickDelete = function() {
 		$action.val( 'delete' );
 		$form.submit();
-	}
+	};
 
 	/**
 	 * @summary Action to take when form has been submitted.
