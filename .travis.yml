@@ -25,5 +25,8 @@ matrix:
 before_script:
   - composer update
   - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
+  - yarn install
 
-script: phpunit --debug
+script:
+  - phpunit --debug
+  - yarn js-lint

@@ -10,3 +10,4 @@ node_modules
 bower_components
 vendor/
 package-lock.json
+yarn-error.log
