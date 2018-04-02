@@ -39,4 +39,4 @@ cache:
 
 script:
   - phpunit --debug
-  - yarn js-lint
+  - yarn js-lint --log-level=debug
