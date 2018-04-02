@@ -22,21 +22,10 @@ matrix:
     - php: 5.6
       env: WP_VERSION=latest WP_MULTISITE=1
 
-sudo: required
-
 before_script:
   - composer update
   - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
-  # Install yarn.
-  # https://yarnpkg.com/lang/en/docs/install-ci/
-  - sudo apt-key adv --fetch-keys http://dl.yarnpkg.com/debian/pubkey.gpg
-  - echo "deb http://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-  - sudo apt-get update -qq
-  - sudo apt-get install -y -qq yarn
-
-cache:
-  - yarn: true
 
 script:
   - phpunit --debug
-  - yarn js-lint --log-level=debug
+  - npm run js-lint 
