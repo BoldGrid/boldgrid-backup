@@ -119,7 +119,7 @@ class Boldgrid_Backup_Admin_WP_Cron {
 		if( 'wp-cron' === $scheduler && $this->core->scheduler->is_available( $scheduler ) && ! empty( $schedule ) ) {
 			$this->core->scheduler->clear_all_schedules();
 
-			$scheduled = $this->schedule( $settings['schedule'], $this->hooks['backup'] );
+			$scheduled = $this->schedule( $settings, $this->hooks['backup'] );
 			$jobs_scheduled = $this->schedule_jobs();
 
 			return $scheduled && $jobs_scheduled;
@@ -284,17 +284,24 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param  array  $schedule BoldGrid Backup's $settings['schedule'].
+	 * @param  array  $settings
 	 * @param  string $hook
 	 * @return bool
 	 */
-	public function schedule( $schedule, $hook ) {
+	public function schedule( $settings, $hook ) {
 
 		/*
 		 * WP Cron works off of UTC. Get our "local" time from our $settings and
 		 * convert it to UTC.
+		 *
+		 * It's important that we pass in our $settings to get_settings_date().
+		 * Let's say the original time was 4am and we changed it to 5am.
+		 * # If we don't pass in $settings, which is the new time we're in the
+		 *   middle of saving right now (5am)...
+		 * # Then it will get the settings from options, which is still 4am (as
+		 *   it hasn't been saved yet).
 		 */
-		$date = $this->core->time->get_settings_date();
+		$date = $this->core->time->get_settings_date( $settings );
 		$new_timezone = new DateTimeZone( 'UTC' );
 		$date->setTimezone( $new_timezone );
 
@@ -306,7 +313,7 @@ class Boldgrid_Backup_Admin_WP_Cron {
 		$success = true;
 
 		foreach( $this->days as $day ) {
-			if( 1 !== $schedule[ 'dow_' . $day ] ) {
+			if( 1 !== $settings['schedule'][ 'dow_' . $day ] ) {
 				continue;
 			}
 
