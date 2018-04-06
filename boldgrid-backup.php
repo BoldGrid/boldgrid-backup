@@ -85,7 +85,9 @@ function run_boldgrid_backup() {
 function load_boldgrid_backup() {
 
 	// Ensure we have our vendor/autoload.php file.
-	if( ! file_exists( BOLDGRID_BACKUP_PATH . '/vendor/autoload.php' ) ) {
+	$exists_composer = file_exists( BOLDGRID_BACKUP_PATH . '/composer.json' );
+	$exists_autoload = file_exists( BOLDGRID_BACKUP_PATH . '/vendor/autoload.php' );
+	if( $exists_composer && ! $exists_autoload ) {
 		add_action( 'admin_init', function() {
 			deactivate_plugins( 'boldgrid-backup/boldgrid-backup.php', true );
 
@@ -121,13 +123,24 @@ function load_boldgrid_backup() {
 	return true;
 }
 
-// If we could not load boldgrid_backup (missing system requirements), abort.
-if( ! load_boldgrid_backup() ) {
-	return;
-}
-
-// Run the plugin only if on a wp-admin page or when DOING_CRON.
+/*
+ * Load the plugin.
+ *
+ * Above is only:
+ * # function declarations
+ * # constant declarations
+ *
+ * The initial loading of this plugin is done below.
+ *
+ * Run the plugin only if on a wp-admin page or when DOING_CRON.
+ */
 if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) || defined( 'WP_CLI' ) && WP_CLI ) {
+
+	// If we could not load boldgrid_backup (missing system requirements), abort.
+	if( ! load_boldgrid_backup() ) {
+		return;
+	}
+
 	require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup.php';
 	run_boldgrid_backup();
 }
