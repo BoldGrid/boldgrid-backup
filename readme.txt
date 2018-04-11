@@ -2,7 +2,7 @@
 Contributors: imh_brad, joemoto, rramo012, timph
 Tags: backup, restore, migrate, migration
 Requires at least: 4.4
-Tested up to: 4.9.4
+Tested up to: 4.9.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -29,41 +29,20 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 == Changelog ==
 
 = 1.6.0 =
-* New feature:  JIRA BGBKUP-70  Premium is now detected from the Connect Key license data.
-* New feature:  JIRA BGBKUP-75  Added plugin framework library for the Connect Key prompt/notice.
-* New feature:  JIRA BGBKUP-72  Restore only a database from a backup.
-
-= 1.5.3 =
-* New feature:  JIRA BGBKUP-43  Allow browsing of archive.
-* New feature:  JIRA BGBKUP-46  Add setting for include tables to the settings page.
-* New feature:  JIRA BGBKUP-47  Omit tables during backup.
-* Bug fix:      JIRA BGBKUP-54  Auto rollback not working.
-
-= 1.5.2 =
-* New feature:  JIRA WPB-3516   Auto rollback via wp cron.
-* Update:       JIRA WPB-3522   Show more detailed error messages when archiving fails.
-* New feature:  JIRA BGBKUP-29  One click upload to Amazon S3.
-* Bug fix:      JIRA WPB-3524   Cannot connect to database on plesk.
-* New feature:  JIRA WPB-3539   Amazon S3 basic retention.
-* Bug fix:      JIRA WPB-3534   Avoid node_modules timeout when calculating disk space.
-* Bug fix:      JIRA BGBKUP-36  PclZip fails on broken symlinks.
-* Bug fix:      JIRA WPB-3526   Total size: 0.00 B.
-* Bug fix:      JIRA BGBKUP-37  Warning: scandir - Permission denied.
-* Bug fix:      JIRA WPB-3512   Show error when user tries to upload file larger than what is accepted.
-* Update:       JIRA BGBKUP-38  Add verbiage about WPCron not being precise.
-* Update:       JIRA BGBKUP-34  If local storage not selected, delete backup after remote uploads.
-* Update:       JIRA BGBKUP-35  As a user, I can receive an email after Amazon S3 upload.
-* Bug fix:      JIRA BGBKUP-21  Wrong sql file is restored.
-* Update:       JIRA WPB-3529   Send email if backup fails via cron.
-* Update:       JIRA WPB-3529   Use ZipArchive by default.
-* Bug fix:      JIRA WPB-3528   Backup: Cannot change backup directory.
-
-= 1.5.1 =
-* Update		JIRA WPB-3480	Use wp filesystem when extracting backups.
-* Update		JIRA WPB-3483	Separate the current php_zip archiving code.
-* New feature:	JIRA WPB-3502	Create PclZip class for archiving.
-* Update:		JIRA WPB-3503	If functionality tests fail, flag failures in red.
-* Update:		JIRA WPB-3504	Use a script to create mysqldump rather than rely on system command.
+* New feature:                  Archive browser, the ability to see what's in a backup.
+* New feature:                  Database browser, the ability to see at a high level what's in a backup.
+* New feature:                  1 click restore database only.
+* New feature:                  FTP / SFTP support added.
+* New feature:                  Control which files and database tables are backed up.
+* Compatibility:                PclZip support added for creating archives.
+* Compatibility:                WP Cron support added for scheduled backups.
+* Compatibility:                PHP Script used to backup database, rather than system commands.
+* Improvement:                  Update admin pages to use WP UI/UX standards.
+* Improvement:                  Improved UI in regards to time zones.
+* Improvement:                  Failed items on Preflight Check page are highlighted in red.
+* Improvement:                  Send email if backup fails via cron.
+* Improvement:                  More details in Preflight Check to help with troubleshooting.
+* Bug fix:                      Bug fixed with auto restoration feature.
 
 = 1.5 =
 * Update:						Bump version.
