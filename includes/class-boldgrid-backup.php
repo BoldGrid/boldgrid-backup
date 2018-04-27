@@ -143,11 +143,6 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-settings.php';
 
 		/**
-		 * The class responsible for the plugin update functionality in the admin area.
-		 */
-		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-update.php';
-
-		/**
 		 * The class responsible for the PHP profiling functionality using XHProf.
 		 */
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-xhprof.php';
@@ -253,11 +248,6 @@ class Boldgrid_Backup {
 
 		// Instantiate the admin core.
 		$plugin_admin_core = new Boldgrid_Backup_Admin_Core();
-
-		// Instantiate the admin update class, if not already done for cron.
-		if ( ! defined( 'DOING_CRON' ) || ! DOING_CRON ) {
-			$plugin_update = new Boldgrid_Backup_Update( Boldgrid_Backup_Admin::get_configs() );
-		}
 
 		// Add nav menu items.
 		$this->loader->add_action( 'admin_menu', $plugin_admin_core,
