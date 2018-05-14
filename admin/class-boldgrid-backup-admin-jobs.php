@@ -228,16 +228,20 @@ class Boldgrid_Backup_Admin_Jobs {
 	 * call this method, which will handle the rest.
 	 *
 	 * @since 1.5.2
+	 *
+	 * @return null
 	 */
 	public function run() {
 		$this->set_jobs();
 
-		if( empty( $this->jobs ) ) {
-			return;
+		// If not logged-in, then require a matching "id".
+		if ( ! $this->core->validateCallId() ) {
+			wp_die( __( 'Error: Invalid id from unauthenticated request.' ), 'boldgrid-backup' );
 		}
 
-		if( $this->is_running() ) {
-			return;
+		// If there are no jobs or already running, then abort.
+		if( empty( $this->jobs ) || $this->is_running() ) {
+			wp_die();
 		}
 
 		foreach( $this->jobs as $key => &$job ) {
@@ -260,6 +264,8 @@ class Boldgrid_Backup_Admin_Jobs {
 		if( ! empty( $job['post_action'] ) && 'delete_all_prior' === $job['post_action'] ) {
 			$this->delete_all_prior( $key );
 		}
+
+		wp_die();
 	}
 
 	/**

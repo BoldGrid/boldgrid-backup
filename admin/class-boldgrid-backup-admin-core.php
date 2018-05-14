@@ -479,7 +479,7 @@ class Boldgrid_Backup_Admin_Core {
 		global $wp_filesystem;
 		global $pagenow;
 
-		$this->doing_cron = ( defined( 'DOING_CRON' ) && DOING_CRON );
+		$this->doing_cron = ( defined( 'DOING_CRON' ) && DOING_CRON ) || isset( $_GET['doing_wp_cron'] );
 		$this->doing_ajax = is_admin() && defined( 'DOING_AJAX' ) && DOING_AJAX;
 		$this->doing_wp_cron = ! empty( $_SERVER['SCRIPT_FILENAME'] ) && $_SERVER['SCRIPT_FILENAME'] === trailingslashit( ABSPATH ) . 'wp-cron.php';
 
@@ -1441,6 +1441,7 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @since 1.0
 	 *
+	 * @see Boldgrid_Backup_Admin_Core::validateCallId().
 	 * @see Boldgrid_Backup_Admin_Core::backup_database().
 	 *
 	 * @param bool $save A switch to save the archive file. Default is FALSE.
@@ -1448,6 +1449,9 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return array An array of archive file information.
 	 */
 	public function archive_files( $save = false, $dryrun = false ) {
+		if ( ! $this->validateCallId() ) {
+			wp_die( __( 'Error: Invalid id from unauthenticated request.' ), 'boldgrid-backup' );
+		}
 
 		$this->pre_auto_update = 'pre_auto_update' === current_filter();
 
@@ -2029,12 +2033,17 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @since 1.0
 	 *
+	 * @see Boldgrid_Backup_Admin_Core::validateCallId().
 	 * @see https://codex.wordpress.org/Function_Reference/flush_rewrite_rules
 	 *
 	 * @param bool $dryrun An optional switch to perform a dry run test.
 	 * @return array An array of archive file information.
 	 */
 	public function restore_archive_file( $dryrun = false ) {
+		if ( !$this->validateCallId() ) {
+			wp_die( __( 'Error: Invalid id from unauthenticated request.' ), 'boldgrid-backup' );
+		}
+
 		$restore_ok = true;
 
 		// If a restoration was not requested, then abort.
@@ -2710,5 +2719,21 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		return;
+	}
+
+	/**
+	 * Validate an unauthenticated wp_ajax_nopriv_ call by id.
+	 *
+	 * @since 1.6.1-rc.1
+	 *
+	 * @uses $_GET['id']
+	 * @see is_user_logged_in()
+	 * @see \BoldGrid_Backup_Admin_Core::get_backup_identifier()
+	 *
+	 * @return bool
+	 */
+	public function validateCallId() {
+		return is_user_logged_in() ||
+			( ! empty( $_GET['id'] ) && $_GET['id'] === $this->get_backup_identifier() );
 	}
 }

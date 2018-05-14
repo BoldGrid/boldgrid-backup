@@ -111,7 +111,8 @@ class Boldgrid_Backup_Admin_Cron {
 		$entry = $date->format( 'i G' ) . ' * * ';
 
 		$entry .= $days_scheduled_list . ' php -qf "' . dirname( dirname( __FILE__ ) ) .
-		'/boldgrid-backup-cron.php" mode=backup HTTP_HOST=' . $_SERVER['HTTP_HOST'];
+			'/boldgrid-backup-cron.php" mode=backup siteurl=' . get_site_url() . ' id=' .
+			$this->core->get_backup_identifier();
 
 		// If not Windows, then also silence the cron job.
 		if ( ! $this->core->test->is_windows() ) {
@@ -218,7 +219,8 @@ class Boldgrid_Backup_Admin_Cron {
 		$entry = date( $minute . ' ' . $hour, $deadline ) . ' * * ' . date( 'w' );
 
 		$entry .= ' php -qf "' . dirname( dirname( __FILE__ ) ) .
-		'/boldgrid-backup-cron.php" mode=restore HTTP_HOST=' . $_SERVER['HTTP_HOST'];
+			'/boldgrid-backup-cron.php" mode=restore siteurl=' . get_site_url() . ' id=' .
+			$this->core->get_backup_identifier();
 
 		$entry .= ' archive_key=' . $archive_key . ' archive_filename=' . $archive_filename;
 
@@ -299,7 +301,13 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @since 1.5.2
 	 */
 	public function schedule_jobs() {
-		$entry = sprintf( '*/5 * * * * php -qf "%1$s/%2$s" > /dev/null 2>&1', dirname( dirname( __FILE__ ) ), $this->run_jobs );
+		$entry = sprintf(
+			'*/5 * * * * php -qf "%1$s/%2$s" siteurl=%3$s id=%4$s > /dev/null 2>&1',
+			dirname( dirname( __FILE__ ) ),
+			$this->run_jobs,
+			urlencode( get_site_url() ),
+			$this->core->get_backup_identifier()
+		);
 
 		return $this->update_cron( $entry );
 	}
@@ -401,11 +409,8 @@ class Boldgrid_Backup_Admin_Cron {
 		// Check if crontab is available.
 		$is_crontab_available = $this->core->test->is_crontab_available();
 
-		// Check if wp-cron is available.
-		$is_wpcron_available = $this->core->test->wp_cron_enabled();
-
-		// If crontab or wp-cron is not available, then abort.
-		if ( ! $is_crontab_available && ! $is_wpcron_available ) {
+		// If crontab is not available, then abort.
+		if ( ! $is_crontab_available ) {
 			return false;
 		}
 
@@ -496,9 +501,6 @@ class Boldgrid_Backup_Admin_Cron {
 
 			// Remove temp crontab file.
 			$wp_filesystem->delete( $temp_crontab_path, false, 'f' );
-		} else {
-			// Use wp-cron.
-			// @todo Write wp-cron code here.
 		}
 
 		return true;

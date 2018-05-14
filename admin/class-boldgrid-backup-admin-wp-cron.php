@@ -265,7 +265,7 @@ class Boldgrid_Backup_Admin_WP_Cron {
 		 */
 
 		/*
-		 * Set GET variables.
+		 * Set POST variables.
 		 *
 		 * The archive_key and the archive_filename must match.
 		 */

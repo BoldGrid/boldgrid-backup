@@ -379,6 +379,11 @@ class Boldgrid_Backup {
 		add_filter( 'pre_update_option_boldgrid_backup_settings', array( 'Boldgrid_Backup_Admin_Crypt', 'pre_update_settings' ), 10, 3 );
 		add_filter( 'option_boldgrid_backup_settings', array( 'Boldgrid_Backup_Admin_Crypt', 'option_settings' ), 10, 2 );
 
+		// Actions run from crontab calls; unauthenticated.
+		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_jobs', $plugin_admin_core->jobs, 'run' );
+		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_backup', $plugin_admin_core->wp_cron, 'backup' );
+		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_restore', $plugin_admin_core->wp_cron, 'restore' );
+
 		return;
 	}
 
