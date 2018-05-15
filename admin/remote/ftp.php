@@ -386,47 +386,55 @@ class Boldgrid_Backup_Admin_Ftp {
 			array(
 				'key' => 'host',
 				'default' => null,
+				'callback' => 'sanitize_file_name',
 			),
 			array(
 				'key' => 'user',
 				'default' => null,
+				'callback' => 'sanitize_file_name',
 			),
 			array(
 				'key' => 'pass',
 				'default' => null,
+				'callback' => 'trim',
 			),
 			array(
 				'key' => 'type',
 				'default' => $this->default_type,
+				'callback' => 'sanitize_key',
 			),
 			array(
 				'key' => 'port',
 				'default' => $this->default_port[$this->default_type],
+				'callback' => 'intval',
 			),
 			array(
 				'key' => 'retention_count',
 				'default' => $this->retention_count,
+				'callback' => 'intval',
 			),
 			array(
 				'key' => 'nickname',
 				'default' => '',
-				'stripslashes' => true,
+				'callback' => 'stripslashes',
 			),
 		);
 
 		foreach( $values as $value ) {
 			$key = $value['key'];
+			$callback = ! empty( $value['callback'] ) ? $value['callback'] : null;
 
-			if( ! empty( $_POST[$key] ) ) {
-				$data[$key] = $_POST[$key];
-			} elseif( ! empty( $settings['remote'][$this->key][$key] ) ) {
-				$data[$key] = $settings['remote'][$this->key][$key];
+			if( ! empty( $_POST[ $key ] ) ) {
+				$data[ $key ] = $_POST[ $key ];
+			} elseif( ! empty( $settings['remote'][ $this->key ][ $key ] ) ) {
+				$data[ $key ] = $settings['remote'][ $this->key ][ $key ];
 			} else {
-				$data[$key] = $value['default'];
+				$data[ $key ] = $value['default'];
 			}
 
-			if( ! empty( $value['stripslashes'] ) && true === $value['stripslashes'] ) {
-				$data[$key] = stripslashes( $data[$key] );
+			// If there is a callback function for sanitizing the value, then run it.
+			if( $callback ) {
+				$data[ $key ] = $callback( $data[ $key ] );
 			}
 		}
 

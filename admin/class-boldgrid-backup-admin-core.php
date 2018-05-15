@@ -1854,7 +1854,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Validate archive_key.
 		if ( isset( $_POST['archive_key'] ) && is_numeric( $_POST['archive_key'] ) ) {
-			$archive_key = sanitize_text_field( $_POST['archive_key'] );
+			$archive_key = intval( $_POST['archive_key'] );
 		} else {
 			$delete_ok = false;
 
@@ -1869,7 +1869,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Validate archive_filename.
 		if ( ! empty( $_POST['archive_filename'] ) ) {
-			$archive_filename = $_POST['archive_filename'];
+			$archive_filename = sanitize_file_name( $_POST['archive_filename'] );
 		} else {
 			// Fail with a notice.
 			do_action(
@@ -2066,7 +2066,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Validate archive_key.
 		if ( isset( $_POST['archive_key'] ) && is_numeric( $_POST['archive_key'] ) ) {
-			$archive_key = sanitize_text_field( wp_unslash( $_POST['archive_key'] ) );
+			$archive_key = intval( $_POST['archive_key'] );
 		} else {
 			return array(
 				'error' => esc_html__( 'Invalid key for the selected archive file.', 'boldgrid-backup' ),
@@ -2075,7 +2075,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Validate archive_filename.
 		if ( ! empty( $_POST['archive_filename'] ) ) {
-			$archive_filename = sanitize_text_field( wp_unslash( $_POST['archive_filename'] ) );
+			$archive_filename = sanitize_file_name( $_POST['archive_filename'] );
 		} else {
 			return array(
 				'error' => esc_html__( 'Invalid filename for the selected archive file.', 'boldgrid-backup' ),
@@ -2335,9 +2335,10 @@ class Boldgrid_Backup_Admin_Core {
 		$this->is_backup_now = true;
 
 		$key = 'folder_exclusion_type';
-		$this->is_backup_full = isset( $_POST[$key] ) && 'full' === $_POST[$key];
+		$this->is_backup_full = isset( $_POST[ $key ] ) && 'full' === $_POST[ $key ];
 
-		$this->is_archiving_update_protection = ! empty( $_POST['is_updating'] ) && 'true' === $_POST['is_updating'];
+		$this->is_archiving_update_protection = ! empty( $_POST['is_updating'] ) &&
+			'true' === $_POST['is_updating'];
 
 		$archive_info = $this->archive_files( true );
 
@@ -2374,8 +2375,8 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Validate download_key.
-		if ( is_numeric( $_POST['download_key'] ) ) {
-			$download_key = sanitize_text_field( wp_unslash( $_POST['download_key'] ) );
+		if ( isset( $_POST['download_key'] ) && is_numeric( $_POST['download_key'] ) ) {
+			$download_key = intval( $_POST['download_key'] );
 		} else {
 			esc_html_e( 'INVALID DOWNLOAD KEY', 'boldgrid-backup' );
 			wp_die();
@@ -2383,7 +2384,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Validate download_filename.
 		if ( ! empty( $_POST['download_filename'] ) ) {
-			$download_filename = sanitize_text_field( wp_unslash( $_POST['download_filename'] ) );
+			$download_filename = sanitize_file_name( $_POST['download_filename'] );
 		} else {
 			esc_html_e( 'INVALID DOWNLOAD FILENAME', 'boldgrid-backup' );
 			wp_die();
@@ -2734,6 +2735,6 @@ class Boldgrid_Backup_Admin_Core {
 	 */
 	public function validateCallId() {
 		return is_user_logged_in() ||
-			( ! empty( $_GET['id'] ) && $_GET['id'] === $this->get_backup_identifier() );
+			( ! empty( $_GET['id'] ) && $this->get_backup_identifier() === $_GET['id'] );
 	}
 }

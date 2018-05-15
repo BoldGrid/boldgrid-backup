@@ -226,7 +226,9 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 		}
 
 		// Validation, $_POST data.
-		$filename = ! empty( $_POST['filename'] ) ? $_POST['filename'] : false;
+		$filename = ! empty( $_POST['filename'] ) ?
+			sanitize_file_name( $_POST['filename'] ) : false;
+
 		if( empty( $filename ) ) {
 			$this->core->notice->add_user_notice(
 				sprintf( $error . ': ' . __( 'Invalid filename.', 'boldgrid-backup' ) ),
@@ -264,8 +266,11 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 			wp_send_json_error( __( 'Invalid nonce.', 'boldgrid-backup' ) );
 		}
 
-		$filename = ! empty( $_POST['filename'] ) ? $_POST['filename'] : false;
+		$filename = ! empty( $_POST['filename'] ) ?
+			sanitize_file_name( $_POST['filename'] ) : false;
+
 		$filepath = $this->core->backup_dir->get_path_to( $filename );
+
 		if( empty( $filename ) || ! $this->core->wp_filesystem->exists( $filepath ) ) {
 			wp_send_json_error( __( 'Invalid archive filepath.', 'boldgrid-backup' ) );
 		}

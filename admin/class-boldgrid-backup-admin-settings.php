@@ -401,7 +401,7 @@ class Boldgrid_Backup_Admin_Settings {
 
 			// Validate input for other settings.
 			$settings['retention_count'] = (
-				isset( $_POST['retention_count'] ) ? intval( $_POST['retention_count'] ) : 5
+				isset( $_POST['retention_count'] ) ? (int) $_POST['retention_count'] : 5
 			);
 
 			$settings['notifications']['backup'] = (
@@ -569,14 +569,23 @@ class Boldgrid_Backup_Admin_Settings {
 			 * @since 1.5.2
 			 */
 			$storage_locations = ! empty( $settings['remote'] ) ? $settings['remote'] : array();
-			$storage_locations_save = ! empty( $_POST['storage_location'] ) ? $_POST['storage_location'] : array();
+
 			// Start off by disabling each storage location.
-			foreach( $settings['remote'] as $remote_key => $storage_location ) {
-				$settings['remote'][$remote_key]['enabled'] = false;
+			foreach( $storage_locations as $remote_key => $storage_location ) {
+				$settings['remote'][ $remote_key ]['enabled'] = false;
 			}
-			// Then enable it only if submitted.
+
+			// Get the storage location array from POST, then sanitize below.
+			$storage_locations_save = ! empty( $_POST['storage_location'] ) ?
+				$_POST['storage_location'] : array();
+
+			// Then enable it only if submitted.  Values are not used, only key/index.
 			foreach( $storage_locations_save as $storage_location => $storage_location_enabled ) {
-				$settings['remote'][$storage_location]['enabled'] = true;
+				$storage_location = sanitize_key( $storage_location );
+
+				if ( isset( $settings['remote'][ $storage_location ] ) ) {
+					$settings['remote'][ $storage_location ]['enabled'] = true;
+				}
 			}
 
 			/*

@@ -483,22 +483,26 @@ class Boldgrid_Backup_Admin_Sftp {
 		$errors = array();
 
 		// Get and validate our credentials.
-		$host = ! empty( $_POST['host'] ) ? $_POST['host'] : null;
-		$user = ! empty( $_POST['user'] ) ? $_POST['user'] : null;
-		$pass = ! empty( $_POST['pass'] ) ? $_POST['pass'] : null;
-		$port = ! empty( $_POST['port'] ) ? $_POST['port'] : $this->port;
+		$host = ! empty( $_POST['host'] ) ? sanitize_file_name( $_POST['host'] ) : null;
+		$user = ! empty( $_POST['user'] ) ? sanitize_file_name( $_POST['user'] ) : null;
+		$pass = ! empty( $_POST['pass'] ) ? trim( $_POST['pass'] ) : null;
+		$port = ! empty( $_POST['port'] ) ? (int) $_POST['port'] : $this->port;
+
 		$valid_credentials = $this->is_valid_credentials( $host, $user, $pass, $port );
 
 		if( $valid_credentials ) {
-			$settings['remote'][$this->key]['host'] = $host;
-			$settings['remote'][$this->key]['user'] = $user;
-			$settings['remote'][$this->key]['pass'] = $pass;
-			$settings['remote'][$this->key]['port'] = $port;
+			$settings['remote'][ $this->key ]['host'] = $host;
+			$settings['remote'][ $this->key ]['user'] = $user;
+			$settings['remote'][ $this->key ]['pass'] = $pass;
+			$settings['remote'][ $this->key ]['port'] = $port;
 		} elseif( empty( $this->errors ) ) {
 			$this->errors[] = __( 'Unknown error.', 'boldgrid-backup' );
 		}
 
-		$retention_count = ! empty( $_POST['retention_count'] ) && is_numeric( $_POST['retention_count'] ) ? $_POST['retention_count'] : $this->retention_count;
+		$retention_count = ! empty( $_POST['retention_count'] ) &&
+			is_numeric( $_POST['retention_count'] ) ?
+			(int) $_POST['retention_count'] : $this->retention_count;
+
 		$settings['remote'][$this->key]['retention_count'] = $retention_count;
 
 		if( ! empty( $this->errors ) ) {

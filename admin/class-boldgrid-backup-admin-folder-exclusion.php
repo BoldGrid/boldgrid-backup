@@ -140,17 +140,18 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	 * @return bool
 	 */
 	public function allow_file( $file ) {
-
 		// If this file is in our backup directory, do not allow it.
 		if( $this->core->backup_dir->file_in_dir( ABSPATH . $file, true ) ) {
 			return false;
 		}
 
+		// Get comma-delimited lists from user input or settings.  Sanitizing is done below.
 		$include = $this->in_ajax_preview ? $_POST['include'] : $this->from_settings( 'include' );
 		$exclude = $this->in_ajax_preview ? $_POST['exclude'] : $this->from_settings( 'exclude' );
 
-		$includes = explode( ',', $include );
-		$excludes = explode( ',', $exclude );
+		// Convert comma-delimited strings to arrays, and sanitize (also trim whitespace).
+		$includes = array_map( 'sanitize_text_field', explode( ',', $include ) );
+		$excludes = array_map( 'sanitize_text_field', explode( ',', $exclude ) );
 
 		// Default values, include everything and exclude nothing.
 		$is_match_include = false;
@@ -335,7 +336,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 		 * If we are backing up a site now (not for update protection) and
 		 * we've posted folder settings, use those.
 		 */
-		if( $this->core->is_backup_now && isset( $_POST[$key] ) ) {
+		if( $this->core->is_backup_now && isset( $_POST[ $key ] ) ) {
 			$this->$type = $this->from_post( $type );
 			return $this->$type;
 		}
@@ -434,21 +435,23 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 				 * If you submit an empty "include" setting, it will be
 				 * interpreted as include all, *.
 				 */
-				$value = ! empty( $_POST[$key] ) ? $_POST[$key] : $this->default_include;
+				$value = ! empty( $_POST[ $key ] ) ? $_POST[ $key ] : $this->default_include;
 				break;
 			case 'exclude':
 				/*
 				 * You are allowed to submit a blank "exclude" setting. It means
 				 * you do not want to exclude anything.
 				 */
-				$value = empty( $_POST[$key] ) ? '' : $_POST[$key];
+				$value = empty( $_POST[ $key ] ) ? '' : $_POST[ $key ];
 				break;
 			case 'type':
-				$value = ! empty( $_POST[$key] ) && in_array( $_POST[$key], $this->valid_types, true ) ? $_POST[$key] : $this->default_type;
+				$value = ! empty( $_POST[ $key ] ) &&
+					in_array( $_POST[ $key ], $this->valid_types, true ) ?
+					$_POST[ $key ] : $this->default_type;
 				break;
 		}
 
-		$value = trim( $value );
+		$value = sanitize_text_field( $value );
 
 		return $value;
 	}
@@ -463,8 +466,9 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 			wp_send_json_error( __( 'Invalid nonce.', 'boldgrid-backup' ) );
 		}
 
-		$include = isset( $_POST['include'] ) ? $_POST['include'] : null;
-		$exclude = isset( $_POST['exclude'] ) ? $_POST['exclude'] : null;
+		$include = isset( $_POST['include'] ) ? sanitize_text_field( $_POST['include'] ) : null;
+		$exclude = isset( $_POST['exclude'] ) ? sanitize_text_field( $_POST['exclude'] ) : null;
+
 		if( is_null( $include ) || is_null( $exclude ) ) {
 			wp_send_json_error( __( 'Invalid include / exclude values.', 'boldgrid-backup' ) );
 		}
@@ -478,6 +482,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 		}
 
 		$markup = array();
+
 		foreach( $filelist as $file ) {
 			$markup[] = $file[1];
 		}

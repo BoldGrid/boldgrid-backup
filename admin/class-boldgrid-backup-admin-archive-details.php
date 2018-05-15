@@ -132,7 +132,7 @@ class Boldgrid_Backup_Admin_Archive_Details {
 
 		$archive_found = false;
 
-		$filename = ! empty( $_GET['filename'] ) ? $_GET['filename'] : false;
+		$filename = ! empty( $_GET['filename'] ) ? sanitize_file_name( $_GET['filename'] ) : false;
 		if( ! $filename ) {
 			echo __( 'No archive specified.', 'boldgrid-backup' );
 			return;
@@ -146,11 +146,10 @@ class Boldgrid_Backup_Admin_Archive_Details {
 			$archive_found = true;
 			$dump_file = $this->core->get_dump_file( $archive['filepath'] );
 		} else {
-			$archive = array();
-			if( ! empty( $_GET['filename'] ) ) {
-				$archive['filename'] = strip_tags( $_GET['filename'] );
-				$archive['filepath'] = $this->core->backup_dir->get_path_to( $archive['filename'] );
-			}
+			$archive = array(
+				'filename' => $filename,
+				'filepath' => $this->core->backup_dir->get_path_to( $archive['filename'] ),
+			);
 		}
 
 		// Initialize the archive. We will need it in our included template below.

@@ -94,7 +94,8 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 		// Post data, used by default or when updating settings.
 		$post_data = $this->core->ftp->get_from_post();
 
-		$action = ! empty( $_POST['action'] ) ? $_POST['action'] : null;
+		$action = ! empty( $_POST['action'] ) ? sanitize_key( $_POST['action'] ) : null;
+
 		switch( $action ) {
 			case 'save':
 				echo $this->core->elements['long_checking_creds'];

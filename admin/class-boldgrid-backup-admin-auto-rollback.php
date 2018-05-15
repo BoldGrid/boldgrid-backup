@@ -121,7 +121,8 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	public function __construct( $core ) {
 		$this->core = $core;
 
-		$this->updating_core = 'update-core.php' === $this->core->pagenow && ! empty( $_GET['action'] ) && $_GET['action'] === 'do-core-upgrade';
+		$this->updating_core = 'update-core.php' === $this->core->pagenow &&
+			! empty( $_GET['action'] ) && 'do-core-upgrade' === $_GET['action'];
 
 		$this->on_update_page = in_array( $this->core->pagenow, $this->update_pages, true );
 	}
@@ -374,7 +375,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	public function notice_countdown_show() {
 
 		// Process GET / POST info.
-		$action = ! empty( $_GET['action'] ) ? $_GET['action'] : null;
+		$action = ! empty( $_GET['action'] ) ? sanitize_key( $_GET['action'] ) : null;
 		$restore_now = ! empty( $_POST['restore_now'] );
 
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );

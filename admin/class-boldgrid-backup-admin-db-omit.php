@@ -178,7 +178,7 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	}
 
 	/**
-	 * From post, get an array of tables to exlucde.
+	 * From post, get an array of tables to exclude.
 	 *
 	 * We are submitting via post "include_tables", however we use this data to
 	 * then calculate "exclude_tables".
@@ -189,7 +189,10 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	 */
 	public function get_from_post() {
 		$exclude_tables = array();
-		$include_tables = ! empty( $_POST['include_tables'] ) ? $_POST['include_tables'] : array();
+
+		$include_tables = ! empty( $_POST['include_tables'] ) ?
+			array_map( 'sanitize_text_field', $_POST['include_tables'] ) : array();
+
 		$all_tables = $this->core->db_get->prefixed();
 
 		/*
@@ -215,7 +218,9 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	 */
 	public function get_post_type() {
 		$key = 'table_inclusion_type';
-		return ! empty( $_POST[$key] ) && in_array( $_POST[$key], $this->valid_types, true ) ? $_POST[$key] : null;
+
+		return ! empty( $_POST[ $key ] ) && in_array( $_POST[ $key ], $this->valid_types, true ) ?
+			sanitize_key( $_POST[ $key ] ) : null;
 	}
 
 	/**
@@ -235,7 +240,9 @@ class Boldgrid_Backup_Admin_Db_Omit {
 
 		// Get the actual value stored in the settings. Set to an empty array if non existing.
 		$key = 'exclude_tables';
-		return ! isset( $settings[$key] ) || ! is_array( $settings[$key] ) ? array() : $settings[$key];
+
+		return ! isset( $settings[ $key ] ) || ! is_array( $settings[ $key ] ) ?
+			array() : array_map( 'sanitize_text_field', $settings[ $key ] );
 	}
 
 	/**
