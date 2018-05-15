@@ -233,18 +233,23 @@ $tests[] = array(
 	'v' => ( $this->test->is_crontab_available() ? $lang['yes'] : sprintf( $warning_span, $lang['no'], '' ) ),
 );
 
+$tests[] = 	array(
+	'k' => __( 'PHP allow_url_fopen enabled?', 'boldgrid-backup' ),
+	'v' => ( ini_get( 'allow_url_fopen' ) ? $lang['yes'] : sprintf( $error_span, $lang['no'], '' ) ),
+);
+
 $tests[] = array(
-	'k' => __( 'Cron jobs', 'boldgrid-backup' ),
+	'k' => __( 'Cron jobs:', 'boldgrid-backup' ),
 	'v' => '<pre>' . implode( '<br /><br />', $our_crons ) . '</pre>',
 );
 
 $tests[] = array(
-	'k' => __( 'Is WP-CRON enabled?', 'boldgrid-backup' ),
+	'k' => __( 'WP Cron enabled?', 'boldgrid-backup' ),
 	'v' => ( $this->test->wp_cron_enabled() ? 'Yes' : 'No' ),
 );
 
 $tests[] = array(
-	'k' => __( 'WP Cron jobs', 'boldgrid-backup' ),
+	'k' => __( 'WP Cron jobs:', 'boldgrid-backup' ),
 	'v' => '<pre>' . implode( '<br /><br />', $our_wp_crons ) . '</pre>',
 );
 
@@ -255,7 +260,7 @@ if ( $is_functional ) {
 	);
 
 	$tests[] = array(
-		'k' => __( 'Directory used to calculate disk space', __( 'boldgrid-backup') ),
+		'k' => __( 'Directory used to calculate disk space:', __( 'boldgrid-backup') ),
 		'v' => $this->home_dir->get_for_disk(),
 	);
 

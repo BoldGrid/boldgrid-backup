@@ -249,9 +249,21 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	 * Restore via wp cron.
 	 *
 	 * @since 1.5.2
+	 *
+	 * @see \Boldgrid_Backup_Admin_WP_Cron::is_valid_call()
+	 *
+	 * @return mixed null|false
 	 */
 	public function restore() {
+		if ( ! $this->is_valid_call() ) {
+			wp_die(
+				__( 'Error: Invalid request.' ),
+				'boldgrid-backup'
+			);
+		}
+
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
+
 		if ( empty( $pending_rollback ) ) {
 			$this->clear_schedules( array( $this->hooks['restore'] ) );
 			return false;
@@ -365,8 +377,17 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	 * Hook into "boldgrid_backup_wp_cron_backup" and generate backup.
 	 *
 	 * @since 1.5.1
+	 *
+	 * @see Boldgrid_Backup_Admin_WP_Cron::is_valid_call()
 	 */
 	public function backup() {
+		if ( ! $this->core->cron->is_valid_call() ) {
+			wp_die(
+				__( 'Error: Invalid request.' ),
+				'boldgrid-backup'
+			);
+		}
+
 		$archive_info = $this->core->archive_files( true );
 	}
 }

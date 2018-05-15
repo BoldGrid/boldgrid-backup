@@ -29,6 +29,7 @@ parse_str( implode( '&', array_slice( $argv, 1 ) ), $input );
 $required_arguments = array(
 	'siteurl',
 	'id',
+	'secret',
 );
 
 // Abort if arguments are not passed.
@@ -44,7 +45,10 @@ if ( $error ) {
 
 // Make an ajax call to run jobs, and report status.
 $url = $input['siteurl'] . '/wp-admin/admin-ajax.php?action=boldgrid_backup_run_jobs&id=' .
-	$input['id'] . '&doing_wp_cron=' . time();
+	$input['id'] . '&secret=' . $input['secret'] . '&doing_wp_cron=' . time();
+
+// Sanitize the url.
+$url = filter_var( $url, FILTER_SANITIZE_URL );
 
 $result = file_get_contents( $url );
 

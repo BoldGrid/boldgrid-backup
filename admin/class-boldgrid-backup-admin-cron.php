@@ -36,6 +36,15 @@ class Boldgrid_Backup_Admin_Cron {
 	public $run_jobs = 'cron/run_jobs.php';
 
 	/**
+	 * A cron secret used to validate unauthenticated crontab jobs.
+	 *
+	 * @since 1.6.1-rc.1
+	 * @access private
+	 * @var string
+	 */
+	private $cron_secret = null;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.2
@@ -54,6 +63,8 @@ class Boldgrid_Backup_Admin_Cron {
 	 *
 	 * @see Boldgrid_Backup_Admin_Cron::delete_cron_entries().
 	 * @see Boldgrid_Backup_Admin_Cron::update_cron().
+	 * @see BoldGrid_Backup_Admin_Core::get_backup_identifier()
+	 * @see BoldGrid_Backup_Admin_Cron::get_cron_secret()
 	 *
 	 * @param  array $settings
 	 * @return bool  Success.
@@ -112,7 +123,7 @@ class Boldgrid_Backup_Admin_Cron {
 
 		$entry .= $days_scheduled_list . ' php -qf "' . dirname( dirname( __FILE__ ) ) .
 			'/boldgrid-backup-cron.php" mode=backup siteurl=' . get_site_url() . ' id=' .
-			$this->core->get_backup_identifier();
+			$this->core->get_backup_identifier() . ' secret=' . $this->get_cron_secret();
 
 		// If not Windows, then also silence the cron job.
 		if ( ! $this->core->test->is_windows() ) {
@@ -165,9 +176,9 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @see Boldgrid_Backup_Admin_Core::execute_command()
 	 * @see Boldgrid_Backup_Admin_Cron::delete_cron_entries().
 	 * @see Boldgrid_Backup_Admin_Cron::update_cron().
-	 * @see Boldgrid_Backup_Admin_Settings::delete_rollback_option().
-	 * @see Boldgrid_Backup_Admin_Settings::get_settings().
 	 * @see Boldgrid_Backup_Admin_Test::is_windows()
+	 * @see BoldGrid_Backup_Admin_Core::get_backup_identifier()
+	 * @see BoldGrid_Backup_Admin_Cron::get_cron_secret()
 	 *
 	 * @return null
 	 */
@@ -216,13 +227,11 @@ class Boldgrid_Backup_Admin_Cron {
 		}
 
 		// Build cron job line in crontab format.
-		$entry = date( $minute . ' ' . $hour, $deadline ) . ' * * ' . date( 'w' );
-
-		$entry .= ' php -qf "' . dirname( dirname( __FILE__ ) ) .
-			'/boldgrid-backup-cron.php" mode=restore siteurl=' . get_site_url() . ' id=' .
-			$this->core->get_backup_identifier();
-
-		$entry .= ' archive_key=' . $archive_key . ' archive_filename=' . $archive_filename;
+		$entry = date( $minute . ' ' . $hour, $deadline ) . ' * * ' . date( 'w' ) . ' php -qf "' .
+			dirname( dirname( __FILE__ ) ) . '/boldgrid-backup-cron.php" mode=restore siteurl=' .
+			get_site_url() . ' id=' . $this->core->get_backup_identifier() . ' secret=' .
+			$this->get_cron_secret() . ' archive_key=' . $archive_key .
+			' archive_filename=' . $archive_filename;
 
 		// If not Windows, then also silence the cron job.
 		if ( ! $this->core->test->is_windows() ) {
@@ -299,14 +308,18 @@ class Boldgrid_Backup_Admin_Cron {
 	 * the "run_jobs" wp-cron scheduled.
 	 *
 	 * @since 1.5.2
+	 *
+	 * @see BoldGrid_Backup_Admin_Core::get_backup_identifier()
+	 * @see BoldGrid_Backup_Admin_Cron::get_cron_secret()
 	 */
 	public function schedule_jobs() {
 		$entry = sprintf(
-			'*/5 * * * * php -qf "%1$s/%2$s" siteurl=%3$s id=%4$s > /dev/null 2>&1',
+			'*/5 * * * * php -qf "%1$s/%2$s" siteurl=%3$s id=%4$s secret=%5$s > /dev/null 2>&1',
 			dirname( dirname( __FILE__ ) ),
 			$this->run_jobs,
 			urlencode( get_site_url() ),
-			$this->core->get_backup_identifier()
+			$this->core->get_backup_identifier(),
+			$this->get_cron_secret()
 		);
 
 		return $this->update_cron( $entry );
@@ -824,5 +837,54 @@ class Boldgrid_Backup_Admin_Cron {
 
 			echo PHP_EOL;
 		}
+	}
+
+	/**
+	 * Get the cron secret used to validate unauthenticated crontab jobs.
+	 *
+	 * @since 1.6.1-rc.1
+	 *
+	 * @see BoldGrid_Backup_Admin_Settings::get_settings()
+	 *
+	 * @return string
+	 */
+	public function get_cron_secret() {
+		if ( empty( $this->cron_secret ) ) {
+			$settings = $this->core->settings->get_settings( true );
+
+			if ( empty( $settings['cron_secret'] ) ) {
+				$settings['cron_secret'] = hash( 'sha256', openssl_random_pseudo_bytes( 21 ) );
+
+				update_site_option( 'boldgrid_backup_settings', $settings );
+			}
+
+			$this->cron_secret = $settings['cron_secret'];
+		}
+
+		return $this->cron_secret;
+	}
+
+	/**
+	 * Validate an unauthenticated wp_ajax_nopriv_ call by backup id and cron secret.
+	 *
+	 * @since 1.6.1-rc.1
+	 *
+	 * @uses $_GET['id']
+	 * @uses $_GET['secret']
+	 *
+	 * @see is_user_logged_in()
+	 * @see BoldGrid_Backup_Admin_Core::get_backup_identifier()
+	 * @see BoldGrid_Backup_Admin_Cron::get_cron_secret()
+	 *
+	 * @return bool
+	 */
+	public function is_valid_call() {
+		$backup_id_match = ! empty( $_GET['id'] ) &&
+			$this->core->get_backup_identifier() === $_GET['id'];
+
+		$cron_secret_match = ! empty( $_GET['secret'] ) &&
+			$this->get_cron_secret() === $_GET['secret'];
+
+		return is_user_logged_in() || ( $backup_id_match && $cron_secret_match );
 	}
 }
