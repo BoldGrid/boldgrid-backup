@@ -45,6 +45,15 @@ class Boldgrid_Backup_Admin_Cron {
 	private $cron_secret = null;
 
 	/**
+	 * Linux crontab entry version string.
+	 *
+	 * The version represents the plugin version string when the crontab entry format was changed.
+	 *
+	 * @var string
+	 */
+	public $crontab_version = '1.6.1';
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.2
@@ -435,7 +444,7 @@ class Boldgrid_Backup_Admin_Cron {
 		/*
 		 * Configure our pattern.
 		 *
-		 * When this method was initiall written, $mode was either
+		 * When this method was initially written, $mode was either
 		 * empty (defaulting to "backup") or "restore", hence the first two
 		 * conditionals below.
 		 *
@@ -886,5 +895,45 @@ class Boldgrid_Backup_Admin_Cron {
 			$this->get_cron_secret() === $_GET['secret'];
 
 		return is_user_logged_in() || ( $backup_id_match && $cron_secret_match );
+	}
+
+	/**
+	 * Upgrade crontab entries, if not already upgraded.
+	 *
+	 * @since 1.6.1-rc.1
+	 *
+	 * @see BoldGrid_Backup_Admin_Settings::get_settings()
+	 * @see BoldGrid_Backup_Admin_Cron::add_all_crons()
+	 *
+	 * @return bool Returns TRUE only if an upgrade was performed.
+	 */
+	public function upgrade_crontab_entries() {
+		$upgraded = false;
+		$settings = $this->core->settings->get_settings( true );
+
+		if ( empty( $settings['crontab_version'] ) ||
+			$this->crontab_version !== $settings['crontab_version'] ) {
+				// Delete and recreate the crontab entries.
+				$upgraded = $this->add_all_crons( $settings );
+
+				if ( $upgraded ) {
+					$settings['crontab_version'] = $this->crontab_version;
+					update_site_option( 'boldgrid_backup_settings', $settings );
+
+					/**
+					 * Action when the crontab entry upgrade is successfully completed.
+					 *
+					 * @since 1.6.1-rc.1
+					 *
+					 * @param string The new crontab entry version.
+					 */
+					do_action(
+						'boldgrid_backup_upgrade_crontab_entries_complete',
+						$settings['crontab_version']
+					);
+				}
+		}
+
+		return $upgraded;
 	}
 }

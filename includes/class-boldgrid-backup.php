@@ -347,6 +347,8 @@ class Boldgrid_Backup {
 
 		$this->loader->add_action( 'admin_init', $plugin_admin_core->auto_rollback, 'enqueue_update_selectors' );
 
+		$this->loader->add_action( 'admin_init', $plugin_admin_core->cron, 'upgrade_crontab_entries' );
+
 		/*
 		 * Ftp
 		 */
