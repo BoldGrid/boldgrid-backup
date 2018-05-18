@@ -2,7 +2,7 @@
  "scripts": {
   "js-lint": "prettier-eslint **/*.js --list-different",
   "js-lint-fix": "prettier-eslint **/*.js --write",
-  "install-codesniffs": "php node_modules/PHP_CodeSniffer/bin/phpcs --config-set installed_paths node_modules/WordPress-Coding-Standards/",
+  "install-codesniffs": "./node_modules/PHP_CodeSniffer/bin/phpcs --config-set installed_paths ./node_modules/WordPress-Coding-Standards/",
   "php-codesniffer": "npm run install-codesniffs && node_modules/PHP_CodeSniffer/bin/phpcs -p -s -v . --standard=WordPress --ignore=*/node_modules/* --extensions=php"
  },
  "devDependencies": {
