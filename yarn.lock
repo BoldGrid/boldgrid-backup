@@ -2,6 +2,14 @@
 # yarn lockfile v1
 
 
+"PHP_CodeSniffer@https://github.com/squizlabs/PHP_CodeSniffer/":
+  version "0.0.0"
+  resolved "https://github.com/squizlabs/PHP_CodeSniffer/#bbdaac852406ebbbd5a772e16a97fa69a4df6cfe"
+
+"WordPress-Coding-Standards@https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/":
+  version "0.0.0"
+  resolved "https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/#119117deb1e64c56ee83a98d79cd7aa6cf10725b"
+
 abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"

@@ -17,3 +17,4 @@ before_script:
 
 script:
   - phpunit --debug
+  - yarn run php-codesniffer
