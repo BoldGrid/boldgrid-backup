@@ -396,7 +396,6 @@ class Boldgrid_Backup_Admin_Ftp {
 			array(
 				'key' => 'pass',
 				'default' => null,
-				'callback' => 'trim',
 			),
 			array(
 				'key' => 'type',
