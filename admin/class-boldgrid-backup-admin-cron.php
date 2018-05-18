@@ -161,6 +161,8 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @return bool
 	 */
 	public function add_all_crons( $settings ) {
+		$success = false;
+
 		$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
 		$schedule = ! empty( $settings['schedule'] ) ? $settings['schedule'] : null;
 
@@ -170,10 +172,15 @@ class Boldgrid_Backup_Admin_Cron {
 			$scheduled = $this->add_cron_entry( $settings );
 			$jobs_scheduled = $this->schedule_jobs();
 
-			return $scheduled && $jobs_scheduled;
+			$success = $scheduled && $jobs_scheduled;
+
+			if ( $success ) {
+				$settings['crontab_version'] = $this->crontab_version;
+				update_site_option( 'boldgrid_backup_settings', $settings );
+			}
 		}
 
-		return false;
+		return $success;
 	}
 
 	/**
@@ -917,9 +924,6 @@ class Boldgrid_Backup_Admin_Cron {
 				$upgraded = $this->add_all_crons( $settings );
 
 				if ( $upgraded ) {
-					$settings['crontab_version'] = $this->crontab_version;
-					update_site_option( 'boldgrid_backup_settings', $settings );
-
 					/**
 					 * Action when the crontab entry upgrade is successfully completed.
 					 *
@@ -929,7 +933,7 @@ class Boldgrid_Backup_Admin_Cron {
 					 */
 					do_action(
 						'boldgrid_backup_upgrade_crontab_entries_complete',
-						$settings['crontab_version']
+						$this->crontab_version
 					);
 				}
 		}
