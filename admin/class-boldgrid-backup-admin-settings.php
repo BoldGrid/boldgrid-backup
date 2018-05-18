@@ -556,6 +556,7 @@ class Boldgrid_Backup_Admin_Settings {
 				$crons_added = $this->core->wp_cron->add_all_crons( $settings );
 			} elseif( 'cron' === $scheduler ) {
 				$crons_added = $this->core->cron->add_all_crons( $settings );
+				$settings['crontab_version'] = $this->core->cron->crontab_version;
 			}
 			// Take action if we tried and failed to add crons.
 			if( isset( $crons_added ) && ! $crons_added ) {
