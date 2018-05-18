@@ -881,7 +881,7 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @uses $_GET['id']
 	 * @uses $_GET['secret']
 	 *
-	 * @see is_user_logged_in()
+	 * @see current_user_can()
 	 * @see BoldGrid_Backup_Admin_Core::get_backup_identifier()
 	 * @see BoldGrid_Backup_Admin_Cron::get_cron_secret()
 	 *
@@ -894,8 +894,7 @@ class Boldgrid_Backup_Admin_Cron {
 		$cron_secret_match = ! empty( $_GET['secret'] ) &&
 			$this->get_cron_secret() === $_GET['secret'];
 
-		return ( is_user_logged_in() && current_user_can( 'update_plugins' ) ) ||
-			( $backup_id_match && $cron_secret_match );
+		return current_user_can( 'update_plugins' ) || ( $backup_id_match && $cron_secret_match );
 	}
 
 	/**
