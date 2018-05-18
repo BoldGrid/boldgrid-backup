@@ -64,7 +64,7 @@ $tests = array(
 		'heading' => __( 'General tests', 'boldgrid-backup' ),
 	),
 	array(
-		'k' => __( 'User home directory', 'boldgrid-backup' ),
+		'k' => __( 'User home directory:', 'boldgrid-backup' ),
 		'v' => $home_dir . ' (' . $home_dir_mode . ')',
 	),
 	array(
@@ -72,7 +72,7 @@ $tests = array(
 		'v' =>( $home_dir_writable ? $lang['yes'] : $lang['no'] ),
 	),
 	array(
-		'k' => __( 'WordPress directory', 'boldgrid-backup' ),
+		'k' => __( 'WordPress directory:', 'boldgrid-backup' ),
 		'v' => ABSPATH,
 	),
 	array(
@@ -80,11 +80,11 @@ $tests = array(
 		'v' => ( $this->test->get_is_abspath_writable() ? $lang['yes'] : sprintf( $error_span, $lang['no'], '' ) ),
 	),
 	array(
-		'k' => __( 'Document root', 'boldgrid-backup' ),
+		'k' => __( 'Document root:', 'boldgrid-backup' ),
 		'v' => str_replace( '\\\\', '\\', $_SERVER['DOCUMENT_ROOT'] ),
 	),
 	array(
-		'k' => __( 'Current user', 'boldgrid-backup' ),
+		'k' => __( 'Current user:', 'boldgrid-backup' ),
 		'v' => get_current_user(),
 	),
 	array(
@@ -102,23 +102,23 @@ $tests = array(
 );
 
 $tests[] = array(
-	'heading' => __( 'Backup directory & permissions', 'boldgrid-backup' ),
+	'heading' => __( 'Backup directory & permissions:', 'boldgrid-backup' ),
 );
 
 $tests[] = array(
-	'k' => __( 'Possible backup directory parents', 'boldgrid-backup' ),
+	'k' => __( 'Possible backup directory parents:', 'boldgrid-backup' ),
 	'v' => implode( '<br />', $possible_backup_dirs ),
 );
 
 $tests[] = array(
-	'k' => __( 'Backup directory', 'boldgrid-backup' ),
+	'k' => __( 'Backup directory:', 'boldgrid-backup' ),
 	'v' => ! empty( $backup_directory ) ? $backup_directory : sprintf( $error_span, $lang['not_set'], '' ),
 );
 
 // As set of tests only to run if a backup directory is found.
 if( ! empty( $backup_directory ) ) {
 	$tests[] = array(
-		'k' => __( 'Backup directory without ABSPATH', 'boldgrid-backup' ),
+		'k' => __( 'Backup directory without ABSPATH:', 'boldgrid-backup' ),
 		'v' => $this->backup_dir->without_abspath,
 	);
 
