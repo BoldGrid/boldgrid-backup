@@ -894,7 +894,8 @@ class Boldgrid_Backup_Admin_Cron {
 		$cron_secret_match = ! empty( $_GET['secret'] ) &&
 			$this->get_cron_secret() === $_GET['secret'];
 
-		return is_user_logged_in() || ( $backup_id_match && $cron_secret_match );
+		return ( is_user_logged_in() && current_user_can( 'update_plugins' ) ) ||
+			( $backup_id_match && $cron_secret_match );
 	}
 
 	/**
