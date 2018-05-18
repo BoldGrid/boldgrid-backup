@@ -1849,7 +1849,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Validate archive_key.
 		if ( isset( $_POST['archive_key'] ) && is_numeric( $_POST['archive_key'] ) ) {
-			$archive_key = intval( $_POST['archive_key'] );
+			$archive_key = (int) $_POST['archive_key'];
 		} else {
 			$delete_ok = false;
 
@@ -2056,7 +2056,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Validate archive_key.
 		if ( isset( $_POST['archive_key'] ) && is_numeric( $_POST['archive_key'] ) ) {
-			$archive_key = intval( $_POST['archive_key'] );
+			$archive_key = (int) $_POST['archive_key'];
 		} else {
 			return array(
 				'error' => esc_html__( 'Invalid key for the selected archive file.', 'boldgrid-backup' ),
@@ -2366,7 +2366,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Validate download_key.
 		if ( isset( $_POST['download_key'] ) && is_numeric( $_POST['download_key'] ) ) {
-			$download_key = intval( $_POST['download_key'] );
+			$download_key = (int) $_POST['download_key'];
 		} else {
 			esc_html_e( 'INVALID DOWNLOAD KEY', 'boldgrid-backup' );
 			wp_die();
