@@ -484,7 +484,7 @@ class Boldgrid_Backup_Admin_Sftp {
 
 		// Get and validate our credentials.
 		$host = ! empty( $_POST['host'] ) ? sanitize_file_name( $_POST['host'] ) : null;
-		$user = ! empty( $_POST['user'] ) ? sanitize_file_name( $_POST['user'] ) : null;
+		$user = ! empty( $_POST['user'] ) ? sanitize_text_field( $_POST['user'] ) : null;
 		$pass = ! empty( $_POST['pass'] ) ? $_POST['pass'] : null;
 		$port = ! empty( $_POST['port'] ) ? (int) $_POST['port'] : $this->port;
 

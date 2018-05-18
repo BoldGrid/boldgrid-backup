@@ -391,7 +391,7 @@ class Boldgrid_Backup_Admin_Ftp {
 			array(
 				'key' => 'user',
 				'default' => null,
-				'callback' => 'sanitize_file_name',
+				'callback' => 'sanitize_text_field',
 			),
 			array(
 				'key' => 'pass',
