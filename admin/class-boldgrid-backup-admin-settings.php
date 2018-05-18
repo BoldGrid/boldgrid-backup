@@ -277,7 +277,8 @@ class Boldgrid_Backup_Admin_Settings {
 	 * @since 1.0
 	 * @access private
 	 *
-	 * @see Boldgrid_Backup_Admin_Cron::add_cron_entry().
+	 * @see Boldgrid_Backup_Admin_Cron::add_cron_entry()
+	 * @see Boldgrid_Backup_Admin_Cron::get_cron_secret()
 	 *
 	 * @return bool Update success.
 	 */
@@ -556,6 +557,8 @@ class Boldgrid_Backup_Admin_Settings {
 				$crons_added = $this->core->wp_cron->add_all_crons( $settings );
 			} elseif( 'cron' === $scheduler ) {
 				$crons_added = $this->core->cron->add_all_crons( $settings );
+				$settings['crontab_version'] = $this->core->cron->crontab_version;
+				$settings['cron_secret'] = $this->core->cron->get_cron_secret();
 			}
 			// Take action if we tried and failed to add crons.
 			if( isset( $crons_added ) && ! $crons_added ) {
