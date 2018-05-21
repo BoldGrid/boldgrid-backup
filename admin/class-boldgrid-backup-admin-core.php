@@ -1517,7 +1517,7 @@ class Boldgrid_Backup_Admin_Core {
 		// Determine how this backup was triggered.
 		if( $this->pre_auto_update ) {
 			$info['trigger'] = __( 'Auto update', 'boldgrid-bakcup' );
-		} elseif( $this->doing_ajax ) {
+		} elseif( $this->doing_ajax && is_user_logged_in() ) {
 			$current_user = wp_get_current_user();
 			$info['trigger'] = $current_user->user_login . ' (' . $current_user->user_email . ')';
 		} elseif( $this->doing_wp_cron ) {
