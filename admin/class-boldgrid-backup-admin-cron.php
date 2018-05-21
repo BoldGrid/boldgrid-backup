@@ -988,13 +988,6 @@ class Boldgrid_Backup_Admin_Cron {
 		}
 
 		/*
-		 * If the deadline has elapsed more than 2 minutes ago, then abort.
-		 *
-		 * The boldgrid-backup-cron.php file has this check. As wp cron is not
-		 * as precise, we will not check.
-		 */
-
-		/*
 		 * Set POST variables.
 		 *
 		 * The archive_key and the archive_filename must match.
