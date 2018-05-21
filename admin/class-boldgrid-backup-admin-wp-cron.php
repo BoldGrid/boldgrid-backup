@@ -250,12 +250,12 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	 *
 	 * @since 1.5.2
 	 *
-	 * @see \Boldgrid_Backup_Admin_WP_Cron::is_valid_call()
+	 * @see Boldgrid_Backup_Admin_Cron::is_valid_call()
 	 *
 	 * @return mixed null|false
 	 */
 	public function restore() {
-		if ( ! $this->is_valid_call() ) {
+		if ( ! $this->core->cron->is_valid_call() ) {
 			wp_die(
 				__( 'Error: Invalid request.' ),
 				'boldgrid-backup'
@@ -378,7 +378,7 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	 *
 	 * @since 1.5.1
 	 *
-	 * @see Boldgrid_Backup_Admin_WP_Cron::is_valid_call()
+	 * @see Boldgrid_Backup_Admin_Cron::is_valid_call()
 	 */
 	public function backup() {
 		if ( ! $this->core->cron->is_valid_call() ) {

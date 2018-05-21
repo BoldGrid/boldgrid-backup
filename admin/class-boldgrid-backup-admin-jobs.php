@@ -229,7 +229,7 @@ class Boldgrid_Backup_Admin_Jobs {
 	 *
 	 * @since 1.5.2
 	 *
-	 * @see Boldgrid_Backup_Admin_WP_Cron::is_valid_call()
+	 * @see Boldgrid_Backup_Admin_Cron::is_valid_call()
 	 *
 	 * @return null
 	 */
