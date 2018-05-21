@@ -940,4 +940,74 @@ class Boldgrid_Backup_Admin_Cron {
 
 		return $upgraded;
 	}
+
+	/**
+	 * Hook into "wp_ajax_nopriv_boldgrid_backup_run_backup" and generate backup.
+	 *
+	 * @since 1.6.1-rc.1
+	 *
+	 * @see Boldgrid_Backup_Admin_Cron::is_valid_call()
+	 *
+	 * @return array An array of archive file information.
+	 */
+	public function backup() {
+		if ( ! $this->is_valid_call() ) {
+			wp_die(
+				__( 'Error: Invalid request.' ),
+				'boldgrid-backup'
+			);
+		}
+
+		$archive_info = $this->core->archive_files( true );
+
+		return $archive_info;
+	}
+
+	/**
+	 * Hook into "wp_ajax_nopriv_boldgrid_backup_run_restore" and restores from backup.
+	 *
+	 * @since 1.6.1-rc.1
+	 *
+	 * @see Boldgrid_Backup_Admin_Cron::is_valid_call()
+	 *
+	 * @return array An array of archive file information.
+	 */
+	public function restore() {
+		if ( ! $this->is_valid_call() ) {
+			wp_die(
+				__( 'Error: Invalid request.' ),
+				'boldgrid-backup'
+			);
+		}
+
+		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
+
+		if ( empty( $pending_rollback ) ) {
+			$this->clear_schedules( array( $this->hooks['restore'] ) );
+			return array();
+		}
+
+		/*
+		 * If the deadline has elapsed more than 2 minutes ago, then abort.
+		 *
+		 * The boldgrid-backup-cron.php file has this check. As wp cron is not
+		 * as precise, we will not check.
+		 */
+
+		/*
+		 * Set POST variables.
+		 *
+		 * The archive_key and the archive_filename must match.
+		 */
+		$_POST['restore_now'] = 1;
+		$_POST['archive_key'] = 0;
+		$_POST['archive_filename'] = basename( $pending_rollback['filepath'] );
+
+		$archive_info = $this->core->restore_archive_file();
+
+		// Remove existing restore cron jobs.
+		$this->clear_schedules( array( $this->hooks['restore'] ) );
+
+		return $archive_info;
+	}
 }

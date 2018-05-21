@@ -383,8 +383,8 @@ class Boldgrid_Backup {
 
 		// Actions run from crontab calls; unauthenticated.
 		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_jobs', $plugin_admin_core->jobs, 'run' );
-		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_backup', $plugin_admin_core->wp_cron, 'backup' );
-		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_restore', $plugin_admin_core->wp_cron, 'restore' );
+		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_backup', $plugin_admin_core->cron, 'backup' );
+		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_restore', $plugin_admin_core->cron, 'restore' );
 
 		return;
 	}
