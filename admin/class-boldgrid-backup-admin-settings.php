@@ -586,7 +586,11 @@ class Boldgrid_Backup_Admin_Settings {
 			foreach( $storage_locations_save as $storage_location => $storage_location_enabled ) {
 				$storage_location = sanitize_key( $storage_location );
 
-				if ( isset( $settings['remote'][ $storage_location ] ) ) {
+				/*
+				 * Unless this is the local environment, don't enable a storage location if it has
+				 * not yet been setup. Why enable FTP if FTP hasn't been setup yet.
+				 */
+				if ( 'local' === $storage_location || isset( $settings['remote'][ $storage_location ] ) ) {
 					$settings['remote'][ $storage_location ]['enabled'] = true;
 				}
 			}
