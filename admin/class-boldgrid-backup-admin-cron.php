@@ -333,7 +333,7 @@ class Boldgrid_Backup_Admin_Cron {
 			'*/5 * * * * php -qf "%1$s/%2$s" siteurl=%3$s id=%4$s secret=%5$s > /dev/null 2>&1',
 			dirname( dirname( __FILE__ ) ),
 			$this->run_jobs,
-			urlencode( get_site_url() ),
+			get_site_url(),
 			$this->core->get_backup_identifier(),
 			$this->get_cron_secret()
 		);
