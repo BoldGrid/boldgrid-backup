@@ -250,36 +250,23 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	 *
 	 * @since 1.5.2
 	 *
+	 * @see Boldgrid_Backup_Admin_Cron::prepare_restore()
+	 *
 	 * @return mixed null|false
 	 */
 	public function restore() {
-		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
+		$archive_info = array(
+			'error' => __( 'Could not perform restoration from WP Cron task.', 'boldgrid-backup' ),
+		);
 
-		if ( empty( $pending_rollback ) ) {
-			$this->clear_schedules( array( $this->hooks['restore'] ) );
-			return false;
+		if ( $this->core->cron->prepare_restore() ) {
+			$archive_info = $this->core->restore_archive_file();
 		}
-
-		/*
-		 * If the deadline has elapsed more than 2 minutes ago, then abort.
-		 *
-		 * The boldgrid-backup-cron.php file has this check. As wp cron is not
-		 * as precise, we will not check.
-		 */
-
-		/*
-		 * Set POST variables.
-		 *
-		 * The archive_key and the archive_filename must match.
-		 */
-		$_POST['restore_now'] = 1;
-		$_POST['archive_key'] = 0;
-		$_POST['archive_filename'] = basename( $pending_rollback['filepath'] );
-
-		$archive_info = $this->core->restore_archive_file();
 
 		// Remove existing restore cron jobs.
 		$this->clear_schedules( array( $this->hooks['restore'] ) );
+
+		return $archive_info;
 	}
 
 	/**
