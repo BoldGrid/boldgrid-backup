@@ -969,7 +969,6 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @since 1.6.1-rc.1
 	 *
 	 * @see Boldgrid_Backup_Admin_Cron::is_valid_call()
-	 * @see Boldgrid_Backup_Admin_Cron::prepare_restore()
 	 *
 	 * @return array An array of archive file information.
 	 */
@@ -985,36 +984,10 @@ class Boldgrid_Backup_Admin_Cron {
 			'error' => __( 'Could not perform restoration from cron job.', 'boldgrid-backup' ),
 		);
 
-		if ( $this->prepare_restore() ) {
+		if ( $this->core->restore_helper->prepare_restore() ) {
 			$archive_info = $this->core->restore_archive_file();
 		}
 
 		return $archive_info;
-	}
-
-	/**
-	 * Prepare for a restoration via cron job.
-	 *
-	 * @since 1.6.1-rc.1
-	 *
-	 * @return bool
-	 */
-	public function prepare_restore() {
-		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
-
-		if ( empty( $pending_rollback ) ) {
-			return false;
-		}
-
-		/*
-		 * Set POST variables.
-		 *
-		 * The archive_key and the archive_filename must match.
-		 */
-		$_POST['restore_now'] = 1;
-		$_POST['archive_key'] = 0;
-		$_POST['archive_filename'] = basename( $pending_rollback['filepath'] );
-
-		return true;
 	}
 }

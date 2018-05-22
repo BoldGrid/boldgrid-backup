@@ -460,6 +460,15 @@ class Boldgrid_Backup_Admin_Core {
 	public $local;
 
 	/**
+	 * The Restore Helper class.
+	 *
+	 * @since  1.6.1
+	 * @access public
+	 * @var    Boldgrid_Backup_Admin_Restore_Helper
+	 */
+	public $restore_helper;
+
+	/**
 	 * The scheduler class object.
 	 *
 	 * @since  1.5.1

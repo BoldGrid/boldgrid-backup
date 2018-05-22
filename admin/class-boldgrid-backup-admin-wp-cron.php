@@ -250,8 +250,6 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	 *
 	 * @since 1.5.2
 	 *
-	 * @see Boldgrid_Backup_Admin_Cron::prepare_restore()
-	 *
 	 * @return mixed null|false
 	 */
 	public function restore() {
@@ -259,7 +257,7 @@ class Boldgrid_Backup_Admin_WP_Cron {
 			'error' => __( 'Could not perform restoration from WP Cron task.', 'boldgrid-backup' ),
 		);
 
-		if ( $this->core->cron->prepare_restore() ) {
+		if ( $this->core->restore_helper->prepare_restore() ) {
 			$archive_info = $this->core->restore_archive_file();
 		}
 

@@ -163,6 +163,32 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 	}
 
 	/**
+	 * Prepare for a restoration via cron job.
+	 *
+	 * @since 1.6.1
+	 *
+	 * @return bool
+	 */
+	public function prepare_restore() {
+		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
+
+		if ( empty( $pending_rollback ) ) {
+			return false;
+		}
+
+		/*
+		 * Set POST variables.
+		 *
+		 * The archive_key and the archive_filename must match.
+		 */
+		$_POST['restore_now'] = 1;
+		$_POST['archive_key'] = 0;
+		$_POST['archive_filename'] = basename( $pending_rollback['filepath'] );
+
+		return true;
+	}
+
+	/**
 	 * Update permissions so an archive is safe to restore.
 	 *
 	 * The most common failure thus for when extracting an archive is file
