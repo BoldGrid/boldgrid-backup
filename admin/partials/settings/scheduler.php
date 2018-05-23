@@ -14,7 +14,7 @@ $schedulers_count = count( $schedulers_available );
 $scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : false;
 
 // No need to show the user any options if there is only 1 scheduler available.
-if( 1 === $schedulers_count ) {
+if ( 1 === $schedulers_count ) {
 	return sprintf( '<input type="hidden" name="scheduler" value="%1$s" />', key( $schedulers_available ) );
 }
 
@@ -24,7 +24,7 @@ $wp_cron_warning = sprintf(
 );
 
 $scheduler_options = '';
-foreach( $schedulers_available as $key => $scheduler_data ) {
+foreach ( $schedulers_available as $key => $scheduler_data ) {
 	$scheduler_options .= sprintf(
 		'<option value="%1$s" %3$s>%2$s</option>',
 		$key,
@@ -50,4 +50,4 @@ return sprintf( '
 	$wp_cron_warning
 );
 
-?>
+

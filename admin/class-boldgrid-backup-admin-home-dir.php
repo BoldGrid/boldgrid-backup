@@ -53,11 +53,11 @@ class Boldgrid_Backup_Admin_Home_Dir {
 		$possible_dirs[] = $this->core->config->get_home_directory();
 		$possible_dirs[] = ABSPATH;
 
-		foreach( $possible_dirs as $dir ) {
+		foreach ( $possible_dirs as $dir ) {
 
 			$dir = Boldgrid_Backup_Admin_Utility::trailingslashit( $dir );
 
-			if( ! empty( $dir ) && $this->core->wp_filesystem->is_dir( $dir ) && $this->core->wp_filesystem->is_readable( $dir ) ) {
+			if ( ! empty( $dir ) && $this->core->wp_filesystem->is_dir( $dir ) && $this->core->wp_filesystem->is_readable( $dir ) ) {
 				return $dir;
 			}
 		}

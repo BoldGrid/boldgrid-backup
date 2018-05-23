@@ -33,4 +33,4 @@ return sprintf('
 	/* 5 */ include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-button.php'
 );
 
-?>
+

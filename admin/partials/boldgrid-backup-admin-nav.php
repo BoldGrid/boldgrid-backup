@@ -45,7 +45,7 @@ $navs = array(
 $navs = apply_filters( 'boldgrid_backup_navs', $navs );
 
 $markup = '<h2 class="nav-tab-wrapper">';
-foreach( $navs as $nav ) {
+foreach ( $navs as $nav ) {
 	$markup .= sprintf(
 		'<a class="nav-tab %1$s" href="%2$s">%3$s</a>',
 		$nav['class'],
@@ -57,4 +57,4 @@ $markup .= '</h2>';
 
 return $markup;
 
-?>
+

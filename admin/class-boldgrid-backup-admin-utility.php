@@ -113,7 +113,7 @@ class Boldgrid_Backup_Admin_Utility {
 	 * @param  string $errfile File in which the error occurs.
 	 * @param  int    $errline Line number where the error is situated.
 	 */
-	public static function handle_error( $errno, $errstr, $errfile=false, $errline=false ) {
+	public static function handle_error( $errno, $errstr, $errfile = false, $errline = false ) {
 
 		// A set of errors to ignore.
 		$skips = array(
@@ -148,7 +148,7 @@ class Boldgrid_Backup_Admin_Utility {
 			'Function mdecrypt_generic() is deprecated',
 		);
 
-		if( in_array( $errstr, $skips, true ) ) {
+		if ( in_array( $errstr, $skips, true ) ) {
 			return;
 		}
 
@@ -831,9 +831,9 @@ class Boldgrid_Backup_Admin_Utility {
 	 * @return int
 	 */
 	public function time( $time ) {
-		$gmt_offset = get_option('gmt_offset');
+		$gmt_offset = get_option( 'gmt_offset' );
 
-		if( empty( $gmt_offset ) || ! is_numeric( $gmt_offset ) ) {
+		if ( empty( $gmt_offset ) || ! is_numeric( $gmt_offset ) ) {
 			return $time;
 		}
 
@@ -852,7 +852,7 @@ class Boldgrid_Backup_Admin_Utility {
 	 * @return string
 	 */
 	public static function trailingslashit( $string ) {
-		switch( DIRECTORY_SEPARATOR ) {
+		switch ( DIRECTORY_SEPARATOR ) {
 			case '/':
 				$string = str_replace( '\\', '/', $string );
 				break;

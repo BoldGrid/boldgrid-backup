@@ -133,8 +133,8 @@ $status = sprintf( '
 		'<a href="#" class="folder_exclude_sample" data-include="%1$s" data-exclude="%2$s">%3$s</a>',
 		/* 1A */ $core->folder_exclusion->default_include,
 		/* 2A */ $core->folder_exclusion->default_exclude,
-		/* 3A */ wp_kses( __( 'Use default settings', 'boldgrid-backup'), $tags )
-		)
+		/* 3A */ wp_kses( __( 'Use default settings', 'boldgrid-backup' ), $tags )
+	)
 );
 
 // TR for the help text.
@@ -259,4 +259,4 @@ $markup = sprintf( '
 
 return $markup;
 
-?>
+

@@ -49,12 +49,12 @@ class Boldgrid_Backup_Admin_Remote {
 	public function any_enabled() {
 		$settings = $this->core->settings->get_settings();
 
-		if( empty( $settings ) || empty( $settings['remote'] ) ) {
+		if ( empty( $settings ) || empty( $settings['remote'] ) ) {
 			return false;
 		}
 
-		foreach( $settings['remote'] as $remote ) {
-			if( isset( $remote['enabled'] ) && true === $remote['enabled'] ) {
+		foreach ( $settings['remote'] as $remote ) {
+			if ( isset( $remote['enabled'] ) && true === $remote['enabled'] ) {
 				return true;
 			}
 		}
@@ -73,7 +73,7 @@ class Boldgrid_Backup_Admin_Remote {
 	public function is_enabled( $id ) {
 		$settings = $this->core->settings->get_settings();
 
-		return ! empty( $settings['remote'][$id]['enabled'] ) && true === $settings['remote'][$id]['enabled'] ;
+		return ! empty( $settings['remote'][ $id ]['enabled'] ) && true === $settings['remote'][ $id ]['enabled'] ;
 	}
 
 	/**

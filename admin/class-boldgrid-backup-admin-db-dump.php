@@ -107,7 +107,7 @@ class Boldgrid_Backup_Admin_Db_Dump {
 
 		$file_contents = $this->core->archive->get_file( $file );
 
-		foreach( $tables as $table ) {
+		foreach ( $tables as $table ) {
 			/*
 			 * Grab the exact insert statement.
 			 *
@@ -117,14 +117,14 @@ class Boldgrid_Backup_Admin_Db_Dump {
 			$expression = sprintf( '/INSERT INTO \`%1$s\` VALUES(.*);/', $table );
 			preg_match_all( $expression, $file_contents[0]['content'], $matches );
 
-			if( empty( $matches[1] ) ) {
-				$return[$table] = 0;
+			if ( empty( $matches[1] ) ) {
+				$return[ $table ] = 0;
 				continue;
 			}
 
 			$count = 0;
 
-			foreach( $matches[1] as $line ) {
+			foreach ( $matches[1] as $line ) {
 				/*
 				 * Ultimately what we're trying to do below is get the number of
 				 * records in the INSERT statement.
@@ -141,10 +141,10 @@ class Boldgrid_Backup_Admin_Db_Dump {
 				 */
 				$insert_command = str_replace( '\\\'', '', $line );
 				$exploded = explode( '\'', $insert_command );
-				foreach( $exploded as $k => $v ) {
+				foreach ( $exploded as $k => $v ) {
 					// Odd numbers are what was between quotes.
-					if( 0 !== $k % 2 ) {
-						$exploded[$k] = '';
+					if ( 0 !== $k % 2 ) {
+						$exploded[ $k ] = '';
 					}
 				}
 				$insert_command = implode( '\'', $exploded );
@@ -152,7 +152,7 @@ class Boldgrid_Backup_Admin_Db_Dump {
 				$count += substr_count( $insert_command, '(' );
 			}
 
-			$return[$table] = $count;
+			$return[ $table ] = $count;
 		}
 
 		return $return;
@@ -187,7 +187,7 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		$tables = array();
 		$exploded = explode( 'INSERT INTO `', $file_contents[0]['content'] );
 		unset( $exploded[0] );
-		foreach( $exploded as $table ) {
+		foreach ( $exploded as $table ) {
 			$tables[] = strstr( $table, '`', true );
 		}
 

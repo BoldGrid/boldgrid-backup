@@ -26,7 +26,7 @@ $connect_key = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/connect-
 $days_of_week = '';
 $time_of_day = '';
 $storage = '';
-if( $this->core->scheduler->is_available( 'cron' ) || $this->core->scheduler->is_available( 'wp-cron' ) ) {
+if ( $this->core->scheduler->is_available( 'cron' ) || $this->core->scheduler->is_available( 'wp-cron' ) ) {
 	$days_of_week = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/days-of-week.php';
 	$time_of_day = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/time-of-day.php';
 	$storage = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/storage.php';
@@ -92,7 +92,7 @@ $sections = apply_filters( 'boldgrid_backup_settings_sections', $sections );
  * @param array $sections
  */
 $col_container = apply_filters( 'Boldgrid\Library\Ui\render_col_container', $sections );
-if( is_array( $col_container ) ) {
+if ( is_array( $col_container ) ) {
 	$col_container = $this->core->lang['icon_warning'] . ' ' . __( 'Unable to display settings page. Unknown BoldGrid Library error.', 'boldgrid-backup' );
 }
 
@@ -126,7 +126,7 @@ wp_nonce_field( 'boldgrid_backup_settings' );
 	$link = sprintf(
 		wp_kses(
 			__( 'The BoldGrid Backup and Restore system allows you to upgrade your themes and plugins without being afraid it will do something you cannot easily undo. We perform a <a href="%s">Preflight Check</a> to see if the needed support is available on your web hosting account.', 'boldgrid-backup' ),
-			array(  'a' => array( 'href' => array() ) )
+			array( 'a' => array( 'href' => array() ) )
 		),
 		esc_url( $url )
 	);

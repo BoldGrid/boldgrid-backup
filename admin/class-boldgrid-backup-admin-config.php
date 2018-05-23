@@ -128,11 +128,11 @@ class Boldgrid_Backup_Admin_Config {
 	 */
 	public function __construct( $core ) {
 		// Save the Boldgrid_Backup_Admin_Core object as a class property.
-		if( is_object( $core ) ) {
+		if ( is_object( $core ) ) {
 			$this->core = $core;
 		}
 
-		if( class_exists( '\Boldgrid\Library\Library\License' ) ) {
+		if ( class_exists( '\Boldgrid\Library\Library\License' ) ) {
 			$this->license = new \Boldgrid\Library\Library\License();
 			$this->is_premium = $this->license->isPremium( 'boldgrid-backup' );
 		}
@@ -153,17 +153,17 @@ class Boldgrid_Backup_Admin_Config {
 			return $this->home_dir;
 		}
 
-		if( $this->core->test->is_windows() && $this->core->test->is_plesk() ) {
+		if ( $this->core->test->is_windows() && $this->core->test->is_plesk() ) {
 			/*
 			 * Plesk's File Manager labels C:\Inetpub\vhosts\domain.com as the
 			 * "Home directory". If we find we cannot read that directory, then
 			 * we'll use the document root as the home directory.
 			 */
 			$home_dir = dirname( $_SERVER['DOCUMENT_ROOT'] );
-			if( ! $this->core->wp_filesystem->is_readable( $home_dir ) ) {
+			if ( ! $this->core->wp_filesystem->is_readable( $home_dir ) ) {
 				$home_dir = $_SERVER['DOCUMENT_ROOT'];
 			}
-		} elseif( $this->core->test->is_windows() ) {
+		} elseif ( $this->core->test->is_windows() ) {
 			// Windows.
 			$home_drive = ( ! empty( $_SERVER['HOMEDRIVE'] ) ? $_SERVER['HOMEDRIVE'] : null );
 			$home_path = ( ! empty( $_SERVER['HOMEPATH'] ) ? $_SERVER['HOMEPATH'] : null );
@@ -246,7 +246,7 @@ class Boldgrid_Backup_Admin_Config {
 	 * @since 1.6.0
 	 */
 	public function get_license_string() {
-		if( ! isset( $this->license ) ) {
+		if ( ! isset( $this->license ) ) {
 			return __( 'Unknown', 'boldgrid-backup' );
 		} else {
 			return $this->license->getLicenseString();
@@ -415,7 +415,7 @@ class Boldgrid_Backup_Admin_Config {
 			return $this->available_compressors;
 		}
 
-		if( ! class_exists( 'PclZip' ) ) {
+		if ( ! class_exists( 'PclZip' ) ) {
 			require_once( ABSPATH . '/wp-admin/includes/class-pclzip.php' );
 		}
 
@@ -428,7 +428,7 @@ class Boldgrid_Backup_Admin_Config {
 		}
 
 		// PclZip
-		if( class_exists( 'PclZip' ) ) {
+		if ( class_exists( 'PclZip' ) ) {
 			$this->add_compressor( 'pcl_zip' );
 		}
 
@@ -447,7 +447,7 @@ class Boldgrid_Backup_Admin_Config {
 			$this->add_compressor( 'php_lzf' );
 		}
 
-		if( $this->core->test->is_windows() ) {
+		if ( $this->core->test->is_windows() ) {
 			return $this->available_compressors;
 		}
 

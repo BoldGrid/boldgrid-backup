@@ -146,7 +146,7 @@ class Boldgrid_Backup_Admin {
 	 */
 	public static function get_configs() {
 		// If the configuration array was already created, then return it.
-			if ( ! empty( self::$configs ) ) {
+		if ( ! empty( self::$configs ) ) {
 			return self::$configs;
 		}
 

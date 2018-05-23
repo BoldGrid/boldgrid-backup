@@ -141,7 +141,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	 */
 	public function allow_file( $file ) {
 		// If this file is in our backup directory, do not allow it.
-		if( $this->core->backup_dir->file_in_dir( ABSPATH . $file, true ) ) {
+		if ( $this->core->backup_dir->file_in_dir( ABSPATH . $file, true ) ) {
 			return false;
 		}
 
@@ -157,24 +157,24 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 		$is_match_include = false;
 		$is_match_exclude = false;
 
-		foreach( $includes as $include ) {
-			if( $this->is_match( $include, $file ) ) {
+		foreach ( $includes as $include ) {
+			if ( $this->is_match( $include, $file ) ) {
 				$is_match_include = true;
 			}
 		}
 
 		// If we're not including this file, we don't need to check excludes.
-		if( ! $is_match_include ) {
+		if ( ! $is_match_include ) {
 			return false;
 		}
 
 		// If the user left "excludes" blank, then we're not excluding anything.
-		if( empty( $exclude ) ) {
+		if ( empty( $exclude ) ) {
 			return true;
 		}
 
-		foreach( $excludes as $exclude ) {
-			if( $this->is_match( $exclude, $file ) ) {
+		foreach ( $excludes as $exclude ) {
+			if ( $this->is_match( $exclude, $file ) ) {
 				$is_match_exclude = true;
 			}
 		}
@@ -197,15 +197,15 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 		$has_folder_included = isset( $info['folder_include'] );
 		$has_folder_excluded = isset( $info['folder_exclude'] );
 
-		if( $has_folder_included || $has_folder_excluded ) {
+		if ( $has_folder_included || $has_folder_excluded ) {
 			$body .= "\n" . __( 'FILE AND FOLDER SETTINGS', 'boldgrid-backup' ) . "\n";
 		}
 
-		if( $has_folder_included ) {
+		if ( $has_folder_included ) {
 			$body .= sprintf( esc_html__( 'Included: %1$s', 'boldgrid-backup' ), $info['folder_include'] ) . "\n";
 		}
 
-		if( $has_folder_excluded ) {
+		if ( $has_folder_excluded ) {
 			$body .= sprintf( esc_html__( 'Excluded: %1$s', 'boldgrid-backup' ), $info['folder_exclude'] ) . "\n";
 		}
 
@@ -313,7 +313,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	 * @return string
 	 */
 	public function from_settings( $type, $settings = false ) {
-		if( ! in_array( $type, $this->types, true ) ) {
+		if ( ! in_array( $type, $this->types, true ) ) {
 			return false;
 		}
 
@@ -328,7 +328,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 		 * # We are creating a 'full' backup.
 		 * # We are creating a backup immediately before a WordPress auto update.
 		 */
-		if( $this->core->is_archiving_update_protection || $this->core->is_backup_full || $this->core->pre_auto_update ) {
+		if ( $this->core->is_archiving_update_protection || $this->core->is_backup_full || $this->core->pre_auto_update ) {
 			return $this->$default;
 		}
 
@@ -336,34 +336,34 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 		 * If we are backing up a site now (not for update protection) and
 		 * we've posted folder settings, use those.
 		 */
-		if( $this->core->is_backup_now && isset( $_POST[ $key ] ) ) {
+		if ( $this->core->is_backup_now && isset( $_POST[ $key ] ) ) {
 			$this->$type = $this->from_post( $type );
 			return $this->$type;
 		}
 
-		if( ! is_null( $this->$type ) ) {
+		if ( ! is_null( $this->$type ) ) {
 			return $this->$type;
 		}
 
-		if( $this->core->settings->is_saving_settings ) {
+		if ( $this->core->settings->is_saving_settings ) {
 			$this->$type = $this->from_post( $type );
-		/*
-		 * Is there value for this in the settings?
-		 *
-		 * Initially, we checked to make sure $settings[$key] wasn't empty and
-		 * it was a string. Now, we'll simply see if it is set. This will allow
-		 * for the user to enter nothing in the exclude field.
-		 */
-		} elseif( isset( $settings[$key] ) ) {
-			$this->$type = $settings[$key];
-		} elseif( ! $settings ) {
+			/*
+			* Is there value for this in the settings?
+			*
+			* Initially, we checked to make sure $settings[$key] wasn't empty and
+			* it was a string. Now, we'll simply see if it is set. This will allow
+			* for the user to enter nothing in the exclude field.
+			*/
+		} elseif ( isset( $settings[ $key ] ) ) {
+			$this->$type = $settings[ $key ];
+		} elseif ( ! $settings ) {
 			$settings = $this->core->settings->get_settings();
-			if( ! empty( $settings[$key] ) && is_string( $settings[$key] ) ) {
-				$this->$type = $settings[$key];
+			if ( ! empty( $settings[ $key ] ) && is_string( $settings[ $key ] ) ) {
+				$this->$type = $settings[ $key ];
 			}
 		}
 
-		if( is_null( $this->$type ) ) {
+		if ( is_null( $this->$type ) ) {
 			$this->$type = $this->$default;
 		}
 
@@ -383,12 +383,12 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	 * @return bool
 	 */
 	public function is_match( $value, $file ) {
-		if( '*' === $value ) {
+		if ( '*' === $value ) {
 			return true;
 		}
 
 		// Handle filtering of core WordPress files.
-		if( 'WPCORE' === $value ) {
+		if ( 'WPCORE' === $value ) {
 			return $this->core->core_files->is_core_file( $file );
 		}
 
@@ -423,13 +423,13 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	 * @return string
 	 */
 	public function from_post( $type ) {
-		if( ! in_array( $type, $this->types, true ) ) {
+		if ( ! in_array( $type, $this->types, true ) ) {
 			return false;
 		}
 
 		$key = 'folder_exclusion_' . $type;
 
-		switch( $type ) {
+		switch ( $type ) {
 			case 'include':
 				/*
 				 * If you submit an empty "include" setting, it will be
@@ -462,14 +462,14 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	 * @since 1.5.4
 	 */
 	public function wp_ajax_preview() {
-		if( ! check_ajax_referer( 'folder_exclusion_preview', 'security', false ) ) {
+		if ( ! check_ajax_referer( 'folder_exclusion_preview', 'security', false ) ) {
 			wp_send_json_error( __( 'Invalid nonce.', 'boldgrid-backup' ) );
 		}
 
 		$include = isset( $_POST['include'] ) ? sanitize_text_field( $_POST['include'] ) : null;
 		$exclude = isset( $_POST['exclude'] ) ? sanitize_text_field( $_POST['exclude'] ) : null;
 
-		if( is_null( $include ) || is_null( $exclude ) ) {
+		if ( is_null( $include ) || is_null( $exclude ) ) {
 			wp_send_json_error( __( 'Invalid include / exclude values.', 'boldgrid-backup' ) );
 		}
 
@@ -477,13 +477,13 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 
 		$filelist = $this->core->get_filtered_filelist();
 
-		if( empty( $filelist ) ) {
+		if ( empty( $filelist ) ) {
 			wp_send_json_error( __( 'No files match your criteria.', 'boldgrid-backup' ) );
 		}
 
 		$markup = array();
 
-		foreach( $filelist as $file ) {
+		foreach ( $filelist as $file ) {
 			$markup[] = $file[1];
 		}
 

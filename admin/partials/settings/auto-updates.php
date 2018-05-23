@@ -20,9 +20,9 @@ ob_start();
 			<tr>
 				<th>
 					<?php esc_html_e( 'Plugin Auto-Updates', 'boldgrid-backup' ); ?>
-		 			<span class="dashicons dashicons-editor-help" data-id="plugin-autoupdate"></span>
+					 <span class="dashicons dashicons-editor-help" data-id="plugin-autoupdate"></span>
 
-		 			<p class="help" data-id="plugin-autoupdate">
+					 <p class="help" data-id="plugin-autoupdate">
 						<?php
 						printf(
 							__( 'Automatically perform all plugin updates when available. Enabling this feature adds the <a target="_blank" href="%1$s">auto_update_plugin filter</a>, which enables automatic plugin updates when an update is available.', 'boldgrid-backup' ),
@@ -30,9 +30,9 @@ ob_start();
 						);
 						?>
 					</p>
-		 		</th>
-		 		<td>
-		 			<input id="plugin-autoupdate-enabled" type="radio" name="plugin_autoupdate" value="1"
+				 </th>
+				 <td>
+					 <input id="plugin-autoupdate-enabled" type="radio" name="plugin_autoupdate" value="1"
 					<?php
 					if ( isset( $settings['plugin_autoupdate'] ) &&
 						 1 === $settings['plugin_autoupdate'] ) {
@@ -46,15 +46,15 @@ ob_start();
 							?> checked<?php
 					}
 					?> /> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
-		 		</td>
-		 	</tr>
+				 </td>
+			 </tr>
 
-		 	<tr>
-		 		<th>
-		 			<?php esc_html_e( 'Theme Auto-Updates', 'boldgrid-backup' ); ?>
-		 			<span class="dashicons dashicons-editor-help" data-id="theme-autoupdate"></span>
+			 <tr>
+				 <th>
+						<?php esc_html_e( 'Theme Auto-Updates', 'boldgrid-backup' ); ?>
+					 <span class="dashicons dashicons-editor-help" data-id="theme-autoupdate"></span>
 
-		 			<p class="help" data-id="theme-autoupdate">
+					 <p class="help" data-id="theme-autoupdate">
 						<?php
 						printf(
 							__( 'Automatically perform all theme updates when available. Enabling this feature adds the <a target="_blank" href="%1$s">auto_update_theme filter</a>, which enables automatic theme updates when an update is available.', 'boldgrid-backup' ),
@@ -62,9 +62,9 @@ ob_start();
 						);
 						?>
 					<p>
-		 		</th>
-		 		<td>
-			 		<input id="theme-autoupdate-enabled" type="radio" name="theme_autoupdate" value="1"
+				 </th>
+				 <td>
+					 <input id="theme-autoupdate-enabled" type="radio" name="theme_autoupdate" value="1"
 					<?php
 					if ( isset( $settings['theme_autoupdate'] ) &&
 						 1 === $settings['theme_autoupdate'] ) {
@@ -78,15 +78,15 @@ ob_start();
 							?> checked<?php
 					}
 					?> /> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
-		 		</td>
-		 	</tr>
+				 </td>
+			 </tr>
 
-		 	<tr>
-		 		<th>
-		 			<?php echo __( 'Auto Backup<br />Before Updates', 'boldgrid-backup' ); ?>
-		 			<span class='dashicons dashicons-editor-help' data-id='auto-backup'></span>
+			 <tr>
+				 <th>
+						<?php echo __( 'Auto Backup<br />Before Updates', 'boldgrid-backup' ); ?>
+					 <span class='dashicons dashicons-editor-help' data-id='auto-backup'></span>
 
-		 			<p class='help' data-id='auto-backup'>
+					 <p class='help' data-id='auto-backup'>
 						<?php
 						printf(
 							__( 'Automatically perform a backup before WordPress updates. When this feature is enabled, a full backup will be made during the <a target="_blank" href="%1$s">pre_auto_update action</a>. ', 'boldgrid-backup' ),
@@ -94,9 +94,9 @@ ob_start();
 						);
 						?>
 					<p>
-		 		</th>
-		 		<td>
-			 		<input id='auto-backup-enabled' type='radio' name='auto_backup'
+				 </th>
+				 <td>
+					 <input id='auto-backup-enabled' type='radio' name='auto_backup'
 					value='1'
 					<?php
 					if ( ! isset( $settings['auto_backup'] ) ||
@@ -110,14 +110,14 @@ ob_start();
 						echo ' checked';
 					}
 					?> /> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
-		 		</td>
-		 	</tr>
+				 </td>
+			 </tr>
 
-		 	<tr>
-		 		<th>
-		 			<?php esc_html_e( 'Auto Rollback', 'boldgrid-backup' ); ?><span class='dashicons dashicons-editor-help' data-id='auto-rollback'></span>
+			 <tr>
+				 <th>
+						<?php esc_html_e( 'Auto Rollback', 'boldgrid-backup' ); ?><span class='dashicons dashicons-editor-help' data-id='auto-rollback'></span>
 
-		 			<p class='help' data-id='auto-rollback'>
+					 <p class='help' data-id='auto-rollback'>
 						<?php
 						esc_html_e(
 							'If something goes wrong while performing WordPress updates, automatically restore the site using a backup made before updating WordPress. This feature does not apply to auto updates.',
@@ -125,9 +125,9 @@ ob_start();
 						);
 						?>
 					</p>
-		 		</th>
-		 		<td>
-			 		<input id='auto-rollback-enabled' type='radio' name='auto_rollback'
+				 </th>
+				 <td>
+					 <input id='auto-rollback-enabled' type='radio' name='auto_rollback'
 					value='1'
 					<?php
 					if ( ! isset( $settings['auto_rollback'] ) ||
@@ -142,8 +142,8 @@ ob_start();
 						echo ' checked';
 					}
 					?> /> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
-		 		</td>
-		 	</tr>
+				 </td>
+			 </tr>
 		</table>
 	</div>
 </div>

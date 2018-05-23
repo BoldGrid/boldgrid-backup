@@ -6,7 +6,7 @@
  */
 
 $selected = 'selected="selected"';
-$ftp_selected  = 'ftp'  === $data['type'] ? $selected : '';
+$ftp_selected  = 'ftp' === $data['type'] ? $selected : '';
 $sftp_selected = 'sftp' === $data['type'] ? $selected : '';
 
 ?>
@@ -27,7 +27,7 @@ $sftp_selected = 'sftp' === $data['type'] ? $selected : '';
 						',
 						__( 'FTP Host', 'boldgrid-backup' ),
 						$data['host'],
-						__( 'FTP host should be in the format of: example.com', 'boldgrid-backup')
+						__( 'FTP host should be in the format of: example.com', 'boldgrid-backup' )
 					);
 				?>
 			</td>
@@ -58,14 +58,14 @@ $sftp_selected = 'sftp' === $data['type'] ? $selected : '';
 		</tr>
 		<tr>
 			<td>
-				<?php echo __( 'Retention (Number of backup archives to retain)', 'boldgrid-backup') ?><br />
+				<?php echo __( 'Retention (Number of backup archives to retain)', 'boldgrid-backup' ) ?><br />
 				<input type="number" name="retention_count" value="<?php echo $data['retention_count']; ?>" min="1" required/>
 			</td>
 			<td></td>
 		</tr>
 		<tr>
 			<td>
-				<?php echo __( 'Nickname (If you would like to refer to this account as something other than FTP)', 'boldgrid-backup') ?><br />
+				<?php echo __( 'Nickname (If you would like to refer to this account as something other than FTP)', 'boldgrid-backup' ) ?><br />
 				<input type="text" name="nickname" value="<?php echo esc_attr( $data['nickname'] ); ?>" />
 			</td>
 			<td></td>

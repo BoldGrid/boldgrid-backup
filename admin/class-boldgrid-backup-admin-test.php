@@ -149,7 +149,7 @@ class Boldgrid_Backup_Admin_Test {
 		 * Initial testing shows the wp_filesystem on Windows, at least when
 		 * running in conjunction with IIS, does not always report accurately.
 		 */
-		if( ! $exists && $this->is_windows() ) {
+		if ( ! $exists && $this->is_windows() ) {
 			$exists = file_exists( $path );
 		}
 
@@ -215,20 +215,20 @@ class Boldgrid_Backup_Admin_Test {
 		$files = $this->core->wp_filesystem->dirlist( $starting_dir );
 		$files = is_array( $files ) ? $files : array();
 
-		foreach( $files as $file ) {
+		foreach ( $files as $file ) {
 
-			if( 'd' !== $file['type'] ) {
+			if ( 'd' !== $file['type'] ) {
 				continue;
 			}
 
-			$full_path =  $starting_dir . $file['name'];
+			$full_path = $starting_dir . $file['name'];
 
-			if( $file['name'] === $folder_name ) {
+			if ( $file['name'] === $folder_name ) {
 				return $full_path;
 			}
 
 			$folder_found = $this->find_folder( $folder_name, $full_path );
-			if( false !== $folder_found ) {
+			if ( false !== $folder_found ) {
 				return $folder_found;
 			}
 		}
@@ -252,14 +252,14 @@ class Boldgrid_Backup_Admin_Test {
 
 		$files = $this->core->wp_filesystem->dirlist( $dir );
 
-		if( ! is_array( $files ) ) {
+		if ( ! is_array( $files ) ) {
 			return false;
 		}
 
-		foreach( $files as $file ) {
+		foreach ( $files as $file ) {
 			$filename = $file['name'];
 
-			if( 0 === strpos( $filename, $this->test_prefix ) ) {
+			if ( 0 === strpos( $filename, $this->test_prefix ) ) {
 				$this->core->wp_filesystem->delete( $dir . $filename );
 			}
 		}
@@ -296,7 +296,7 @@ class Boldgrid_Backup_Admin_Test {
 	 * @return bool
 	 */
 	public function is_writable( $dir ) {
-		if( true === $this->core->wp_filesystem->is_writable( $dir ) ) {
+		if ( true === $this->core->wp_filesystem->is_writable( $dir ) ) {
 			return true;
 		}
 
@@ -311,7 +311,7 @@ class Boldgrid_Backup_Admin_Test {
 		$this->core->wp_filesystem->touch( $random_filename );
 		$exists = $this->core->wp_filesystem->exists( $random_filename );
 
-		if( ! $exists ) {
+		if ( ! $exists ) {
 			return false;
 		}
 
@@ -338,11 +338,11 @@ class Boldgrid_Backup_Admin_Test {
 		 */
 		$node_modules_folder = $this->find_folder( 'node_modules' );
 
-		if( false === $node_modules_folder ) {
+		if ( false === $node_modules_folder ) {
 			return false;
 		}
 
-		if( $this->core->doing_ajax || $this->core->doing_cron ) {
+		if ( $this->core->doing_ajax || $this->core->doing_cron ) {
 			return true;
 		}
 
@@ -380,7 +380,7 @@ class Boldgrid_Backup_Admin_Test {
 			return $this->is_crontab_available;
 		}
 
-		if( $this->is_windows() ) {
+		if ( $this->is_windows() ) {
 			$this->is_crontab_available = false;
 			return $this->is_crontab_available;
 		}
@@ -458,8 +458,8 @@ class Boldgrid_Backup_Admin_Test {
 	 * @return bool
 	 */
 	public function is_plesk() {
-		foreach( $_SERVER as $k => $v ) {
-			if( 'plesk_' === substr( $k, 0, strlen('plesk_') ) ) {
+		foreach ( $_SERVER as $k => $v ) {
+			if ( 'plesk_' === substr( $k, 0, strlen( 'plesk_' ) ) ) {
 				return true;
 			}
 		}
@@ -503,16 +503,16 @@ class Boldgrid_Backup_Admin_Test {
 			$this->is_functional = false;
 		}
 
-		if( 'php_zip' === $this->core->compressors->get() ) {
+		if ( 'php_zip' === $this->core->compressors->get() ) {
 			$php_zip = new Boldgrid_Backup_Admin_Compressor_Php_Zip( $this->core );
-			if( ! $php_zip->test( false ) ) {
+			if ( ! $php_zip->test( false ) ) {
 				$this->is_functional = false;
 			}
 		}
 
-		if( 'pcl_zip' === $this->core->compressors->get() ) {
+		if ( 'pcl_zip' === $this->core->compressors->get() ) {
 			$pcl_zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this->core );
-			if( ! $pcl_zip->test( false ) ) {
+			if ( ! $pcl_zip->test( false ) ) {
 				$this->is_functional = false;
 			}
 		}
@@ -600,9 +600,9 @@ class Boldgrid_Backup_Admin_Test {
 		}
 
 		// Avoid timeout caused when node_modules exist. Return 0 bytes.
-		if( empty( $_GET['skip_node_modules'] ) ) {
+		if ( empty( $_GET['skip_node_modules'] ) ) {
 			$node_modules_found = $this->node_modules_warning();
-			if( true === $node_modules_found ) {
+			if ( true === $node_modules_found ) {
 				return 0;
 			}
 		}

@@ -19,6 +19,7 @@
  *     An array of jobs that need to be ran.
  *
  *     array {
+ *
  *        @type string $status      pending|running|complete|fail
  *        @type string $filepath    Full filepath to the backup file.
  *        @type int    $start_time
@@ -78,7 +79,7 @@ class Boldgrid_Backup_Admin_Jobs {
 	 *                    this class for more information.
 	 */
 	public function add( $args ) {
-		if( empty( $args['action'] ) ) {
+		if ( empty( $args['action'] ) ) {
 			return false;
 		}
 
@@ -101,15 +102,15 @@ class Boldgrid_Backup_Admin_Jobs {
 	 */
 	public function delete_all_prior( $delete_key ) {
 
-		if( ! is_numeric( $delete_key ) ) {
+		if ( ! is_numeric( $delete_key ) ) {
 			return;
 		}
 
 		$this->set_jobs();
 
-		foreach( $this->jobs as $key => $job ) {
-			if( $key <= $delete_key ) {
-				unset( $this->jobs[$key] );
+		foreach ( $this->jobs as $key => $job ) {
+			if ( $key <= $delete_key ) {
+				unset( $this->jobs[ $key ] );
 			}
 		}
 
@@ -127,8 +128,8 @@ class Boldgrid_Backup_Admin_Jobs {
 	public function is_running() {
 		$this->set_jobs();
 
-		foreach( $this->jobs as $job ) {
-			if( 'running' === $job['status'] ) {
+		foreach ( $this->jobs as $job ) {
+			if ( 'running' === $job['status'] ) {
 				return true;
 			}
 		}
@@ -153,11 +154,11 @@ class Boldgrid_Backup_Admin_Jobs {
 		 * an automatic backup. If the user simply clicked on "Backup site now",
 		 * we don't want to email the user, we'll already be doing that.
 		 */
-		if( ! $this->core->doing_cron ) {
+		if ( ! $this->core->doing_cron ) {
 			return;
 		}
 
-		if( ! $this->core->email->user_wants_notification( 'backup' ) ) {
+		if ( ! $this->core->email->user_wants_notification( 'backup' ) ) {
 			return;
 		}
 
@@ -165,7 +166,7 @@ class Boldgrid_Backup_Admin_Jobs {
 			'filepath' => $info['filepath'],
 			'action' => 'boldgrid_backup_post_jobs_email',
 			'action_data' => $info,
-			'post_action' => 'delete_all_prior'
+			'post_action' => 'delete_all_prior',
 		);
 
 		$this->add( $args );
@@ -185,10 +186,10 @@ class Boldgrid_Backup_Admin_Jobs {
 
 		$this->set_jobs();
 
-		foreach( $this->jobs as $key => $job ) {
+		foreach ( $this->jobs as $key => $job ) {
 
-			if( 'boldgrid_backup_post_jobs_email' === $job['action'] ) {
-				unset( $this->jobs[$key] );
+			if ( 'boldgrid_backup_post_jobs_email' === $job['action'] ) {
+				unset( $this->jobs[ $key ] );
 				break;
 			}
 
@@ -207,12 +208,12 @@ class Boldgrid_Backup_Admin_Jobs {
 			);
 			$post_jobs++;
 
-			unset( $this->jobs[$key] );
+			unset( $this->jobs[ $key ] );
 		}
 
 		$this->save_jobs();
 
-		if( $post_jobs > 0 ) {
+		if ( $post_jobs > 0 ) {
 			$email_parts['body']['main'] .= implode( "\n\n", $job_summary ) . "\n\n";
 		}
 
@@ -242,12 +243,12 @@ class Boldgrid_Backup_Admin_Jobs {
 		}
 
 		// If there are no jobs or already running, then abort.
-		if( empty( $this->jobs ) || $this->is_running() ) {
+		if ( empty( $this->jobs ) || $this->is_running() ) {
 			wp_die();
 		}
 
-		foreach( $this->jobs as $key => &$job ) {
-			if( 'pending' !== $job['status'] ) {
+		foreach ( $this->jobs as $key => &$job ) {
+			if ( 'pending' !== $job['status'] ) {
 				continue;
 			}
 
@@ -263,7 +264,7 @@ class Boldgrid_Backup_Admin_Jobs {
 			break;
 		}
 
-		if( ! empty( $job['post_action'] ) && 'delete_all_prior' === $job['post_action'] ) {
+		if ( ! empty( $job['post_action'] ) && 'delete_all_prior' === $job['post_action'] ) {
 			$this->delete_all_prior( $key );
 		}
 
@@ -285,7 +286,7 @@ class Boldgrid_Backup_Admin_Jobs {
 	 * @since 1.5.2
 	 */
 	public function set_jobs() {
-		if( ! is_null( $this->jobs ) ) {
+		if ( ! is_null( $this->jobs ) ) {
 			return;
 		}
 

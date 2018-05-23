@@ -28,6 +28,9 @@ WordPress backup and restoration with update protection.
 
 == Changelog ==
 
+= 1.6.1 In progress =
+* Update: Ran PHPCBF to beautify PHP code.
+
 = 1.6.0 =
 
 Release Date: April 11th, 2018

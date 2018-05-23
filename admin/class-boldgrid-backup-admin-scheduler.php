@@ -71,11 +71,11 @@ class Boldgrid_Backup_Admin_Scheduler {
 
 		$available = $this->get_available();
 
-		if( ! empty( $settings['scheduler'] ) ) {
+		if ( ! empty( $settings['scheduler'] ) ) {
 			return $settings['scheduler'];
-		} elseif( array_key_exists( 'cron', $available ) ) {
+		} elseif ( array_key_exists( 'cron', $available ) ) {
 			return 'cron';
-		} elseif( array_key_exists( 'wp-cron', $available ) ) {
+		} elseif ( array_key_exists( 'wp-cron', $available ) ) {
 			return 'wp-cron';
 		} else {
 			return false;
@@ -98,7 +98,7 @@ class Boldgrid_Backup_Admin_Scheduler {
 	 *     }
 	 */
 	public function get_available() {
-		if( ! empty( $this->available ) ) {
+		if ( ! empty( $this->available ) ) {
 			return $this->available;
 		}
 
@@ -113,7 +113,7 @@ class Boldgrid_Backup_Admin_Scheduler {
 
 		$is_wpcron_available = $this->core->test->wp_cron_enabled();
 
-		if( $is_wpcron_available ) {
+		if ( $is_wpcron_available ) {
 			$this->available['wp-cron'] = array(
 				'title' => 'WP Cron',
 			);

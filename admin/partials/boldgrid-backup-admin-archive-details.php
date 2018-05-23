@@ -33,7 +33,7 @@ $delete_link = $this->core->archive_actions->get_delete_link( $archive['filename
 $download_button = $this->core->archive_actions->get_download_button( $archive['filename'] );
 $restore_button = $this->core->archive_actions->get_restore_button( $archive['filename'] );
 
-if( ! $archive_found ) {
+if ( ! $archive_found ) {
 	$file_size = '';
 	$backup_date = '';
 	$more_info = '';
@@ -144,7 +144,7 @@ $editor_tools = sprintf( '
 	',
 	/* 1 */ $db['buttons'],
 	/* 2 */ __( 'Files & Folders', 'boldgrid-backup' ),
-	/* 3 */ __( 'Database', 'boldgrid-backup')
+	/* 3 */ __( 'Database', 'boldgrid-backup' )
 );
 
 $intro = $this->core->config->is_premium_done ? '' : sprintf( '
@@ -195,9 +195,9 @@ $main_content = '
 	</div>
 ';
 
-if( ! $this->core->archive->is_stored_locally() ) {
+if ( ! $this->core->archive->is_stored_locally() ) {
 
-	if( $this->core->archive->is_stored_remotely() ) {
+	if ( $this->core->archive->is_stored_remotely() ) {
 		$main_content = $only_remote;
 	} else {
 		$main_content = $not_found;
@@ -237,4 +237,4 @@ $page = sprintf( '
 
 echo $page;
 
-?>
+

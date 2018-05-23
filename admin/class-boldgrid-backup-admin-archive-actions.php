@@ -83,10 +83,10 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 	 * @param  string $filename
 	 * @return string
 	 */
-	public function get_delete_link( $filename ){
+	public function get_delete_link( $filename ) {
 		$archive = $this->core->archive->get_by_name( $filename );
 
-		if( empty( $archive ) ) {
+		if ( empty( $archive ) ) {
 			$link = '';
 		} else {
 			$link = sprintf( '
@@ -120,7 +120,7 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 	public function get_download_button( $filename ) {
 		$archive = $this->core->archive->get_by_name( $filename );
 
-		if( empty( $archive ) ) {
+		if ( empty( $archive ) ) {
 			$button = '';
 		} else {
 			$button = sprintf( '
@@ -161,7 +161,7 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 
 		$archive = $this->core->archive->get_by_name( $filename );
 
-		if( empty( $archive ) ) {
+		if ( empty( $archive ) ) {
 			$button = '';
 		} else {
 			$button = sprintf('
@@ -178,7 +178,7 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 				/* 1 */ get_admin_url( null, 'admin.php?page=boldgrid-backup' ),
 				/* 2 */ $archive['key'],
 				/* 3 */ $filename,
-				/* 4 */ wp_create_nonce( 'boldgrid_backup_restore_archive'),
+				/* 4 */ wp_create_nonce( 'boldgrid_backup_restore_archive' ),
 				/* 5 */ $args['button_text'],
 				/* 6 */ $this->core->lang['spinner']
 			);

@@ -63,13 +63,13 @@ class Boldgrid_Backup_Admin_Settings {
 	public function get_dow_count() {
 		$count = 0;
 
-		if( ! isset( $_POST ) || ! is_array( $_POST ) ) {
+		if ( ! isset( $_POST ) || ! is_array( $_POST ) ) {
 			return 0;
 		}
 
 		// Loop through each $_POST value and check if the key begins with dow_.
-		foreach( $_POST as $k => $v ) {
-			if ( substr( $k, 0, 4 ) === "dow_" ) {
+		foreach ( $_POST as $k => $v ) {
+			if ( substr( $k, 0, 4 ) === 'dow_' ) {
 				$count++;
 			}
 		}
@@ -91,7 +91,7 @@ class Boldgrid_Backup_Admin_Settings {
 		// Get settings.
 		$settings = get_site_option( 'boldgrid_backup_settings', array() );
 
-		if( $raw ) {
+		if ( $raw ) {
 			return $settings;
 		}
 
@@ -208,24 +208,24 @@ class Boldgrid_Backup_Admin_Settings {
 
 		$boldgrid_settings = get_site_option( 'boldgrid_settings' );
 
-		$settings['plugin_autoupdate'] =  (
+		$settings['plugin_autoupdate'] = (
 			! empty( $boldgrid_settings['plugin_autoupdate'] ) ? 1 : 0
 		);
 
-		$settings['theme_autoupdate'] =  (
+		$settings['theme_autoupdate'] = (
 			! empty( $boldgrid_settings['theme_autoupdate'] ) ? 1 : 0
 		);
 
-		if( empty( $settings['remote'] ) ) {
+		if ( empty( $settings['remote'] ) ) {
 			$settings['remote'] = array();
 		}
 
 		// For consistency, untrailingslashit the backup dir.
-		if( isset( $settings['backup_directory'] ) ) {
+		if ( isset( $settings['backup_directory'] ) ) {
 			$settings['backup_directory'] = untrailingslashit( $settings['backup_directory'] );
 		}
 
-		if( empty( $settings['exclude_tables'] ) ) {
+		if ( empty( $settings['exclude_tables'] ) ) {
 			$settings['exclude_tables'] = array();
 		}
 
@@ -254,16 +254,16 @@ class Boldgrid_Backup_Admin_Settings {
 
 		$archives = $this->core->get_archive_list( null, $old_dir );
 
-		ignore_user_abort(true);
+		ignore_user_abort( true );
 
 		// Loop through each archive and move it.
-		foreach( $archives as $archive ) {
+		foreach ( $archives as $archive ) {
 			$source = $archive['filepath'];
 			$destination = $new_dir . $archive['filename'];
 
 			$success = @$this->core->wp_filesystem->move( $source, $destination );
 
-			if( ! $success ) {
+			if ( ! $success ) {
 				$fail_count++;
 			}
 		}
@@ -289,7 +289,7 @@ class Boldgrid_Backup_Admin_Settings {
 		check_admin_referer( 'boldgrid-backup-settings', 'settings_auth' );
 
 		// Get the retention count.
-		if( isset( $_POST['retention_count'] ) ) {
+		if ( isset( $_POST['retention_count'] ) ) {
 			$retention_count = intval( $_POST['retention_count'] );
 		} else {
 			$retention_count = $this->core->config->get_default_retention();
@@ -443,7 +443,7 @@ class Boldgrid_Backup_Admin_Settings {
 			$backup_dir_changed = false;
 			$original_backup_directory = ! empty( $settings['backup_directory'] ) ? $settings['backup_directory'] : false;
 
-			if( ! empty( $_POST['backup_directory'] ) ) {
+			if ( ! empty( $_POST['backup_directory'] ) ) {
 				$post_backup_directory = trim( $_POST['backup_directory'] );
 				$post_backup_directory = untrailingslashit( $post_backup_directory );
 				$post_backup_directory = str_replace( '\\\\', '\\', $post_backup_directory );
@@ -455,12 +455,12 @@ class Boldgrid_Backup_Admin_Settings {
 			 * Allow the user to submit a blank backup directory if they want
 			 * to set the backup directory to the default.
 			 */
-			if( empty( $_POST['backup_directory'] ) ) {
+			if ( empty( $_POST['backup_directory'] ) ) {
 				// The get method validates and creates the backup directory.
 				$backup_directory = $this->core->backup_dir->guess_and_set();
 
 				$backup_dir_changed = $original_backup_directory !== $backup_directory;
-			} elseif( $post_backup_directory !== $original_backup_directory ) {
+			} elseif ( $post_backup_directory !== $original_backup_directory ) {
 				$backup_directory = $post_backup_directory;
 
 				/*
@@ -474,15 +474,15 @@ class Boldgrid_Backup_Admin_Settings {
 
 				// Make sure that the backup directory has proper permissions.
 				$valid = $this->core->backup_dir->is_valid( $backup_directory );
-				if( ! $valid ) {
+				if ( ! $valid ) {
 					$backup_directory = false;
 				}
 
 				$backup_dir_changed = true;
 			}
 
-			if( $backup_dir_changed ) {
-				if( false === $backup_directory ) {
+			if ( $backup_dir_changed ) {
+				if ( false === $backup_directory ) {
 					$update_error = true;
 					$backup_dir_changed = false;
 					$update_errors = array_merge( $update_errors, $this->core->backup_dir->errors );
@@ -492,10 +492,10 @@ class Boldgrid_Backup_Admin_Settings {
 			}
 
 			// Move backups to the new directory.
-			if( $backup_dir_changed && isset( $_POST['move-backups'] ) && 'on' === $_POST['move-backups'] ) {
+			if ( $backup_dir_changed && isset( $_POST['move-backups'] ) && 'on' === $_POST['move-backups'] ) {
 				$backups_moved = $this->move_backups( $original_backup_directory, $backup_directory );
 
-				if( ! $backups_moved ) {
+				if ( ! $backups_moved ) {
 					$update_error = true;
 					$update_errors[] = sprintf( __( 'Unable to move backups from %1$s to %2$s', 'boldgrid-backup' ), $original_backup_directory, $backup_directory );
 				}
@@ -506,10 +506,10 @@ class Boldgrid_Backup_Admin_Settings {
 			 *
 			 * @since 1.5.1
 			 */
-			if( ! empty( $_POST['compressor'] ) ) {
+			if ( ! empty( $_POST['compressor'] ) ) {
 				$available_compressors = $this->core->compressors->get_available();
 				$selected_compressor = $_POST['compressor'];
-				if( in_array( $selected_compressor, $available_compressors, true ) ) {
+				if ( in_array( $selected_compressor, $available_compressors, true ) ) {
 					$settings['compressor'] = $selected_compressor;
 				} else {
 					$update_error = true;
@@ -522,9 +522,9 @@ class Boldgrid_Backup_Admin_Settings {
 			 *
 			 * @since 1.5.1
 			 */
-			if( ! empty( $_POST['extractor'] ) ) {
+			if ( ! empty( $_POST['extractor'] ) ) {
 				$selected_extractor = $_POST['extractor'];
-				if( in_array( $selected_extractor, $available_compressors, true ) ) {
+				if ( in_array( $selected_extractor, $available_compressors, true ) ) {
 					$settings['extractor'] = $selected_extractor;
 				} else {
 					$update_error = true;
@@ -543,7 +543,7 @@ class Boldgrid_Backup_Admin_Settings {
 			$original_scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : false;
 			$schedulers_available = $this->core->scheduler->get_available();
 			$scheduler_changed = ! empty( $_POST['scheduler'] ) && $original_scheduler !== $_POST['scheduler'];
-			if( $scheduler_changed && array_key_exists( $_POST['scheduler'], $schedulers_available ) ) {
+			if ( $scheduler_changed && array_key_exists( $_POST['scheduler'], $schedulers_available ) ) {
 				$settings['scheduler'] = $_POST['scheduler'];
 			}
 
@@ -553,15 +553,15 @@ class Boldgrid_Backup_Admin_Settings {
 			 * @since 1.5.1
 			 */
 			$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
-			if( 'wp-cron' === $scheduler ) {
+			if ( 'wp-cron' === $scheduler ) {
 				$crons_added = $this->core->wp_cron->add_all_crons( $settings );
-			} elseif( 'cron' === $scheduler ) {
+			} elseif ( 'cron' === $scheduler ) {
 				$crons_added = $this->core->cron->add_all_crons( $settings );
 				$settings['crontab_version'] = $this->core->cron->crontab_version;
 				$settings['cron_secret'] = $this->core->cron->get_cron_secret();
 			}
 			// Take action if we tried and failed to add crons.
-			if( isset( $crons_added ) && ! $crons_added ) {
+			if ( isset( $crons_added ) && ! $crons_added ) {
 				$update_error = true;
 				$update_errors[] = esc_html__( 'An error occurred when modifying cron jobs. Please try again.', 'boldgrid-backup' );
 			}
@@ -574,7 +574,7 @@ class Boldgrid_Backup_Admin_Settings {
 			$storage_locations = ! empty( $settings['remote'] ) ? $settings['remote'] : array();
 
 			// Start off by disabling each storage location.
-			foreach( $storage_locations as $remote_key => $storage_location ) {
+			foreach ( $storage_locations as $remote_key => $storage_location ) {
 				$settings['remote'][ $remote_key ]['enabled'] = false;
 			}
 
@@ -583,7 +583,7 @@ class Boldgrid_Backup_Admin_Settings {
 				$_POST['storage_location'] : array();
 
 			// Then enable it only if submitted.  Values are not used, only key/index.
-			foreach( $storage_locations_save as $storage_location => $storage_location_enabled ) {
+			foreach ( $storage_locations_save as $storage_location => $storage_location_enabled ) {
 				$storage_location = sanitize_key( $storage_location );
 
 				/*
@@ -628,17 +628,17 @@ class Boldgrid_Backup_Admin_Settings {
 				esc_html__( 'Settings saved.', 'boldgrid-backup' ),
 				'updated settings-error notice is-dismissible'
 			);
-		} elseif( empty( $update_errors ) ) {
+		} elseif ( empty( $update_errors ) ) {
 			$failure_message = esc_html__( 'Invalid settings submitted.  Please try again.', 'boldgrid-backup' );
 		} else {
 			$failure_message = sprintf( '<strong>%1$s</strong><br /><br />%2$s', __( 'We were unable to save your settings for the following reason(s):', 'boldgrid-backup' ), implode( '<br /><br />', $update_errors ) );
 		}
 
-		if( isset( $failure_message ) ) {
+		if ( isset( $failure_message ) ) {
 			do_action( 'boldgrid_backup_notice', $failure_message );
 		}
 
-		if( ! $update_error ) {
+		if ( ! $update_error ) {
 			/**
 			 * Take action when settings have been updated.
 			 *
@@ -677,7 +677,7 @@ class Boldgrid_Backup_Admin_Settings {
 
 		wp_enqueue_script( 'bglib-license' );
 
-		if( ! $this->is_saving_settings ) {
+		if ( ! $this->is_saving_settings ) {
 			$is_functional = $this->core->test->run_functionality_tests();
 		}
 
@@ -687,7 +687,7 @@ class Boldgrid_Backup_Admin_Settings {
 				'boldgrid_backup_notice',
 				sprintf(
 					esc_html__(
-						'Functionality test has failed.  You can go to %sFunctionality Test%s to view a report.',
+						'Functionality test has failed.  You can go to %1$sFunctionality Test%1$s to view a report.',
 						'boldgrid-backup'
 					),
 					'<a href="' . admin_url( 'admin.php?page=boldgrid-backup-test' ) . '">',
@@ -773,7 +773,7 @@ class Boldgrid_Backup_Admin_Settings {
 	public function save( $settings ) {
 
 		// For consistency, untrailingslashit the backup dir.
-		if( isset( $settings['backup_directory'] ) ) {
+		if ( isset( $settings['backup_directory'] ) ) {
 			$settings['backup_directory'] = untrailingslashit( $settings['backup_directory'] );
 		}
 

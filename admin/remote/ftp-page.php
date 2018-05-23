@@ -84,7 +84,7 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 		$blank_data = array(
 			'type' => $type,
 			'host' => null,
-			'port' => $this->core->ftp->default_port[$type],
+			'port' => $this->core->ftp->default_port[ $type ],
 			'user' => null,
 			'pass' => null,
 			'retention_count' => $this->core->ftp->retention_count,
@@ -96,7 +96,7 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 
 		$action = ! empty( $_POST['action'] ) ? sanitize_key( $_POST['action'] ) : null;
 
-		switch( $action ) {
+		switch ( $action ) {
 			case 'save':
 				echo $this->core->elements['long_checking_creds'];
 				ob_flush();
@@ -129,11 +129,11 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 		}
 
 		$settings = $this->core->settings->get_settings();
-		if( ! isset( $settings['remote'][$ftp->key] ) || ! is_array( $settings['remote'][$ftp->key] ) ) {
-			$settings['remote'][$ftp->key] = array();
+		if ( ! isset( $settings['remote'][ $ftp->key ] ) || ! is_array( $settings['remote'][ $ftp->key ] ) ) {
+			$settings['remote'][ $ftp->key ] = array();
 		}
 
-		$settings['remote'][$ftp->key] = array();
+		$settings['remote'][ $ftp->key ] = array();
 		update_site_option( 'boldgrid_backup_settings', $settings );
 
 		$ftp->reset();
@@ -156,31 +156,31 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 			return false;
 		}
 
-		if( empty( $_POST ) ) {
+		if ( empty( $_POST ) ) {
 			return false;
 		}
 
 		$settings = $this->core->settings->get_settings();
-		if( ! isset( $settings['remote'][$ftp->key] ) || ! is_array( $settings['remote'][$ftp->key] ) ) {
-			$settings['remote'][$ftp->key] = array();
+		if ( ! isset( $settings['remote'][ $ftp->key ] ) || ! is_array( $settings['remote'][ $ftp->key ] ) ) {
+			$settings['remote'][ $ftp->key ] = array();
 		}
 
 		$data = $ftp->get_from_post();
 
 		$valid_credentials = $ftp->is_valid_credentials( $data['host'], $data['user'], $data['pass'], $data['port'], $data['type'] );
 
-		if( $valid_credentials ) {
-			$settings['remote'][$ftp->key]['host'] = $data['host'];
-			$settings['remote'][$ftp->key]['user'] = $data['user'];
-			$settings['remote'][$ftp->key]['pass'] = $data['pass'];
-			$settings['remote'][$ftp->key]['port'] = $data['port'];
-			$settings['remote'][$ftp->key]['type'] = $data['type'];
+		if ( $valid_credentials ) {
+			$settings['remote'][ $ftp->key ]['host'] = $data['host'];
+			$settings['remote'][ $ftp->key ]['user'] = $data['user'];
+			$settings['remote'][ $ftp->key ]['pass'] = $data['pass'];
+			$settings['remote'][ $ftp->key ]['port'] = $data['port'];
+			$settings['remote'][ $ftp->key ]['type'] = $data['type'];
 		}
 
-		$settings['remote'][$ftp->key]['retention_count'] = $data['retention_count'];
-		$settings['remote'][$ftp->key]['nickname'] = $data['nickname'];
+		$settings['remote'][ $ftp->key ]['retention_count'] = $data['retention_count'];
+		$settings['remote'][ $ftp->key ]['nickname'] = $data['nickname'];
 
-		if( ! empty( $ftp->errors ) ) {
+		if ( ! empty( $ftp->errors ) ) {
 			do_action( 'boldgrid_backup_notice', implode( '<br /><br />', $ftp->errors ) );
 		} else {
 			update_site_option( 'boldgrid_backup_settings', $settings );

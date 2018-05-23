@@ -83,7 +83,7 @@ class Boldgrid_Backup_Admin_Time {
 	 * @return int
 	 */
 	public function get_server_offset() {
-		if( is_null( $this->server_offset ) ) {
+		if ( is_null( $this->server_offset ) ) {
 			$this->server_offset = $this->core->execute_command( 'date +%:::z' );
 		}
 
@@ -128,7 +128,7 @@ class Boldgrid_Backup_Admin_Time {
 		 *										)
 		 */
 		$timezone = new DateTimeZone( 'EDT' );
-		if( 'EDT' === $timezone->getName() ) {
+		if ( 'EDT' === $timezone->getName() ) {
 			// Example, get -0400.
 			$timezone = $this->core->execute_command( 'date +%z' );
 		} else {
@@ -139,7 +139,7 @@ class Boldgrid_Backup_Admin_Time {
 		try {
 			$timezone = new DateTimeZone( $timezone );
 			return $timezone;
-		} catch( Exception $e ) {
+		} catch ( Exception $e ) {
 			return false;
 		}
 	}
@@ -153,21 +153,21 @@ class Boldgrid_Backup_Admin_Time {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param  array    $settings
-	 * @param  array    $tz_info
+	 * @param  array $settings
+	 * @param  array $tz_info
 	 * @return DateTime
 	 */
 	public function get_settings_date( $settings = array(), $tz_info = array() ) {
 
 		// Abort right away if bad data sent in.
-		if( ! is_array( $settings ) || ! is_array( $tz_info ) ) {
+		if ( ! is_array( $settings ) || ! is_array( $tz_info ) ) {
 			return false;
 		}
 
 		$settings = empty( $settings ) ? $this->core->settings->get_settings() : $settings;
 
 		$tz_info = empty( $tz_info ) ? $this->get_timezone_info() : $tz_info;
-		$is_utc = ! empty( $tz_info['abbr'] ) && 'UTC' === substr( $tz_info['abbr'], 0, 3  );
+		$is_utc = ! empty( $tz_info['abbr'] ) && 'UTC' === substr( $tz_info['abbr'], 0, 3 );
 
 		$time_string = $settings['schedule']['tod_h'] . ':' . $settings['schedule']['tod_m'] . ' ' . $settings['schedule']['tod_a'];
 
@@ -183,8 +183,8 @@ class Boldgrid_Backup_Admin_Time {
 		 * # Type 2: A timezone abbreviation new DateTime( "17 July 2013 GMT" );
 		 * # Type 3: A timezone identifier   new DateTime( "17 July 2013", new DateTimeZone( "Europe/London" ) );
 		 */
-		try{
-			if( $is_utc ) {
+		try {
+			if ( $is_utc ) {
 				$date = new DateTime( $time_string, new DateTimeZone( 'UTC' ) );
 
 				// If we have a gmt_offset (example: -4.5), use that, otherwise parse the -4 from UTC-4.
@@ -200,7 +200,7 @@ class Boldgrid_Backup_Admin_Time {
 				$date = new DateTime( $time_string, new DateTimeZone( $tz_info['name'] ) );
 			}
 			return $date;
-		} catch( Exception $e ) {
+		} catch ( Exception $e ) {
 			return false;
 		}
 	}
@@ -212,7 +212,7 @@ class Boldgrid_Backup_Admin_Time {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param  float  $offset Offset in hours.
+	 * @param  float $offset Offset in hours.
 	 * @return string         Formatted offset.
 	 */
 	public function format_gmt_offset( $offset ) {
@@ -238,7 +238,7 @@ class Boldgrid_Backup_Admin_Time {
 	 * @return string
 	 */
 	public function get_span( $format = 'M j, Y h:i a' ) {
-		if( empty( $this->local_time ) ) {
+		if ( empty( $this->local_time ) ) {
 			return '';
 		}
 
@@ -250,28 +250,28 @@ class Boldgrid_Backup_Admin_Time {
 	}
 
 	/**
-     * Get timezone info.
-     *
-     * This is a core WordPress function, copied here. It requires
-     * the format_gmt_offset() method, which is copied here as well.
-     *
-     * The core implementation of this method is used within the Customizer to
-     * show a user their timezone when scheduling changes for a future date.
-     *
-     * In our efforts to use the same formatting as WordPress, we attempted to
-     * use this method, however ran into a blocker. This method is defined in the
-     * WP_Customize_Date_Time_Control class, which extends the WP_Customize_Control
-     * class. The WP_Customize_Control class was designed for use within the
-     * Customizer, and cannot really be instantiated outside of it.
-     *
-     * Example: WordPress set to UTC-4
-     * Array
-     * (
-     *     [abbr] => UTC-4
-     *     [description] => Timezone is UTC-4.
-     *     [markup_timezone] => UTC-4
-     *     [markup_change] => Change timezone
-     * )
+	 * Get timezone info.
+	 *
+	 * This is a core WordPress function, copied here. It requires
+	 * the format_gmt_offset() method, which is copied here as well.
+	 *
+	 * The core implementation of this method is used within the Customizer to
+	 * show a user their timezone when scheduling changes for a future date.
+	 *
+	 * In our efforts to use the same formatting as WordPress, we attempted to
+	 * use this method, however ran into a blocker. This method is defined in the
+	 * WP_Customize_Date_Time_Control class, which extends the WP_Customize_Control
+	 * class. The WP_Customize_Control class was designed for use within the
+	 * Customizer, and cannot really be instantiated outside of it.
+	 *
+	 * Example: WordPress set to UTC-4
+	 * Array
+	 * (
+	 *     [abbr] => UTC-4
+	 *     [description] => Timezone is UTC-4.
+	 *     [markup_timezone] => UTC-4
+	 *     [markup_change] => Change timezone
+	 * )
 	 *
 	 * Example: WordPress set to NewYork
 	 * Array
@@ -292,11 +292,11 @@ class Boldgrid_Backup_Admin_Time {
 	 *     [markup_timezone] => UTC-4.5
 	 *     [markup_change] => Change timezone
 	 * )
-     *
-     * @since 1.6.0
-     *
-     * @return array
-     */
+	 *
+	 * @since 1.6.0
+	 *
+	 * @return array
+	 */
 	public function get_timezone_info() {
 		$tz_string = get_option( 'timezone_string' );
 		$timezone_info = array();
@@ -326,7 +326,7 @@ class Boldgrid_Backup_Admin_Time {
 
 			// This set of code is not in core.
 			$gmt_offset = get_option( 'gmt_offset', 0 );
-			if( ! empty( $gmt_offset ) ) {
+			if ( ! empty( $gmt_offset ) ) {
 				$timezone_info['gmt_offset'] = $gmt_offset;
 			}
 
@@ -360,12 +360,12 @@ class Boldgrid_Backup_Admin_Time {
 	 * @param string $type The type of type ( utc, local, -5)
 	 */
 	public function init( $time, $type = 'utc' ) {
-		if( empty( $time ) ) {
+		if ( empty( $time ) ) {
 			$this->reset();
 			return;
 		}
 
-		$gmt_offset = get_option('gmt_offset');
+		$gmt_offset = get_option( 'gmt_offset' );
 		$valid_gmt_offset = ! empty( $gmt_offset ) || is_numeric( $gmt_offset );
 
 		$this->local_timezone = 'UTC';
@@ -381,17 +381,17 @@ class Boldgrid_Backup_Admin_Time {
 		 * we can then calculate UTC and the User's local time (set in WordPress).
 		 */
 		$this->utc_time = $time;
-		if( 'php_zip' === $type || 'local' === $type ) {
+		if ( 'php_zip' === $type || 'local' === $type ) {
 			$server_offset = $this->get_server_offset();
 
 			// We can calculate UTC time with the server's timezone.
-			if( is_numeric( $server_offset ) ) {
+			if ( is_numeric( $server_offset ) ) {
 				$this->utc_time = $time + ( -1 * $server_offset * HOUR_IN_SECONDS );
 			}
 		}
 
 		// Once we have the UTC time (above), we can calculate the user's local time.
-		if( $valid_gmt_offset ) {
+		if ( $valid_gmt_offset ) {
 			$this->local_time = $this->utc_time + ( $gmt_offset * HOUR_IN_SECONDS );
 			$this->local_timezone .= ' ' . $gmt_offset;
 		} else {

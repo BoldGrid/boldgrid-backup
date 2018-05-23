@@ -46,4 +46,4 @@ return sprintf(
 	$this->core->time->get_span()
 );
 
-?>
+

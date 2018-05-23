@@ -66,7 +66,7 @@ class Boldgrid_Backup_Admin_Email {
 
 		$email_body .= trim( $message ) . "\n\n";
 
-		if( $add_ad ) {
+		if ( $add_ad ) {
 			$email_body .= $this->ads['generic'];
 		}
 
@@ -120,7 +120,7 @@ class Boldgrid_Backup_Admin_Email {
 		$parts['body']['main'] .= sprintf( esc_html__( 'Archive file size: %s', 'boldgrid-backup' ), Boldgrid_Backup_Admin_Utility::bytes_to_human( $info['filesize'] ) ) . "\n";
 		$parts['body']['main'] .= sprintf( esc_html__( 'Compressor used: %s', 'boldgrid-backup' ), $info['compressor'] ) . "\n";
 
-		if( ! empty( $info['trigger'] ) ) {
+		if ( ! empty( $info['trigger'] ) ) {
 			$parts['body']['main'] .= sprintf( esc_html__( 'Backup triggered by: %1$s', 'boldgrid-backup' ), $info['trigger'] ) . "\n";
 		}
 
@@ -186,6 +186,6 @@ class Boldgrid_Backup_Admin_Email {
 	public function user_wants_notification( $task ) {
 		$settings = $this->core->settings->get_settings();
 
-		return ! empty( $settings['notifications'][$task] );
+		return ! empty( $settings['notifications'][ $task ] );
 	}
 }

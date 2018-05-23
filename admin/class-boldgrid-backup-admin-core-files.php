@@ -82,12 +82,12 @@ class Boldgrid_Backup_Admin_Core_Files {
 	 * @return bool
 	 */
 	public function is_core_file( $file ) {
-		if( ! is_string( $file ) || empty( $file ) ) {
+		if ( ! is_string( $file ) || empty( $file ) ) {
 			return false;
 		}
 
-		foreach( $this->files as $core_file ) {
-			if( 0 === strpos( $file, $core_file ) ) {
+		foreach ( $this->files as $core_file ) {
+			if ( 0 === strpos( $file, $core_file ) ) {
 				return true;
 			}
 		}

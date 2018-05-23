@@ -349,9 +349,8 @@ class Boldgrid_Backup {
 
 		$this->loader->add_action( 'admin_init', $plugin_admin_core->cron, 'upgrade_crontab_entries' );
 
-		/*
-		 * Ftp
-		 */
+		/* FTP */
+
 		// Allow one click upload.
 		$this->loader->add_action( 'boldgrid_backup_single_archive_remote_options', $plugin_admin_core->ftp->hooks, 'single_archive_remote_option' );
 		// Process upload via ajax.

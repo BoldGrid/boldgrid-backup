@@ -146,8 +146,8 @@ class Boldgrid_Backup_Admin_Archive {
 
 		$archives = $this->core->get_archive_list();
 
-		foreach( $archives as $key => $archive ) {
-			if( $archive['filename'] === $filename ) {
+		foreach ( $archives as $key => $archive ) {
+			if ( $archive['filename'] === $filename ) {
 				$archive['key'] = $key;
 				$return_archive = $archive;
 				break;
@@ -167,7 +167,7 @@ class Boldgrid_Backup_Admin_Archive {
 	 * @return array
 	 */
 	public function get_file( $file, $meta_only = false ) {
-		if( empty( $this->filepath ) || ! $this->is_archive( $this->filepath ) ) {
+		if ( empty( $this->filepath ) || ! $this->is_archive( $this->filepath ) ) {
 			return false;
 		}
 
@@ -176,7 +176,7 @@ class Boldgrid_Backup_Admin_Archive {
 		$file_contents = $zip->get_file( $this->filepath, $file );
 
 		// If we only want the meta data, unset the content of the file.
-		if( $meta_only && ! empty( $file_contents[0]['content'] ) ) {
+		if ( $meta_only && ! empty( $file_contents[0]['content'] ) ) {
 			unset( $file_contents[0]['content'] );
 		}
 
@@ -194,7 +194,7 @@ class Boldgrid_Backup_Admin_Archive {
 
 		$filepath = strip_tags( $filepath );
 
-		if( ! empty( $this->filepath ) && $filepath === $this->filepath ) {
+		if ( ! empty( $this->filepath ) && $filepath === $this->filepath ) {
 			return;
 		}
 
@@ -210,12 +210,12 @@ class Boldgrid_Backup_Admin_Archive {
 
 		// If the archive's log file does not exist, extract it.
 		$have_log = $this->core->wp_filesystem->exists( $this->log_filepath );
-		if( ! $have_log ) {
+		if ( ! $have_log ) {
 			$have_log = $this->core->archive_log->restore_by_zip( $this->filepath );
 		}
 
 		// Init our log.
-		if( $have_log ) {
+		if ( $have_log ) {
 			$this->log = $this->core->archive_log->get_by_zip( $this->filepath );
 		}
 
@@ -243,12 +243,12 @@ class Boldgrid_Backup_Admin_Archive {
 	public function is_archive( $filepath ) {
 		$archives = $this->core->get_archive_list();
 
-		if( empty( $archives ) ) {
+		if ( empty( $archives ) ) {
 			return false;
 		}
 
-		foreach( $archives as $archive ) {
-			if( $filepath === $archive['filepath'] ) {
+		foreach ( $archives as $archive ) {
+			if ( $filepath === $archive['filepath'] ) {
 				return true;
 			}
 		}
@@ -272,17 +272,17 @@ class Boldgrid_Backup_Admin_Archive {
 
 		// End in zip.
 		$extension = pathinfo( $filename, PATHINFO_EXTENSION );
-		if( 'zip' !== $extension ) {
+		if ( 'zip' !== $extension ) {
 			return false;
 		}
 
 		// Include the backup identifier.
-		if( false === strpos( $filename, $backup_identifier ) ) {
+		if ( false === strpos( $filename, $backup_identifier ) ) {
 			return false;
 		}
 
 		// Begin with 'boldgrid-backup-'.
-		if( 0 !== strpos( $filename, 'boldgrid-backup-' ) ) {
+		if ( 0 !== strpos( $filename, 'boldgrid-backup-' ) ) {
 			return false;
 		}
 
@@ -303,8 +303,8 @@ class Boldgrid_Backup_Admin_Archive {
 	public function is_stored_locally() {
 		$this->core->archives_all->init();
 
-		return isset( $this->core->archives_all->archives[$this->filename]['on_web_server'] ) &&
-			true === $this->core->archives_all->archives[$this->filename]['on_web_server'];
+		return isset( $this->core->archives_all->archives[ $this->filename ]['on_web_server'] ) &&
+			true === $this->core->archives_all->archives[ $this->filename ]['on_web_server'];
 	}
 
 	/**
@@ -320,8 +320,8 @@ class Boldgrid_Backup_Admin_Archive {
 	public function is_stored_remotely() {
 		$this->core->archives_all->init();
 
-		return isset( $this->core->archives_all->archives[$this->filename]['on_remote_server'] ) &&
-			true === $this->core->archives_all->archives[$this->filename]['on_remote_server'];
+		return isset( $this->core->archives_all->archives[ $this->filename ]['on_remote_server'] ) &&
+			true === $this->core->archives_all->archives[ $this->filename ]['on_remote_server'];
 	}
 
 	/**
@@ -350,7 +350,7 @@ class Boldgrid_Backup_Admin_Archive {
 	public function update_timestamp() {
 
 		// If we don't have what we need, abort.
-		if( empty( $this->filepath ) || empty( $this->log['lastmodunix'] ) ) {
+		if ( empty( $this->filepath ) || empty( $this->log['lastmodunix'] ) ) {
 			return false;
 		}
 

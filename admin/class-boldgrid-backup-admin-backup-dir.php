@@ -116,29 +116,29 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 		 */
 		$files = apply_filters( 'boldgrid_backup_create_dir_config', $files, $backup_dir );
 
-		foreach( $files as $file ) {
-			switch( $file['type'] ) {
+		foreach ( $files as $file ) {
+			switch ( $file['type'] ) {
 				case 'dir':
-					if( ! $this->core->wp_filesystem->exists( $file['path'] ) ) {
+					if ( ! $this->core->wp_filesystem->exists( $file['path'] ) ) {
 						$chmod = ! empty( $file['chmod'] ) ? $file['chmod'] : false;
 						$created = $this->core->wp_filesystem->mkdir( $file['path'], $chmod );
-						if( ! $created ) {
+						if ( ! $created ) {
 							$this->errors[] = sprintf( $cannot_create, $file['path'], $check_permissions );
 							return false;
 						}
 					}
 					break;
 				case 'file':
-					if( ! $this->core->wp_filesystem->exists( $file['path'] ) ) {
+					if ( ! $this->core->wp_filesystem->exists( $file['path'] ) ) {
 						$created = $this->core->wp_filesystem->touch( $file['path'] );
-						if( ! $created ) {
+						if ( ! $created ) {
 							$this->errors[] = sprintf( $cannot_create, $file['path'], $check_permissions );
 							return false;
 						}
 
-						if( ! empty( $file['contents'] ) ) {
+						if ( ! empty( $file['contents'] ) ) {
 							$written = $this->core->wp_filesystem->put_contents( $file['path'], $file['contents'] );
-							if( ! $written ) {
+							if ( ! $written ) {
 								$this->errors[] = sprintf( $cannot_write, $file['path'], $check_permissions );
 								return false;
 							}
@@ -161,13 +161,13 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	public function get() {
 
 		// If we've already set the backup directory, return it.
-		if( ! empty( $this->backup_directory ) ) {
+		if ( ! empty( $this->backup_directory ) ) {
 			return $this->backup_directory;
 		}
 
 		// If we have it in the settings, then use it.
 		$settings = $this->core->settings->get_settings();
-		if( ! empty( $settings['backup_directory'] ) ) {
+		if ( ! empty( $settings['backup_directory'] ) ) {
 			$this->set( $settings['backup_directory'] );
 			return $this->backup_directory;
 		}
@@ -187,11 +187,11 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 		// Standard value, the user's home directory.
 		$dirs[] = $this->core->config->get_home_directory();
 
-		if( $this->core->test->is_windows() ) {
+		if ( $this->core->test->is_windows() ) {
 			// C:\Users\user\AppData\Local
 			$dirs[] = $this->core->config->get_home_directory() . DIRECTORY_SEPARATOR . 'AppData' . DIRECTORY_SEPARATOR . 'Local';
 
-			if( ! empty( $_SERVER['DOCUMENT_ROOT'] ) ) {
+			if ( ! empty( $_SERVER['DOCUMENT_ROOT'] ) ) {
 				/*
 				 * App_Data (Windows / Plesk).
 				 *
@@ -241,12 +241,12 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	public function guess_and_set() {
 		$possible_dirs = $this->get_possible_dirs();
 
-		foreach( $possible_dirs as $possible_dir ) {
+		foreach ( $possible_dirs as $possible_dir ) {
 
 			$possible_dir = untrailingslashit( $possible_dir );
 
 			// Ensure /parent_directory exists.
-			if( ! $this->core->wp_filesystem->exists( $possible_dir ) ) {
+			if ( ! $this->core->wp_filesystem->exists( $possible_dir ) ) {
 				continue;
 			}
 
@@ -256,13 +256,13 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 			 */
 			$possible_dir .= DIRECTORY_SEPARATOR . 'boldgrid_backup';
 			$backup_directory = $this->create( $possible_dir );
-			if( ! $backup_directory ) {
+			if ( ! $backup_directory ) {
 				continue;
 			}
 
 			// Validate read/write/modify/ect. permissions of directory.
 			$valid = $this->is_valid( $backup_directory );
-			if( ! $valid ) {
+			if ( ! $valid ) {
 				continue;
 			}
 
@@ -270,7 +270,7 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 			break;
 		}
 
-		if( empty( $backup_directory ) ) {
+		if ( empty( $backup_directory ) ) {
 			return false;
 		}
 
@@ -304,7 +304,7 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	 * @return bool
 	 */
 	public function file_in_dir( $file, $use_abspath = false ) {
-		if( ! $use_abspath ) {
+		if ( ! $use_abspath ) {
 			return false !== strpos( $file, $this->without_abspath );
 		} else {
 			return false !== strpos( $file, $this->backup_directory );
@@ -321,29 +321,29 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	 */
 	public function is_valid( $backup_dir ) {
 
-		if( empty( $backup_dir ) ) {
+		if ( empty( $backup_dir ) ) {
 			return false;
 		}
 
 		$perms = $this->core->test->extensive_dir_test( $backup_dir );
 
-		if( ! $perms['exists'] ) {
+		if ( ! $perms['exists'] ) {
 			$this->errors[] = sprintf( __( 'Backup Directory does not exists: %1$s', 'boldgrid-backup' ), $backup_dir );
 		}
 
-		if( ! $perms['read'] ) {
+		if ( ! $perms['read'] ) {
 			$this->errors[] = sprintf( __( 'Backup Directory does not have read permission: %1$s', 'boldgrid-backup' ), $backup_dir );
 		}
 
-		if( ! $perms['rename'] ) {
+		if ( ! $perms['rename'] ) {
 			$this->errors[] = sprintf( __( 'Backup Directory does not have permission to rename files: %1$s', 'boldgrid-backup' ), $backup_dir );
 		}
 
-		if( ! $perms['delete'] ) {
+		if ( ! $perms['delete'] ) {
 			$this->errors[] = sprintf( __( 'Backup Directory does not have permission to delete files: %1$s', 'boldgrid-backup' ), $backup_dir );
 		}
 
-		if( ! $perms['dirlist'] ) {
+		if ( ! $perms['dirlist'] ) {
 			$this->errors[] = sprintf( __( 'Backup Directory does not have permission to retrieve directory listing: %1$s', 'boldgrid-backup' ), $backup_dir );
 		}
 
@@ -356,7 +356,7 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 		 */
 		$backup_dir = Boldgrid_Backup_Admin_Utility::trailingslashit( $backup_dir );
 		$abspath_in_dir = 0 === strpos( ABSPATH, $backup_dir );
-		if( $abspath_in_dir ) {
+		if ( $abspath_in_dir ) {
 			$this->errors[] = sprintf(
 				__( 'Your <strong>WordPress directory</strong> <em>%1$s</em> cannot be within your <strong>backup directory</strong> %2$s.', 'boldgrid-backup' ),
 				ABSPATH,
@@ -374,12 +374,12 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	 */
 	public function set( $backup_directory ) {
 
-		if( empty( $backup_directory ) ) {
+		if ( empty( $backup_directory ) ) {
 			return false;
 		}
 
 		$created = $this->create( $backup_directory );
-		if( ! $created ) {
+		if ( ! $created ) {
 			return false;
 		}
 

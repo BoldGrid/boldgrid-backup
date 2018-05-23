@@ -13,24 +13,24 @@ defined( 'WPINC' ) ? : die;
 $data['postbox'] = '';
 
 $action = 'boldgrid_backup_single_archive_remote_options';
-if( ! empty( $archive['filepath'] ) ) {
+if ( ! empty( $archive['filepath'] ) ) {
 	do_action( $action, $archive['filepath'] );
-} elseif( ! empty( $archive['filename'] ) ) {
+} elseif ( ! empty( $archive['filename'] ) ) {
 	do_action( $action, $archive['filename'] );
 }
 
-if( empty( $this->remote_storage_li ) ) {
+if ( empty( $this->remote_storage_li ) ) {
 	$data['postbox'] = __( 'No remote storage options available.', 'boldgrid-backup' );
 	return $data;
 }
 
 $count = 0;
-foreach( $this->remote_storage_li as $provider ) {
+foreach ( $this->remote_storage_li as $provider ) {
 	$count++;
 
 	// Generate a link to "download to server" from remote provider.
 	$download = '';
-	if( ! $archive_found && $provider['uploaded'] ) {
+	if ( ! $archive_found && $provider['uploaded'] ) {
 		$download = sprintf( '
 			<a class="button download-to-server" data-provider-id="%3$s">%1$s</a>
 			%2$s
@@ -41,15 +41,15 @@ foreach( $this->remote_storage_li as $provider ) {
 		);
 	}
 
-	if( $provider['uploaded'] ) {
+	if ( $provider['uploaded'] ) {
 		$upload = '&#10003; ' . __( 'Uploaded', 'boldgrid-backup' );
-	} elseif( $provider['allow_upload'] && $archive_found ) {
+	} elseif ( $provider['allow_upload'] && $archive_found ) {
 		$upload = sprintf(
 			'<a class="button button-primary upload" data-provider-id="%2$s">%1$s</a>',
 			__( 'Upload', 'boldgrid-backup' ),
 			$provider['id']
 		);
-	} elseif( isset( $provider['is_setup'] ) and false === $provider['is_setup'] ) {
+	} elseif ( isset( $provider['is_setup'] ) and false === $provider['is_setup'] ) {
 		$upload = sprintf( __( 'Please go to your <a target="_parent" href="%1$s">%2$s</a> to configure %3$s.', 'boldgrid-backup' ), 'admin.php?page=boldgrid-backup-settings', __( 'settings page', 'boldgrid-backup' ), $provider['title'] );
 	} else {
 		$upload = '';
@@ -77,4 +77,4 @@ foreach( $this->remote_storage_li as $provider ) {
 
 return $data;
 
-?>
+
