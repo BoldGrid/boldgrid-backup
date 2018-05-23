@@ -80,4 +80,4 @@ return sprintf( '
 	/* 5 */ $tables
 );
 
-?>
+

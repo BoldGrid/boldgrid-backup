@@ -77,7 +77,7 @@ class Boldgrid_Backup_Admin_Archive_Details {
 		wp_register_script(
 			'boldgrid-backup-admin-archive-details',
 			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-archive-details.js',
-			array( 'jquery', ),
+			array( 'jquery' ),
 			BOLDGRID_BACKUP_VERSION
 		);
 		$translations = array(
@@ -91,7 +91,7 @@ class Boldgrid_Backup_Admin_Archive_Details {
 		wp_register_script(
 			'boldgrid-backup-admin-zip-browser',
 			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-zip-browser.js',
-			array( 'jquery', ),
+			array( 'jquery' ),
 			BOLDGRID_BACKUP_VERSION
 		);
 		$unknown_error = __( 'An unknown error has occurred.', 'boldgrid-backup' );
@@ -133,14 +133,14 @@ class Boldgrid_Backup_Admin_Archive_Details {
 		$archive_found = false;
 
 		$filename = ! empty( $_GET['filename'] ) ? sanitize_file_name( $_GET['filename'] ) : false;
-		if( ! $filename ) {
+		if ( ! $filename ) {
 			echo __( 'No archive specified.', 'boldgrid-backup' );
 			return;
 		}
 
 		// Get our archive.
 		$archive = $this->core->archive->get_by_name( $filename );
-		if( $archive ) {
+		if ( $archive ) {
 			$log = $this->core->archive_log->get_by_zip( $archive['filepath'] );
 			$archive = array_merge( $log, $archive );
 			$archive_found = true;

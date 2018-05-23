@@ -62,7 +62,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 	public function add_notice( $notices ) {
 		$in_progress = $this->get();
 
-		if( empty( $in_progress ) ) {
+		if ( empty( $in_progress ) ) {
 			return $notices;
 		}
 
@@ -71,13 +71,13 @@ class Boldgrid_Backup_Admin_In_Progress {
 		 * of the heartbeat so that we can more quickly update the user when
 		 * the backup has completed.
 		 */
-		wp_enqueue_script('heartbeat');
+		wp_enqueue_script( 'heartbeat' );
 
 		$elapsed = time() - $in_progress;
 		$limit = 15 * MINUTE_IN_SECONDS;
 
 		$notice = $this->get_notice();
-		if( false === $notice ) {
+		if ( false === $notice ) {
 			return $notices;
 		}
 
@@ -85,7 +85,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 		 * @todo If the backup takes longer than 15 minutes, the user needs more
 		 * help with troubleshooting.
 		 */
-		if( $elapsed > $limit ) {
+		if ( $elapsed > $limit ) {
 			$notice['message'] .= __( ' Most backups usually finish before this amount of time, so we will stop displaying this notice.', 'boldgrid-backup' );
 			$this->end();
 		}
@@ -105,7 +105,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 	public function end() {
 		$settings = $this->core->settings->get_settings( true );
 
-		if( ! empty( $settings['in_progress'] ) ) {
+		if ( ! empty( $settings['in_progress'] ) ) {
 			unset( $settings['in_progress'] );
 		}
 
@@ -139,14 +139,14 @@ class Boldgrid_Backup_Admin_In_Progress {
 	public function get_notice() {
 		$in_progress = $this->get();
 
-		if( empty( $in_progress ) ) {
+		if ( empty( $in_progress ) ) {
 			return false;
 		}
 
 		$notice = array(
 			'class' => 'notice notice-warning boldgrid-backup-in-progress',
 			'message' => sprintf( __( 'BoldGrid Backup began archiving your website %1$s ago.', 'boldgrid-backup' ), human_time_diff( $in_progress, time() ) ),
-			'heading' => __( 'BoldGrid Backup - Backup in progress', 'boldgrid-backup' )
+			'heading' => __( 'BoldGrid Backup - Backup in progress', 'boldgrid-backup' ),
 		);
 
 		return $notice;
@@ -164,7 +164,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 		$notice = $this->get_notice();
 		$markup = false;
 
-		if( $notice ) {
+		if ( $notice ) {
 			$markup = $this->core->notice->get_notice_markup( $notice['class'], $notice['message'], $notice['heading'] );
 		}
 
@@ -186,15 +186,15 @@ class Boldgrid_Backup_Admin_In_Progress {
 	public function heartbeat_received( $response, $data ) {
 		$key = 'boldgrid_backup_in_progress';
 
-		if( empty( $data[$key] ) ) {
+		if ( empty( $data[ $key ] ) ) {
 			return $response;
 		}
 
 		// An int specifiying when the current "in progress" backup started.
-		$response[$key] = $this->get();
+		$response[ $key ] = $this->get();
 
 		// Our "backup complete!" admin notice.
-		$response[ 'boldgrid_backup_complete' ] = $this->core->notice->get_backup_complete();
+		$response['boldgrid_backup_complete'] = $this->core->notice->get_backup_complete();
 
 		return $response;
 	}
@@ -212,7 +212,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 		 *
 		 * @see documentation in $this->pre_dump().
 		 */
-		if( ! empty( $this->in_progress ) ) {
+		if ( ! empty( $this->in_progress ) ) {
 			$this->set( $this->in_progress );
 		}
 	}
@@ -263,7 +263,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 			wp_send_json_error( __( 'Permission denied.', 'boldgrid-backup' ) );
 		}
 
-		if( ! check_ajax_referer( 'boldgrid_backup_customizer', 'nonce', false ) ) {
+		if ( ! check_ajax_referer( 'boldgrid_backup_customizer', 'nonce', false ) ) {
 			wp_send_json_error( __( 'Invalid nonce.', 'boldgrid-backup' ) );
 		}
 

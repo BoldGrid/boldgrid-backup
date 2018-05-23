@@ -80,11 +80,11 @@ class Boldgrid_Backup_Admin_Storage_Local {
 		 * If we're doing a backup immediately before WordPress does an auto
 		 * update, we want to make sure this backup is not deleted.
 		 */
-		if( ! $this->core->doing_cron || $this->core->pre_auto_update ) {
+		if ( ! $this->core->doing_cron || $this->core->pre_auto_update ) {
 			return;
 		}
 
-		if( $this->core->remote->is_enabled( 'local' ) ) {
+		if ( $this->core->remote->is_enabled( 'local' ) ) {
 			return;
 		}
 

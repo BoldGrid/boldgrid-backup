@@ -45,7 +45,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	public function __construct( $core = false ) {
 
 		// We don't always require $core for this class.
-		if( $core ) {
+		if ( $core ) {
 			$this->core = $core;
 		}
 	}
@@ -60,7 +60,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 */
 	public function import( $file ) {
 		$lines = file( $file );
-		if( false === $lines ) {
+		if ( false === $lines ) {
 			return array( 'error' => sprintf( __( 'Unable to open mysqldump, %1$s.', 'boldgrid-backup' ), $file ) );
 		}
 
@@ -86,7 +86,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 		$file_from_archive = $this->core->archive->get_file( $file );
 
 		$sql = ! empty( $file_from_archive[0]['content'] ) ? $file_from_archive[0]['content'] : null;
-		if( empty( $sql ) ) {
+		if ( empty( $sql ) ) {
 			$this->errors[] = __( 'Unable to get contents of file.', 'boldgrid-backup' );
 			return false;
 		}
@@ -114,7 +114,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * @return bool
 	 */
 	public function import_lines( $lines ) {
-		if( empty( $lines ) ) {
+		if ( empty( $lines ) ) {
 			return false;
 		}
 
@@ -122,19 +122,18 @@ class Boldgrid_Backup_Admin_Db_Import {
 
 		$templine = '';
 
-		foreach ($lines as $line)
-		{
+		foreach ( $lines as $line ) {
 			// Skip comments and empty lines.
-			if ( substr($line, 0, 2) === '--' || empty( $line ) ) {
+			if ( substr( $line, 0, 2 ) === '--' || empty( $line ) ) {
 				continue;
 			}
 
 			$templine .= $line;
 
 			// Check if this is the end of the query.
-			if( substr( trim( $line ), -1, 1 ) === ';' ) {
+			if ( substr( trim( $line ), -1, 1 ) === ';' ) {
 				$affected_rows = $db->exec( $templine );
-				if( false === $affected_rows ) {
+				if ( false === $affected_rows ) {
 					return false;
 				}
 
@@ -158,7 +157,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * @return bool
 	 */
 	public function import_string( $string ) {
-		$lines = preg_split("/\\r\\n|\\r|\\n/", $string );
+		$lines = preg_split( "/\\r\\n|\\r|\\n/", $string );
 
 		$success = $this->import_lines( $lines );
 

@@ -116,7 +116,7 @@ class Boldgrid_Backup_Admin_WP_Cron {
 		$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
 		$schedule = ! empty( $settings['schedule'] ) ? $settings['schedule'] : null;
 
-		if( 'wp-cron' === $scheduler && $this->core->scheduler->is_available( $scheduler ) && ! empty( $schedule ) ) {
+		if ( 'wp-cron' === $scheduler && $this->core->scheduler->is_available( $scheduler ) && ! empty( $schedule ) ) {
 			$this->core->scheduler->clear_all_schedules();
 
 			$scheduled = $this->schedule( $settings, $this->hooks['backup'] );
@@ -165,11 +165,11 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	 * @param array An array of hooks to clear.
 	 */
 	public function clear_schedules( $hooks = array() ) {
-		if( empty( $hooks ) ) {
+		if ( empty( $hooks ) ) {
 			$hooks = $this->hooks;
 		}
 
-		foreach( $hooks as $hook ) {
+		foreach ( $hooks as $hook ) {
 			wp_clear_scheduled_hook( $hook );
 		}
 	}
@@ -183,12 +183,12 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	 * @return array
 	 */
 	public function cron_schedules( $schedules ) {
-		foreach( $this->schedules as $key => $schedule ) {
-			if( in_array( $key, $schedules, true ) ) {
+		foreach ( $this->schedules as $key => $schedule ) {
+			if ( in_array( $key, $schedules, true ) ) {
 				continue;
 			}
 
-			$schedules[$key] = $schedule;
+			$schedules[ $key ] = $schedule;
 		}
 
 		return $schedules;
@@ -210,7 +210,7 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	public function get_next_time( $d, $h, $m, $p ) {
 		$schedule_time = strtotime( sprintf( 'this %1$s %2$s:%3$s %4$s', $d, $h, $m, $p ) );
 
-		if( time() > $schedule_time ) {
+		if ( time() > $schedule_time ) {
 			$schedule_time = strtotime( sprintf( 'next %1$s %2$s:%3$s %4$s', $d, $h, $m, $p ) );
 		}
 
@@ -230,16 +230,16 @@ class Boldgrid_Backup_Admin_WP_Cron {
 		$crons = _get_cron_array();
 		$crons = is_array( $crons ) ? $crons : array();
 
-		foreach( $crons as $time => $cron ) {
+		foreach ( $crons as $time => $cron ) {
 			$action = key( $cron );
 
-			if( empty( $action ) || 0 !== strpos( $action, 'boldgrid_backup_' ) ) {
+			if ( empty( $action ) || 0 !== strpos( $action, 'boldgrid_backup_' ) ) {
 				continue;
 			}
 
-			$action_key = key( $cron[$action] );
+			$action_key = key( $cron[ $action ] );
 
-			$ours[] = sprintf( '%1$s (%2$s %3$s %4$s)', $action, $cron[$action][$action_key]['schedule'], __( 'starting','boldgrid-backup' ), date( 'Y.m.d h:i:s a e', $time ) );
+			$ours[] = sprintf( '%1$s (%2$s %3$s %4$s)', $action, $cron[ $action ][ $action_key ]['schedule'], __( 'starting','boldgrid-backup' ), date( 'Y.m.d h:i:s a e', $time ) );
 		}
 
 		return $ours;
@@ -300,8 +300,8 @@ class Boldgrid_Backup_Admin_WP_Cron {
 
 		$success = true;
 
-		foreach( $this->days as $day ) {
-			if( 1 !== $settings['schedule'][ 'dow_' . $day ] ) {
+		foreach ( $this->days as $day ) {
+			if ( 1 !== $settings['schedule'][ 'dow_' . $day ] ) {
 				continue;
 			}
 
@@ -316,7 +316,7 @@ class Boldgrid_Backup_Admin_WP_Cron {
 			 * only 4 are scheduled successfully, this method returns false.
 			 */
 			$scheduled = wp_schedule_event( $schedule_time, 'weekly', $hook );
-			if( false === $scheduled ) {
+			if ( false === $scheduled ) {
 				$success = false;
 			}
 		}
@@ -341,7 +341,7 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	public function schedule_jobs() {
 		$success = true;
 
-		if( ! wp_next_scheduled( $this->hooks['run_jobs'] ) ) {
+		if ( ! wp_next_scheduled( $this->hooks['run_jobs'] ) ) {
 			$scheduled = wp_schedule_event( time(), 'every-5-minutes', $this->hooks['run_jobs'] );
 			$success = false !== $scheduled;
 		}

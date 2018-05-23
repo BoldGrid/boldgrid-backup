@@ -95,11 +95,11 @@ class Boldgrid_Backup_Admin_Notice {
 
 		$notices = $this->core->in_progress->add_notice( $notices );
 
-		if( empty( $notices ) ) {
+		if ( empty( $notices ) ) {
 			return;
 		}
 
-		foreach( $notices as $notice ) {
+		foreach ( $notices as $notice ) {
 			printf( '
 				<div class="%1$s is-dismissible">
 					%3$s
@@ -123,7 +123,7 @@ class Boldgrid_Backup_Admin_Notice {
 	 * @param string $class The class string for the div.
 	 */
 	public function boldgrid_backup_notice( $message, $class = 'notice notice-error is-dismissible' ) {
-		if( in_array( $message, $this->displayed_messages, true ) ) {
+		if ( in_array( $message, $this->displayed_messages, true ) ) {
 			return;
 		}
 
@@ -145,7 +145,7 @@ class Boldgrid_Backup_Admin_Notice {
 
 		// Assume that this "backup complete!" notice is for the last backup made.
 		$archive_info = get_option( 'boldgrid_backup_latest_backup' );
-		if( empty( $archive_info ) ) {
+		if ( empty( $archive_info ) ) {
 			return false;
 		}
 

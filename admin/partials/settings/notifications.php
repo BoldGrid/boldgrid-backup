@@ -26,10 +26,10 @@ ob_start();
 				<td>
 					<input id='notification-backup' type='checkbox' name='notify_backup' value='1'
 						<?php
-							if ( ! isset( $settings['notifications']['backup'] ) ||
+						if ( ! isset( $settings['notifications']['backup'] ) ||
 								0 !== $settings['notifications']['backup'] ) {
-								echo ' checked';
-							}
+							echo ' checked';
+						}
 						?> />
 				</td>
 			</tr>
@@ -38,10 +38,10 @@ ob_start();
 				<td>
 					<input id='notification-restore' type='checkbox' name='notify_restore' value='1'
 						<?php
-							if ( ! isset( $settings['notifications']['restore'] ) ||
+						if ( ! isset( $settings['notifications']['restore'] ) ||
 								0 !== $settings['notifications']['restore'] ) {
-								echo ' checked';
-							}
+							echo ' checked';
+						}
 						?> />
 				</td>
 			</tr>

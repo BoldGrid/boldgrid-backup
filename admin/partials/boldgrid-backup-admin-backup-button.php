@@ -37,4 +37,4 @@ return sprintf(
 	/* 4 */ __( 'You may leave this page, doing so will not stop your backup.', 'boldgrid-backup' )
 );
 
-?>
+

@@ -2,7 +2,7 @@
 **Contributors:** boldgrid, imh_brad, joemoto, rramo012, timph
 **Tags:** boldgrid, backup, restore, migrate, migration
 **Requires at least:** 4.4
-**Tested up to:** 4.9.5
+**Tested up to:** 4.9.6
 **Requires PHP:** 5.3
 **Stable tag:** 1.6.0
 **License:** GPLv2 or later
@@ -28,6 +28,9 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 1. Activate the plugin through the Plugins menu in WordPress.
 
 ## Changelog ##
+
+### 1.6.1 In progress ###
+* Update: Ran PHPCBF to beautify PHP code.
 
 ### 1.6.0 ###
 

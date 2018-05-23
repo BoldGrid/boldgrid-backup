@@ -79,7 +79,7 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @return bool  Success.
 	 */
 	public function add_cron_entry( $settings = array() ) {
-		if( empty( $settings ) ) {
+		if ( empty( $settings ) ) {
 			$settings = $this->core->settings->get_settings();
 		}
 
@@ -118,11 +118,11 @@ class Boldgrid_Backup_Admin_Cron {
 
 		// Convert our WordPress time to Server time.
 		$date = $this->core->time->get_settings_date( $settings );
-		if( false === $date ) {
+		if ( false === $date ) {
 			return false;
 		}
 		$server_timezone = $this->core->time->get_server_timezone();
-		if( false === $server_timezone ) {
+		if ( false === $server_timezone ) {
 			return false;
 		}
 		$date->setTimezone( $server_timezone );
@@ -166,7 +166,7 @@ class Boldgrid_Backup_Admin_Cron {
 		$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
 		$schedule = ! empty( $settings['schedule'] ) ? $settings['schedule'] : null;
 
-		if( 'cron' === $scheduler && $this->core->scheduler->is_available( $scheduler ) && ! empty( $schedule ) ) {
+		if ( 'cron' === $scheduler && $this->core->scheduler->is_available( $scheduler ) && ! empty( $schedule ) ) {
 			$this->core->scheduler->clear_all_schedules();
 
 			$scheduled = $this->add_cron_entry( $settings );
@@ -286,13 +286,13 @@ class Boldgrid_Backup_Admin_Cron {
 
 		// Get our cron jobs.
 		$crontab_exploded = $this->get_all();
-		if( empty( $crontab_exploded ) ) {
+		if ( empty( $crontab_exploded ) ) {
 			return array();
 		}
 
 		// If there's no cron jobs matching our pattern, abort.
-		$crontab = implode( "", $crontab_exploded );
-		if( false === strpos( $crontab, $pattern ) ) {
+		$crontab = implode( '', $crontab_exploded );
+		if ( false === strpos( $crontab, $pattern ) ) {
 			return array();
 		}
 
@@ -358,7 +358,7 @@ class Boldgrid_Backup_Admin_Cron {
 			return false;
 		}
 
-		if( $this->entry_exists( $entry ) ) {
+		if ( $this->entry_exists( $entry ) ) {
 			return true;
 		}
 
@@ -463,11 +463,11 @@ class Boldgrid_Backup_Admin_Cron {
 		 * added to the pattern and ALL crons for this site will be removed.
 		 */
 		$pattern = BOLDGRID_BACKUP_PATH . '/';
-		if( '' === $mode ) {
+		if ( '' === $mode ) {
 			$pattern .= 'boldgrid-backup-cron.php" mode=';
-		} elseif( 'restore' === $mode ) {
+		} elseif ( 'restore' === $mode ) {
 			$pattern .= 'boldgrid-backup-cron.php" mode=restore';
-		} elseif( true !== $mode ) {
+		} elseif ( true !== $mode ) {
 			$pattern .= $mode;
 		}
 
@@ -544,14 +544,14 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @return bool   True if the entry does not exist or was deleted successfully.
 	 */
 	public function entry_delete( $entry ) {
-		if( ! $this->entry_exists( $entry ) ) {
+		if ( ! $this->entry_exists( $entry ) ) {
 			return true;
 		}
 
 		$all_entries = $this->get_all();
 
-		if( ( $key = array_search( $entry, $all_entries ) ) !== false ) {
-			unset( $all_entries[$key] );
+		if ( ( $key = array_search( $entry, $all_entries ) ) !== false ) {
+			unset( $all_entries[ $key ] );
 		}
 
 		$all_entries = implode( "\n", $all_entries );
@@ -578,7 +578,7 @@ class Boldgrid_Backup_Admin_Cron {
 	 *
 	 * @since 1.5.2
 	 *
-	 * @param  bool  $raw Return a string of crons when true, an array when false.
+	 * @param  bool $raw Return a string of crons when true, an array when false.
 	 * @return mixed
 	 */
 	public function get_all( $raw = false ) {
@@ -589,7 +589,7 @@ class Boldgrid_Backup_Admin_Cron {
 		 * It would be clean to call is_crontab_available(), but that method
 		 * uses this method, and would result in an infinite loop.
 		 */
-		if( $this->core->test->is_windows() ) {
+		if ( $this->core->test->is_windows() ) {
 			return false;
 		}
 
@@ -617,12 +617,12 @@ class Boldgrid_Backup_Admin_Cron {
 		$our = array();
 		$all = $this->get_all();
 
-		if( empty( $all ) ) {
+		if ( empty( $all ) ) {
 			return $our;
 		}
 
-		foreach( $all as $cron ) {
-			if( false !== strpos( $cron, BOLDGRID_BACKUP_PATH ) ) {
+		foreach ( $all as $cron ) {
+			if ( false !== strpos( $cron, BOLDGRID_BACKUP_PATH ) ) {
 				$our[] = $cron;
 			}
 		}
@@ -653,7 +653,7 @@ class Boldgrid_Backup_Admin_Cron {
 			'tod_a' => null,
 		);
 
-		if( empty( $cron_line ) ) {
+		if ( empty( $cron_line ) ) {
 			return $schedule;
 		}
 
@@ -923,19 +923,19 @@ class Boldgrid_Backup_Admin_Cron {
 				// Delete and recreate the crontab entries.
 				$upgraded = $this->add_all_crons( $settings );
 
-				if ( $upgraded ) {
-					/**
+			if ( $upgraded ) {
+				/**
 					 * Action when the crontab entry upgrade is successfully completed.
 					 *
 					 * @since 1.6.1-rc.1
 					 *
 					 * @param string The new crontab entry version.
 					 */
-					do_action(
-						'boldgrid_backup_upgrade_crontab_entries_complete',
-						$this->crontab_version
-					);
-				}
+				do_action(
+					'boldgrid_backup_upgrade_crontab_entries_complete',
+					$this->crontab_version
+				);
+			}
 		}
 
 		return $upgraded;

@@ -164,7 +164,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 
 		$scheduler = $this->core->scheduler->get();
 
-		switch( $scheduler ) {
+		switch ( $scheduler ) {
 			case 'cron':
 				$this->core->cron->add_restore_cron();
 				break;
@@ -202,7 +202,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		wp_register_script(
 			$handle,
 			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-backup-now.js',
-			array( 'jquery', ),
+			array( 'jquery' ),
 			BOLDGRID_BACKUP_VERSION,
 			false
 		);
@@ -245,7 +245,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		wp_register_script(
 			$handle,
 			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-customizer.js',
-			array( 'jquery', ),
+			array( 'jquery' ),
 			BOLDGRID_BACKUP_VERSION,
 			false
 		);
@@ -275,7 +275,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		wp_enqueue_script(
 			'boldgrid-backup-admin-home',
 			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-home.js',
-			array( 'jquery', ),
+			array( 'jquery' ),
 			BOLDGRID_BACKUP_VERSION,
 			false
 		);
@@ -304,12 +304,12 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		wp_register_script(
 			$handle,
 			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-rollback.js',
-			array( 'jquery', ),
+			array( 'jquery' ),
 			BOLDGRID_BACKUP_VERSION,
 			false
 		);
 
-		if( ! empty( $deadline ) ) {
+		if ( ! empty( $deadline ) ) {
 			$localize_script_data = array(
 				// Include the time (in ISO 8601 format).
 				'rolloutDeadline' => date( 'c', $deadline ),
@@ -338,13 +338,13 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 * @since 1.6.0
 	 */
 	public function enqueue_update_selectors() {
-		if( $this->on_update_page ) {
+		if ( $this->on_update_page ) {
 			$handle = 'boldgrid-backup-admin-update-selectors';
 
 			wp_register_script(
 				$handle,
 				plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-update-selectors.js',
-				array( 'jquery', ),
+				array( 'jquery' ),
 				BOLDGRID_BACKUP_VERSION,
 				false
 			);
@@ -382,7 +382,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		$deadline = ! empty( $pending_rollback['deadline'] ) ? $pending_rollback['deadline'] : null;
 		$deadline_passed = ! empty( $deadline ) && $deadline <= time();
 
-		if( $this->on_update_page ) {
+		if ( $this->on_update_page ) {
 			$this->enqueue_rollback_scripts();
 		}
 
@@ -413,7 +413,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		$updated_and_pending = 'update-core.php' === $this->core->pagenow && ! empty( $action ) && ! empty( $pending_rollback );
 
 		// If we're restoring a file, we don't need to show any notices.
-		if( $restore_now ) {
+		if ( $restore_now ) {
 			return;
 		}
 
@@ -444,7 +444,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		 * Because we're redirecting, there's no need to show the countdown on
 		 * this page.
 		 */
-		if( $this->updating_core ) {
+		if ( $this->updating_core ) {
 			return;
 		}
 
@@ -488,12 +488,12 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	public function notice_countdown_get( $args = array() ) {
 
 		// By default we will restore the newest backup.
-		if( empty( $args ) ) {
+		if ( empty( $args ) ) {
 			$key = 0;
 			$archives = $this->core->get_archive_list();
 			$args = array(
 				'restore_key' => $key,
-				'restore_filename' => $archives[$key]['filename'],
+				'restore_filename' => $archives[ $key ]['filename'],
 			);
 		}
 
@@ -599,23 +599,23 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		$notice = false;
 		$li = array();
 
-		if( empty( $pending_rollback['update_trigger'] ) ) {
+		if ( empty( $pending_rollback['update_trigger'] ) ) {
 			return false;
 		}
 
 		$trigger = $pending_rollback['update_trigger'];
 
-		if( 'update' !== $trigger['action'] ) {
+		if ( 'update' !== $trigger['action'] ) {
 			return false;
 		}
 
-		switch( $trigger['type'] ) {
+		switch ( $trigger['type'] ) {
 			case 'core':
 				$wordpress_version = get_bloginfo( 'version' );
 				$notice = sprintf( __( 'WordPress was recently updated to version %1$s.', 'boldgrid-backup' ), $wordpress_version );
 				break;
 			case 'theme':
-				foreach( $trigger['themes'] as $theme ) {
+				foreach ( $trigger['themes'] as $theme ) {
 					$data = wp_get_theme( $theme );
 					$li[] = sprintf( '<strong>%1$s</strong> to version %2$s', $data->get( 'Name' ), $data->get( 'Version' ) );
 				}
@@ -623,7 +623,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 				$notice .= implode( '<br />', $li );
 				break;
 			case 'plugin':
-				foreach( $trigger['plugins'] as $plugin ) {
+				foreach ( $trigger['plugins'] as $plugin ) {
 					$data = $this->core->utility->get_plugin_data( $plugin );
 					$li[] = sprintf( '<strong>%1$s</strong> to version %2$s', $data['Name'], $data['Version'] );
 				}
@@ -647,7 +647,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 
 		$notice_text .= '<p>';
 
-		switch( $this->core->pagenow ) {
+		switch ( $this->core->pagenow ) {
 			case 'update-core.php':
 				$notice_text .= __( 'On this page you are able to update WordPress, Plugins, and Themes.' ) . ' ';
 				break;
@@ -684,7 +684,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		 * This method is hooked into admin_notices. If we don't have auto_rollback
 		 * enabled, then we can abort right now.
 		 */
-		if( ! $this->is_enabled() ) {
+		if ( ! $this->is_enabled() ) {
 			return;
 		}
 
@@ -702,7 +702,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 			array(
 				'pagenow' => 'update-core.php',
 				'check' => 'total',
-			)
+			),
 		);
 
 		/**
@@ -721,17 +721,17 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		 * wp_get_update_data() if we are on a $pagenow that should show the
 		 * notice.
 		 */
-		foreach( $configs as $config ) {
-			if( $this->core->pagenow === $config['pagenow'] ) {
+		foreach ( $configs as $config ) {
+			if ( $this->core->pagenow === $config['pagenow'] ) {
 				$update_data = ! isset( $update_data ) ? wp_get_update_data() : $update_data;
-				if( $update_data['counts'][$config['check']] ) {
+				if ( $update_data['counts'][ $config['check'] ] ) {
 					$display = true;
 					break;
 				}
 			}
 		}
 
-		if( ! $display || $this->updating_core ) {
+		if ( ! $display || $this->updating_core ) {
 			return;
 		}
 
@@ -739,7 +739,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
 
 		// If we're in the middle of a countdown, abort.
-		if( ! empty( $pending_rollback['deadline'] ) ) {
+		if ( ! empty( $pending_rollback['deadline'] ) ) {
 			return;
 		}
 
@@ -784,7 +784,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		 *
 		 * @todo Allow update protection for plugin activation.
 		 */
-		if( empty( $options['action'] ) || 'update' !== $options['action'] ) {
+		if ( empty( $options['action'] ) || 'update' !== $options['action'] ) {
 			return;
 		}
 
@@ -821,17 +821,17 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 * @param array $options https://pastebin.com/ah4E048B
 	 */
 	public function set_update_trigger( $options ) {
-		if( empty( $options ) || ! is_array( $options ) ) {
+		if ( empty( $options ) || ! is_array( $options ) ) {
 			return;
 		}
 
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
 
-		if( empty( $pending_rollback ) || ! is_array( $pending_rollback ) ) {
+		if ( empty( $pending_rollback ) || ! is_array( $pending_rollback ) ) {
 			return;
 		}
 
-		$pending_rollback[ 'update_trigger' ] = $options;
+		$pending_rollback['update_trigger'] = $options;
 
 		update_site_option( 'boldgrid_backup_pending_rollback', $pending_rollback );
 	}
@@ -862,7 +862,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 			human_time_diff( $pending_rollback['lastmodunix'], time() )
 		) . ' ';
 
-		switch( $this->core->pagenow ) {
+		switch ( $this->core->pagenow ) {
 			case 'update-core.php':
 				$message .= __( 'If you update WordPress, any plugins, or any themes on this page, an auto rollback will occur if anything goes wrong.', 'boldgrid-backup' );
 				break;
@@ -876,7 +876,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 
 		// Customize our message for the "update theme" feature within the customizer.
 		$path = parse_url( wp_get_referer(), PHP_URL_PATH );
-		if( defined('DOING_AJAX') && DOING_AJAX && 'customize.php' === substr( $path, -1 * strlen( 'customize.php' ) ) ) {
+		if ( defined( 'DOING_AJAX' ) && DOING_AJAX && 'customize.php' === substr( $path, -1 * strlen( 'customize.php' ) ) ) {
 			$message .= $theme_message;
 		}
 
@@ -908,7 +908,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		 * update-core.php?action=do-theme-upgrade
 		 * Then there's no need to show a message.
 		 */
-		if( ! empty( $_GET['action'] ) ) {
+		if ( ! empty( $_GET['action'] ) ) {
 			return;
 		}
 
@@ -994,7 +994,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		}
 
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
-		if( empty( $pending_rollback ) ) {
+		if ( empty( $pending_rollback ) ) {
 			wp_send_json_error();
 		}
 
@@ -1017,7 +1017,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		}
 
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
-		if( ! empty( $pending_rollback ) ) {
+		if ( ! empty( $pending_rollback ) ) {
 			// You're protected, go ahead and update.
 			$message = $this->notice_activated_get();
 			$notice = sprintf( '<div class="%1$s">%2$s</div>', $message['class'], $message['html'] );

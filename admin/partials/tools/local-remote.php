@@ -25,8 +25,8 @@ $local_info = array(
 );
 
 $local_info_markup = '';
-foreach( $local_info as $info ) {
-	if( empty( $info['value'] ) ) {
+foreach ( $local_info as $info ) {
+	if ( empty( $info['value'] ) ) {
 		continue;
 	}
 
@@ -49,8 +49,8 @@ $server_info = array(
 );
 
 $server_info_markup = '';
-foreach( $server_info as $info ) {
-	if( empty( $_SERVER[ $info['key'] ] ) ) {
+foreach ( $server_info as $info ) {
+	if ( empty( $_SERVER[ $info['key'] ] ) ) {
 		continue;
 	}
 
@@ -76,7 +76,7 @@ printf(
 	__( 'Your <strong>Local Machine</strong> is the device you are using right now to access the internet. It could be a desktop, laptop, tablet, or even a smart phone.', 'boldgrid-backup' )
 );
 
-if( ! empty( $local_info_markup ) ) {
+if ( ! empty( $local_info_markup ) ) {
 	printf( '
 		<p>%1$s</p>
 		%2$s',
@@ -94,7 +94,7 @@ printf(
 	__( 'The <strong>Web Server</strong> is the server where your WordPress website lives. You usually pay your web hosting provider monthly or yearly for hosting.', 'boldgrid-backup' )
 );
 
-if( ! empty( $server_info_markup ) ) {
+if ( ! empty( $server_info_markup ) ) {
 	printf( '
 		<p>%1$s</p>
 		%2$s',
@@ -112,7 +112,7 @@ printf(
 	__( '<strong>Remote Storage</strong> providers are servers other than your <em>Local Machine</em> and <em>Web Server</em> where you can store files. For example, <em>FTP</em>, <em>SFTP</em>, and <em>Amazon S3</em> are all considered Remote Storage Providers.', 'boldgrid-backup' )
 );
 
-if( ! $this->core->config->is_premium_done ) {
+if ( ! $this->core->config->is_premium_done ) {
 	printf( '
 		<div class="bg-box-bottom premium wp-clearfix">
 			%1$s
@@ -127,4 +127,4 @@ if( ! $this->core->config->is_premium_done ) {
 $output = ob_get_contents();
 ob_end_clean();
 return $output;
-?>
+

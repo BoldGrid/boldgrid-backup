@@ -12,8 +12,8 @@
  */
 
 // Abort if not being ran from the command line.
-if( ! isset( $_SERVER['argv'], $_SERVER['argc'] ) || ! $_SERVER['argc'] ) {
-    die( 'Error: No parameters were passed.  A "siteurl" and "id" are required.' . PHP_EOL );
+if ( ! isset( $_SERVER['argv'], $_SERVER['argc'] ) || ! $_SERVER['argc'] ) { // WPCS: input var ok; sanitization ok.
+	die( 'Error: No parameters were passed.  A "siteurl" and "id" are required.' . PHP_EOL ); // WPCS: XSS ok.
 }
 
 // Initialize $input and $error.
@@ -40,7 +40,7 @@ foreach ( $required_arguments as $required_argument ) {
 }
 
 if ( $error ) {
-	die( $error );
+	die( $error ); // WPCS: XSS ok.
 }
 
 // Make an ajax call to run jobs, and report status.
@@ -58,4 +58,4 @@ if ( false !== $result ) {
 	$message = 'Error: Could not reach URL address "' . $url . '".';
 }
 
-die( $message );
+die( $message ); // WPCS: XSS ok.
