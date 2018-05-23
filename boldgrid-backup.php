@@ -16,7 +16,7 @@
  *          Plugin URI: https://www.boldgrid.com/boldgrid-backup/
  *          Description: BoldGrid Backup provides WordPress backup and restoration with update protection.
  *          Version: 1.6.0
- *          Author: BoldGrid.com
+ *          Author: BoldGrid
  *          Author URI: https://www.boldgrid.com/
  *          License: GPL-2.0+
  *          License URI: http://www.gnu.org/licenses/gpl-2.0.txt
