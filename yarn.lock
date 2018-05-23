@@ -2,6 +2,10 @@
 # yarn lockfile v1
 
 
+"@boldgrid/wordpress-tag-sync@^1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@boldgrid/wordpress-tag-sync/-/wordpress-tag-sync-1.3.0.tgz#c3e2a14d65bc611df4d6d90e87940a83a0831399"
+
 "PHP_CodeSniffer@https://github.com/squizlabs/PHP_CodeSniffer/#2.9":
   version "0.0.0"
   resolved "https://github.com/squizlabs/PHP_CodeSniffer/#8a457eb0e3dcd366b85fd0ee1e6509cf17e47814"

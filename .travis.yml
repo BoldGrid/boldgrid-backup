@@ -19,3 +19,16 @@ before_script:
 script:
   - phpunit --debug
   - yarn run php-codesniffer
+
+deploy:
+  - provider: script
+    script: chmod +x ./node_modules/@boldgrid/wordpress-tag-sync/release.sh && ./node_modules/@boldgrid/wordpress-tag-sync/release.sh
+    skip_cleanup: true
+    on:
+      tags: true
+  - provider: releases
+    api_key: "${GITHUB_TOKEN}"
+    file: "boldgrid-backup.zip"
+    skip_cleanup: true
+    on:
+      tags: true
