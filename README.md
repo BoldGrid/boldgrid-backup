@@ -1,10 +1,10 @@
-# BoldGrid Backup #
-**Contributors:** boldgrid, imh_brad, joemoto, rramo012, timph
+# Backup and Upgrade Manager by BoldGrid #
+**Contributors:** boldgrid, joemoto, imh_brad, rramo012, timph, bgnicolepaschen
 **Tags:** boldgrid, backup, restore, migrate, migration
 **Requires at least:** 4.4
 **Tested up to:** 4.9.6
 **Requires PHP:** 5.3
-**Stable tag:** 1.6.0
+**Stable tag:** 1.6.1
 **License:** GPLv2 or later
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,8 +12,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 
 ## Description ##
 
-BoldGrid Backup provides WordPress backup and restoration with update protection.
-
+WordPress backup and restoration with update protection.
 
 ## Installation ##
 
@@ -29,8 +28,13 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 
 ## Changelog ##
 
-### 1.6.1 In progress ###
+### 1.6.1 ###
+
+Release Date: May 23rd, 2018
+
 * Update: Ran PHPCBF to beautify PHP code.
+* Update: $_POST sanitization
+* Update: Cron system updated to avoid calling core files directly
 
 ### 1.6.0 ###
 
