@@ -176,6 +176,7 @@ class Boldgrid_Backup_Admin_Cron {
 
 			if ( $success ) {
 				$settings['crontab_version'] = $this->crontab_version;
+				$settings['cron_secret'] = $this->get_cron_secret();
 				update_site_option( 'boldgrid_backup_settings', $settings );
 			}
 		}
