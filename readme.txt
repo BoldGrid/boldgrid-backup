@@ -1,4 +1,4 @@
-=== BoldGrid Backup ===
+=== Backup and Upgrade Manager by BoldGrid ===
 Contributors: boldgrid, imh_brad, joemoto, rramo012, timph
 Tags: boldgrid, backup, restore, migrate, migration
 Requires at least: 4.4
@@ -12,8 +12,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 
 == Description ==
 
-BoldGrid Backup provides WordPress backup and restoration with update protection.
-
+WordPress backup and restoration with update protection.
 
 == Installation ==
 
