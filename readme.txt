@@ -1,5 +1,5 @@
 === Backup and Upgrade Manager by BoldGrid ===
-Contributors: boldgrid, imh_brad, joemoto, rramo012, timph
+Contributors: boldgrid, joemoto, imh_brad, rramo012, timph, bgnicolepaschen
 Tags: boldgrid, backup, restore, migrate, migration
 Requires at least: 4.4
 Tested up to: 4.9.6
