@@ -35,7 +35,7 @@ $is_retention_set = ( isset( $settings['retention_count'] ) );
 				$selected = ( ( $x_is_retention || $x_is_default ) ? ' selected' : '' );
 
 				// Should we flag this option as "Requires Upgrade"?
-				if( ! $this->core->config->get_is_premium() && ( $this->core->config->get_default_retention() + 1 ) === $x ) {
+				if ( ! $this->core->config->get_is_premium() && ( $this->core->config->get_default_retention() + 1 ) === $x ) {
 					$requires_upgrade = esc_html__( '- Requires Upgrade', 'boldgrid-backup' );
 				} else {
 					$requires_upgrade = '';

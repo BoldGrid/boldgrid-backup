@@ -94,8 +94,8 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 	 *
 	 * @since 1.5.2
 	 *
-	 * @param  array $data
-	 * @return bool True on success
+	 * @param  array $data Array of data, containing a message to send via email.
+	 * @return bool
 	 */
 	public function cron_fail_email( $data ) {
 		$subject = __( 'Backup failed for', 'boldgrid-backup' ) . ' ' . get_site_url();
@@ -145,7 +145,7 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 		 * If an archive fails, there may be a rogue db dump sitting out there.
 		 * If it exists, delete it, it should be in the archive file.
 		 */
-		if( $this->core->wp_filesystem->exists( $this->core->db_dump_filepath ) ) {
+		if ( $this->core->wp_filesystem->exists( $this->core->db_dump_filepath ) ) {
 			$this->core->wp_filesystem->delete( $this->core->db_dump_filepath );
 		}
 
@@ -156,7 +156,7 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 		 *
 		 * @see http://php.net/manual/en/errorfunc.constants.php
 		*/
-		if( empty( $last_error ) || 1 !== $last_error['type'] ) {
+		if ( empty( $last_error ) || 1 !== $last_error['type'] ) {
 			return;
 		}
 
@@ -170,7 +170,7 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 
 		$this->schedule_fail_email( $error_message );
 
-		if( ! $this->core->doing_cron ) {
+		if ( ! $this->core->doing_cron ) {
 			$data['errorText'] = $this->unable_to_backup . '<br />' . $error_message;
 			wp_send_json_error( $data );
 		}

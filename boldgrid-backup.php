@@ -15,7 +15,7 @@
  *          Plugin Name: BoldGrid Backup
  *          Plugin URI: https://www.boldgrid.com/boldgrid-backup/
  *          Description: BoldGrid Backup provides WordPress backup and restoration with update protection.
- *          Version: 1.6.0
+ *          Version: 1.6.1-rc.1
  *          Author: BoldGrid
  *          Author URI: https://www.boldgrid.com/
  *          License: GPL-2.0+
@@ -87,7 +87,7 @@ function load_boldgrid_backup() {
 	// Ensure we have our vendor/autoload.php file.
 	$exists_composer = file_exists( BOLDGRID_BACKUP_PATH . '/composer.json' );
 	$exists_autoload = file_exists( BOLDGRID_BACKUP_PATH . '/vendor/autoload.php' );
-	if( $exists_composer && ! $exists_autoload ) {
+	if ( $exists_composer && ! $exists_autoload ) {
 		add_action( 'admin_init', function() {
 			deactivate_plugins( 'boldgrid-backup/boldgrid-backup.php', true );
 
@@ -137,7 +137,7 @@ function load_boldgrid_backup() {
 if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) || defined( 'WP_CLI' ) && WP_CLI ) {
 
 	// If we could not load boldgrid_backup (missing system requirements), abort.
-	if( ! load_boldgrid_backup() ) {
+	if ( ! load_boldgrid_backup() ) {
 		return;
 	}
 

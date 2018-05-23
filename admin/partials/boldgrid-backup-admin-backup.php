@@ -32,7 +32,7 @@ $redirect_url = admin_url( 'admin.php?page=boldgrid-backup' );
  *
  * @since 1.6.0
  */
-if( $is_restore && $is_success ) {
+if ( $is_restore && $is_success ) {
 
 	/*
 	 * After restoration, redirect user to the backups page.
@@ -50,7 +50,7 @@ if( $is_restore && $is_success ) {
 	 * you'll have a newer version of Backup, but you'll have to refresh the page
 	 * to see it. We'll take care of the refresh for the user.
 	 */
-	if( ! wp_doing_ajax() ) {
+	if ( ! wp_doing_ajax() ) {
 		printf( '<script type="text/javascript">window.location.href = "%1$s";</script>', $redirect_url );
 		return;
 	}
@@ -79,7 +79,7 @@ $url = admin_url( 'admin.php?page=boldgrid-backup-settings' );
 $settings_page_link = sprintf(
 	wp_kses(
 		__( 'See <a href="%s">Settings for BoldGrid Backup</a> for details.', 'boldgrid-backup' ),
-		array(  'a' => array( 'href' => array() ) )
+		array( 'a' => array( 'href' => array() ) )
 	),
 	esc_url( $url )
 );
@@ -148,7 +148,7 @@ if ( ! empty( $archive_info ) ) {
 	);
 }
 
-if( ! isset( $message ) ) {
+if ( ! isset( $message ) ) {
 	$message = array(
 		'class' => 'notice notice-error is-dismissible',
 		'message' => __( 'Unknown error.', 'boldgrid-backup' ),

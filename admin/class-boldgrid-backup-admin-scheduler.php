@@ -71,11 +71,11 @@ class Boldgrid_Backup_Admin_Scheduler {
 
 		$available = $this->get_available();
 
-		if( ! empty( $settings['scheduler'] ) ) {
+		if ( ! empty( $settings['scheduler'] ) ) {
 			return $settings['scheduler'];
-		} elseif( array_key_exists( 'cron', $available ) ) {
+		} elseif ( array_key_exists( 'cron', $available ) ) {
 			return 'cron';
-		} elseif( array_key_exists( 'wp-cron', $available ) ) {
+		} elseif ( array_key_exists( 'wp-cron', $available ) ) {
 			return 'wp-cron';
 		} else {
 			return false;
@@ -98,19 +98,22 @@ class Boldgrid_Backup_Admin_Scheduler {
 	 *     }
 	 */
 	public function get_available() {
-		if( ! empty( $this->available ) ) {
+		if ( ! empty( $this->available ) ) {
 			return $this->available;
 		}
 
 		$is_crontab_available = $this->core->test->is_crontab_available();
-		if( $is_crontab_available ) {
+
+		// We schedule crontab jobs requiring the PHP setting "allow_url_fopen" be enabled.
+		if ( $is_crontab_available && ini_get( 'allow_url_fopen' ) ) {
 			$this->available['cron'] = array(
 				'title' => 'Cron',
 			);
 		}
 
 		$is_wpcron_available = $this->core->test->wp_cron_enabled();
-		if( $is_wpcron_available ) {
+
+		if ( $is_wpcron_available ) {
 			$this->available['wp-cron'] = array(
 				'title' => 'WP Cron',
 			);

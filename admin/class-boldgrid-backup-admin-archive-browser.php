@@ -52,7 +52,7 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 			wp_send_json_error( __( 'Permission denied.', 'boldgrid-backup' ) );
 		}
 
-		if( ! check_ajax_referer( 'boldgrid_backup_remote_storage_upload', 'security', false ) ) {
+		if ( ! check_ajax_referer( 'boldgrid_backup_remote_storage_upload', 'security', false ) ) {
 			wp_send_json_error( __( 'Invalid nonce.', 'boldgrid-backup' ) );
 		}
 	}
@@ -93,7 +93,7 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 			/* 2 */ $in_current
 		);
 
-		foreach( $prefixed_tables as $table => $record_count ) {
+		foreach ( $prefixed_tables as $table => $record_count ) {
 			$return .= sprintf(
 				'<tr>
 					<td>%1$s</td>
@@ -101,7 +101,7 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 					<td>%3$s</td>
 				</tr>',
 				esc_html( $table ),
-				isset( $tables_with_records[$table] ) ? $tables_with_records[$table] : '0',
+				isset( $tables_with_records[ $table ] ) ? $tables_with_records[ $table ] : '0',
 				esc_html( $record_count )
 			);
 		}
@@ -123,16 +123,15 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 
 		$this->authorize();
 
-		$filename = ! empty( $_POST['filename'] ) ? $_POST['filename'] : false;
+		$filename = ! empty( $_POST['filename'] ) ? sanitize_file_name( $_POST['filename'] ) : false;
 		$filepath = $this->core->backup_dir->get_path_to( $filename );
-		if( empty( $filename ) || ! $this->core->wp_filesystem->exists( $filepath ) ) {
+		if ( empty( $filename ) || ! $this->core->wp_filesystem->exists( $filepath ) ) {
 			wp_send_json_error( $error . ' ' . __( 'Invalid archive filename.', 'boldgrid-backup' ) );
 		}
 
 		$this->core->archive->init( $filepath );
 
 		$dump_file = $this->core->get_dump_file( $filepath );
-
 
 		// An array of files not to show in the archive browser.
 		$no_show = array(
@@ -145,7 +144,7 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 			basename( $this->core->archive->log_filepath ),
 		);
 
-		$dir = ! empty( $_POST['dir'] ) ? $_POST['dir'] : null;
+		$dir = ! empty( $_POST['dir'] ) ? trim( strip_tags( $_POST['dir'] ) ) : null;
 
 		$zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this->core );
 
@@ -173,8 +172,8 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 			__( 'Last Modified', 'boldgrid-backup' )
 		);
 
-		foreach( $contents as $file ) {
-			if( in_array( basename( $file['filename'] ), $no_show, true ) ) {
+		foreach ( $contents as $file ) {
+			if ( in_array( basename( $file['filename'] ), $no_show, true ) ) {
 				continue;
 			}
 
@@ -199,10 +198,10 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 	public function wp_ajax_file_actions() {
 		$this->authorize();
 
-		$filename = ! empty( $_POST['filename'] ) ? $_POST['filename'] : false;
+		$filename = ! empty( $_POST['filename'] ) ? sanitize_file_name( $_POST['filename'] ) : false;
 		$filepath = $this->core->backup_dir->get_path_to( $filename );
-		$file = ! empty( $_POST['file'] ) ? $_POST['file'] : false;
-		if( empty( $filepath ) || empty( $file ) ) {
+		$file = ! empty( $_POST['file'] ) ? trim( strip_tags( $_POST['file'] ) ) : false;
+		if ( empty( $filepath ) || empty( $file ) ) {
 			wp_send_json_error( __( 'Invalid file / filepath.', 'boldgrid-backup' ) );
 		}
 
@@ -233,17 +232,17 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 	public function wp_ajax_restore_db() {
 		$this->authorize();
 
-		$filename = ! empty( $_POST['filename'] ) ? $_POST['filename'] : false;
+		$filename = ! empty( $_POST['filename'] ) ? sanitize_file_name( $_POST['filename'] ) : false;
 		$filepath = $this->core->backup_dir->get_path_to( $filename );
-		$file = ! empty( $_POST['file'] ) ? $_POST['file'] : false;
-		if( empty( $filepath ) || empty( $file ) ) {
+		$file = ! empty( $_POST['file'] ) ? trim( strip_tags( $_POST['file'] ) ) : false;
+		if ( empty( $filepath ) || empty( $file ) ) {
 			wp_send_json_error( __( 'Invalid file / filepath.', 'boldgrid-backup' ) );
 		}
 
 		$importer = new Boldgrid_Backup_Admin_Db_Import( $this->core );
 		$success = $importer->import_from_archive( $filepath, $file );
 
-		if( ! $success ) {
+		if ( ! $success ) {
 			$this->core->notice->add_user_notice(
 				sprintf( __( 'Error, unable to import database %1$s from %2$s.', 'boldgrid-backup' ), $file, $filepath ),
 				$this->core->notice->lang['dis_error']
@@ -267,16 +266,16 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 	public function wp_ajax_view_db() {
 		$this->authorize();
 
-		$filename = ! empty( $_POST['filename'] ) ? $_POST['filename'] : false;
+		$filename = ! empty( $_POST['filename'] ) ? sanitize_file_name( $_POST['filename'] ) : false;
 		$filepath = $this->core->backup_dir->get_path_to( $filename );
-		$file = ! empty( $_POST['file'] ) ? $_POST['file'] : false;
-		if( empty( $filename ) || empty( $filepath ) || empty( $file ) ) {
+		$file = ! empty( $_POST['file'] ) ? trim( strip_tags( $_POST['file'] ) ) : false;
+		if ( empty( $filename ) || empty( $filepath ) || empty( $file ) ) {
 			wp_send_json_error( __( 'Invalid file / filepath.', 'boldgrid-backup' ) );
 		}
 
 		$table = $this->get_sql_details( $filepath, $file );
 
-		if( empty( $table ) ) {
+		if ( empty( $table ) ) {
 			$error = $this->core->notice->get_notice_markup( 'notice notice-error is-dismissible', __( 'Error, unable to get details from this database backup.', 'boldgrid-backup' ) );
 			wp_send_json_error( $error );
 		} else {

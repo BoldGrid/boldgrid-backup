@@ -29,4 +29,4 @@ return sprintf( '
 	)
 );
 
-?>
+

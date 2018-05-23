@@ -81,32 +81,6 @@ class Boldgrid_Backup_Admin {
 		}
 
 		$this->config = new Boldgrid_Backup_Admin_Config( null );
-
-		$this->prepare_plugin_update();
-	}
-
-	/**
-	 * Prepare the plugin update class.
-	 *
-	 * @since 1.3.6
-	 *
-	 * @see self::wpcron()
-	 * @see self::load_update()
-	 */
-	public function prepare_plugin_update() {
-		$is_cron = ( defined( 'DOING_CRON' ) && DOING_CRON );
-		$is_wpcli = ( defined( 'WP_CLI' ) && WP_CLI );
-
-		if ( $is_cron || $is_wpcli || is_admin() ) {
-			require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-update.php';
-
-			$plugin_update = new Boldgrid_Backup_Update( self::get_configs() );
-
-			add_action( 'init', array (
-				$plugin_update,
-				'add_hooks'
-			) );
-		}
 	}
 
 	/**
@@ -172,7 +146,7 @@ class Boldgrid_Backup_Admin {
 	 */
 	public static function get_configs() {
 		// If the configuration array was already created, then return it.
-			if ( ! empty( self::$configs ) ) {
+		if ( ! empty( self::$configs ) ) {
 			return self::$configs;
 		}
 

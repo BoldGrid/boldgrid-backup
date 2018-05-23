@@ -13,4 +13,4 @@ defined( 'WPINC' ) ? : die;
 
 return '<p>' . $this->core->lang['icon_warning'] . __( 'Backup file not found!', 'boldgrid-backup' ) . '</p>';
 
-?>
+

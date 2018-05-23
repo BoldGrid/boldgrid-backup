@@ -77,7 +77,7 @@ class Boldgrid_Backup_Admin_Archive_Details {
 		wp_register_script(
 			'boldgrid-backup-admin-archive-details',
 			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-archive-details.js',
-			array( 'jquery', ),
+			array( 'jquery' ),
 			BOLDGRID_BACKUP_VERSION
 		);
 		$translations = array(
@@ -91,7 +91,7 @@ class Boldgrid_Backup_Admin_Archive_Details {
 		wp_register_script(
 			'boldgrid-backup-admin-zip-browser',
 			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-zip-browser.js',
-			array( 'jquery', ),
+			array( 'jquery' ),
 			BOLDGRID_BACKUP_VERSION
 		);
 		$unknown_error = __( 'An unknown error has occurred.', 'boldgrid-backup' );
@@ -132,25 +132,24 @@ class Boldgrid_Backup_Admin_Archive_Details {
 
 		$archive_found = false;
 
-		$filename = ! empty( $_GET['filename'] ) ? $_GET['filename'] : false;
-		if( ! $filename ) {
+		$filename = ! empty( $_GET['filename'] ) ? sanitize_file_name( $_GET['filename'] ) : false;
+		if ( ! $filename ) {
 			echo __( 'No archive specified.', 'boldgrid-backup' );
 			return;
 		}
 
 		// Get our archive.
 		$archive = $this->core->archive->get_by_name( $filename );
-		if( $archive ) {
+		if ( $archive ) {
 			$log = $this->core->archive_log->get_by_zip( $archive['filepath'] );
 			$archive = array_merge( $log, $archive );
 			$archive_found = true;
 			$dump_file = $this->core->get_dump_file( $archive['filepath'] );
 		} else {
-			$archive = array();
-			if( ! empty( $_GET['filename'] ) ) {
-				$archive['filename'] = strip_tags( $_GET['filename'] );
-				$archive['filepath'] = $this->core->backup_dir->get_path_to( $archive['filename'] );
-			}
+			$archive = array(
+				'filename' => $filename,
+				'filepath' => $this->core->backup_dir->get_path_to( $archive['filename'] ),
+			);
 		}
 
 		// Initialize the archive. We will need it in our included template below.

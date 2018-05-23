@@ -112,13 +112,13 @@ class Boldgrid_Backup_Admin_Archives_All {
 		$in_all = false;
 
 		$is_remote = ! empty( $backup['locations'][0]['on_remote_server'] ) && true === $backup['locations'][0]['on_remote_server'];
-		if( $is_remote ) {
-			$this->archives[$backup['filename']]['on_remote_server'] = true;
+		if ( $is_remote ) {
+			$this->archives[ $backup['filename'] ]['on_remote_server'] = true;
 		}
 
 		// Loop through all of our existing backups to see if this one exists.
-		foreach( $this->all as &$all_backup ) {
-			if( $backup['filename'] === $all_backup['filename'] ) {
+		foreach ( $this->all as &$all_backup ) {
+			if ( $backup['filename'] === $all_backup['filename'] ) {
 
 				// Once we found our backup, flag that we found it.
 				$in_all = true;
@@ -127,7 +127,7 @@ class Boldgrid_Backup_Admin_Archives_All {
 		}
 
 		// If we didn't find it, add it to the list.
-		if( ! $in_all ) {
+		if ( ! $in_all ) {
 			$this->all[] = $backup;
 		}
 	}
@@ -142,8 +142,8 @@ class Boldgrid_Backup_Admin_Archives_All {
 	 * @return bool
 	 */
 	public function has_location_type( $archive, $location_type ) {
-		foreach( $archive['locations'] as $location ) {
-			if( isset( $location[$location_type] ) && true === $location[$location_type] ) {
+		foreach ( $archive['locations'] as $location ) {
+			if ( isset( $location[ $location_type ] ) && true === $location[ $location_type ] ) {
 				return true;
 			}
 		}
@@ -158,22 +158,20 @@ class Boldgrid_Backup_Admin_Archives_All {
 	 */
 	public function init_location_count() {
 
-
-
 		$this->location_count['all'] = count( $this->all );
 
-		foreach( $this->all as $archive ) {
+		foreach ( $this->all as $archive ) {
 
-			if( empty( $archive['locations'] ) ) {
+			if ( empty( $archive['locations'] ) ) {
 				continue;
 			}
 
-			foreach( $this->core->archives_all->location_types as $location_type ) {
-				if( ! $this->has_location_type( $archive, $location_type ) ) {
+			foreach ( $this->core->archives_all->location_types as $location_type ) {
+				if ( ! $this->has_location_type( $archive, $location_type ) ) {
 					continue;
 				}
 
-				if( empty( $this->location_count[ $location_type ] ) ) {
+				if ( empty( $this->location_count[ $location_type ] ) ) {
 					$this->location_count[ $location_type ] = 0;
 				}
 
@@ -188,13 +186,13 @@ class Boldgrid_Backup_Admin_Archives_All {
 	 * @since 1.5.4
 	 */
 	public function init() {
-		if( $this->is_init ) {
+		if ( $this->is_init ) {
 			return;
 		}
 
 		$archives = $this->core->get_archive_list();
 
-		foreach( $archives as $archive ) {
+		foreach ( $archives as $archive ) {
 			$this->all[] = array(
 				'filename' => $archive['filename'],
 				'last_modified' => $archive['lastmodunix'],
@@ -207,7 +205,7 @@ class Boldgrid_Backup_Admin_Archives_All {
 				),
 			);
 
-			$this->archives[$archive['filename']]['on_web_server'] = true;
+			$this->archives[ $archive['filename'] ]['on_web_server'] = true;
 		}
 
 		do_action( 'boldgrid_backup_get_all' );

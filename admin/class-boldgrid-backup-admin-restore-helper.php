@@ -99,25 +99,25 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 	 * @param array $info
 	 */
 	public function post_restore( $info ) {
-		if( $info['dryrun'] ) {
+		if ( $info['dryrun'] ) {
 			return;
 		}
 
 		global $wp_filesystem;
 
-		foreach( $this->monitor_files as $key => $file ) {
+		foreach ( $this->monitor_files as $key => $file ) {
 			$original = ABSPATH . $file['filename'];
 			$new = $original . '.bgb';
 
 			// Determine if the file was restored from backup.
 			$file_restored = false;
-			if( $file['copied'] && sha1_file( $original ) !== sha1_file( $new ) ) {
+			if ( $file['copied'] && sha1_file( $original ) !== sha1_file( $new ) ) {
 				$file_restored = true;
-			} elseif( $file['copy'] && ! $file['copied'] && $wp_filesystem->exists( $original ) ) {
+			} elseif ( $file['copy'] && ! $file['copied'] && $wp_filesystem->exists( $original ) ) {
 				$file_restored = true;
 			}
 
-			if( $file_restored ) {
+			if ( $file_restored ) {
 				/**
 				 * Action to take after a specific file has been restored.
 				 *
@@ -126,7 +126,7 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 				do_action( 'boldgrid_backup_post_restore_' . $key );
 			}
 
-			if( $file['copy'] && $file['copied'] && ! $file['keep_copy'] ) {
+			if ( $file['copy'] && $file['copied'] && ! $file['keep_copy'] ) {
 				$wp_filesystem->delete( $new );
 			}
 		}
@@ -142,24 +142,50 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 	 * @param array $info
 	 */
 	public function pre_restore( $info ) {
-		if( $info['dryrun'] ) {
+		if ( $info['dryrun'] ) {
 			return;
 		}
 
 		global $wp_filesystem;
 
-		foreach( $this->monitor_files as $key => $file ) {
+		foreach ( $this->monitor_files as $key => $file ) {
 			$original = ABSPATH . $file['filename'];
 			$new = $original . '.bgb';
 
-			if( $file['copy'] && $wp_filesystem->exists( $original ) ) {
+			if ( $file['copy'] && $wp_filesystem->exists( $original ) ) {
 				$wp_filesystem->copy( $original, $new, true, 0644 );
-				$this->monitor_files[$key]['copied'] = true;
+				$this->monitor_files[ $key ]['copied'] = true;
 			}
 		}
 
 		// Only register this action when we know we're doing a restore.
 		add_action( 'shutdown', array( $this, 'shutdown' ) );
+	}
+
+	/**
+	 * Prepare for a restoration via cron job.
+	 *
+	 * @since 1.6.1
+	 *
+	 * @return bool
+	 */
+	public function prepare_restore() {
+		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
+
+		if ( empty( $pending_rollback ) ) {
+			return false;
+		}
+
+		/*
+		 * Set POST variables.
+		 *
+		 * The archive_key and the archive_filename must match.
+		 */
+		$_POST['restore_now'] = 1;
+		$_POST['archive_key'] = 0;
+		$_POST['archive_filename'] = basename( $pending_rollback['filepath'] );
+
+		return true;
 	}
 
 	/**
@@ -182,11 +208,11 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 
 		$zip = new ZipArchive();
 
-		if( $zip->open( $archive_filepath ) ) {
-			for ($i = 0; $i < $zip->numFiles; $i++) {
+		if ( $zip->open( $archive_filepath ) ) {
+			for ( $i = 0; $i < $zip->numFiles; $i++ ) {
 				$data = $zip->statIndex( $i );
 
-				if( empty( $data['name'] ) ) {
+				if ( empty( $data['name'] ) ) {
 					continue;
 				}
 
@@ -208,7 +234,7 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 	 * @since 1.5.1
 	 */
 	public function shutdown() {
-		if( $this->doing_cron ) {
+		if ( $this->doing_cron ) {
 			return;
 		}
 
@@ -219,7 +245,7 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 		 *
 		 * @see http://php.net/manual/en/errorfunc.constants.php
 		 */
-		if( empty( $last_error ) || 1 !== $last_error['type'] ) {
+		if ( empty( $last_error ) || 1 !== $last_error['type'] ) {
 			return;
 		}
 
@@ -255,11 +281,11 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 		$message = $error->get_error_message();
 		$data = $error->get_error_data();
 
-		if( __( 'Could not copy file.' ) === $message ) {
+		if ( __( 'Could not copy file.' ) === $message ) {
 
 			// Take action if we are having trouble restoring .git/objects/.
-			preg_match('/(.*\.git\/objects\/).*/', $data, $matches );
-			if( ! empty( $matches[1] ) ) {
+			preg_match( '/(.*\.git\/objects\/).*/', $data, $matches );
+			if ( ! empty( $matches[1] ) ) {
 				$new_error = false;
 				return apply_filters( 'boldgrid_backup_cannnot_restore_git_objects', $matches[1] );
 			}

@@ -12,8 +12,23 @@ env:
   - WP_VERSION=latest WP_MULTISITE=0
 
 before_script:
+  - yarn install
   - composer update
   - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
 
 script:
   - phpunit --debug
+  # - yarn run php-codesniffer
+
+deploy:
+  - provider: script
+    script: chmod +x ./node_modules/@boldgrid/wordpress-tag-sync/release.sh && ./node_modules/@boldgrid/wordpress-tag-sync/release.sh
+    skip_cleanup: true
+    on:
+      tags: true
+  - provider: releases
+    api_key: "${GITHUB_TOKEN}"
+    file: "boldgrid-backup.zip"
+    skip_cleanup: true
+    on:
+      tags: true

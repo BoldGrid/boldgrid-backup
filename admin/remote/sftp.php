@@ -138,7 +138,7 @@ class Boldgrid_Backup_Admin_Sftp {
 		include_once BOLDGRID_BACKUP_PATH . '/vendor/phpseclib/phpseclib/phpseclib/Net/SFTP.php';
 
 		$this->core = $core;
-		//$this->hooks = new Boldgrid_Backup_Admin_Sftp_Hooks( $core );
+		// $this->hooks = new Boldgrid_Backup_Admin_Sftp_Hooks( $core );
 	}
 
 	/**
@@ -147,13 +147,13 @@ class Boldgrid_Backup_Admin_Sftp {
 	 * @since 1.5.4
 	 */
 	public function connect() {
-		if( ! empty( $this->connection ) ) {
+		if ( ! empty( $this->connection ) ) {
 			return;
 		}
 
 		$this->init();
 
-		if( empty( $this->user ) || empty( $this->pass ) || empty( $this->host ) ) {
+		if ( empty( $this->user ) || empty( $this->pass ) || empty( $this->host ) ) {
 			return;
 		}
 
@@ -170,12 +170,12 @@ class Boldgrid_Backup_Admin_Sftp {
 	public function create_backup_dir() {
 		$this->connect();
 		$this->log_in();
-		if( ! $this->logged_in ) {
+		if ( ! $this->logged_in ) {
 			return false;
 		}
 
 		$contents = $this->get_contents();
-		if( in_array( $this->remote_dir, $contents, true ) ) {
+		if ( in_array( $this->remote_dir, $contents, true ) ) {
 			return true;
 		}
 
@@ -188,10 +188,10 @@ class Boldgrid_Backup_Admin_Sftp {
 	 * @since 1.5.4
 	 */
 	public function disconnect() {
-		if( $this->connection ) {
-			//sftp_close( $this->connection );
-			//$this->connection = null;
-			//$this->logged_in = false;
+		if ( $this->connection ) {
+			// sftp_close( $this->connection );
+			// $this->connection = null;
+			// $this->logged_in = false;
 		}
 	}
 
@@ -201,7 +201,7 @@ class Boldgrid_Backup_Admin_Sftp {
 	 * @since 1.5.4
 	 */
 	public function enforce_retention() {
-		if( empty( $this->retention_count ) ) {
+		if ( empty( $this->retention_count ) ) {
 			return;
 		}
 
@@ -209,20 +209,20 @@ class Boldgrid_Backup_Admin_Sftp {
 		$contents = $this->get_contents( true, $this->remote_dir );
 
 		// The contents usually include . and .., so remove 2 from list.
-		$count_to_delete = count($contents) - $this->retention_count - 2;
+		$count_to_delete = count( $contents ) - $this->retention_count - 2;
 
-		if( ! is_array( $contents ) || $count_to_delete <= 0 ) {
+		if ( ! is_array( $contents ) || $count_to_delete <= 0 ) {
 			return false;
 		}
 
 		$backups = $this->format_raw_contents( $contents );
 
-		usort( $backups, function( $a, $b ){
+		usort( $backups, function( $a, $b ) {
 			return $a['time'] < $b['time'] ? -1 : 1;
 		});
 
-		for( $x = 0; $x < $count_to_delete; $x++ ) {
-			$filename = $backups[$x]['filename'];
+		for ( $x = 0; $x < $count_to_delete; $x++ ) {
+			$filename = $backups[ $x ]['filename'];
 			$this->connection->delete( $this->remote_dir . '/' . $filename );
 
 			/**
@@ -258,18 +258,18 @@ class Boldgrid_Backup_Admin_Sftp {
 		$skips = array( '.', '..' );
 		$backups = array();
 
-		if( ! is_array( $contents ) ) {
+		if ( ! is_array( $contents ) ) {
 			return array();
 		}
 
-		foreach( $contents as $item ) {
+		foreach ( $contents as $item ) {
 			$exploded_item = explode( ' ', $item );
 
 			$count = count( $exploded_item );
 
 			$filename = $exploded_item[ $count - 1 ];
 
-			if( in_array( $filename, $skips, true ) ) {
+			if ( in_array( $filename, $skips, true ) ) {
 				continue;
 			}
 
@@ -293,19 +293,19 @@ class Boldgrid_Backup_Admin_Sftp {
 	 *
 	 * @since 1.5.4
 	 *
-	 * @param  bool $raw   Whether to get the raw contents (sftp_rawlist) or not
-	 *                     (sftp_nlist).
+	 * @param  bool   $raw   Whether to get the raw contents (sftp_rawlist) or not
+	 *                       (sftp_nlist).
 	 * @param  string $dir The directory to get listing of.
 	 * @return mixed
 	 */
 	public function get_contents( $raw = false, $dir = '.' ) {
 		$this->connect();
 		$this->log_in();
-		if( ! $this->logged_in ) {
+		if ( ! $this->logged_in ) {
 			return array();
 		}
 
-		if( $raw ) {
+		if ( $raw ) {
 			return $this->connection->rawlist( $dir );
 		} else {
 			return $this->connection->nlist( $dir );
@@ -325,7 +325,7 @@ class Boldgrid_Backup_Admin_Sftp {
 			'key' => $this->key,
 			'configure' => 'admin.php?page=boldgrid-backup-sftp',
 			'is_setup' => $this->is_setup(),
-			'enabled' => ! empty( $settings['remote'][$this->key]['enabled'] ) && $settings['remote'][$this->key]['enabled'] && $this->is_setup(),
+			'enabled' => ! empty( $settings['remote'][ $this->key ]['enabled'] ) && $settings['remote'][ $this->key ]['enabled'] && $this->is_setup(),
 		);
 	}
 
@@ -335,7 +335,7 @@ class Boldgrid_Backup_Admin_Sftp {
 	 * @since 1.5.4
 	 */
 	public function init() {
-		if( ! empty( $this->user ) || ! empty( $this->pass ) || ! empty( $this->host ) ) {
+		if ( ! empty( $this->user ) || ! empty( $this->pass ) || ! empty( $this->host ) ) {
 			return;
 		}
 
@@ -343,8 +343,8 @@ class Boldgrid_Backup_Admin_Sftp {
 
 		$labels = array( 'user', 'pass', 'host', 'port', 'retention_count' );
 
-		foreach( $labels as $label ) {
-			$this->$label = ! empty( $settings['remote'][$this->key][$label] ) ? $settings['remote'][$this->key][$label] : null;
+		foreach ( $labels as $label ) {
+			$this->$label = ! empty( $settings['remote'][ $this->key ][ $label ] ) ? $settings['remote'][ $this->key ][ $label ] : null;
 		}
 	}
 
@@ -375,18 +375,18 @@ class Boldgrid_Backup_Admin_Sftp {
 	 */
 	public function is_valid_credentials( $host, $user, $pass, $port ) {
 		$connection = new phpseclib\Net\SFTP( $host, $port );
-		if( ! $connection ) {
+		if ( ! $connection ) {
 			return false;
 		}
 
 		$logged_in = @$connection->login( $user, $pass );
-		if( ! $logged_in ) {
-			//sftp_close( $connection );
+		if ( ! $logged_in ) {
+			// sftp_close( $connection );
 			$this->errors[] = __( 'Unable to connect and log in.', 'boldgrid-backup' );
 			return false;
 		}
 
-		//sftp_close( $connection );
+		// sftp_close( $connection );
 		return true;
 	}
 
@@ -398,17 +398,17 @@ class Boldgrid_Backup_Admin_Sftp {
 	 * @return bool
 	 */
 	public function log_in() {
-		if( $this->logged_in ) {
+		if ( $this->logged_in ) {
 			return;
 		}
 
 		$this->connect();
-		if( empty( $this->connection) ) {
+		if ( empty( $this->connection ) ) {
 			return false;
 		}
 
 		$this->logged_in = $this->connection->login( $this->user, $this->pass );
-		if( ! $this->logged_in ) {
+		if ( ! $this->logged_in ) {
 			$this->disconnect();
 		}
 	}
@@ -434,11 +434,11 @@ class Boldgrid_Backup_Admin_Sftp {
 
 		$settings = $this->core->settings->get_settings();
 
-		$host = ! empty( $settings['remote'][$this->key]['host'] ) ? $settings['remote'][$this->key]['host'] : null;
-		$user = ! empty( $settings['remote'][$this->key]['user'] ) ? $settings['remote'][$this->key]['user'] : null;
-		$pass = ! empty( $settings['remote'][$this->key]['pass'] ) ? $settings['remote'][$this->key]['pass'] : null;
-		$port = ! empty( $settings['remote'][$this->key]['port'] ) ? $settings['remote'][$this->key]['port'] : $this->port;
-		$retention_count = ! empty( $settings['remote'][$this->key]['retention_count'] ) ? $settings['remote'][$this->key]['retention_count'] : $this->retention_count;
+		$host = ! empty( $settings['remote'][ $this->key ]['host'] ) ? $settings['remote'][ $this->key ]['host'] : null;
+		$user = ! empty( $settings['remote'][ $this->key ]['user'] ) ? $settings['remote'][ $this->key ]['user'] : null;
+		$pass = ! empty( $settings['remote'][ $this->key ]['pass'] ) ? $settings['remote'][ $this->key ]['pass'] : null;
+		$port = ! empty( $settings['remote'][ $this->key ]['port'] ) ? $settings['remote'][ $this->key ]['port'] : $this->port;
+		$retention_count = ! empty( $settings['remote'][ $this->key ]['retention_count'] ) ? $settings['remote'][ $this->key ]['retention_count'] : $this->retention_count;
 
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/remote/sftp.php';
 	}
@@ -453,21 +453,21 @@ class Boldgrid_Backup_Admin_Sftp {
 			return false;
 		}
 
-		if( empty( $_POST ) ) {
+		if ( empty( $_POST ) ) {
 			return false;
 		}
 
 		$settings = $this->core->settings->get_settings();
-		if( ! isset( $settings['remote'][$this->key] ) || ! is_array( $settings['remote'][$this->key] ) ) {
-			$settings['remote'][$this->key] = array();
+		if ( ! isset( $settings['remote'][ $this->key ] ) || ! is_array( $settings['remote'][ $this->key ] ) ) {
+			$settings['remote'][ $this->key ] = array();
 		}
 
 		/*
 		 * If the user has requested to delete all their settings, do that now
 		 * and return.
 		 */
-		if( __( 'Delete settings', 'boldgrid-backup' ) === $_POST['submit'] ) {
-			$settings['remote'][$this->key] = array();
+		if ( __( 'Delete settings', 'boldgrid-backup' ) === $_POST['submit'] ) {
+			$settings['remote'][ $this->key ] = array();
 			update_site_option( 'boldgrid_backup_settings', $settings );
 
 			$this->host = null;
@@ -483,25 +483,29 @@ class Boldgrid_Backup_Admin_Sftp {
 		$errors = array();
 
 		// Get and validate our credentials.
-		$host = ! empty( $_POST['host'] ) ? $_POST['host'] : null;
-		$user = ! empty( $_POST['user'] ) ? $_POST['user'] : null;
+		$host = ! empty( $_POST['host'] ) ? sanitize_file_name( $_POST['host'] ) : null;
+		$user = ! empty( $_POST['user'] ) ? sanitize_text_field( $_POST['user'] ) : null;
 		$pass = ! empty( $_POST['pass'] ) ? $_POST['pass'] : null;
-		$port = ! empty( $_POST['port'] ) ? $_POST['port'] : $this->port;
+		$port = ! empty( $_POST['port'] ) ? (int) $_POST['port'] : $this->port;
+
 		$valid_credentials = $this->is_valid_credentials( $host, $user, $pass, $port );
 
-		if( $valid_credentials ) {
-			$settings['remote'][$this->key]['host'] = $host;
-			$settings['remote'][$this->key]['user'] = $user;
-			$settings['remote'][$this->key]['pass'] = $pass;
-			$settings['remote'][$this->key]['port'] = $port;
-		} elseif( empty( $this->errors ) ) {
+		if ( $valid_credentials ) {
+			$settings['remote'][ $this->key ]['host'] = $host;
+			$settings['remote'][ $this->key ]['user'] = $user;
+			$settings['remote'][ $this->key ]['pass'] = $pass;
+			$settings['remote'][ $this->key ]['port'] = $port;
+		} elseif ( empty( $this->errors ) ) {
 			$this->errors[] = __( 'Unknown error.', 'boldgrid-backup' );
 		}
 
-		$retention_count = ! empty( $_POST['retention_count'] ) && is_numeric( $_POST['retention_count'] ) ? $_POST['retention_count'] : $this->retention_count;
-		$settings['remote'][$this->key]['retention_count'] = $retention_count;
+		$retention_count = ! empty( $_POST['retention_count'] ) &&
+			is_numeric( $_POST['retention_count'] ) ?
+			(int) $_POST['retention_count'] : $this->retention_count;
 
-		if( ! empty( $this->errors ) ) {
+		$settings['remote'][ $this->key ]['retention_count'] = $retention_count;
+
+		if ( ! empty( $this->errors ) ) {
 			do_action( 'boldgrid_backup_notice', implode( '<br /><br />', $this->errors ) );
 		} else {
 			update_site_option( 'boldgrid_backup_settings', $settings );
@@ -522,19 +526,19 @@ class Boldgrid_Backup_Admin_Sftp {
 
 		$this->connect();
 		$this->log_in();
-		if( ! $this->logged_in ) {
+		if ( ! $this->logged_in ) {
 			$this->errors[] = __( 'Unable to log in to sftp server.', 'boldgrid-backup' );
 			return false;
 		}
 
 		$has_remote_dir = $this->create_backup_dir();
-		if( ! $has_remote_dir ) {
+		if ( ! $has_remote_dir ) {
 			$this->errors[] = sprint_f( __( 'Unable to create the following directory on SFTP server: %1$s', 'boldgrid-backup' ), $this->remote_dir );
 			return false;
 		}
 
 		$uploaded = $this->connection->put( $remote_file, $filepath, NET_SFTP_LOCAL_FILE );
-		if( ! $uploaded ) {
+		if ( ! $uploaded ) {
 			$this->disconnect();
 			$this->errors[] = __( 'Unable to upload file.', 'boldgrid-backup' );
 			return false;

@@ -219,17 +219,17 @@ class Boldgrid_Backup_Admin_Ftp {
 	 * @since 1.5.4
 	 */
 	public function connect() {
-		if( ! empty( $this->connection ) ) {
+		if ( ! empty( $this->connection ) ) {
 			return;
 		}
 
 		$this->init();
 
-		if( empty( $this->user ) || empty( $this->pass ) || empty( $this->host ) || empty( $this->type ) || empty( $this->port ) ) {
+		if ( empty( $this->user ) || empty( $this->pass ) || empty( $this->host ) || empty( $this->type ) || empty( $this->port ) ) {
 			return;
 		}
 
-		switch( $this->type ) {
+		switch ( $this->type ) {
 			case 'ftp':
 				$this->connection = ftp_connect( $this->host, $this->port, $this->timeout );
 				break;
@@ -249,19 +249,19 @@ class Boldgrid_Backup_Admin_Ftp {
 	public function create_backup_dir() {
 		$this->connect();
 		$this->log_in();
-		if( ! $this->logged_in ) {
+		if ( ! $this->logged_in ) {
 			return false;
 		}
 
 		$contents = $this->get_contents();
-		if( ! $contents || ! is_array( $contents ) ) {
+		if ( ! $contents || ! is_array( $contents ) ) {
 			$this->errors[] = __( 'Unable to get a directory listing from FTP server.', 'boldgrid-backup' );
 			return false;
-		} elseif( in_array( $this->remote_dir, $contents, true ) ) {
+		} elseif ( in_array( $this->remote_dir, $contents, true ) ) {
 			return true;
 		}
 
-		switch( $this->type ) {
+		switch ( $this->type ) {
 			case 'ftp':
 				$created = ftp_mkdir( $this->connection, $this->remote_dir );
 				break;
@@ -270,7 +270,7 @@ class Boldgrid_Backup_Admin_Ftp {
 				break;
 		}
 
-		if( ! $created ) {
+		if ( ! $created ) {
 			$this->errors[] = sprintf( __( 'Unable to create the following directory on FTP server: %1$s', 'boldgrid-backup' ), $this->remote_dir );
 		}
 
@@ -283,7 +283,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	 * @since 1.5.4
 	 */
 	public function disconnect() {
-		if( 'ftp' === $this->type && is_resource( $this->connection ) ) {
+		if ( 'ftp' === $this->type && is_resource( $this->connection ) ) {
 			ftp_close( $this->connection );
 			$this->connection = null;
 			$this->logged_in = false;
@@ -307,7 +307,7 @@ class Boldgrid_Backup_Admin_Ftp {
 
 		$this->log_in();
 
-		switch( $this->type ) {
+		switch ( $this->type ) {
 			case 'ftp':
 				$success = ftp_get( $this->connection, $local_filepath, $server_filepath, FTP_BINARY );
 				break;
@@ -316,7 +316,7 @@ class Boldgrid_Backup_Admin_Ftp {
 				break;
 		}
 
-		if( $success ) {
+		if ( $success ) {
 			$this->core->remote->post_download( $local_filepath );
 		}
 
@@ -329,28 +329,28 @@ class Boldgrid_Backup_Admin_Ftp {
 	 * @since 1.5.4
 	 */
 	public function enforce_retention() {
-		if( empty( $this->retention_count ) ) {
+		if ( empty( $this->retention_count ) ) {
 			return;
 		}
 
 		$contents = $this->get_contents( true, $this->remote_dir );
 		$backups = $this->format_raw_contents( $contents );
 
-		$count_to_delete = count($backups) - $this->retention_count;
+		$count_to_delete = count( $backups ) - $this->retention_count;
 
-		if( empty( $backups ) || $count_to_delete <= 0 ) {
+		if ( empty( $backups ) || $count_to_delete <= 0 ) {
 			return false;
 		}
 
-		usort( $backups, function( $a, $b ){
+		usort( $backups, function( $a, $b ) {
 			return $a['time'] < $b['time'] ? -1 : 1;
 		});
 
-		for( $x = 0; $x < $count_to_delete; $x++ ) {
-			$filename = $backups[$x]['filename'];
+		for ( $x = 0; $x < $count_to_delete; $x++ ) {
+			$filename = $backups[ $x ]['filename'];
 			$path = $this->remote_dir . '/' . $filename;
 
-			switch( $this->type ) {
+			switch ( $this->type ) {
 				case 'ftp':
 					ftp_delete( $this->connection, $path );
 					break;
@@ -386,10 +386,12 @@ class Boldgrid_Backup_Admin_Ftp {
 			array(
 				'key' => 'host',
 				'default' => null,
+				'callback' => 'sanitize_file_name',
 			),
 			array(
 				'key' => 'user',
 				'default' => null,
+				'callback' => 'sanitize_text_field',
 			),
 			array(
 				'key' => 'pass',
@@ -398,35 +400,40 @@ class Boldgrid_Backup_Admin_Ftp {
 			array(
 				'key' => 'type',
 				'default' => $this->default_type,
+				'callback' => 'sanitize_key',
 			),
 			array(
 				'key' => 'port',
-				'default' => $this->default_port[$this->default_type],
+				'default' => $this->default_port[ $this->default_type ],
+				'callback' => 'intval',
 			),
 			array(
 				'key' => 'retention_count',
 				'default' => $this->retention_count,
+				'callback' => 'intval',
 			),
 			array(
 				'key' => 'nickname',
 				'default' => '',
-				'stripslashes' => true,
+				'callback' => 'stripslashes',
 			),
 		);
 
-		foreach( $values as $value ) {
+		foreach ( $values as $value ) {
 			$key = $value['key'];
+			$callback = ! empty( $value['callback'] ) ? $value['callback'] : null;
 
-			if( ! empty( $_POST[$key] ) ) {
-				$data[$key] = $_POST[$key];
-			} elseif( ! empty( $settings['remote'][$this->key][$key] ) ) {
-				$data[$key] = $settings['remote'][$this->key][$key];
+			if ( ! empty( $_POST[ $key ] ) ) {
+				$data[ $key ] = $_POST[ $key ];
+			} elseif ( ! empty( $settings['remote'][ $this->key ][ $key ] ) ) {
+				$data[ $key ] = $settings['remote'][ $this->key ][ $key ];
 			} else {
-				$data[$key] = $value['default'];
+				$data[ $key ] = $value['default'];
 			}
 
-			if( ! empty( $value['stripslashes'] ) && true === $value['stripslashes'] ) {
-				$data[$key] = stripslashes( $data[$key] );
+			// If there is a callback function for sanitizing the value, then run it.
+			if ( $callback ) {
+				$data[ $key ] = $callback( $data[ $key ] );
 			}
 		}
 
@@ -458,15 +465,15 @@ class Boldgrid_Backup_Admin_Ftp {
 		$skips = array( '.', '..' );
 		$backups = array();
 
-		if( ! is_array( $contents ) ) {
+		if ( ! is_array( $contents ) ) {
 			return $backups;
 		}
 
-		foreach( $contents as $item ) {
+		foreach ( $contents as $item ) {
 
-			if( 'sftp' === $this->type ) {
+			if ( 'sftp' === $this->type ) {
 				$filename = $item['filename'];
-				if( in_array( $filename, $skips, true ) ) {
+				if ( in_array( $filename, $skips, true ) ) {
 					continue;
 				}
 
@@ -483,7 +490,7 @@ class Boldgrid_Backup_Admin_Ftp {
 				$count = count( $exploded_item );
 
 				$filename = $exploded_item[ $count - 1 ];
-				if( in_array( $filename, $skips, true ) ) {
+				if ( in_array( $filename, $skips, true ) ) {
 					continue;
 				}
 
@@ -501,9 +508,9 @@ class Boldgrid_Backup_Admin_Ftp {
 			}
 		}
 
-		foreach( $backups as $key => $backup ) {
-			if( ! $this->core->archive->is_site_archive( $backup['filename'] ) ) {
-				unset( $backups[$key] );
+		foreach ( $backups as $key => $backup ) {
+			if ( ! $this->core->archive->is_site_archive( $backup['filename'] ) ) {
+				unset( $backups[ $key ] );
 			}
 		}
 		$backups = array_values( $backups );
@@ -516,29 +523,29 @@ class Boldgrid_Backup_Admin_Ftp {
 	 *
 	 * @since 1.5.4
 	 *
-	 * @param  bool $raw   Whether to get the raw contents (ftp_rawlist) or not
-	 *                     (ftp_nlist).
+	 * @param  bool   $raw   Whether to get the raw contents (ftp_rawlist) or not
+	 *                       (ftp_nlist).
 	 * @param  string $dir The directory to get listing of.
 	 * @return mixed
 	 */
 	public function get_contents( $raw = false, $dir = '.' ) {
 		$this->connect();
 		$this->log_in();
-		if( ! $this->logged_in ) {
+		if ( ! $this->logged_in ) {
 			$this->errors[] = __( 'Unable to log in to FTP server.', 'boldgrid-backup' );
 			return array();
 		}
 
-		switch( $this->type ) {
+		switch ( $this->type ) {
 			case 'ftp':
-				if( $raw ) {
+				if ( $raw ) {
 					return ftp_rawlist( $this->connection, $dir );
 				} else {
 					return ftp_nlist( $this->connection , $dir );
 				}
 				break;
 			case 'sftp':
-				if( $raw ) {
+				if ( $raw ) {
 					return $this->connection->rawlist( $dir );
 				} else {
 					return $this->connection->nlist( $dir );
@@ -562,7 +569,7 @@ class Boldgrid_Backup_Admin_Ftp {
 			'key' => $this->key,
 			'configure' => 'admin.php?page=boldgrid-backup-ftp',
 			'is_setup' => $is_setup,
-			'enabled' => ! empty( $settings['remote'][$this->key]['enabled'] ) && $settings['remote'][$this->key]['enabled'] && $is_setup,
+			'enabled' => ! empty( $settings['remote'][ $this->key ]['enabled'] ) && $settings['remote'][ $this->key ]['enabled'] && $is_setup,
 		);
 	}
 
@@ -572,7 +579,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	 * @since 1.5.4
 	 */
 	public function init() {
-		if( ! empty( $this->user ) || ! empty( $this->pass ) || ! empty( $this->host ) ) {
+		if ( ! empty( $this->user ) || ! empty( $this->pass ) || ! empty( $this->host ) ) {
 			return;
 		}
 
@@ -611,17 +618,17 @@ class Boldgrid_Backup_Admin_Ftp {
 			),
 		);
 
-		foreach( $configs as $config ) {
+		foreach ( $configs as $config ) {
 			$property = $config['property'];
 
-			if( ! empty( $settings['remote'][$this->key][$property] ) ) {
-				$this->$property = $settings['remote'][$this->key][$property];
+			if ( ! empty( $settings['remote'][ $this->key ][ $property ] ) ) {
+				$this->$property = $settings['remote'][ $this->key ][ $property ];
 			} else {
 				$this->$property = $config['default'];
 			}
 		}
 
-		if( ! empty( $this->host ) ) {
+		if ( ! empty( $this->host ) ) {
 			$this->title_attr = strtoupper( $this->type ) . ': ' . $this->host;
 		}
 	}
@@ -662,12 +669,12 @@ class Boldgrid_Backup_Admin_Ftp {
 		$port = intval( $port );
 
 		// Avoid a really long timeout.
-		if( 21 === $port && 'sftp' === $type ) {
-			$this->errors[] = sprintf( __( 'Unable to connect to %1$s over port %2$u.', 'boldgrid-backup'), $host, $port );
+		if ( 21 === $port && 'sftp' === $type ) {
+			$this->errors[] = sprintf( __( 'Unable to connect to %1$s over port %2$u.', 'boldgrid-backup' ), $host, $port );
 			return false;
 		}
 
-		switch( $type ) {
+		switch ( $type ) {
 			case 'ftp':
 				$connection = @ftp_connect( $host, $port, $this->timeout );
 				break;
@@ -675,8 +682,8 @@ class Boldgrid_Backup_Admin_Ftp {
 				$connection = @new phpseclib\Net\SFTP( $host, $port, $this->timeout );
 				break;
 		}
-		if( ! $connection ) {
-			$this->errors[] = sprintf( __( 'Unable to connect to %1$s over port %2$u.', 'boldgrid-backup'), $host, $port );
+		if ( ! $connection ) {
+			$this->errors[] = sprintf( __( 'Unable to connect to %1$s over port %2$u.', 'boldgrid-backup' ), $host, $port );
 			return false;
 		}
 
@@ -695,8 +702,8 @@ class Boldgrid_Backup_Admin_Ftp {
 		 */
 		$error_caught = false;
 		set_error_handler( array( 'Boldgrid_Backup_Admin_Utility', 'handle_error' ) );
-		try{
-			switch( $type ) {
+		try {
+			switch ( $type ) {
 				case 'ftp':
 					$logged_in = ftp_login( $connection, $user, $pass );
 					ftp_close( $connection );
@@ -705,13 +712,13 @@ class Boldgrid_Backup_Admin_Ftp {
 					$logged_in = $connection->login( $user, $pass );
 					break;
 			}
-		} catch( Exception $e ) {
+		} catch ( Exception $e ) {
 			$this->errors[] = $e->getMessage();
 			$error_caught = true;
 		}
 		restore_error_handler();
 
-		if( ! $error_caught && ! $logged_in ) {
+		if ( ! $error_caught && ! $logged_in ) {
 			$this->errors[] = __( 'Invalid username / password.', 'boldgrid-backup' );
 		}
 
@@ -726,17 +733,17 @@ class Boldgrid_Backup_Admin_Ftp {
 	 * @return bool
 	 */
 	public function log_in() {
-		if( $this->logged_in ) {
+		if ( $this->logged_in ) {
 			return;
 		}
 
 		// If we tried to connect but don't have a connection, abort.
 		$this->connect();
-		if( empty( $this->connection ) ) {
+		if ( empty( $this->connection ) ) {
 			return false;
 		}
 
-		switch( $this->type ) {
+		switch ( $this->type ) {
 			case 'ftp':
 				$this->logged_in = @ftp_login( $this->connection, $this->user, $this->pass );
 				break;
@@ -746,7 +753,7 @@ class Boldgrid_Backup_Admin_Ftp {
 		}
 
 		// If we tried to login and it failed, disconnect.
-		if( ! $this->logged_in ) {
+		if ( ! $this->logged_in ) {
 			$this->disconnect();
 		}
 	}
@@ -805,17 +812,17 @@ class Boldgrid_Backup_Admin_Ftp {
 
 		$this->connect();
 		$this->log_in();
-		if( ! $this->logged_in ) {
+		if ( ! $this->logged_in ) {
 			$this->errors[] = __( 'Unable to log in to ftp server.', 'boldgrid-backup' );
 			return false;
 		}
 
 		$has_remote_dir = $this->create_backup_dir();
-		if( ! $has_remote_dir ) {
+		if ( ! $has_remote_dir ) {
 			return false;
 		}
 
-		switch( $this->type ) {
+		switch ( $this->type ) {
 			case 'ftp':
 				$uploaded = ftp_put( $this->connection, $remote_file, $filepath, FTP_BINARY );
 				break;
@@ -824,7 +831,7 @@ class Boldgrid_Backup_Admin_Ftp {
 				break;
 		}
 
-		if( ! $uploaded ) {
+		if ( ! $uploaded ) {
 			$last_error = error_get_last();
 
 			$this->disconnect();
@@ -835,7 +842,7 @@ class Boldgrid_Backup_Admin_Ftp {
 			 * such as ftp_put(): Quota exceeded. Make sure the user sees the
 			 * last error.
 			 */
-			if( ! empty( $last_error['message'] ) && ! empty( $last_error['file'] ) && $last_error['file'] === __FILE__ ) {
+			if ( ! empty( $last_error['message'] ) && ! empty( $last_error['file'] ) && $last_error['file'] === __FILE__ ) {
 				$this->errors[] = $last_error['message'];
 			}
 

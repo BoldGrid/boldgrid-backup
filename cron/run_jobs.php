@@ -11,29 +11,51 @@
  * @author    BoldGrid.com <wpb@boldgrid.com>
  */
 
-/*
- * Abort if not being ran from the command line.
- *
- * http://www.binarytides.com/php-check-running-cli/
+// Abort if not being ran from the command line.
+if ( ! isset( $_SERVER['argv'], $_SERVER['argc'] ) || ! $_SERVER['argc'] ) { // WPCS: input var ok; sanitization ok.
+	die( 'Error: No parameters were passed.  A "siteurl" and "id" are required.' . PHP_EOL ); // WPCS: XSS ok.
+}
+
+// Initialize $input and $error.
+$input = null;
+$error = '';
+
+/**
+ * Parse input variables into an array.
+ * Expected parameter: "siteurl"
  */
-$is_cli = empty( $_SERVER['REMOTE_ADDR'] ) && ! isset( $_SERVER['HTTP_USER_AGENT'] ) && count( $_SERVER['argv'] ) > 0;
-if( ! $is_cli ) {
-    return;
+parse_str( implode( '&', array_slice( $argv, 1 ) ), $input );
+
+$required_arguments = array(
+	'siteurl',
+	'id',
+	'secret',
+);
+
+// Abort if arguments are not passed.
+foreach ( $required_arguments as $required_argument ) {
+	if ( empty( $input[ $required_argument ] ) ) {
+		$error .= 'Error: "' . $required_argument . '" was not specified.' . PHP_EOL;
+	}
 }
 
-if ( ! defined( 'DOING_CRON' ) ) {
-	define( 'DOING_CRON', true );
+if ( $error ) {
+	die( $error ); // WPCS: XSS ok.
 }
 
-$abspath = dirname( dirname( dirname( dirname( dirname( __FILE__ ) ) ) ) );
-if ( ! chdir( $abspath ) ) {
-	die( 'Error: Could not change to directory "' . $abspath . '".' . PHP_EOL );
-}
-require_once $abspath . '/wp-load.php';
+// Make an ajax call to run jobs, and report status.
+$url = $input['siteurl'] . '/wp-admin/admin-ajax.php?action=boldgrid_backup_run_jobs&id=' .
+	$input['id'] . '&secret=' . $input['secret'] . '&doing_wp_cron=' . time();
 
-if( ! class_exists( 'Boldgrid_Backup_Admin_Core' ) ) {
-	return;
+// Sanitize the url.
+$url = filter_var( $url, FILTER_SANITIZE_URL );
+
+$result = file_get_contents( $url );
+
+if ( false !== $result ) {
+	$message = $result;
+} else {
+	$message = 'Error: Could not reach URL address "' . $url . '".';
 }
 
-$core = new Boldgrid_Backup_Admin_Core();
-$core->jobs->run();
+die( $message ); // WPCS: XSS ok.

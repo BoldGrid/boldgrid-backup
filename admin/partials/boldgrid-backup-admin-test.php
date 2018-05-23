@@ -13,8 +13,8 @@ defined( 'WPINC' ) ? : die;
 
 // Setup our lang.
 $lang = array(
-	'yes' =>  __( 'Yes', 'boldgrid-backup' ),
-	'no' =>   __( 'No', 'boldgrid-backup' ),
+	'yes' => __( 'Yes', 'boldgrid-backup' ),
+	'no' => __( 'No', 'boldgrid-backup' ),
 	'untested' => __( 'untested', 'boldgrid-backup' ),
 	'PASS' => __( 'PASS', 'boldgrid-backup' ),
 	'FAIL' => __( 'FAIL', 'boldgrid-backup' ),
@@ -24,7 +24,7 @@ $lang = array(
 );
 
 $lang['dir_of_dir'] = $lang['ensure_dir_perms'];
-if( $this->test->is_windows() ) {
+if ( $this->test->is_windows() ) {
 	$lang['dir_of_dir'] = __( 'Please review directory permissions. If you are on a Windows server, your user may need to be able to read BOTH the backup directory and its parent directory.', 'boldgrid-backup' );
 }
 
@@ -36,7 +36,7 @@ $allowed_tags = array(
 	'span' => array(
 		'class' => array(
 			'error'
-		)
+		),
 	),
 	'br' => array(),
 	'pre' => array(),
@@ -57,22 +57,22 @@ $timezone = false === $timezone ? 'UTC' . $this->time->get_server_offset() : $ti
 $tests = array(
 	array(
 		'id' => 'pass',
-		'k' =>  __( 'Functionality test status:', 'boldgrid-backup' ),
-		'v' =>  ( $this->test->run_functionality_tests() ? sprintf( $success_span, $lang['PASS'] ) : sprintf( $error_span, $lang['FAIL'], '' ) ),
+		'k' => __( 'Functionality test status:', 'boldgrid-backup' ),
+		'v' => ( $this->test->run_functionality_tests() ? sprintf( $success_span, $lang['PASS'] ) : sprintf( $error_span, $lang['FAIL'], '' ) ),
 	),
 	array(
 		'heading' => __( 'General tests', 'boldgrid-backup' ),
 	),
 	array(
-		'k' => __( 'User home directory', 'boldgrid-backup' ),
+		'k' => __( 'User home directory:', 'boldgrid-backup' ),
 		'v' => $home_dir . ' (' . $home_dir_mode . ')',
 	),
 	array(
 		'k' => __( 'User home directory writable?', 'boldgrid-backup' ),
-		'v' =>( $home_dir_writable ? $lang['yes'] : $lang['no'] ),
+		'v' => ( $home_dir_writable ? $lang['yes'] : $lang['no'] ),
 	),
 	array(
-		'k' => __( 'WordPress directory', 'boldgrid-backup' ),
+		'k' => __( 'WordPress directory:', 'boldgrid-backup' ),
 		'v' => ABSPATH,
 	),
 	array(
@@ -80,11 +80,11 @@ $tests = array(
 		'v' => ( $this->test->get_is_abspath_writable() ? $lang['yes'] : sprintf( $error_span, $lang['no'], '' ) ),
 	),
 	array(
-		'k' => __( 'Document root', 'boldgrid-backup' ),
+		'k' => __( 'Document root:', 'boldgrid-backup' ),
 		'v' => str_replace( '\\\\', '\\', $_SERVER['DOCUMENT_ROOT'] ),
 	),
 	array(
-		'k' => __( 'Current user', 'boldgrid-backup' ),
+		'k' => __( 'Current user:', 'boldgrid-backup' ),
 		'v' => get_current_user(),
 	),
 	array(
@@ -102,23 +102,23 @@ $tests = array(
 );
 
 $tests[] = array(
-	'heading' => __( 'Backup directory & permissions', 'boldgrid-backup' ),
+	'heading' => __( 'Backup directory & permissions:', 'boldgrid-backup' ),
 );
 
 $tests[] = array(
-	'k' => __( 'Possible backup directory parents', 'boldgrid-backup' ),
+	'k' => __( 'Possible backup directory parents:', 'boldgrid-backup' ),
 	'v' => implode( '<br />', $possible_backup_dirs ),
 );
 
 $tests[] = array(
-	'k' => __( 'Backup directory', 'boldgrid-backup' ),
+	'k' => __( 'Backup directory:', 'boldgrid-backup' ),
 	'v' => ! empty( $backup_directory ) ? $backup_directory : sprintf( $error_span, $lang['not_set'], '' ),
 );
 
 // As set of tests only to run if a backup directory is found.
-if( ! empty( $backup_directory ) ) {
+if ( ! empty( $backup_directory ) ) {
 	$tests[] = array(
-		'k' => __( 'Backup directory without ABSPATH', 'boldgrid-backup' ),
+		'k' => __( 'Backup directory without ABSPATH:', 'boldgrid-backup' ),
 		'v' => $this->backup_dir->without_abspath,
 	);
 
@@ -127,7 +127,7 @@ if( ! empty( $backup_directory ) ) {
 		'v' => $backup_dir_perms['exists'] ? $lang['yes'] : sprintf( $error_span, $lang['no'], $lang['ensure_dir_perms'] ),
 	);
 
-	if( $backup_dir_perms['exists'] ) {
+	if ( $backup_dir_perms['exists'] ) {
 		$tests[] = array(
 			'k' => __( 'Backup directory has read permission?', 'boldgrid-backup' ),
 			'v' => $backup_dir_perms['read'] ? $lang['yes'] : sprintf( $error_span, $lang['no'], $lang['ensure_dir_perms'] ),
@@ -156,7 +156,7 @@ if( ! empty( $backup_directory ) ) {
 }
 
 $tests[] = array(
-	'heading' => 'Available compressors'
+	'heading' => 'Available compressors',
 );
 
 $tests[] = array(
@@ -164,10 +164,10 @@ $tests[] = array(
 	'v' => ( $this->config->is_compressor_available( 'php_zip' ) ? 'Yes' : 'No' ),
 );
 
-if( 'php_zip' === $this->compressors->get() ) {
-	if( ! $valid_backup_dir ) {
+if ( 'php_zip' === $this->compressors->get() ) {
+	if ( ! $valid_backup_dir ) {
 		$status = sprintf( $warning_span, $lang['untested'], $lang['before_test_compress'] );
-	} elseif( $php_zip->test() ) {
+	} elseif ( $php_zip->test() ) {
 		$status = $lang['yes'];
 	} else {
 		$status = sprintf( $error_span, $lang['no'], '' );
@@ -184,10 +184,10 @@ $tests[] = array(
 	'v' => ( $this->config->is_compressor_available( 'pcl_zip' ) ? 'Yes' : 'No' ),
 );
 
-if( 'pcl_zip' === $this->compressors->get() ) {
-	if( ! $valid_backup_dir ) {
+if ( 'pcl_zip' === $this->compressors->get() ) {
+	if ( ! $valid_backup_dir ) {
 		$status = sprintf( $warning_span, $lang['untested'], $lang['before_test_compress'] );
-	} elseif( $pcl_zip->test() ) {
+	} elseif ( $pcl_zip->test() ) {
 		$status = $lang['yes'];
 	} else {
 		$status = sprintf( $error_span, $lang['no'], '' );
@@ -234,17 +234,22 @@ $tests[] = array(
 );
 
 $tests[] = array(
-	'k' => __( 'Cron jobs', 'boldgrid-backup' ),
+	'k' => __( 'PHP allow_url_fopen enabled?', 'boldgrid-backup' ),
+	'v' => ( ini_get( 'allow_url_fopen' ) ? $lang['yes'] : sprintf( $error_span, $lang['no'], '' ) ),
+);
+
+$tests[] = array(
+	'k' => __( 'Cron jobs:', 'boldgrid-backup' ),
 	'v' => '<pre>' . implode( '<br /><br />', $our_crons ) . '</pre>',
 );
 
 $tests[] = array(
-	'k' => __( 'Is WP-CRON enabled?', 'boldgrid-backup' ),
+	'k' => __( 'WP Cron enabled?', 'boldgrid-backup' ),
 	'v' => ( $this->test->wp_cron_enabled() ? 'Yes' : 'No' ),
 );
 
 $tests[] = array(
-	'k' => __( 'WP Cron jobs', 'boldgrid-backup' ),
+	'k' => __( 'WP Cron jobs:', 'boldgrid-backup' ),
 	'v' => '<pre>' . implode( '<br /><br />', $our_wp_crons ) . '</pre>',
 );
 
@@ -255,7 +260,7 @@ if ( $is_functional ) {
 	);
 
 	$tests[] = array(
-		'k' => __( 'Directory used to calculate disk space', __( 'boldgrid-backup') ),
+		'k' => __( 'Directory used to calculate disk space:', __( 'boldgrid-backup' ) ),
 		'v' => $this->home_dir->get_for_disk(),
 	);
 
@@ -271,7 +276,7 @@ if ( $is_functional ) {
 
 	$tests[] = array(
 		'k' => __( 'Disk free space:', 'boldgrid-backup' ),
-		'v' =>Boldgrid_Backup_Admin_Utility::bytes_to_human( $disk_space[2] ),
+		'v' => Boldgrid_Backup_Admin_Utility::bytes_to_human( $disk_space[2] ),
 	);
 
 	if ( ! empty( $disk_space[3] ) ) {
@@ -309,7 +314,7 @@ if ( $is_functional ) {
 		'v' => $db_charset,
 	);
 
-	if( ! empty( $db_collate ) ) {
+	if ( ! empty( $db_collate ) ) {
 		$tests[] = array(
 			'k' => __( 'WordPress database collate:', 'boldgrid-backup' ),
 			'v' => $db_collate,
@@ -334,15 +339,15 @@ if ( $is_functional ) {
 
 // Create the table that will contain the tests data.
 $table = '<table class="wp-list-table fixed striped">';
-foreach( $tests as $test ) {
-	if( ! empty( $test['heading'] ) ) {
+foreach ( $tests as $test ) {
+	if ( ! empty( $test['heading'] ) ) {
 		$table .= sprintf( '<tr class="heading"><td colspan="2"><h2>%1$s</h2></td></tr>', esc_html( $test['heading'] ) );
-	} elseif( isset( $test['id'] ) && 'pass' === $test['id'] ) {
+	} elseif ( isset( $test['id'] ) && 'pass' === $test['id'] ) {
 		$table .= sprintf('<tr><td>%1$s</td><td><strong>%2$s</strong></td></tr>',
 			esc_html( $test['k'] ),
 			wp_kses( $test['v'], $allowed_tags )
 		);
-	} elseif( isset( $test['k'] ) ) {
+	} elseif ( isset( $test['k'] ) ) {
 		$table .= sprintf('<tr><td>%1$s</td><td><em>%2$s</em></td></tr>',
 			esc_html( $test['k'] ),
 			wp_kses( $test['v'], $allowed_tags )

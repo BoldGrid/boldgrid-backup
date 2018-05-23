@@ -37,9 +37,9 @@ class Boldgrid_Backup_Activator {
 		 * The add_all_crons methods called include proper checks to ensure
 		 * scheduler is available and $settings include a schedule.
 		 */
-		if( 'cron' === $scheduler ) {
+		if ( 'cron' === $scheduler ) {
 			$core->cron->add_all_crons( $settings );
-		} elseif( 'wp-cron' === $scheduler ) {
+		} elseif ( 'wp-cron' === $scheduler ) {
 			$core->wp_cron->add_all_crons( $settings );
 		}
 	}

@@ -74,7 +74,7 @@ class Boldgrid_Backup_Admin_Db_Omit {
 		$body = '';
 
 		// Include database tables excluded.
-		if( isset( $info['table_exclude'] ) ) {
+		if ( isset( $info['table_exclude'] ) ) {
 			$body .= "\n" . __( 'DATABASE SETTINGS', 'boldgrid-backup' ) . "\n";
 
 			$tables_excluded = empty( $info['table_exclude'] ) ? __( 'None', 'boldgrid-backup' ) : implode( ',', $info['table_exclude'] );
@@ -97,17 +97,16 @@ class Boldgrid_Backup_Admin_Db_Omit {
 			BOLDGRID_BACKUP_VERSION,
 			false
 		);
-		$translation = array(
-		);
+		$translation = array();
 		wp_localize_script( $handle, 'BoldGridBackupAdminTableInclude', $translation );
 		wp_enqueue_script( $handle );
 
-// 		// Enqueue CSS for folder exclude functionality.
-// 		wp_enqueue_style(
-// 			$handle,
-// 			plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-folder-exclude.css', array(),
-// 			BOLDGRID_BACKUP_VERSION
-// 		);
+		// Enqueue CSS for folder exclude functionality.
+		// wp_enqueue_style(
+		// $handle,
+		// plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-folder-exclude.css', array(),
+		// BOLDGRID_BACKUP_VERSION
+		// );
 	}
 
 	/**
@@ -131,9 +130,9 @@ class Boldgrid_Backup_Admin_Db_Omit {
 		 */
 		$backup_now_full = $this->core->is_backup_now && 'full' === $this->get_post_type();
 
-		if( $this->core->is_archiving_update_protection || $backup_now_full || $this->core->pre_auto_update ) {
+		if ( $this->core->is_archiving_update_protection || $backup_now_full || $this->core->pre_auto_update ) {
 			$excluded_tables = array();
-		} elseif( $this->core->is_backup_now && isset( $_POST['include_tables'] ) ) {
+		} elseif ( $this->core->is_backup_now && isset( $_POST['include_tables'] ) ) {
 			$excluded_tables = $this->get_from_post();
 		} else {
 			$settings = $this->core->settings->get_settings();
@@ -162,15 +161,15 @@ class Boldgrid_Backup_Admin_Db_Omit {
 		$prefixed_tables = $this->core->db_get->prefixed();
 
 		// If we're creating a backup for update protection, backup all tables.
-		if( $this->core->is_archiving_update_protection || $this->core->pre_auto_update ) {
+		if ( $this->core->is_archiving_update_protection || $this->core->pre_auto_update ) {
 			return $prefixed_tables;
 		}
 
 		$exclude_tables = $this->get_excluded_tables();
 
-		foreach( $prefixed_tables as $key => $table ) {
-			if( in_array( $table, $exclude_tables ) ) {
-				unset( $prefixed_tables[$key] );
+		foreach ( $prefixed_tables as $key => $table ) {
+			if ( in_array( $table, $exclude_tables ) ) {
+				unset( $prefixed_tables[ $key ] );
 			}
 		}
 
@@ -178,7 +177,7 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	}
 
 	/**
-	 * From post, get an array of tables to exlucde.
+	 * From post, get an array of tables to exclude.
 	 *
 	 * We are submitting via post "include_tables", however we use this data to
 	 * then calculate "exclude_tables".
@@ -189,7 +188,10 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	 */
 	public function get_from_post() {
 		$exclude_tables = array();
-		$include_tables = ! empty( $_POST['include_tables'] ) ? $_POST['include_tables'] : array();
+
+		$include_tables = ! empty( $_POST['include_tables'] ) ?
+			array_map( 'sanitize_text_field', $_POST['include_tables'] ) : array();
+
 		$all_tables = $this->core->db_get->prefixed();
 
 		/*
@@ -197,8 +199,8 @@ class Boldgrid_Backup_Admin_Db_Omit {
 		 *
 		 * If the table we want to
 		 */
-		foreach( $all_tables as $table ) {
-			if( ! in_array( $table, $include_tables ) ) {
+		foreach ( $all_tables as $table ) {
+			if ( ! in_array( $table, $include_tables ) ) {
 				$exclude_tables[] = $table;
 			}
 		}
@@ -215,7 +217,9 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	 */
 	public function get_post_type() {
 		$key = 'table_inclusion_type';
-		return ! empty( $_POST[$key] ) && in_array( $_POST[$key], $this->valid_types, true ) ? $_POST[$key] : null;
+
+		return ! empty( $_POST[ $key ] ) && in_array( $_POST[ $key ], $this->valid_types, true ) ?
+			sanitize_key( $_POST[ $key ] ) : null;
 	}
 
 	/**
@@ -229,13 +233,15 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	 * @return bool
 	 */
 	public function get_settings_excluded( $settings = array() ) {
-		if( empty( $settings ) ) {
+		if ( empty( $settings ) ) {
 			$settings = $this->core->settings->get_settings();
 		}
 
 		// Get the actual value stored in the settings. Set to an empty array if non existing.
 		$key = 'exclude_tables';
-		return ! isset( $settings[$key] ) || ! is_array( $settings[$key] ) ? array() : $settings[$key];
+
+		return ! isset( $settings[ $key ] ) || ! is_array( $settings[ $key ] ) ?
+			array() : array_map( 'sanitize_text_field', $settings[ $key ] );
 	}
 
 	/**
@@ -252,13 +258,13 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	 * @return bool
 	 */
 	public function get_settings_type( $settings = array() ) {
-		if( empty( $settings ) ) {
+		if ( empty( $settings ) ) {
 			$settings = $this->core->settings->get_settings();
 		}
 
 		$key = 'exclude_tables_type';
 
-		return ! empty( $settings[$key] ) && in_array( $settings[$key], $this->valid_types, true ) ? $settings[$key] : null;
+		return ! empty( $settings[ $key ] ) && in_array( $settings[ $key ], $this->valid_types, true ) ? $settings[ $key ] : null;
 	}
 
 	/**
@@ -276,7 +282,7 @@ class Boldgrid_Backup_Admin_Db_Omit {
 		$tables = $this->core->db_get->prefixed();
 		$return = '';
 
-		foreach( $tables as $table ) {
+		foreach ( $tables as $table ) {
 			$checked = in_array( $table, $exclude_tables ) ? '' : 'checked';
 			$return .= sprintf(
 				'<div title="%1$s"><input value="%1$s" name="include_tables[]" type="checkbox" %2$s /> %1$s</div>',

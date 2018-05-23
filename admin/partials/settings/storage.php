@@ -66,7 +66,7 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf( '
 
 		<table id="storage_locations">
 		<?php
-		foreach( $storage_locations as $location ) {
+		foreach ( $storage_locations as $location ) {
 			$tr = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/storage-location.php';
 			echo $tr;
 		}

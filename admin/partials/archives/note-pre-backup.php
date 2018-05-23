@@ -24,7 +24,7 @@ defined( 'WPINC' ) ? : die;
 			array(
 				'a' => array( 'href' => array(), 'target' => array() ),
 				'strong' => array(),
-	 		)
+			 )
 		),
 		esc_url( $this->configs['urls']['resource_usage'] )
 	);
@@ -37,7 +37,7 @@ defined( 'WPINC' ) ? : die;
 	 * only configured to store x. Backing up your site now will delete your oldest backup to
 	 * make room for your new backup. We recommend you download a backup to your local computer.
 	 */
-	if( count( $archives ) >= $settings['retention_count'] ) {
+	if ( count( $archives ) >= $settings['retention_count'] ) {
 		$link = sprintf(
 			wp_kses(
 				__( 'You currently have %1$s backups stored on your server, and your <a href="%3$s">backup settings</a> are only configured to store %2$s. Backing up your site now will delete your oldest backup to make room for your new backup. We recommend you download a backup to your local computer.', 'boldgrid-backup' ),

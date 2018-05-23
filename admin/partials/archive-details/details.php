@@ -55,18 +55,18 @@ $datas = array(
 	),
 );
 
-foreach( $datas as $data ) {
-	if( ! isset( $archive[ $data['key'] ] ) ) {
+foreach ( $datas as $data ) {
+	if ( ! isset( $archive[ $data['key'] ] ) ) {
 		continue;
 	}
 
-	if( ! empty( $data['heading'] ) ) {
+	if ( ! empty( $data['heading'] ) ) {
 		$details .= sprintf( '<h2>%1$s:</h2>', $data['heading'] );
 	}
 
 	$value = $archive[ $data['key'] ];
-	if( ! empty( $data['presentation'] ) ) {
-		switch( $data['presentation'] ) {
+	if ( ! empty( $data['presentation'] ) ) {
+		switch ( $data['presentation'] ) {
 			case 'bytes_to_human':
 				$value = Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive[ $data['key'] ] );
 				break;
@@ -79,11 +79,11 @@ foreach( $datas as $data ) {
 		}
 	}
 
-	if( ! empty( $data['suffix'] ) ) {
+	if ( ! empty( $data['suffix'] ) ) {
 		$value .= $data['suffix'];
 	}
 
-	if( ! empty( $data['hidden_input' ] ) ) {
+	if ( ! empty( $data['hidden_input'] ) ) {
 		$value .= sprintf( '<input type="hidden" id="%1$s" value="%2$s" />', $data['key'], $archive[ $data['key'] ] );
 	}
 
@@ -92,4 +92,4 @@ foreach( $datas as $data ) {
 
 return $details;
 
-?>
+

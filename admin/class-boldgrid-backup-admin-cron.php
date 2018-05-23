@@ -36,6 +36,24 @@ class Boldgrid_Backup_Admin_Cron {
 	public $run_jobs = 'cron/run_jobs.php';
 
 	/**
+	 * A cron secret used to validate unauthenticated crontab jobs.
+	 *
+	 * @since 1.6.1-rc.1
+	 * @access private
+	 * @var string
+	 */
+	private $cron_secret = null;
+
+	/**
+	 * Linux crontab entry version string.
+	 *
+	 * The version represents the plugin version string when the crontab entry format was changed.
+	 *
+	 * @var string
+	 */
+	public $crontab_version = '1.6.1';
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.2
@@ -54,12 +72,14 @@ class Boldgrid_Backup_Admin_Cron {
 	 *
 	 * @see Boldgrid_Backup_Admin_Cron::delete_cron_entries().
 	 * @see Boldgrid_Backup_Admin_Cron::update_cron().
+	 * @see BoldGrid_Backup_Admin_Core::get_backup_identifier()
+	 * @see BoldGrid_Backup_Admin_Cron::get_cron_secret()
 	 *
 	 * @param  array $settings
 	 * @return bool  Success.
 	 */
 	public function add_cron_entry( $settings = array() ) {
-		if( empty( $settings ) ) {
+		if ( empty( $settings ) ) {
 			$settings = $this->core->settings->get_settings();
 		}
 
@@ -98,11 +118,11 @@ class Boldgrid_Backup_Admin_Cron {
 
 		// Convert our WordPress time to Server time.
 		$date = $this->core->time->get_settings_date( $settings );
-		if( false === $date ) {
+		if ( false === $date ) {
 			return false;
 		}
 		$server_timezone = $this->core->time->get_server_timezone();
-		if( false === $server_timezone ) {
+		if ( false === $server_timezone ) {
 			return false;
 		}
 		$date->setTimezone( $server_timezone );
@@ -111,7 +131,8 @@ class Boldgrid_Backup_Admin_Cron {
 		$entry = $date->format( 'i G' ) . ' * * ';
 
 		$entry .= $days_scheduled_list . ' php -qf "' . dirname( dirname( __FILE__ ) ) .
-		'/boldgrid-backup-cron.php" mode=backup HTTP_HOST=' . $_SERVER['HTTP_HOST'];
+			'/boldgrid-backup-cron.php" mode=backup siteurl=' . get_site_url() . ' id=' .
+			$this->core->get_backup_identifier() . ' secret=' . $this->get_cron_secret();
 
 		// If not Windows, then also silence the cron job.
 		if ( ! $this->core->test->is_windows() ) {
@@ -140,19 +161,26 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @return bool
 	 */
 	public function add_all_crons( $settings ) {
+		$success = false;
+
 		$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
 		$schedule = ! empty( $settings['schedule'] ) ? $settings['schedule'] : null;
 
-		if( 'cron' === $scheduler && $this->core->scheduler->is_available( $scheduler ) && ! empty( $schedule ) ) {
+		if ( 'cron' === $scheduler && $this->core->scheduler->is_available( $scheduler ) && ! empty( $schedule ) ) {
 			$this->core->scheduler->clear_all_schedules();
 
 			$scheduled = $this->add_cron_entry( $settings );
 			$jobs_scheduled = $this->schedule_jobs();
 
-			return $scheduled && $jobs_scheduled;
+			$success = $scheduled && $jobs_scheduled;
+
+			if ( $success ) {
+				$settings['crontab_version'] = $this->crontab_version;
+				update_site_option( 'boldgrid_backup_settings', $settings );
+			}
 		}
 
-		return false;
+		return $success;
 	}
 
 	/**
@@ -164,9 +192,9 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @see Boldgrid_Backup_Admin_Core::execute_command()
 	 * @see Boldgrid_Backup_Admin_Cron::delete_cron_entries().
 	 * @see Boldgrid_Backup_Admin_Cron::update_cron().
-	 * @see Boldgrid_Backup_Admin_Settings::delete_rollback_option().
-	 * @see Boldgrid_Backup_Admin_Settings::get_settings().
 	 * @see Boldgrid_Backup_Admin_Test::is_windows()
+	 * @see BoldGrid_Backup_Admin_Core::get_backup_identifier()
+	 * @see BoldGrid_Backup_Admin_Cron::get_cron_secret()
 	 *
 	 * @return null
 	 */
@@ -215,12 +243,11 @@ class Boldgrid_Backup_Admin_Cron {
 		}
 
 		// Build cron job line in crontab format.
-		$entry = date( $minute . ' ' . $hour, $deadline ) . ' * * ' . date( 'w' );
-
-		$entry .= ' php -qf "' . dirname( dirname( __FILE__ ) ) .
-		'/boldgrid-backup-cron.php" mode=restore HTTP_HOST=' . $_SERVER['HTTP_HOST'];
-
-		$entry .= ' archive_key=' . $archive_key . ' archive_filename=' . $archive_filename;
+		$entry = date( $minute . ' ' . $hour, $deadline ) . ' * * ' . date( 'w' ) . ' php -qf "' .
+			dirname( dirname( __FILE__ ) ) . '/boldgrid-backup-cron.php" mode=restore siteurl=' .
+			get_site_url() . ' id=' . $this->core->get_backup_identifier() . ' secret=' .
+			$this->get_cron_secret() . ' archive_key=' . $archive_key .
+			' archive_filename=' . $archive_filename;
 
 		// If not Windows, then also silence the cron job.
 		if ( ! $this->core->test->is_windows() ) {
@@ -259,13 +286,13 @@ class Boldgrid_Backup_Admin_Cron {
 
 		// Get our cron jobs.
 		$crontab_exploded = $this->get_all();
-		if( empty( $crontab_exploded ) ) {
+		if ( empty( $crontab_exploded ) ) {
 			return array();
 		}
 
 		// If there's no cron jobs matching our pattern, abort.
-		$crontab = implode( "", $crontab_exploded );
-		if( false === strpos( $crontab, $pattern ) ) {
+		$crontab = implode( '', $crontab_exploded );
+		if ( false === strpos( $crontab, $pattern ) ) {
 			return array();
 		}
 
@@ -297,9 +324,19 @@ class Boldgrid_Backup_Admin_Cron {
 	 * the "run_jobs" wp-cron scheduled.
 	 *
 	 * @since 1.5.2
+	 *
+	 * @see BoldGrid_Backup_Admin_Core::get_backup_identifier()
+	 * @see BoldGrid_Backup_Admin_Cron::get_cron_secret()
 	 */
 	public function schedule_jobs() {
-		$entry = sprintf( '*/5 * * * * php -qf "%1$s/%2$s" > /dev/null 2>&1', dirname( dirname( __FILE__ ) ), $this->run_jobs );
+		$entry = sprintf(
+			'*/5 * * * * php -qf "%1$s/%2$s" siteurl=%3$s id=%4$s secret=%5$s > /dev/null 2>&1',
+			dirname( dirname( __FILE__ ) ),
+			$this->run_jobs,
+			get_site_url(),
+			$this->core->get_backup_identifier(),
+			$this->get_cron_secret()
+		);
 
 		return $this->update_cron( $entry );
 	}
@@ -321,7 +358,7 @@ class Boldgrid_Backup_Admin_Cron {
 			return false;
 		}
 
-		if( $this->entry_exists( $entry ) ) {
+		if ( $this->entry_exists( $entry ) ) {
 			return true;
 		}
 
@@ -401,11 +438,8 @@ class Boldgrid_Backup_Admin_Cron {
 		// Check if crontab is available.
 		$is_crontab_available = $this->core->test->is_crontab_available();
 
-		// Check if wp-cron is available.
-		$is_wpcron_available = $this->core->test->wp_cron_enabled();
-
-		// If crontab or wp-cron is not available, then abort.
-		if ( ! $is_crontab_available && ! $is_wpcron_available ) {
+		// If crontab is not available, then abort.
+		if ( ! $is_crontab_available ) {
 			return false;
 		}
 
@@ -417,7 +451,7 @@ class Boldgrid_Backup_Admin_Cron {
 		/*
 		 * Configure our pattern.
 		 *
-		 * When this method was initiall written, $mode was either
+		 * When this method was initially written, $mode was either
 		 * empty (defaulting to "backup") or "restore", hence the first two
 		 * conditionals below.
 		 *
@@ -429,11 +463,11 @@ class Boldgrid_Backup_Admin_Cron {
 		 * added to the pattern and ALL crons for this site will be removed.
 		 */
 		$pattern = BOLDGRID_BACKUP_PATH . '/';
-		if( '' === $mode ) {
+		if ( '' === $mode ) {
 			$pattern .= 'boldgrid-backup-cron.php" mode=';
-		} elseif( 'restore' === $mode ) {
+		} elseif ( 'restore' === $mode ) {
 			$pattern .= 'boldgrid-backup-cron.php" mode=restore';
-		} elseif( true !== $mode ) {
+		} elseif ( true !== $mode ) {
 			$pattern .= $mode;
 		}
 
@@ -496,9 +530,6 @@ class Boldgrid_Backup_Admin_Cron {
 
 			// Remove temp crontab file.
 			$wp_filesystem->delete( $temp_crontab_path, false, 'f' );
-		} else {
-			// Use wp-cron.
-			// @todo Write wp-cron code here.
 		}
 
 		return true;
@@ -513,14 +544,14 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @return bool   True if the entry does not exist or was deleted successfully.
 	 */
 	public function entry_delete( $entry ) {
-		if( ! $this->entry_exists( $entry ) ) {
+		if ( ! $this->entry_exists( $entry ) ) {
 			return true;
 		}
 
 		$all_entries = $this->get_all();
 
-		if( ( $key = array_search( $entry, $all_entries ) ) !== false ) {
-			unset( $all_entries[$key] );
+		if ( ( $key = array_search( $entry, $all_entries ) ) !== false ) {
+			unset( $all_entries[ $key ] );
 		}
 
 		$all_entries = implode( "\n", $all_entries );
@@ -547,7 +578,7 @@ class Boldgrid_Backup_Admin_Cron {
 	 *
 	 * @since 1.5.2
 	 *
-	 * @param  bool  $raw Return a string of crons when true, an array when false.
+	 * @param  bool $raw Return a string of crons when true, an array when false.
 	 * @return mixed
 	 */
 	public function get_all( $raw = false ) {
@@ -558,7 +589,7 @@ class Boldgrid_Backup_Admin_Cron {
 		 * It would be clean to call is_crontab_available(), but that method
 		 * uses this method, and would result in an infinite loop.
 		 */
-		if( $this->core->test->is_windows() ) {
+		if ( $this->core->test->is_windows() ) {
 			return false;
 		}
 
@@ -586,12 +617,12 @@ class Boldgrid_Backup_Admin_Cron {
 		$our = array();
 		$all = $this->get_all();
 
-		if( empty( $all ) ) {
+		if ( empty( $all ) ) {
 			return $our;
 		}
 
-		foreach( $all as $cron ) {
-			if( false !== strpos( $cron, BOLDGRID_BACKUP_PATH ) ) {
+		foreach ( $all as $cron ) {
+			if ( false !== strpos( $cron, BOLDGRID_BACKUP_PATH ) ) {
 				$our[] = $cron;
 			}
 		}
@@ -622,7 +653,7 @@ class Boldgrid_Backup_Admin_Cron {
 			'tod_a' => null,
 		);
 
-		if( empty( $cron_line ) ) {
+		if ( empty( $cron_line ) ) {
 			return $schedule;
 		}
 
@@ -822,5 +853,141 @@ class Boldgrid_Backup_Admin_Cron {
 
 			echo PHP_EOL;
 		}
+	}
+
+	/**
+	 * Get the cron secret used to validate unauthenticated crontab jobs.
+	 *
+	 * @since 1.6.1-rc.1
+	 *
+	 * @see BoldGrid_Backup_Admin_Settings::get_settings()
+	 *
+	 * @return string
+	 */
+	public function get_cron_secret() {
+		if ( empty( $this->cron_secret ) ) {
+			$settings = $this->core->settings->get_settings( true );
+
+			if ( empty( $settings['cron_secret'] ) ) {
+				$settings['cron_secret'] = hash( 'sha256', openssl_random_pseudo_bytes( 21 ) );
+
+				update_site_option( 'boldgrid_backup_settings', $settings );
+			}
+
+			$this->cron_secret = $settings['cron_secret'];
+		}
+
+		return $this->cron_secret;
+	}
+
+	/**
+	 * Validate an unauthenticated wp_ajax_nopriv_ call by backup id and cron secret.
+	 *
+	 * @since 1.6.1-rc.1
+	 *
+	 * @uses $_GET['id']
+	 * @uses $_GET['secret']
+	 *
+	 * @see current_user_can()
+	 * @see BoldGrid_Backup_Admin_Core::get_backup_identifier()
+	 * @see BoldGrid_Backup_Admin_Cron::get_cron_secret()
+	 *
+	 * @return bool
+	 */
+	public function is_valid_call() {
+		$backup_id_match = ! empty( $_GET['id'] ) &&
+			$this->core->get_backup_identifier() === $_GET['id'];
+
+		$cron_secret_match = ! empty( $_GET['secret'] ) &&
+			$this->get_cron_secret() === $_GET['secret'];
+
+		return current_user_can( 'update_plugins' ) || ( $backup_id_match && $cron_secret_match );
+	}
+
+	/**
+	 * Upgrade crontab entries, if not already upgraded.
+	 *
+	 * @since 1.6.1-rc.1
+	 *
+	 * @see BoldGrid_Backup_Admin_Settings::get_settings()
+	 * @see BoldGrid_Backup_Admin_Cron::add_all_crons()
+	 *
+	 * @return bool Returns TRUE only if an upgrade was performed.
+	 */
+	public function upgrade_crontab_entries() {
+		$upgraded = false;
+		$settings = $this->core->settings->get_settings( true );
+
+		if ( empty( $settings['crontab_version'] ) ||
+			$this->crontab_version !== $settings['crontab_version'] ) {
+				// Delete and recreate the crontab entries.
+				$upgraded = $this->add_all_crons( $settings );
+
+			if ( $upgraded ) {
+				/**
+					 * Action when the crontab entry upgrade is successfully completed.
+					 *
+					 * @since 1.6.1-rc.1
+					 *
+					 * @param string The new crontab entry version.
+					 */
+				do_action(
+					'boldgrid_backup_upgrade_crontab_entries_complete',
+					$this->crontab_version
+				);
+			}
+		}
+
+		return $upgraded;
+	}
+
+	/**
+	 * Hook into "wp_ajax_nopriv_boldgrid_backup_run_backup" and generate backup.
+	 *
+	 * @since 1.6.1-rc.1
+	 *
+	 * @see Boldgrid_Backup_Admin_Cron::is_valid_call()
+	 *
+	 * @return array An array of archive file information.
+	 */
+	public function backup() {
+		if ( ! $this->is_valid_call() ) {
+			wp_die(
+				__( 'Error: Invalid request.' ),
+				'boldgrid-backup'
+			);
+		}
+
+		$archive_info = $this->core->archive_files( true );
+
+		return $archive_info;
+	}
+
+	/**
+	 * Hook into "wp_ajax_nopriv_boldgrid_backup_run_restore" and restores from backup.
+	 *
+	 * @since 1.6.1-rc.1
+	 *
+	 * @see Boldgrid_Backup_Admin_Cron::is_valid_call()
+	 *
+	 * @return array An array of archive file information.
+	 */
+	public function restore() {
+		if ( ! $this->is_valid_call() ) {
+			wp_die(
+				__( 'Error: Invalid request.' ),
+				'boldgrid-backup'
+			);
+		}
+
+		$archive_info = array(
+			'error' => __( 'Could not perform restoration from cron job.', 'boldgrid-backup' ),
+		);
+
+		if ( $this->core->restore_helper->prepare_restore() ) {
+			$archive_info = $this->core->restore_archive_file();
+		}
+
+		return $archive_info;
 	}
 }

@@ -53,7 +53,7 @@ class Boldgrid_Backup_Admin_Compressors {
 		 * If ZipArchive is available, make it the default. Tests show it is
 		 * superior to PclZip.
 		 */
-		if( class_exists( 'Boldgrid_Backup_Admin_Compressor_Php_Zip' ) && Boldgrid_Backup_Admin_Compressor_Php_Zip::is_available() ) {
+		if ( class_exists( 'Boldgrid_Backup_Admin_Compressor_Php_Zip' ) && Boldgrid_Backup_Admin_Compressor_Php_Zip::is_available() ) {
 			$this->default = 'php_zip';
 		}
 	}
@@ -73,7 +73,7 @@ class Boldgrid_Backup_Admin_Compressors {
 		 * If we have a compressor saved in our settings and it is an
 		 * available compressor, then use it.
 		 */
-		if( ! empty( $settings['compressor'] ) && in_array( $settings['compressor'], $available_compressors, true ) ) {
+		if ( ! empty( $settings['compressor'] ) && in_array( $settings['compressor'], $available_compressors, true ) ) {
 			return $settings['compressor'];
 		}
 
@@ -100,7 +100,7 @@ class Boldgrid_Backup_Admin_Compressors {
 	 * @return bool True on success.
 	 */
 	public function set_php_zip() {
-		if( Boldgrid_Backup_Admin_Compressor_Php_Zip::is_available() ) {
+		if ( Boldgrid_Backup_Admin_Compressor_Php_Zip::is_available() ) {
 			$settings = $this->core->settings->get_settings();
 			$settings['compressor'] = 'php_zip';
 			$settings['extractor'] = 'php_zip';
@@ -124,7 +124,7 @@ class Boldgrid_Backup_Admin_Compressors {
 		 * By default WordPress is set to use ZipArchive by default. Only use
 		 * PclZip if we explicitly set it.
 		 */
-		if( ! empty( $settings['extractor'] ) && 'pcl_zip' === $settings['extractor'] ) {
+		if ( ! empty( $settings['extractor'] ) && 'pcl_zip' === $settings['extractor'] ) {
 			return false;
 		}
 

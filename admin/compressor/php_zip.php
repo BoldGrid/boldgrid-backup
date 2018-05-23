@@ -80,14 +80,14 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 		$add_directory = '';
 		$dirs = explode( DIRECTORY_SEPARATOR, dirname( $file ) );
 
-		foreach( $dirs as $key => $dir ) {
-			if( 0 === $key ) {
+		foreach ( $dirs as $key => $dir ) {
+			if ( 0 === $key ) {
 				$add_directory = $dir;
 			} else {
 				$add_directory .= '/' . $dir;
 			}
 
-			if( ! in_array( $add_directory, $this->dirs, true ) ) {
+			if ( ! in_array( $add_directory, $this->dirs, true ) ) {
 				$this->zip->addEmptyDir( $add_directory );
 				$this->dirs[] = $add_directory;
 			}
@@ -114,7 +114,7 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 	public function archive_files( $filelist, &$info ) {
 		$info['filepath'] = $this->core->generate_archive_path( 'zip' );
 
-		if( $info['dryrun'] ) {
+		if ( $info['dryrun'] ) {
 			return true;
 		}
 
@@ -133,7 +133,7 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 		foreach ( $filelist as $fileinfo ) {
 			$is_dir = ! empty( $fileinfo[3] ) && 'd' === $fileinfo[3];
 
-			if( $is_dir ) {
+			if ( $is_dir ) {
 				$this->zip->addEmptyDir( $fileinfo[1] );
 			} else {
 				$this->zip->addFile( $fileinfo[0], $fileinfo[1] );
@@ -167,7 +167,7 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 	 * @return bool
 	 */
 	public function test() {
-		if( null !== self::$test_result ) {
+		if ( null !== self::$test_result ) {
 			return self::$test_result;
 		}
 
@@ -185,7 +185,7 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 
 		$zip = new ZipArchive();
 		$status = $zip->open( $zip_filepath, ZipArchive::CREATE );
-		if( ! $status ) {
+		if ( ! $status ) {
 			$this->test_errors[] = sprintf( $cannot_open_zip, $zip_filepath );
 			self::$test_result = false;
 			return false;
@@ -200,7 +200,7 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 
 		$this->core->test->delete_test_files( $backup_dir );
 
-		if( ! $zip_closed ) {
+		if ( ! $zip_closed ) {
 			$this->test_errors[] = sprintf( $cannot_close_zip, $backup_dir );
 			self::$test_result = false;
 			return false;

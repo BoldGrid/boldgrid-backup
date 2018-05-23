@@ -143,11 +143,6 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-settings.php';
 
 		/**
-		 * The class responsible for the plugin update functionality in the admin area.
-		 */
-		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-update.php';
-
-		/**
 		 * The class responsible for the PHP profiling functionality using XHProf.
 		 */
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-xhprof.php';
@@ -254,11 +249,6 @@ class Boldgrid_Backup {
 		// Instantiate the admin core.
 		$plugin_admin_core = new Boldgrid_Backup_Admin_Core();
 
-		// Instantiate the admin update class, if not already done for cron.
-		if ( ! defined( 'DOING_CRON' ) || ! DOING_CRON ) {
-			$plugin_update = new Boldgrid_Backup_Update( Boldgrid_Backup_Admin::get_configs() );
-		}
-
 		// Add nav menu items.
 		$this->loader->add_action( 'admin_menu', $plugin_admin_core,
 			'add_menu_items'
@@ -357,9 +347,10 @@ class Boldgrid_Backup {
 
 		$this->loader->add_action( 'admin_init', $plugin_admin_core->auto_rollback, 'enqueue_update_selectors' );
 
-		/*
-		 * Ftp
-		 */
+		$this->loader->add_action( 'admin_init', $plugin_admin_core->cron, 'upgrade_crontab_entries' );
+
+		/* FTP */
+
 		// Allow one click upload.
 		$this->loader->add_action( 'boldgrid_backup_single_archive_remote_options', $plugin_admin_core->ftp->hooks, 'single_archive_remote_option' );
 		// Process upload via ajax.
@@ -388,6 +379,11 @@ class Boldgrid_Backup {
 
 		add_filter( 'pre_update_option_boldgrid_backup_settings', array( 'Boldgrid_Backup_Admin_Crypt', 'pre_update_settings' ), 10, 3 );
 		add_filter( 'option_boldgrid_backup_settings', array( 'Boldgrid_Backup_Admin_Crypt', 'option_settings' ), 10, 2 );
+
+		// Actions run from crontab calls; unauthenticated.
+		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_jobs', $plugin_admin_core->jobs, 'run' );
+		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_backup', $plugin_admin_core->cron, 'backup' );
+		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_restore', $plugin_admin_core->cron, 'restore' );
 
 		return;
 	}

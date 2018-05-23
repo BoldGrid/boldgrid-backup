@@ -59,7 +59,7 @@ class Boldgrid_Backup_Admin_Go_Pro {
 	public function admin_notice_setup() {
 
 		// If the premium plugin is installed and all is good, abort!
-		if( $this->core->config->is_premium_done ) {
+		if ( $this->core->config->is_premium_done ) {
 			return;
 		}
 
@@ -68,7 +68,7 @@ class Boldgrid_Backup_Admin_Go_Pro {
 			return;
 		}
 
-		if( ! class_exists( '\Boldgrid\Library\Library\Notice' ) ) {
+		if ( ! class_exists( '\Boldgrid\Library\Library\Notice' ) ) {
 			return;
 		}
 
@@ -98,11 +98,11 @@ class Boldgrid_Backup_Admin_Go_Pro {
 					__( 'Hello there! We see that you have a <strong>Premium BoldGrid Connect Key</strong> and you have the <strong>BoldGrid Backup Plugin</strong> activated! Be sure to download the <strong>BoldGrid Backup Premium Extension</strong> from <a href="%1$s">BoldGrid Central</a> to gain access to more features!', 'boldgrid-backup' ),
 					'https://www.boldgrid.com/central'
 				) . '</p>',
-			)
+			),
 		);
 
-		foreach( $notices as $notice ) {
-			if( $notice['show'] ) {
+		foreach ( $notices as $notice ) {
+			if ( $notice['show'] ) {
 				\Boldgrid\Library\Library\Notice::show( $notice['message'], $notice['id'] );
 				break;
 			}

@@ -51,7 +51,7 @@ class Boldgrid_Backup_Admin_Archive_Log {
 		$log_filepath = $this->path_from_zip( $zip_filepath );
 
 		$exists = $this->core->wp_filesystem->exists( $log_filepath );
-		if( ! $exists ) {
+		if ( ! $exists ) {
 			return true;
 		}
 
@@ -70,12 +70,12 @@ class Boldgrid_Backup_Admin_Archive_Log {
 		$log_filepath = $this->path_from_zip( $zip_filepath );
 
 		$exists = $this->core->wp_filesystem->exists( $log_filepath );
-		if( ! $exists ) {
+		if ( ! $exists ) {
 			return array();
 		}
 
 		$file_contents = $this->core->wp_filesystem->get_contents( $log_filepath );
-		if( ! $file_contents ) {
+		if ( ! $file_contents ) {
 			return array();
 		}
 
@@ -110,7 +110,7 @@ class Boldgrid_Backup_Admin_Archive_Log {
 		$path_abspath = ABSPATH . basename( $path_backup_dir );
 
 		// If this backup did not restore a log file to ABSPATH, then we can abort.
-		if( ! $this->core->wp_filesystem->exists( $path_abspath ) ) {
+		if ( ! $this->core->wp_filesystem->exists( $path_abspath ) ) {
 			return;
 		}
 
@@ -136,14 +136,14 @@ class Boldgrid_Backup_Admin_Archive_Log {
 		$log_filepath = $this->path_from_zip( $filepath );
 		$log_filename = basename( $log_filepath );
 
-		if( $this->core->wp_filesystem->exists( $log_filepath ) ) {
+		if ( $this->core->wp_filesystem->exists( $log_filepath ) ) {
 			return true;
 		}
 
 		// Extract the log file to ABSPATH.
 		$zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this->core );
 		$status = $zip->extract_one( $filepath, $log_filename );
-		if( ! $status ) {
+		if ( ! $status ) {
 			return false;
 		}
 
@@ -162,19 +162,19 @@ class Boldgrid_Backup_Admin_Archive_Log {
 	 * @return bool
 	 */
 	public function write( $info ) {
-		if( empty( $info['filepath'] ) ) {
+		if ( empty( $info['filepath'] ) ) {
 			return false;
 		}
 
 		$log_filepath = $this->path_from_zip( $info['filepath'] );
 
 		$touched = $this->core->wp_filesystem->touch( $log_filepath );
-		if( ! $touched ) {
+		if ( ! $touched ) {
 			return false;
 		}
 
 		$written = $this->core->wp_filesystem->put_contents( $log_filepath, json_encode( $info ) );
-		if( ! $written ) {
+		if ( ! $written ) {
 			return false;
 		}
 
@@ -190,7 +190,7 @@ class Boldgrid_Backup_Admin_Archive_Log {
 		 * directory and delete it from the ABSPATH.
 		 */
 		$status = $archive->add( $log_filepath, PCLZIP_OPT_REMOVE_ALL_PATH );
-		if( 0 === $status ) {
+		if ( 0 === $status ) {
 			return false;
 		}
 

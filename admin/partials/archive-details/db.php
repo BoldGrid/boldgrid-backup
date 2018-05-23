@@ -16,7 +16,7 @@ $db = array(
 	'buttons' => '',
 );
 
-if( empty( $dump_file ) ) {
+if ( empty( $dump_file ) ) {
 	$db['browser'] = sprintf( '
 		<div class="hidden" data-view-type="db">
 			<p>%1$s</p>
@@ -47,4 +47,4 @@ $db = array(
 
 return $db;
 
-?>
+

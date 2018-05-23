@@ -73,7 +73,7 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 		$contents = $this->core->ftp->get_contents( true, $this->core->ftp->remote_dir );
 		$contents = $this->core->ftp->format_raw_contents( $contents );
 
-		foreach( $contents as $item ) {
+		foreach ( $contents as $item ) {
 			$filename = $item['filename'];
 
 			$backup = array(
@@ -103,7 +103,7 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 			wp_send_json_error( __( 'Permission denied.', 'boldgrid-backup' ) );
 		}
 
-		if( ! check_ajax_referer( 'boldgrid_backup_settings', 'security', false ) ) {
+		if ( ! check_ajax_referer( 'boldgrid_backup_settings', 'security', false ) ) {
 			wp_send_json_error( __( 'Invalid nonce.', 'boldgrid-backup' ) );
 		}
 
@@ -112,7 +112,7 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 		$location = $this->core->ftp->get_details();
 		$tr = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/storage-location.php';
 
-		if( $this->core->ftp->is_setup() ) {
+		if ( $this->core->ftp->is_setup() ) {
 			wp_send_json_success( $tr );
 		} else {
 			wp_send_json_error( $tr );
@@ -134,11 +134,11 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 		 * we don't want to automatically send the backup to Amazon, there's a
 		 * button for that.
 		 */
-		if( ! $this->core->doing_cron ) {
+		if ( ! $this->core->doing_cron ) {
 			return;
 		}
 
-		if( ! $this->core->remote->is_enabled( $this->core->ftp->key ) || $info['dryrun'] || ! $info['save'] ) {
+		if ( ! $this->core->remote->is_enabled( $this->core->ftp->key ) || $info['dryrun'] || ! $info['save'] ) {
 			return;
 		}
 
@@ -217,7 +217,7 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 		}
 
 		// Validation, nonce.
-		if( ! $this->core->archive_details->validate_nonce() ) {
+		if ( ! $this->core->archive_details->validate_nonce() ) {
 			$this->core->notice->add_user_notice(
 				sprintf( $error . ': ' . __( 'Invalid nonce.', 'boldgrid-backup' ) ),
 				'notice notice-error'
@@ -226,8 +226,10 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 		}
 
 		// Validation, $_POST data.
-		$filename = ! empty( $_POST['filename'] ) ? $_POST['filename'] : false;
-		if( empty( $filename ) ) {
+		$filename = ! empty( $_POST['filename'] ) ?
+			sanitize_file_name( $_POST['filename'] ) : false;
+
+		if ( empty( $filename ) ) {
 			$this->core->notice->add_user_notice(
 				sprintf( $error . ': ' . __( 'Invalid filename.', 'boldgrid-backup' ) ),
 				'notice notice-error'
@@ -237,7 +239,7 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 
 		$result = $this->core->ftp->download( $filename );
 
-		if( $result ) {
+		if ( $result ) {
 			$this->core->notice->add_user_notice(
 				sprintf(
 					__( '<h2>%2$s</h2><p>Backup file <strong>%1$s</strong> successfully downloaded from FTP.</p>', 'boldgrid-backup' ),
@@ -260,19 +262,22 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 			wp_send_json_error( __( 'Permission denied.', 'boldgrid-backup' ) );
 		}
 
-		if( ! $this->core->archive_details->validate_nonce() ) {
+		if ( ! $this->core->archive_details->validate_nonce() ) {
 			wp_send_json_error( __( 'Invalid nonce.', 'boldgrid-backup' ) );
 		}
 
-		$filename = ! empty( $_POST['filename'] ) ? $_POST['filename'] : false;
+		$filename = ! empty( $_POST['filename'] ) ?
+			sanitize_file_name( $_POST['filename'] ) : false;
+
 		$filepath = $this->core->backup_dir->get_path_to( $filename );
-		if( empty( $filename ) || ! $this->core->wp_filesystem->exists( $filepath ) ) {
+
+		if ( empty( $filename ) || ! $this->core->wp_filesystem->exists( $filepath ) ) {
 			wp_send_json_error( __( 'Invalid archive filepath.', 'boldgrid-backup' ) );
 		}
 
 		$uploaded = $this->core->ftp->upload( $filepath );
 
-		if( $uploaded ) {
+		if ( $uploaded ) {
 			wp_send_json_success( 'uploaded!' );
 		} else {
 			$error = ! empty( $this->core->ftp->errors ) ? implode( '<br /><br />', $this->core->ftp->errors ) : '';

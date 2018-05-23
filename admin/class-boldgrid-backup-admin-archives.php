@@ -53,8 +53,8 @@ class Boldgrid_Backup_Admin_Archives {
 	 * @return mixed
 	 */
 	public function get_location_type( $location ) {
-		foreach( $this->core->archives_all->location_types as $type ) {
-			if( isset( $location[$type] ) && true === $location[$type] ) {
+		foreach ( $this->core->archives_all->location_types as $type ) {
+			if ( isset( $location[ $type ] ) && true === $location[ $type ] ) {
 				return $type;
 			}
 		}
@@ -71,9 +71,9 @@ class Boldgrid_Backup_Admin_Archives {
 	 * @return string
 	 */
 	public function get_location_type_title( $type ) {
-		if( 'all' === $type ) {
+		if ( 'all' === $type ) {
 			$title = $this->core->lang['All'];
-		} elseif( 'on_web_server' === $type ) {
+		} elseif ( 'on_web_server' === $type ) {
 			$title = $this->core->lang['Web_Server'];
 		} else {
 			$title = $this->core->lang['Remote'];
@@ -95,7 +95,7 @@ class Boldgrid_Backup_Admin_Archives {
 	public function get_locations( $archive ) {
 		$locations = array();
 
-		foreach( $archive['locations'] as $location ) {
+		foreach ( $archive['locations'] as $location ) {
 
 			$location_type = $this->get_location_type( $location );
 
@@ -132,7 +132,7 @@ class Boldgrid_Backup_Admin_Archives {
 		// An array of locations, each array item simliar to: <a>All<a/> (5)
 		$locations = array();
 
-		foreach( $this->core->archives_all->location_count as $location => $count ) {
+		foreach ( $this->core->archives_all->location_count as $location => $count ) {
 
 			// The first locaion, "All", should have the "current" class.
 			$current = 'all' === $location ? 'current' : '';
@@ -188,11 +188,11 @@ class Boldgrid_Backup_Admin_Archives {
 					<td>%2$s</td>
 					<td></td>
 				<tbody id="backup-archive-list-body">',
-			__( 'Date', 'boldgrid-backup'),
-			__( 'Size', 'boldgrid-backup')
+			__( 'Date', 'boldgrid-backup' ),
+			__( 'Size', 'boldgrid-backup' )
 		);
 
-		foreach( $this->core->archives_all->all as $archive ) {
+		foreach ( $this->core->archives_all->all as $archive ) {
 			$locations = $this->get_locations( $archive );
 
 			// dirlist -> lastmodunix -> mtime (last_modified in unix time).
@@ -227,7 +227,7 @@ class Boldgrid_Backup_Admin_Archives {
 			</table>
 		';
 
-		if( empty( $this->core->archives_all->all ) ) {
+		if ( empty( $this->core->archives_all->all ) ) {
 			$table = sprintf( '
 				<p>%1$s</p>',
 				__( 'You currently do not have any backups.', 'boldgrid-backup' )
