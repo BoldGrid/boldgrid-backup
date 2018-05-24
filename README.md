@@ -1,4 +1,4 @@
-# Backup and Upgrade Manager by BoldGrid #
+# BoldGrid Backup #
 **Contributors:** boldgrid, joemoto, imh_brad, rramo012, timph, bgnicolepaschen
 **Tags:** boldgrid, backup, restore, migrate, migration
 **Requires at least:** 4.4
@@ -30,7 +30,7 @@ WordPress backup and restoration with update protection.
 
 ### 1.6.1 ###
 
-Release Date: May 23rd, 2018
+Release Date: May 24th, 2018
 
 * Update: Ran PHPCBF to beautify PHP code.
 * Update: $_POST sanitization
