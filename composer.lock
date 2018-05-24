@@ -1,0 +1,258 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "711a85a6948ebf467d815dba0248001f",
+    "packages": [
+        {
+            "name": "boldgrid/library",
+            "version": "2.3.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/BoldGrid/library.git",
+                "reference": "fa13062b0812ecb9c913f8ac47b619211b2699de"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/BoldGrid/library/zipball/fa13062b0812ecb9c913f8ac47b619211b2699de",
+                "reference": "fa13062b0812ecb9c913f8ac47b619211b2699de",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Boldgrid\\Library\\Util\\": "src/Util"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Tim Elsass",
+                    "email": "dev@tim.ph",
+                    "homepage": "http://tim.ph",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Rafael Ramos",
+                    "homepage": "http://rafael-ramos.com",
+                    "role": "Developer"
+                },
+                {
+                    "name": "bwmarkle",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Joe C",
+                    "email": "joec@boldgrid.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "The BoldGrid Library for shared code used in official BoldGrid plugins and themes.",
+            "time": "2018-05-08T13:27:34+00:00"
+        },
+        {
+            "name": "cbschuld/browser.php",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cbschuld/Browser.php.git",
+                "reference": "6bde9efb0b14a4917affe741500c29149419e491"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cbschuld/Browser.php/zipball/6bde9efb0b14a4917affe741500c29149419e491",
+                "reference": "6bde9efb0b14a4917affe741500c29149419e491",
+                "shasum": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.95-dev"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "lib/Browser.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Chris Schuld",
+                    "email": "chris@chrisschuld.com",
+                    "homepage": "http://chrisschuld.com"
+                }
+            ],
+            "description": "A PHP Class to detect a user's Browser",
+            "homepage": "http://chrisschuld.com/projects/browser-php-detecting-a-users-browser-from-php.html",
+            "keywords": [
+                "browser",
+                "detection",
+                "user agent"
+            ],
+            "time": "2017-07-31T23:43:17+00:00"
+        },
+        {
+            "name": "ifsnop/mysqldump-php",
+            "version": "v2.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ifsnop/mysqldump-php.git",
+                "reference": "2a633b3da5db1e5bdc39c1b71c697ef197c39eeb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ifsnop/mysqldump-php/zipball/2a633b3da5db1e5bdc39c1b71c697ef197c39eeb",
+                "reference": "2a633b3da5db1e5bdc39c1b71c697ef197c39eeb",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "3.7.*",
+                "squizlabs/php_codesniffer": "1.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Ifsnop\\": "src/Ifsnop/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Diego Torres",
+                    "homepage": "https://github.com/ifsnop",
+                    "role": "Developer"
+                }
+            ],
+            "description": "This is a php version of linux's mysqldump in terminal \"$ mysqldump -u username -p...\"",
+            "homepage": "https://github.com/ifsnop/mysqldump-php",
+            "keywords": [
+                "backup",
+                "database",
+                "dump",
+                "export",
+                "mysql",
+                "mysqldump",
+                "pdo",
+                "sqlite"
+            ],
+            "time": "2018-03-07T22:27:23+00:00"
+        },
+        {
+            "name": "phpseclib/phpseclib",
+            "version": "2.0.11",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phpseclib/phpseclib.git",
+                "reference": "7053f06f91b3de78e143d430e55a8f7889efc08b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/7053f06f91b3de78e143d430e55a8f7889efc08b",
+                "reference": "7053f06f91b3de78e143d430e55a8f7889efc08b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "phing/phing": "~2.7",
+                "phpunit/phpunit": "^4.8.35|^5.7|^6.0",
+                "sami/sami": "~2.0",
+                "squizlabs/php_codesniffer": "~2.0"
+            },
+            "suggest": {
+                "ext-gmp": "Install the GMP (GNU Multiple Precision) extension in order to speed up arbitrary precision integer arithmetic operations.",
+                "ext-libsodium": "SSH2/SFTP can make use of some algorithms provided by the libsodium-php extension.",
+                "ext-mcrypt": "Install the Mcrypt extension in order to speed up a few other cryptographic operations.",
+                "ext-openssl": "Install the OpenSSL extension in order to speed up a wide variety of cryptographic operations."
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "phpseclib/bootstrap.php"
+                ],
+                "psr-4": {
+                    "phpseclib\\": "phpseclib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jim Wigginton",
+                    "email": "terrafrost@php.net",
+                    "role": "Lead Developer"
+                },
+                {
+                    "name": "Patrick Monnerat",
+                    "email": "pm@datasphere.ch",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Andreas Fischer",
+                    "email": "bantu@phpbb.com",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Hans-Jürgen Petrich",
+                    "email": "petrich@tronic-media.com",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Graham Campbell",
+                    "email": "graham@alt-three.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "PHP Secure Communications Library - Pure-PHP implementations of RSA, AES, SSH2, SFTP, X.509 etc.",
+            "homepage": "http://phpseclib.sourceforge.net",
+            "keywords": [
+                "BigInteger",
+                "aes",
+                "asn.1",
+                "asn1",
+                "blowfish",
+                "crypto",
+                "cryptography",
+                "encryption",
+                "rsa",
+                "security",
+                "sftp",
+                "signature",
+                "signing",
+                "ssh",
+                "twofish",
+                "x.509",
+                "x509"
+            ],
+            "time": "2018-04-15T16:55:05+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": {
+        "cbschuld/browser.php": 20
+    },
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}
