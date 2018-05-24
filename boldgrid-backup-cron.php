@@ -6,9 +6,9 @@
  * @since 1.0
  *
  * @package Boldgrid_Backup
- * @copyright BoldGrid.com
+ * @copyright BoldGrid
  * @version $Id$
- * @author BoldGrid.com <wpb@boldgrid.com>
+ * @author BoldGrid <support@boldgrid.com>
  */
 
 // Abort if not being ran from the command line.
@@ -58,10 +58,10 @@ if ( ! in_array( $input['mode'], $valid_modes, true ) ) {
 $url = $input['siteurl'] . '/wp-admin/admin-ajax.php?action=boldgrid_backup_run_' . $input['mode'] .
 	'&id=' . $input['id'] . '&secret=' . $input['secret'] . '&doing_wp_cron=' . time();
 
-// Sanitize the url.
-$url = filter_var( $url, FILTER_SANITIZE_URL );
-
-$result = file_get_contents( $url );
+// The helper class method will sanitize the url.
+require dirname( __FILE__ ) . '/cron/url-helper.php';
+$url_helper = new Boldgrid_Backup_Url_Helper();
+$result = $url_helper->call_url( $url );
 
 if ( false !== $result ) {
 	$message = $result;

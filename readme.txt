@@ -28,6 +28,9 @@ WordPress backup and restoration with update protection.
 
 == Changelog ==
 
+= 1.6.2 In progress =
+* Improvement: Detect and use available resources to trigger cron tasks.
+
 = 1.6.1 =
 
 Release Date: May 24th, 2018
