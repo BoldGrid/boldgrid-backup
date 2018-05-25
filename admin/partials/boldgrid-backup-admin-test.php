@@ -235,7 +235,12 @@ $tests[] = array(
 
 $tests[] = array(
 	'k' => __( 'PHP allow_url_fopen enabled?', 'boldgrid-backup' ),
-	'v' => ( ini_get( 'allow_url_fopen' ) ? $lang['yes'] : sprintf( $error_span, $lang['no'], '' ) ),
+	'v' => true === $cli_support['has_url_fopen'] ? $lang['yes'] : sprintf( $warning_span, $lang['no'], '' ),
+);
+
+$tests[] = array(
+	'k' => __( 'Curl SSL enabled?', 'boldgrid-backup' ),
+	'v' => true === $cli_support['has_curl_ssl'] ? $lang['yes'] : sprintf( $warning_span, $lang['no'], '' ),
 );
 
 $tests[] = array(
@@ -260,7 +265,7 @@ if ( $is_functional ) {
 	);
 
 	$tests[] = array(
-		'k' => __( 'Directory used to calculate disk space:', __( 'boldgrid-backup' ) ),
+		'k' => __( 'Directory used to calculate disk space:', 'boldgrid-backup' ),
 		'v' => $this->home_dir->get_for_disk(),
 	);
 

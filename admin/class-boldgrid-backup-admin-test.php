@@ -625,6 +625,30 @@ class Boldgrid_Backup_Admin_Test {
 	}
 
 	/**
+	 * Check for support when php is ran from the CLI.
+	 *
+	 * If running a PHP script from CLI, it's possible that a different php.ini file will be used than
+	 * if a server (nginx or apache) runs it.
+	 *
+	 * @since 1.6.2
+	 *
+	 * @return array
+	 */
+	public function get_cli_support() {
+		$default = array(
+			'has_curl_ssl' => false,
+			'has_url_fopen' => false,
+		);
+
+		$cmd = 'php -f ' . trailingslashit( BOLDGRID_BACKUP_PATH ) . 'cron/cli-support.php';
+
+		$result = $this->core->execute_command( $cmd );
+		$result = json_decode( $result, true );
+
+		return ! is_array( $result ) ? $default : $result;
+	}
+
+	/**
 	 * Get database size.
 	 *
 	 * @since 1.0

@@ -2498,6 +2498,8 @@ class Boldgrid_Backup_Admin_Core {
 			$cron = esc_html( $cron );
 		}
 
+		$cli_support = $this->test->get_cli_support();
+
 		// Enqueue CSS for the test page.
 		wp_enqueue_style( 'boldgrid-backup-admin-test',
 			plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-test.css', array(),
