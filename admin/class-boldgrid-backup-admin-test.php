@@ -644,8 +644,11 @@ class Boldgrid_Backup_Admin_Test {
 
 		$result = $this->core->execute_command( $cmd );
 		$result = json_decode( $result, true );
+		$result = is_array( $result ) ? $result : $default;
 
-		return ! is_array( $result ) ? $default : $result;
+		$result['can_remote_get'] = $result['has_curl_ssl'] || $result['has_url_fopen'];
+
+		return $result;
 	}
 
 	/**

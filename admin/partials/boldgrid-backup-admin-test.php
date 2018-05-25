@@ -244,6 +244,11 @@ $tests[] = array(
 );
 
 $tests[] = array(
+	'k' => __( 'Can fetch a remote url via CLI?', 'boldgrid-backup' ),
+	'v' => true === $cli_support['can_remote_get'] ? $lang['yes'] : sprintf( $error_span, $lang['no'], '' ),
+);
+
+$tests[] = array(
 	'k' => __( 'Cron jobs:', 'boldgrid-backup' ),
 	'v' => '<pre>' . implode( '<br /><br />', $our_crons ) . '</pre>',
 );
