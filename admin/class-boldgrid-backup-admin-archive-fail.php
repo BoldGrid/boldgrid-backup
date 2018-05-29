@@ -85,7 +85,7 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 		 * #  NO .10 MB shutdown function fails early on when calling
 		 *              error_get_last().
 		 */
-		$mb = 1000000;
+		$mb           = 1000000;
 		$this->memory = str_repeat( '0', ( 0.35 * $mb ) );
 	}
 
@@ -118,8 +118,8 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 		$email_body = $this->core->email->fill_generic_template( $message, false );
 
 		$args = array(
-			'action' => 'boldgrid_backup_cron_fail_email',
-			'action_data' => array(
+			'action'       => 'boldgrid_backup_cron_fail_email',
+			'action_data'  => array(
 				'message' => $email_body,
 			),
 			'action_title' => __( 'Send warning email because backup failed', 'boldgrid-backup' ),

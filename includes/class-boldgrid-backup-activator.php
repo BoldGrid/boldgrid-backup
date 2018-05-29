@@ -27,8 +27,8 @@ class Boldgrid_Backup_Activator {
 	 * @since 1.0
 	 */
 	public static function activate() {
-		$core = new Boldgrid_Backup_Admin_Core();
-		$settings = $core->settings->get_settings();
+		$core      = new Boldgrid_Backup_Admin_Core();
+		$settings  = $core->settings->get_settings();
 		$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
 
 		/*

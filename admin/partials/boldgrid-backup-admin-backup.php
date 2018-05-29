@@ -13,8 +13,8 @@
 
 defined( 'WPINC' ) ? : die;
 
-$is_restore = ! empty( $_POST['restore_now'] ) && '1' === $_POST['restore_now'];
-$is_success = ! empty( $archive_info ) && empty( $archive_info['error'] );
+$is_restore   = ! empty( $_POST['restore_now'] ) && '1' === $_POST['restore_now'];
+$is_success   = ! empty( $archive_info ) && empty( $archive_info['error'] );
 $redirect_url = admin_url( 'admin.php?page=boldgrid-backup' );
 
 /*
@@ -75,7 +75,7 @@ $core->archive->init( $archive_info['filepath'] );
  */
 
 // Create a link to the settings page.
-$url = admin_url( 'admin.php?page=boldgrid-backup-settings' );
+$url                = admin_url( 'admin.php?page=boldgrid-backup-settings' );
 $settings_page_link = sprintf(
 	wp_kses(
 		__( 'See <a href="%s">Settings for BoldGrid Backup</a> for details.', 'boldgrid-backup' ),
@@ -88,7 +88,7 @@ if ( ! empty( $archive_info ) ) {
 
 	if ( ! empty( $archive_info['dryrun'] ) ) {
 		$message = array(
-			'class' => 'notice notice-info is-dismissible',
+			'class'   => 'notice notice-info is-dismissible',
 			'message' => sprintf( '<p>%1$s</p>', esc_html__( 'This was a dry run test', 'boldgrid-backup' ) ),
 		);
 	}
@@ -108,8 +108,9 @@ if ( ! empty( $archive_info ) ) {
 	 */
 	if ( $is_success ) {
 		$message = array(
-			'class' => 'notice notice-success is-dismissible boldgrid-backup-complete',
-			'message' => sprintf( '
+			'class'   => 'notice notice-success is-dismissible boldgrid-backup-complete',
+			'message' => sprintf(
+				'
 					<h2 class="header-notice">%1$s - %2$s</h2>
 					<p>%3$s <a href="%4$s">%5$s</a></p>
 				',
@@ -122,9 +123,9 @@ if ( ! empty( $archive_info ) ) {
 		);
 	} else {
 		$message = array(
-			'class' => 'notice notice-error is-dismissible',
+			'class'   => 'notice notice-error is-dismissible',
 			'message' => esc_html( $archive_info['error'] ),
-			'header' => sprintf(
+			'header'  => sprintf(
 				'%1$s - %2$s',
 				__( 'BoldGrid Backup', 'boldgrid-backup' ),
 				empty( $_POST['restore_now'] ) ? __( 'Error creating archive', 'boldgrid-backup' ) : __( 'Error restoring archive', 'boldgrid-backup' )
@@ -133,15 +134,16 @@ if ( ! empty( $archive_info ) ) {
 	}
 } else {
 	$message = array(
-		'class' => 'notice notice-error is-dismissible',
-		'message' => sprintf('
+		'class'   => 'notice notice-error is-dismissible',
+		'message' => sprintf(
+			'
 			<p>%1$s</p>
 			%2$s
 			%3$s
 			%4$s %5$s',
 			/* 1 */ $is_restore ? esc_html__( 'There was an error restoring the selected backup archive file', 'boldgrid-backup' ) : esc_html__( 'There was an error creating a backup archive file', 'boldgrid-backup' ),
-			/* 2 */ empty( $archive_info['filepath'] )        ? '' : '<p>' . sprintf( esc_html__( 'File Path: %s', 'boldgrid-backup' ), $archive_info['filepath'] ) . '</p>',
-			/* 3 */ empty( $archive_info['error'] )           ? '' : '<p>' . $archive_info['error'] . '</p>',
+			/* 2 */ empty( $archive_info['filepath'] ) ? '' : '<p>' . sprintf( esc_html__( 'File Path: %s', 'boldgrid-backup' ), $archive_info['filepath'] ) . '</p>',
+			/* 3 */ empty( $archive_info['error'] ) ? '' : '<p>' . $archive_info['error'] . '</p>',
 			/* 4 */ ! isset( $archive_info['error_message'] ) ? '' : '<p>' . sprintf( __( 'Error Details: %s', 'boldgrid-backup' ), $archive_info['error_message'] ),
 			/* 5 */ isset( $archive_info['error_message'] ) && isset( $archive_info['error_code'] ) ? ' (' . $archive_info['error_code'] . ')' : ''
 		),
@@ -150,9 +152,9 @@ if ( ! empty( $archive_info ) ) {
 
 if ( ! isset( $message ) ) {
 	$message = array(
-		'class' => 'notice notice-error is-dismissible',
+		'class'   => 'notice notice-error is-dismissible',
 		'message' => __( 'Unknown error.', 'boldgrid-backup' ),
-		'header' => __( 'BoldGrid Backup', 'boldgrid-backup' ),
+		'header'  => __( 'BoldGrid Backup', 'boldgrid-backup' ),
 	);
 }
 

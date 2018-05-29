@@ -13,14 +13,14 @@ defined( 'WPINC' ) ? : die;
 
 // Setup our lang.
 $lang = array(
-	'yes' => __( 'Yes', 'boldgrid-backup' ),
-	'no' => __( 'No', 'boldgrid-backup' ),
-	'untested' => __( 'untested', 'boldgrid-backup' ),
-	'PASS' => __( 'PASS', 'boldgrid-backup' ),
-	'FAIL' => __( 'FAIL', 'boldgrid-backup' ),
-	'not_set' => __( 'not set', 'boldgrid-backup' ),
+	'yes'                  => __( 'Yes', 'boldgrid-backup' ),
+	'no'                   => __( 'No', 'boldgrid-backup' ),
+	'untested'             => __( 'untested', 'boldgrid-backup' ),
+	'PASS'                 => __( 'PASS', 'boldgrid-backup' ),
+	'FAIL'                 => __( 'FAIL', 'boldgrid-backup' ),
+	'not_set'              => __( 'not set', 'boldgrid-backup' ),
 	'before_test_compress' => __( 'Before any compressors are tested, please be sure your backup directory is created and has proper permissions set.', 'boldgrid-backup' ),
-	'ensure_dir_perms' => __( 'Please be sure that your backup directory exists. If it does, also ensure it has read, write, and modify permissions.', 'boldgrid-backup' ),
+	'ensure_dir_perms'     => __( 'Please be sure that your backup directory exists. If it does, also ensure it has read, write, and modify permissions.', 'boldgrid-backup' ),
 );
 
 $lang['dir_of_dir'] = $lang['ensure_dir_perms'];
@@ -28,18 +28,18 @@ if ( $this->test->is_windows() ) {
 	$lang['dir_of_dir'] = __( 'Please review directory permissions. If you are on a Windows server, your user may need to be able to read BOTH the backup directory and its parent directory.', 'boldgrid-backup' );
 }
 
-$error_span = '<span class="error">%1$s</span><br />%2$s';
+$error_span   = '<span class="error">%1$s</span><br />%2$s';
 $warning_span = '<span class="warning">%1$s</span><br />%2$s';
 $success_span = '<span class="success">%1$s</span>';
 
 $allowed_tags = array(
 	'span' => array(
 		'class' => array(
-			'error'
+			'error',
 		),
 	),
-	'br' => array(),
-	'pre' => array(),
+	'br'   => array(),
+	'pre'  => array(),
 );
 
 $backup_dir_perms = $this->test->extensive_dir_test( $backup_directory );
@@ -57,8 +57,8 @@ $timezone = false === $timezone ? 'UTC' . $this->time->get_server_offset() : $ti
 $tests = array(
 	array(
 		'id' => 'pass',
-		'k' => __( 'Functionality test status:', 'boldgrid-backup' ),
-		'v' => ( $this->test->run_functionality_tests() ? sprintf( $success_span, $lang['PASS'] ) : sprintf( $error_span, $lang['FAIL'], '' ) ),
+		'k'  => __( 'Functionality test status:', 'boldgrid-backup' ),
+		'v'  => ( $this->test->run_functionality_tests() ? sprintf( $success_span, $lang['PASS'] ) : sprintf( $error_span, $lang['FAIL'], '' ) ),
 	),
 	array(
 		'heading' => __( 'General tests', 'boldgrid-backup' ),
@@ -336,7 +336,8 @@ if ( $is_functional ) {
 if ( $is_functional ) {
 	$fail_tips = '';
 } else {
-	$fail_tips = sprintf('
+	$fail_tips = sprintf(
+		'
 		<p>
 			%1$s<br />
 			<a href="%3$s" target="_blank" />%2$s</a>
@@ -353,17 +354,20 @@ foreach ( $tests as $test ) {
 	if ( ! empty( $test['heading'] ) ) {
 		$table .= sprintf( '<tr class="heading"><td colspan="2"><h2>%1$s</h2></td></tr>', esc_html( $test['heading'] ) );
 	} elseif ( isset( $test['id'] ) && 'pass' === $test['id'] ) {
-		$table .= sprintf('<tr><td>%1$s</td><td><strong>%2$s</strong></td></tr>',
+		$table .= sprintf(
+			'<tr><td>%1$s</td><td><strong>%2$s</strong></td></tr>',
 			esc_html( $test['k'] ),
 			wp_kses( $test['v'], $allowed_tags )
 		);
 	} elseif ( isset( $test['k'] ) ) {
-		$table .= sprintf('<tr><td>%1$s</td><td><em>%2$s</em></td></tr>',
+		$table .= sprintf(
+			'<tr><td>%1$s</td><td><em>%2$s</em></td></tr>',
 			esc_html( $test['k'] ),
 			wp_kses( $test['v'], $allowed_tags )
 		);
 	} else {
-		$table .= sprintf('<tr><td colspan="2">%1$s</td></tr>',
+		$table .= sprintf(
+			'<tr><td colspan="2">%1$s</td></tr>',
 			esc_html( $test['v'] )
 		);
 	}

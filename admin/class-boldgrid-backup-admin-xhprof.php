@@ -42,7 +42,8 @@ class Boldgrid_Backup_Admin_Xhprof {
 		// If XHprof was enabled, then register a shutdown action to disable XHProf and
 		// save the run report data to file.
 		if ( $this->xhprof_active ) {
-			add_action( 'shutdown',
+			add_action(
+				'shutdown',
 				array(
 					$this,
 					'xhprof_disable',
@@ -115,7 +116,7 @@ class Boldgrid_Backup_Admin_Xhprof {
 
 				// Save the run data to file.
 				$xhprof_runs = new XHProfRuns_Default();
-				$run_id = $xhprof_runs->save_run( $xhprof_data, 'xhprof_boldgrid_backup' );
+				$run_id      = $xhprof_runs->save_run( $xhprof_data, 'xhprof_boldgrid_backup' );
 
 				// Write the report URL to the error log.
 				error_log(

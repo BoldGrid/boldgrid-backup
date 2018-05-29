@@ -276,7 +276,8 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	 */
 	public function enqueue_scripts() {
 		$handle = 'boldgrid-backup-admin-folder-exclude';
-		wp_register_script( $handle,
+		wp_register_script(
+			$handle,
 			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-folder-exclude.js',
 			array( 'jquery' ),
 			BOLDGRID_BACKUP_VERSION,
@@ -285,9 +286,9 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 		$translation = array(
 			'default_include' => $this->default_include,
 			'default_exclude' => $this->default_exclude,
-			'items' => __( 'items', 'boldgrid-backup' ),
-			'no_results' => __( 'No results', 'boldgrid-backup' ),
-			'of' => __( 'of', 'boldgrid-backup' ),
+			'items'           => __( 'items', 'boldgrid-backup' ),
+			'no_results'      => __( 'No results', 'boldgrid-backup' ),
+			'of'              => __( 'of', 'boldgrid-backup' ),
 		);
 		wp_localize_script( $handle, 'BoldGridBackupAdminFolderExclude', $translation );
 		wp_enqueue_script( $handle );
@@ -317,7 +318,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 			return false;
 		}
 
-		$key = 'folder_exclusion_' . $type;
+		$key     = 'folder_exclusion_' . $type;
 		$default = 'default_' . $type;
 
 		/*

@@ -20,23 +20,23 @@ wp_nonce_field( 'boldgrid_backup_remote_storage_upload' );
 
 $separator = '<hr class="separator">';
 
-$details = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/details.php';
+$details        = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/details.php';
 $remote_storage = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/remote-storage.php';
-$browser = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/browser.php';
-$db = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/db.php';
+$browser        = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/browser.php';
+$db             = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/db.php';
 
 // Special situations where the backup file is not local and/or remote.
 $only_remote = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/only-remote.php';
-$not_found = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/not-found.php';
+$not_found   = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/not-found.php';
 
-$delete_link = $this->core->archive_actions->get_delete_link( $archive['filename'] );
+$delete_link     = $this->core->archive_actions->get_delete_link( $archive['filename'] );
 $download_button = $this->core->archive_actions->get_download_button( $archive['filename'] );
-$restore_button = $this->core->archive_actions->get_restore_button( $archive['filename'] );
+$restore_button  = $this->core->archive_actions->get_restore_button( $archive['filename'] );
 
 if ( ! $archive_found ) {
-	$file_size = '';
-	$backup_date = '';
-	$more_info = '';
+	$file_size     = '';
+	$backup_date   = '';
+	$more_info     = '';
 	$major_actions = '';
 } else {
 	$file_size = sprintf(
@@ -53,7 +53,8 @@ if ( ! $archive_found ) {
 		$this->core->time->get_span()
 	);
 
-	$more_info = empty( $details ) ? '' : sprintf( '
+	$more_info = empty( $details ) ? '' : sprintf(
+		'
 		<div class="misc-pub-section">
 			More info <a href="" data-toggle-target="#more_info">Show</a>
 			<div id="more_info" class="hidden">
@@ -64,7 +65,8 @@ if ( ! $archive_found ) {
 		$details
 	);
 
-	$major_actions = sprintf( '
+	$major_actions = sprintf(
+		'
 		<div id="major-publishing-actions">
 			<div id="delete-action">
 				%1$s
@@ -76,7 +78,8 @@ if ( ! $archive_found ) {
 	);
 }
 
-$main_meta_box = sprintf( '
+$main_meta_box = sprintf(
+	'
 	<div id="submitdiv" class="postbox">
 		<h2 class="hndle ui-sortable-handle"><span>%1$s</span></h2>
 		<div class="inside submitbox">
@@ -102,7 +105,8 @@ $main_meta_box = sprintf( '
 	/* 7 */ $major_actions
 );
 
-$remote_meta_box = sprintf( '
+$remote_meta_box = sprintf(
+	'
 	<div class="postbox remote-storage">
 		<h2 class="hndle ui-sortable-handle">
 			<span>%1$s</span>
@@ -120,7 +124,8 @@ $remote_meta_box = sprintf( '
 	</div>',
 	/* 1 */ __( 'Remote Storage', 'boldgrid-backup' ),
 	/* 2 */ $remote_storage['postbox'],
-	/* 3 */ $this->core->config->is_premium_done ? '' : sprintf( '
+	/* 3 */ $this->core->config->is_premium_done ? '' : sprintf(
+		'
 		<div class="inside premium wp-clearfix">
 			%1$s
 			%2$s
@@ -131,7 +136,8 @@ $remote_meta_box = sprintf( '
 	/* 4 */ __( 'Secure your backups by keeping copies of them on <a href="admin.php?page=boldgrid-backup-tools&section=section_locations">remote storage</a>.', 'boldgrid-backup' )
 );
 
-$editor_tools = sprintf( '
+$editor_tools = sprintf(
+	'
 	<div style="padding-top:0px;" id="wp-content-editor-tools" class="wp-editor-tools hide-if-no-js">
 		<div id="wp-content-media-buttons" class="wp-media-buttons">
 			%1$s
@@ -147,7 +153,8 @@ $editor_tools = sprintf( '
 	/* 3 */ __( 'Database', 'boldgrid-backup' )
 );
 
-$intro = $this->core->config->is_premium_done ? '' : sprintf( '
+$intro = $this->core->config->is_premium_done ? '' : sprintf(
+	'
 	<div class="bg-box-bottom premium" style="margin-bottom:15px;">
 		<strong>%1$s</strong>
 
@@ -200,12 +207,13 @@ if ( ! $this->core->archive->is_stored_locally() ) {
 	if ( $this->core->archive->is_stored_remotely() ) {
 		$main_content = $only_remote;
 	} else {
-		$main_content = $not_found;
+		$main_content    = $not_found;
 		$remote_meta_box = '';
 	}
 }
 
-$page = sprintf( '
+$page = sprintf(
+	'
 	<input type="hidden" id="filename" value="%1$s" />
 	<div class="wrap">
 		<h1 class="wp-heading-inline">%2$s</h1>
@@ -229,7 +237,7 @@ $page = sprintf( '
 	',
 	/* 1 */ $archive['filename'],
 	/* 2 */ __( 'Backup Archive Details', 'boldgrid-backup' ),
-	/* 3 */ include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php',
+	/* 3 */ require BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php',
 	/* 4 */ $main_content,
 	/* 5 */ $main_meta_box,
 	/* 6 */ $remote_meta_box

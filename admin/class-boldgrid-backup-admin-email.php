@@ -130,7 +130,7 @@ class Boldgrid_Backup_Admin_Email {
 
 		$parts['body']['main'] .= "\n";
 
-		$parts['body']['signature'] = esc_html__( 'You can manage notifications in your WordPress admin panel, under BoldGrid Backup Settings', 'boldgrid-backup' ) . ".\n\n";
+		$parts['body']['signature']  = esc_html__( 'You can manage notifications in your WordPress admin panel, under BoldGrid Backup Settings', 'boldgrid-backup' ) . ".\n\n";
 		$parts['body']['signature'] .= sprintf( esc_html__( 'For help with restoring a BoldGrid Backup archive file, please visit: %s', 'boldgrid-backup' ), esc_url( $this->core->configs['urls']['restore'] ) ) . "\n\n";
 
 		$parts['body']['signature'] .= $this->ads['generic'];

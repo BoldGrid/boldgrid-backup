@@ -66,7 +66,7 @@ class Boldgrid_Backup_Admin_Compressors {
 	 * @return string
 	 */
 	public function get() {
-		$settings = $this->core->settings->get_settings();
+		$settings              = $this->core->settings->get_settings();
 		$available_compressors = $this->get_available();
 
 		/*
@@ -101,9 +101,9 @@ class Boldgrid_Backup_Admin_Compressors {
 	 */
 	public function set_php_zip() {
 		if ( Boldgrid_Backup_Admin_Compressor_Php_Zip::is_available() ) {
-			$settings = $this->core->settings->get_settings();
+			$settings               = $this->core->settings->get_settings();
 			$settings['compressor'] = 'php_zip';
-			$settings['extractor'] = 'php_zip';
+			$settings['extractor']  = 'php_zip';
 			return $this->core->settings->save( $settings );
 		}
 

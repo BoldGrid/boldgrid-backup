@@ -69,7 +69,7 @@ class Boldgrid_Backup_Admin {
 	 */
 	public function __construct( $plugin_name, $version ) {
 		$this->plugin_name = $plugin_name;
-		$this->version = $version;
+		$this->version     = $version;
 
 		// Connect to the WordPress Filesystem API.
 		global $wp_filesystem;
@@ -98,22 +98,25 @@ class Boldgrid_Backup_Admin {
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-		wp_enqueue_style( $this->plugin_name,
-		plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin.css', array(), $this->version );
+		wp_enqueue_style(
+			$this->plugin_name,
+			plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin.css', array(), $this->version
+		);
 
 		// Enqueue JS.
-		wp_register_script( 'boldgrid-backup-admin',
+		wp_register_script(
+			'boldgrid-backup-admin',
 			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin.js',
 			array( 'jquery' ),
 			BOLDGRID_BACKUP_VERSION,
 			false
 		);
 
-		$spinner = '<span class="spinner inline"></span> ';
-		$dots = ' ...';
+		$spinner     = '<span class="spinner inline"></span> ';
+		$dots        = ' ...';
 		$translation = array(
-			'is_premium' => ( true === $this->config->get_is_premium() ? 'true' : 'false' ),
-			'lang' => $this->config->lang,
+			'is_premium'      => ( true === $this->config->get_is_premium() ? 'true' : 'false' ),
+			'lang'            => $this->config->lang,
 			'spinner_loading' => $spinner . __( 'Loading', 'boldgrid-backup' ) . $dots,
 			'get_premium_url' => Boldgrid_Backup_Admin_Go_Pro::$url,
 		);
@@ -128,7 +131,8 @@ class Boldgrid_Backup_Admin {
 
 		// Enqueue CSS for the home page.
 		if ( isset( $_REQUEST['page'] ) && 'boldgrid-backup' === $_REQUEST['page'] ) {
-			wp_enqueue_style( 'boldgrid-backup-admin-home',
+			wp_enqueue_style(
+				'boldgrid-backup-admin-home',
 				plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-home.css', array(),
 				BOLDGRID_BACKUP_VERSION
 			);
@@ -155,7 +159,7 @@ class Boldgrid_Backup_Admin {
 
 		// Set the config file paths.
 		$global_config_path = $config_dir . '/config.plugin.php';
-		$local_config_path = $config_dir . '/config.local.php';
+		$local_config_path  = $config_dir . '/config.local.php';
 
 		// Initialize $global_configs array.
 		$global_configs = array();

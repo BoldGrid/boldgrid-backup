@@ -52,8 +52,8 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	 * @var    array
 	 */
 	public $hooks = array(
-		'backup' => 'boldgrid_backup_wp_cron_backup',
-		'restore' => 'boldgrid_backup_wp_cron_restore',
+		'backup'   => 'boldgrid_backup_wp_cron_backup',
+		'restore'  => 'boldgrid_backup_wp_cron_restore',
 		'run_jobs' => 'boldgrid_backup_wp_cron_run_jobs',
 	);
 
@@ -79,20 +79,20 @@ class Boldgrid_Backup_Admin_WP_Cron {
 		$this->schedules = array(
 			'every-5-minutes' => array(
 				'interval' => 5 * MINUTE_IN_SECONDS,
-				'display' => __( 'Every 5 minutes', 'boldgrid-backup' ),
+				'display'  => __( 'Every 5 minutes', 'boldgrid-backup' ),
 			),
-			'weekly' => array(
+			'weekly'          => array(
 				'interval' => 7 * DAY_IN_SECONDS,
-				'display' => __( 'Weekly', 'boldgrid-backup' ),
+				'display'  => __( 'Weekly', 'boldgrid-backup' ),
 			),
 			/*
 			 * It does not appear that crons can be added for a one time event.
 			 * Add a "never" schedule. Let someone in 1,000 years have the fun
 			 * of their site being restored out of nowhere wha ha ha!
 			 */
-			'never' => array(
+			'never'           => array(
 				'interval' => 1000 * YEAR_IN_SECONDS,
-				'display' => __( 'Never', 'boldgrid-backup' ),
+				'display'  => __( 'Never', 'boldgrid-backup' ),
 			),
 		);
 	}
@@ -114,12 +114,12 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	 */
 	public function add_all_crons( $settings = array() ) {
 		$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
-		$schedule = ! empty( $settings['schedule'] ) ? $settings['schedule'] : null;
+		$schedule  = ! empty( $settings['schedule'] ) ? $settings['schedule'] : null;
 
 		if ( 'wp-cron' === $scheduler && $this->core->scheduler->is_available( $scheduler ) && ! empty( $schedule ) ) {
 			$this->core->scheduler->clear_all_schedules();
 
-			$scheduled = $this->schedule( $settings, $this->hooks['backup'] );
+			$scheduled      = $this->schedule( $settings, $this->hooks['backup'] );
 			$jobs_scheduled = $this->schedule_jobs();
 
 			return $scheduled && $jobs_scheduled;
@@ -135,9 +135,9 @@ class Boldgrid_Backup_Admin_WP_Cron {
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
 
 		// Get the archive to restore.
-		$archives = $this->core->get_archive_list();
-		$archive_key = 0;
-		$archive = $archives[ $archive_key ];
+		$archives         = $this->core->get_archive_list();
+		$archive_key      = 0;
+		$archive          = $archives[ $archive_key ];
 		$archive_filename = $archive['filename'];
 
 		// Remove existing restore cron jobs.
@@ -239,7 +239,7 @@ class Boldgrid_Backup_Admin_WP_Cron {
 
 			$action_key = key( $cron[ $action ] );
 
-			$ours[] = sprintf( '%1$s (%2$s %3$s %4$s)', $action, $cron[ $action ][ $action_key ]['schedule'], __( 'starting','boldgrid-backup' ), date( 'Y.m.d h:i:s a e', $time ) );
+			$ours[] = sprintf( '%1$s (%2$s %3$s %4$s)', $action, $cron[ $action ][ $action_key ]['schedule'], __( 'starting', 'boldgrid-backup' ), date( 'Y.m.d h:i:s a e', $time ) );
 		}
 
 		return $ours;
@@ -289,7 +289,7 @@ class Boldgrid_Backup_Admin_WP_Cron {
 		 * # Then it will get the settings from options, which is still 4am (as
 		 *   it hasn't been saved yet).
 		 */
-		$date = $this->core->time->get_settings_date( $settings );
+		$date         = $this->core->time->get_settings_date( $settings );
 		$new_timezone = new DateTimeZone( 'UTC' );
 		$date->setTimezone( $new_timezone );
 
@@ -343,7 +343,7 @@ class Boldgrid_Backup_Admin_WP_Cron {
 
 		if ( ! wp_next_scheduled( $this->hooks['run_jobs'] ) ) {
 			$scheduled = wp_schedule_event( time(), 'every-5-minutes', $this->hooks['run_jobs'] );
-			$success = false !== $scheduled;
+			$success   = false !== $scheduled;
 		}
 
 		return $success;

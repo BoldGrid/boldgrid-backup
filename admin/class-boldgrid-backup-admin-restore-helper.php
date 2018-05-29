@@ -36,19 +36,19 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 	public $monitor_files = array(
 		'htaccess' => array(
 			// Filename, relative to ABSPATH.
-			'filename' => '.htaccess',
+			'filename'  => '.htaccess',
 			// Whether or not to make a copy of the file before restoration.
-			'copy' => true,
+			'copy'      => true,
 			// Whether or not to keep the copy after restoration.
 			'keep_copy' => true,
 			// Whether or not the file has been copied.
-			'copied' => false,
+			'copied'    => false,
 		),
 		'wpconfig' => array(
-			'filename' => 'wp-config.php',
-			'copy' => true,
+			'filename'  => 'wp-config.php',
+			'copy'      => true,
 			'keep_copy' => false,
-			'copied' => false,
+			'copied'    => false,
 		),
 	);
 
@@ -107,7 +107,7 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 
 		foreach ( $this->monitor_files as $key => $file ) {
 			$original = ABSPATH . $file['filename'];
-			$new = $original . '.bgb';
+			$new      = $original . '.bgb';
 
 			// Determine if the file was restored from backup.
 			$file_restored = false;
@@ -150,7 +150,7 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 
 		foreach ( $this->monitor_files as $key => $file ) {
 			$original = ABSPATH . $file['filename'];
-			$new = $original . '.bgb';
+			$new      = $original . '.bgb';
 
 			if ( $file['copy'] && $wp_filesystem->exists( $original ) ) {
 				$wp_filesystem->copy( $original, $new, true, 0644 );
@@ -181,8 +181,8 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 		 *
 		 * The archive_key and the archive_filename must match.
 		 */
-		$_POST['restore_now'] = 1;
-		$_POST['archive_key'] = 0;
+		$_POST['restore_now']      = 1;
+		$_POST['archive_key']      = 0;
 		$_POST['archive_filename'] = basename( $pending_rollback['filepath'] );
 
 		return true;
@@ -279,7 +279,7 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 		global $wp_filesystem;
 
 		$message = $error->get_error_message();
-		$data = $error->get_error_data();
+		$data    = $error->get_error_data();
 
 		if ( __( 'Could not copy file.' ) === $message ) {
 

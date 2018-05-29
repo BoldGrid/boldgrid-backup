@@ -31,7 +31,8 @@ foreach ( $this->remote_storage_li as $provider ) {
 	// Generate a link to "download to server" from remote provider.
 	$download = '';
 	if ( ! $archive_found && $provider['uploaded'] ) {
-		$download = sprintf( '
+		$download = sprintf(
+			'
 			<a class="button download-to-server" data-provider-id="%3$s">%1$s</a>
 			%2$s
 			',
@@ -55,7 +56,8 @@ foreach ( $this->remote_storage_li as $provider ) {
 		$upload = '';
 	}
 
-	$data['postbox'] .= sprintf( '
+	$data['postbox'] .= sprintf(
+		'
 		%5$s
 		<div data-remote-provider="%3$s">
 			<span style="float:left;" %6$s><strong>%1$s</strong></span>

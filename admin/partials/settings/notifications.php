@@ -30,7 +30,8 @@ ob_start();
 								0 !== $settings['notifications']['backup'] ) {
 							echo ' checked';
 						}
-						?> />
+						?>
+						 />
 				</td>
 			</tr>
 			<tr>
@@ -42,7 +43,8 @@ ob_start();
 								0 !== $settings['notifications']['restore'] ) {
 							echo ' checked';
 						}
-						?> />
+						?>
+						 />
 				</td>
 			</tr>
 		</table>

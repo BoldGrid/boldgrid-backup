@@ -100,7 +100,7 @@ class Boldgrid_Backup_Admin_Utility {
 	 * Can be used in this manner:
 	 * set_error_handler( array( 'Boldgrid_Backup_Admin_Utility', 'handle_error' ) );
 	 * try{
-	 * 		// Try something
+	 *      // Try something
 	 * } catch( Exception $e ) {
 			$e->getMessage();
 	 * }
@@ -167,34 +167,34 @@ class Boldgrid_Backup_Admin_Utility {
 	 */
 	public static function translate_zip_error( $error_code = null ) {
 		switch ( $error_code ) {
-			case ZipArchive::ER_EXISTS :
+			case ZipArchive::ER_EXISTS:
 				$message = esc_html__( 'File already exists', 'boldgrid-backup' );
 				break;
-			case ZipArchive::ER_INCONS :
+			case ZipArchive::ER_INCONS:
 				$message = esc_html__( 'Zip archive inconsistent', 'boldgrid-backup' );
 				break;
-			case ZipArchive::ER_INVAL :
+			case ZipArchive::ER_INVAL:
 				$message = esc_html__( 'Invalid argument', 'boldgrid-backup' );
 				break;
-			case ZipArchive::ER_MEMORY :
+			case ZipArchive::ER_MEMORY:
 				$message = esc_html__( 'Malloc failure', 'boldgrid-backup' );
 				break;
-			case ZipArchive::ER_NOENT :
+			case ZipArchive::ER_NOENT:
 				$message = esc_html__( 'No such file', 'boldgrid-backup' );
 				break;
-			case ZipArchive::ER_NOZIP :
+			case ZipArchive::ER_NOZIP:
 				$message = esc_html__( 'Not a zip archive', 'boldgrid-backup' );
 				break;
-			case ZipArchive::ER_OPEN :
+			case ZipArchive::ER_OPEN:
 				$message = esc_html__( 'Cannot open file', 'boldgrid-backup' );
 				break;
-			case ZipArchive::ER_READ :
+			case ZipArchive::ER_READ:
 				$message = esc_html__( 'Read error', 'boldgrid-backup' );
 				break;
-			case ZipArchive::ER_SEEK :
+			case ZipArchive::ER_SEEK:
 				$message = esc_html__( 'Seek error', 'boldgrid-backup' );
 				break;
-			default :
+			default:
 				$message = esc_html__( 'No error code was passed', 'boldgrid-backup' );
 				break;
 		}
@@ -521,7 +521,7 @@ class Boldgrid_Backup_Admin_Utility {
 		}
 
 		// Create a ZipArchive object.
-		$zip = new ZipArchive;
+		$zip = new ZipArchive();
 
 		// Check the ZIP file for consistency.
 		$status = $zip->open( $file, ZipArchive::CHECKCONS );
@@ -557,7 +557,7 @@ class Boldgrid_Backup_Admin_Utility {
 		}
 
 		// Create a ZipArchive object.
-		$zip = new ZipArchive;
+		$zip = new ZipArchive();
 
 		// Check the ZIP file for consistency.
 		$status = $zip->open( $zip_file, ZipArchive::CHECKCONS );
@@ -589,7 +589,7 @@ class Boldgrid_Backup_Admin_Utility {
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
 	 * @param string $file Path to a directory or file.
-	 * @param int    $mode 	(Optional) The permissions as octal number, usually 0644 for files, 0755 for dirs.
+	 * @param int    $mode  (Optional) The permissions as octal number, usually 0644 for files, 0755 for dirs.
 	 * @return bool
 	 */
 	public static function chmod( $file, $mode = false ) {

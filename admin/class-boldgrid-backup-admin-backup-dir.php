@@ -77,23 +77,23 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 		$check_permissions = __( 'Please ensure your backup directory exists and has the proper read, write, and modify permissions.', 'boldgrid-backup' );
 
 		$cannot_create = __( 'Unable to create necessary file: %1$s<br />%2$s', 'boldgrid-backup' );
-		$cannot_write = __( 'Unable to write to necessary file: %1$s<br />%2$s', 'boldgrid-backup' );
+		$cannot_write  = __( 'Unable to write to necessary file: %1$s<br />%2$s', 'boldgrid-backup' );
 
 		$backup_dir = untrailingslashit( $backup_dir );
 
-		$htaccess_path = $backup_dir . DIRECTORY_SEPARATOR . '.htaccess';
+		$htaccess_path   = $backup_dir . DIRECTORY_SEPARATOR . '.htaccess';
 		$index_html_path = $backup_dir . DIRECTORY_SEPARATOR . 'index.html';
-		$index_php_path = $backup_dir . DIRECTORY_SEPARATOR . 'index.php';
+		$index_php_path  = $backup_dir . DIRECTORY_SEPARATOR . 'index.php';
 
 		$files = array(
 			array(
-				'type' => 'dir',
-				'path' => $backup_dir,
+				'type'  => 'dir',
+				'path'  => $backup_dir,
 				'chmod' => 0700,
 			),
 			array(
-				'type' => 'file',
-				'path' => $htaccess_path,
+				'type'     => 'file',
+				'path'     => $htaccess_path,
 				'contents' => "<IfModule mod_access_compat.c>\nOrder Allow,Deny\nDeny from all\n</IfModule>\nOptions -Indexes\n",
 			),
 			array(
@@ -120,7 +120,7 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 			switch ( $file['type'] ) {
 				case 'dir':
 					if ( ! $this->core->wp_filesystem->exists( $file['path'] ) ) {
-						$chmod = ! empty( $file['chmod'] ) ? $file['chmod'] : false;
+						$chmod   = ! empty( $file['chmod'] ) ? $file['chmod'] : false;
 						$created = $this->core->wp_filesystem->mkdir( $file['path'], $chmod );
 						if ( ! $created ) {
 							$this->errors[] = sprintf( $cannot_create, $file['path'], $check_permissions );
@@ -203,7 +203,7 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 				 * there won't be downloadable.
 				 */
 				$app_data = $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'App_Data';
-				$dirs[] = str_replace( '\\\\', '\\', $app_data );
+				$dirs[]   = str_replace( '\\\\', '\\', $app_data );
 			}
 		}
 
@@ -254,7 +254,7 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 			 * Create the directory and all applicable files needed within for security,
 			 * such as .htaccess / etc.
 			 */
-			$possible_dir .= DIRECTORY_SEPARATOR . 'boldgrid_backup';
+			$possible_dir    .= DIRECTORY_SEPARATOR . 'boldgrid_backup';
 			$backup_directory = $this->create( $possible_dir );
 			if ( ! $backup_directory ) {
 				continue;
@@ -354,7 +354,7 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 		 * In the above example, we will create /home/user/.htaccess to prevent
 		 * browsing of backups, and this would prevent all traffic to the ABSPATH.
 		 */
-		$backup_dir = Boldgrid_Backup_Admin_Utility::trailingslashit( $backup_dir );
+		$backup_dir     = Boldgrid_Backup_Admin_Utility::trailingslashit( $backup_dir );
 		$abspath_in_dir = 0 === strpos( ABSPATH, $backup_dir );
 		if ( $abspath_in_dir ) {
 			$this->errors[] = sprintf(

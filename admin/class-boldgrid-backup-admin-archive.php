@@ -330,12 +330,12 @@ class Boldgrid_Backup_Admin_Archive {
 	 * @since 1.6.0
 	 */
 	public function reset() {
-		$this->filename = null;
-		$this->filepath = null;
+		$this->filename     = null;
+		$this->filepath     = null;
 		$this->log_filepath = null;
 		$this->log_filename = null;
-		$this->log = array();
-		$this->compressor = null;
+		$this->log          = array();
+		$this->compressor   = null;
 	}
 
 	/**

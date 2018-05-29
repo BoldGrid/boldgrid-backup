@@ -41,7 +41,8 @@ $is_retention_set = ( isset( $settings['retention_count'] ) );
 					$requires_upgrade = '';
 				}
 
-				printf(	'<option value="%1$d" %2$s>%1$d</option>',
+				printf(
+					'<option value="%1$d" %2$s>%1$d</option>',
 					$x,
 					$selected
 				);

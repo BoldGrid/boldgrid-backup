@@ -74,7 +74,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 		wp_enqueue_script( 'heartbeat' );
 
 		$elapsed = time() - $in_progress;
-		$limit = 15 * MINUTE_IN_SECONDS;
+		$limit   = 15 * MINUTE_IN_SECONDS;
 
 		$notice = $this->get_notice();
 		if ( false === $notice ) {
@@ -144,7 +144,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 		}
 
 		$notice = array(
-			'class' => 'notice notice-warning boldgrid-backup-in-progress',
+			'class'   => 'notice notice-warning boldgrid-backup-in-progress',
 			'message' => sprintf( __( 'BoldGrid Backup began archiving your website %1$s ago.', 'boldgrid-backup' ), human_time_diff( $in_progress, time() ) ),
 			'heading' => __( 'BoldGrid Backup - Backup in progress', 'boldgrid-backup' ),
 		);

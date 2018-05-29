@@ -8,7 +8,7 @@
 defined( 'WPINC' ) ? : die;
 
 // https://github.com/cbschuld/Browser.php
-include_once BOLDGRID_BACKUP_PATH . '/vendor/cbschuld/browser.php/lib/Browser.php';
+require_once BOLDGRID_BACKUP_PATH . '/vendor/cbschuld/browser.php/lib/Browser.php';
 $browser = new Browser();
 
 ob_start();
@@ -36,15 +36,15 @@ foreach ( $local_info as $info ) {
 $server_info = array(
 	array(
 		'title' => __( 'Server Name', 'boldgrid-backup' ),
-		'key' => 'SERVER_NAME',
+		'key'   => 'SERVER_NAME',
 	),
 	array(
 		'title' => __( 'Server IP Address', 'boldgrid-backup' ),
-		'key' => 'SERVER_ADDR',
+		'key'   => 'SERVER_ADDR',
 	),
 	array(
 		'title' => __( 'Server Type / OS', 'boldgrid-backup' ),
-		'key' => 'SERVER_SOFTWARE',
+		'key'   => 'SERVER_SOFTWARE',
 	),
 );
 
@@ -57,7 +57,8 @@ foreach ( $server_info as $info ) {
 	$server_info_markup .= sprintf( '<li><strong>%1$s</strong>: %2$s</li>', $info['title'], $_SERVER[ $info['key'] ] );
 }
 
-printf( '
+printf(
+	'
 	<h2>%1$s</h2>
 	<p>%2$s</p>
 	<p>%3$s</p>
@@ -77,7 +78,8 @@ printf(
 );
 
 if ( ! empty( $local_info_markup ) ) {
-	printf( '
+	printf(
+		'
 		<p>%1$s</p>
 		%2$s',
 		__( 'We are able to see the following information about your <strong>Local Machine</strong>:', 'boldgrid-backup' ),
@@ -95,7 +97,8 @@ printf(
 );
 
 if ( ! empty( $server_info_markup ) ) {
-	printf( '
+	printf(
+		'
 		<p>%1$s</p>
 		%2$s',
 		__( 'We are able to see the following information about your <strong>Web Server</strong>:', 'boldgrid-backup' ),
@@ -113,7 +116,8 @@ printf(
 );
 
 if ( ! $this->core->config->is_premium_done ) {
-	printf( '
+	printf(
+		'
 		<div class="bg-box-bottom premium wp-clearfix">
 			%1$s
 			%2$s

@@ -17,7 +17,8 @@ $db = array(
 );
 
 if ( empty( $dump_file ) ) {
-	$db['browser'] = sprintf( '
+	$db['browser'] = sprintf(
+		'
 		<div class="hidden" data-view-type="db">
 			<p>%1$s</p>
 		</div>',
@@ -30,7 +31,8 @@ $contains = __( 'This archive contains the following database backup: <strong>%1
 $basename = basename( $dump_file );
 
 $db = array(
-	'browser' => sprintf( '
+	'browser' => sprintf(
+		'
 		<div class="hidden" data-view-type="db">
 			<input type="hidden" id="dump_filename" value="%1$s" />
 			<div id="db_details" data-rendered="false"></div>

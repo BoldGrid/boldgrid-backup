@@ -14,10 +14,10 @@ ob_start();
 
 $storage_locations = array(
 	array(
-		'title' => __( 'Web Server', 'boldgrid-backup' ),
-		'key' => 'local',
+		'title'    => __( 'Web Server', 'boldgrid-backup' ),
+		'key'      => 'local',
 		'is_setup' => true,
-		'enabled' => ! empty( $settings['remote']['local']['enabled'] ) && true === $settings['remote']['local']['enabled'],
+		'enabled'  => ! empty( $settings['remote']['local']['enabled'] ) && true === $settings['remote']['local']['enabled'],
 	),
 );
 
@@ -38,7 +38,8 @@ $storage_locations = array(
  */
 $storage_locations = apply_filters( 'boldgrid_backup_register_storage_location', $storage_locations );
 
-$premium_box = $this->core->config->is_premium_done ? '' : sprintf( '
+$premium_box = $this->core->config->is_premium_done ? '' : sprintf(
+	'
 	<div class="bg-box-bottom premium">
 		<input type="checkbox" disabled="true" /> <strong>%1$s</strong>
 

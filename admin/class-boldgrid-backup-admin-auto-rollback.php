@@ -153,7 +153,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 			return;
 		}
 
-		$archives = $this->core->get_archive_list();
+		$archives      = $this->core->get_archive_list();
 		$archive_count = count( $archives );
 
 		// If there are no archives, then abort.
@@ -207,14 +207,14 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 			false
 		);
 
-		$access_type = get_filesystem_method();
-		$archive_nonce = wp_create_nonce( 'archive_auth' );
+		$access_type          = get_filesystem_method();
+		$archive_nonce        = wp_create_nonce( 'archive_auth' );
 		$localize_script_data = array(
-			'archiveNonce' => $archive_nonce,
-			'accessType' => $access_type,
+			'archiveNonce'              => $archive_nonce,
+			'accessType'                => $access_type,
 			'updateProtectionActivated' => $this->core->elements['update_protection_activated'],
-			'backupCreated' => $this->core->lang['backup_created'],
-			'errorText' => esc_html__(
+			'backupCreated'             => $this->core->lang['backup_created'],
+			'errorText'                 => esc_html__(
 				'There was an error processing your request.  Please reload the page and try again.',
 				'boldgrid-backup'
 			),
@@ -251,9 +251,9 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		);
 
 		$translations = array(
-			'update_data' => wp_get_update_data(),
-			'in_progress_notice' => $this->core->in_progress->get_notice_markup(),
-			'nonce' => wp_create_nonce( 'boldgrid_backup_customizer' ),
+			'update_data'         => wp_get_update_data(),
+			'in_progress_notice'  => $this->core->in_progress->get_notice_markup(),
+			'nonce'               => wp_create_nonce( 'boldgrid_backup_customizer' ),
 			'is_rollback_enabled' => $this->is_enabled(),
 		);
 		wp_localize_script( $handle, 'boldgridBackupCustomizer', $translations );
@@ -352,7 +352,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 			$localize_script_data = array(
 				// Generally used as the title attr of a disable update button.
 				'backupInProgress' => __( 'Your website is currently being backed up. You can perform updates when the backup is complete.', 'boldgrid-backup' ),
-				'waitClass' => 'bgbu-wait',
+				'waitClass'        => 'bgbu-wait',
 			);
 
 			wp_localize_script( $handle, 'boldgrid_backup_admin_update_selectors', $localize_script_data );
@@ -375,12 +375,12 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	public function notice_countdown_show() {
 
 		// Process GET / POST info.
-		$action = ! empty( $_GET['action'] ) ? sanitize_key( $_GET['action'] ) : null;
+		$action      = ! empty( $_GET['action'] ) ? sanitize_key( $_GET['action'] ) : null;
 		$restore_now = ! empty( $_POST['restore_now'] );
 
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
-		$deadline = ! empty( $pending_rollback['deadline'] ) ? $pending_rollback['deadline'] : null;
-		$deadline_passed = ! empty( $deadline ) && $deadline <= time();
+		$deadline         = ! empty( $pending_rollback['deadline'] ) ? $pending_rollback['deadline'] : null;
+		$deadline_passed  = ! empty( $deadline ) && $deadline <= time();
 
 		if ( $this->on_update_page ) {
 			$this->enqueue_rollback_scripts();
@@ -422,7 +422,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 			return;
 		}
 
-		$archives = $this->core->get_archive_list();
+		$archives      = $this->core->get_archive_list();
 		$archive_count = count( $archives );
 
 		/*
@@ -478,10 +478,10 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 * @access private
 	 *
 	 * @param array $args {
-	 * 		An array of arguments.
+	 *      An array of arguments.
 	 *
-	 * 		@type int $restore_key Key index used for restoration.
-	 * 		@type string $restore_filename Filename of the backup archive to be restored.
+	 *      @type int $restore_key Key index used for restoration.
+	 *      @type string $restore_filename Filename of the backup archive to be restored.
 	 * }
 	 * @return string The resulting markup.
 	 */
@@ -489,28 +489,28 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 
 		// By default we will restore the newest backup.
 		if ( empty( $args ) ) {
-			$key = 0;
+			$key      = 0;
 			$archives = $this->core->get_archive_list();
-			$args = array(
-				'restore_key' => $key,
+			$args     = array(
+				'restore_key'      => $key,
 				'restore_filename' => $archives[ $key ]['filename'],
 			);
 		}
 
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
-		$deadline = ! empty( $pending_rollback['deadline'] ) ? sprintf( '(<em>%1$s</em>)', date( 'g:i a', $this->core->utility->time( $pending_rollback['deadline'] ) ) ) : '';
+		$deadline         = ! empty( $pending_rollback['deadline'] ) ? sprintf( '(<em>%1$s</em>)', date( 'g:i a', $this->core->utility->time( $pending_rollback['deadline'] ) ) ) : '';
 
 		$update_trigger = $this->notice_trigger_get();
 		$update_trigger = ! empty( $update_trigger ) ? sprintf( '<p>%1$s</p>', $update_trigger ) : '';
 
 		$nonce = wp_nonce_field( 'boldgrid_rollback_notice', 'cancel_rollback_auth', true, false );
 
-		$button_args = array(
+		$button_args    = array(
 			'button_text' => __( 'Rollback Site Now', 'boldgrid-backup' ),
 		);
 		$restore_button = $this->core->archive_actions->get_restore_button( $args['restore_filename'], $button_args );
 
-		$iso_time = ! empty( $pending_rollback['deadline'] ) ? date( 'c', $pending_rollback['deadline'] ) : null;
+		$iso_time          = ! empty( $pending_rollback['deadline'] ) ? date( 'c', $pending_rollback['deadline'] ) : null;
 		$rollback_deadline = sprintf( '<input type="hidden" id="rollback-deadline" value="%1$s" />', $iso_time );
 
 		$notice_markup = '
@@ -596,8 +596,8 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 */
 	public function notice_trigger_get() {
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
-		$notice = false;
-		$li = array();
+		$notice           = false;
+		$li               = array();
 
 		if ( empty( $pending_rollback['update_trigger'] ) ) {
 			return false;
@@ -612,14 +612,14 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		switch ( $trigger['type'] ) {
 			case 'core':
 				$wordpress_version = get_bloginfo( 'version' );
-				$notice = sprintf( __( 'WordPress was recently updated to version %1$s.', 'boldgrid-backup' ), $wordpress_version );
+				$notice            = sprintf( __( 'WordPress was recently updated to version %1$s.', 'boldgrid-backup' ), $wordpress_version );
 				break;
 			case 'theme':
 				foreach ( $trigger['themes'] as $theme ) {
 					$data = wp_get_theme( $theme );
 					$li[] = sprintf( '<strong>%1$s</strong> to version %2$s', $data->get( 'Name' ), $data->get( 'Version' ) );
 				}
-				$notice = __( 'The following theme(s) were recently updated:', 'boldgrid-backup' ) . '<br />';
+				$notice  = __( 'The following theme(s) were recently updated:', 'boldgrid-backup' ) . '<br />';
 				$notice .= implode( '<br />', $li );
 				break;
 			case 'plugin':
@@ -627,7 +627,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 					$data = $this->core->utility->get_plugin_data( $plugin );
 					$li[] = sprintf( '<strong>%1$s</strong> to version %2$s', $data['Name'], $data['Version'] );
 				}
-				$notice = __( 'The following plugin(s) were recently updated:', 'boldgrid-backup' ) . '<br />';
+				$notice  = __( 'The following plugin(s) were recently updated:', 'boldgrid-backup' ) . '<br />';
 				$notice .= implode( '<br />', $li );
 				break;
 		}
@@ -693,15 +693,15 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		$configs = array(
 			array(
 				'pagenow' => 'plugins.php',
-				'check' => 'plugins',
+				'check'   => 'plugins',
 			),
 			array(
 				'pagenow' => 'themes.php',
-				'check' => 'themes',
+				'check'   => 'themes',
 			),
 			array(
 				'pagenow' => 'update-core.php',
-				'check' => 'total',
+				'check'   => 'total',
 			),
 		);
 
@@ -758,7 +758,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		 * 1.6.0 so that we can uniquely identify this notice on the page.
 		 */
 		$backup_button = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-button.php';
-		$notice = $this->notice_backup_get();
+		$notice        = $this->notice_backup_get();
 		do_action( 'boldgrid_backup_notice', $notice . $backup_button, 'notice notice-warning is-dismissible boldgrid-backup-protect-now' );
 	}
 
@@ -883,7 +883,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		$message .= '</p>';
 
 		$message = array(
-			'html' => $message,
+			'html'  => $message,
 			'class' => 'notice notice-success is-dismissible boldgrid-backup-protected',
 		);
 
@@ -1020,12 +1020,12 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		if ( ! empty( $pending_rollback ) ) {
 			// You're protected, go ahead and update.
 			$message = $this->notice_activated_get();
-			$notice = sprintf( '<div class="%1$s">%2$s</div>', $message['class'], $message['html'] );
+			$notice  = sprintf( '<div class="%1$s">%2$s</div>', $message['class'], $message['html'] );
 		} else {
 			// You're not protected, make a backup first.
-			$notice = $this->notice_backup_get();
+			$notice        = $this->notice_backup_get();
 			$backup_button = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-button.php';
-			$notice = '<div class="notice notice-warning is-dismissible boldgrid-backup-protect-now">' . $notice . $backup_button . '</div>';
+			$notice        = '<div class="notice notice-warning is-dismissible boldgrid-backup-protect-now">' . $notice . $backup_button . '</div>';
 		}
 
 		wp_send_json_success( $notice );

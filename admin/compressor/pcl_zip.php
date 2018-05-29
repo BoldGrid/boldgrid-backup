@@ -55,7 +55,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 	 */
 	public function __construct( $core ) {
 		if ( ! class_exists( 'PclZip' ) ) {
-			require_once( ABSPATH . '/wp-admin/includes/class-pclzip.php' );
+			require_once ABSPATH . '/wp-admin/includes/class-pclzip.php';
 		}
 
 		parent::__construct( $core );
@@ -87,7 +87,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 		foreach ( $list as $key => $file ) {
 
 			// These variables are very similar, both exist for readability.
-			$top_dir = null;
+			$top_dir  = null;
 			$next_dir = null;
 
 			if ( '.' === $in_dir ) {
@@ -127,12 +127,12 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 				}
 			}
 
-			$dir = ! empty( $top_dir ) ? $top_dir : $next_dir;
-			$sudo_file = array(
+			$dir         = ! empty( $top_dir ) ? $top_dir : $next_dir;
+			$sudo_file   = array(
 				'filename' => $dir,
-				'folder' => true,
+				'folder'   => true,
 			);
-			$contents[] = $sudo_file;
+			$contents[]  = $sudo_file;
 			$filenames[] = $dir;
 		}
 
@@ -190,7 +190,8 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 			$new_filelist[] = $file[0];
 		}
 
-		$status = $archive->add( $new_filelist,
+		$status = $archive->add(
+			$new_filelist,
 			PCLZIP_OPT_REMOVE_PATH, ABSPATH
 		);
 
@@ -220,7 +221,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 			$status = $archive->add( $this->core->db_dump_filepath, PCLZIP_OPT_REMOVE_ALL_PATH );
 			if ( 0 === $status ) {
 				return array(
-						'error' => sprintf( 'Cannot add database dump to ZIP archive file: %1$s', $archive->errorInfo() ),
+					'error' => sprintf( 'Cannot add database dump to ZIP archive file: %1$s', $archive->errorInfo() ),
 				);
 			}
 		}
@@ -285,7 +286,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 				continue;
 			}
 
-			$contents[] = $file;
+			$contents[]  = $file;
 			$filenames[] = rtrim( $file['filename'], '/' );
 		}
 
@@ -449,9 +450,9 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 	 *               returning a message to the user.
 	 */
 	public function parse_error_info( $error_info ) {
-		$parts = explode( '\'', $error_info );
+		$parts         = explode( '\'', $error_info );
 		$force_php_zip = false;
-		$messages = array();
+		$messages      = array();
 
 		// Does not exist [code -4].
 		if ( ! empty( $parts[2] ) && false !== strpos( $parts[2], 'code -4' ) ) {
@@ -460,7 +461,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 			// Check for broken symlink.
 			if ( is_link( $path ) && ! $this->core->wp_filesystem->exists( $path ) ) {
 				$force_php_zip = true;
-				$messages[] = sprintf( __( 'PclZip encountered the following broken symlink and is unable to create a backup:<br />%1$s', 'boldgrid-backup' ), $parts[1] );
+				$messages[]    = sprintf( __( 'PclZip encountered the following broken symlink and is unable to create a backup:<br />%1$s', 'boldgrid-backup' ), $parts[1] );
 			}
 		}
 
@@ -496,19 +497,21 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 
 		// Strings to help with creating test files.
 		$test_file_contents = $str = __( 'This is a test file from BoldGrid Backup. You can delete this file.', 'boldgrid-backup' );
-		$safe_to_delete = __( 'safe-to-delete', 'boldgrid-backup' );
-		$test_zip_file = $this->core->test->test_prefix . '-zip';
-		$test_filename = sprintf( '%1$s%5$s%2$s-%3$s-%4$s', $backup_dir, $test_zip_file, mt_rand(), $safe_to_delete, DIRECTORY_SEPARATOR );
-		$zip_filepath = $test_filename . '.zip';
-		$random_filename = $test_filename . '.txt';
+		$safe_to_delete     = __( 'safe-to-delete', 'boldgrid-backup' );
+		$test_zip_file      = $this->core->test->test_prefix . '-zip';
+		$test_filename      = sprintf( '%1$s%5$s%2$s-%3$s-%4$s', $backup_dir, $test_zip_file, mt_rand(), $safe_to_delete, DIRECTORY_SEPARATOR );
+		$zip_filepath       = $test_filename . '.zip';
+		$random_filename    = $test_filename . '.txt';
 
-		$cannot_touch_file = __( 'PclZip test failed. We were unable to create the following test file:<br />
+		$cannot_touch_file = __(
+			'PclZip test failed. We were unable to create the following test file:<br />
 			%1$s.<br />
 			Please ensure your backup directory has read, write, and modify permissions.',
 			'boldgrid-backup'
 		);
 
-		$cannot_put_contents = __( 'PclZip test failed. We were able to create the following test file, but we were unable to modify it. were unable to modify it:<br />
+		$cannot_put_contents = __(
+			'PclZip test failed. We were able to create the following test file, but we were unable to modify it. were unable to modify it:<br />
 			%1$s<br />
 			Please ensure your backup directory has read, write, and modify permissions.',
 			'boldgrid-backup'
@@ -517,14 +520,14 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 		$touched = $this->core->wp_filesystem->touch( $random_filename );
 		if ( ! $touched ) {
 			$this->test_errors[] = sprintf( $cannot_touch_file, $random_filename );
-			self::$test_result = false;
+			self::$test_result   = false;
 			return false;
 		}
 
 		$contents_put = $this->core->wp_filesystem->put_contents( $random_filename, $test_file_contents );
 		if ( ! $contents_put ) {
 			$this->test_errors[] = sprintf( $cannot_put_contents, $random_filename );
-			self::$test_result = false;
+			self::$test_result   = false;
 			return false;
 		}
 

@@ -22,9 +22,12 @@ defined( 'WPINC' ) ? : die;
 		wp_kses(
 			__( '<strong>Note</strong>: Backups use resources and <a href="%s" target="_blank">must pause your site</a> momentarily.  Use sparingly. ', 'boldgrid-backup' ),
 			array(
-				'a' => array( 'href' => array(), 'target' => array() ),
+				'a'      => array(
+					'href'   => array(),
+					'target' => array(),
+				),
 				'strong' => array(),
-			 )
+			)
 		),
 		esc_url( $this->configs['urls']['resource_usage'] )
 	);
@@ -51,5 +54,5 @@ defined( 'WPINC' ) ? : die;
 		);
 		echo $link;
 	}
-?>
+	?>
 </p>

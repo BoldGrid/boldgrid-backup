@@ -205,7 +205,7 @@ class Boldgrid_Backup_Admin_Sftp {
 			return;
 		}
 
-		$backups = array();
+		$backups  = array();
 		$contents = $this->get_contents( true, $this->remote_dir );
 
 		// The contents usually include . and .., so remove 2 from list.
@@ -217,9 +217,11 @@ class Boldgrid_Backup_Admin_Sftp {
 
 		$backups = $this->format_raw_contents( $contents );
 
-		usort( $backups, function( $a, $b ) {
-			return $a['time'] < $b['time'] ? -1 : 1;
-		});
+		usort(
+			$backups, function( $a, $b ) {
+				return $a['time'] < $b['time'] ? -1 : 1;
+			}
+		);
 
 		for ( $x = 0; $x < $count_to_delete; $x++ ) {
 			$filename = $backups[ $x ]['filename'];
@@ -255,7 +257,7 @@ class Boldgrid_Backup_Admin_Sftp {
 	 * }
 	 */
 	public function format_raw_contents( $contents ) {
-		$skips = array( '.', '..' );
+		$skips   = array( '.', '..' );
 		$backups = array();
 
 		if ( ! is_array( $contents ) ) {
@@ -275,12 +277,12 @@ class Boldgrid_Backup_Admin_Sftp {
 
 			// Get the timestamp.
 			$month = $exploded_item[ $count - 4 ];
-			$day = $exploded_item[ $count - 3 ];
-			$time = $exploded_item[ $count - 2 ];
-			$time = strtotime( $month . ' ' . $day . ' ' . $time );
+			$day   = $exploded_item[ $count - 3 ];
+			$time  = $exploded_item[ $count - 2 ];
+			$time  = strtotime( $month . ' ' . $day . ' ' . $time );
 
 			$backups[] = array(
-				'time' => $time,
+				'time'     => $time,
 				'filename' => $filename,
 			);
 		}
@@ -321,11 +323,11 @@ class Boldgrid_Backup_Admin_Sftp {
 		$settings = $this->core->settings->get_settings();
 
 		return array(
-			'title' => $this->title,
-			'key' => $this->key,
+			'title'     => $this->title,
+			'key'       => $this->key,
 			'configure' => 'admin.php?page=boldgrid-backup-sftp',
-			'is_setup' => $this->is_setup(),
-			'enabled' => ! empty( $settings['remote'][ $this->key ]['enabled'] ) && $settings['remote'][ $this->key ]['enabled'] && $this->is_setup(),
+			'is_setup'  => $this->is_setup(),
+			'enabled'   => ! empty( $settings['remote'][ $this->key ]['enabled'] ) && $settings['remote'][ $this->key ]['enabled'] && $this->is_setup(),
 		);
 	}
 
@@ -434,10 +436,10 @@ class Boldgrid_Backup_Admin_Sftp {
 
 		$settings = $this->core->settings->get_settings();
 
-		$host = ! empty( $settings['remote'][ $this->key ]['host'] ) ? $settings['remote'][ $this->key ]['host'] : null;
-		$user = ! empty( $settings['remote'][ $this->key ]['user'] ) ? $settings['remote'][ $this->key ]['user'] : null;
-		$pass = ! empty( $settings['remote'][ $this->key ]['pass'] ) ? $settings['remote'][ $this->key ]['pass'] : null;
-		$port = ! empty( $settings['remote'][ $this->key ]['port'] ) ? $settings['remote'][ $this->key ]['port'] : $this->port;
+		$host            = ! empty( $settings['remote'][ $this->key ]['host'] ) ? $settings['remote'][ $this->key ]['host'] : null;
+		$user            = ! empty( $settings['remote'][ $this->key ]['user'] ) ? $settings['remote'][ $this->key ]['user'] : null;
+		$pass            = ! empty( $settings['remote'][ $this->key ]['pass'] ) ? $settings['remote'][ $this->key ]['pass'] : null;
+		$port            = ! empty( $settings['remote'][ $this->key ]['port'] ) ? $settings['remote'][ $this->key ]['port'] : $this->port;
 		$retention_count = ! empty( $settings['remote'][ $this->key ]['retention_count'] ) ? $settings['remote'][ $this->key ]['retention_count'] : $this->retention_count;
 
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/remote/sftp.php';
@@ -470,9 +472,9 @@ class Boldgrid_Backup_Admin_Sftp {
 			$settings['remote'][ $this->key ] = array();
 			update_site_option( 'boldgrid_backup_settings', $settings );
 
-			$this->host = null;
-			$this->user = null;
-			$this->pass = null;
+			$this->host            = null;
+			$this->user            = null;
+			$this->pass            = null;
 			$this->retention_count = null;
 			$this->disconnect();
 

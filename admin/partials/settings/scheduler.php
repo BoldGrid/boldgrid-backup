@@ -35,7 +35,8 @@ foreach ( $schedulers_available as $key => $scheduler_data ) {
 
 $scheduler_select = sprintf( '<select name="scheduler" id="scheduler">%1$s</select>', $scheduler_options );
 
-return sprintf( '
+return sprintf(
+	'
 	<div class="bg-box">
 		<div class="bg-box-top">
 			%1$s

@@ -36,16 +36,22 @@ ob_start();
 					<?php
 					if ( isset( $settings['plugin_autoupdate'] ) &&
 						 1 === $settings['plugin_autoupdate'] ) {
-							?> checked<?php
+						?>
+							 checked
+							<?php
 					}
-					?> /> <?php esc_html_e( 'Enabled', 'boldgrid-backup' ); ?> &nbsp; <input
+					?>
+					 /> <?php esc_html_e( 'Enabled', 'boldgrid-backup' ); ?> &nbsp; <input
 					id="plugin-autoupdate-disabled" type="radio" name="plugin_autoupdate" value="0"
 					<?php
 					if ( ! isset( $settings['plugin_autoupdate'] ) ||
 						! $settings['plugin_autoupdate'] ) {
-							?> checked<?php
+						?>
+							 checked
+							<?php
 					}
-					?> /> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
+					?>
+					 /> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
 				 </td>
 			 </tr>
 
@@ -68,16 +74,22 @@ ob_start();
 					<?php
 					if ( isset( $settings['theme_autoupdate'] ) &&
 						 1 === $settings['theme_autoupdate'] ) {
-							?> checked<?php
+						?>
+							 checked
+							<?php
 					}
-					?> /> <?php esc_html_e( 'Enabled', 'boldgrid-backup' ); ?> &nbsp; <input
+					?>
+					 /> <?php esc_html_e( 'Enabled', 'boldgrid-backup' ); ?> &nbsp; <input
 					id="theme-autoupdate-disabled" type="radio" name="theme_autoupdate" value="0"
 					<?php
 					if ( ! isset( $settings['theme_autoupdate'] ) ||
 						! $settings['theme_autoupdate'] ) {
-							?> checked<?php
+						?>
+							 checked
+							<?php
 					}
-					?> /> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
+					?>
+					 /> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
 				 </td>
 			 </tr>
 
@@ -103,13 +115,15 @@ ob_start();
 						 1 === $settings['auto_backup'] ) {
 						echo ' checked';
 					}
-					?> /> <?php esc_html_e( 'Enabled', 'boldgrid-backup' ); ?> &nbsp; <input
+					?>
+					 /> <?php esc_html_e( 'Enabled', 'boldgrid-backup' ); ?> &nbsp; <input
 					id='auto-backup-disabled' type='radio' name='auto_backup' value='0'
 					<?php
 					if ( isset( $settings['auto_backup'] ) && 0 === $settings['auto_backup'] ) {
 						echo ' checked';
 					}
-					?> /> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
+					?>
+					 /> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
 				 </td>
 			 </tr>
 
@@ -134,14 +148,16 @@ ob_start();
 						 1 === $settings['auto_rollback'] ) {
 						echo ' checked';
 					}
-					?> /> <?php esc_html_e( 'Enabled', 'boldgrid-backup' ); ?> &nbsp; <input
+					?>
+					 /> <?php esc_html_e( 'Enabled', 'boldgrid-backup' ); ?> &nbsp; <input
 					id='auto-rollback-disabled' type='radio' name='auto_rollback'
 					value='0'
 					<?php
 					if ( isset( $settings['auto_rollback'] ) && 0 === $settings['auto_rollback'] ) {
 						echo ' checked';
 					}
-					?> /> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
+					?>
+					 /> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
 				 </td>
 			 </tr>
 		</table>

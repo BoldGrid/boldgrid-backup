@@ -133,7 +133,7 @@ class Boldgrid_Backup_Admin_Config {
 		}
 
 		if ( class_exists( '\Boldgrid\Library\Library\License' ) ) {
-			$this->license = new \Boldgrid\Library\Library\License();
+			$this->license    = new \Boldgrid\Library\Library\License();
 			$this->is_premium = $this->license->isPremium( 'boldgrid-backup' );
 		}
 
@@ -166,7 +166,7 @@ class Boldgrid_Backup_Admin_Config {
 		} elseif ( $this->core->test->is_windows() ) {
 			// Windows.
 			$home_drive = ( ! empty( $_SERVER['HOMEDRIVE'] ) ? $_SERVER['HOMEDRIVE'] : null );
-			$home_path = ( ! empty( $_SERVER['HOMEPATH'] ) ? $_SERVER['HOMEPATH'] : null );
+			$home_path  = ( ! empty( $_SERVER['HOMEPATH'] ) ? $_SERVER['HOMEPATH'] : null );
 
 			if ( ! ( empty( $home_drive ) || empty( $home_path ) ) ) {
 				$home_dir = $home_drive . $home_path;
@@ -179,7 +179,7 @@ class Boldgrid_Backup_Admin_Config {
 		} else {
 			// Linux.  Try posix_getpwuid and posix_getuid.
 			if ( function_exists( 'posix_getuid' ) && function_exists( 'posix_getpwuid' ) ) {
-				$user = posix_getpwuid( posix_getuid() );
+				$user     = posix_getpwuid( posix_getuid() );
 				$home_dir = ( ! empty( $user['dir'] ) ? $user['dir'] : null );
 			}
 
@@ -272,10 +272,10 @@ class Boldgrid_Backup_Admin_Config {
 	 */
 	public function set_lang() {
 		$this->lang = array(
-			'website_size' => esc_html__( 'Website Size:', 'boldgrid-backup' ),
+			'website_size'  => esc_html__( 'Website Size:', 'boldgrid-backup' ),
 			'database_size' => esc_html__( 'Database Size:', 'boldgrid-backup' ),
-			'of' => esc_html__( 'of', 'boldgrid-backup' ),
-			'xmark' => '&#10007;',
+			'of'            => esc_html__( 'of', 'boldgrid-backup' ),
+			'xmark'         => '&#10007;',
 		);
 	}
 
@@ -369,7 +369,7 @@ class Boldgrid_Backup_Admin_Config {
 	 */
 	public function admin_init() {
 		$relative_path = 'boldgrid-backup-premium/boldgrid-backup-premium.php';
-		$abs_path = dirname( BOLDGRID_BACKUP_PATH ) . '/' . $relative_path;
+		$abs_path      = dirname( BOLDGRID_BACKUP_PATH ) . '/' . $relative_path;
 
 		// Function is_plugin_active only available in and after admin_init.
 		$this->is_premium_active = is_plugin_active( $relative_path );
@@ -416,7 +416,7 @@ class Boldgrid_Backup_Admin_Config {
 		}
 
 		if ( ! class_exists( 'PclZip' ) ) {
-			require_once( ABSPATH . '/wp-admin/includes/class-pclzip.php' );
+			require_once ABSPATH . '/wp-admin/includes/class-pclzip.php';
 		}
 
 		// Initialize $this->available_compressors to an empty array.

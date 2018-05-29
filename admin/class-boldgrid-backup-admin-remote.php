@@ -73,7 +73,7 @@ class Boldgrid_Backup_Admin_Remote {
 	public function is_enabled( $id ) {
 		$settings = $this->core->settings->get_settings();
 
-		return ! empty( $settings['remote'][ $id ]['enabled'] ) && true === $settings['remote'][ $id ]['enabled'] ;
+		return ! empty( $settings['remote'][ $id ]['enabled'] ) && true === $settings['remote'][ $id ]['enabled'];
 	}
 
 	/**

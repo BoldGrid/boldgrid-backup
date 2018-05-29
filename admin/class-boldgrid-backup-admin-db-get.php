@@ -52,7 +52,7 @@ class Boldgrid_Backup_Admin_Db_Get {
 		global $wpdb;
 		$prefix_tables = array();
 
-		$sql = sprintf( 'SHOW TABLES LIKE "%1$s%%"', $wpdb->prefix );
+		$sql     = sprintf( 'SHOW TABLES LIKE "%1$s%%"', $wpdb->prefix );
 		$results = $wpdb->get_results( $sql, ARRAY_N );
 
 		foreach ( $results as $k => $v ) {
@@ -79,8 +79,8 @@ class Boldgrid_Backup_Admin_Db_Get {
 		$tables = $this->prefixed();
 
 		foreach ( $tables as $table ) {
-			$sql = sprintf( 'SELECT COUNT(*) FROM %1$s;', $table );
-			$num = $wpdb->get_var( $sql );
+			$sql              = sprintf( 'SELECT COUNT(*) FROM %1$s;', $table );
+			$num              = $wpdb->get_var( $sql );
 			$return[ $table ] = $num;
 		}
 

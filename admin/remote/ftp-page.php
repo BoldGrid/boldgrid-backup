@@ -46,7 +46,8 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 	 */
 	public function enqueue_scripts() {
 		$handle = 'boldgrid-backup-admin-ftp-settings';
-		wp_register_script( $handle,
+		wp_register_script(
+			$handle,
 			plugin_dir_url( dirname( __FILE__ ) ) . 'js/' . $handle . '.js',
 			array( 'jquery' ),
 			BOLDGRID_BACKUP_VERSION,
@@ -80,15 +81,15 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 		wp_enqueue_style( 'boldgrid-backup-admin-hide-all' );
 
 		// Blank data, used when deleting settings.
-		$type = $this->core->ftp->default_type;
+		$type       = $this->core->ftp->default_type;
 		$blank_data = array(
-			'type' => $type,
-			'host' => null,
-			'port' => $this->core->ftp->default_port[ $type ],
-			'user' => null,
-			'pass' => null,
+			'type'            => $type,
+			'host'            => null,
+			'port'            => $this->core->ftp->default_port[ $type ],
+			'user'            => null,
+			'pass'            => null,
 			'retention_count' => $this->core->ftp->retention_count,
-			'nickname' => '',
+			'nickname'        => '',
 		);
 
 		// Post data, used by default or when updating settings.
@@ -178,7 +179,7 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 		}
 
 		$settings['remote'][ $ftp->key ]['retention_count'] = $data['retention_count'];
-		$settings['remote'][ $ftp->key ]['nickname'] = $data['nickname'];
+		$settings['remote'][ $ftp->key ]['nickname']        = $data['nickname'];
 
 		if ( ! empty( $ftp->errors ) ) {
 			do_action( 'boldgrid_backup_notice', implode( '<br /><br />', $ftp->errors ) );

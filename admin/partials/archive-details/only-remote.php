@@ -11,7 +11,8 @@
 
 defined( 'WPINC' ) ? : die;
 
-return sprintf( '
+return sprintf(
+	'
 	<p>
 		%1$s <span class="dashicons dashicons-editor-help" data-id="help-web-server"></span>
 	</p>

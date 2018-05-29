@@ -73,11 +73,11 @@ class Boldgrid_Backup_Admin_Db_Dump {
 				array(
 					'include-tables' => $include_tables,
 					'add-drop-table' => true,
-					'no-autocommit' => false,
+					'no-autocommit'  => false,
 				)
 			);
 			$dump->start( $file );
-		} catch (\Exception $e) {
+		} catch ( \Exception $e ) {
 			return array( 'error' => $e->getMessage() );
 		}
 
@@ -140,7 +140,7 @@ class Boldgrid_Backup_Admin_Db_Dump {
 				 * of records.
 				 */
 				$insert_command = str_replace( '\\\'', '', $line );
-				$exploded = explode( '\'', $insert_command );
+				$exploded       = explode( '\'', $insert_command );
 				foreach ( $exploded as $k => $v ) {
 					// Odd numbers are what was between quotes.
 					if ( 0 !== $k % 2 ) {
@@ -184,7 +184,7 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		 *
 		 * For now, we'll go with the handy explode technique.
 		*/
-		$tables = array();
+		$tables   = array();
 		$exploded = explode( 'INSERT INTO `', $file_contents[0]['content'] );
 		unset( $exploded[0] );
 		foreach ( $exploded as $table ) {

@@ -139,7 +139,8 @@ class Boldgrid_Backup_Admin_Archives {
 
 			$title = $this->get_location_type_title( $location );
 
-			$locations[] = sprintf('
+			$locations[] = sprintf(
+				'
 				%3$s %1$s %4$s (%2$s)
 				',
 				/* 1 */ $title,
@@ -155,7 +156,8 @@ class Boldgrid_Backup_Admin_Archives {
 		$markup = '<p class="subsubsub">' . implode( ' | ', $locations ) . '</p>';
 
 		// Create help text to go along with help icon.
-		$markup .= sprintf('
+		$markup .= sprintf(
+			'
 			<p class="help" data-id="mine-count">
 				%1$s
 			</p>',
@@ -176,12 +178,13 @@ class Boldgrid_Backup_Admin_Archives {
 	 */
 	public function get_table() {
 		$this->core->archives_all->init();
-		$backup = __( 'Backup', 'boldgrid-backup' );
+		$backup       = __( 'Backup', 'boldgrid-backup' );
 		$view_details = __( 'View details', 'boldgrid-backup' );
 
 		$table = $this->get_mine_count();
 
-		$table .= sprintf( '
+		$table .= sprintf(
+			'
 			<table class="wp-list-table widefat fixed striped pages">
 				<thead>
 					<td>%1$s</td>
@@ -198,7 +201,8 @@ class Boldgrid_Backup_Admin_Archives {
 			// dirlist -> lastmodunix -> mtime (last_modified in unix time).
 			$this->core->time->init( $archive['last_modified'], 'utc' );
 
-			$table .= sprintf( '
+			$table .= sprintf(
+				'
 				<tr>
 					<td>
 						%2$s
@@ -228,7 +232,8 @@ class Boldgrid_Backup_Admin_Archives {
 		';
 
 		if ( empty( $this->core->archives_all->all ) ) {
-			$table = sprintf( '
+			$table = sprintf(
+				'
 				<p>%1$s</p>',
 				__( 'You currently do not have any backups.', 'boldgrid-backup' )
 			);

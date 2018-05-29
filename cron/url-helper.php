@@ -31,7 +31,7 @@ class Boldgrid_Backup_Url_Helper {
 		$url = filter_var( $url, FILTER_SANITIZE_URL );
 
 		switch ( true ) {
-			case $this->has_curl_ssl() :
+			case $this->has_curl_ssl():
 				$ch = curl_init( $url );
 
 				$curl_options = array(
@@ -39,8 +39,8 @@ class Boldgrid_Backup_Url_Helper {
 					CURLOPT_RETURNTRANSFER => true,
 					CURLOPT_SSL_VERIFYPEER => false,
 					CURLOPT_SSL_VERIFYHOST => 0,
-					CURLOPT_TIMEOUT => 0,
-					CURLOPT_USERAGENT => 'BoldGrid Backup cron task',
+					CURLOPT_TIMEOUT        => 0,
+					CURLOPT_USERAGENT      => 'BoldGrid Backup cron task',
 				);
 
 				curl_setopt_array( $ch, $curl_options );
@@ -55,11 +55,11 @@ class Boldgrid_Backup_Url_Helper {
 
 				break;
 
-			case $this->has_url_fopen() :
+			case $this->has_url_fopen():
 				$result = file_get_contents( $url );
 				break;
 
-			default :
+			default:
 				break;
 		}
 

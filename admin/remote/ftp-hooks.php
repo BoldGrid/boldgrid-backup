@@ -77,14 +77,14 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 			$filename = $item['filename'];
 
 			$backup = array(
-				'filename' => $filename,
+				'filename'      => $filename,
 				'last_modified' => $item['time'],
-				'size' => $item['size'],
-				'locations' => array(
+				'size'          => $item['size'],
+				'locations'     => array(
 					array(
-						'title' => $this->core->ftp->nickname,
+						'title'            => $this->core->ftp->nickname,
 						'on_remote_server' => true,
-						'title_attr' => $this->core->ftp->title_attr,
+						'title_attr'       => $this->core->ftp->title_attr,
 					),
 				),
 			);
@@ -110,7 +110,7 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 		$settings = $this->core->settings->get_settings();
 
 		$location = $this->core->ftp->get_details();
-		$tr = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/storage-location.php';
+		$tr       = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/storage-location.php';
 
 		if ( $this->core->ftp->is_setup() ) {
 			wp_send_json_success( $tr );
@@ -143,9 +143,9 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 		}
 
 		$args = array(
-			'filepath' => $info['filepath'],
-			'action' => 'boldgrid_backup_' . $this->core->ftp->key . '_upload_post_archive',
-			'action_data' => $info['filepath'],
+			'filepath'     => $info['filepath'],
+			'action'       => 'boldgrid_backup_' . $this->core->ftp->key . '_upload_post_archive',
+			'action_data'  => $info['filepath'],
 			'action_title' => sprintf( __( 'Upload backup file to %1$s', 'boldgrid-backup' ), $this->core->ftp->title ),
 		);
 
@@ -172,15 +172,15 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 	 */
 	public function single_archive_remote_option( $filepath ) {
 		$allow_upload = $this->core->ftp->is_setup();
-		$uploaded = $this->core->ftp->is_uploaded( $filepath );
+		$uploaded     = $this->core->ftp->is_uploaded( $filepath );
 
 		$this->core->archive_details->remote_storage_li[] = array(
-			'id' => $this->core->ftp->key,
-			'title' => $this->core->ftp->nickname,
-			'title_attr' => $this->core->ftp->title_attr,
-			'uploaded' => $uploaded,
+			'id'           => $this->core->ftp->key,
+			'title'        => $this->core->ftp->nickname,
+			'title_attr'   => $this->core->ftp->title_attr,
+			'uploaded'     => $uploaded,
 			'allow_upload' => $allow_upload,
-			'is_setup' => $this->core->ftp->is_setup(),
+			'is_setup'     => $this->core->ftp->is_setup(),
 		);
 	}
 

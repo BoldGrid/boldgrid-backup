@@ -91,13 +91,13 @@ class Boldgrid_Backup_Admin_Cron {
 
 		// Create an array of days index names.
 		$days = array(
-			'dow_sunday' => 0,
-			'dow_monday' => 1,
-			'dow_tuesday' => 2,
+			'dow_sunday'    => 0,
+			'dow_monday'    => 1,
+			'dow_tuesday'   => 2,
 			'dow_wednesday' => 3,
-			'dow_thursday' => 4,
-			'dow_friday' => 5,
-			'dow_saturday' => 6,
+			'dow_thursday'  => 4,
+			'dow_friday'    => 5,
+			'dow_saturday'  => 6,
 		);
 
 		// Add scheduled days to the list.
@@ -164,19 +164,19 @@ class Boldgrid_Backup_Admin_Cron {
 		$success = false;
 
 		$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
-		$schedule = ! empty( $settings['schedule'] ) ? $settings['schedule'] : null;
+		$schedule  = ! empty( $settings['schedule'] ) ? $settings['schedule'] : null;
 
 		if ( 'cron' === $scheduler && $this->core->scheduler->is_available( $scheduler ) && ! empty( $schedule ) ) {
 			$this->core->scheduler->clear_all_schedules();
 
-			$scheduled = $this->add_cron_entry( $settings );
+			$scheduled      = $this->add_cron_entry( $settings );
 			$jobs_scheduled = $this->schedule_jobs();
 
 			$success = $scheduled && $jobs_scheduled;
 
 			if ( $success ) {
 				$settings['crontab_version'] = $this->crontab_version;
-				$settings['cron_secret'] = $this->get_cron_secret();
+				$settings['cron_secret']     = $this->get_cron_secret();
 				update_site_option( 'boldgrid_backup_settings', $settings );
 			}
 		}
@@ -201,7 +201,7 @@ class Boldgrid_Backup_Admin_Cron {
 	 */
 	public function add_restore_cron() {
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
-		$archives = $this->core->get_archive_list();
+		$archives         = $this->core->get_archive_list();
 
 		// Use the first key to get info on the most recent archive.
 		$archive_key = 0;
@@ -497,7 +497,7 @@ class Boldgrid_Backup_Admin_Cron {
 
 			foreach ( $crontab_exploded as $line ) {
 				if ( false === strpos( $line, $pattern ) ) {
-					$line = trim( $line );
+					$line     = trim( $line );
 					$crontab .= $line . "\n";
 				}
 			}
@@ -642,16 +642,16 @@ class Boldgrid_Backup_Admin_Cron {
 	public function get_schedule( $cron_line ) {
 		// Initialize $schedule.
 		$schedule = array(
-			'dow_sunday' => 0,
-			'dow_monday' => 0,
-			'dow_tuesday' => 0,
+			'dow_sunday'    => 0,
+			'dow_monday'    => 0,
+			'dow_tuesday'   => 0,
 			'dow_wednesday' => 0,
-			'dow_thursday' => 0,
-			'dow_friday' => 0,
-			'dow_saturday' => 0,
-			'tod_h' => null,
-			'tod_m' => null,
-			'tod_a' => null,
+			'dow_thursday'  => 0,
+			'dow_friday'    => 0,
+			'dow_saturday'  => 0,
+			'tod_h'         => null,
+			'tod_m'         => null,
+			'tod_a'         => null,
 		);
 
 		if ( empty( $cron_line ) ) {
@@ -686,28 +686,28 @@ class Boldgrid_Backup_Admin_Cron {
 			$days = explode( ',', $matches[0][4] );
 			foreach ( $days as $day ) {
 				switch ( $day ) {
-					case 0 :
+					case 0:
 						$schedule['dow_sunday'] = 1;
 						break;
-					case 1 :
+					case 1:
 						$schedule['dow_monday'] = 1;
 						break;
-					case 2 :
+					case 2:
 						$schedule['dow_tuesday'] = 1;
 						break;
-					case 3 :
+					case 3:
 						$schedule['dow_wednesday'] = 1;
 						break;
-					case 4 :
+					case 4:
 						$schedule['dow_thursday'] = 1;
 						break;
-					case 5 :
+					case 5:
 						$schedule['dow_friday'] = 1;
 						break;
-					case 6 :
+					case 6:
 						$schedule['dow_saturday'] = 1;
 						break;
-					default :
+					default:
 						break;
 				}
 			}
@@ -745,15 +745,15 @@ class Boldgrid_Backup_Admin_Cron {
 
 		// Create action name.
 		switch ( $archive_info['mode'] ) {
-			case 'backup' :
+			case 'backup':
 				$action_name = 'creating';
 				break;
 
-			case 'restore' :
+			case 'restore':
 				$action_name = 'restoring';
 				break;
 
-			default :
+			default:
 				$action_name = 'handling';
 				break;
 		}

@@ -9,8 +9,9 @@
 
 defined( 'WPINC' ) ? : die;
 
-if( $this->core->config->get_is_premium() ) {
-	?><p><?php
+if ( $this->core->config->get_is_premium() ) {
+	?><p>
+	<?php
 	/*
 	 * Print this message:
 	 *
@@ -20,11 +21,17 @@ if( $this->core->config->get_is_premium() ) {
 	printf(
 		wp_kses(
 			__( 'You are running the Premium version of the BoldGrid Backup Plugin. Please visit our <a href="%s" target="_blank">BoldGrid Backup User Guide</a> for more information.', 'boldgrid-backup' ),
-			array( 'a' => array( 'href' => array(), 'target' => array() ) )
+			array(
+				'a' => array(
+					'href'   => array(),
+					'target' => array(),
+				),
+			)
 		),
 		esc_url( $this->core->configs['urls']['user_guide'] )
 	);
-	?></p><?php
+	?>
+	</p><?php
 } else {
 	/*
 	 * Print this message:
@@ -46,7 +53,10 @@ if( $this->core->config->get_is_premium() ) {
 				'boldgrid-backup'
 			),
 			array(
-				'a' => array( 'href' => array(), 'target' => array() ),
+				'a' => array(
+					'href'   => array(),
+					'target' => array(),
+				),
 				'p' => array(),
 			)
 		),

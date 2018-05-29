@@ -71,12 +71,13 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 	 */
 	public function get_sql_details( $filepath, $file ) {
 		$tables_with_records = $this->core->db_dump->get_insert_count( $filepath, $file );
-		$prefixed_tables = $this->core->db_get->prefixed_count();
+		$prefixed_tables     = $this->core->db_get->prefixed_count();
 
-		$in_backup = __( '# Records in this backup', 'boldgrid-backup' );
+		$in_backup  = __( '# Records in this backup', 'boldgrid-backup' );
 		$in_current = __( '# Records in current database', 'boldgrid-backup' );
 
-		$return = sprintf( '
+		$return = sprintf(
+			'
 			<table class="wp-list-table fixed striped widefat">
 			<thead>
 				<tr>
@@ -150,7 +151,7 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 
 		$contents = $zip->browse( $filepath, $dir );
 
-		$tr = '';
+		$tr              = '';
 		$empty_directory = '<tr><td colspan="3">' . __( 'Empty directory', 'boldgrid-backup' ) . '</td></tr>';
 
 		$table = sprintf(
@@ -200,7 +201,7 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 
 		$filename = ! empty( $_POST['filename'] ) ? sanitize_file_name( $_POST['filename'] ) : false;
 		$filepath = $this->core->backup_dir->get_path_to( $filename );
-		$file = ! empty( $_POST['file'] ) ? trim( strip_tags( $_POST['file'] ) ) : false;
+		$file     = ! empty( $_POST['file'] ) ? trim( strip_tags( $_POST['file'] ) ) : false;
 		if ( empty( $filepath ) || empty( $file ) ) {
 			wp_send_json_error( __( 'Invalid file / filepath.', 'boldgrid-backup' ) );
 		}
@@ -234,13 +235,13 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 
 		$filename = ! empty( $_POST['filename'] ) ? sanitize_file_name( $_POST['filename'] ) : false;
 		$filepath = $this->core->backup_dir->get_path_to( $filename );
-		$file = ! empty( $_POST['file'] ) ? trim( strip_tags( $_POST['file'] ) ) : false;
+		$file     = ! empty( $_POST['file'] ) ? trim( strip_tags( $_POST['file'] ) ) : false;
 		if ( empty( $filepath ) || empty( $file ) ) {
 			wp_send_json_error( __( 'Invalid file / filepath.', 'boldgrid-backup' ) );
 		}
 
 		$importer = new Boldgrid_Backup_Admin_Db_Import( $this->core );
-		$success = $importer->import_from_archive( $filepath, $file );
+		$success  = $importer->import_from_archive( $filepath, $file );
 
 		if ( ! $success ) {
 			$this->core->notice->add_user_notice(
@@ -268,7 +269,7 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 
 		$filename = ! empty( $_POST['filename'] ) ? sanitize_file_name( $_POST['filename'] ) : false;
 		$filepath = $this->core->backup_dir->get_path_to( $filename );
-		$file = ! empty( $_POST['file'] ) ? trim( strip_tags( $_POST['file'] ) ) : false;
+		$file     = ! empty( $_POST['file'] ) ? trim( strip_tags( $_POST['file'] ) ) : false;
 		if ( empty( $filename ) || empty( $filepath ) || empty( $file ) ) {
 			wp_send_json_error( __( 'Invalid file / filepath.', 'boldgrid-backup' ) );
 		}

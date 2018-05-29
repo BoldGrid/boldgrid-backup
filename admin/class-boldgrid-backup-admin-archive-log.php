@@ -107,7 +107,7 @@ class Boldgrid_Backup_Admin_Archive_Log {
 	 */
 	public function post_restore( $info ) {
 		$path_backup_dir = $this->path_from_zip( $info['filepath'] );
-		$path_abspath = ABSPATH . basename( $path_backup_dir );
+		$path_abspath    = ABSPATH . basename( $path_backup_dir );
 
 		// If this backup did not restore a log file to ABSPATH, then we can abort.
 		if ( ! $this->core->wp_filesystem->exists( $path_abspath ) ) {
@@ -141,7 +141,7 @@ class Boldgrid_Backup_Admin_Archive_Log {
 		}
 
 		// Extract the log file to ABSPATH.
-		$zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this->core );
+		$zip    = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this->core );
 		$status = $zip->extract_one( $filepath, $log_filename );
 		if ( ! $status ) {
 			return false;

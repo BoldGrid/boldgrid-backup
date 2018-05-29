@@ -5,7 +5,7 @@
  * The file handles the rendering of the settings page.
  */
 
-$selected = 'selected="selected"';
+$selected      = 'selected="selected"';
 $ftp_selected  = 'ftp' === $data['type'] ? $selected : '';
 $sftp_selected = 'sftp' === $data['type'] ? $selected : '';
 
@@ -13,7 +13,7 @@ $sftp_selected = 'sftp' === $data['type'] ? $selected : '';
 
 <form method="post">
 
-	<h1><?php echo __( 'BoldGrid Backup - FTP Settings', 'boldgrid-backup' )?></h1>
+	<h1><?php echo __( 'BoldGrid Backup - FTP Settings', 'boldgrid-backup' ); ?></h1>
 
 	<hr />
 
@@ -21,7 +21,8 @@ $sftp_selected = 'sftp' === $data['type'] ? $selected : '';
 		<tr>
 			<td>
 				<?php
-					printf( '
+					printf(
+						'
 						<label for="host">%1$s</label>
 						<input type="text" name="host" value="%2$s" minlength="5" title="%3$s" required />
 						',
@@ -29,7 +30,7 @@ $sftp_selected = 'sftp' === $data['type'] ? $selected : '';
 						$data['host'],
 						__( 'FTP host should be in the format of: example.com', 'boldgrid-backup' )
 					);
-				?>
+					?>
 			</td>
 			<td></td>
 		</tr>
@@ -58,14 +59,14 @@ $sftp_selected = 'sftp' === $data['type'] ? $selected : '';
 		</tr>
 		<tr>
 			<td>
-				<?php echo __( 'Retention (Number of backup archives to retain)', 'boldgrid-backup' ) ?><br />
+				<?php echo __( 'Retention (Number of backup archives to retain)', 'boldgrid-backup' ); ?><br />
 				<input type="number" name="retention_count" value="<?php echo $data['retention_count']; ?>" min="1" required/>
 			</td>
 			<td></td>
 		</tr>
 		<tr>
 			<td>
-				<?php echo __( 'Nickname (If you would like to refer to this account as something other than FTP)', 'boldgrid-backup' ) ?><br />
+				<?php echo __( 'Nickname (If you would like to refer to this account as something other than FTP)', 'boldgrid-backup' ); ?><br />
 				<input type="text" name="nickname" value="<?php echo esc_attr( $data['nickname'] ); ?>" />
 			</td>
 			<td></td>

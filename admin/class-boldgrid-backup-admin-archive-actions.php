@@ -45,9 +45,9 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 	 * @since 1.5.4
 	 */
 	public function enqueue_scripts() {
-		$access_type = get_filesystem_method();
-		$archive_nonce = wp_create_nonce( 'archive_auth' );
-		$delete_confirm_text = esc_html__(
+		$access_type          = get_filesystem_method();
+		$archive_nonce        = wp_create_nonce( 'archive_auth' );
+		$delete_confirm_text  = esc_html__(
 			'Please confirm the deletion of the archive file:' . PHP_EOL,
 			'boldgrid-backup'
 		);
@@ -59,16 +59,17 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 		);
 
 		$handle = 'boldgrid-backup-admin-archive-actions';
-		wp_register_script( $handle,
+		wp_register_script(
+			$handle,
 			plugin_dir_url( __FILE__ ) . 'js/' . $handle . '.js',
 			array( 'jquery' ),
 			BOLDGRID_BACKUP_VERSION,
 			false
 		);
 		$translation = array(
-			'accessType' => $access_type,
-			'archiveNonce' => $archive_nonce,
-			'deleteConfirmText' => $delete_confirm_text,
+			'accessType'         => $access_type,
+			'archiveNonce'       => $archive_nonce,
+			'deleteConfirmText'  => $delete_confirm_text,
 			'restoreConfirmText' => $restore_confirm_text,
 		);
 		wp_localize_script( $handle, 'BoldGridBackupAdminArchiveActions', $translation );
@@ -89,7 +90,8 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 		if ( empty( $archive ) ) {
 			$link = '';
 		} else {
-			$link = sprintf( '
+			$link = sprintf(
+				'
 				<form method="post" id="delete-action" >
 					<input type="hidden" name="delete_now" value="1" />
 					<input type="hidden" name="archive_key" value="%2$s" />
@@ -123,7 +125,8 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 		if ( empty( $archive ) ) {
 			$button = '';
 		} else {
-			$button = sprintf( '
+			$button = sprintf(
+				'
 				<a
 					id="backup-archive-download-%1$s"
 					class="button button-primary action-download"
@@ -164,7 +167,8 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 		if ( empty( $archive ) ) {
 			$button = '';
 		} else {
-			$button = sprintf('
+			$button = sprintf(
+				'
 				<a
 					data-restore-now="1"
 					data-archive-key="%2$s"

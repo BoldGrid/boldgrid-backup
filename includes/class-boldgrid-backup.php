@@ -64,7 +64,7 @@ class Boldgrid_Backup {
 	 */
 	public function __construct() {
 		$this->plugin_name = 'boldgrid-backup';
-		$this->version = ( defined( 'BOLDGRID_BACKUP_VERSION' ) ? BOLDGRID_BACKUP_VERSION : '' );
+		$this->version     = ( defined( 'BOLDGRID_BACKUP_VERSION' ) ? BOLDGRID_BACKUP_VERSION : '' );
 
 		$this->load_dependencies();
 		$this->set_locale();
@@ -250,12 +250,14 @@ class Boldgrid_Backup {
 		$plugin_admin_core = new Boldgrid_Backup_Admin_Core();
 
 		// Add nav menu items.
-		$this->loader->add_action( 'admin_menu', $plugin_admin_core,
+		$this->loader->add_action(
+			'admin_menu', $plugin_admin_core,
 			'add_menu_items'
 		);
 
 		// Add a custom action for admin notices.
-		$this->loader->add_action( 'boldgrid_backup_notice', $plugin_admin_core->notice,
+		$this->loader->add_action(
+			'boldgrid_backup_notice', $plugin_admin_core->notice,
 			'boldgrid_backup_notice', 10, 2
 		);
 
@@ -265,39 +267,46 @@ class Boldgrid_Backup {
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_get_progress_notice', $plugin_admin_core->in_progress, 'wp_ajax_get_progress_notice' );
 
 		// Add a custom action to handle AJAX callback for creating a backup archive file.
-		$this->loader->add_action( 'wp_ajax_boldgrid_backup_now', $plugin_admin_core,
+		$this->loader->add_action(
+			'wp_ajax_boldgrid_backup_now', $plugin_admin_core,
 			'boldgrid_backup_now_callback'
 		);
 
 		// Add a custom action to handle AJAX callback for archive file download buttons.
-		$this->loader->add_action( 'wp_ajax_download_archive_file', $plugin_admin_core,
+		$this->loader->add_action(
+			'wp_ajax_download_archive_file', $plugin_admin_core,
 			'download_archive_file_callback'
 		);
 
 		// Add an action to perform an auto-backup before an auto-update occurs.
-		$this->loader->add_action( 'pre_auto_update', $plugin_admin_core,
+		$this->loader->add_action(
+			'pre_auto_update', $plugin_admin_core,
 			'boldgrid_backup_now_auto'
 		);
 
 		// Add an action to display an admin notice for a pending rollback.
-		$this->loader->add_action( 'admin_notices', $plugin_admin_core->auto_rollback,
+		$this->loader->add_action(
+			'admin_notices', $plugin_admin_core->auto_rollback,
 			'notice_countdown_show'
 		);
 
 		// Add a custom action to handle AJAX callback for canceling a pending rollback.
-		$this->loader->add_action( 'wp_ajax_boldgrid_cancel_rollback', $plugin_admin_core->auto_rollback,
+		$this->loader->add_action(
+			'wp_ajax_boldgrid_cancel_rollback', $plugin_admin_core->auto_rollback,
 			'wp_ajax_cancel'
 		);
 
 		$this->loader->add_action( 'admin_notices', $plugin_admin_core->auto_rollback, 'notice_backup_show' );
 
 		// Add an action to add a cron job to restore after WordPress Updates, unless canceled.
-		$this->loader->add_action( 'upgrader_process_complete', $plugin_admin_core->auto_rollback,
+		$this->loader->add_action(
+			'upgrader_process_complete', $plugin_admin_core->auto_rollback,
 			'notice_deadline_show', 10, 2
 		);
 
 		// Add a custom action to handle AJAX callback for getting the rollback deadline.
-		$this->loader->add_action( 'wp_ajax_boldgrid_backup_deadline', $plugin_admin_core->auto_rollback,
+		$this->loader->add_action(
+			'wp_ajax_boldgrid_backup_deadline', $plugin_admin_core->auto_rollback,
 			'wp_ajax_get_deadline'
 		);
 
@@ -356,7 +365,7 @@ class Boldgrid_Backup {
 		// Process upload via ajax.
 		$this->loader->add_filter( 'wp_ajax_boldgrid_backup_remote_storage_upload_ftp', $plugin_admin_core->ftp->hooks, 'wp_ajax_upload' );
 		// Add to the settings page.
-		$this->loader->add_filter( 'boldgrid_backup_register_storage_location',  $plugin_admin_core->ftp->hooks, 'register_storage_location' );
+		$this->loader->add_filter( 'boldgrid_backup_register_storage_location', $plugin_admin_core->ftp->hooks, 'register_storage_location' );
 		// Add our "configure ftp" page.
 		$this->loader->add_action( 'admin_menu', $plugin_admin_core->ftp->hooks, 'add_menu_items' );
 		// After updating settings on the settings page, check if we have valid credentials.

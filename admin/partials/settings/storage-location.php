@@ -29,7 +29,7 @@ $configure = '';
 $configure_link = '<a href="%1$s&TB_iframe=true&width=600&height=550" class="thickbox">%2$s</a>';
 
 if ( $location['is_setup'] && ! empty( $location['configure'] ) ) {
-	$configure = sprintf( '&#10003; %1$s', __( 'Configured', 'boldgrid-backup' ) );
+	$configure  = sprintf( '&#10003; %1$s', __( 'Configured', 'boldgrid-backup' ) );
 	$configure .= ' (' . sprintf( $configure_link, $location['configure'], __( 'update', 'boldgrid-backup' ) ) . ')';
 } elseif ( ! empty( $location['configure'] ) ) {
 	$configure .= sprintf( $configure_link, $location['configure'], __( 'Configure', 'boldgrid-backup' ) );
@@ -39,7 +39,8 @@ $disabled = $location['is_setup'] ? '' : 'disabled';
 
 $checked = isset( $location['enabled'] ) && true === $location['enabled'] ? 'checked' : '';
 
-return sprintf( '
+return sprintf(
+	'
 	<tr data-key="%4$s">
 		<td>
 			<input type="checkbox" name="storage_location[%4$s]" value="1" %3$s %5$s> <strong>%1$s</strong>

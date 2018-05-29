@@ -121,7 +121,7 @@ class Boldgrid_Backup_Admin_Archives_All {
 			if ( $backup['filename'] === $all_backup['filename'] ) {
 
 				// Once we found our backup, flag that we found it.
-				$in_all = true;
+				$in_all                    = true;
 				$all_backup['locations'][] = $backup['locations'][0];
 			}
 		}
@@ -194,12 +194,12 @@ class Boldgrid_Backup_Admin_Archives_All {
 
 		foreach ( $archives as $archive ) {
 			$this->all[] = array(
-				'filename' => $archive['filename'],
+				'filename'      => $archive['filename'],
 				'last_modified' => $archive['lastmodunix'],
-				'size' => $archive['filesize'],
-				'locations' => array(
+				'size'          => $archive['filesize'],
+				'locations'     => array(
 					array(
-						'title' => $this->local_title,
+						'title'         => $this->local_title,
 						'on_web_server' => true,
 					),
 				),

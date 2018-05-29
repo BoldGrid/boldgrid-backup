@@ -21,12 +21,12 @@ $available_compressors = array( 'php_zip', 'pcl_zip' );
 // Settings for compressor.
 $pcl_zip_selected = empty( $settings['compressor'] ) || 'pcl_zip' === $settings['compressor'] ? $selected : '';
 $php_zip_selected = ! empty( $settings['compressor'] ) && 'php_zip' === $settings['compressor'] ? $selected : '';
-$php_zip_option = ! in_array( 'php_zip', $available_compressors ) ? '' : sprintf( '<option value="php_zip" %1$s>ZipArchive</option>', $php_zip_selected );
+$php_zip_option   = ! in_array( 'php_zip', $available_compressors ) ? '' : sprintf( '<option value="php_zip" %1$s>ZipArchive</option>', $php_zip_selected );
 
 // Settings for extractor.
 $extractor_pcl_zip_selected = ! empty( $settings['extractor'] ) && 'pcl_zip' === $settings['extractor'] ? $selected : '';
 $extractor_php_zip_selected = empty( $settings['extractor'] ) || 'php_zip' === $settings['extractor'] ? $selected : '';
-$extractor_php_zip_option = ! in_array( 'php_zip', $available_compressors ) ? '' : sprintf( '<option value="php_zip" %1$s>ZipArchive</option>', $extractor_php_zip_selected );
+$extractor_php_zip_option   = ! in_array( 'php_zip', $available_compressors ) ? '' : sprintf( '<option value="php_zip" %1$s>ZipArchive</option>', $extractor_php_zip_selected );
 
 ?>
 <div class="bg-box">
@@ -44,7 +44,7 @@ $extractor_php_zip_option = ! in_array( 'php_zip', $available_compressors ) ? ''
 
 		<table class="form-table">
 			<tr>
-				<th><?php echo __( 'Compressor', 'boldgrid-backup' );?>:</th>
+				<th><?php echo __( 'Compressor', 'boldgrid-backup' ); ?>:</th>
 				<td>
 					<select name="compressor">
 						<option value='pcl_zip' <?php echo $pcl_zip_selected; ?> >PclZip</option>
@@ -53,7 +53,7 @@ $extractor_php_zip_option = ! in_array( 'php_zip', $available_compressors ) ? ''
 				</td>
 			</tr>
 			<tr>
-				<th><?php echo __( 'Extractor', 'boldgrid-backup' ) ?>:</th>
+				<th><?php echo __( 'Extractor', 'boldgrid-backup' ); ?>:</th>
 				<td>
 					<select name="extractor">
 						<option value='pcl_zip' <?php echo $extractor_pcl_zip_selected; ?> >PclZip</option>

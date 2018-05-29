@@ -34,7 +34,8 @@ defined( 'WPINC' ) ? : die;
 $nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
 
 // Premium advertisement on the bottom of the archives page.
-$ad = $this->config->is_premium_done ? '' : sprintf( '
+$ad = $this->config->is_premium_done ? '' : sprintf(
+	'
 	<div class="bg-box-bottom premium wp-clearfix">
 		%1$s
 		%2$s
@@ -45,7 +46,7 @@ $ad = $this->config->is_premium_done ? '' : sprintf( '
 
 // Backup now modal.
 $in_modal = true;
-$modal = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-modal.php';
+$modal    = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-modal.php';
 $in_modal = false;
 
 ?>
@@ -60,13 +61,13 @@ $in_modal = false;
 	<?php
 	echo $nav;
 
-	include BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
+	require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
 
 	echo $table;
 
 	echo $modal;
 
-	include BOLDGRID_BACKUP_PATH . '/admin/partials/archives/note-pre-backup.php';
+	require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/note-pre-backup.php';
 
 	echo $ad;
 	?>

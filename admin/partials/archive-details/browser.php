@@ -23,8 +23,7 @@ $browser = '
 				</tbody>
 			</table>
 		</div>
-	</div>'
-;
+	</div>';
 
 return $browser;
 

@@ -103,25 +103,25 @@ class Boldgrid_Backup_Admin_Settings {
 		if ( ! empty( $settings['schedule'] ) ) {
 			// Update schedule format.
 			// Days of the week.
-			$settings['schedule']['dow_sunday'] = (
+			$settings['schedule']['dow_sunday']    = (
 				! empty( $settings['schedule']['dow_sunday'] ) ? 1 : 0
 			);
-			$settings['schedule']['dow_monday'] = (
+			$settings['schedule']['dow_monday']    = (
 				! empty( $settings['schedule']['dow_monday'] ) ? 1 : 0
 			);
-			$settings['schedule']['dow_tuesday'] = (
+			$settings['schedule']['dow_tuesday']   = (
 				! empty( $settings['schedule']['dow_tuesday'] ) ? 1 : 0
 			);
 			$settings['schedule']['dow_wednesday'] = (
 				! empty( $settings['schedule']['dow_wednesday'] ) ? 1 : 0
 			);
-			$settings['schedule']['dow_thursday'] = (
+			$settings['schedule']['dow_thursday']  = (
 				! empty( $settings['schedule']['dow_thursday'] ) ? 1 : 0
 			);
-			$settings['schedule']['dow_friday'] = (
+			$settings['schedule']['dow_friday']    = (
 				! empty( $settings['schedule']['dow_friday'] ) ? 1 : 0
 			);
-			$settings['schedule']['dow_saturday'] = (
+			$settings['schedule']['dow_saturday']  = (
 				! empty( $settings['schedule']['dow_saturday'] ) ? 1 : 0
 			);
 
@@ -140,7 +140,7 @@ class Boldgrid_Backup_Admin_Settings {
 			);
 
 			// Notification settings.
-			$settings['notifications']['backup'] = (
+			$settings['notifications']['backup']  = (
 				! isset( $settings['notifications']['backup'] ) ||
 				! empty( $settings['notifications']['backup'] ) ? 1 : 0
 			);
@@ -155,7 +155,7 @@ class Boldgrid_Backup_Admin_Settings {
 			}
 
 			// Other settings.
-			$settings['auto_backup'] = (
+			$settings['auto_backup']   = (
 				! isset( $settings['auto_backup'] ) || ! empty( $settings['auto_backup'] ) ? 1 : 0
 			);
 			$settings['auto_rollback'] = (
@@ -165,13 +165,13 @@ class Boldgrid_Backup_Admin_Settings {
 		} else {
 			// Define defaults.
 			// Days of the week.
-			$settings['schedule']['dow_sunday'] = 0;
-			$settings['schedule']['dow_monday'] = 0;
-			$settings['schedule']['dow_tuesday'] = 0;
+			$settings['schedule']['dow_sunday']    = 0;
+			$settings['schedule']['dow_monday']    = 0;
+			$settings['schedule']['dow_tuesday']   = 0;
 			$settings['schedule']['dow_wednesday'] = 0;
-			$settings['schedule']['dow_thursday'] = 0;
-			$settings['schedule']['dow_friday'] = 0;
-			$settings['schedule']['dow_saturday'] = 0;
+			$settings['schedule']['dow_thursday']  = 0;
+			$settings['schedule']['dow_friday']    = 0;
+			$settings['schedule']['dow_saturday']  = 0;
 
 			// Time of day.
 			$settings['schedule']['tod_h'] = mt_rand( 1, 5 );
@@ -179,12 +179,12 @@ class Boldgrid_Backup_Admin_Settings {
 			$settings['schedule']['tod_a'] = 'AM';
 
 			// Other settings.
-			$settings['retention_count'] = 5;
-			$settings['notification_email'] = $this->core->config->get_admin_email();
-			$settings['notifications']['backup'] = 1;
+			$settings['retention_count']          = 5;
+			$settings['notification_email']       = $this->core->config->get_admin_email();
+			$settings['notifications']['backup']  = 1;
 			$settings['notifications']['restore'] = 1;
-			$settings['auto_backup'] = 1;
-			$settings['auto_rollback'] = 1;
+			$settings['auto_backup']              = 1;
+			$settings['auto_rollback']            = 1;
 		}
 
 		/*
@@ -258,7 +258,7 @@ class Boldgrid_Backup_Admin_Settings {
 
 		// Loop through each archive and move it.
 		foreach ( $archives as $archive ) {
-			$source = $archive['filepath'];
+			$source      = $archive['filepath'];
 			$destination = $new_dir . $archive['filename'];
 
 			$success = @$this->core->wp_filesystem->move( $source, $destination );
@@ -338,7 +338,7 @@ class Boldgrid_Backup_Admin_Settings {
 				if ( ! empty( $_POST[ $index ] ) ) {
 					// Validate by type.
 					switch ( $type ) {
-						case 'day' :
+						case 'day':
 							// Convert to integer.
 							$_POST[ $index ] = (int) $_POST[ $index ];
 
@@ -348,7 +348,7 @@ class Boldgrid_Backup_Admin_Settings {
 							}
 
 							break;
-						case 'h' :
+						case 'h':
 							if ( $_POST[ $index ] < 1 || $_POST[ $index ] > 12 ) {
 								// Error in input.
 								$update_error = true;
@@ -359,7 +359,7 @@ class Boldgrid_Backup_Admin_Settings {
 							$_POST[ $index ] = (int) $_POST[ $index ];
 
 							break;
-						case 'm' :
+						case 'm':
 							if ( $_POST[ $index ] < 0 || $_POST[ $index ] > 59 ) {
 								// Error in input.
 								$update_error = true;
@@ -373,7 +373,7 @@ class Boldgrid_Backup_Admin_Settings {
 							$_POST[ $index ] = str_pad( $_POST[ $index ], 2, '0', STR_PAD_LEFT );
 
 							break;
-						case 'a' :
+						case 'a':
 							if ( 'AM' !== $_POST[ $index ] && 'PM' !== $_POST[ $index ] ) {
 								// Error in input; unknown type.
 								$update_error = true;
@@ -381,7 +381,7 @@ class Boldgrid_Backup_Admin_Settings {
 							}
 
 							break;
-						default :
+						default:
 							// Error in input; unknown type.
 							$update_error = true;
 							break 2;
@@ -440,7 +440,7 @@ class Boldgrid_Backup_Admin_Settings {
 			unset( $settings['plugin_autoupdate'], $settings['theme_autoupdate'] );
 
 			// Get the current backup directory path.
-			$backup_dir_changed = false;
+			$backup_dir_changed        = false;
 			$original_backup_directory = ! empty( $settings['backup_directory'] ) ? $settings['backup_directory'] : false;
 
 			if ( ! empty( $_POST['backup_directory'] ) ) {
@@ -483,9 +483,9 @@ class Boldgrid_Backup_Admin_Settings {
 
 			if ( $backup_dir_changed ) {
 				if ( false === $backup_directory ) {
-					$update_error = true;
+					$update_error       = true;
 					$backup_dir_changed = false;
-					$update_errors = array_merge( $update_errors, $this->core->backup_dir->errors );
+					$update_errors      = array_merge( $update_errors, $this->core->backup_dir->errors );
 				} else {
 					$settings['backup_directory'] = $backup_directory;
 				}
@@ -496,7 +496,7 @@ class Boldgrid_Backup_Admin_Settings {
 				$backups_moved = $this->move_backups( $original_backup_directory, $backup_directory );
 
 				if ( ! $backups_moved ) {
-					$update_error = true;
+					$update_error    = true;
 					$update_errors[] = sprintf( __( 'Unable to move backups from %1$s to %2$s', 'boldgrid-backup' ), $original_backup_directory, $backup_directory );
 				}
 			}
@@ -508,11 +508,11 @@ class Boldgrid_Backup_Admin_Settings {
 			 */
 			if ( ! empty( $_POST['compressor'] ) ) {
 				$available_compressors = $this->core->compressors->get_available();
-				$selected_compressor = $_POST['compressor'];
+				$selected_compressor   = $_POST['compressor'];
 				if ( in_array( $selected_compressor, $available_compressors, true ) ) {
 					$settings['compressor'] = $selected_compressor;
 				} else {
-					$update_error = true;
+					$update_error    = true;
 					$update_errors[] = __( 'The compressor you seleted is unavailable. Please select another.', 'boldgrid-backup' );
 				}
 			}
@@ -527,7 +527,7 @@ class Boldgrid_Backup_Admin_Settings {
 				if ( in_array( $selected_extractor, $available_compressors, true ) ) {
 					$settings['extractor'] = $selected_extractor;
 				} else {
-					$update_error = true;
+					$update_error    = true;
 					$update_errors[] = __( 'The extractor you seleted is unavailable. Please select another.', 'boldgrid-backup' );
 				}
 			}
@@ -540,9 +540,9 @@ class Boldgrid_Backup_Admin_Settings {
 			 *
 			 * @since 1.5.1
 			 */
-			$original_scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : false;
+			$original_scheduler   = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : false;
 			$schedulers_available = $this->core->scheduler->get_available();
-			$scheduler_changed = ! empty( $_POST['scheduler'] ) && $original_scheduler !== $_POST['scheduler'];
+			$scheduler_changed    = ! empty( $_POST['scheduler'] ) && $original_scheduler !== $_POST['scheduler'];
 			if ( $scheduler_changed && array_key_exists( $_POST['scheduler'], $schedulers_available ) ) {
 				$settings['scheduler'] = $_POST['scheduler'];
 			}
@@ -556,13 +556,13 @@ class Boldgrid_Backup_Admin_Settings {
 			if ( 'wp-cron' === $scheduler ) {
 				$crons_added = $this->core->wp_cron->add_all_crons( $settings );
 			} elseif ( 'cron' === $scheduler ) {
-				$crons_added = $this->core->cron->add_all_crons( $settings );
+				$crons_added                 = $this->core->cron->add_all_crons( $settings );
 				$settings['crontab_version'] = $this->core->cron->crontab_version;
-				$settings['cron_secret'] = $this->core->cron->get_cron_secret();
+				$settings['cron_secret']     = $this->core->cron->get_cron_secret();
 			}
 			// Take action if we tried and failed to add crons.
 			if ( isset( $crons_added ) && ! $crons_added ) {
-				$update_error = true;
+				$update_error    = true;
 				$update_errors[] = esc_html__( 'An error occurred when modifying cron jobs. Please try again.', 'boldgrid-backup' );
 			}
 
@@ -600,7 +600,7 @@ class Boldgrid_Backup_Admin_Settings {
 			 *
 			 * @since 1.5.3
 			 */
-			$settings['exclude_tables'] = $this->core->db_omit->get_from_post();
+			$settings['exclude_tables']      = $this->core->db_omit->get_from_post();
 			$settings['exclude_tables_type'] = $this->core->db_omit->get_post_type();
 
 			/*
@@ -610,7 +610,7 @@ class Boldgrid_Backup_Admin_Settings {
 			 */
 			$settings['folder_exclusion_include'] = $this->core->folder_exclusion->from_post( 'include' );
 			$settings['folder_exclusion_exclude'] = $this->core->folder_exclusion->from_post( 'exclude' );
-			$settings['folder_exclusion_type'] = $this->core->folder_exclusion->from_post( 'type' );
+			$settings['folder_exclusion_type']    = $this->core->folder_exclusion->from_post( 'type' );
 
 			// If no errors, then save the settings.
 			if ( ! $update_error ) {
@@ -731,13 +731,15 @@ class Boldgrid_Backup_Admin_Settings {
 		}
 
 		// Enqueue CSS for the settings page.
-		wp_enqueue_style( 'boldgrid-backup-admin-settings',
+		wp_enqueue_style(
+			'boldgrid-backup-admin-settings',
 			plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-settings.css', array(),
 			BOLDGRID_BACKUP_VERSION, 'all'
 		);
 
 		// Enqueue the JS for the settings page.
-		wp_enqueue_script( 'boldgrid-backup-admin-settings',
+		wp_enqueue_script(
+			'boldgrid-backup-admin-settings',
 			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-settings.js',
 			array( 'jquery' ),
 			BOLDGRID_BACKUP_VERSION,

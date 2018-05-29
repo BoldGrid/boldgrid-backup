@@ -88,17 +88,21 @@ function load_boldgrid_backup() {
 	$exists_composer = file_exists( BOLDGRID_BACKUP_PATH . '/composer.json' );
 	$exists_autoload = file_exists( BOLDGRID_BACKUP_PATH . '/vendor/autoload.php' );
 	if ( $exists_composer && ! $exists_autoload ) {
-		add_action( 'admin_init', function() {
-			deactivate_plugins( 'boldgrid-backup/boldgrid-backup.php', true );
+		add_action(
+			'admin_init', function() {
+				deactivate_plugins( 'boldgrid-backup/boldgrid-backup.php', true );
 
-			add_action( 'admin_notices', function() {
-				?>
+				add_action(
+					'admin_notices', function() {
+						?>
 				<div class="notice notice-error is-dismissible">
 					<p><?php _e( '<strong>BoldGrid Backup</strong> has been deactivated because the vendor folder is missing. Please run <strong>composer install</strong>, or contact your host for further assistance.', 'boldgrid-backup' ); ?></p>
 				</div>
-				<?php
-			});
-		});
+						<?php
+					}
+				);
+			}
+		);
 
 		return false;
 	}
@@ -112,11 +116,12 @@ function load_boldgrid_backup() {
 	// Load Library.
 	$load = new Boldgrid\Library\Util\Load(
 		array(
-			'type' => 'plugin',
-			'file' => plugin_basename( __FILE__ ),
-			'loader' => $loader,
+			'type'        => 'plugin',
+			'file'        => plugin_basename( __FILE__ ),
+			'loader'      => $loader,
 			'keyValidate' => true,
-			'licenseActivate', false,
+			'licenseActivate',
+			false,
 		)
 	);
 

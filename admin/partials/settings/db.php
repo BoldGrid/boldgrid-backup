@@ -17,12 +17,13 @@ $tables = $core->db_omit->format_prefixed_tables();
 
 // Determine if the "Backup all tables" option should be checked.
 $all_included = empty( $settings['exclude_tables'] );
-$type = $core->db_omit->get_settings_type();
+$type         = $core->db_omit->get_settings_type();
 $full_checked = 'full' === $type || $all_included;
 
 $checked = 'checked="checked"';
 
-$types = sprintf( '
+$types = sprintf(
+	'
 	<input type="radio" name="table_inclusion_type" value="full"   %3$s>%1$s<br>
 	<input type="radio" name="table_inclusion_type" value="custom" %4$s>%2$s
 	',
@@ -32,7 +33,8 @@ $types = sprintf( '
 	/* 4 */ $in_modal || $full_checked ? '' : $checked
 );
 
-$buttons = sprintf( '
+$buttons = sprintf(
+	'
 	<button id="include_all_tables" class="button button-primary">%1$s</button>
 	<button id="exclude_all_tables" class="button button">%2$s</button>
 	',
@@ -40,7 +42,8 @@ $buttons = sprintf( '
 	/* 2 */ esc_html__( 'Exclude all', 'boldgrid-backup' )
 );
 
-$status = sprintf( '
+$status = sprintf(
+	'
 	<p class="yes-default">
 		%1$s
 	</p>
@@ -53,7 +56,8 @@ $status = sprintf( '
 	/* 3 */ sprintf( '<a href="#" class="include-all">%1$s</a>', __( 'Backup all tables', 'boldgrid-backup' ) )
 );
 
-return sprintf( '
+return sprintf(
+	'
 	<div class="bg-box" id="table_inclusion">
 		<div class="bg-box-top">
 			%1$s

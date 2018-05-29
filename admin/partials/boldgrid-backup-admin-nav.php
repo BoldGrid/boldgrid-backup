@@ -15,22 +15,22 @@ $active = 'nav-tab-active';
 $navs = array(
 	array(
 		'title' => __( 'Backups', 'boldgrid-backup' ),
-		'href' => 'admin.php?page=boldgrid-backup',
+		'href'  => 'admin.php?page=boldgrid-backup',
 		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup' === $_GET['page'] ? $active : '',
 	),
 	array(
 		'title' => __( 'Settings', 'boldgrid-backup' ),
-		'href' => 'admin.php?page=boldgrid-backup-settings',
+		'href'  => 'admin.php?page=boldgrid-backup-settings',
 		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup-settings' === $_GET['page'] ? $active : '',
 	),
 	array(
 		'title' => __( 'Preflight Check', 'boldgrid-backup' ),
-		'href' => 'admin.php?page=boldgrid-backup-test',
+		'href'  => 'admin.php?page=boldgrid-backup-test',
 		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup-test' === $_GET['page'] ? $active : '',
 	),
 	array(
 		'title' => __( 'Tools', 'boldgrid-backup' ),
-		'href' => 'admin.php?page=boldgrid-backup-tools',
+		'href'  => 'admin.php?page=boldgrid-backup-tools',
 		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup-tools' === $_GET['page'] ? $active : '',
 	),
 );

@@ -29,7 +29,12 @@ ob_start();
 			$link = sprintf(
 				wp_kses(
 					__( 'For security purposes, please do not set this to a publicly available directory. Once you set this, it is not recommended that you change it again. You can find more help with setting your backup directory <a href="%s" target="_blank">here</a>.', 'boldgrid-backup' ),
-					array( 'a' => array( 'href' => array(), 'target' => array() ) )
+					array(
+						'a' => array(
+							'href'   => array(),
+							'target' => array(),
+						),
+					)
 				),
 				esc_url( $this->core->configs['urls']['setting_directory'] )
 			);

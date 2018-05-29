@@ -10,7 +10,8 @@
 
 defined( 'WPINC' ) ? : die;
 
-return sprintf('
+return sprintf(
+	'
 	<div id="backup_now_content" style="display:none;">
 		<h2>%1$s</h2>
 
@@ -28,9 +29,9 @@ return sprintf('
 	</div>',
 	/* 1 */ __( 'Backup Site Now', 'boldgrid-backup' ),
 	/* 2 */ __( 'The <strong>Files and Folders</strong> and <strong>Database</strong> settings below customize which parts of your site to backup.', 'boldgrid-backup' ),
-	/* 3 */ include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/folders.php',
-	/* 4 */ include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/db.php',
-	/* 5 */ include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-button.php'
+	/* 3 */ require BOLDGRID_BACKUP_PATH . '/admin/partials/settings/folders.php',
+	/* 4 */ require BOLDGRID_BACKUP_PATH . '/admin/partials/settings/db.php',
+	/* 5 */ require BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-button.php'
 );
 
 

@@ -78,7 +78,7 @@ class Boldgrid_Backup_Admin_Db_Omit {
 			$body .= "\n" . __( 'DATABASE SETTINGS', 'boldgrid-backup' ) . "\n";
 
 			$tables_excluded = empty( $info['table_exclude'] ) ? __( 'None', 'boldgrid-backup' ) : implode( ',', $info['table_exclude'] );
-			$body .= sprintf( esc_html__( 'Tables Excluded: %1$s', 'boldgrid-backup' ), $tables_excluded ) . "\n";
+			$body           .= sprintf( esc_html__( 'Tables Excluded: %1$s', 'boldgrid-backup' ), $tables_excluded ) . "\n";
 		}
 
 		return $body;
@@ -91,7 +91,8 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	 */
 	public function enqueue_scripts() {
 		$handle = 'boldgrid-backup-admin-table-include';
-		wp_register_script( $handle,
+		wp_register_script(
+			$handle,
 			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-table-include.js',
 			array( 'jquery' ),
 			BOLDGRID_BACKUP_VERSION,
@@ -302,7 +303,7 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	 * @return bool
 	 */
 	public function is_omit_all() {
-		$exclude_tables = $this->get_excluded_tables();
+		$exclude_tables  = $this->get_excluded_tables();
 		$prefixed_tables = $this->core->db_get->prefixed();
 
 		$diff = array_diff( $prefixed_tables, $exclude_tables );

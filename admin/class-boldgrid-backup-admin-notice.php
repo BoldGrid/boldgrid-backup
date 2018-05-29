@@ -35,7 +35,7 @@ class Boldgrid_Backup_Admin_Notice {
 	 * @var   array
 	 */
 	public $lang = array(
-		'dis_error' => 'notice notice-error is-dismissible',
+		'dis_error'   => 'notice notice-error is-dismissible',
 		'dis_success' => 'notice notice-success is-dismissible',
 	);
 
@@ -68,7 +68,7 @@ class Boldgrid_Backup_Admin_Notice {
 
 		$notices[] = array(
 			'message' => $message,
-			'class' => $class,
+			'class'   => $class,
 			'heading' => $heading,
 		);
 
@@ -100,7 +100,8 @@ class Boldgrid_Backup_Admin_Notice {
 		}
 
 		foreach ( $notices as $notice ) {
-			printf( '
+			printf(
+				'
 				<div class="%1$s is-dismissible">
 					%3$s
 					%2$s
@@ -165,7 +166,8 @@ class Boldgrid_Backup_Admin_Notice {
 	 * @return string
 	 */
 	public function get_notice_markup( $class, $message, $heading = null ) {
-		return sprintf( '
+		return sprintf(
+			'
 				<div class="%1$s">
 					%2$s
 					%3$s

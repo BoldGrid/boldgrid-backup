@@ -45,7 +45,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	 * @var    array
 	 */
 	public $default_port = array(
-		'ftp' => 21,
+		'ftp'  => 21,
 		'sftp' => 22,
 	);
 
@@ -208,9 +208,9 @@ class Boldgrid_Backup_Admin_Ftp {
 	public function __construct( $core ) {
 		include_once BOLDGRID_BACKUP_PATH . '/vendor/phpseclib/phpseclib/phpseclib/Net/SFTP.php';
 
-		$this->core = $core;
+		$this->core  = $core;
 		$this->hooks = new Boldgrid_Backup_Admin_Ftp_Hooks( $core );
-		$this->page = new Boldgrid_Backup_Admin_Ftp_Page( $core );
+		$this->page  = new Boldgrid_Backup_Admin_Ftp_Page( $core );
 	}
 
 	/**
@@ -286,7 +286,7 @@ class Boldgrid_Backup_Admin_Ftp {
 		if ( 'ftp' === $this->type && is_resource( $this->connection ) ) {
 			ftp_close( $this->connection );
 			$this->connection = null;
-			$this->logged_in = false;
+			$this->logged_in  = false;
 		}
 	}
 
@@ -301,9 +301,9 @@ class Boldgrid_Backup_Admin_Ftp {
 	public function download( $filename ) {
 		$this->connect();
 
-		$local_filepath = $this->core->backup_dir->get_path_to( $filename );
+		$local_filepath  = $this->core->backup_dir->get_path_to( $filename );
 		$server_filepath = $this->remote_dir . '/' . $filename;
-		$success = false;
+		$success         = false;
 
 		$this->log_in();
 
@@ -334,7 +334,7 @@ class Boldgrid_Backup_Admin_Ftp {
 		}
 
 		$contents = $this->get_contents( true, $this->remote_dir );
-		$backups = $this->format_raw_contents( $contents );
+		$backups  = $this->format_raw_contents( $contents );
 
 		$count_to_delete = count( $backups ) - $this->retention_count;
 
@@ -342,13 +342,15 @@ class Boldgrid_Backup_Admin_Ftp {
 			return false;
 		}
 
-		usort( $backups, function( $a, $b ) {
-			return $a['time'] < $b['time'] ? -1 : 1;
-		});
+		usort(
+			$backups, function( $a, $b ) {
+				return $a['time'] < $b['time'] ? -1 : 1;
+			}
+		);
 
 		for ( $x = 0; $x < $count_to_delete; $x++ ) {
 			$filename = $backups[ $x ]['filename'];
-			$path = $this->remote_dir . '/' . $filename;
+			$path     = $this->remote_dir . '/' . $filename;
 
 			switch ( $this->type ) {
 				case 'ftp':
@@ -384,43 +386,43 @@ class Boldgrid_Backup_Admin_Ftp {
 
 		$values = array(
 			array(
-				'key' => 'host',
-				'default' => null,
+				'key'      => 'host',
+				'default'  => null,
 				'callback' => 'sanitize_file_name',
 			),
 			array(
-				'key' => 'user',
-				'default' => null,
+				'key'      => 'user',
+				'default'  => null,
 				'callback' => 'sanitize_text_field',
 			),
 			array(
-				'key' => 'pass',
+				'key'     => 'pass',
 				'default' => null,
 			),
 			array(
-				'key' => 'type',
-				'default' => $this->default_type,
+				'key'      => 'type',
+				'default'  => $this->default_type,
 				'callback' => 'sanitize_key',
 			),
 			array(
-				'key' => 'port',
-				'default' => $this->default_port[ $this->default_type ],
+				'key'      => 'port',
+				'default'  => $this->default_port[ $this->default_type ],
 				'callback' => 'intval',
 			),
 			array(
-				'key' => 'retention_count',
-				'default' => $this->retention_count,
+				'key'      => 'retention_count',
+				'default'  => $this->retention_count,
 				'callback' => 'intval',
 			),
 			array(
-				'key' => 'nickname',
-				'default' => '',
+				'key'      => 'nickname',
+				'default'  => '',
 				'callback' => 'stripslashes',
 			),
 		);
 
 		foreach ( $values as $value ) {
-			$key = $value['key'];
+			$key      = $value['key'];
 			$callback = ! empty( $value['callback'] ) ? $value['callback'] : null;
 
 			if ( ! empty( $_POST[ $key ] ) ) {
@@ -462,7 +464,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	 * }
 	 */
 	public function format_raw_contents( $contents ) {
-		$skips = array( '.', '..' );
+		$skips   = array( '.', '..' );
 		$backups = array();
 
 		if ( ! is_array( $contents ) ) {
@@ -478,16 +480,16 @@ class Boldgrid_Backup_Admin_Ftp {
 				}
 
 				$backups[] = array(
-					'time' => $item['mtime'],
+					'time'     => $item['mtime'],
 					'filename' => $filename,
-					'size' => $item['size'],
+					'size'     => $item['size'],
 				);
 			} else {
 				// Before exploding by space, replace multiple spaces with one space.
 				$item = preg_replace( '!\s+!', ' ', $item );
 
 				$exploded_item = explode( ' ', $item );
-				$count = count( $exploded_item );
+				$count         = count( $exploded_item );
 
 				$filename = $exploded_item[ $count - 1 ];
 				if ( in_array( $filename, $skips, true ) ) {
@@ -496,14 +498,14 @@ class Boldgrid_Backup_Admin_Ftp {
 
 				// Get the timestamp.
 				$month = $exploded_item[ $count - 4 ];
-				$day = $exploded_item[ $count - 3 ];
-				$time = $exploded_item[ $count - 2 ];
-				$time = strtotime( $month . ' ' . $day . ' ' . $time );
+				$day   = $exploded_item[ $count - 3 ];
+				$time  = $exploded_item[ $count - 2 ];
+				$time  = strtotime( $month . ' ' . $day . ' ' . $time );
 
 				$backups[] = array(
-					'time' => $time,
+					'time'     => $time,
 					'filename' => $filename,
-					'size' => $exploded_item[ $count - 5 ],
+					'size'     => $exploded_item[ $count - 5 ],
 				);
 			}
 		}
@@ -541,7 +543,7 @@ class Boldgrid_Backup_Admin_Ftp {
 				if ( $raw ) {
 					return ftp_rawlist( $this->connection, $dir );
 				} else {
-					return ftp_nlist( $this->connection , $dir );
+					return ftp_nlist( $this->connection, $dir );
 				}
 				break;
 			case 'sftp':
@@ -565,11 +567,11 @@ class Boldgrid_Backup_Admin_Ftp {
 		$settings = $this->core->settings->get_settings();
 
 		return array(
-			'title' => $this->title,
-			'key' => $this->key,
+			'title'     => $this->title,
+			'key'       => $this->key,
 			'configure' => 'admin.php?page=boldgrid-backup-ftp',
-			'is_setup' => $is_setup,
-			'enabled' => ! empty( $settings['remote'][ $this->key ]['enabled'] ) && $settings['remote'][ $this->key ]['enabled'] && $is_setup,
+			'is_setup'  => $is_setup,
+			'enabled'   => ! empty( $settings['remote'][ $this->key ]['enabled'] ) && $settings['remote'][ $this->key ]['enabled'] && $is_setup,
 		);
 	}
 
@@ -590,31 +592,31 @@ class Boldgrid_Backup_Admin_Ftp {
 		$configs = array(
 			array(
 				'property' => 'user',
-				'default' => null,
+				'default'  => null,
 			),
 			array(
 				'property' => 'pass',
-				'default' => null,
+				'default'  => null,
 			),
 			array(
 				'property' => 'host',
-				'default' => null,
+				'default'  => null,
 			),
 			array(
 				'property' => 'port',
-				'default' => $this->default_port,
+				'default'  => $this->default_port,
 			),
 			array(
 				'property' => 'type',
-				'default' => $this->default_type,
+				'default'  => $this->default_type,
 			),
 			array(
 				'property' => 'retention_count',
-				'default' => $this->retention_count,
+				'default'  => $this->retention_count,
 			),
 			array(
 				'property' => 'nickname',
-				'default' => $this->title,
+				'default'  => $this->title,
 			),
 		);
 
@@ -665,8 +667,8 @@ class Boldgrid_Backup_Admin_Ftp {
 	 */
 	public function is_valid_credentials( $host, $user, $pass, $port, $type ) {
 		$connection = false;
-		$logged_in = false;
-		$port = intval( $port );
+		$logged_in  = false;
+		$port       = intval( $port );
 
 		// Avoid a really long timeout.
 		if ( 21 === $port && 'sftp' === $type ) {
@@ -714,7 +716,7 @@ class Boldgrid_Backup_Admin_Ftp {
 			}
 		} catch ( Exception $e ) {
 			$this->errors[] = $e->getMessage();
-			$error_caught = true;
+			$error_caught   = true;
 		}
 		restore_error_handler();
 
@@ -770,9 +772,9 @@ class Boldgrid_Backup_Admin_Ftp {
 		$this->host = null;
 		$this->user = null;
 		$this->set_pass( null );
-		$this->port = $this->default_port['ftp'];
+		$this->port            = $this->default_port['ftp'];
 		$this->retention_count = null;
-		$this->type = $this->default_type;
+		$this->type            = $this->default_type;
 	}
 
 	/**

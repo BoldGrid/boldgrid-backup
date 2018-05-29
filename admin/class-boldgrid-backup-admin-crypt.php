@@ -37,10 +37,10 @@ class Boldgrid_Backup_Admin_Crypt {
 			return $string;
 		}
 
-		$output = false;
+		$output         = false;
 		$encrypt_method = 'AES-256-CBC';
-		$key = hash( 'sha256', AUTH_KEY );
-		$iv = substr( hash( 'sha256', SECURE_AUTH_KEY ), 0, 16 );
+		$key            = hash( 'sha256', AUTH_KEY );
+		$iv             = substr( hash( 'sha256', SECURE_AUTH_KEY ), 0, 16 );
 
 		if ( 'e' === $action ) {
 			$output = base64_encode( openssl_encrypt( $string, $encrypt_method, $key, 0, $iv ) );

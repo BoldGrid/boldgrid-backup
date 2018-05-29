@@ -81,8 +81,8 @@ class Boldgrid_Backup_Admin_Archive_Details {
 			BOLDGRID_BACKUP_VERSION
 		);
 		$translations = array(
-			'uploading' => __( 'Uploading', 'boldgrid-backup' ),
-			'uploaded' => __( 'Uploaded', 'boldgrid-backup' ),
+			'uploading'  => __( 'Uploading', 'boldgrid-backup' ),
+			'uploaded'   => __( 'Uploaded', 'boldgrid-backup' ),
 			'failUpload' => __( 'Unable to upload backup file.', 'boldgrid-backup' ),
 		);
 		wp_localize_script( 'boldgrid-backup-admin-archive-details', 'boldgrid_backup_archive_details', $translations );
@@ -95,13 +95,13 @@ class Boldgrid_Backup_Admin_Archive_Details {
 			BOLDGRID_BACKUP_VERSION
 		);
 		$unknown_error = __( 'An unknown error has occurred.', 'boldgrid-backup' );
-		$translations = array(
-			'loading' => __( 'Loading', 'boldgrid-backup' ),
-			'home' => __( 'Home', 'boldgrid-backup' ),
-			'restoring' => __( 'Restoring', 'boldgrid-backup' ),
-			'confirmDbRestore' => __( 'Are you sure you want to restore this database backup?', 'boldgrid-backup' ),
+		$translations  = array(
+			'loading'            => __( 'Loading', 'boldgrid-backup' ),
+			'home'               => __( 'Home', 'boldgrid-backup' ),
+			'restoring'          => __( 'Restoring', 'boldgrid-backup' ),
+			'confirmDbRestore'   => __( 'Are you sure you want to restore this database backup?', 'boldgrid-backup' ),
 			'unknownBrowseError' => __( 'An unknown error has occurred when trying to get a listing of the files in this archive.', 'boldgrid-backup' ),
-			'unknownError' => $unknown_error,
+			'unknownError'       => $unknown_error,
 			'unknownErrorNotice' => sprintf( '<div class="%1$s"><p>%2$s</p></div>', $this->core->notice->lang['dis_error'], $unknown_error ),
 		);
 		wp_localize_script( 'boldgrid-backup-admin-zip-browser', 'boldgrid_backup_zip_browser', $translations );
@@ -141,10 +141,10 @@ class Boldgrid_Backup_Admin_Archive_Details {
 		// Get our archive.
 		$archive = $this->core->archive->get_by_name( $filename );
 		if ( $archive ) {
-			$log = $this->core->archive_log->get_by_zip( $archive['filepath'] );
-			$archive = array_merge( $log, $archive );
+			$log           = $this->core->archive_log->get_by_zip( $archive['filepath'] );
+			$archive       = array_merge( $log, $archive );
 			$archive_found = true;
-			$dump_file = $this->core->get_dump_file( $archive['filepath'] );
+			$dump_file     = $this->core->get_dump_file( $archive['filepath'] );
 		} else {
 			$archive = array(
 				'filename' => $filename,

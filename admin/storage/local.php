@@ -89,9 +89,9 @@ class Boldgrid_Backup_Admin_Storage_Local {
 		}
 
 		$args = array(
-			'filepath' => $info['filepath'],
-			'action' => 'boldgrid_backup_delete_local',
-			'action_data' => $info['filepath'],
+			'filepath'     => $info['filepath'],
+			'action'       => 'boldgrid_backup_delete_local',
+			'action_data'  => $info['filepath'],
 			'action_title' => __( 'Delete backup from Web Server', 'boldgrid-backup' ),
 		);
 

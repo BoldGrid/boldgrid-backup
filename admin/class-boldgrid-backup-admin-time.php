@@ -35,7 +35,7 @@ class Boldgrid_Backup_Admin_Time {
 	 * @access public
 	 * @var    int
 	 */
-	public	$utc_time;
+	public $utc_time;
 
 	/**
 	 * Local time (local to a user).
@@ -123,8 +123,8 @@ class Boldgrid_Backup_Admin_Time {
 		 * -------------						--------------
 		 * DateTimeZone Object					DateTimeZone Object
 		 * (									(
-    	 * )										[timezone_type] => 2
-    	 *											[timezone] => EDT
+		 * )										[timezone_type] => 2
+		 *											[timezone] => EDT
 		 *										)
 		 */
 		$timezone = new DateTimeZone( 'EDT' );
@@ -167,7 +167,7 @@ class Boldgrid_Backup_Admin_Time {
 		$settings = empty( $settings ) ? $this->core->settings->get_settings() : $settings;
 
 		$tz_info = empty( $tz_info ) ? $this->get_timezone_info() : $tz_info;
-		$is_utc = ! empty( $tz_info['abbr'] ) && 'UTC' === substr( $tz_info['abbr'], 0, 3 );
+		$is_utc  = ! empty( $tz_info['abbr'] ) && 'UTC' === substr( $tz_info['abbr'], 0, 3 );
 
 		$time_string = $settings['schedule']['tod_h'] . ':' . $settings['schedule']['tod_m'] . ' ' . $settings['schedule']['tod_a'];
 
@@ -298,7 +298,7 @@ class Boldgrid_Backup_Admin_Time {
 	 * @return array
 	 */
 	public function get_timezone_info() {
-		$tz_string = get_option( 'timezone_string' );
+		$tz_string     = get_option( 'timezone_string' );
 		$timezone_info = array();
 
 		if ( $tz_string ) {
@@ -309,9 +309,9 @@ class Boldgrid_Backup_Admin_Time {
 			}
 
 			if ( $tz ) {
-				$now = new DateTime( 'now', $tz );
-				$formatted_gmt_offset = sprintf( 'UTC%s', $this->format_gmt_offset( $tz->getOffset( $now ) / 3600 ) );
-				$tz_name = str_replace( '_', ' ', $tz->getName() );
+				$now                   = new DateTime( 'now', $tz );
+				$formatted_gmt_offset  = sprintf( 'UTC%s', $this->format_gmt_offset( $tz->getOffset( $now ) / 3600 ) );
+				$tz_name               = str_replace( '_', ' ', $tz->getName() );
 				$timezone_info['abbr'] = $now->format( 'T' );
 
 				// This set of code is not in core.
@@ -332,7 +332,7 @@ class Boldgrid_Backup_Admin_Time {
 
 			// Not sure why WordPress is doing this. If it is -4.5, show me -4.5 and not -4.
 			// $formatted_gmt_offset = $this->format_gmt_offset( intval( $gmt_offset ) );
-			$formatted_gmt_offset = $gmt_offset;
+			$formatted_gmt_offset  = $gmt_offset;
 			$timezone_info['abbr'] = sprintf( 'UTC%s', $formatted_gmt_offset );
 
 			/* translators: %s: UTC offset  */
@@ -341,7 +341,7 @@ class Boldgrid_Backup_Admin_Time {
 
 		// This set of code is not in core.
 		$timezone_info['markup_timezone'] = sprintf( '<span title="%1$s">%2$s</span>', esc_attr( $timezone_info['description'] ), $timezone_info['abbr'] );
-		$timezone_info['markup_change'] = sprintf(
+		$timezone_info['markup_change']   = sprintf(
 			'<a href="%1$s" title="%3$s">%2$s</a>',
 			admin_url( 'options-general.php' ),
 			__( 'Change timezone', 'boldgrid-backup' ),
@@ -365,7 +365,7 @@ class Boldgrid_Backup_Admin_Time {
 			return;
 		}
 
-		$gmt_offset = get_option( 'gmt_offset' );
+		$gmt_offset       = get_option( 'gmt_offset' );
 		$valid_gmt_offset = ! empty( $gmt_offset ) || is_numeric( $gmt_offset );
 
 		$this->local_timezone = 'UTC';
@@ -392,7 +392,7 @@ class Boldgrid_Backup_Admin_Time {
 
 		// Once we have the UTC time (above), we can calculate the user's local time.
 		if ( $valid_gmt_offset ) {
-			$this->local_time = $this->utc_time + ( $gmt_offset * HOUR_IN_SECONDS );
+			$this->local_time      = $this->utc_time + ( $gmt_offset * HOUR_IN_SECONDS );
 			$this->local_timezone .= ' ' . $gmt_offset;
 		} else {
 			$this->local_time = $this->utc_time;
@@ -405,8 +405,8 @@ class Boldgrid_Backup_Admin_Time {
 	 * @since 1.6.0
 	 */
 	public function reset() {
-		$this->local_time = null;
+		$this->local_time     = null;
 		$this->local_timezone = null;
-		$this->utc_time = null;
+		$this->utc_time       = null;
 	}
 }

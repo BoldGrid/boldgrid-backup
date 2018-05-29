@@ -18,39 +18,39 @@ $attribute = '<p><strong>%1$s</strong>: %2$s</p>';
 
 $datas = array(
 	array(
-		'key' => 'trigger',
+		'key'   => 'trigger',
 		'title' => __( 'Backup triggered by', 'boldgrid-backup' ),
 	),
 	array(
-		'key' => 'compressor',
+		'key'   => 'compressor',
 		'title' => __( 'Compressor', 'boldgrid-backup' ),
 	),
 	array(
-		'key' => 'duration',
-		'title' => __( 'Total duration', 'boldgrid-backup' ),
+		'key'    => 'duration',
+		'title'  => __( 'Total duration', 'boldgrid-backup' ),
 		'suffix' => ' ' . __( 'seconds', 'boldgrid-backup' ),
 	),
 	array(
-		'key' => 'db_duration',
-		'title' => __( 'Time to backup database', 'boldgrid-backup' ),
+		'key'    => 'db_duration',
+		'title'  => __( 'Time to backup database', 'boldgrid-backup' ),
 		'suffix' => ' ' . __( 'seconds', 'boldgrid-backup' ),
 	),
 	array(
-		'key' => 'mail_success',
-		'title' => __( 'Email sent after backup', 'boldgrid-backup' ),
+		'key'          => 'mail_success',
+		'title'        => __( 'Email sent after backup', 'boldgrid-backup' ),
 		'presentation' => 'bool',
 	),
 	array(
-		'key' => 'folder_include',
+		'key'   => 'folder_include',
 		'title' => __( 'Files included', 'boldgrid-backup' ),
 	),
 	array(
-		'key' => 'folder_exclude',
+		'key'   => 'folder_exclude',
 		'title' => __( 'Files excluded', 'boldgrid-backup' ),
 	),
 	array(
-		'key' => 'table_exclude',
-		'title' => __( 'Database tables excluded', 'boldgrid-backup' ),
+		'key'          => 'table_exclude',
+		'title'        => __( 'Database tables excluded', 'boldgrid-backup' ),
 		'presentation' => 'comma_implode',
 	),
 );

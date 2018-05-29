@@ -13,9 +13,9 @@ $nonce = wp_create_nonce( 'folder_exclusion_preview' );
 
 $tags = array(
 	'strong' => array(),
-	'a' => array(
+	'a'      => array(
 		'href' => array(),
-		'id' => array(),
+		'id'   => array(),
 	),
 );
 
@@ -31,7 +31,8 @@ $using_defaults = $core->folder_exclusion->is_using_defaults();
 $markup = '<table class="form-table bulk-action-notice" id="folder_exclusion"><tbody>';
 
 // TR for the header and intro
-$tr_header = sprintf( '
+$tr_header = sprintf(
+	'
 	<p>
 		<input type="radio" name="folder_exclusion_type" value="full" %3$s>%1$s<br>
 		<input type="radio" name="folder_exclusion_type" value="custom" %4$s>%2$s
@@ -44,7 +45,8 @@ $tr_header = sprintf( '
 
 // This markup for the legend.
 // TR for the help text.
-$table_legend = sprintf( '
+$table_legend = sprintf(
+	'
 	<table class="folder_exclude_help wp-list-table widefat fixed striped pages">
 		<tr>
 			<th>*</th>
@@ -87,7 +89,8 @@ $table_legend = sprintf( '
 );
 
 // Examples
-$table_examples = sprintf( '
+$table_examples = sprintf(
+	'
 	<table class="folder_exclude_help wp-list-table widefat fixed striped pages">
 		<tr>
 			<th><a href="#" class="folder_exclude_sample" data-include="%1$s" data-exclude="%2$s">%3$s</a></th>
@@ -119,7 +122,8 @@ $table_examples = sprintf( '
 	/* 10 */ wp_kses( __( 'Backup everything except WordPress core files.', 'boldgrid-backup' ), $tags )
 );
 
-$status = sprintf( '
+$status = sprintf(
+	'
 	<p class="yes-default">
 		%1$s
 	</p>
@@ -138,7 +142,8 @@ $status = sprintf( '
 );
 
 // TR for the help text.
-$tr_help = sprintf( '
+$tr_help = sprintf(
+	'
 	<div id="folder_misc_info">
 		<p>
 			<span class="dashicons dashicons-editor-help" data-id="folder_exclude_inputs" style="float:left;margin-right:4px;"></span>
@@ -171,7 +176,8 @@ $tr_help = sprintf( '
 );
 
 // TR for the include
-$tr_include = sprintf( '
+$tr_include = sprintf(
+	'
 	<tr class="%3$s">
 		<th style="padding-top:0px;">
 			%1$s
@@ -187,7 +193,8 @@ $tr_include = sprintf( '
 );
 
 // TR for the exclude.
-$tr_exclude = sprintf( '
+$tr_exclude = sprintf(
+	'
 	<tr class="%3$s">
 		<th>
 			%1$s
@@ -203,7 +210,8 @@ $tr_exclude = sprintf( '
 );
 
 // TR for the preview
-$tr_preview = sprintf( '
+$tr_preview = sprintf(
+	'
 		<tr class="%1$s">
 			<th></th>
 			<td>
@@ -232,7 +240,8 @@ $tr_preview = sprintf( '
 	/* 4 */ esc_attr( __( 'Filter below results', 'boldgrid-backup' ) )
 );
 
-$markup = sprintf( '
+$markup = sprintf(
+	'
 	<div class="bg-box" id="folder_exclusion">
 		<div class="bg-box-top">
 			%1$s

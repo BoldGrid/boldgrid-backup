@@ -167,18 +167,18 @@ class Boldgrid_Backup_Admin_Test {
 	 * @return array
 	 */
 	public function extensive_dir_test( $dir ) {
-		$dir = Boldgrid_Backup_Admin_Utility::trailingslashit( $dir );
+		$dir             = Boldgrid_Backup_Admin_Utility::trailingslashit( $dir );
 		$random_filename = $dir . $this->test_prefix . mt_rand();
-		$txt_filename = $random_filename . '.txt';
-		$info_filename = $random_filename . '.rtf';
-		$str = __( 'This is a test file from BoldGrid Backup. You can delete this file.', 'boldgrid-backup' );
+		$txt_filename    = $random_filename . '.txt';
+		$info_filename   = $random_filename . '.rtf';
+		$str             = __( 'This is a test file from BoldGrid Backup. You can delete this file.', 'boldgrid-backup' );
 
 		$data['exists'] = $this->core->wp_filesystem->exists( $dir );
-		$data['read'] = $this->core->wp_filesystem->is_readable( $dir );
-		$data['write'] = $this->core->wp_filesystem->is_writable( $dir );
+		$data['read']   = $this->core->wp_filesystem->is_readable( $dir );
+		$data['write']  = $this->core->wp_filesystem->is_writable( $dir );
 
 		// Can we get a directory listing?
-		$dirlist = $this->core->wp_filesystem->dirlist( $dir );
+		$dirlist         = $this->core->wp_filesystem->dirlist( $dir );
 		$data['dirlist'] = is_array( $dirlist );
 
 		// Determine if we have permission to rename a file.
@@ -346,9 +346,9 @@ class Boldgrid_Backup_Admin_Test {
 			return true;
 		}
 
-		$folders_found = __( 'The following node_modules folder was found in your account:', 'boldgrid-backup' );
+		$folders_found   = __( 'The following node_modules folder was found in your account:', 'boldgrid-backup' );
 		$possible_issues = __( 'Due to possible issues node_modules folders can cause when calculating disk space, your WordPress directory size was not calculated.', 'boldgrid-backup' );
-		$ignore_warning = __( 'To ignore this warning and try again, please <a href="%1$s">click here</a>', 'boldgrid-backup' );
+		$ignore_warning  = __( 'To ignore this warning and try again, please <a href="%1$s">click here</a>', 'boldgrid-backup' );
 
 		$warning = sprintf(
 			'<strong>%1$s</strong><br />
@@ -391,8 +391,8 @@ class Boldgrid_Backup_Admin_Test {
 		 * To determine if crontab is available, we will BOTH write and remove
 		 * a test entry from the crontab.
 		 */
-		$entry_added = $this->core->cron->update_cron( $test_entry );
-		$entry_deleted = $this->core->cron->entry_delete( $test_entry );
+		$entry_added                = $this->core->cron->update_cron( $test_entry );
+		$entry_deleted              = $this->core->cron->entry_delete( $test_entry );
 		$this->is_crontab_available = $entry_added && $entry_deleted;
 
 		return $this->is_crontab_available;
@@ -563,8 +563,8 @@ class Boldgrid_Backup_Admin_Test {
 
 		// Get filesystem disk space information.
 		$disk_total_space = disk_total_space( $home_dir );
-		$disk_free_space = disk_free_space( $home_dir );
-		$disk_used_space = $disk_total_space - $disk_free_space;
+		$disk_free_space  = disk_free_space( $home_dir );
+		$disk_used_space  = $disk_total_space - $disk_free_space;
 
 		// Initialize $wp_root_size.
 		$wp_root_size = false;
@@ -636,7 +636,7 @@ class Boldgrid_Backup_Admin_Test {
 	 */
 	public function get_cli_support() {
 		$default = array(
-			'has_curl_ssl' => false,
+			'has_curl_ssl'  => false,
 			'has_url_fopen' => false,
 		);
 
@@ -749,7 +749,7 @@ class Boldgrid_Backup_Admin_Test {
 	 * @return bool
 	 */
 	public function is_iis() {
-		return	$this->is_windows() &&
+		return $this->is_windows() &&
 				! empty( $_SERVER['SERVER_SOFTWARE'] ) &&
 				false !== strpos( $_SERVER['SERVER_SOFTWARE'], 'IIS' );
 	}

@@ -187,7 +187,7 @@ class Boldgrid_Backup_Admin_Upload {
 		// Currently only "zip"; others to be added in the future.
 		// @todo Write a method to get the allowed file extensions, based on available compressors.
 		$allowed_file_ext = array(
-			'zip'
+			'zip',
 		);
 
 		if ( ! in_array( $validate['ext'], $allowed_file_ext, true ) ) {
@@ -278,7 +278,8 @@ class Boldgrid_Backup_Admin_Upload {
 		);
 
 		// Add a filter to specify a custom upload directory (the backup directory).
-		add_filter( 'upload_dir',
+		add_filter(
+			'upload_dir',
 			array(
 				$this->core->config,
 				'custom_upload_dir',
@@ -288,7 +289,8 @@ class Boldgrid_Backup_Admin_Upload {
 		$movefile = wp_handle_upload( $_FILES['file'], $upload_overrides );
 
 		// Remove the temporary filter for a custom upload directory.
-		remove_filter( 'upload_dir',
+		remove_filter(
+			'upload_dir',
 			array(
 				$this->core->config,
 				'custom_upload_dir',

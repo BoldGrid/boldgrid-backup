@@ -163,8 +163,8 @@ class Boldgrid_Backup_Admin_Jobs {
 		}
 
 		$args = array(
-			'filepath' => $info['filepath'],
-			'action' => 'boldgrid_backup_post_jobs_email',
+			'filepath'    => $info['filepath'],
+			'action'      => 'boldgrid_backup_post_jobs_email',
 			'action_data' => $info,
 			'post_action' => 'delete_all_prior',
 		);
@@ -258,7 +258,7 @@ class Boldgrid_Backup_Admin_Jobs {
 			$status = apply_filters( $job['action'], $job['action_data'] );
 
 			$job['end_time'] = time();
-			$job['status'] = $status ? 'success' : 'fail';
+			$job['status']   = $status ? 'success' : 'fail';
 			$this->save_jobs();
 
 			break;
