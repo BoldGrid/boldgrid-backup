@@ -1,17 +1,20 @@
 <?php
 /**
- * Provide a admin area view for the plugin
+ * File: boldgrid-backup-admin-backup.php
  *
  * This file is used to markup the admin-facing aspects of the plugin.
  *
- * @link http://www.boldgrid.com
+ * @link https://www.boldgrid.com
  * @since 1.0
  *
- * @package Boldgrid_Backup
+ * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin/partials
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
 $is_restore   = ! empty( $_POST['restore_now'] ) && '1' === $_POST['restore_now'];
 $is_success   = ! empty( $archive_info ) && empty( $archive_info['error'] );
@@ -33,7 +36,6 @@ $redirect_url = admin_url( 'admin.php?page=boldgrid-backup' );
  * @since 1.6.0
  */
 if ( $is_restore && $is_success ) {
-
 	/*
 	 * After restoration, redirect user to the backups page.
 	 *
@@ -78,6 +80,7 @@ $core->archive->init( $archive_info['filepath'] );
 $url                = admin_url( 'admin.php?page=boldgrid-backup-settings' );
 $settings_page_link = sprintf(
 	wp_kses(
+		// translators: 1: URL address.
 		__( 'See <a href="%s">Settings for BoldGrid Backup</a> for details.', 'boldgrid-backup' ),
 		array( 'a' => array( 'href' => array() ) )
 	),
@@ -141,11 +144,13 @@ if ( ! empty( $archive_info ) ) {
 			%2$s
 			%3$s
 			%4$s %5$s',
-			/* 1 */ $is_restore ? esc_html__( 'There was an error restoring the selected backup archive file', 'boldgrid-backup' ) : esc_html__( 'There was an error creating a backup archive file', 'boldgrid-backup' ),
-			/* 2 */ empty( $archive_info['filepath'] ) ? '' : '<p>' . sprintf( esc_html__( 'File Path: %s', 'boldgrid-backup' ), $archive_info['filepath'] ) . '</p>',
-			/* 3 */ empty( $archive_info['error'] ) ? '' : '<p>' . $archive_info['error'] . '</p>',
-			/* 4 */ ! isset( $archive_info['error_message'] ) ? '' : '<p>' . sprintf( __( 'Error Details: %s', 'boldgrid-backup' ), $archive_info['error_message'] ),
-			/* 5 */ isset( $archive_info['error_message'] ) && isset( $archive_info['error_code'] ) ? ' (' . $archive_info['error_code'] . ')' : ''
+			$is_restore ? esc_html__( 'There was an error restoring the selected backup archive file', 'boldgrid-backup' ) : esc_html__( 'There was an error creating a backup archive file', 'boldgrid-backup' ),
+			// translators: 1: File path.
+			empty( $archive_info['filepath'] ) ? '' : '<p>' . sprintf( esc_html__( 'File Path: %s', 'boldgrid-backup' ), $archive_info['filepath'] ) . '</p>',
+			empty( $archive_info['error'] ) ? '' : '<p>' . $archive_info['error'] . '</p>',
+			// translators: 1: Error message.
+			! isset( $archive_info['error_message'] ) ? '' : '<p>' . sprintf( __( 'Error Details: %s', 'boldgrid-backup' ), $archive_info['error_message'] ),
+			isset( $archive_info['error_message'] ) && isset( $archive_info['error_code'] ) ? ' (' . $archive_info['error_code'] . ')' : ''
 		),
 	);
 }

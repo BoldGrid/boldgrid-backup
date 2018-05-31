@@ -1,20 +1,23 @@
 <?php
 /**
- * BoldGrid Source Code
+ * File: test-class-boldgrid-backup-admin-time.php
  *
- * @package   Test_Boldgrid_Editor
- * @copyright BoldGrid.com
- * @version   $Id$
+ * @link https://www.boldgrid.com
  * @since     1.6.0
- * @author    BoldGrid.com <wpb@boldgrid.com>
+ *
+ * @package    Boldgrid_Backup
+ * @subpackage Boldgrid_Backup/tests/admin
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
+ * Class: Test_Boldgrid_Backup_Admin_Time
  *
+ * @since 1.6.0
  */
 class Test_Boldgrid_Backup_Admin_Time extends WP_UnitTestCase {
-
-
 	/**
 	 * Setup.
 	 *

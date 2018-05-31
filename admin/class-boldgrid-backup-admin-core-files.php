@@ -1,28 +1,27 @@
 <?php
 /**
- * Core files.
+ * File: class-boldgrid-backup-admin-core-files.php
  *
- * @link  http://www.boldgrid.com
- * @since 1.5.4
+ * @link  https://www.boldgrid.com
+ * @since 1.6.0
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup Admin Core Files Class.
+ * Class: Boldgrid_Backup_Admin_Core_Files
  *
- * @since 1.5.4
+ * @since 1.6.0
  */
 class Boldgrid_Backup_Admin_Core_Files {
-
 	/**
 	 * The core class object.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access private
 	 * @var    Boldgrid_Backup_Admin_Core
 	 */
@@ -35,7 +34,7 @@ class Boldgrid_Backup_Admin_Core_Files {
 	 * # The wp-content folder is not included.
 	 * # .htaccess.bgb is included, but it is not a core file.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    array
 	 */
@@ -65,7 +64,7 @@ class Boldgrid_Backup_Admin_Core_Files {
 	/**
 	 * Constructor.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
 	 */
@@ -76,9 +75,9 @@ class Boldgrid_Backup_Admin_Core_Files {
 	/**
 	 * Determine if a given $file (relative to ABSPATH) is a core file.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param  string $file
+	 * @param  string $file File path.
 	 * @return bool
 	 */
 	public function is_core_file( $file ) {
@@ -94,5 +93,4 @@ class Boldgrid_Backup_Admin_Core_Files {
 
 		return false;
 	}
-
 }

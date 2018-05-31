@@ -2,7 +2,9 @@
 /**
  * File: url-helper.php
  *
- * @link http://www.boldgrid.com
+ * Standalone URL address helper for Cron tasks.
+ *
+ * @link https://www.boldgrid.com
  * @since 1.6.3
  *
  * @package Boldgrid_Backup
@@ -11,13 +13,18 @@
  * @author BoldGrid <support@boldgrid.com>
  */
 
+/**
+ * Class: Boldgrid_Backup_Url_Helper.
+ *
+ * @since 1.6.3
+ */
 class Boldgrid_Backup_Url_Helper {
 	/**
 	 * Call a URL address.
 	 *
 	 * @since 1.6.3
 	 *
-	 * @param  string $url
+	 * @param  string $url A URL address.
 	 * @return mixed  Returns a string or FALSE on failure to make the call.
 	 */
 	public function call_url( $url ) {

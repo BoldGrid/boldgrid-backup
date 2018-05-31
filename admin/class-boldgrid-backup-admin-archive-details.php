@@ -1,24 +1,23 @@
 <?php
 /**
- * Archive Details class.
+ * File: class-boldgrid-backup-admin-archive-details.php
  *
- * @link  http://www.boldgrid.com
- * @since 1.5.1
+ * @link       https://www.boldgrid.com
+ * @since      1.5.1
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup Admin Archive Details Class.
+ * Class: Boldgrid_Backup_Admin_Archive_Details
  *
  * @since 1.5.1
  */
 class Boldgrid_Backup_Admin_Archive_Details {
-
 	/**
 	 * The core class object.
 	 *
@@ -31,7 +30,7 @@ class Boldgrid_Backup_Admin_Archive_Details {
 	/**
 	 * An array of remote storage locations.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    array
 	 */
@@ -53,7 +52,7 @@ class Boldgrid_Backup_Admin_Archive_Details {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param  string $filename
+	 * @param  string $filename Filename.
 	 * @return string
 	 */
 	public function get_url( $filename ) {
@@ -63,7 +62,7 @@ class Boldgrid_Backup_Admin_Archive_Details {
 	/**
 	 * Enqueue scripts.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function enqueue_scripts() {
 		wp_enqueue_style(
@@ -168,7 +167,7 @@ class Boldgrid_Backup_Admin_Archive_Details {
 	 * The nonce can be added to an ajax request's data via:
 	 * 'security' : $( '#_wpnonce' ).val()
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function validate_nonce() {
 		return check_ajax_referer( 'boldgrid_backup_remote_storage_upload', 'security', false );

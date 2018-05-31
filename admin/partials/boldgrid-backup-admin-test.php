@@ -1,15 +1,20 @@
 <?php
 /**
- * Provide a admin area view for the plugin functionality test report
+ * File: boldgrid-backup-admin-test.php
  *
- * @link http://www.boldgrid.com
+ * Provide a admin area view for the plugin functionality test report.
+ *
+ * @link https://www.boldgrid.com
  * @since 1.0
  *
- * @package Boldgrid_Backup
+ * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin/partials
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
 // Setup our lang.
 $lang = array(

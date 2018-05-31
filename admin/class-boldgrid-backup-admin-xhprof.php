@@ -1,19 +1,19 @@
 <?php
 /**
- * The admin-specific PHP profiling methods for the plugin
+ * File: class-boldgrid-backup-admin-xhprof.php
  *
- * @link http://www.boldgrid.com
+ * @link https://www.boldgrid.com
  * @since 1.2
  *
- * @package Boldgrid_Backup
+ * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright BoldGrid.com
- * @version $Id$
- * @author BoldGrid.com <wpb@boldgrid.com>
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup admin xhprof class.
+ * Class: Boldgrid_Backup_Admin_Xhprof
  *
  * @since 1.2
  */

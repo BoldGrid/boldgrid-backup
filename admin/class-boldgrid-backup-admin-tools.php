@@ -1,28 +1,27 @@
 <?php
 /**
- * Tools class.
+ * File: class-boldgrid-backup-admin-tools.php
  *
- * @link  http://www.boldgrid.com
- * @since 1.5.4
+ * @link  https://www.boldgrid.com
+ * @since 1.6.0
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup Admin Tools Class.
+ * Class: Boldgrid_Backup_Admin_Tools
  *
- * @since 1.5.4
+ * @since 1.6.0
  */
 class Boldgrid_Backup_Admin_Tools {
-
 	/**
 	 * The core class object.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access private
 	 * @var    Boldgrid_Backup_Admin_Core
 	 */
@@ -31,7 +30,7 @@ class Boldgrid_Backup_Admin_Tools {
 	/**
 	 * Constructor.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
 	 */
@@ -42,7 +41,7 @@ class Boldgrid_Backup_Admin_Tools {
 	/**
 	 * Render the tools page.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function page() {
 		wp_enqueue_style( 'bglib-ui-css' );

@@ -1,30 +1,35 @@
 <?php
 /**
- * Fired during plugin activation
+ * File: class-boldgrid-backup-activator.php
  *
- * @link http://www.boldgrid.com
+ * @link https://www.boldgrid.com
  * @since 1.0
  *
- * @package Boldgrid_Backup
+ * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/includes
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * Fired during plugin activation.
+ * Class: Boldgrid_Backup_Activator
  *
  * This class defines all code necessary to run during the plugin's activation.
  *
  * @since 1.0
- * @package Boldgrid_Backup
- * @subpackage Boldgrid_Backup/includes
- * @author BoldGrid.com <wpb@boldgrid.com>
  */
 class Boldgrid_Backup_Activator {
-
 	/**
 	 * Plugin activation.
 	 *
 	 * @since 1.0
+	 *
+	 * @static
+	 *
+	 * @see Boldgrid_Backup_Admin_Core()
+	 * @see Boldgrid_Backup_Admin_Settings::get_settings()
+	 * @see Boldgrid_Backup_Admin_Cron::add_all_crons()
 	 */
 	public static function activate() {
 		$core      = new Boldgrid_Backup_Admin_Core();

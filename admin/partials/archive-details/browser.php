@@ -1,15 +1,20 @@
 <?php
 /**
+ * File: browser.php
+ *
  * Display the Archive Browser section on the Archive Details page.
  *
- * @link  http://www.boldgrid.com
+ * @link  https://www.boldgrid.com
  * @since 1.5.3
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin/partials/archive-details
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
 $browser = '
 	<div id="zip_browser" class="hidden" data-view-type="file">
@@ -26,5 +31,3 @@ $browser = '
 	</div>';
 
 return $browser;
-
-

@@ -28,6 +28,9 @@ WordPress backup and restoration with update protection.
 
 ## Changelog ##
 
+### 1.6.3 In progress ###
+* Update: Satisfying CodeSniffer.
+
 ### 1.6.2 ###
 
 Release Date: May 25th, 2018

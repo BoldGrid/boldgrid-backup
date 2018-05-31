@@ -1,11 +1,18 @@
 <?php
 /**
- * Time of day.
+ * File: time-of-day.php
  *
- * @since 1.5.4
+ * @link https://www.boldgrid.com
+ * @since 1.6.0
+ *
+ * @package    Boldgrid_Backup
+ * @subpackage Boldgrid_Backup/admin/partials/settings
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
 $tz_info = $this->core->time->get_timezone_info();
 
@@ -80,4 +87,3 @@ ob_start();
 $output = ob_get_contents();
 ob_end_clean();
 return $output;
-?>

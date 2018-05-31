@@ -1,16 +1,21 @@
 <?php
 /**
- * This file contains the markup necessary to upload a new backup archive.
+ * File: add-new.php
  *
+ * This file contains the markup necessary to upload a new backup archive.
  * It follows the same structure as the "Upload Plugin" section of plugins.
  *
+ * @link https://www.boldgrid.com
  * @since 1.5.1
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin/partials/archives
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
 $max_file_size = Boldgrid_Backup_Admin_Utility::get_upload_limit();
 
@@ -32,7 +37,8 @@ $upload_info = esc_html__(
 );
 
 $backup_id_notice = sprintf(
-	esc_html__(
+	// translators: 1: HTML tag, 2: Filename part, 3: Backup identifier, 4: File extension, 5: Archive filename, 6: Backup directory path.
+	__(
 		'Your BoldGrid Backup id is %3$s. This backup id is used to determine if a backup archive file is associated with this WordPress installation.
 		Manually uploaded archive files must have filenames starting with "%2$s", contain the BoldGrid Backup id "%3$s", and end with "%4$s", to be recognized.%1$s%1$s
 		For example: %5$s%1$s%1$s

@@ -1,16 +1,22 @@
 <?php
 /**
+ * File: details.php
+ *
  * Render the details of a particular backup.
  *
- * @since 1.5.4
+ * @link https://www.boldgrid.com
+ * @since 1.6.0
  *
  * @package    Boldgrid_Backup
- * @subpackage Boldgrid_Backup/admin/partials
+ * @subpackage Boldgrid_Backup/admin/partials/archive-details
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  *
  * @param bool $archive_found Whether or not the archive was found.
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
 $details = '';
 
@@ -91,5 +97,3 @@ foreach ( $datas as $data ) {
 }
 
 return $details;
-
-

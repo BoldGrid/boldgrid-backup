@@ -1,12 +1,18 @@
 <?php
-
 /**
+ * File: storage-location.php
+ *
  * Display a single provider on the settings page.
+ * This page returns the html markup needed for the <tr> #storage_locations table.
  *
- * This page returns the html markup needed for the <tr> #storage_locations
- * table.
- *
+ * @link https://www.boldgrid.com
  * @since 1.5.2
+ *
+ * @package    Boldgrid_Backup
+ * @subpackage Boldgrid_Backup/admin/partials/settings
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  *
  * @param  array $location {
  *     A remote storage location / provider.
@@ -22,7 +28,7 @@
  * @return string
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
 $configure = '';
 
@@ -56,5 +62,3 @@ return sprintf(
 	$location['key'],
 	$checked
 );
-
-

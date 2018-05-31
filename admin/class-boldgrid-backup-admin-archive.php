@@ -1,24 +1,23 @@
 <?php
 /**
- * Archive class.
+ * File: class-boldgrid-backup-admin-archive.php
  *
- * @link  http://www.boldgrid.com
- * @since 1.5.3
+ * @link       https://www.boldgrid.com
+ * @since      1.5.3
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup Admin Archive Browser Class.
+ * Class: Boldgrid_Backup_Admin_Archive
  *
  * @since 1.5.3
  */
 class Boldgrid_Backup_Admin_Archive {
-
 	/**
 	 * The core class object.
 	 *
@@ -127,9 +126,9 @@ class Boldgrid_Backup_Admin_Archive {
 	 *
 	 * Please see @return for more information on what an archive actually is.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param  string $filename
+	 * @param  string $filename Filename.
 	 * @return array {
 	 *     Details about an archive.
 	 *
@@ -188,7 +187,7 @@ class Boldgrid_Backup_Admin_Archive {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param string $filepath
+	 * @param string $filepath File path.
 	 */
 	public function init( $filepath ) {
 
@@ -237,7 +236,7 @@ class Boldgrid_Backup_Admin_Archive {
 	 *
 	 * @since 1.5.3
 	 *
-	 * @param  string $filepath
+	 * @param  string $filepath File path.
 	 * @return bool
 	 */
 	public function is_archive( $filepath ) {
@@ -264,7 +263,7 @@ class Boldgrid_Backup_Admin_Archive {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param  string $filename
+	 * @param  string $filename Filename.
 	 * @return bool
 	 */
 	public function is_site_archive( $filename ) {

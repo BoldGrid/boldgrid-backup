@@ -1,17 +1,20 @@
 <?php
 /**
- * Provide a admin area view for the plugin
+ * File: boldgrid-backup-admin-settings.php
  *
  * This file is used to markup the admin-facing aspects of the plugin.
  *
- * @link http://www.boldgrid.com
+ * @link https://www.boldgrid.com
  * @since 1.0
  *
- * @package Boldgrid_Backup
+ * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin/partials
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
 $nav              = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
 $scheduler        = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/scheduler.php';
@@ -79,7 +82,7 @@ $sections = array(
 /**
  * Allow other plugins to modify the sections of the settings page.
  *
- * @since 1.5.4
+ * @since 1.6.0
  *
  * @param array $sections
  */
@@ -88,9 +91,11 @@ $sections = apply_filters( 'boldgrid_backup_settings_sections', $sections );
 /**
  * Render the $sections into displayable markup.
  *
- * @since 1.5.4
+ * @since 1.6.0
  *
  * @param array $sections
+ *
+ * phpcs:disable WordPress.NamingConventions.ValidHookName
  */
 $col_container = apply_filters( 'Boldgrid\Library\Ui\render_col_container', $sections );
 if ( is_array( $col_container ) ) {
@@ -127,7 +132,11 @@ wp_nonce_field( 'boldgrid_backup_settings' );
 	$url  = admin_url( 'admin.php?page=boldgrid-backup-test' );
 	$link = sprintf(
 		wp_kses(
-			__( 'The BoldGrid Backup and Restore system allows you to upgrade your themes and plugins without being afraid it will do something you cannot easily undo. We perform a <a href="%s">Preflight Check</a> to see if the needed support is available on your web hosting account.', 'boldgrid-backup' ),
+			// translators: 1: URL address.
+			esc_html__(
+				'The BoldGrid Backup and Restore system allows you to upgrade your themes and plugins without being afraid it will do something you cannot easily undo. We perform a <a href="%s">Preflight Check</a> to see if the needed support is available on your web hosting account.',
+				'boldgrid-backup'
+			),
 			array( 'a' => array( 'href' => array() ) )
 		),
 		esc_url( $url )

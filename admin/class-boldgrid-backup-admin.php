@@ -1,23 +1,24 @@
 <?php
 /**
- * The admin-specific functionality of the plugin
+ * File: class-boldgrid-backup-admin.php
  *
- * @link http://www.boldgrid.com
+ * @link https://www.boldgrid.com
  * @since 1.0
  *
- * @package Boldgrid_Backup
+ * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * The admin-specific functionality of the plugin.
+ * Class: Boldgrid_Backup_Admin
  *
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the admin-specific stylesheet and JavaScript.
  *
- * @package Boldgrid_Backup
- * @subpackage Boldgrid_Backup/admin
- * @author BoldGrid.com <wpb@boldgrid.com>
+ * @since 1.0
  */
 class Boldgrid_Backup_Admin {
 	/**

@@ -1,15 +1,20 @@
 <?php
 /**
+ * File: browser-entry.php
+ *
  * Create the <tr> for each file in the archilve.
  *
- * @link  http://www.boldgrid.com
+ * @link  https://www.boldgrid.com
  * @since 1.5.3
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin/partials/archive-details
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
 $class = $file['folder'] ? 'folder' : 'file';
 
@@ -45,5 +50,3 @@ return sprintf(
 	$size,
 	$this->core->time->get_span()
 );
-
-

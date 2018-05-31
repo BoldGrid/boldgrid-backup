@@ -3,7 +3,7 @@
  *
  * @summary JavaScript for handling Table include settings.
  *
- * @since 1.5.4
+ * @since 1.6.0
  *
  * @param $ The jQuery object.
  */
@@ -32,7 +32,7 @@ BoldGrid.TableInclude = function( $ ) {
 	/**
 	 * @summary Action to take when the type (full / custom) has been changed.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	self.onChangeType = function() {
 		self.toggleConfig();
@@ -41,7 +41,7 @@ BoldGrid.TableInclude = function( $ ) {
 	/**
 	 * @summary Toogle all database tables so they are all backed up.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	self.toggleAll = function() {
 		$includeTables.bgbuDrawAttention();
@@ -54,7 +54,7 @@ BoldGrid.TableInclude = function( $ ) {
 	/**
 	 * @summary Toggle the area that allows you to choose which tables to backup.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	self.toggleConfig = function() {
 		var type = $type.filter( ':checked' ).val();
@@ -69,7 +69,7 @@ BoldGrid.TableInclude = function( $ ) {
 	/**
 	 * @summary Deselect all tables.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	self.toggleNone = function() {
 		$includeTables.bgbuDrawAttention();
@@ -82,7 +82,7 @@ BoldGrid.TableInclude = function( $ ) {
 	/**
 	 * @summary Toogle the status that tells the user if they're backing up all tables.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	self.toggleStatus = function() {
 		var allIncluded = $includeTables.length === $includeTables.filter( ':checked' ).length;

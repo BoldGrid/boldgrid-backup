@@ -1,8 +1,17 @@
 <?php
 /**
- * BoldGrid Backup - FTP Settings page.
+ * File: ftp.php
  *
- * The file handles the rendering of the settings page.
+ * The file handles the rendering of the remove FTP/SFTP options on the settings page.
+ *
+ * @link https://www.boldgrid.com
+ * @since 1.6.0
+ *
+ * @package    Boldgrid_Backup
+ * @subpackage Boldgrid_Backup/admin/partials/remote
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 $selected      = 'selected="selected"';

@@ -1,13 +1,20 @@
 <?php
 /**
- * Retention settings.
+ * File: retention.php
  *
- * @summary Show the retention settings section of the BoldGrid Backup settings page.
+ * Show the retention settings section of the BoldGrid Backup settings page.
  *
+ * @link https://www.boldgrid.com
  * @since 1.3.1
+ *
+ * @package    Boldgrid_Backup
+ * @subpackage Boldgrid_Backup/admin/partials/settings
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
 ob_start();
 
@@ -56,4 +63,3 @@ $is_retention_set = ( isset( $settings['retention_count'] ) );
 $output = ob_get_contents();
 ob_end_clean();
 return $output;
-?>

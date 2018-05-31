@@ -1,14 +1,21 @@
 <?php
 /**
- * Display "Backup Storage" options.
+ * File: storage.php
  *
- * This file is included on the BoldGrid Backup Settings page and helps render
- * the "Backup Storage" section.
+ * This file is included on the BoldGrid Backup Settings page and helps render the "Backup Storage"
+ * section.
  *
+ * @link https://www.boldgrid.com
  * @since 1.5.2
+ *
+ * @package    Boldgrid_Backup
+ * @subpackage Boldgrid_Backup/admin/partials/settings
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
 ob_start();
 
@@ -87,4 +94,3 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 $output = ob_get_contents();
 ob_end_clean();
 return $output;
-?>

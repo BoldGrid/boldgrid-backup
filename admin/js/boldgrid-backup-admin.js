@@ -57,7 +57,7 @@ BoldGrid.Backup = function( $ ) {
 	 * # <a href="" data-toggle-target="#more_info">Show</a>
 	 * # <div id="more_info" class="hidden">
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	self.onClickToggle = function() {
 		var $e = $( this ),
@@ -214,7 +214,7 @@ BoldGrid.Backup( jQuery );
 /**
  * @summary Draw attention to an element.
  *
- * @since 1.5.4
+ * @since 1.6.0
  */
 jQuery.fn.bgbuDrawAttention = function() {
 	var currentColor,
@@ -262,7 +262,7 @@ jQuery.fn.bgbuDrawAttention = function() {
  * For example, if we click "restore" on a page, we want to disable all other
  * actions within the wpwrap (IE can't restore and delete at the same time).
  *
- * @since 1.5.4
+ * @since 1.6.0
  */
 jQuery.fn.bgbuDisableActions = function() {
 	this.find( 'a, [type="submit"]' ).attr( 'disabled', 'disabled' );

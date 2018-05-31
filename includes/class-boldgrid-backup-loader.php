@@ -1,27 +1,30 @@
 <?php
 /**
- * Register all actions and filters for the plugin
+ * File: class-boldgrid-backup-loader.php
  *
- * @link http://www.boldgrid.com
+ * Register all actions and filters for the plugin.
+ *
+ * @link https://www.boldgrid.com
  * @since 1.0
  *
- * @package Boldgrid_Backup
+ * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/includes
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * Register all actions and filters for the plugin.
+ * Class: Boldgrid_Backup_Loader
  *
+ * Register all actions and filters for the plugin.
  * Maintain a list of all hooks that are registered throughout
  * the plugin, and register them with the WordPress API. Call the
  * run function to execute the list of actions and filters.
  *
- * @package Boldgrid_Backup
- * @subpackage Boldgrid_Backup/includes
- * @author BoldGrid.com <wpb@boldgrid.com>
+ * @since 1.0
  */
 class Boldgrid_Backup_Loader {
-
 	/**
 	 * The array of actions registered with WordPress.
 	 *

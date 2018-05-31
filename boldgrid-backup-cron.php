@@ -1,14 +1,16 @@
 <?php
 /**
- * BoldGrid Backup cron control script
+ * File: boldgrid-backup-cron.php
  *
- * @link http://www.boldgrid.com
+ * BoldGrid Backup cron control script.
+ *
+ * @link https://www.boldgrid.com
  * @since 1.0
  *
- * @package Boldgrid_Backup
- * @copyright BoldGrid
- * @version $Id$
- * @author BoldGrid <support@boldgrid.com>
+ * @package    Boldgrid_Backup
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 // Abort if not being ran from the command line.

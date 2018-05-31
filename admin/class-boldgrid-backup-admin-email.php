@@ -1,28 +1,29 @@
 <?php
 /**
- * Email.
+ * File: class-boldgrid-backup-admin-email.php
  *
- * @link  http://www.boldgrid.com
+ * Email helper.
+ *
+ * @link  https://www.boldgrid.com
  * @since 1.5.2
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * Email.
+ * Class: Boldgrid_Backup_Admin_Email
  *
  * @since 1.5.2
  */
 class Boldgrid_Backup_Admin_Email {
-
 	/**
 	 * An array of ads.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access private
 	 * @var    array
 	 */
@@ -42,7 +43,7 @@ class Boldgrid_Backup_Admin_Email {
 	 *
 	 * @since 1.5.2
 	 *
-	 * @param Boldgrid_Backup_Admin_Core $core
+	 * @param Boldgrid_Backup_Admin_Core $core Boldgrid_Backup_Admin_Core object.
 	 */
 	public function __construct( $core ) {
 		$this->core = $core;
@@ -53,7 +54,7 @@ class Boldgrid_Backup_Admin_Email {
 	 *
 	 * @since 1.5.2
 	 *
-	 * @param  string $message
+	 * @param  string $message Message to send.
 	 * @param  bool   $add_ad  Allow ads to be added to the email. In some cases,
 	 *                         like when we have bad news (something failed), we
 	 *                         may not want to ask the user to upgrade (bad timing).
@@ -79,11 +80,12 @@ class Boldgrid_Backup_Admin_Email {
 	/**
 	 * Init our ads.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function init_ads() {
 		$this->ads = array(
 			'generic' => $this->core->config->get_is_premium() ? '' : sprintf(
+				// translators: 1: URL address.
 				__( 'Want to store your backups on Amazon S3, restore individual files with just a click, and have access to more tools? Get BoldGrid Backup Premium! - %1$s', 'boldgrid-backup' ),
 				Boldgrid_Backup_Admin_Go_Pro::$url
 			) . "\n\n",
@@ -95,7 +97,7 @@ class Boldgrid_Backup_Admin_Email {
 	 *
 	 * @since 1.5.2
 	 *
-	 * @param  array $info
+	 * @param  array $info Archive process information.
 	 * @return array
 	 */
 	public function post_archive_parts( $info ) {
@@ -105,22 +107,37 @@ class Boldgrid_Backup_Admin_Email {
 
 		$site_id = Boldgrid_Backup_Admin_Utility::create_site_id();
 
+		// translators: 1: Site identifier.
 		$parts['subject'] = sprintf( __( 'Backup completed for %s', 'boldgrid-backup' ), $site_id );
 
 		$parts['body']['main'] = esc_html__( 'Hello', 'boldgrid-backup' ) . ",\n\n";
+
 		if ( $info['dryrun'] ) {
 			$body['main'] .= esc_html__( 'THIS OPERATION WAS A DRY-RUN TEST', 'boldgrid-backup' ) . ".\n\n";
 		}
+
+		// translators: 1: Site identifier.
 		$parts['body']['main'] .= sprintf( esc_html__( 'A backup archive has been created for %s', 'boldgrid-backup' ), $site_id ) . ".\n\n";
 		$parts['body']['main'] .= esc_html__( 'Backup details', 'boldgrid-backup' ) . ":\n";
 		$parts['body']['main'] .= sprintf( $this->core->configs['lang']['est_pause'], $info['db_duration'] ) . "\n";
+
+		// translators: 1: Backup duration.
 		$parts['body']['main'] .= sprintf( esc_html__( 'Duration: %s seconds', 'boldgrid-backup' ), $info['duration'] ) . "\n";
+
+		// translators: 1: Total backup size.
 		$parts['body']['main'] .= sprintf( esc_html__( 'Total size: %s', 'boldgrid-backup' ), Boldgrid_Backup_Admin_Utility::bytes_to_human( $info['total_size'] ) ) . "\n";
+
+		// translators: 1: Archive file path.
 		$parts['body']['main'] .= sprintf( esc_html__( 'Archive file path: %s', 'boldgrid-backup' ), $info['filepath'] ) . "\n";
+
+		// translators: 1: Archive file size.
 		$parts['body']['main'] .= sprintf( esc_html__( 'Archive file size: %s', 'boldgrid-backup' ), Boldgrid_Backup_Admin_Utility::bytes_to_human( $info['filesize'] ) ) . "\n";
+
+		// translators: 1: Archive compressor name.
 		$parts['body']['main'] .= sprintf( esc_html__( 'Compressor used: %s', 'boldgrid-backup' ), $info['compressor'] ) . "\n";
 
 		if ( ! empty( $info['trigger'] ) ) {
+			// translators: 1: What triggered the backup process.
 			$parts['body']['main'] .= sprintf( esc_html__( 'Backup triggered by: %1$s', 'boldgrid-backup' ), $info['trigger'] ) . "\n";
 		}
 
@@ -130,7 +147,9 @@ class Boldgrid_Backup_Admin_Email {
 
 		$parts['body']['main'] .= "\n";
 
-		$parts['body']['signature']  = esc_html__( 'You can manage notifications in your WordPress admin panel, under BoldGrid Backup Settings', 'boldgrid-backup' ) . ".\n\n";
+		$parts['body']['signature'] = esc_html__( 'You can manage notifications in your WordPress admin panel, under BoldGrid Backup Settings', 'boldgrid-backup' ) . ".\n\n";
+
+		// translators: 1: URL address for help restoring a backup archive file.
 		$parts['body']['signature'] .= sprintf( esc_html__( 'For help with restoring a BoldGrid Backup archive file, please visit: %s', 'boldgrid-backup' ), esc_url( $this->core->configs['urls']['restore'] ) ) . "\n\n";
 
 		$parts['body']['signature'] .= $this->ads['generic'];

@@ -1,4 +1,15 @@
 <?php
+/**
+ * File: bootstrap.php
+ *
+ * Bootstrap file for tests.
+ *
+ * @package    Boldgrid_Backup
+ * @subpackage Boldgrid_Backup/tests
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
+ */
 
 $_tests_dir = getenv( 'WP_TESTS_DIR' );
 if ( ! $_tests_dir ) {

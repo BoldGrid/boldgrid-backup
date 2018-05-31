@@ -1,19 +1,19 @@
 <?php
 /**
- * Boldgrid Backup Admin Auto Rollback.
+ * File: class-boldgrid-backup-admin-auto-rollback.php
  *
- * @link  http://www.boldgrid.com
+ * @link  https://www.boldgrid.com
  * @since 1.5.2
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * Boldgrid Backup Admin Auto Rollback class.
+ * Class: Boldgrid_Backup_Admin_Auto_Rollback
  *
  * We hook into "the upgrader_process_complete" (run when the download process
  * for a plugin install or update finishes). If the user has enabled auto
@@ -47,7 +47,6 @@
  * @since 1.5.1
  */
 class Boldgrid_Backup_Admin_Auto_Rollback {
-
 	/**
 	 * The core class object.
 	 *
@@ -116,7 +115,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param Boldgrid_Backup_Admin_Core $core
+	 * @param Boldgrid_Backup_Admin_Core $core Boldgrid_Backup_Admin_Core object.
 	 */
 	public function __construct( $core ) {
 		$this->core = $core;
@@ -528,7 +527,15 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 				</p>
 
 				<p>
-					' . sprintf( __( '<strong>Update Protection</strong> for <em>future updates</em> can be configured on your <a href="%1$s">Settings</a> page.', 'boldgrid-backup' ), admin_url( 'admin.php?page=boldgrid-backup-settings&section=section_updates' ) ) . '
+					' .
+			sprintf(
+				// translators: 1: URL address.
+				esc_html__(
+					'<strong>Update Protection</strong> for <em>future updates</em> can be configured on your <a href="%1$s">Settings</a> page.',
+					'boldgrid-backup'
+				),
+				admin_url( 'admin.php?page=boldgrid-backup-settings&section=section_updates' )
+			) . '
 				</p>
 
 				<p>
@@ -612,7 +619,14 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		switch ( $trigger['type'] ) {
 			case 'core':
 				$wordpress_version = get_bloginfo( 'version' );
-				$notice            = sprintf( __( 'WordPress was recently updated to version %1$s.', 'boldgrid-backup' ), $wordpress_version );
+				$notice            = sprintf(
+					// translators: 1: WordPress version string.
+					__(
+						'WordPress was recently updated to version %1$s.',
+						'boldgrid-backup'
+					),
+					$wordpress_version
+				);
 				break;
 			case 'theme':
 				foreach ( $trigger['themes'] as $theme ) {
@@ -679,7 +693,6 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 * @global string $pagenow
 	 */
 	public function notice_backup_show() {
-
 		/*
 		 * This method is hooked into admin_notices. If we don't have auto_rollback
 		 * enabled, then we can abort right now.
@@ -771,12 +784,12 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 *
 	 * @link https://developer.wordpress.org/reference/hooks/upgrader_process_complete/
 	 * @see Boldgrid_Backup_Admin_Cron::add_restore_cron().
+	 * @link https://pastebin.com/ah4E048B
 	 *
-	 * @param object $upgrader_object Plugin_Upgrader Object
-	 * @param array  $options         See https://pastebin.com/ah4E048B
+	 * @param object $upgrader_object Plugin_Upgrader Object.
+	 * @param array  $options         Options array.
 	 */
 	public function notice_deadline_show( $upgrader_object, $options ) {
-
 		/*
 		 * This method is ran both when a plugin/theme/WP is updated, and when
 		 * a plugin is simply uploaded. As of 1.6.0, this plugin does not offer
@@ -818,7 +831,9 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 *
 	 * @since 1.5.3
 	 *
-	 * @param array $options https://pastebin.com/ah4E048B
+	 * @link https://pastebin.com/ah4E048B
+	 *
+	 * @param array $options Option array.
 	 */
 	public function set_update_trigger( $options ) {
 		if ( empty( $options ) || ! is_array( $options ) ) {
@@ -858,6 +873,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		$message .= '<p>';
 
 		$message .= sprintf(
+			// translators: 1: Time difference.
 			__( 'You last made a backup %1$s ago.', 'boldgrid-backup' ),
 			human_time_diff( $pending_rollback['lastmodunix'], time() )
 		) . ' ';
@@ -902,7 +918,6 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 * @since 1.5.3
 	 */
 	public function notice_activated_show() {
-
 		/*
 		 * If we're in the middle of upgrading something, such as:
 		 * update-core.php?action=do-theme-upgrade

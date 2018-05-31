@@ -1,28 +1,27 @@
 <?php
 /**
- * Folder Exclusion class.
+ * File: class-boldgrid-backup-admin-folder-exclusion.php
  *
- * @link  http://www.boldgrid.com
- * @since 1.5.4
+ * @link  https://www.boldgrid.com
+ * @since 1.6.0
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup Admin Folder Exclusion Class.
+ * Class: Boldgrid_Backup_Admin_Folder_Exclusion
  *
- * @since 1.5.4
+ * @since 1.6.0
  */
 class Boldgrid_Backup_Admin_Folder_Exclusion {
-
 	/**
 	 * The default exclude value.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 * @var   string
 	 */
 	public $default_exclude = '.git,node_modules';
@@ -30,7 +29,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	/**
 	 * The default include value.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 * @var   string
 	 */
 	public $default_include = 'WPCORE,/wp-content';
@@ -38,7 +37,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	/**
 	 * By default, backup all files and folders (use default settings).
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 * @var   string
 	 */
 	public $default_type = 'full';
@@ -46,7 +45,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	/**
 	 * Our exclude value.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 * @var   string|null
 	 */
 	public $exclude = null;
@@ -54,7 +53,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	/**
 	 * Our include value.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 * @var   string|null
 	 */
 	public $include = null;
@@ -62,7 +61,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	/**
 	 * Whether or not we're in the ajax preview.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 * @var   bool
 	 */
 	public $in_ajax_preview = false;
@@ -72,7 +71,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	 *
 	 * Usually it will be 'full' or 'custom'.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 * @var   null|string
 	 */
 	public $type = null;
@@ -80,7 +79,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	/**
 	 * Allowable types.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 * @var   array
 	 */
 	public $types = array( 'include', 'exclude', 'type' );
@@ -88,7 +87,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	/**
 	 * Valid backup types.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 * @var   array
 	 */
 	public $valid_types = array( 'full', 'custom' );
@@ -96,7 +95,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	/**
 	 * The core class object.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access private
 	 * @var    Boldgrid_Backup_Admin_Core
 	 */
@@ -105,7 +104,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	/**
 	 * Constructor.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
 	 */
@@ -134,9 +133,9 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	/**
 	 * Determine if we should allow a file in the backup.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param  string $file
+	 * @param  string $file File path.
 	 * @return bool
 	 */
 	public function allow_file( $file ) {
@@ -186,9 +185,9 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	 * Generate a section for email alerts including information about files and
 	 * folders excluded.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param  array $info
+	 * @param  array $info File and folder settings.
 	 * @return string
 	 */
 	public function email_part( $info ) {
@@ -202,11 +201,19 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 		}
 
 		if ( $has_folder_included ) {
-			$body .= sprintf( esc_html__( 'Included: %1$s', 'boldgrid-backup' ), $info['folder_include'] ) . "\n";
+			$body .= sprintf(
+				// translators: 1: Included folder list.
+				esc_html__( 'Included: %1$s', 'boldgrid-backup' ),
+				$info['folder_include']
+			) . "\n";
 		}
 
 		if ( $has_folder_excluded ) {
-			$body .= sprintf( esc_html__( 'Excluded: %1$s', 'boldgrid-backup' ), $info['folder_exclude'] ) . "\n";
+			$body .= sprintf(
+				// translators: 1: Excluded folder list.
+				esc_html__( 'Excluded: %1$s', 'boldgrid-backup' ),
+				$info['folder_exclude']
+			) . "\n";
 		}
 
 		return $body;
@@ -216,7 +223,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	 * Create our regex pattern.
 	 *
 	 * If the user enters wp-* for their include / exclude value, then we need
-	 * to convert that into a propper regex pattern.
+	 * to convert that into a proper regex pattern.
 	 *
 	 * When we look for matches, we want to keep it specific to one folder.
 	 * For example, if we're given wp-adm*n, the expectation is that we want
@@ -225,12 +232,11 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	 * To prevent this false positive:
 	 *   wp-admin/images/media-button.png
 	 *   wp-adm************************ng
-	 * ... we will set the wildcard to match everything except a directory
-	 * separator.
+	 * ... we will set the wildcard to match everything except a directory separator.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param  string $value
+	 * @param  string $value Input string.
 	 * @return string
 	 */
 	public function create_pattern( $value ) {
@@ -272,7 +278,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	/**
 	 * Enqueue scripts.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function enqueue_scripts() {
 		$handle = 'boldgrid-backup-admin-folder-exclude';
@@ -307,10 +313,10 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	/**
 	 * Get our include or exclude value from the settings.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param  string $type Either 'include' or 'exclude'.
-	 * @param  array  $settings
+	 * @param  string $type     Either 'include' or 'exclude'.
+	 * @param  array  $settings File and folder settings.
 	 * @return string
 	 */
 	public function from_settings( $type, $settings = false ) {
@@ -384,9 +390,9 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	 * wp-content/file.php as a $file, it should match. If I pass in "joec" as a
 	 * $value and wp-content/file.php as a $file, it should not match.
 	 *
-	 * @param  string $value
-	 * @param  string $file  Filepath relative to ABSPATH, such as
-	 *                       wp-content/plugins/boldgrid-backup/boldgrid-backup.php
+	 * @param  string $value Input string.
+	 * @param  string $file  File path relative to ABSPATH, such as:
+	 *                       "wp-content/plugins/boldgrid-backup/boldgrid-backup.php".
 	 * @return bool
 	 */
 	public function is_match( $value, $file ) {
@@ -413,7 +419,11 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	}
 
 	/**
+	 * Is using default settings?
 	 *
+	 * @since 1.6.0
+	 *
+	 * @return bool
 	 */
 	public function is_using_defaults() {
 		$type = $this->from_settings( 'type' );
@@ -424,7 +434,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	/**
 	 * Get our include / exclude settings from $_POST.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @param  string $type Either include or exclude.
 	 * @return string
@@ -466,7 +476,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	/**
 	 * Handle the ajax request to preview the filters.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function wp_ajax_preview() {
 		if ( ! check_ajax_referer( 'folder_exclusion_preview', 'security', false ) ) {

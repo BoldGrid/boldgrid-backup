@@ -2,10 +2,17 @@
 /**
  * Database settings.
  *
+ * @link https://www.boldgrid.com
  * @since 1.5.3
+ *
+ * @package    Boldgrid_Backup
+ * @subpackage Boldgrid_Backup/admin/partials/settings
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
 // $core will vary based on how this file is included.
 $core = isset( $this->core ) ? $this->core : $this;
@@ -83,5 +90,3 @@ return sprintf(
 	/* 4 */ $buttons,
 	/* 5 */ $tables
 );
-
-

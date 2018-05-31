@@ -1,24 +1,23 @@
 <?php
 /**
- * Boldgrid Backup Admin Remote.
+ * File: class-boldgrid-backup-admin-remote.php
  *
- * @link  http://www.boldgrid.com
+ * @link  https://www.boldgrid.com
  * @since 1.5.2
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * Boldgrid Backup Admin Remote class.
+ * Class: Boldgrid_Backup_Admin_Remote
  *
  * @since 1.5.2
  */
 class Boldgrid_Backup_Admin_Remote {
-
 	/**
 	 * The core class object.
 	 *
@@ -33,7 +32,7 @@ class Boldgrid_Backup_Admin_Remote {
 	 *
 	 * @since 1.5.2
 	 *
-	 * @param Boldgrid_Backup_Admin_Core $core
+	 * @param Boldgrid_Backup_Admin_Core $core Boldgrid_Backup_Admin_Core object.
 	 */
 	public function __construct( $core ) {
 		$this->core = $core;
@@ -42,7 +41,7 @@ class Boldgrid_Backup_Admin_Remote {
 	/**
 	 * Determine if any storage locations are enabled.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @return bool
 	 */
@@ -67,7 +66,7 @@ class Boldgrid_Backup_Admin_Remote {
 	 *
 	 * @since 1.5.2
 	 *
-	 * @param  string $id amazon_s3
+	 * @param  string $id A remote storage id, such as "amazon_s3".
 	 * @return bool
 	 */
 	public function is_enabled( $id ) {
@@ -79,10 +78,11 @@ class Boldgrid_Backup_Admin_Remote {
 	/**
 	 * Take action after a backup has been downloaded remotely.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
+	 *
+	 * @param string $filepath A file path.
 	 */
 	public function post_download( $filepath ) {
-
 		/*
 		 * Restore the log file from the archive so we can get all the juicy
 		 * meta data about the archive.

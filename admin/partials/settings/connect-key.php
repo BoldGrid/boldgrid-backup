@@ -4,11 +4,19 @@
  *
  * Show Connect Key status.
  *
- * @since 1.5.4
+ * @link https://www.boldgrid.com
+ * @since      1.6.0
+ *
+ * @package    Boldgrid_Backup
+ * @subpackage Boldgrid_Backup/admin/partials/settings
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
+/* phpcs:disable WordPress.NamingConventions.ValidHookName */
 $is_dismissed = apply_filters( 'Boldgrid\Library\Notice\KeyPrompt\getIsDismissed', false );
 $is_displayed = apply_filters( 'Boldgrid\Library\Notice\KeyPrompt\getIsDisplayed', false );
 
@@ -30,7 +38,8 @@ $refresh_key = ! $has_key_entered || $this->core->config->get_is_premium() ? '' 
 ob_start();
 if ( $has_key_entered ) {
 	printf(
-		__( 'You have entered a <strong>%1$s</strong> BoldGrid Connect Key.', 'boldgrid-backup' ),
+		// translators: 1: Subscription type ("Premium" or "Free").
+		esc_html__( 'You have entered a <strong>%1$s</strong> BoldGrid Connect Key.', 'boldgrid-backup' ),
 		$this->core->config->get_is_premium() ? __( 'Premium', 'boldgrid-backup' ) : __( 'Free', 'boldgrid-backup' )
 	);
 } elseif ( $is_dismissed ) {
@@ -64,5 +73,5 @@ return '
 		' . $output . $refresh_key . '
 	</div>
 	' . $bottom_box_premium . '
-</div>';
-
+</div>
+';

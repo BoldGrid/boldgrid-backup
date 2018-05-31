@@ -261,7 +261,7 @@ BoldGrid.Settings = function( $ ) {
 	/**
 	 * Handle click of the undismissBoldgridNotice link for the key prompt.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	self.undismissBoldgridNotice = function() {
 		var data, nonce, wpHttpReferer;

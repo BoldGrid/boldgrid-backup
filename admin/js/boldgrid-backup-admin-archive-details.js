@@ -71,7 +71,7 @@ BoldGrid.ArchiveDetails = function( $ ) {
 	/**
 	 * @summary Action to take when a user clicks download.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	self.onClickDownload = function() {
 		var $button = $( this ),
@@ -100,7 +100,7 @@ BoldGrid.ArchiveDetails = function( $ ) {
 	 *
 	 * This method downloads the first remote archive it finds.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	self.onClickDownloadFirst = function() {
 		var $downloadToServer = $body.find( '.download-to-server' ),
@@ -122,7 +122,7 @@ BoldGrid.ArchiveDetails = function( $ ) {
 	 *
 	 * These are the "Files & Folders" and "Database" tabs.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	self.onClickTab = function() {
 		var $dbElements = $( '[data-view-type="db"]' ),

@@ -1,24 +1,23 @@
 <?php
 /**
- * Time class.
+ * File :class-boldgrid-backup-admin-time.php
  *
- * @link  http://www.boldgrid.com
+ * @link  https://www.boldgrid.com
  * @since 1.6.0
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup Admin Time Class.
+ * Class: Boldgrid_Backup_Admin_Time
  *
  * @since 1.6.0
  */
 class Boldgrid_Backup_Admin_Time {
-
 	/**
 	 * The core class object.
 	 *
@@ -98,7 +97,6 @@ class Boldgrid_Backup_Admin_Time {
 	 * @return mixed DateTimeZone object on success, false on failure.
 	 */
 	public function get_server_timezone() {
-
 		/*
 		 * Determine how we are going to get the server's timezone.
 		 *
@@ -153,12 +151,11 @@ class Boldgrid_Backup_Admin_Time {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param  array $settings
-	 * @param  array $tz_info
+	 * @param  array $settings BoldGrid Backup settings.
+	 * @param  array $tz_info  Timezone information.
 	 * @return DateTime
 	 */
 	public function get_settings_date( $settings = array(), $tz_info = array() ) {
-
 		// Abort right away if bad data sent in.
 		if ( ! is_array( $settings ) || ! is_array( $tz_info ) ) {
 			return false;
@@ -234,7 +231,7 @@ class Boldgrid_Backup_Admin_Time {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param  string $format
+	 * @param  string $format Date format.
 	 * @return string
 	 */
 	public function get_span( $format = 'M j, Y h:i a' ) {
@@ -330,8 +327,10 @@ class Boldgrid_Backup_Admin_Time {
 				$timezone_info['gmt_offset'] = $gmt_offset;
 			}
 
-			// Not sure why WordPress is doing this. If it is -4.5, show me -4.5 and not -4.
-			// $formatted_gmt_offset = $this->format_gmt_offset( intval( $gmt_offset ) );
+			/*
+			 * Not sure why WordPress is doing this. If it is -4.5, show me -4.5 and not -4.
+			 * $formatted_gmt_offset = $this->format_gmt_offset( intval( $gmt_offset ) );.
+			 */
 			$formatted_gmt_offset  = $gmt_offset;
 			$timezone_info['abbr'] = sprintf( 'UTC%s', $formatted_gmt_offset );
 
@@ -357,7 +356,7 @@ class Boldgrid_Backup_Admin_Time {
 	 * @since 1.6.0
 	 *
 	 * @param int    $time In seconds.
-	 * @param string $type The type of type ( utc, local, -5)
+	 * @param string $type The type of type (utc, local, -5).
 	 */
 	public function init( $time, $type = 'utc' ) {
 		if ( empty( $time ) ) {

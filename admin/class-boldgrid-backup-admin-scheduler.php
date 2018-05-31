@@ -1,24 +1,23 @@
 <?php
 /**
- * Scheduler.
+ * File: class-boldgrid-backup-admin-scheduler.php
  *
- * @link  http://www.boldgrid.com
- * @since 1.5.1
+ * @link       https://www.boldgrid.com
+ * @since      1.5.1
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup Admin Scheduler class.
+ * Class: Boldgrid_Backup_Admin_Scheduler
  *
  * @since 1.5.1
  */
 class Boldgrid_Backup_Admin_Scheduler {
-
 	/**
 	 * Available schedulers.
 	 *
@@ -128,7 +127,7 @@ class Boldgrid_Backup_Admin_Scheduler {
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param  string
+	 * @param  string $scheduler Scheduler type ("cron" or "wp-cron").
 	 * @return bool
 	 */
 	public function is_available( $scheduler ) {
@@ -136,5 +135,4 @@ class Boldgrid_Backup_Admin_Scheduler {
 
 		return array_key_exists( $scheduler, $available );
 	}
-
 }

@@ -1,11 +1,20 @@
 <?php
 /**
+ * File: scheduler.php
+ *
  * Show "Scheduler" on settings page.
  *
+ * @link https://www.boldgrid.com
  * @since 1.5.1
+ *
+ * @package    Boldgrid_Backup
+ * @subpackage Boldgrid_Backup/admin/partials/settings
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
 $schedulers_available = $this->core->scheduler->get_available();
 
@@ -50,5 +59,3 @@ return sprintf(
 	$scheduler_select,
 	$wp_cron_warning
 );
-
-

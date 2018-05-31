@@ -1,14 +1,20 @@
 <?php
 /**
+ * File: boldgrid-backup-admin-backup-modal.php
+ *
  * Display a "Backup Site Now" button and modal.
  *
- * @since 1.5.4
+ * @link https://www.boldgrid.com
+ * @since 1.6.0
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin/partials
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
 return sprintf(
 	'
@@ -33,5 +39,3 @@ return sprintf(
 	/* 4 */ require BOLDGRID_BACKUP_PATH . '/admin/partials/settings/db.php',
 	/* 5 */ require BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-button.php'
 );
-
-

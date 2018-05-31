@@ -1,15 +1,20 @@
 <?php
 /**
+ * File: db.php
+ *
  * Display the Database section on the Archive Details page.
  *
- * @link  http://www.boldgrid.com
- * @since 1.5.4
+ * @link  https://www.boldgrid.com
+ * @since 1.6.0
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin/partials/archive-details
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
 $db = array(
 	'browser' => '',
@@ -24,10 +29,16 @@ if ( empty( $dump_file ) ) {
 		</div>',
 		__( 'This archive does not contain a database backup.', 'boldgrid-backup' )
 	);
+
 	return $db;
 }
 
-$contains = __( 'This archive contains the following database backup: <strong>%1$s</strong>', 'boldgrid-backup' );
+// translators: 1: Backup archive filename.
+$contains = esc_html__(
+	'This archive contains the following database backup: <strong>%1$s</strong>',
+	'boldgrid-backup'
+);
+
 $basename = basename( $dump_file );
 
 $db = array(
@@ -48,5 +59,3 @@ $db = array(
 );
 
 return $db;
-
-

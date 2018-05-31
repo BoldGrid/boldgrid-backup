@@ -1,17 +1,20 @@
 <?php
 /**
- * Provide a admin area view for the plugin
+ * File: boldgrid-backup-admin-home.php
  *
  * This file is used to markup the admin-facing aspects of the plugin.
  *
- * @link http://www.boldgrid.com
+ * @link https://www.boldgrid.com
  * @since 1.0
  *
- * @package Boldgrid_Backup
+ * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin/partials
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
 /*
  * Variables passed by scope.

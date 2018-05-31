@@ -1,11 +1,20 @@
 <?php
 /**
+ * File: auto-updates.php
+ *
  * Show "Auto Updates" on settings page.
  *
- * @since 1.5.4
+ * @link https://www.boldgrid.com
+ * @since 1.6.0
+ *
+ * @package    Boldgrid_Backup
+ * @subpackage Boldgrid_Backup/admin/partials/settings
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
 ob_start();
 ?>
@@ -20,12 +29,16 @@ ob_start();
 			<tr>
 				<th>
 					<?php esc_html_e( 'Plugin Auto-Updates', 'boldgrid-backup' ); ?>
-					 <span class="dashicons dashicons-editor-help" data-id="plugin-autoupdate"></span>
+					<span class="dashicons dashicons-editor-help" data-id="plugin-autoupdate"></span>
 
-					 <p class="help" data-id="plugin-autoupdate">
+					<p class="help" data-id="plugin-autoupdate">
 						<?php
 						printf(
-							__( 'Automatically perform all plugin updates when available. Enabling this feature adds the <a target="_blank" href="%1$s">auto_update_plugin filter</a>, which enables automatic plugin updates when an update is available.', 'boldgrid-backup' ),
+							// translators: 1: URL address.
+							esc_html__(
+								'Automatically perform all plugin updates when available. Enabling this feature adds the <a target="_blank" href="%1$s">auto_update_plugin filter</a>, which enables automatic plugin updates when an update is available.',
+								'boldgrid-backup'
+							),
 							'https://codex.wordpress.org/Configuring_Automatic_Background_Updates#Plugin_.26_Theme_Updates_via_Filter'
 						);
 						?>
@@ -63,7 +76,11 @@ ob_start();
 					 <p class="help" data-id="theme-autoupdate">
 						<?php
 						printf(
-							__( 'Automatically perform all theme updates when available. Enabling this feature adds the <a target="_blank" href="%1$s">auto_update_theme filter</a>, which enables automatic theme updates when an update is available.', 'boldgrid-backup' ),
+							// translators: 1: URL address.
+							esc_html__(
+								'Automatically perform all theme updates when available. Enabling this feature adds the <a target="_blank" href="%1$s">auto_update_theme filter</a>, which enables automatic theme updates when an update is available.',
+								'boldgrid-backup'
+							),
 							'https://codex.wordpress.org/Configuring_Automatic_Background_Updates#Plugin_.26_Theme_Updates_via_Filter'
 						);
 						?>
@@ -101,7 +118,11 @@ ob_start();
 					 <p class='help' data-id='auto-backup'>
 						<?php
 						printf(
-							__( 'Automatically perform a backup before WordPress updates. When this feature is enabled, a full backup will be made during the <a target="_blank" href="%1$s">pre_auto_update action</a>. ', 'boldgrid-backup' ),
+							// translators: 1: URL address.
+							esc_html__(
+								'Automatically perform a backup before WordPress updates. When this feature is enabled, a full backup will be made during the <a target="_blank" href="%1$s">pre_auto_update action</a>. ',
+								'boldgrid-backup'
+							),
 							'https://developer.wordpress.org/reference/hooks/pre_auto_update/'
 						);
 						?>
@@ -168,4 +189,3 @@ ob_start();
 $output = ob_get_contents();
 ob_end_clean();
 return $output;
-?>

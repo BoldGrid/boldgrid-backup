@@ -1,30 +1,31 @@
 <?php
 /**
- * Define the internationalization functionality
+ * File: class-boldgrid-backup-i18n.php
  *
+ * Define the internationalization functionality.
  * Loads and defines the internationalization files for this plugin
  * so that it is ready for translation.
  *
- * @link http://www.boldgrid.com
+ * @link https://www.boldgrid.com
  * @since 1.0
  *
- * @package Boldgrid_Backup
+ * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/includes
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * Define the internationalization functionality.
+ * Class: Boldgrid_Backup_i18n
  *
+ * Define the internationalization functionality.
  * Loads and defines the internationalization files for this plugin
  * so that it is ready for translation.
  *
  * @since 1.0
- * @package Boldgrid_Backup
- * @subpackage Boldgrid_Backup/includes
- * @author BoldGrid.com <wpb@boldgrid.com>
  */
 class Boldgrid_Backup_i18n {
-
 	/**
 	 * Load the plugin text domain for translation.
 	 *

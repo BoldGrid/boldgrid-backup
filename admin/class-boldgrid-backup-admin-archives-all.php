@@ -1,28 +1,27 @@
 <?php
 /**
- * Archives All class.
+ * File: class-boldgrid-backup-admin-archives-all.php
  *
- * @link  http://www.boldgrid.com
- * @since 1.5.4
+ * @link       https://www.boldgrid.com
+ * @since      1.6.0
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup Admin Archives All Class.
+ * Class: Boldgrid_Backup_Admin_Archives_All
  *
- * @since 1.5.4
+ * @since 1.6.0
  */
 class Boldgrid_Backup_Admin_Archives_All {
-
 	/**
 	 * An array of all archives.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    array
 	 */
@@ -31,7 +30,7 @@ class Boldgrid_Backup_Admin_Archives_All {
 	/**
 	 * The core class object.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access private
 	 * @var    Boldgrid_Backup_Admin_Core
 	 */
@@ -40,7 +39,7 @@ class Boldgrid_Backup_Admin_Archives_All {
 	/**
 	 * Whether or not we have initialized all backups.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    bool
 	 */
@@ -49,7 +48,7 @@ class Boldgrid_Backup_Admin_Archives_All {
 	/**
 	 * Local server title, such as "Web server".
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    string
 	 */
@@ -58,7 +57,7 @@ class Boldgrid_Backup_Admin_Archives_All {
 	/**
 	 * An array of data about remote locations and how many backups at each.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    array
 	 */
@@ -91,7 +90,7 @@ class Boldgrid_Backup_Admin_Archives_All {
 	/**
 	 * Constructor.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
 	 */
@@ -104,9 +103,9 @@ class Boldgrid_Backup_Admin_Archives_All {
 	/**
 	 * Add a backup to the list of all backups.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param array $backup
+	 * @param array $backup Backup archive information.
 	 */
 	public function add( $backup ) {
 		$in_all = false;
@@ -137,8 +136,8 @@ class Boldgrid_Backup_Admin_Archives_All {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param  array  $archive
-	 * @param  string $location_type
+	 * @param  array  $archive       Archive information.
+	 * @param  string $location_type Location type.
 	 * @return bool
 	 */
 	public function has_location_type( $archive, $location_type ) {
@@ -154,7 +153,7 @@ class Boldgrid_Backup_Admin_Archives_All {
 	/**
 	 * Init the $location_count property.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function init_location_count() {
 
@@ -183,7 +182,7 @@ class Boldgrid_Backup_Admin_Archives_All {
 	/**
 	 * Init and get a list of all backups (local and remote).
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function init() {
 		if ( $this->is_init ) {

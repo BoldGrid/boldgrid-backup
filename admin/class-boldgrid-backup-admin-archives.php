@@ -1,28 +1,27 @@
 <?php
 /**
- * Archives class.
+ * File: class-boldgrid-backup-admin-archives.php
  *
- * @link  http://www.boldgrid.com
- * @since 1.5.4
+ * @link       https://www.boldgrid.com
+ * @since      1.6.0
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
  * @copyright  BoldGrid.com
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup Admin Archives Class.
+ * Class: Boldgrid_Backup_Admin_Archives
  *
- * @since 1.5.4
+ * @since 1.6.0
  */
 class Boldgrid_Backup_Admin_Archives {
-
 	/**
 	 * The core class object.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access private
 	 * @var    Boldgrid_Backup_Admin_Core
 	 */
@@ -31,7 +30,7 @@ class Boldgrid_Backup_Admin_Archives {
 	/**
 	 * Constructor.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
 	 */
@@ -44,7 +43,7 @@ class Boldgrid_Backup_Admin_Archives {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param $location array {
+	 * @param array $location {
 	 *     A location.
 	 *
 	 *     @type string $title    Such as "Web Server".
@@ -67,7 +66,7 @@ class Boldgrid_Backup_Admin_Archives {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param  string $type
+	 * @param  string $type Location type.
 	 * @return string
 	 */
 	public function get_location_type_title( $type ) {
@@ -90,6 +89,7 @@ class Boldgrid_Backup_Admin_Archives {
 	 *
 	 * @since 1.6.0
 	 *
+	 * @param  array $archive Archive information.
 	 * @return string
 	 */
 	public function get_locations( $archive ) {
@@ -122,14 +122,14 @@ class Boldgrid_Backup_Admin_Archives {
 	 * Returns a string such as:
 	 * All (5) | Web Server (4) | Remote (2)
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @return string
 	 */
 	public function get_mine_count() {
 		$this->core->archives_all->init();
 
-		// An array of locations, each array item simliar to: <a>All<a/> (5)
+		// An array of locations, each array item simliar to: <a>All<a/> (5).
 		$locations = array();
 
 		foreach ( $this->core->archives_all->location_count as $location => $count ) {
@@ -172,7 +172,7 @@ class Boldgrid_Backup_Admin_Archives {
 	 *
 	 * This table is displayed on the Backup Archives page.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @return string
 	 */

@@ -1,24 +1,23 @@
 <?php
 /**
- * Archive Browser class.
+ * File: class-boldgrid-backup-admin-archive-browser.php
  *
- * @link  http://www.boldgrid.com
- * @since 1.5.2
+ * @link       https://www.boldgrid.com
+ * @since      1.5.2
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup Admin Archive Browser Class.
+ * Class: Boldgrid_Backup_Admin_Archive_Browser
  *
  * @since 1.5.2
  */
 class Boldgrid_Backup_Admin_Archive_Browser {
-
 	/**
 	 * The core class object.
 	 *
@@ -45,7 +44,7 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 	 * Many of the ajax handlers in this method require the same
 	 * current_user_can() and check_ajax_referer() checks.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function authorize() {
 		if ( ! current_user_can( 'update_plugins' ) ) {
@@ -63,7 +62,7 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 	 * When a user clicks to "View details" of a database dump, this
 	 * method will create a table showing all the tables in that backup.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @param  string $filepath Zip file.
 	 * @param  string $file     Sql file name.
@@ -134,13 +133,12 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 
 		$dump_file = $this->core->get_dump_file( $filepath );
 
-		// An array of files not to show in the archive browser.
+		/*
+		 * An array of files not to show in the archive browser.
+		 * If this is our database dump file, skip over it. We have another section of the archive
+		 * details page that will help with restoring a dump file.
+		 */
 		$no_show = array(
-			/*
-			 * If this is our database dump file, skip over it. We have another
-			 * section of the archive details page that will help with restoring
-			 * a dump file.
-			 */
 			basename( $dump_file ),
 			basename( $this->core->archive->log_filepath ),
 		);
@@ -228,7 +226,7 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 	 * This handles an ajax call for restoring a dump from the archive details
 	 * page.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function wp_ajax_restore_db() {
 		$this->authorize();
@@ -245,11 +243,13 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 
 		if ( ! $success ) {
 			$this->core->notice->add_user_notice(
+				// translators: 1: Filename 2: File path.
 				sprintf( __( 'Error, unable to import database %1$s from %2$s.', 'boldgrid-backup' ), $file, $filepath ),
 				$this->core->notice->lang['dis_error']
 			);
 		} else {
 			$this->core->notice->add_user_notice(
+				// translators: 1: Filename 2: File path.
 				sprintf( __( 'Success! Database %1$s imported from %2$s.', 'boldgrid-backup' ), $file, $filepath ),
 				$this->core->notice->lang['dis_success']
 			);
@@ -262,7 +262,7 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 	 * This method handles the ajax call of "View details" for a database on the
 	 * archive details page.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function wp_ajax_view_db() {
 		$this->authorize();

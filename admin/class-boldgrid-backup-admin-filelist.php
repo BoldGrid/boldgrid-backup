@@ -1,28 +1,27 @@
 <?php
 /**
- * Boldgrid Backup Admin Filelist.
+ * File: class-boldgrid-backup-admin-filelist.php
  *
- * @link  http://www.boldgrid.com
+ * @link  https://www.boldgrid.com
  * @since 1.5.1
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup Admin Filelist Class.
+ * Class: Boldgrid_Backup_Admin_Filelist
  *
  * @since 1.5.1
  */
 class Boldgrid_Backup_Admin_Filelist {
-
 	/**
 	 * The core class object.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access private
 	 * @var    Boldgrid_Backup_Admin_Core
 	 */
@@ -36,7 +35,7 @@ class Boldgrid_Backup_Admin_Filelist {
 	 * This array primarily exists to help get the total size of your website.
 	 * We loop through this list and calculate the disk space of each item.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    array
 	 */
@@ -67,7 +66,7 @@ class Boldgrid_Backup_Admin_Filelist {
 	/**
 	 * Constructor.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
 	 */
@@ -78,12 +77,11 @@ class Boldgrid_Backup_Admin_Filelist {
 	/**
 	 * Get the total size of WordPress core and the wp-content directory.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @return int
 	 */
 	public function get_size() {
-
 		/*
 		 * Include wp-includes/ms-functions.php.
 		 *

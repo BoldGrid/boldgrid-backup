@@ -1,24 +1,23 @@
 <?php
 /**
- * Database Omit class.
+ * File: class-boldgrid-backup-admin-db-omit.php
  *
- * @link  http://www.boldgrid.com
+ * @link  https://www.boldgrid.com
  * @since 1.5.3
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup Admin Db Omit Class.
+ * Class: Boldgrid_Backup_Admin_Db_Omit
  *
  * @since 1.5.3
  */
 class Boldgrid_Backup_Admin_Db_Omit {
-
 	/**
 	 * The core class object.
 	 *
@@ -33,7 +32,7 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	 *
 	 * Usually 'full' or 'custom' backup.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    string
 	 */
@@ -44,7 +43,7 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	 *
 	 * Usually 'full' or 'custom' backup.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    array
 	 */
@@ -65,9 +64,9 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	 * Generate a section for email alerts including information about tables
 	 * excluded.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param  array $info
+	 * @param  array $info Database table information.
 	 * @return string
 	 */
 	public function email_part( $info ) {
@@ -78,7 +77,14 @@ class Boldgrid_Backup_Admin_Db_Omit {
 			$body .= "\n" . __( 'DATABASE SETTINGS', 'boldgrid-backup' ) . "\n";
 
 			$tables_excluded = empty( $info['table_exclude'] ) ? __( 'None', 'boldgrid-backup' ) : implode( ',', $info['table_exclude'] );
-			$body           .= sprintf( esc_html__( 'Tables Excluded: %1$s', 'boldgrid-backup' ), $tables_excluded ) . "\n";
+
+			$body .= sprintf(
+				// translators: 1: Database tables excluded.
+				__(
+					'Tables Excluded: %1$s', 'boldgrid-backup'
+				),
+				$tables_excluded
+			) . "\n";
 		}
 
 		return $body;
@@ -87,7 +93,7 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	/**
 	 * Enqueue scripts.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function enqueue_scripts() {
 		$handle = 'boldgrid-backup-admin-table-include';
@@ -101,13 +107,6 @@ class Boldgrid_Backup_Admin_Db_Omit {
 		$translation = array();
 		wp_localize_script( $handle, 'BoldGridBackupAdminTableInclude', $translation );
 		wp_enqueue_script( $handle );
-
-		// Enqueue CSS for folder exclude functionality.
-		// wp_enqueue_style(
-		// $handle,
-		// plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-folder-exclude.css', array(),
-		// BOLDGRID_BACKUP_VERSION
-		// );
 	}
 
 	/**
@@ -124,7 +123,6 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	 * @return array
 	 */
 	public function get_excluded_tables() {
-
 		/*
 		 * Determine if the user is doing "backup site now" and they selected to
 		 * backup all tables (full backup).
@@ -183,7 +181,7 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	 * We are submitting via post "include_tables", however we use this data to
 	 * then calculate "exclude_tables".
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @return array
 	 */
@@ -212,7 +210,7 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	/**
 	 * Get value of 'table_inclusion_type' from $_POST.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @return string
 	 */
@@ -228,9 +226,9 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	 *
 	 * If no exclude_tables are set, return an empty array.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param  array $settings
+	 * @param  array $settings BoldGrid Backup settings.
 	 * @return bool
 	 */
 	public function get_settings_excluded( $settings = array() ) {
@@ -253,9 +251,9 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	 *
 	 * Return null if we do not have a type saved in the settings.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param  array $settings
+	 * @param  array $settings BoldGrid Backup settings.
 	 * @return bool
 	 */
 	public function get_settings_type( $settings = array() ) {

@@ -1,24 +1,23 @@
 <?php
 /**
- * Compressor.
+ * File: class-boldgrid-backup-admin-compressor.php
  *
- * @link  http://www.boldgrid.com
+ * @link  https://www.boldgrid.com
  * @since 1.5.1
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * Base Compressor class for which other compressors extend.
+ * Class: Boldgrid_Backup_Admin_Compressor
  *
  * @since 1.5.1
  */
 class Boldgrid_Backup_Admin_Compressor {
-
 	/**
 	 * An instance of Boldgrid_Backup_Admin_Core.
 	 *
@@ -42,7 +41,7 @@ class Boldgrid_Backup_Admin_Compressor {
 	 *
 	 * @global $wp_filesystem
 	 *
-	 * @param Boldgrid_Backup_Admin_Core $core
+	 * @param Boldgrid_Backup_Admin_Core $core Boldgrid_Backup_Admin_Core object.
 	 */
 	public function __construct( $core ) {
 		global $wp_filesystem;
@@ -58,7 +57,9 @@ class Boldgrid_Backup_Admin_Compressor {
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param array $filelist See Boldgrid_Backup_Admin_Filelist::get_total_size
+	 * @see Boldgrid_Backup_Admin_Filelist::get_total_size()
+	 *
+	 * @param array $filelist A file list.
 	 * @param array $info {
 	 *     An array of data about the backup archive we are generating.
 	 *

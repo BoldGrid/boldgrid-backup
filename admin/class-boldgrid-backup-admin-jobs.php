@@ -1,19 +1,19 @@
 <?php
 /**
- * Boldgrid Backup Admin Jobs.
+ * File: class-boldgrid-backup-admin-jobs.php
  *
- * @link  http://www.boldgrid.com
+ * @link  https://www.boldgrid.com
  * @since 1.5.2
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * Boldgrid Backup Admin Jobs class.
+ * Class: Boldgrid_Backup_Admin_Jobs
  *
  * Option $boldgrid_backup_jobs array {
  *     An array of jobs that need to be ran.
@@ -32,7 +32,6 @@
  * @since 1.5.2
  */
 class Boldgrid_Backup_Admin_Jobs {
-
 	/**
 	 * The core class object.
 	 *
@@ -64,7 +63,7 @@ class Boldgrid_Backup_Admin_Jobs {
 	 *
 	 * @since 1.5.2
 	 *
-	 * @param Boldgrid_Backup_Admin_Core $core
+	 * @param Boldgrid_Backup_Admin_Core $core Boldgrid_Backup_Admin_Core Object.
 	 */
 	public function __construct( $core ) {
 		$this->core = $core;
@@ -98,7 +97,7 @@ class Boldgrid_Backup_Admin_Jobs {
 	 *
 	 * @since 1.5.2
 	 *
-	 * @param int $delete_key
+	 * @param int $delete_key Archive list key index number.
 	 */
 	public function delete_all_prior( $delete_key ) {
 
@@ -146,7 +145,7 @@ class Boldgrid_Backup_Admin_Jobs {
 	 *
 	 * @since 1.5.2
 	 *
-	 * @param array $info
+	 * @param array $info Archive information.
 	 */
 	public function post_archive_files( $info ) {
 		/*
@@ -174,6 +173,10 @@ class Boldgrid_Backup_Admin_Jobs {
 
 	/**
 	 * Send an email after all jobs have been ran.
+	 *
+	 * @since 1.5.2
+	 *
+	 * @param array $info Archive information.
 	 */
 	public function post_jobs_email( $info ) {
 		$post_jobs = 0;
@@ -231,8 +234,6 @@ class Boldgrid_Backup_Admin_Jobs {
 	 * @since 1.5.2
 	 *
 	 * @see Boldgrid_Backup_Admin_Cron::is_valid_call()
-	 *
-	 * @return null
 	 */
 	public function run() {
 		$this->set_jobs();

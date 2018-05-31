@@ -1,28 +1,27 @@
 <?php
 /**
- * FTP class.
+ * File: ftp.php
  *
- * @link  http://www.boldgrid.com
- * @since 1.5.4
+ * @link  https://www.boldgrid.com
+ * @since 1.6.0
  *
  * @package    Boldgrid_Backup
- * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @subpackage Boldgrid_Backup/admin/remote
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * FTP class.
+ * Class: Boldgrid_Backup_Admin_Ftp
  *
- * @since 1.5.4
+ * @since 1.6.0
  */
 class Boldgrid_Backup_Admin_Ftp {
-
 	/**
 	 * An FTP connection.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access private
 	 * @var    Resource
 	 */
@@ -31,7 +30,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * The core class object.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access private
 	 * @var    Boldgrid_Backup_Admin_Core
 	 */
@@ -40,7 +39,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Default port numbers.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    array
 	 */
@@ -52,7 +51,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Default type.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    string
 	 */
@@ -61,7 +60,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Errors.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    array
 	 */
@@ -70,7 +69,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Hooks class.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    Boldgrid_Backup_Admin_Ftp_Hooks
 	 */
@@ -79,7 +78,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * FTP host.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access private
 	 * @var    string
 	 */
@@ -88,7 +87,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Whether or not we have logged in.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    bool
 	 */
@@ -108,7 +107,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Our key / label for ftp.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    string
 	 */
@@ -117,7 +116,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * FTP password.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access private
 	 * @var    string
 	 */
@@ -126,7 +125,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * FTP remote directory.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    string
 	 */
@@ -135,7 +134,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Retention count.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    int $retention_count
 	 */
@@ -144,7 +143,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Default timeout.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    int
 	 */
@@ -153,7 +152,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Our title / label for ftp.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    string
 	 */
@@ -174,7 +173,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Our FTP type, ftp or sftp.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    string
 	 */
@@ -183,7 +182,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * FTP username.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access private
 	 * @var    string
 	 */
@@ -192,7 +191,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Valid types.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    array
 	 */
@@ -201,7 +200,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Constructor.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
 	 */
@@ -216,7 +215,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Connect to our ftp server.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function connect() {
 		if ( ! empty( $this->connection ) ) {
@@ -242,7 +241,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Create backup directory on remote host.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @return bool False when we were unable to create directory.
 	 */
@@ -271,7 +270,14 @@ class Boldgrid_Backup_Admin_Ftp {
 		}
 
 		if ( ! $created ) {
-			$this->errors[] = sprintf( __( 'Unable to create the following directory on FTP server: %1$s', 'boldgrid-backup' ), $this->remote_dir );
+			$this->errors[] = sprintf(
+				// translators: 1: Remote directory path.
+				__(
+					'Unable to create the following directory on FTP server: %1$s',
+					'boldgrid-backup'
+				),
+				$this->remote_dir
+			);
 		}
 
 		return $created;
@@ -280,7 +286,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Disconnect from FTP server.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function disconnect() {
 		if ( 'ftp' === $this->type && is_resource( $this->connection ) ) {
@@ -293,9 +299,9 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Download a backup via FTP.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param  string $filename
+	 * @param  string $filename Filename.
 	 * @return bool
 	 */
 	public function download( $filename ) {
@@ -326,7 +332,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Enforce retention.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function enforce_retention() {
 		if ( empty( $this->retention_count ) ) {
@@ -364,7 +370,7 @@ class Boldgrid_Backup_Admin_Ftp {
 			/**
 			 * Remote file deleted due to remote retention settings.
 			 *
-			 * @since 1.5.4
+			 * @since 1.6.0
 			 */
 			do_action(
 				'boldgrid_backup_remote_retention_deleted',
@@ -377,7 +383,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Get our settings from $_POST.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @return array
 	 */
@@ -453,9 +459,9 @@ class Boldgrid_Backup_Admin_Ftp {
 	 * # Files / backups that do not belong to this site.
 	 *   See $this->core->archive->is_site_archive().
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param  array $conents Raw contents received from this->get_contents.
+	 * @param  array $contents Raw contents received from this->get_contents.
 	 * @return array {
 	 *     An array of backups.
 	 *
@@ -523,7 +529,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Get the remote contents / listing.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @param  bool   $raw   Whether to get the raw contents (ftp_rawlist) or not
 	 *                       (ftp_nlist).
@@ -559,7 +565,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Get settings.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function get_details() {
 		$is_setup = $this->is_setup();
@@ -578,7 +584,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Init properties.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function init() {
 		if ( ! empty( $this->user ) || ! empty( $this->pass ) || ! empty( $this->host ) ) {
@@ -638,7 +644,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Determine whether or not FTP is setup.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @return bool
 	 */
@@ -656,13 +662,13 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Determine if a set of FTP credentials are valid.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param  string $host
-	 * @param  string $user
-	 * @param  string $pass
-	 * @param  int    $port
-	 * @param  string $type
+	 * @param  string $host Hostname.
+	 * @param  string $user Username.
+	 * @param  string $pass Password.
+	 * @param  int    $port Port number.
+	 * @param  string $type Type.
 	 * @return bool
 	 */
 	public function is_valid_credentials( $host, $user, $pass, $port, $type ) {
@@ -672,7 +678,15 @@ class Boldgrid_Backup_Admin_Ftp {
 
 		// Avoid a really long timeout.
 		if ( 21 === $port && 'sftp' === $type ) {
-			$this->errors[] = sprintf( __( 'Unable to connect to %1$s over port %2$u.', 'boldgrid-backup' ), $host, $port );
+			$this->errors[] = sprintf(
+				// translators: 1: Hostname, 2: Port number.
+				__(
+					'Unable to connect to %1$s over port %2$u.',
+					'boldgrid-backup'
+				),
+				$host,
+				$port
+			);
 			return false;
 		}
 
@@ -685,7 +699,15 @@ class Boldgrid_Backup_Admin_Ftp {
 				break;
 		}
 		if ( ! $connection ) {
-			$this->errors[] = sprintf( __( 'Unable to connect to %1$s over port %2$u.', 'boldgrid-backup' ), $host, $port );
+			$this->errors[] = sprintf(
+				// translators: 1: Hostname, 2: Port number.
+				__(
+					'Unable to connect to %1$s over port %2$u.',
+					'boldgrid-backup'
+				),
+				$host,
+				$port
+			);
 			return false;
 		}
 
@@ -730,7 +752,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Log into the FTP server.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @return bool
 	 */
@@ -766,7 +788,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	 * If the user wants to delete all FTP settings, after we clear the data from
 	 * the options, run this method to clear the properties.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function reset() {
 		$this->host = null;
@@ -780,9 +802,9 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Set our ftp password.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param string $pass
+	 * @param string $pass Password.
 	 */
 	public function set_pass( $pass ) {
 		$this->pass = $pass;
@@ -791,9 +813,9 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Determine if a backup archive is uploaded to the remote server.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param string $filepath
+	 * @param string $filepath File path.
 	 */
 	public function is_uploaded( $filepath ) {
 		$contents = $this->get_contents( false, $this->remote_dir );
@@ -804,9 +826,9 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Upload a file.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param  string $filepath
+	 * @param  string $filepath File path.
 	 * @return bool
 	 */
 	public function upload( $filepath ) {

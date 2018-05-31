@@ -1,11 +1,20 @@
 <?php
 /**
+ * File: backup-directory.php
+ *
  * Show "Backup Directory" on settings page.
  *
+ * @link https://www.boldgrid.com
  * @since 1.3.1
+ *
+ * @package    Boldgrid_Backup
+ * @subpackage Boldgrid_Backup/admin/partials/settings
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
 ob_start();
 ?>
@@ -19,6 +28,7 @@ ob_start();
 
 		<p class="help" data-id="backup-dir">
 			<?php
+
 			/*
 			 * Print this text:
 			 *
@@ -28,7 +38,11 @@ ob_start();
 			 */
 			$link = sprintf(
 				wp_kses(
-					__( 'For security purposes, please do not set this to a publicly available directory. Once you set this, it is not recommended that you change it again. You can find more help with setting your backup directory <a href="%s" target="_blank">here</a>.', 'boldgrid-backup' ),
+					// translators: 1: URL address.
+					esc_html__(
+						'For security purposes, please do not set this to a publicly available directory. Once you set this, it is not recommended that you change it again. You can find more help with setting your backup directory <a href="%s" target="_blank">here</a>.',
+						'boldgrid-backup'
+					),
 					array(
 						'a' => array(
 							'href'   => array(),
@@ -59,4 +73,3 @@ ob_start();
 $output = ob_get_contents();
 ob_end_clean();
 return $output;
-?>

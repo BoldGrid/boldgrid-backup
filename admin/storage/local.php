@@ -1,24 +1,25 @@
 <?php
 /**
+ * File: local.php
+ *
  * Local storage.
  *
- * @link  http://www.boldgrid.com
+ * @link  https://www.boldgrid.com
  * @since 1.5.2
  *
  * @package    Boldgrid_Backup
- * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @subpackage Boldgrid_Backup/admin/storage
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * Local storage.
+ * Class: Boldgrid_Backup_Admin_Storage_Local
  *
  * @since 1.5.2
  */
 class Boldgrid_Backup_Admin_Storage_Local {
-
 	/**
 	 * The core class object.
 	 *
@@ -33,7 +34,7 @@ class Boldgrid_Backup_Admin_Storage_Local {
 	 *
 	 * @since 1.5.2
 	 *
-	 * @param Boldgrid_Backup_Admin_Core $core
+	 * @param Boldgrid_Backup_Admin_Core $core Boldgrid_Backup_Admin_Core object.
 	 */
 	public function __construct( $core ) {
 		$this->core = $core;
@@ -65,10 +66,9 @@ class Boldgrid_Backup_Admin_Storage_Local {
 	 *
 	 * @see self::delete_local()
 	 *
-	 * @param array $info
+	 * @param array $info Archive information.
 	 */
 	public function post_archive_files( $info ) {
-
 		/*
 		 * Do not "delete local copy" in the following scenarios:
 		 *

@@ -3,7 +3,7 @@
  *
  * @summary JavaScript for handling Folder Exclude settings..
  *
- * @since 1.5.4
+ * @since 1.6.0
  *
  * @param $ The jQuery object.
  */
@@ -72,7 +72,7 @@ BoldGrid.FolderExclude = function( $ ) {
 	/**
 	 * @summary Handle the click of the pagination button.s
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	self.onClickPagination = function() {
 		var $a = $( this ),
@@ -96,7 +96,7 @@ BoldGrid.FolderExclude = function( $ ) {
 	/**
 	 * @summary Handle the click of the preview button.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	self.onClickPreview = function() {
 		var data = {
@@ -140,7 +140,7 @@ BoldGrid.FolderExclude = function( $ ) {
 	/**
 	 * @summary Handle the click of one of the samples.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	self.onClickSample = function() {
 		var $button = $( this ),
@@ -159,7 +159,7 @@ BoldGrid.FolderExclude = function( $ ) {
 	/**
 	 * @summary Action to take when backup type has been changed.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	self.onChangeType = function() {
 		self.toggleConfig();
@@ -176,7 +176,7 @@ BoldGrid.FolderExclude = function( $ ) {
 	 * .current-page input, then we do nothing. Otherwise, we prevent default
 	 * action and do the pagination.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	self.onKeyDown = function( e ) {
 		var isCurrentPage = $( e.target ).hasClass( 'current-page' );
@@ -193,7 +193,7 @@ BoldGrid.FolderExclude = function( $ ) {
 	/**
 	 * @summary Handle pagination.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	self.onSubmitPagination = function() {
 		var page = parseInt( $excludeFoldersPreview.find( '.current-page' ).val() ),
@@ -214,7 +214,7 @@ BoldGrid.FolderExclude = function( $ ) {
 	 * has typed into the filter box though, filteredList will be genereated
 	 * based on the filtered values.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @todo Possibly move this toward a template system. For now, it works.
 	 *
@@ -281,7 +281,7 @@ BoldGrid.FolderExclude = function( $ ) {
 	 *
 	 * @todo Possibly move this toward a template system. For now, it works.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @param int page
 	 * @param int perPage
@@ -350,7 +350,7 @@ BoldGrid.FolderExclude = function( $ ) {
 	/**
 	 * @summary Toggle display of everything after the "full" or "custom" options.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	self.toggleConfig = function() {
 		var type = $type.filter( ':checked' ).val(),

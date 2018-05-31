@@ -1,19 +1,19 @@
 <?php
 /**
- * The admin-specific core functionality of the plugin
+ * File: class-boldgrid-backup-admin-upload.php
  *
- * @link http://www.boldgrid.com
+ * @link https://www.boldgrid.com
  * @since 1.2.2
  *
- * @package Boldgrid_Backup
+ * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright BoldGrid.com
- * @version $Id$
- * @author BoldGrid.com <wpb@boldgrid.com>
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup admin upload class.
+ * Class: Boldgrid_Backup_Admin_Upload
  *
  * @since 1.2.2
  */
@@ -195,6 +195,7 @@ class Boldgrid_Backup_Admin_Upload {
 			do_action(
 				'boldgrid_backup_notice',
 				sprintf(
+					// translators: 1: File extension.
 					esc_html__(
 						'Upload file extension type %s is not allowed.',
 						'boldgrid-backup'
@@ -356,6 +357,7 @@ class Boldgrid_Backup_Admin_Upload {
 			do_action(
 				'boldgrid_backup_notice',
 				sprintf(
+					// translators: 1: Error message.
 					esc_html__( 'Upload has failed; %s.', 'boldgrid-backup' ),
 					$movefile['error']
 				),

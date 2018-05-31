@@ -1,14 +1,20 @@
 <?php
 /**
+ * File: boldgrid-backup-admin-nav.php
+ *
  * This file contains the navbar for all BoldGrid Backup pages.
  *
+ * @link https://www.boldgrid.com
  * @since 1.5.1
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin/partials
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
 $active = 'nav-tab-active';
 
@@ -56,5 +62,3 @@ foreach ( $navs as $nav ) {
 $markup .= '</h2>';
 
 return $markup;
-
-

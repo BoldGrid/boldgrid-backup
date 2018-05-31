@@ -1,16 +1,19 @@
 <?php
 /**
- * Fired during plugin deactivation
+ * File: class-boldgrid-backup-deactivator.php
  *
- * @link http://www.boldgrid.com
+ * @link https://www.boldgrid.com
  * @since 1.0
  *
- * @package Boldgrid_Backup
+ * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/includes
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * Fired during plugin deactivation.
+ * Class: Boldgrid_Backup_Deactivator
  *
  * This class defines all code necessary to run during the plugin's deactivation.
  *
@@ -20,7 +23,6 @@
  * @author BoldGrid.com <wpb@boldgrid.com>
  */
 class Boldgrid_Backup_Deactivator {
-
 	/**
 	 * Plugin deactivation.
 	 *

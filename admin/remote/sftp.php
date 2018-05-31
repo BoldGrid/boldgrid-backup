@@ -1,28 +1,27 @@
 <?php
 /**
- * SFTP class.
+ * File: sftp.php
  *
- * @link  http://www.boldgrid.com
- * @since 1.5.4
+ * @link  https://www.boldgrid.com
+ * @since 1.6.0
  *
  * @package    Boldgrid_Backup
- * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @subpackage Boldgrid_Backup/admin/remote
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * SFTP class.
+ * Class: Boldgrid_Backup_Admin_Sftp
  *
- * @since 1.5.4
+ * @since 1.6.0
  */
 class Boldgrid_Backup_Admin_Sftp {
-
 	/**
 	 * An SFTP connection.
 	 *
-	 * @since  1.5.4
+	 * @since  1.6.0
 	 * @access private
 	 * @var    Resource
 	 */
@@ -31,7 +30,7 @@ class Boldgrid_Backup_Admin_Sftp {
 	/**
 	 * The core class object.
 	 *
-	 * @since  1.5.4
+	 * @since  1.6.0
 	 * @access private
 	 * @var    Boldgrid_Backup_Admin_Core
 	 */
@@ -40,7 +39,7 @@ class Boldgrid_Backup_Admin_Sftp {
 	/**
 	 * Hooks class.
 	 *
-	 * @since  1.5.4
+	 * @since  1.6.0
 	 * @access public
 	 * @var    Boldgrid_Backup_Admin_Sftp_Hooks
 	 */
@@ -49,7 +48,7 @@ class Boldgrid_Backup_Admin_Sftp {
 	/**
 	 * SFTP host.
 	 *
-	 * @since  1.5.4
+	 * @since  1.6.0
 	 * @access private
 	 * @var    string
 	 */
@@ -58,7 +57,7 @@ class Boldgrid_Backup_Admin_Sftp {
 	/**
 	 * Whether or not we have logged in.
 	 *
-	 * @since  1.5.4
+	 * @since  1.6.0
 	 * @access public
 	 * @var    bool
 	 */
@@ -67,7 +66,7 @@ class Boldgrid_Backup_Admin_Sftp {
 	/**
 	 * Our key / label for sftp.
 	 *
-	 * @since  1.5.4
+	 * @since  1.6.0
 	 * @access public
 	 * @var    string
 	 */
@@ -76,7 +75,7 @@ class Boldgrid_Backup_Admin_Sftp {
 	/**
 	 * SFTP password.
 	 *
-	 * @since  1.5.4
+	 * @since  1.6.0
 	 * @access private
 	 * @var    string
 	 */
@@ -85,7 +84,7 @@ class Boldgrid_Backup_Admin_Sftp {
 	/**
 	 * SFTP port.
 	 *
-	 * @since  1.5.4
+	 * @since  1.6.0
 	 * @access public
 	 * @var    int
 	 */
@@ -94,7 +93,7 @@ class Boldgrid_Backup_Admin_Sftp {
 	/**
 	 * SFTP remote directory.
 	 *
-	 * @since  1.5.4
+	 * @since  1.6.0
 	 * @access public
 	 * @var    string
 	 */
@@ -103,7 +102,7 @@ class Boldgrid_Backup_Admin_Sftp {
 	/**
 	 * Retention count.
 	 *
-	 * @since  1.5.4
+	 * @since  1.6.0
 	 * @access public
 	 * @var    int $retention_count
 	 */
@@ -112,7 +111,7 @@ class Boldgrid_Backup_Admin_Sftp {
 	/**
 	 * Our title / label for sftp.
 	 *
-	 * @since  1.5.4
+	 * @since  1.6.0
 	 * @access public
 	 * @var    string
 	 */
@@ -121,7 +120,7 @@ class Boldgrid_Backup_Admin_Sftp {
 	/**
 	 * SFTP username.
 	 *
-	 * @since  1.5.4
+	 * @since  1.6.0
 	 * @access private
 	 * @var    string
 	 */
@@ -130,7 +129,7 @@ class Boldgrid_Backup_Admin_Sftp {
 	/**
 	 * Constructor.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
 	 */
@@ -138,13 +137,12 @@ class Boldgrid_Backup_Admin_Sftp {
 		include_once BOLDGRID_BACKUP_PATH . '/vendor/phpseclib/phpseclib/phpseclib/Net/SFTP.php';
 
 		$this->core = $core;
-		// $this->hooks = new Boldgrid_Backup_Admin_Sftp_Hooks( $core );
 	}
 
 	/**
 	 * Connect to our sftp server.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function connect() {
 		if ( ! empty( $this->connection ) ) {
@@ -163,7 +161,7 @@ class Boldgrid_Backup_Admin_Sftp {
 	/**
 	 * Create backup directory on remote host.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @return bool False when we were unable to create directory.
 	 */
@@ -185,20 +183,15 @@ class Boldgrid_Backup_Admin_Sftp {
 	/**
 	 * Disconnect from SFTP server.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function disconnect() {
-		if ( $this->connection ) {
-			// sftp_close( $this->connection );
-			// $this->connection = null;
-			// $this->logged_in = false;
-		}
 	}
 
 	/**
 	 * Enforce retention.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function enforce_retention() {
 		if ( empty( $this->retention_count ) ) {
@@ -230,7 +223,7 @@ class Boldgrid_Backup_Admin_Sftp {
 			/**
 			 * Remote file deleted due to remote retention settings.
 			 *
-			 * @since 1.5.4
+			 * @since 1.6.0
 			 */
 			do_action(
 				'boldgrid_backup_remote_retention_deleted',
@@ -246,9 +239,9 @@ class Boldgrid_Backup_Admin_Sftp {
 	 * This method takes in raw contents and returns an array of backups, with
 	 * keys defining timestamp and filename.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param  array $conents Raw contents received from this->get_contents.
+	 * @param  array $contents Raw contents received from this->get_contents.
 	 * @return array {
 	 *     An array of backups.
 	 *
@@ -293,7 +286,7 @@ class Boldgrid_Backup_Admin_Sftp {
 	/**
 	 * Get the remote contents / listing.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @param  bool   $raw   Whether to get the raw contents (sftp_rawlist) or not
 	 *                       (sftp_nlist).
@@ -317,7 +310,7 @@ class Boldgrid_Backup_Admin_Sftp {
 	/**
 	 * Get settings.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function get_details() {
 		$settings = $this->core->settings->get_settings();
@@ -334,7 +327,7 @@ class Boldgrid_Backup_Admin_Sftp {
 	/**
 	 * Init properties.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function init() {
 		if ( ! empty( $this->user ) || ! empty( $this->pass ) || ! empty( $this->host ) ) {
@@ -353,7 +346,7 @@ class Boldgrid_Backup_Admin_Sftp {
 	/**
 	 * Determine whether or not SFTP is setup.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @return bool
 	 */
@@ -367,12 +360,12 @@ class Boldgrid_Backup_Admin_Sftp {
 	/**
 	 * Determine if a set of SFTP credentials are valid.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param  string $host
-	 * @param  string $user
-	 * @param  string $pass
-	 * @param  int    $port
+	 * @param  string $host Hostname.
+	 * @param  string $user Username.
+	 * @param  string $pass Password.
+	 * @param  int    $port Port number.
 	 * @return bool
 	 */
 	public function is_valid_credentials( $host, $user, $pass, $port ) {
@@ -383,19 +376,17 @@ class Boldgrid_Backup_Admin_Sftp {
 
 		$logged_in = @$connection->login( $user, $pass );
 		if ( ! $logged_in ) {
-			// sftp_close( $connection );
 			$this->errors[] = __( 'Unable to connect and log in.', 'boldgrid-backup' );
 			return false;
 		}
 
-		// sftp_close( $connection );
 		return true;
 	}
 
 	/**
 	 * Log into the SFTP server.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @return bool
 	 */
@@ -416,7 +407,11 @@ class Boldgrid_Backup_Admin_Sftp {
 	}
 
 	/**
+	 * Is file uploaded?
 	 *
+	 * @since 1.6.0
+	 *
+	 * @param string $filepath File path.
 	 */
 	public function is_uploaded( $filepath ) {
 		$contents = $this->get_contents( false, $this->remote_dir );
@@ -427,7 +422,7 @@ class Boldgrid_Backup_Admin_Sftp {
 	/**
 	 * Generate the submenu page for our SFTP Settings page.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function submenu_page() {
 		wp_enqueue_style( 'boldgrid-backup-admin-hide-all' );
@@ -448,7 +443,7 @@ class Boldgrid_Backup_Admin_Sftp {
 	/**
 	 * Process the user's request to update their SFTP settings.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function submenu_page_save() {
 		if ( ! current_user_can( 'update_plugins' ) ) {
@@ -518,9 +513,9 @@ class Boldgrid_Backup_Admin_Sftp {
 	/**
 	 * Upload a file.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param  string $filepath
+	 * @param  string $filepath File path.
 	 * @return bool
 	 */
 	public function upload( $filepath ) {
@@ -535,7 +530,14 @@ class Boldgrid_Backup_Admin_Sftp {
 
 		$has_remote_dir = $this->create_backup_dir();
 		if ( ! $has_remote_dir ) {
-			$this->errors[] = sprint_f( __( 'Unable to create the following directory on SFTP server: %1$s', 'boldgrid-backup' ), $this->remote_dir );
+			$this->errors[] = sprint_f(
+				// translators: 1: Remote directory path.
+				__(
+					'Unable to create the following directory on SFTP server: %1$s',
+					'boldgrid-backup'
+				),
+				$this->remote_dir
+			);
 			return false;
 		}
 

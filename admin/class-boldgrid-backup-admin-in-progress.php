@@ -1,28 +1,27 @@
 <?php
 /**
- * In Progress class.
+ * File: class-boldgrid-backup-admin-in-progress.php
  *
- * @link  http://www.boldgrid.com
- * @since 1.5.4
+ * @link  https://www.boldgrid.com
+ * @since 1.6.0
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup Admin In Progress Class.
+ * Class: Boldgrid_Backup_Admin_In_Progress
  *
- * @since 1.5.4
+ * @since 1.6.0
  */
 class Boldgrid_Backup_Admin_In_Progress {
-
 	/**
 	 * The core class object.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access private
 	 * @var    Boldgrid_Backup_Admin_Core
 	 */
@@ -43,7 +42,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 	/**
 	 * Constructor.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
 	 */
@@ -54,9 +53,9 @@ class Boldgrid_Backup_Admin_In_Progress {
 	/**
 	 * Add a notice telling the user there's a backup in progress.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param  array $notices
+	 * @param  array $notices Array of notices to display.
 	 * @return array
 	 */
 	public function add_notice( $notices ) {
@@ -86,7 +85,11 @@ class Boldgrid_Backup_Admin_In_Progress {
 		 * help with troubleshooting.
 		 */
 		if ( $elapsed > $limit ) {
-			$notice['message'] .= __( ' Most backups usually finish before this amount of time, so we will stop displaying this notice.', 'boldgrid-backup' );
+			$notice['message'] .= __(
+				' Most backups usually finish before this amount of time, so we will stop displaying this notice.',
+				'boldgrid-backup'
+			);
+
 			$this->end();
 		}
 
@@ -100,7 +103,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 	 *
 	 * Specify that we are no longer backing up a website.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function end() {
 		$settings = $this->core->settings->get_settings( true );
@@ -117,7 +120,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 	 *
 	 * The value is the time we started the backup.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 *
 	 * @return int
 	 */
@@ -145,7 +148,14 @@ class Boldgrid_Backup_Admin_In_Progress {
 
 		$notice = array(
 			'class'   => 'notice notice-warning boldgrid-backup-in-progress',
-			'message' => sprintf( __( 'BoldGrid Backup began archiving your website %1$s ago.', 'boldgrid-backup' ), human_time_diff( $in_progress, time() ) ),
+			'message' => sprintf(
+				// translators: 1: Time difference.
+				__(
+					'BoldGrid Backup began archiving your website %1$s ago.',
+					'boldgrid-backup'
+				),
+				human_time_diff( $in_progress, time() )
+			),
 			'heading' => __( 'BoldGrid Backup - Backup in progress', 'boldgrid-backup' ),
 		);
 
@@ -179,8 +189,8 @@ class Boldgrid_Backup_Admin_In_Progress {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param  array $response
-	 * @param  array $data
+	 * @param  array $response Response.
+	 * @param  array $data     Data in heartbeat.
 	 * @return array
 	 */
 	public function heartbeat_received( $response, $data ) {
@@ -205,7 +215,6 @@ class Boldgrid_Backup_Admin_In_Progress {
 	 * @since 1.6.0
 	 */
 	public function post_dump() {
-
 		/*
 		 * After the database has been dumped, restore the flag stating a backup
 		 * is still in progress.
@@ -223,7 +232,6 @@ class Boldgrid_Backup_Admin_In_Progress {
 	 * @since 1.6.0
 	 */
 	public function pre_dump() {
-
 		/*
 		 * Cancel any "Backup in progress" statuses.
 		 *
@@ -241,7 +249,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 	/**
 	 * Set that we are in progress of backing up a website.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @param int $time A unix timestamp indicating the time a backup started.
 	 */

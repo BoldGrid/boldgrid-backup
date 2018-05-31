@@ -1,24 +1,23 @@
 <?php
 /**
- * Db Get class.
+ * File: class-boldgrid-backup-admin-db-get.php
  *
- * @link  http://www.boldgrid.com
- * @since 1.5.3
+ * @link       https://www.boldgrid.com
+ * @since      1.5.3
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup Admin Db Get Class.
+ * Class: Boldgrid_Backup_Admin_Db_Get
  *
  * @since 1.5.3
  */
 class Boldgrid_Backup_Admin_Db_Get {
-
 	/**
 	 * The core class object.
 	 *

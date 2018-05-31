@@ -1,31 +1,31 @@
 <?php
 /**
- * The file that defines the core plugin class
+ * File: class-boldgrid-backup.php
  *
  * A class definition that includes attributes and functions used across the admin area.
  *
- * @link http://www.boldgrid.com
+ * @link https://www.boldgrid.com
  * @since 1.0
  *
- * @package Boldgrid_Backup
+ * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/includes
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * The core plugin class.
+ * Class: Boldgrid_Backup
  *
+ * The core plugin class.
  * This is used to define internationalization and admin-specific hooks.
  *
  * Also maintains the unique identifier of this plugin as well as the current
  * version of the plugin.
  *
  * @since 1.0
- * @package Boldgrid_Backup
- * @subpackage Boldgrid_Backup/includes
- * @author BoldGrid.com <wpb@boldgrid.com>
  */
 class Boldgrid_Backup {
-
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
 	 * the plugin.

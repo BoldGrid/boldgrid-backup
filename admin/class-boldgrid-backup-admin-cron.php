@@ -1,19 +1,19 @@
 <?php
 /**
- * The admin-specific cron functionality of the plugin
+ * File: class-boldgrid-backup-admin-cron.php
  *
- * @link http://www.boldgrid.com
+ * @link https://www.boldgrid.com
  * @since 1.2
  *
- * @package Boldgrid_Backup
+ * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright BoldGrid.com
- * @version $Id$
- * @author BoldGrid.com <wpb@boldgrid.com>
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup admin cron class.
+ * Class: Boldgrid_Backup_Admin_Cron
  *
  * @since 1.2
  */
@@ -75,7 +75,7 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @see BoldGrid_Backup_Admin_Core::get_backup_identifier()
 	 * @see BoldGrid_Backup_Admin_Cron::get_cron_secret()
 	 *
-	 * @param  array $settings
+	 * @param  array $settings BoldGrid Backup settings.
 	 * @return bool  Success.
 	 */
 	public function add_cron_entry( $settings = array() ) {
@@ -157,7 +157,7 @@ class Boldgrid_Backup_Admin_Cron {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param  array $settings
+	 * @param  array $settings BoldGrid Backup settings.
 	 * @return bool
 	 */
 	public function add_all_crons( $settings ) {
@@ -541,8 +541,8 @@ class Boldgrid_Backup_Admin_Cron {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param  string $entry
-	 * @return bool   True if the entry does not exist or was deleted successfully.
+	 * @param  string $entry Crontab entry.
+	 * @return bool True if the entry does not exist or was deleted successfully.
 	 */
 	public function entry_delete( $entry ) {
 		if ( ! $this->entry_exists( $entry ) ) {
@@ -565,7 +565,7 @@ class Boldgrid_Backup_Admin_Cron {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param  string $entry
+	 * @param  string $entry Crontab entry.
 	 * @return bool
 	 */
 	public function entry_exists( $entry ) {
@@ -583,7 +583,6 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @return mixed
 	 */
 	public function get_all( $raw = false ) {
-
 		/*
 		 * Cron is not available on Windows.
 		 *
@@ -737,6 +736,7 @@ class Boldgrid_Backup_Admin_Cron {
 
 		if ( ! in_array( $archive_info['mode'], $valid_modes, true ) ) {
 			printf(
+				// translators: 1: Archive mode ("backup" or "restore").
 				esc_html__( 'Error: Invalid mode "%s".', 'boldgrid-backup' ),
 				$archive_info['mode']
 			);
@@ -769,6 +769,7 @@ class Boldgrid_Backup_Admin_Cron {
 			echo PHP_EOL;
 
 			printf(
+				// translators: 1: Error message.
 				esc_html__( 'Error: %s', 'boldgrid-backup' ),
 				$archive_info['error']
 			);
@@ -777,6 +778,7 @@ class Boldgrid_Backup_Admin_Cron {
 
 			if ( isset( $archive_info['error_message'] ) ) {
 				printf(
+					// translators: 1: Error message.
 					esc_html__( 'Error Message: %s', 'boldgrid-backup' ),
 					$archive_info['error_message']
 				);
@@ -794,6 +796,7 @@ class Boldgrid_Backup_Admin_Cron {
 			// Dry run.
 			if ( ! empty( $archive_info['filepath'] ) ) {
 				printf(
+					// translators: 1: File path.
 					esc_html__( 'File Path: %s', 'boldgrid-backup' ),
 					$archive_info['filepath']
 				);
@@ -803,6 +806,7 @@ class Boldgrid_Backup_Admin_Cron {
 
 			if ( ! empty( $archive_info['filesize'] ) ) {
 				printf(
+					// translators: 1: File size.
 					esc_html__( 'File Size: %s', 'boldgrid-backup' ),
 					Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['filesize'] )
 				);
@@ -812,6 +816,7 @@ class Boldgrid_Backup_Admin_Cron {
 
 			if ( ! empty( $archive_info['total_size'] ) ) {
 				printf(
+					// translators: 1: Total backup size.
 					esc_html__( 'Total size: %s', 'boldgrid-backup' ),
 					Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] )
 				);
@@ -821,6 +826,7 @@ class Boldgrid_Backup_Admin_Cron {
 
 			if ( ! empty( $archive_info['compressor'] ) ) {
 				printf(
+					// translators: 1: Compressor name.
 					esc_html__( 'Compressor: %s', 'boldgrid-backup' ),
 					$archive_info['compressor']
 				);
@@ -836,6 +842,7 @@ class Boldgrid_Backup_Admin_Cron {
 
 			if ( isset( $archive_info['duration'] ) ) {
 				printf(
+					// translators: 1: Backup duration.
 					esc_html__( 'Duration: %s seconds', 'boldgrid-backup' ),
 					$archive_info['duration']
 				);
@@ -845,6 +852,7 @@ class Boldgrid_Backup_Admin_Cron {
 		} else {
 			// Unknown error.
 			printf(
+				// translators: 1: Backup action name.
 				esc_html__(
 					'There was an unknown error %s a backup archive file.',
 					'boldgrid-backup'

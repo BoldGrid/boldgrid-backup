@@ -1,19 +1,19 @@
 <?php
 /**
- * The admin-specific utilities methods for the plugin
+ * File: class-boldgrid-backup-admin-settings.php
  *
- * @link http://www.boldgrid.com
+ * @link https://www.boldgrid.com
  * @since 1.0
  *
- * @package Boldgrid_Backup
+ * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright BoldGrid.com
- * @version $Id$
- * @author BoldGrid.com <wpb@boldgrid.com>
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup admin settings class.
+ * Class: Boldgrid_Backup_Admin_Settings
  *
  * @since 1.0
  */
@@ -30,7 +30,7 @@ class Boldgrid_Backup_Admin_Settings {
 	/**
 	 * Whether or not we're in the middle of saving settings from $_POST.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    bool
 	 */
@@ -187,25 +187,6 @@ class Boldgrid_Backup_Admin_Settings {
 			$settings['auto_rollback']            = 1;
 		}
 
-		/*
-		 * If a cron schedule was found, then merge the settings.
-		 *
-		 * @todo As of 1.6.0, this feature is on hold. We need to take into
-		 * account timezones, and possibly tell the user their settings don't
-		 * actually match what's in the crontab.
-		 */
-		/*
-		// If not updating the settings, then check cron for schedule.
-		if ( ! isset( $_POST['save_time'] ) ) {
-			$cron_schedule = $this->core->cron->read_cron_entry();
-		}
-
-		// If a cron schedule was found, then merge the settings.
-		if ( ! empty( $cron_schedule ) ) {
-			$settings['schedule'] = array_merge( $settings['schedule'], $cron_schedule );
-		}
-		*/
-
 		$boldgrid_settings = get_site_option( 'boldgrid_settings' );
 
 		$settings['plugin_autoupdate'] = (
@@ -242,9 +223,9 @@ class Boldgrid_Backup_Admin_Settings {
 	 *
 	 * @since 1.3.2
 	 *
-	 * @param string $old_dir
-	 * @param string $new_dir
-	 * @return bool True on success / no backups needed to be moved.
+	 * @param string $old_dir Source directory.
+	 * @param string $new_dir Destination directory.
+	 * @return bool TRUE on success / no backups needed to be moved.
 	 */
 	private function move_backups( $old_dir, $new_dir ) {
 		$fail_count = 0;
@@ -497,7 +478,15 @@ class Boldgrid_Backup_Admin_Settings {
 
 				if ( ! $backups_moved ) {
 					$update_error    = true;
-					$update_errors[] = sprintf( __( 'Unable to move backups from %1$s to %2$s', 'boldgrid-backup' ), $original_backup_directory, $backup_directory );
+					$update_errors[] = sprintf(
+						// translators: 1: Original backup directory, 2: New backup directory.
+						__(
+							'Unable to move backups from %1$s to %2$s',
+							'boldgrid-backup'
+						),
+						$original_backup_directory,
+						$backup_directory
+					);
 				}
 			}
 
@@ -606,7 +595,7 @@ class Boldgrid_Backup_Admin_Settings {
 			/*
 			 * Save folder exclusion settings.
 			 *
-			 * @since 1.5.4
+			 * @since 1.6.0
 			 */
 			$settings['folder_exclusion_include'] = $this->core->folder_exclusion->from_post( 'include' );
 			$settings['folder_exclusion_exclude'] = $this->core->folder_exclusion->from_post( 'exclude' );
@@ -686,8 +675,9 @@ class Boldgrid_Backup_Admin_Settings {
 			do_action(
 				'boldgrid_backup_notice',
 				sprintf(
-					esc_html__(
-						'Functionality test has failed.  You can go to %1$sFunctionality Test%1$s to view a report.',
+					// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag.
+					__(
+						'Functionality test has failed.  You can go to %1$sFunctionality Test%2$s to view a report.',
 						'boldgrid-backup'
 					),
 					'<a href="' . admin_url( 'admin.php?page=boldgrid-backup-test' ) . '">',
@@ -769,7 +759,7 @@ class Boldgrid_Backup_Admin_Settings {
 	 *
 	 * @since 1.5.2
 	 *
-	 * @param  array $settings
+	 * @param  array $settings BoldGrid Backup settings.
 	 * @return bool True on success.
 	 */
 	public function save( $settings ) {

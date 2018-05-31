@@ -1,26 +1,25 @@
 <?php
 /**
- * Database Dump.
+ * File: class-boldgrid-backup-admin-db-dump.php
  *
- * @link  http://www.boldgrid.com
+ * @link  https://www.boldgrid.com
  * @since 1.5.1
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 use Ifsnop\Mysqldump as IMysqldump;
 
 /**
- * BoldGrid Backup Admin Database Dump class.
+ * Class: Boldgrid_Backup_Admin_Db_Dump
  *
  * @since 1.5.1
  */
 class Boldgrid_Backup_Admin_Db_Dump {
-
 	/**
 	 * The core class object.
 	 *

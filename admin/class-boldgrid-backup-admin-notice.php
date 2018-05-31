@@ -1,28 +1,27 @@
 <?php
 /**
- * The admin-specific notice methods for the plugin
+ * File: class-boldgrid-backup-admin-notice.php
  *
- * @link http://www.boldgrid.com
- * @since 1.2
+ * @link       http://www.boldgrid.com
+ * @since      1.2
  *
- * @package Boldgrid_Backup
+ * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright BoldGrid.com
- * @version $Id$
- * @author BoldGrid.com <wpb@boldgrid.com>
+ * @copyright  BoldGrid.com
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup admin notice class.
+ * Class: Boldgrid_Backup_Admin_Notice
  *
  * @since 1.2
  */
 class Boldgrid_Backup_Admin_Notice {
-
 	/**
 	 * The core class object.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access private
 	 * @var    Boldgrid_Backup_Admin_Core
 	 */
@@ -31,7 +30,7 @@ class Boldgrid_Backup_Admin_Notice {
 	/**
 	 * Common strings used in notices.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 * @var   array
 	 */
 	public $lang = array(
@@ -42,7 +41,7 @@ class Boldgrid_Backup_Admin_Notice {
 	/**
 	 * Constructor.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
 	 */
@@ -53,11 +52,11 @@ class Boldgrid_Backup_Admin_Notice {
 	/**
 	 * Add a notice for a user.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param string $message
-	 * @param string $class
-	 * @param string $heading
+	 * @param string $message Message.
+	 * @param string $class   Class.
+	 * @param string $heading Heading.
 	 */
 	public function add_user_notice( $message, $class, $heading = null ) {
 		$option = $this->get_user_option();
@@ -86,7 +85,7 @@ class Boldgrid_Backup_Admin_Notice {
 	/**
 	 * Display notices for user.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function display_user_notice() {
 		$option = $this->get_user_option();
@@ -143,7 +142,6 @@ class Boldgrid_Backup_Admin_Notice {
 	 * @return mixed String (html markup) of admin notice on success, false on failure.
 	 */
 	public function get_backup_complete() {
-
 		// Assume that this "backup complete!" notice is for the last backup made.
 		$archive_info = get_option( 'boldgrid_backup_latest_backup' );
 		if ( empty( $archive_info ) ) {
@@ -160,9 +158,9 @@ class Boldgrid_Backup_Admin_Notice {
 	/**
 	 * Get the entire html markup for a notice, including the .notice container.
 	 *
-	 * @param  string $class
-	 * @param  string $message
-	 * @param  string $heading
+	 * @param  string $class   Class.
+	 * @param  string $message Message.
+	 * @param  string $heading Heading.
 	 * @return string
 	 */
 	public function get_notice_markup( $class, $message, $heading = null ) {
@@ -188,6 +186,7 @@ class Boldgrid_Backup_Admin_Notice {
 	public function functionality_fail_notice( $use_link = true ) {
 		if ( $use_link ) {
 			$message = sprintf(
+				// translators: 1: HTML anchor opening tag, 2: HTML anchor closing tag.
 				esc_html__(
 					'Functionality test has failed.  You can go to %1$sFunctionality Test%2$s to view a report.',
 					'boldgrid-backup'
@@ -205,7 +204,7 @@ class Boldgrid_Backup_Admin_Notice {
 	/**
 	 * Get user_notices option name for current user.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function get_user_option() {
 		$user_id = get_current_user_id();
@@ -217,9 +216,9 @@ class Boldgrid_Backup_Admin_Notice {
 	 *
 	 * If it is not within a p or div, wrap it in a p tag.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param  string $message
+	 * @param  string $message Message.
 	 * @return string
 	 */
 	public function add_container( $message ) {

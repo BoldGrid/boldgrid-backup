@@ -1,14 +1,20 @@
 <?php
 /**
+ * File: boldgrid-backup-admin-backup-button.php
+ *
  * Display a "Backup Site Now" button.
  *
+ * @link https://www.boldgrid.com
  * @since 1.3
  *
  * @package    Boldgrid_Backup
- * @subpackage Boldgrid_Backup/admin/partials/archives
+ * @subpackage Boldgrid_Backup/admin/partials
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
 $core = isset( $this->core ) ? $this->core : $this;
 
@@ -36,5 +42,3 @@ return sprintf(
 	$update_protection_ajax || $core->auto_rollback->on_update_page ? 'data-updating="true"' : '',
 	/* 4 */ __( 'You may leave this page, doing so will not stop your backup.', 'boldgrid-backup' )
 );
-
-

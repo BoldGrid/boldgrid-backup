@@ -1,12 +1,17 @@
 <?php
 /**
- * Plugin sample configuration file
+ * File: config.sample.php
  *
- * @link http://www.boldgrid.com
+ * Plugin sample configuration file.
+ *
+ * @link https://www.boldgrid.com
  * @since 1.0
  *
- * @package Boldgrid_Backup
+ * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/includes
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 // Prevent direct calls.
@@ -17,7 +22,8 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Copy this sample file to config.local.php and update it with any variables that you would like to override
+ * Copy this sample file to config.local.php and update it with any variables that you would like
+ * to override.
  */
 return array(
 	'asset_server' => 'https://wp-assets-dev.boldgrid.com',

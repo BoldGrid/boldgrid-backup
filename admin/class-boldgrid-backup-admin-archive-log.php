@@ -1,24 +1,23 @@
 <?php
 /**
- * Archive Log class.
+ * File: class-boldgrid-backup-admin-archive-log.php
  *
- * @link  http://www.boldgrid.com
- * @since 1.5.1
+ * @link       https://www.boldgrid.com
+ * @since      1.5.1
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup Admin Archive Log Class.
+ * Class: Boldgrid_Backup_Admin_Archive_Log
  *
  * @since 1.5.1
  */
 class Boldgrid_Backup_Admin_Archive_Log {
-
 	/**
 	 * The core class object.
 	 *
@@ -44,7 +43,7 @@ class Boldgrid_Backup_Admin_Archive_Log {
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param  string $zip_filepath
+	 * @param  string $zip_filepath Archive file path.
 	 * @return bool
 	 */
 	public function delete_by_zip( $zip_filepath ) {
@@ -63,7 +62,7 @@ class Boldgrid_Backup_Admin_Archive_Log {
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param  string $zip_filepath
+	 * @param  string $zip_filepath Archive file path.
 	 * @return array
 	 */
 	public function get_by_zip( $zip_filepath ) {
@@ -89,7 +88,7 @@ class Boldgrid_Backup_Admin_Archive_Log {
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param  string $zip_filepath
+	 * @param  string $zip_filepath Archive file path.
 	 * @return bool
 	 */
 	public function path_from_zip( $zip_filepath ) {
@@ -103,7 +102,7 @@ class Boldgrid_Backup_Admin_Archive_Log {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param array $info
+	 * @param array $info Archive information.
 	 */
 	public function post_restore( $info ) {
 		$path_backup_dir = $this->path_from_zip( $info['filepath'] );
@@ -128,9 +127,9 @@ class Boldgrid_Backup_Admin_Archive_Log {
 	 * extract backup.log from backup.zip if it exists. This was, we have all
 	 * of the meta data about the backup.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param string $filepath
+	 * @param string $filepath Archive file path.
 	 */
 	public function restore_by_zip( $filepath ) {
 		$log_filepath = $this->path_from_zip( $filepath );
@@ -158,7 +157,7 @@ class Boldgrid_Backup_Admin_Archive_Log {
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param  $info array
+	 * @param  array $info Archive information.
 	 * @return bool
 	 */
 	public function write( $info ) {
@@ -183,6 +182,7 @@ class Boldgrid_Backup_Admin_Archive_Log {
 		if ( 0 === $archive ) {
 			return false;
 		}
+
 		/*
 		 * The log file is being added to the root of the archive. If the user
 		 * restores the archive, the log will be restored to the ABSPATH. The

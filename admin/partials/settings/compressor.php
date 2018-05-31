@@ -1,16 +1,21 @@
 <?php
 /**
- * Compressor on settings page.
+ * File: compressor.php
  *
+ * Compressor on settings page.
  * This page is only shown for testers who have appropriate hooks in place.
  *
+ * @link https://www.boldgrid.com
  * @since 1.5.1
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin/partials/settings
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
 ob_start();
 
@@ -69,4 +74,3 @@ $extractor_php_zip_option   = ! in_array( 'php_zip', $available_compressors ) ? 
 $output = ob_get_contents();
 ob_end_clean();
 return $output;
-?>

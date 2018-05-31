@@ -1,19 +1,19 @@
 <?php
 /**
- * BoldGrid Backup Admin Archive Fail.
+ * File: class-boldgrid-backup-admin-archive-fail.php
  *
- * @link  http://www.boldgrid.com
- * @since 1.5.2
+ * @link       https://www.boldgrid.com
+ * @since      1.5.2
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup Admin Archive Fail Class.
+ * Class: Boldgrid_Backup_Admin_Archive_Fail
  *
  * @since 1.5.1
  */
@@ -40,7 +40,7 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 	/**
 	 * Generic lang string stating unable to backup.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    string
 	 */
@@ -105,7 +105,7 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 	/**
 	 * Create a "backup failed" email and schedule it to be sent via jobs.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @param string $message Error message.
 	 */

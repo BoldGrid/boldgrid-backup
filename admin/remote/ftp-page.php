@@ -1,28 +1,27 @@
 <?php
 /**
- * FTP Page class.
+ * File: ftp-page.php
  *
- * @link  http://www.boldgrid.com
- * @since 1.5.4
+ * @link  https://www.boldgrid.com
+ * @since 1.6.0
  *
  * @package    Boldgrid_Backup
- * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @subpackage Boldgrid_Backup/admin/remote
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * FTP Page class.
+ * Class: Boldgrid_Backup_Admin_Ftp_Page
  *
- * @since 1.5.4
+ * @since 1.6.0
  */
 class Boldgrid_Backup_Admin_Ftp_Page {
-
 	/**
 	 * The core class object.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access private
 	 * @var    Boldgrid_Backup_Admin_Core
 	 */
@@ -31,7 +30,7 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 	/**
 	 * Constructor.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
 	 */
@@ -42,7 +41,7 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 	/**
 	 * Enqueue scripts.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function enqueue_scripts() {
 		$handle = 'boldgrid-backup-admin-ftp-settings';
@@ -70,7 +69,7 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 	/**
 	 * Generate the submenu page for our FTP Settings page.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function settings() {
 		if ( ! current_user_can( 'update_plugins' ) ) {
@@ -120,7 +119,7 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 	/**
 	 * Process the user's request to update their FTP settings.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function settings_delete() {
 		$ftp = $this->core->ftp;
@@ -146,7 +145,7 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 	/**
 	 * Process the user's request to update their FTP settings.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function settings_save() {
 

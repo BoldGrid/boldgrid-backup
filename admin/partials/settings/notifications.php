@@ -1,11 +1,20 @@
 <?php
 /**
+ * File: notifications.php
+ *
  * Show "Notifications" on settings page.
  *
+ * @link https://www.boldgrid.com
  * @since 1.5.1
+ *
+ * @package    Boldgrid_Backup
+ * @subpackage Boldgrid_Backup/admin/partials/settings
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
 ob_start();
 ?>
@@ -55,4 +64,3 @@ ob_start();
 $output = ob_get_contents();
 ob_end_clean();
 return $output;
-?>

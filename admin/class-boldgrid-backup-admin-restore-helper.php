@@ -1,24 +1,23 @@
 <?php
 /**
- * BoldGrid Backup Admin Restore Helper Class.
+ * FIle: class-boldgrid-backup-admin-restore-helper.php
  *
- * @link  http://www.boldgrid.com
+ * @link  https://www.boldgrid.com
  * @since 1.5.1
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup Admin Restore Helper Class.
+ * Class: Boldgrid_Backup_Admin_Restore_Helper
  *
  * @since 1.5.1
  */
 class Boldgrid_Backup_Admin_Restore_Helper {
-
 	/**
 	 * Whether or not we are doing cron.
 	 *
@@ -96,7 +95,7 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 	 *
 	 * @global wp_filesystem
 	 *
-	 * @param array $info
+	 * @param array $info Archive information.
 	 */
 	public function post_restore( $info ) {
 		if ( $info['dryrun'] ) {
@@ -139,7 +138,7 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 	 *
 	 * @global wp_filesystem
 	 *
-	 * @param array $info
+	 * @param array $info Archive information.
 	 */
 	public function pre_restore( $info ) {
 		if ( $info['dryrun'] ) {
@@ -271,7 +270,7 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param  WP_Error $error
+	 * @param  WP_Error $error WP_Error object.
 	 * @return mixed False if no action is taken, otherwise a string containing
 	 *               a description of the action.
 	 */

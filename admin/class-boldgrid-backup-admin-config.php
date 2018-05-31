@@ -1,19 +1,19 @@
 <?php
 /**
- * The admin-specific configuration class for the plugin
+ * File: class-boldgrid-backup-admin-config.php
  *
- * @link http://www.boldgrid.com
+ * @link https://www.boldgrid.com
  * @since 1.0
  *
- * @package Boldgrid_Backup
+ * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright BoldGrid.com
- * @version $Id$
- * @author BoldGrid.com <wpb@boldgrid.com>
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup admin configuration class.
+ * Class: Boldgrid_Backup_Admin_Config
  *
  * @since 1.0
  */
@@ -75,7 +75,7 @@ class Boldgrid_Backup_Admin_Config {
 	/**
 	 * Whether or not the premium plugin is activated.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    bool
 	 */
@@ -85,7 +85,7 @@ class Boldgrid_Backup_Admin_Config {
 	 * Whether or not we have a premium license and the premium extension is
 	 * installed.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    bool
 	 */
@@ -95,7 +95,7 @@ class Boldgrid_Backup_Admin_Config {
 	 * Whether or not the premium extension is installed (we didn't say activated,
 	 * just installed, the files exist on the server).
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    bool
 	 */
@@ -351,21 +351,18 @@ class Boldgrid_Backup_Admin_Config {
 	 * @access private
 	 *
 	 * @param string $compressor A name of a compressor.
-	 * @return null
 	 */
 	private function add_compressor( $compressor = null ) {
 		if ( ! empty( $compressor ) &&
 		! in_array( $compressor, $this->available_compressors, true ) ) {
 			$this->available_compressors[] = $compressor;
 		}
-
-		return;
 	}
 
 	/**
 	 * Actions to take during the admin_init hook.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function admin_init() {
 		$relative_path = 'boldgrid-backup-premium/boldgrid-backup-premium.php';
@@ -427,7 +424,7 @@ class Boldgrid_Backup_Admin_Config {
 			$this->add_compressor( 'php_zip' );
 		}
 
-		// PclZip
+		// PclZip.
 		if ( class_exists( 'PclZip' ) ) {
 			$this->add_compressor( 'pcl_zip' );
 		}

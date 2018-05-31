@@ -1,29 +1,28 @@
 <?php
 /**
- * WP Cron.
+ * FIle: class-boldgrid-backup-admin-wp-cron.php
  *
  * @link  http://www.boldgrid.com
  * @since 1.5.1
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * WP Cron.
+ * Class: Boldgrid_Backup_Admin_WP_Cron
  *
  * @since 1.5.1
  */
 class Boldgrid_Backup_Admin_WP_Cron {
-
 	/**
-	 * $days of the weeky.
+	 * Days of the week.
 	 *
 	 * @since  1.5.1
-	 * @access publc
+	 * @var array
 	 */
 	public $days = array(
 		'sunday',
@@ -48,7 +47,6 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	 * Hooks.
 	 *
 	 * @since  1.5.1
-	 * @access public
 	 * @var    array
 	 */
 	public $hooks = array(
@@ -61,7 +59,6 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	 * Schedules.
 	 *
 	 * @since  1.5.1
-	 * @access public
 	 * @var    array
 	 */
 	public $schedules = array();
@@ -85,6 +82,7 @@ class Boldgrid_Backup_Admin_WP_Cron {
 				'interval' => 7 * DAY_IN_SECONDS,
 				'display'  => __( 'Weekly', 'boldgrid-backup' ),
 			),
+
 			/*
 			 * It does not appear that crons can be added for a one time event.
 			 * Add a "never" schedule. Let someone in 1,000 years have the fun
@@ -109,7 +107,7 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param  array $settings
+	 * @param  array $settings BoldGrid Backup settings.
 	 * @return bool
 	 */
 	public function add_all_crons( $settings = array() ) {
@@ -162,7 +160,7 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param array An array of hooks to clear.
+	 * @param array $hooks An array of hooks to clear.
 	 */
 	public function clear_schedules( $hooks = array() ) {
 		if ( empty( $hooks ) ) {
@@ -179,7 +177,7 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param  array $schedules
+	 * @param  array $schedules An array of events.
 	 * @return array
 	 */
 	public function cron_schedules( $schedules ) {
@@ -201,10 +199,10 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	 * should return 1 minute from now. If you pass in Monday 1:09pm, that time
 	 * has already passed, so return next Monday at 1:09pm.
 	 *
-	 * @param  $d string Day of the week.
-	 * @param  $h int    Hour.
-	 * @param  $m int    Minute.
-	 * @param  $p string Period (am/pm).
+	 * @param string $d Day of the week.
+	 * @param int    $h Hour.
+	 * @param int    $m Minute.
+	 * @param string $p Period (am/pm).
 	 * @return A timestamp on success.
 	 */
 	public function get_next_time( $d, $h, $m, $p ) {
@@ -272,12 +270,11 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param  array  $settings
-	 * @param  string $hook
+	 * @param  array  $settings BoldGrid Backup settings.
+	 * @param  string $hook     Hook name.
 	 * @return bool
 	 */
 	public function schedule( $settings, $hook ) {
-
 		/*
 		 * WP Cron works off of UTC. Get our "local" time from our $settings and
 		 * convert it to UTC.

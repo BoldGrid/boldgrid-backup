@@ -1,19 +1,19 @@
 <?php
 /**
- * Crypt class.
+ * File: class-boldgrid-backup-admin-crypt.php
  *
- * @link  http://www.boldgrid.com
+ * @link  https://www.boldgrid.com
  * @since 1.6.0
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup Admin Crypt Class.
+ * Class: Boldgrid_Backup_Admin_Crypt
  *
  * @since 1.6.0
  */

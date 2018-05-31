@@ -1,14 +1,25 @@
 <?php
 /**
- * Render remote provider's table on archive details page.
+ * File: remote-storage.php
  *
- * This file is included by admin/partials/boldgrid-backup-admin-archive-details.php
- * whis is included by      admin/class-boldgrid-backup-admin-archive-details.php
+ * Render remote provider's table on archive details page.
+ * This file is included by:
+ *  admin/partials/boldgrid-backup-admin-archive-details.php
+ *  admin/class-boldgrid-backup-admin-archive-details.php
+ *
+ * @link https://www.boldgrid.com
+ * @since 1.5.2
+ *
+ * @package    Boldgrid_Backup
+ * @subpackage Boldgrid_Backup/admin/partials/archive-details
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  *
  * @param bool $archive_found Whether or not the archive was found.
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
 $data['postbox'] = '';
 
@@ -50,8 +61,17 @@ foreach ( $this->remote_storage_li as $provider ) {
 			__( 'Upload', 'boldgrid-backup' ),
 			$provider['id']
 		);
-	} elseif ( isset( $provider['is_setup'] ) and false === $provider['is_setup'] ) {
-		$upload = sprintf( __( 'Please go to your <a target="_parent" href="%1$s">%2$s</a> to configure %3$s.', 'boldgrid-backup' ), 'admin.php?page=boldgrid-backup-settings', __( 'settings page', 'boldgrid-backup' ), $provider['title'] );
+	} elseif ( isset( $provider['is_setup'] ) && false === $provider['is_setup'] ) {
+		$upload = sprintf(
+			// translators: 1: Link, 2: Link text.
+			esc_html__(
+				'Please go to your <a target="_parent" href="%1$s">%2$s</a> to configure %3$s.',
+				'boldgrid-backup'
+			),
+			'admin.php?page=boldgrid-backup-settings',
+			__( 'settings page', 'boldgrid-backup' ),
+			$provider['title']
+		);
 	} else {
 		$upload = '';
 	}
@@ -78,5 +98,3 @@ foreach ( $this->remote_storage_li as $provider ) {
 }
 
 return $data;
-
-

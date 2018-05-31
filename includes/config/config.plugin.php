@@ -1,12 +1,17 @@
 <?php
 /**
- * Plugin configuration file
+ * File: config.plugin.php
  *
- * @link http://www.boldgrid.com
+ * Plugin configuration file.
+ *
+ * @link https://www.boldgrid.com
  * @since 1.0
  *
- * @package Boldgrid_Backup
+ * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/includes
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 // Prevent direct calls.
@@ -34,6 +39,7 @@ return array(
 		'setting_directory'   => 'https://www.boldgrid.com/support/advanced-tutorials/backup-userguide#setting-backup-directory',
 	),
 	'lang'                  => array(
+		// translators: 1: Number of seconds.
 		'est_pause' => esc_html__( 'Estimated Pause: %s seconds', 'boldgrid-backup' ),
 	),
 	'plugin_name'           => 'boldgrid-backup',

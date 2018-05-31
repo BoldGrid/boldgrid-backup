@@ -1,18 +1,24 @@
 <?php
 /**
+ * File: boldgrid-backup-admin-archive-details.php
+ *
  * This file contains renders the details page of a backup archive.
  *
+ * @link https://www.boldgrid.com
  * @since 1.5.1
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin/partials
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  *
  * @param bool  $archive_found Whether or not the archive was found.
  * @param array $archive       An array of details about the archive, similar to
  *                             the $info created during archiving.
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
 wp_enqueue_style( 'editor-buttons' );
 
@@ -244,5 +250,3 @@ $page = sprintf(
 );
 
 echo $page;
-
-

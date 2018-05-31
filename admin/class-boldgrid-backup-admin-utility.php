@@ -1,19 +1,19 @@
 <?php
 /**
- * The admin-specific utility methods for the plugin
+ * File: class-boldgrid-backup-admin-utility.php
  *
- * @link http://www.boldgrid.com
+ * @link https://www.boldgrid.com
  * @since 1.0
  *
- * @package Boldgrid_Backup
+ * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright BoldGrid.com
- * @version $Id$
- * @author BoldGrid.com <wpb@boldgrid.com>
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup admin utility class.
+ * Class: Boldgrid_Backup_Admin_Utility
  *
  * @since 1.0
  */
@@ -25,7 +25,7 @@ class Boldgrid_Backup_Admin_Utility {
 	 *
 	 * @static
 	 *
-	 * @param int $bytes Number of bytes.
+	 * @param int $bytes    Number of bytes.
 	 * @param int $decimals Number of decimal places.
 	 * @return string
 	 */
@@ -108,13 +108,15 @@ class Boldgrid_Backup_Admin_Utility {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param  int    $errno   Error number. (can be a PHP Error level constant)
+	 * @static
+	 *
+	 * @param  int    $errno   Error number. (can be a PHP Error level constant).
 	 * @param  string $errstr  Error description.
 	 * @param  string $errfile File in which the error occurs.
 	 * @param  int    $errline Line number where the error is situated.
+	 * @throws ErrorException  Error exception object.
 	 */
 	public static function handle_error( $errno, $errstr, $errfile = false, $errline = false ) {
-
 		// A set of errors to ignore.
 		$skips = array(
 
@@ -377,7 +379,7 @@ class Boldgrid_Backup_Admin_Utility {
 	 *
 	 * @since 1.5.3
 	 *
-	 * @param  string $plugin boldgrid-backup/boldgrid-backup.php
+	 * @param  string $plugin Plugin slug ("boldgrid-backup/boldgrid-backup.php").
 	 * @return array
 	 */
 	public function get_plugin_data( $plugin ) {
@@ -545,9 +547,9 @@ class Boldgrid_Backup_Admin_Utility {
 	 *
 	 * @link http://php.net/manual/en/class.ziparchive.php
 	 *
-	 * @param string $zip_file Path to a ZIP file.
+	 * @param string $zip_file    Path to a ZIP file.
 	 * @param string $locate_file A filename or path to be located.
-	 * @param bool   $is_path Is the input file a path.
+	 * @param bool   $is_path     Is the input file a path.
 	 * @return bool
 	 */
 	public static function zip_file_exists( $zip_file, $locate_file, $is_path = false ) {
@@ -588,8 +590,11 @@ class Boldgrid_Backup_Admin_Utility {
 	 *
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
+	 * @static
+	 *
 	 * @param string $file Path to a directory or file.
-	 * @param int    $mode  (Optional) The permissions as octal number, usually 0644 for files, 0755 for dirs.
+	 * @param int    $mode (Optional) The permissions as octal number, usually 0644 for files,
+	 *                     0755 for dirs.
 	 * @return bool
 	 */
 	public static function chmod( $file, $mode = false ) {
@@ -791,7 +796,7 @@ class Boldgrid_Backup_Admin_Utility {
 	 *
 	 * @static
 	 *
-	 * @param string $search Search string.
+	 * @param string $search  Search string.
 	 * @param string $replace Replace string.
 	 * @param mixed  $subject Input subject (array|object|string).
 	 * @return mixed The input subject with recursive string replacements.
@@ -827,7 +832,7 @@ class Boldgrid_Backup_Admin_Utility {
 	 *
 	 * @since 1.5.3
 	 *
-	 * @param  int $time
+	 * @param  int $time Time in UNIX seconds.
 	 * @return int
 	 */
 	public function time( $time ) {
@@ -848,7 +853,9 @@ class Boldgrid_Backup_Admin_Utility {
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param  string
+	 * @static
+	 *
+	 * @param  string $string A string.
 	 * @return string
 	 */
 	public static function trailingslashit( $string ) {

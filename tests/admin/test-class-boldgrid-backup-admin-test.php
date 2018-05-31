@@ -1,19 +1,23 @@
 <?php
 /**
- * BoldGrid Source Code
+ * File: test-class-boldgrid-backup-admin-test.php
  *
- * @package   Test_Boldgrid_Backup_Admin_Test
- * @copyright BoldGrid.com
- * @version   $Id$
+ * @link https://www.boldgrid.com
  * @since     1.6.2
- * @author    BoldGrid.com <wpb@boldgrid.com>
+ *
+ * @package    Boldgrid_Backup
+ * @subpackage Boldgrid_Backup/tests/admin
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
+ * Class: Test_Boldgrid_Backup_Admin_Test
  *
+ * @since 1.6.2
  */
 class Test_Boldgrid_Backup_Admin_Test extends WP_UnitTestCase {
-
 	/**
 	 * Setup.
 	 *

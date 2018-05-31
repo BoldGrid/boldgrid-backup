@@ -92,7 +92,7 @@ BoldGrid.ZipBrowser = function( $ ) {
 	/**
 	 * @summary Handle the click of the "load archive browser" button.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	self.onClickLoadBrowser = function() {
 		$( this ).attr( 'disabled', 'disabled' );
@@ -103,7 +103,7 @@ BoldGrid.ZipBrowser = function( $ ) {
 	/**
 	 * @summary Handle the click of the "restore this database" button.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	self.onClickRestoreDb = function() {
 		var $a = $( this ),
@@ -140,7 +140,7 @@ BoldGrid.ZipBrowser = function( $ ) {
 	/**
 	 * @summary Handle the postbox-like toggle on thead th's that hide a table.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	self.onClickToggle = function() {
 		var $toggle = $( this ),
@@ -158,7 +158,7 @@ BoldGrid.ZipBrowser = function( $ ) {
 	/**
 	 * @summary Handle the click of the "View details" button for a database.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	self.onClickViewDb = function() {
 		var $a = $( this ),

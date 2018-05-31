@@ -1,24 +1,23 @@
 <?php
 /**
- * Boldgrid Backup Admin Home Dir.
+ * File: class-boldgrid-backup-admin-home-dir.php
  *
- * @link  http://www.boldgrid.com
+ * @link  https://www.boldgrid.com
  * @since 1.5.1
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * Boldgrid Backup Admin Home Dir class.
+ * Class: Boldgrid_Backup_Admin_Home_Dir
  *
  * @since 1.5.1
  */
 class Boldgrid_Backup_Admin_Home_Dir {
-
 	/**
 	 * The core class object.
 	 *
@@ -33,7 +32,7 @@ class Boldgrid_Backup_Admin_Home_Dir {
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param Boldgrid_Backup_Admin_Core $core
+	 * @param Boldgrid_Backup_Admin_Core $core Boldgrid_Backup_Admin_Core object.
 	 */
 	public function __construct( $core ) {
 		$this->core = $core;

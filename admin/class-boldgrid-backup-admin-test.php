@@ -1,24 +1,23 @@
 <?php
 /**
- * The admin-specific test functionality of the plugin
+ * File: class-boldgrid-backup-admin-test.php
  *
- * @link http://www.boldgrid.com
+ * @link https://www.boldgrid.com
  * @since 1.0
  *
- * @package Boldgrid_Backup
+ * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright BoldGrid.com
- * @version $Id$
- * @author BoldGrid.com <wpb@boldgrid.com>
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup admin test class.
+ * Class: Boldgrid_Backup_Admin_Test
  *
  * @since 1.0
  */
 class Boldgrid_Backup_Admin_Test {
-
 	/**
 	 * Base test filename.
 	 *
@@ -139,7 +138,7 @@ class Boldgrid_Backup_Admin_Test {
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param  string $path
+	 * @param  string $path File or directory path.
 	 * @return bool
 	 */
 	public function exists( $path ) {
@@ -163,7 +162,7 @@ class Boldgrid_Backup_Admin_Test {
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param  string $dir
+	 * @param  string $dir Dircetory path.
 	 * @return array
 	 */
 	public function extensive_dir_test( $dir ) {
@@ -205,8 +204,8 @@ class Boldgrid_Backup_Admin_Test {
 	 *
 	 * @since 1.5.2
 	 *
-	 * @param  string $folder_name
-	 * @param  string $starting_dir
+	 * @param  string $folder_name  Directory folder name.
+	 * @param  string $starting_dir Start director path.
 	 * @return bool True if folder name found.
 	 */
 	public function find_folder( $folder_name, $starting_dir = ABSPATH ) {
@@ -244,7 +243,7 @@ class Boldgrid_Backup_Admin_Test {
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param  string $dir
+	 * @param  string $dir Directory path.
 	 * @return bool
 	 */
 	public function delete_test_files( $dir ) {
@@ -292,7 +291,7 @@ class Boldgrid_Backup_Admin_Test {
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param  $dir string
+	 * @param  string $dir Directory path.
 	 * @return bool
 	 */
 	public function is_writable( $dir ) {
@@ -348,7 +347,12 @@ class Boldgrid_Backup_Admin_Test {
 
 		$folders_found   = __( 'The following node_modules folder was found in your account:', 'boldgrid-backup' );
 		$possible_issues = __( 'Due to possible issues node_modules folders can cause when calculating disk space, your WordPress directory size was not calculated.', 'boldgrid-backup' );
-		$ignore_warning  = __( 'To ignore this warning and try again, please <a href="%1$s">click here</a>', 'boldgrid-backup' );
+
+		// translators: 1: Link.
+		$ignore_warning = __(
+			'To ignore this warning and try again, please <a href="%1$s">click here</a>',
+			'boldgrid-backup'
+		);
 
 		$warning = sprintf(
 			'<strong>%1$s</strong><br />

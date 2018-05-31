@@ -1,28 +1,29 @@
 <?php
 /**
- * BoldGrid Source Code
+ * File: test-class-boldgrid-backup-admin-crypt.php
  *
- * @copyright BoldGrid.com
- * @version   $Id$
+ * @link https://www.boldgrid.com
  * @since     1.6.0
- * @author    BoldGrid.com <wpb@boldgrid.com>
+ *
+ * @package    Boldgrid_Backup
+ * @subpackage Boldgrid_Backup/tests/admin
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * Test Boldgrid_Backup_Admin_Crypt.
+ * Class: Test_Boldgrid_Backup_Admin_Crypt
  *
  * @since 1.6.0
  */
 class Test_Boldgrid_Backup_Admin_Crypt extends WP_UnitTestCase {
-
-
 	/**
 	 * Setup.
 	 *
 	 * @since 1.6.0
 	 */
 	public function setUp() {
-
 		/*
 		 * Define keys / salts for crypt.
 		 *
@@ -47,7 +48,6 @@ class Test_Boldgrid_Backup_Admin_Crypt extends WP_UnitTestCase {
 	 * @since 1.6.0
 	 */
 	public function test_crypt() {
-
 		$valids = array(
 			'',
 			' ',

@@ -1,28 +1,27 @@
 <?php
 /**
- * Go Pro class.
+ * File: class-boldgrid-backup-admin-go-pro.php
  *
- * @link  http://www.boldgrid.com
- * @since 1.5.4
+ * @link  https://www.boldgrid.com
+ * @since 1.6.0
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup Admin Go Pro Class.
+ * Class: Boldgrid_Backup_Admin_Go_Pro
  *
- * @since 1.5.4
+ * @since 1.6.0
  */
 class Boldgrid_Backup_Admin_Go_Pro {
-
 	/**
 	 * The core class object.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access private
 	 * @var    Boldgrid_Backup_Admin_Core
 	 */
@@ -31,16 +30,16 @@ class Boldgrid_Backup_Admin_Go_Pro {
 	/**
 	 * Generic upgrade link.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    string
 	 */
-	public static $url = 'https://boldgrid.com/update-backup';
+	public static $url = 'https://www.boldgrid.com/update-backup';
 
 	/**
 	 * Constructor.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
 	 */
@@ -54,10 +53,9 @@ class Boldgrid_Backup_Admin_Go_Pro {
 	 * This method is currently used to display admin notices to help guide the
 	 * user to getting a premium key and getting / activating the premium extension.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function admin_notice_setup() {
-
 		// If the premium plugin is installed and all is good, abort!
 		if ( $this->core->config->is_premium_done ) {
 			return;
@@ -79,7 +77,11 @@ class Boldgrid_Backup_Admin_Go_Pro {
 				'id'      => 'boldgrid_backup_activate_premium',
 				'show'    => $is_premium && $this->core->config->is_premium_installed,
 				'message' => '<p>' . sprintf(
-					__( 'You have a <strong>Premium BoldGrid Connect Key</strong> and you have the <strong>BoldGrid Backup Premium Extension installed</strong>. Please go to your <a href="%1$s">plugins page</a> and activate your premium extension!', 'boldgrid-backup' ),
+					// translators: 1: URL address for the wp-admin plugins page.
+					__(
+						'You have a <strong>Premium BoldGrid Connect Key</strong> and you have the <strong>BoldGrid Backup Premium Extension installed</strong>. Please go to your <a href="%1$s">plugins page</a> and activate your premium extension!',
+						'boldgrid-backup'
+					),
 					admin_url( 'plugins.php' )
 				) . '</p>',
 			),
@@ -87,7 +89,11 @@ class Boldgrid_Backup_Admin_Go_Pro {
 				'id'      => 'boldgrid_backup_upgrade_premium',
 				'show'    => ! $is_premium && $this->core->config->is_premium_active,
 				'message' => '<p>' . sprintf(
-					__( 'Thank you for activating the <strong>BoldGrid Backup Premium Extension</strong>! Before you can begin using all of the premium features, please visit <a href="%1$s" target="_blank">BoldGrid Central</a> and upgrade your BoldGrid Connect Key.', 'boldgrid-backup' ),
+					// translators: 1: URL address for the upgrade page.
+					__(
+						'Thank you for activating the <strong>BoldGrid Backup Premium Extension</strong>! Before you can begin using all of the premium features, please visit <a href="%1$s" target="_blank">BoldGrid Central</a> and upgrade your BoldGrid Connect Key.',
+						'boldgrid-backup'
+					),
 					self::$url
 				) . '</p>',
 			),
@@ -95,7 +101,11 @@ class Boldgrid_Backup_Admin_Go_Pro {
 				'id'      => 'boldgrid_backup_download_premium',
 				'show'    => $is_premium && ! $this->core->config->is_premium_installed,
 				'message' => '<p>' . sprintf(
-					__( 'Hello there! We see that you have a <strong>Premium BoldGrid Connect Key</strong> and you have the <strong>BoldGrid Backup Plugin</strong> activated! Be sure to download the <strong>BoldGrid Backup Premium Extension</strong> from <a href="%1$s">BoldGrid Central</a> to gain access to more features!', 'boldgrid-backup' ),
+					// translators: 1: URL address for BoldGrid Central.
+					__(
+						'Hello there! We see that you have a <strong>Premium BoldGrid Connect Key</strong> and you have the <strong>BoldGrid Backup Plugin</strong> activated! Be sure to download the <strong>BoldGrid Backup Premium Extension</strong> from <a href="%1$s">BoldGrid Central</a> to gain access to more features!',
+						'boldgrid-backup'
+					),
 					'https://www.boldgrid.com/central'
 				) . '</p>',
 			),
@@ -112,13 +122,13 @@ class Boldgrid_Backup_Admin_Go_Pro {
 	/**
 	 * Get a "Get Premium" button.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param  string $url
-	 * @param  string $text
+	 * @param  string $url  URL address for the upgrade page.
+	 * @param  string $text Button text.
 	 * @return string
 	 */
-	public function get_premium_button( $url = 'https://boldgrid.com/update-backup', $text = 'Get Premium' ) {
+	public function get_premium_button( $url = 'https://www.boldgrid.com/update-backup', $text = 'Get Premium' ) {
 		return sprintf(
 			'
 			<a href="%1$s" class="button button-success" target="_blank">%2$s</a>',

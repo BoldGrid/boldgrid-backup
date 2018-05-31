@@ -1,8 +1,8 @@
 <?php
 /**
- * Boldgrid Backup Admin Backup Dir.
+ * File: class-boldgrid-backup-admin-backup-dir.php
  *
- * @link  http://www.boldgrid.com
+ * @link  https://www.boldgrid.com
  * @since 1.5.1
  *
  * @package    Boldgrid_Backup
@@ -13,12 +13,11 @@
  */
 
 /**
- * Boldgrid Backup Admin Backup Dir class.
+ * Class: Boldgrid_Backup_Admin_Backup_Dir
  *
  * @since 1.5.1
  */
 class Boldgrid_Backup_Admin_Backup_Dir {
-
 	/**
 	 * Backup directory.
 	 *
@@ -59,7 +58,7 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param Boldgrid_Backup_Admin_Core $core
+	 * @param Boldgrid_Backup_Admin_Core $core Boldgrid_Backup_Admin_Core object.
 	 */
 	public function __construct( $core ) {
 		$this->core = $core;
@@ -70,14 +69,17 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param  string $backup_dir
+	 * @param  string $backup_dir Backup directory path.
 	 * @return mixed False on failure, trailingslashed $backup_dir on success.
 	 */
 	public function create( $backup_dir ) {
 		$check_permissions = __( 'Please ensure your backup directory exists and has the proper read, write, and modify permissions.', 'boldgrid-backup' );
 
+		// translators: 1: File path, 2: Informational message above ($check_permissions).
 		$cannot_create = __( 'Unable to create necessary file: %1$s<br />%2$s', 'boldgrid-backup' );
-		$cannot_write  = __( 'Unable to write to necessary file: %1$s<br />%2$s', 'boldgrid-backup' );
+
+		// translators: 1: File path, 2: Informational message above ($check_permissions).
+		$cannot_write = __( 'Unable to write to necessary file: %1$s<br />%2$s', 'boldgrid-backup' );
 
 		$backup_dir = untrailingslashit( $backup_dir );
 
@@ -188,7 +190,7 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 		$dirs[] = $this->core->config->get_home_directory();
 
 		if ( $this->core->test->is_windows() ) {
-			// C:\Users\user\AppData\Local
+			// Example: "C:\Users\user\AppData\Local".
 			$dirs[] = $this->core->config->get_home_directory() . DIRECTORY_SEPARATOR . 'AppData' . DIRECTORY_SEPARATOR . 'Local';
 
 			if ( ! empty( $_SERVER['DOCUMENT_ROOT'] ) ) {
@@ -218,9 +220,9 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	 *
 	 * Returns backup_dir/$file.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param  string $file
+	 * @param  string $file Filename.
 	 * @return string
 	 */
 	public function get_path_to( $file ) {
@@ -298,7 +300,7 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param  string $file
+	 * @param  string $file Filename.
 	 * @param  bool   $use_abspath Bool determining whether or not to use the
 	 *                             backup directory in its absolute path.
 	 * @return bool
@@ -316,7 +318,9 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	 *
 	 * Make sure it exists, it's writable, etc.
 	 *
-	 * @param  string $backup_dir
+	 * @since 1.5.1
+	 *
+	 * @param  string $backup_dir Backup directory path.
 	 * @return bool
 	 */
 	public function is_valid( $backup_dir ) {
@@ -328,23 +332,52 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 		$perms = $this->core->test->extensive_dir_test( $backup_dir );
 
 		if ( ! $perms['exists'] ) {
-			$this->errors[] = sprintf( __( 'Backup Directory does not exists: %1$s', 'boldgrid-backup' ), $backup_dir );
+			$this->errors[] = sprintf(
+				// translators: 1: Backup directory path.
+				__( 'Backup Directory does not exists: %1$s', 'boldgrid-backup' ),
+				$backup_dir
+			);
 		}
 
 		if ( ! $perms['read'] ) {
-			$this->errors[] = sprintf( __( 'Backup Directory does not have read permission: %1$s', 'boldgrid-backup' ), $backup_dir );
+			$this->errors[] = sprintf(
+				// translators: 1: Backup directory path.
+				__( 'Backup Directory does not have read permission: %1$s', 'boldgrid-backup' ),
+				$backup_dir
+			);
 		}
 
 		if ( ! $perms['rename'] ) {
-			$this->errors[] = sprintf( __( 'Backup Directory does not have permission to rename files: %1$s', 'boldgrid-backup' ), $backup_dir );
+			$this->errors[] = sprintf(
+				// translators: 1: Backup directory path.
+				__(
+					'Backup Directory does not have permission to rename files: %1$s',
+					'boldgrid-backup'
+				),
+				$backup_dir
+			);
 		}
 
 		if ( ! $perms['delete'] ) {
-			$this->errors[] = sprintf( __( 'Backup Directory does not have permission to delete files: %1$s', 'boldgrid-backup' ), $backup_dir );
+			$this->errors[] = sprintf(
+				// translators: 1: Backup directory path.
+				__(
+					'Backup Directory does not have permission to delete files: %1$s',
+					'boldgrid-backup'
+				),
+				$backup_dir
+			);
 		}
 
 		if ( ! $perms['dirlist'] ) {
-			$this->errors[] = sprintf( __( 'Backup Directory does not have permission to retrieve directory listing: %1$s', 'boldgrid-backup' ), $backup_dir );
+			$this->errors[] = sprintf(
+				// translators: 1: Backup directory path.
+				__(
+					'Backup Directory does not have permission to retrieve directory listing: %1$s',
+					'boldgrid-backup'
+				),
+				$backup_dir
+			);
 		}
 
 		/*
@@ -358,7 +391,11 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 		$abspath_in_dir = 0 === strpos( ABSPATH, $backup_dir );
 		if ( $abspath_in_dir ) {
 			$this->errors[] = sprintf(
-				__( 'Your <strong>WordPress directory</strong> <em>%1$s</em> cannot be within your <strong>backup directory</strong> %2$s.', 'boldgrid-backup' ),
+				// translators: 1: WordPress installation directory path, 2: Backup directory path.
+				__(
+					'Your <strong>WordPress directory</strong> <em>%1$s</em> cannot be within your <strong>backup directory</strong> %2$s.',
+					'boldgrid-backup'
+				),
 				ABSPATH,
 				$backup_dir
 			);
@@ -371,6 +408,10 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	 * Even in a Windows environment, wp_filesystem->dirlist retrieves paths
 	 * with a / instead of \. Fix $without_abspath so we can properly check if
 	 * files are in the backup directory.
+	 *
+	 * @since 1.5.2
+	 *
+	 * @param string $backup_directory Backup directory.
 	 */
 	public function set( $backup_directory ) {
 

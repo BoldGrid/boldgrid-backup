@@ -1,15 +1,20 @@
 <?php
 /**
+ * File: only-remote.php
+ *
  * Display for instances in which backup is not local, but exists remotely.
  *
- * @link  http://www.boldgrid.com
- * @since 1.5.4
+ * @link  https://www.boldgrid.com
+ * @since 1.6.0
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin/partials/archive-details
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
 return sprintf(
 	'
@@ -25,9 +30,11 @@ return sprintf(
 	'<a class="button button-primary" id="download_first">Download to web server</a>',
 	$this->core->lang['spinner'],
 	sprintf(
-		__( 'After your backup has been downloaded to the web server, this page will refresh and you will see more options available. To learn more about your web server vs. remote storage providers, <a href="%1$s">click here</a>.', 'boldgrid-backup' ),
+		// translators: 1: Link.
+		esc_html__(
+			'After your backup has been downloaded to the web server, this page will refresh and you will see more options available. To learn more about your web server vs. remote storage providers, <a href="%1$s">click here</a>.',
+			'boldgrid-backup'
+		),
 		'admin.php?page=boldgrid-backup-tools&section=section_locations'
 	)
 );
-
-

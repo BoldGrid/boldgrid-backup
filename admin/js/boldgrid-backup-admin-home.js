@@ -126,7 +126,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 	/**
 	 * @summary Action to take when a user clicks on a mine count.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	self.onClickCount = function() {
 		var $anchor = $( this ),

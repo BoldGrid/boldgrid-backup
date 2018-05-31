@@ -1,27 +1,27 @@
 <?php
 /**
- * Database Import.
+ * File: class-boldgrid-backup-admin-db-import.php
  *
- * @link  http://www.boldgrid.com
+ * @link  https://www.boldgrid.com
  * @since 1.5.1
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
+
 /**
- * BoldGrid Backup Admin Database Import class.
+ * Class: Boldgrid_Backup_Admin_Db_Import
  *
  * @since 1.5.1
  */
 class Boldgrid_Backup_Admin_Db_Import {
-
 	/**
 	 * The core class object.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access private
 	 * @var    Boldgrid_Backup_Admin_Core
 	 */
@@ -30,7 +30,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	/**
 	 * Errors.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 * @var   array
 	 */
 	public $errors = array();
@@ -38,12 +38,11 @@ class Boldgrid_Backup_Admin_Db_Import {
 	/**
 	 * Constructor.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param Boldgrid_Backup_Admin_Core $core
+	 * @param Boldgrid_Backup_Admin_Core $core Boldgrid_Backup_Admin_Core object.
 	 */
 	public function __construct( $core = false ) {
-
 		// We don't always require $core for this class.
 		if ( $core ) {
 			$this->core = $core;
@@ -55,13 +54,20 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param  string $file The filepath to our file.
-	 * @return bool   True on success.
+	 * @param  string $file File path.
+	 * @return bool TRUE on success.
 	 */
 	public function import( $file ) {
 		$lines = file( $file );
+
 		if ( false === $lines ) {
-			return array( 'error' => sprintf( __( 'Unable to open mysqldump, %1$s.', 'boldgrid-backup' ), $file ) );
+			return array(
+				'error' => sprintf(
+					// translators: 1: File path.
+					__( 'Unable to open mysqldump, %1$s.', 'boldgrid-backup' ),
+					$file
+				),
+			);
 		}
 
 		$success = $this->import_lines( $lines );
@@ -75,10 +81,10 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * Pass in "file.zip" and "backup.sql" and we'll find "backup.sql" in the
 	 * "file.zip" file and restore it.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param  string $archive_filepath
-	 * @param  string $file
+	 * @param  string $archive_filepath Archive file path.
+	 * @param  string $file             Filename.
 	 * @return bool
 	 */
 	public function import_from_archive( $archive_filepath, $file ) {
@@ -108,9 +114,9 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * The functionality in this method use to be in the main import method,
 	 * however it was broken away to make more reusable.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param  array $lines
+	 * @param  array $lines MySQL dump file lines.
 	 * @return bool
 	 */
 	public function import_lines( $lines ) {
@@ -118,6 +124,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 			return false;
 		}
 
+		/* phpcs:disable WordPress.DB.RestrictedClasses */
 		$db = new PDO( sprintf( 'mysql:host=%1$s;dbname=%2$s;', DB_HOST, DB_NAME ), DB_USER, DB_PASSWORD );
 
 		$templine = '';
@@ -151,9 +158,9 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * file and import it. Instead of saving the .sql file then importing, it
 	 * comes straight from the .zip file as a string to here.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param  string $string
+	 * @param  string $string MySQL dump file as a string.
 	 * @return bool
 	 */
 	public function import_string( $string ) {
@@ -164,4 +171,3 @@ class Boldgrid_Backup_Admin_Db_Import {
 		return $success;
 	}
 }
-

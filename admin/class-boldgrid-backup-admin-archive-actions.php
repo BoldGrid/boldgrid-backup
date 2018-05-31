@@ -1,28 +1,28 @@
 <?php
 /**
- * Archive Actions class.
+ * File: class-boldgrid-backup-admin-archive-actions.php
  *
- * @link  http://www.boldgrid.com
- * @since 1.5.4
+ * @link       https://www.boldgrid.com
+ * @since      1.5.4
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
  * BoldGrid Backup Admin Archive Actions Class.
  *
- * @since 1.5.4
+ * @since 1.6.0
  */
 class Boldgrid_Backup_Admin_Archive_Actions {
 
 	/**
 	 * The core class object.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access private
 	 * @var    Boldgrid_Backup_Admin_Core
 	 */
@@ -31,7 +31,7 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 	/**
 	 * Constructor.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
 	 */
@@ -42,19 +42,19 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 	/**
 	 * Enqueue scripts.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function enqueue_scripts() {
-		$access_type          = get_filesystem_method();
-		$archive_nonce        = wp_create_nonce( 'archive_auth' );
-		$delete_confirm_text  = esc_html__(
-			'Please confirm the deletion of the archive file:' . PHP_EOL,
+		$access_type         = get_filesystem_method();
+		$archive_nonce       = wp_create_nonce( 'archive_auth' );
+		$delete_confirm_text = __(
+			'Please confirm the deletion of the archive file:',
 			'boldgrid-backup'
-		);
-		$restore_confirm_text = esc_html__(
-			'Please confirm the restoration of this WordPress installation from the archive file:' .
-			PHP_EOL . '"%s"' . PHP_EOL . PHP_EOL .
-			'Please be aware that you may get logged-out if your session token does not exist in the database restored.',
+		) . PHP_EOL;
+
+		// translators: 1: Archive filename.
+		$restore_confirm_text = __(
+			"Please confirm the restoration of this WordPress installation from the archive file:\n\"%s\"\n\nPlease be aware that you may get logged-out if your session token does not exist in the database restored.",
 			'boldgrid-backup'
 		);
 
@@ -79,9 +79,9 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 	/**
 	 * Return a link to delete an archive.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param  string $filename
+	 * @param  string $filename Filename.
 	 * @return string
 	 */
 	public function get_delete_link( $filename ) {
@@ -114,9 +114,9 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 	/**
 	 * Return a link to download an archive.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param  string $filename
+	 * @param  string $filename Filename.
 	 * @return string
 	 */
 	public function get_download_button( $filename ) {
@@ -149,10 +149,10 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 	/**
 	 * Return a link to restore an archive.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param  string $filename
-	 * @param  array  $args
+	 * @param  string $filename Filename.
+	 * @param  array  $args     Arguments for the link/button.
 	 * @return string
 	 */
 	public function get_restore_button( $filename, $args = array() ) {

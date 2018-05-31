@@ -3,7 +3,7 @@
  *
  * @summary JavaScript for handling FTP Settings page.
  *
- * @since 1.5.4
+ * @since 1.6.0
  *
  * @param $ The jQuery object.
  */
@@ -38,7 +38,7 @@ BoldGrid.FtpSettings = function( $ ) {
 	/**
 	 * @summary Action to take when form has been submitted.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	self.onSubmit = function() {
 		$saveButton.attr( 'disabled', true );
@@ -51,7 +51,7 @@ BoldGrid.FtpSettings = function( $ ) {
 	/**
 	 * @summary Action to take when type has been changed.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	self.onTypeChange = function() {
 		var suggestedPort = lang.default_port[$type.val()];

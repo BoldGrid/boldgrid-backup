@@ -1,19 +1,19 @@
 <?php
 /**
- * The admin-specific core functionality of the plugin
+ * File: class-boldgrid-backup-admin-core.php
  *
- * @link http://www.boldgrid.com
- * @since 1.0
+ * @link       https://www.boldgrid.com
+ * @since      1.0
  *
- * @package Boldgrid_Backup
+ * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
- * @copyright BoldGrid.com
- * @version $Id$
- * @author BoldGrid.com <wpb@boldgrid.com>
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup admin core class.
+ * Class: Boldgrid_Backup_Admin_Core
  *
  * @since 1.0
  */
@@ -57,7 +57,7 @@ class Boldgrid_Backup_Admin_Core {
 	/**
 	 * Core Files class.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    Boldgrid_Backup_Admin_Core_Files
 	 */
@@ -92,12 +92,14 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * In WordPress' wp-cron.php DOING_CRON is defined as true. In several of
 	 * our files, we define DOING_CRON as well. When we want to tell the
-	 * difference between (1)wp-cron.php and (2)cron / cli, it's difficult. This
-	 * property is soley to know if we're in wp-cron.php
+	 * difference between (1)wp-cron.php and (2)cron / cli, it's difficult.
+	 * This property is solely to know if we're in wp-cron.php.
 	 *
 	 * @todo Within our plugins, DOING_CRON should be cleaned up.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
+	 *
+	 * @var bool
 	 */
 	public $doing_wp_cron;
 
@@ -143,7 +145,7 @@ class Boldgrid_Backup_Admin_Core {
 	/**
 	 * An instance of Boldgrid_Backup_Admin_Tools.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    Boldgrid_Backup_Admin_Tools
 	 */
@@ -235,7 +237,7 @@ class Boldgrid_Backup_Admin_Core {
 	/**
 	 * An instance of the Boldgrid_Backup_Admin_Archives class.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    Boldgrid_Backup_Admin_Archives
 	 */
@@ -244,7 +246,7 @@ class Boldgrid_Backup_Admin_Core {
 	/**
 	 * An instance of the Boldgrid_Backup_Admin_Archives_All class.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    Boldgrid_Backup_Admin_Archives_All
 	 */
@@ -253,7 +255,7 @@ class Boldgrid_Backup_Admin_Core {
 	/**
 	 * An instance of the Boldgrid_Backup_Admin_Archive_Actions class.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    Boldgrid_Backup_Admin_Archive_Actions
 	 */
@@ -360,7 +362,7 @@ class Boldgrid_Backup_Admin_Core {
 	/**
 	 * An instance of the Boldgrid_Backup_Admin_Folder_Exclusion class.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 * @var   Boldgrid_Backup_Admin_Folder_Exclusion
 	 */
 	public $folder_exclusion;
@@ -368,7 +370,7 @@ class Boldgrid_Backup_Admin_Core {
 	/**
 	 * An instance of the Boldgrid_Backup_Admin_Ftp class.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 * @var   Boldgrid_Backup_Admin_Ftp
 	 */
 	public $ftp;
@@ -376,7 +378,7 @@ class Boldgrid_Backup_Admin_Core {
 	/**
 	 * An instance of the Boldgrid_Backup_Admin_Go_Pro class.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 * @var   Boldgrid_Backup_Admin_Go_Pro
 	 */
 	public $go_pro;
@@ -402,7 +404,7 @@ class Boldgrid_Backup_Admin_Core {
 	 * Value indicating we are in the Backup Site Now callback and the user is
 	 * choosing a full backup.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    bool
 	 */
@@ -411,7 +413,7 @@ class Boldgrid_Backup_Admin_Core {
 	/**
 	 * Value indicating we are in the Backup Site Now callback.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    bool
 	 */
@@ -428,7 +430,7 @@ class Boldgrid_Backup_Admin_Core {
 	/**
 	 * An instance of the In Progress class.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 * @var   Boldgrid_Backup_Admin_In_Progress object.
 	 */
 	public $in_progress;
@@ -437,7 +439,7 @@ class Boldgrid_Backup_Admin_Core {
 	 * Value indicating whether or not we're creating a backup for update
 	 * protection.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 * @var   bool
 	 */
 	public $is_archiving_update_protection = false;
@@ -1072,7 +1074,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return bool Status of the operation.
 	 */
 	private function backup_database() {
-
 		/*
 		 * If we're omitting all the tables, we can skip trying to backup the
 		 * database.
@@ -1096,7 +1097,13 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Check if the backup directory is writable.
 		if ( ! $wp_filesystem->is_writable( $backup_directory ) ) {
-			return array( 'error' => sprintf( __( 'The backup directory is not writable: %1$s.', 'boldgrid-backup' ), $backup_directory ) );
+			return array(
+				'error' => sprintf(
+					// translators: 1: Backup directory path.
+					__( 'The backup directory is not writable: %1$s.', 'boldgrid-backup' ),
+					$backup_directory
+				),
+			);
 		}
 
 		// Create a file path for the dump file.
@@ -1116,11 +1123,23 @@ class Boldgrid_Backup_Admin_Core {
 		// Ensure file is written and is over 100 bytes.
 		$exists = $this->test->exists( $db_dump_filepath );
 		if ( ! $exists ) {
-			return array( 'error' => sprintf( __( 'mysqldump file does not exist: %1$s', 'boldgrid-backup' ), $db_dump_filepath ) );
+			return array(
+				'error' => sprintf(
+					// translators: 1: MySQL dump file path.
+					__( 'mysqldump file does not exist: %1$s', 'boldgrid-backup' ),
+					$db_dump_filepath
+				),
+			);
 		}
 		$dump_file_size = $this->wp_filesystem->size( $db_dump_filepath );
 		if ( 100 > $dump_file_size ) {
-			return array( 'error' => sprintf( __( 'mysqldump file was not written to: %1$s', 'boldgrid-backup' ), $db_dump_filepath ) );
+			return array(
+				'error' => sprintf(
+					// translators: 1: MySQL dump file path.
+					__( 'mysqldump file was not written to: %1$s', 'boldgrid-backup' ),
+					$db_dump_filepath
+				),
+			);
 		}
 
 		// Limit file permissions to the dump file.
@@ -1285,10 +1304,7 @@ class Boldgrid_Backup_Admin_Core {
 				$dirpath,
 				str_replace( ABSPATH, '', $dirpath ),
 				0,
-				/*
-				 * @since 1.5.4, this 4th key represetnts 'type', as in a file
-				 * or a directory.
-				 */
+				// Since 1.6.0, this 4th key represetnts 'type', as in a file or a directory.
 				'd',
 			);
 		}
@@ -1506,7 +1522,12 @@ class Boldgrid_Backup_Admin_Core {
 		// Close any PHP session, so that another session can open during the backup operation.
 		session_write_close();
 
-		// Initialize return array and add "compressor" and "save" keys.
+		/*
+		 * Initialize return array and add "compressor" and "save" keys.
+		 * Since 1.6.0, the folder include and exclude settings below are
+		 * for informational purposes only. This array cannot be filtered to
+		 * adjust which folders are actually included / excluded.
+		 */
 		$info = array(
 			'mode'           => 'backup',
 			'dryrun'         => $dryrun,
@@ -1514,11 +1535,6 @@ class Boldgrid_Backup_Admin_Core {
 			'filesize'       => 0,
 			'save'           => $save,
 			'total_size'     => 0,
-			/*
-			 * As of 1.6.0, the folder include and exclude settings below are
-			 * for informational purposes only. This array cannot be filtered to
-			 * adjust which folders are actually included / excluded.
-			 */
 			'folder_include' => $this->folder_exclusion->from_settings( 'include' ),
 			'folder_exclude' => $this->folder_exclusion->from_settings( 'exclude' ),
 			'table_exclude'  => $this->db_omit->get_excluded_tables(),
@@ -2022,9 +2038,11 @@ class Boldgrid_Backup_Admin_Core {
 			}
 		);
 
-		// Find the first occurrence of a MySQL dump file.
-		// Format: *.########-######.sql
-		// An example filename: joec_wrdp2.20160919-162431.sql
+		/*
+		 * Find the first occurrence of a MySQL dump file.
+		 * Format: "*.########-######.sql".
+		 * An example filename: joec_wrdp2.20160919-162431.sql".
+		 */
 		foreach ( $dirlist as $fileinfo ) {
 			if ( 1 === preg_match( '/\.[\d]+-[\d]+\.sql$/', $fileinfo['name'] ) ) {
 				$db_dump_filepath = ABSPATH . $fileinfo['name'];
@@ -2575,7 +2593,7 @@ class Boldgrid_Backup_Admin_Core {
 	/**
 	 * Handle ajax request to restore a file.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function wp_ajax_restore() {
 		$error        = __( 'Unable to restore backup: ', 'boldgrid-backup' );

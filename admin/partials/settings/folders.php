@@ -4,10 +4,17 @@
  *
  * Which files and folders should be included / excluded?
  *
- * @since 1.5.4
+ * @link https://www.boldgrid.com
+ * @since 1.6.0
+ *
+ * @package    Boldgrid_Backup
+ * @subpackage Boldgrid_Backup/admin/partials/settings
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
 $nonce = wp_create_nonce( 'folder_exclusion_preview' );
 
@@ -30,7 +37,7 @@ $using_defaults = $core->folder_exclusion->is_using_defaults();
 
 $markup = '<table class="form-table bulk-action-notice" id="folder_exclusion"><tbody>';
 
-// TR for the header and intro
+// TR for the header and intro.
 $tr_header = sprintf(
 	'
 	<p>
@@ -43,8 +50,7 @@ $tr_header = sprintf(
 	/* 4 */ ! $in_modal && ! $using_defaults ? $checked : ''
 );
 
-// This markup for the legend.
-// TR for the help text.
+// This markup for the legend. TR for the help text.
 $table_legend = sprintf(
 	'
 	<table class="folder_exclude_help wp-list-table widefat fixed striped pages">
@@ -88,7 +94,7 @@ $table_legend = sprintf(
 	/* 8 */ wp_kses( __( 'For example, <strong>wp-admin,wp-includes</strong> will backup both the wp-admin folder and the wp-includes folder.', 'boldgrid-backup' ), $tags )
 );
 
-// Examples
+// Examples.
 $table_examples = sprintf(
 	'
 	<table class="folder_exclude_help wp-list-table widefat fixed striped pages">
@@ -175,7 +181,7 @@ $tr_help = sprintf(
 	/* 7 */ $status
 );
 
-// TR for the include
+// TR for the include.
 $tr_include = sprintf(
 	'
 	<tr class="%3$s">
@@ -209,7 +215,7 @@ $tr_exclude = sprintf(
 	/* A1  */ $using_defaults ? 'hidden' : ''
 );
 
-// TR for the preview
+// TR for the preview.
 $tr_preview = sprintf(
 	'
 		<tr class="%1$s">
@@ -267,5 +273,3 @@ $markup = sprintf(
 );
 
 return $markup;
-
-

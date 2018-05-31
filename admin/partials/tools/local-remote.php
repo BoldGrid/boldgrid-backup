@@ -1,13 +1,22 @@
 <?php
 /**
+ * File: local-remote.php
+ *
  * Show "Auto Updates" on settings page.
  *
- * @since 1.5.4
+ * @link https://www.boldgrid.com
+ * @since 1.6.0
+ *
+ * @package    Boldgrid_Backup
+ * @subpackage Boldgrid_Backup/admin/partials/tools
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
-// https://github.com/cbschuld/Browser.php
+// @link https://github.com/cbschuld/Browser.php
 require_once BOLDGRID_BACKUP_PATH . '/vendor/cbschuld/browser.php/lib/Browser.php';
 $browser = new Browser();
 
@@ -131,4 +140,3 @@ if ( ! $this->core->config->is_premium_done ) {
 $output = ob_get_contents();
 ob_end_clean();
 return $output;
-

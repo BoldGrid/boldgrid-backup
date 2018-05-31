@@ -1,32 +1,31 @@
 <?php
 /**
- * FTP Hooks class.
+ * File: ftp-hooks.php
  *
- * @link  http://www.boldgrid.com
- * @since 1.5.4
+ * @link  https://www.boldgrid.com
+ * @since 1.6.0
  *
  * @package    Boldgrid_Backup
- * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @subpackage Boldgrid_Backup/admin/remote
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * FTP Hooks class.
+ * Class: Boldgrid_Backup_Admin_Ftp_Hooks
  *
  * The only purpose this class is to be used for is to separate methods that are
  * used for registering a new remove provider. All of these methods are called
  * via hooks.
  *
- * @since 1.5.4
+ * @since 1.6.0
  */
 class Boldgrid_Backup_Admin_Ftp_Hooks {
-
 	/**
 	 * The core class object.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access private
 	 * @var    Boldgrid_Backup_Admin_Core
 	 */
@@ -35,7 +34,7 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 	/**
 	 * Constructor.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
 	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
 	 */
@@ -46,7 +45,7 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 	/**
 	 * Add menu items.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function add_menu_items() {
 		$capability = 'administrator';
@@ -67,7 +66,7 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 	/**
 	 * Hook into the filter to add all ftp backups to the full list of backups.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function filter_get_all() {
 		$contents = $this->core->ftp->get_contents( true, $this->core->ftp->remote_dir );
@@ -96,7 +95,7 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 	/**
 	 * Determine if FTP is setup.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function is_setup_ajax() {
 		if ( ! current_user_can( 'update_plugins' ) ) {
@@ -122,12 +121,11 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 	/**
 	 * Actions to take after a backup file has been generated.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param array $info
+	 * @param array $info Archive information.
 	 */
 	public function post_archive_files( $info ) {
-
 		/*
 		 * We only want to add this to the jobs queue if we're in the middle of
 		 * an automatic backup. If the user simply clicked on "Backup site now",
@@ -146,6 +144,7 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 			'filepath'     => $info['filepath'],
 			'action'       => 'boldgrid_backup_' . $this->core->ftp->key . '_upload_post_archive',
 			'action_data'  => $info['filepath'],
+			// translators: 1: FTP accoun title/name.
 			'action_title' => sprintf( __( 'Upload backup file to %1$s', 'boldgrid-backup' ), $this->core->ftp->title ),
 		);
 
@@ -155,7 +154,9 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 	/**
 	 * Register FTP as a storage location.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
+	 *
+	 * @param array $storage_locations Storage locations.
 	 */
 	public function register_storage_location( $storage_locations ) {
 		$storage_locations[] = $this->core->ftp->get_details();
@@ -166,9 +167,9 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 	/**
 	 * Register FTP on the archive details page.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param string $filepath
+	 * @param string $filepath File path.
 	 */
 	public function single_archive_remote_option( $filepath ) {
 		$allow_upload = $this->core->ftp->is_setup();
@@ -191,7 +192,7 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string $filepath
+	 * @param string $filepath File path.
 	 */
 	public function upload_post_archiving( $filepath ) {
 		$success = $this->core->ftp->upload( $filepath );
@@ -202,7 +203,7 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 	/**
 	 * Handle the ajax request to download an FTP backup locally.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function wp_ajax_download() {
 		$error = __( 'Unable to download backup from FTP', 'bolgrid-bakcup' );
@@ -242,9 +243,12 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 		if ( $result ) {
 			$this->core->notice->add_user_notice(
 				sprintf(
-					__( '<h2>%2$s</h2><p>Backup file <strong>%1$s</strong> successfully downloaded from FTP.</p>', 'boldgrid-backup' ),
-					/* 1 */ $filename,
-					/* 2 */ __( 'BoldGrid Backup Premium - FTP Download', 'boldgrid-backup' )
+					// translators: 1: Filename.
+					esc_html__(
+						'<h2>BoldGrid Backup Premium - FTP Download</h2><p>Backup file <strong>%1$s</strong> successfully downloaded from FTP.</p>',
+						'boldgrid-backup'
+					),
+					$filename
 				),
 				'notice notice-success'
 			);
@@ -255,7 +259,7 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 	/**
 	 * Upload a file (triggered by ajax).
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	public function wp_ajax_upload() {
 		if ( ! current_user_can( 'update_plugins' ) ) {

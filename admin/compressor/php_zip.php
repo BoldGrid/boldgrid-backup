@@ -1,28 +1,29 @@
 <?php
 /**
+ * File: php_zip.php
+ *
  * PHP Zip Compressor.
  *
- * @link  http://www.boldgrid.com
+ * @link  https://www.boldgrid.com
  * @since 1.5.1
  *
  * @package    Boldgrid_Backup
- * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @subpackage Boldgrid_Backup/admin/compressor
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup Admin Compressor PHP Zip Class.
+ * Class: Boldgrid_Backup_Admin_Compressor_Php_Zip
  *
  * @since 1.5.1
  */
 class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Compressor {
-
 	/**
 	 * An array of directories we've added to the zip.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    array
 	 */
@@ -59,7 +60,7 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param Boldgrid_Backup_Admin_Core $core
+	 * @param Boldgrid_Backup_Admin_Core $core Boldgrid_Backup_Admin_Core Object.
 	 */
 	public function __construct( $core ) {
 		parent::__construct( $core );
@@ -72,9 +73,9 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 	 * created. For example, if you add wp-content/themes/pavilion/index.php the
 	 * wp-content directory (and so forth) is not explicity added to the zip.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param string $file
+	 * @param string $file A file path.
 	 */
 	public function add_dir( $file ) {
 		$add_directory = '';
@@ -99,7 +100,9 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param array $filelist See Boldgrid_Backup_Admin_Filelist::get_total_size
+	 * @see Boldgrid_Backup_Admin_Filelist::get_total_size()
+	 *
+	 * @param array $filelist File list.
 	 * @param array $info {
 	 *     An array of data about the backup archive we are generating.
 	 *
@@ -174,14 +177,16 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 		$backup_dir = $this->core->backup_dir->get();
 
 		$test_file_contents = $str = __( 'This is a test file from BoldGrid Backup. You can delete this file.', 'boldgrid-backup' );
-		$cannot_open_zip    = __( 'Unable to create zip file: %1$s', 'boldgrid-backup' );
-		$cannot_close_zip   = __( 'When testing ZipArchive functionality, we are able to create a zip file and add files to it, but we were unable to close the zip file.<br /><strong>Please be sure the following backup directory has modify permissions</strong>:<br />%1$s', 'boldgrid-backup' );
-		$safe_to_delete     = __( 'safe-to-delete', 'boldgrid-backup' );
-		$test_zip_file      = $test_zip_file = $this->core->test->test_prefix . '-zip';
-		$test_filename      = sprintf( '%1$s%5$s%2$s-%3$s-%4$s', $backup_dir, $test_zip_file, mt_rand(), $safe_to_delete, DIRECTORY_SEPARATOR );
 
-		$zip_filepath    = $test_filename . '.zip';
-		$random_filename = $test_filename . '.txt';
+		// translators: 1: A filename.
+		$cannot_open_zip = __( 'Unable to create zip file: %1$s', 'boldgrid-backup' );
+		// translators: 1: Backup directory path.
+		$cannot_close_zip = __( 'When testing ZipArchive functionality, we are able to create a zip file and add files to it, but we were unable to close the zip file.<br /><strong>Please be sure the following backup directory has modify permissions</strong>:<br />%1$s', 'boldgrid-backup' );
+		$safe_to_delete   = __( 'safe-to-delete', 'boldgrid-backup' );
+		$test_zip_file    = $test_zip_file = $this->core->test->test_prefix . '-zip';
+		$test_filename    = sprintf( '%1$s%5$s%2$s-%3$s-%4$s', $backup_dir, $test_zip_file, mt_rand(), $safe_to_delete, DIRECTORY_SEPARATOR );
+		$zip_filepath     = $test_filename . '.zip';
+		$random_filename  = $test_filename . '.txt';
 
 		$zip    = new ZipArchive();
 		$status = $zip->open( $zip_filepath, ZipArchive::CREATE );

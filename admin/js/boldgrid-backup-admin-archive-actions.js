@@ -3,7 +3,7 @@
  *
  * @summary JavaScript to handle archive actions.
  *
- * @since 1.5.4
+ * @since 1.6.0
  */
 
 /* global ajaxurl,BoldGridBackupAdminArchiveActions,jQuery */
@@ -23,7 +23,7 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 	 * This function was originally in admin-home.js as of 1.0, but moved here
 	 * as of 1.5.4.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	self.onClickDelete = function( e ) {
 		var confirmResponse,
@@ -50,7 +50,7 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 	 * This function was originally in admin-home.js as of 1.0, but moved here
 	 * as of 1.5.4.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	self.downloadArchive = function( e ) {
 		var downloadKey,
@@ -109,7 +109,7 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 	 * This function was originally in admin-home.js as of 1.0, but moved here
 	 * as of 1.5.4.
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 */
 	self.restoreArchiveConfirm = function() {
 		var confirmResponse,

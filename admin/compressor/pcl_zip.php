@@ -1,28 +1,29 @@
 <?php
 /**
+ * File: pcl_zip.php
+ *
  * Pcl Zip Compressor.
  *
- * @link  http://www.boldgrid.com
+ * @link  https://www.boldgrid.com
  * @since 1.5.1
  *
  * @package    Boldgrid_Backup
- * @subpackage Boldgrid_Backup/admin
- * @copyright  BoldGrid.com
+ * @subpackage Boldgrid_Backup/admin/compressor
+ * @copyright  BoldGrid
  * @version    $Id$
- * @author     BoldGrid.com <wpb@boldgrid.com>
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**
- * BoldGrid Backup Admin Compressor Pclzip Class.
+ * Class: Boldgrid_Backup_Admin_Compressor_Pcl_Zip
  *
  * @since 1.5.1
  */
 class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Compressor {
-
 	/**
 	 * An array of errors.
 	 *
-	 * @since  1.5.4
+	 * @since 1.6.0
 	 * @access public
 	 * @var    array
 	 */
@@ -51,7 +52,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param Boldgrid_Backup_Admin_Core $core
+	 * @param Boldgrid_Backup_Admin_Core $core Boldgrid_Backup_Admin_Core object.
 	 */
 	public function __construct( $core ) {
 		if ( ! class_exists( 'PclZip' ) ) {
@@ -75,12 +76,12 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 	 * # wp-content/plugins/
 	 * # wp-content/plugins/boldgrid/
 	 *
-	 * @since 1.5.4
+	 * @since 1.6.0
 	 *
-	 * @param  array  $list
-	 * @param  array  $contents
-	 * @param  array  $filenames
-	 * @param  string $in_dir
+	 * @param  array  $list      A list of files.
+	 * @param  array  $contents  Contents; not used here.
+	 * @param  array  $filenames Filenames.
+	 * @param  string $in_dir    Current directory.
 	 * @return array  An updated $contents.
 	 */
 	public function browse_add_dirs( $list, $contents, $filenames, $in_dir ) {
@@ -98,7 +99,6 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 					continue;
 				}
 			} else {
-
 				/*
 				 * Determine if file is in directory.
 				 *
@@ -144,7 +144,9 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param array $filelist See Boldgrid_Backup_Admin_Filelist::get_total_size
+	 * @see Boldgrid_Backup_Admin_Filelist::get_total_size()
+	 *
+	 * @param array $filelist File list.
 	 * @param array $info {
 	 *     An array of data about the backup archive we are generating.
 	 *
@@ -234,8 +236,8 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 	/**
 	 * Get the contents of a zip file.
 	 *
-	 * @param  string $filepath
-	 * @param  string $in_dir
+	 * @param  string $filepath File path.
+	 * @param  string $in_dir   Current directory.
 	 * @return array
 	 */
 	public function browse( $filepath, $in_dir = '.' ) {
@@ -271,7 +273,6 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 		 * https://pastebin.com/bjQZYcAt
 		 */
 		foreach ( $list as $key => $file ) {
-
 			/*
 			 * Calculate the parent directory this file / folder belongs to.
 			 *
@@ -300,8 +301,8 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 	 *
 	 * @since 1.5.3
 	 *
-	 * @param  string $filepath    /home/user/boldgrid_backup/archive.zip
-	 * @param  string $file        wp-content/index.php
+	 * @param  string $filepath    Archive path, such as "/home/user/boldgrid_backup/archive.zip".
+	 * @param  string $file        A file path in the archive file, such as "wp-content/index.php".
 	 * @return bool
 	 */
 	public function extract_one( $filepath, $file ) {
@@ -334,8 +335,8 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 	 *
 	 * @since 1.5.3
 	 *
-	 * @param  string $filepath /home/user/boldgrid_backup/archive.zip
-	 * @param  string $file     wp-content/index.php
+	 * @param  string $filepath    Archive path, such as "/home/user/boldgrid_backup/archive.zip".
+	 * @param  string $file        A file path in the archive file, such as "wp-content/index.php".
 	 * @return mixed False on failure, array on success {
 	 *     Accessed via $file_contentws[0].
 	 *
@@ -429,7 +430,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 				continue;
 			}
 
-			// If it's not in this format, skip it - Format: *.########-######.sql
+			// If it's not in this format, skip it - Format: "*.########-######.sql".
 			if ( 1 !== preg_match( '/\.[\d]+-[\d]+\.sql$/', $filename ) ) {
 				continue;
 			}
@@ -445,7 +446,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 	 *
 	 * @since 1.5.2
 	 *
-	 * @param string $error_info
+	 * @param  string $error_info Error message.
 	 * @return mixed False when no messages should be displayed, String when
 	 *               returning a message to the user.
 	 */
@@ -461,7 +462,8 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 			// Check for broken symlink.
 			if ( is_link( $path ) && ! $this->core->wp_filesystem->exists( $path ) ) {
 				$force_php_zip = true;
-				$messages[]    = sprintf( __( 'PclZip encountered the following broken symlink and is unable to create a backup:<br />%1$s', 'boldgrid-backup' ), $parts[1] );
+				// translators: 1: File path.
+				$messages[] = sprintf( __( 'PclZip encountered the following broken symlink and is unable to create a backup:<br />%1$s', 'boldgrid-backup' ), $parts[1] );
 			}
 		}
 
@@ -485,7 +487,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 	 *
 	 * @since 1.5
 	 *
-	 * @param  bool $display_errors
+	 * @param  bool $display_errors Display errors; default is TRUE.
 	 * @return bool
 	 */
 	public function test( $display_errors = true ) {
@@ -503,6 +505,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 		$zip_filepath       = $test_filename . '.zip';
 		$random_filename    = $test_filename . '.txt';
 
+		// translators: 1: File path.
 		$cannot_touch_file = __(
 			'PclZip test failed. We were unable to create the following test file:<br />
 			%1$s.<br />
@@ -510,6 +513,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 			'boldgrid-backup'
 		);
 
+		// translators: 1: File path.
 		$cannot_put_contents = __(
 			'PclZip test failed. We were able to create the following test file, but we were unable to modify it. were unable to modify it:<br />
 			%1$s<br />

@@ -1,14 +1,20 @@
 <?php
 /**
+ * File: boldgrid-backup-admin-mail-restore.php
+ *
  * Mail template for restoration notifications.
  *
+ * @link https://www.boldgrid.com
  * @since 1.2.2
  *
- * @package Boldgrid_Backup
+ * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin/partials
+ * @copyright  BoldGrid
+ * @version    $Id$
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
-defined( 'WPINC' ) ? : die;
+defined( 'WPINC' ) || die;
 
 /**
  * This template uses inherited variables.
@@ -19,16 +25,14 @@ defined( 'WPINC' ) ? : die;
  * @param bool $restore_ok Success of the restoration.
  * @param string $info['filepath'] The file path restored.
  */
-// Create a site identifier.
 $site_id = Boldgrid_Backup_Admin_Utility::create_site_id();
 
-// Create subject.
 $subject = sprintf(
+	// translators: 1: Site identifier.
 	esc_html__( 'Restoration completed for %s', 'boldgrid-backup' ),
 	$site_id
 );
 
-// Create message.
 $body = esc_html__( 'Hello', 'boldgrid-backup' ) . ",\n\n";
 
 if ( $dryrun ) {
@@ -45,6 +49,7 @@ if ( $restore_ok ) {
 }
 
 $body .= sprintf(
+	// translators: 1: Site identifier.
 	__( ' for %s', 'boldgrid-backup' ),
 	$site_id
 ) . ".\n\n";
@@ -52,11 +57,13 @@ $body .= sprintf(
 $body .= esc_html__( 'Restoration details', 'boldgrid-backup' ) . ":\n";
 
 $body .= sprintf(
+	// translators: 1: Archive file path.
 	esc_html__( 'Archive file path: %s', 'boldgrid-backup' ),
 	$info['filepath']
 ) . "\n";
 
 $body .= sprintf(
+	// translators: 1: Archive file size.
 	esc_html__( 'Archive file size: %s', 'boldgrid-backup' ),
 	Boldgrid_Backup_Admin_Utility::bytes_to_human( $info['filesize'] )
 ) . "\n";
