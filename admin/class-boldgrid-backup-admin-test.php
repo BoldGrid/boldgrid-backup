@@ -640,7 +640,13 @@ class Boldgrid_Backup_Admin_Test {
 			'has_url_fopen' => false,
 		);
 
-		$cmd = 'php -f ' . trailingslashit( BOLDGRID_BACKUP_PATH ) . 'cron/cli-support.php';
+		$cmd = '';
+
+		if ( ! $this->is_windows() ) {
+			$cmd .= 'env -i ';
+		}
+
+		$cmd .= 'php -qf ' . trailingslashit( BOLDGRID_BACKUP_PATH ) . 'cron/cli-support.php';
 
 		$result = $this->core->execute_command( $cmd );
 		$result = json_decode( $result, true );
