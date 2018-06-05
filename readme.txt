@@ -29,7 +29,9 @@ WordPress backup and restoration with update protection.
 == Changelog ==
 
 = 1.6.3 In progress =
-* Update: Satisfying CodeSniffer.
+
+* Update:  Satisfying CodeSniffer.
+* Bug fix: System Cron detection failed in some environments.
 
 = 1.6.2 =
 
