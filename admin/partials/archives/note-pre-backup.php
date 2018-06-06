@@ -28,7 +28,7 @@ defined( 'WPINC' ) || die;
 	$link = sprintf(
 		wp_kses(
 			// translators: 1: URL address.
-			esc_html__(
+			__(
 				'<strong>Note</strong>: Backups use resources and <a href="%s" target="_blank">must pause your site</a> momentarily.  Use sparingly. ',
 				'boldgrid-backup'
 			),

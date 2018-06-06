@@ -905,7 +905,7 @@ class Boldgrid_Backup_Admin_Cron {
 	 */
 	public function is_valid_call() {
 		$backup_id_match = ! empty( $_GET['id'] ) &&
-			$this->core->get_backup_identifier() === $_GET['id'];
+			$this->core->get_backup_identifier() === sanitize_key( $_GET['id'] );
 
 		$cron_secret_match = ! empty( $_GET['secret'] ) &&
 			$this->get_cron_secret() === $_GET['secret'];
