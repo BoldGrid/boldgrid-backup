@@ -648,27 +648,32 @@ class Boldgrid_Backup_Admin_Test {
 		$cmds = array(
 			'php -qf ' . trailingslashit( BOLDGRID_BACKUP_PATH ) . 'cron/cli-support.php',
 		);
+		
 		if ( ! $this->is_windows() && $this->core->execute_command( 'env' ) ) {
-			$cmds[1] = 'env -i ' . $cmds[0];
+			// Some environments may run PHP in CGI mode; try to force CLI, by preferencing paths.
+			$cmds[1] = 'env PATH=/usr/local/bin:/usr/bin:/bin ' . $cmds[0];
 		}
 
 		// Find a command that gives us an array.
-		foreach( $cmds as $cmd ) {
+		foreach ( $cmds as $cmd ) {
 			$result = $this->core->execute_command( $cmd );
+			
 			$result = json_decode( $result, true );
 
-			if( ! is_array( $result ) ) {
+			if ( ! is_array( $result ) ) {
 				continue;
 			}
+			
 			break;
 		}
 
-		$result = is_array( $result ) ? $result : $default;
+		$result = is_array( $result ) ? wp_parse_args( $result, $default ) : $default;
+		
 		$result['can_remote_get'] = $result['has_curl_ssl'] || $result['has_url_fopen'];
 
 		return $result;
 	}
-
+	
 	/**
 	 * Get database size.
 	 *
