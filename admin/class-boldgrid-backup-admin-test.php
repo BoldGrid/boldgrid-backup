@@ -643,7 +643,7 @@ class Boldgrid_Backup_Admin_Test {
 		$cmd = '';
 
 		if ( ! $this->is_windows() ) {
-			$cmd .= 'env -i ';
+			//$cmd .= 'env -i ';
 		}
 
 		$cmd .= 'php -qf ' . trailingslashit( BOLDGRID_BACKUP_PATH ) . 'cron/cli-support.php';
