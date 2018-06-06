@@ -649,6 +649,10 @@ class Boldgrid_Backup_Admin_Test {
 		$cmd .= 'php -qf ' . trailingslashit( BOLDGRID_BACKUP_PATH ) . 'cron/cli-support.php';
 
 		$result = $this->core->execute_command( $cmd );
+
+		// tmp - travis ci testing
+		fwrite( STDERR, "\n" . '$result = ' . print_r( $result, 1 ) . "\n" );
+
 		$result = json_decode( $result, true );
 		$result = is_array( $result ) ? $result : $default;
 
