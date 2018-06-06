@@ -640,27 +640,26 @@ class Boldgrid_Backup_Admin_Test {
 			'has_url_fopen' => false,
 		);
 
-		$cmd = '';
-
+		// Configure an array of commands to run.
+		$cmds = array(
+			'php -qf ' . trailingslashit( BOLDGRID_BACKUP_PATH ) . 'cron/cli-support.php',
+		);
 		if ( ! $this->is_windows() && $this->core->execute_command( 'env' ) ) {
-			$cmd .= 'env -i ';
+			$cmds[1] = 'env -i ' . $cmds[0];
 		}
 
-		$cmd .= 'php -qf ' . trailingslashit( BOLDGRID_BACKUP_PATH ) . 'cron/cli-support.php';
+		// Find a command that gives us an array.
+		foreach( $cmds as $cmd ) {
+			$result = $this->core->execute_command( $cmd );
+			$result = json_decode( $result, true );
 
-		$result = $this->core->execute_command( $cmd );
+			if( ! is_array( $result ) ) {
+				continue;
+			}
+			break;
+		}
 
-		// tmp - travis ci testing
-		fwrite( STDERR, "\n" . '$result = ' . print_r(
-			array(
-				'$cmd' => $cmd,
-				'$result' => $result,
-			)
-			, true ) . "\n" );
-
-		$result = json_decode( $result, true );
 		$result = is_array( $result ) ? $result : $default;
-
 		$result['can_remote_get'] = $result['has_curl_ssl'] || $result['has_url_fopen'];
 
 		return $result;
