@@ -642,8 +642,8 @@ class Boldgrid_Backup_Admin_Test {
 
 		$cmd = '';
 
-		if ( ! $this->is_windows() ) {
-			//$cmd .= 'env -i ';
+		if ( ! $this->is_windows() && $this->core->execute_command( 'env' ) ) {
+			$cmd .= 'env -i ';
 		}
 
 		$cmd .= 'php -qf ' . trailingslashit( BOLDGRID_BACKUP_PATH ) . 'cron/cli-support.php';
@@ -651,7 +651,12 @@ class Boldgrid_Backup_Admin_Test {
 		$result = $this->core->execute_command( $cmd );
 
 		// tmp - travis ci testing
-		fwrite( STDERR, "\n" . '$result = ' . print_r( $result, 1 ) . "\n" );
+		fwrite( STDERR, "\n" . '$result = ' . print_r(
+			array(
+				'$cmd' => $cmd,
+				'$result' => $result,
+			)
+			, true ) . "\n" );
 
 		$result = json_decode( $result, true );
 		$result = is_array( $result ) ? $result : $default;
