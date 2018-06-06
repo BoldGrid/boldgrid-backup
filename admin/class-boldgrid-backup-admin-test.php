@@ -636,35 +636,29 @@ class Boldgrid_Backup_Admin_Test {
 	 */
 	public function get_cli_support() {
 		$default = array(
-			'has_curl_ssl' => false,
+			'has_curl_ssl'  => false,
 			'has_url_fopen' => false,
 		);
 
-		// Configure an array of commands to run.
-		$cmds = array(
-			'php -qf ' . trailingslashit( BOLDGRID_BACKUP_PATH ) . 'cron/cli-support.php',
-		);
+		$cmd = '';
+
 		if ( ! $this->is_windows() && $this->core->execute_command( 'env' ) ) {
-			$cmds[1] = 'env -i ' . $cmds[0];
+			$cmd .= 'env PATH=/usr/local/bin:/usr/bin:/bin ';
 		}
 
-		// Find a command that gives us an array.
-		foreach( $cmds as $cmd ) {
-			$result = $this->core->execute_command( $cmd );
-			$result = json_decode( $result, true );
+		$cmd .= 'php -qf ' . trailingslashit( BOLDGRID_BACKUP_PATH ) . 'cron/cli-support.php';
 
-			if( ! is_array( $result ) ) {
-				continue;
-			}
-			break;
-		}
+		$result = $this->core->execute_command( $cmd );
 
-		$result = is_array( $result ) ? $result : $default;
+		$result = json_decode( $result, true );
+
+		$result = is_array( $result ) ? wp_parse_args( $result, $default ) : $default;
+
 		$result['can_remote_get'] = $result['has_curl_ssl'] || $result['has_url_fopen'];
 
 		return $result;
 	}
-
+	
 	/**
 	 * Get database size.
 	 *
