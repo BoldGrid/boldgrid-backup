@@ -30,6 +30,7 @@ WordPress backup and restoration with update protection.
 
 = 1.6.3 In progress =
 * Bug fix: System Cron detection failed in some environments.
+* Update: Clarified verbiage on setting up Premium connect key.
 
 = 1.6.2 =
 
