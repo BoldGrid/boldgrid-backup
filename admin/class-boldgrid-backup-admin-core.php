@@ -485,7 +485,9 @@ class Boldgrid_Backup_Admin_Core {
 	 * @global $wp_filesystem.
 	 */
 	public function __construct() {
+		WP_Filesystem();
 		global $wp_filesystem;
+
 		global $pagenow;
 
 		$this->doing_cron = ( defined( 'DOING_CRON' ) && DOING_CRON ) || isset( $_GET['doing_wp_cron'] );
@@ -493,6 +495,7 @@ class Boldgrid_Backup_Admin_Core {
 		$this->doing_wp_cron = ! empty( $_SERVER['SCRIPT_FILENAME'] ) && $_SERVER['SCRIPT_FILENAME'] === trailingslashit( ABSPATH ) . 'wp-cron.php';
 
 		$this->wp_filesystem = $wp_filesystem;
+
 		$this->pagenow = $pagenow;
 
 		// Instantiate Boldgrid_Backup_Admin_Settings.
