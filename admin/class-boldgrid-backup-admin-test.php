@@ -648,32 +648,37 @@ class Boldgrid_Backup_Admin_Test {
 		$cmds = array(
 			'php -qf ' . trailingslashit( BOLDGRID_BACKUP_PATH ) . 'cron/cli-support.php',
 		);
-		
+
 		if ( ! $this->is_windows() && $this->core->execute_command( 'env' ) ) {
 			// Some environments may run PHP in CGI mode; try to force CLI, by preferencing paths.
-			$cmds[1] = 'env PATH=/usr/local/bin:/usr/bin:/bin ' . $cmds[0];
+			$cmds[] = 'env PATH=/usr/local/bin:/usr/bin:/bin ' . $cmds[0];
+
+			if ( $this->is_ea4_cli() ) {
+				// If is a cPanel EA4 server with php-cli, then try using env first.
+				sort( $cmds );
+			}
 		}
 
 		// Find a command that gives us an array.
 		foreach ( $cmds as $cmd ) {
 			$result = $this->core->execute_command( $cmd );
-			
+
 			$result = json_decode( $result, true );
 
 			if ( ! is_array( $result ) ) {
 				continue;
 			}
-			
+
 			break;
 		}
 
 		$result = is_array( $result ) ? wp_parse_args( $result, $default ) : $default;
-		
+
 		$result['can_remote_get'] = $result['has_curl_ssl'] || $result['has_url_fopen'];
 
 		return $result;
 	}
-	
+
 	/**
 	 * Get database size.
 	 *
@@ -775,5 +780,23 @@ class Boldgrid_Backup_Admin_Test {
 		return $this->is_windows() &&
 				! empty( $_SERVER['SERVER_SOFTWARE'] ) &&
 				false !== strpos( $_SERVER['SERVER_SOFTWARE'], 'IIS' );
+	}
+
+	/**
+	 * Determine if this server has cPanel EasyApache 4 with php-cli installed.
+	 *
+	 * @since 1.6.3
+	 *
+	 * @link https://developer.wordpress.org/reference/classes/wp_filesystem_direct/
+	 *
+	 * @return bool
+	 */
+	public function is_ea4_cli() {
+		$is_ea4 = $this->core->wp_filesystem->exists( '/etc/cpanel/ea4/is_ea4' ) ||
+			$this->core->wp_filesystem->is_dir( '/etc/cpanel/ea4' );
+
+		$has_php_cli = $this->core->wp_filesystem->exists( '/usr/local/bin/php' );
+
+		return	$is_ea4 && $has_php_cli;
 	}
 }
