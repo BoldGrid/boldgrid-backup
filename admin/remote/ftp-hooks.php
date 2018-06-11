@@ -144,7 +144,7 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 			'filepath'     => $info['filepath'],
 			'action'       => 'boldgrid_backup_' . $this->core->ftp->key . '_upload_post_archive',
 			'action_data'  => $info['filepath'],
-			// translators: 1: FTP accoun title/name.
+			// translators: 1: FTP account title/name.
 			'action_title' => sprintf( __( 'Upload backup file to %1$s', 'boldgrid-backup' ), $this->core->ftp->title ),
 		);
 
