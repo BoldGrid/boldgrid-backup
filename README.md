@@ -4,7 +4,7 @@
 **Requires at least:** 4.4
 **Tested up to:** 4.9.6
 **Requires PHP:** 5.3
-**Stable tag:** 1.6.2
+**Stable tag:** 1.6.3
 **License:** GPLv2 or later
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -27,6 +27,13 @@ WordPress backup and restoration with update protection.
 1. Activate the plugin through the Plugins menu in WordPress.
 
 ## Changelog ##
+
+### 1.6.3 ###
+
+Release Date: June 11th, 2018
+
+* Bug fix: System Cron detection failed in some environments.
+* Update: Clarified verbiage on setting up Premium connect key.
 
 ### 1.6.2 ###
 
