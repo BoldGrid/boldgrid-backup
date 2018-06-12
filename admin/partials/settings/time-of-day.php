@@ -48,7 +48,7 @@ ob_start();
 				?>
 			<option value='<?php echo esc_attr( $x ); ?>'
 				<?php
-				if ( ! empty( $settings['schedule']['tod_m'] ) && $x == $settings['schedule']['tod_m'] ) {
+				if ( ! empty( $settings['schedule']['tod_m'] ) && $x === $settings['schedule']['tod_m'] ) {
 					echo ' selected';
 				}
 				?>

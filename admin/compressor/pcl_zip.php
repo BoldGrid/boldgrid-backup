@@ -95,7 +95,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 				$top_dir = explode( '/', $file['filename'] );
 				$top_dir = $top_dir[0];
 
-				if ( empty( $top_dir ) || in_array( $top_dir, $filenames ) ) {
+				if ( empty( $top_dir ) || in_array( $top_dir, $filenames, true ) ) {
 					continue;
 				}
 			} else {
@@ -122,7 +122,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 				$next_dir = explode( '/', $next_dir );
 				$next_dir = $in_dir . '/' . $next_dir[0];
 
-				if ( $next_dir === $file['filename'] || in_array( $next_dir, $filenames ) ) {
+				if ( $next_dir === $file['filename'] || in_array( $next_dir, $filenames, true ) ) {
 					continue;
 				}
 			}

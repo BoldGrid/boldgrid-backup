@@ -2588,12 +2588,9 @@ class Boldgrid_Backup_Admin_Core {
 	 * @param int $time_limit Limit in seconds.
 	 */
 	public function set_time_limit( $time_limit = 900 ) {
-		set_time_limit(
-			( ( $max_execution_time = ini_get( 'max_execution_time' ) ) > $time_limit ?
-			$max_execution_time :
-			$time_limit
-			)
-		);
+		$max_execution_time = ini_get( 'max_execution_time' );
+
+		set_time_limit( ( $max_execution_time > $time_limit ? $max_execution_time : $time_limit ) );
 	}
 
 	/**

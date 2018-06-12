@@ -169,7 +169,7 @@ class Boldgrid_Backup_Admin_Db_Omit {
 		$exclude_tables = $this->get_excluded_tables();
 
 		foreach ( $prefixed_tables as $key => $table ) {
-			if ( in_array( $table, $exclude_tables ) ) {
+			if ( in_array( $table, $exclude_tables, true ) ) {
 				unset( $prefixed_tables[ $key ] );
 			}
 		}
@@ -201,7 +201,7 @@ class Boldgrid_Backup_Admin_Db_Omit {
 		 * If the table we want to
 		 */
 		foreach ( $all_tables as $table ) {
-			if ( ! in_array( $table, $include_tables ) ) {
+			if ( ! in_array( $table, $include_tables, true ) ) {
 				$exclude_tables[] = $table;
 			}
 		}
@@ -284,7 +284,7 @@ class Boldgrid_Backup_Admin_Db_Omit {
 		$return = '';
 
 		foreach ( $tables as $table ) {
-			$checked = in_array( $table, $exclude_tables ) ? '' : 'checked';
+			$checked = in_array( $table, $exclude_tables, true ) ? '' : 'checked';
 			$return .= sprintf(
 				'<div title="%1$s"><input value="%1$s" name="include_tables[]" type="checkbox" %2$s /> %1$s</div>',
 				esc_html( $table ),

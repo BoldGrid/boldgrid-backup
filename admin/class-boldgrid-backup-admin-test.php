@@ -601,7 +601,9 @@ class Boldgrid_Backup_Admin_Test {
 	 */
 	private function get_wp_size() {
 		// Save time, use transients.
-		if ( false !== ( $transient = get_transient( 'boldgrid_backup_wp_size' ) ) ) {
+		$transient = get_transient( 'boldgrid_backup_wp_size' );
+
+		if ( false !== $transient ) {
 			return $transient;
 		}
 
@@ -692,7 +694,9 @@ class Boldgrid_Backup_Admin_Test {
 	 */
 	public function get_database_size() {
 		// Save some time, get transient.
-		if ( false !== ( $transient = get_transient( 'boldgrid_backup_db_size' ) ) ) {
+		$transient = get_transient( 'boldgrid_backup_db_size' );
+
+		if ( false !== $transient ) {
 			return $transient;
 		}
 

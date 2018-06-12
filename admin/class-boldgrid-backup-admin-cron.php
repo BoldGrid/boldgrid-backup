@@ -553,7 +553,9 @@ class Boldgrid_Backup_Admin_Cron {
 
 		$all_entries = $this->get_all();
 
-		if ( ( $key = array_search( $entry, $all_entries ) ) !== false ) {
+		$key = array_search( $entry, $all_entries, true );
+
+		if ( false !== $key ) {
 			unset( $all_entries[ $key ] );
 		}
 
@@ -573,7 +575,7 @@ class Boldgrid_Backup_Admin_Cron {
 	public function entry_exists( $entry ) {
 		$all_entries = $this->get_all();
 
-		return false !== array_search( $entry, $all_entries );
+		return false !== array_search( $entry, $all_entries, true );
 	}
 
 	/**
