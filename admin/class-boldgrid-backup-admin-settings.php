@@ -49,7 +49,7 @@ class Boldgrid_Backup_Admin_Settings {
 		// Save the Boldgrid_Backup_Admin_Core object as a class property.
 		$this->core = $core;
 
-		$this->is_saving_settings = isset( $_POST['save_time'] );
+		$this->is_saving_settings = isset( $_POST['save_time'] ); // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 	}
 
 	/**
@@ -65,12 +65,12 @@ class Boldgrid_Backup_Admin_Settings {
 	public function get_dow_count() {
 		$count = 0;
 
-		if ( ! isset( $_POST ) || ! is_array( $_POST ) ) {
+		if ( ! isset( $_POST ) || ! is_array( $_POST ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			return 0;
 		}
 
 		// Loop through each $_POST value and check if the key begins with dow_.
-		foreach ( $_POST as $k => $v ) {
+		foreach ( $_POST as $k => $v ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			if ( substr( $k, 0, 4 ) === 'dow_' ) {
 				$count++;
 			}

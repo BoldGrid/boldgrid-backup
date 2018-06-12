@@ -18,7 +18,7 @@
 
 defined( 'WPINC' ) || die;
 
-$is_restore   = ! empty( $_POST['restore_now'] ) && '1' === $_POST['restore_now'];
+$is_restore   = ! empty( $_POST['restore_now'] ) && '1' === $_POST['restore_now']; // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 $is_success   = ! empty( $archive_info ) && empty( $archive_info['error'] );
 $redirect_url = admin_url( 'admin.php?page=boldgrid-backup' );
 
@@ -135,7 +135,9 @@ if ( ! empty( $archive_info ) ) {
 			'header'  => sprintf(
 				'%1$s - %2$s',
 				__( 'BoldGrid Backup', 'boldgrid-backup' ),
-				empty( $_POST['restore_now'] ) ? __( 'Error creating archive', 'boldgrid-backup' ) : __( 'Error restoring archive', 'boldgrid-backup' )
+				empty( $_POST['restore_now'] ) ? // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+					__( 'Error creating archive', 'boldgrid-backup' ) :
+					__( 'Error restoring archive', 'boldgrid-backup' )
 			),
 		);
 	}

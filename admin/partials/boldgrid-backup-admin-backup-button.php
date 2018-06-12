@@ -14,14 +14,16 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP
+// phpcs:disable WordPress.VIP, WordPress.CSRF.NonceVerification.NoNonceVerification
 
 defined( 'WPINC' ) || die;
 
 $core = isset( $this->core ) ? $this->core : $this;
 
 // Are we loading the "protect now" form via ajax?
-$update_protection_ajax = ! empty( $_POST['action'] ) && 'boldgrid_backup_get_protect_notice' === $_POST['action'] && ! empty( $_POST['update_protection'] );
+$update_protection_ajax = ! empty( $_POST['action'] ) &&
+	'boldgrid_backup_get_protect_notice' === $_POST['action'] &&
+	! empty( $_POST['update_protection'] );
 
 return sprintf(
 	'<div id="backup-site-now-section">

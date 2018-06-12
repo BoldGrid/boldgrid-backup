@@ -895,11 +895,14 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @return bool
 	 */
 	public function is_valid_call() {
+		// phpcs:disable WordPress.CSRF.NonceVerification.NoNonceVerification
 		$backup_id_match = ! empty( $_GET['id'] ) &&
 			$this->core->get_backup_identifier() === sanitize_key( $_GET['id'] );
 
 		$cron_secret_match = ! empty( $_GET['secret'] ) &&
 			$this->get_cron_secret() === $_GET['secret'];
+
+		// phpcs:enable WordPress.CSRF.NonceVerification.NoNonceVerification
 
 		return current_user_can( 'update_plugins' ) || ( $backup_id_match && $cron_secret_match );
 	}

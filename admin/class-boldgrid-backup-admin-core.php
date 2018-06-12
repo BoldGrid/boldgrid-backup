@@ -494,7 +494,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		global $pagenow;
 
-		$this->doing_cron    = ( defined( 'DOING_CRON' ) && DOING_CRON ) || isset( $_GET['doing_wp_cron'] );
+		$this->doing_cron    = ( defined( 'DOING_CRON' ) && DOING_CRON ) || isset( $_GET['doing_wp_cron'] ); // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 		$this->doing_ajax    = is_admin() && defined( 'DOING_AJAX' ) && DOING_AJAX;
 		$this->doing_wp_cron = ! empty( $_SERVER['SCRIPT_FILENAME'] ) &&
 			trailingslashit( ABSPATH ) . 'wp-cron.php' === $_SERVER['SCRIPT_FILENAME'];
@@ -1515,7 +1515,7 @@ class Boldgrid_Backup_Admin_Core {
 		// Check if functional.
 		if ( ! $this->test->run_functionality_tests() ) {
 			// Display an error notice, if not already on the test page.
-			if ( ! isset( $_GET['page'] ) || 'boldgrid-backup-test' !== $_GET['page'] ) {
+			if ( ! isset( $_GET['page'] ) || 'boldgrid-backup-test' !== $_GET['page'] ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 				// Display an error notice.
 				$this->notice->functionality_fail_notice();
 			}
@@ -2074,7 +2074,7 @@ class Boldgrid_Backup_Admin_Core {
 		$restore_ok = true;
 
 		// If a restoration was not requested, then abort.
-		if ( empty( $_POST['restore_now'] ) ) {
+		if ( empty( $_POST['restore_now'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			return array(
 				'error' => esc_html__( 'Invalid restore_now value.', 'boldgrid-backup' ),
 			);
@@ -2092,7 +2092,7 @@ class Boldgrid_Backup_Admin_Core {
 		$archive_filename = null;
 
 		// Validate archive_key.
-		if ( isset( $_POST['archive_key'] ) && is_numeric( $_POST['archive_key'] ) ) {
+		if ( isset( $_POST['archive_key'] ) && is_numeric( $_POST['archive_key'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			$archive_key = (int) $_POST['archive_key'];
 		} else {
 			return array(
@@ -2101,7 +2101,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Validate archive_filename.
-		if ( ! empty( $_POST['archive_filename'] ) ) {
+		if ( ! empty( $_POST['archive_filename'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			$archive_filename = sanitize_file_name( $_POST['archive_filename'] );
 		} else {
 			return array(

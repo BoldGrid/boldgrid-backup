@@ -12,7 +12,11 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP
+/*
+ * AJAX callback functions in this class have their nonce verified by authorize() in this class.
+ *
+ * phpcs:disable WordPress.VIP, WordPress.CSRF.NonceVerification.NoNonceVerification
+ */
 
 /**
  * Class: Boldgrid_Backup_Admin_Archive_Browser
@@ -54,7 +58,7 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 		}
 
 		if ( ! check_ajax_referer( 'boldgrid_backup_remote_storage_upload', 'security', false ) ) {
-			wp_send_json_error( __( 'Invalid nonce.', 'boldgrid-backup' ) );
+			wp_send_json_error( __( 'Invalid nonce; security check failed.', 'boldgrid-backup' ) );
 		}
 	}
 

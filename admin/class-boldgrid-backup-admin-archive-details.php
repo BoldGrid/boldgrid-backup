@@ -124,7 +124,7 @@ class Boldgrid_Backup_Admin_Archive_Details {
 	 * @since 1.5.1
 	 */
 	public function render_archive() {
-		if ( ! empty( $_POST['delete_now'] ) ) {
+		if ( ! empty( $_POST['delete_now'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			$this->core->delete_archive_file();
 		}
 
@@ -133,7 +133,7 @@ class Boldgrid_Backup_Admin_Archive_Details {
 
 		$archive_found = false;
 
-		$filename = ! empty( $_GET['filename'] ) ? sanitize_file_name( $_GET['filename'] ) : false;
+		$filename = ! empty( $_GET['filename'] ) ? sanitize_file_name( $_GET['filename'] ) : false; // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 		if ( ! $filename ) {
 			echo esc_attr__( 'No archive specified.', 'boldgrid-backup' );
 			return;

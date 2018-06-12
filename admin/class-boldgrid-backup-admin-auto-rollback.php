@@ -123,7 +123,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		$this->core = $core;
 
 		$this->updating_core = 'update-core.php' === $this->core->pagenow &&
-			! empty( $_GET['action'] ) && 'do-core-upgrade' === $_GET['action'];
+			! empty( $_GET['action'] ) && 'do-core-upgrade' === $_GET['action']; // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 
 		$this->on_update_page = in_array( $this->core->pagenow, $this->update_pages, true );
 	}
@@ -374,10 +374,9 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 * @return null
 	 */
 	public function notice_countdown_show() {
-
 		// Process GET / POST info.
-		$action      = ! empty( $_GET['action'] ) ? sanitize_key( $_GET['action'] ) : null;
-		$restore_now = ! empty( $_POST['restore_now'] );
+		$action      = ! empty( $_GET['action'] ) ? sanitize_key( $_GET['action'] ) : null; // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		$restore_now = ! empty( $_POST['restore_now'] ); // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
 		$deadline         = ! empty( $pending_rollback['deadline'] ) ? $pending_rollback['deadline'] : null;
@@ -924,7 +923,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		 * update-core.php?action=do-theme-upgrade
 		 * Then there's no need to show a message.
 		 */
-		if ( ! empty( $_GET['action'] ) ) {
+		if ( ! empty( $_GET['action'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			return;
 		}
 

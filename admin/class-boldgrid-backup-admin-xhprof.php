@@ -63,7 +63,7 @@ class Boldgrid_Backup_Admin_Xhprof {
 	 */
 	private function xhprof_enable() {
 		// If the action is "heartbeat", then abort.
-		if ( ! empty( $_POST['action'] ) && 'heartbeat' === $_POST['action'] ) {
+		if ( ! empty( $_POST['action'] ) && 'heartbeat' === $_POST['action'] ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			return false;
 		}
 

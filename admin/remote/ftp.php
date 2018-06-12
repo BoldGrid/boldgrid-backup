@@ -429,6 +429,8 @@ class Boldgrid_Backup_Admin_Ftp {
 			),
 		);
 
+		// phpcs:disable WordPress.CSRF.NonceVerification.NoNonceVerification
+
 		foreach ( $values as $value ) {
 			$key      = $value['key'];
 			$callback = ! empty( $value['callback'] ) ? $value['callback'] : null;
@@ -446,6 +448,8 @@ class Boldgrid_Backup_Admin_Ftp {
 				$data[ $key ] = $callback( $data[ $key ] );
 			}
 		}
+
+		// phpcs:enable WordPress.CSRF.NonceVerification.NoNonceVerification
 
 		return $data;
 	}

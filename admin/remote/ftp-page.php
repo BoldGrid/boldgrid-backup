@@ -96,7 +96,7 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 		// Post data, used by default or when updating settings.
 		$post_data = $this->core->ftp->get_from_post();
 
-		$action = ! empty( $_POST['action'] ) ? sanitize_key( $_POST['action'] ) : null;
+		$action = ! empty( $_POST['action'] ) ? sanitize_key( $_POST['action'] ) : null; // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 
 		switch ( $action ) {
 			case 'save':
@@ -158,7 +158,7 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 			return false;
 		}
 
-		if ( empty( $_POST ) ) {
+		if ( empty( $_POST ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			return false;
 		}
 

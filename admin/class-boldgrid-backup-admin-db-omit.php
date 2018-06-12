@@ -133,7 +133,7 @@ class Boldgrid_Backup_Admin_Db_Omit {
 
 		if ( $this->core->is_archiving_update_protection || $backup_now_full || $this->core->pre_auto_update ) {
 			$excluded_tables = array();
-		} elseif ( $this->core->is_backup_now && isset( $_POST['include_tables'] ) ) {
+		} elseif ( $this->core->is_backup_now && isset( $_POST['include_tables'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			$excluded_tables = $this->get_from_post();
 		} else {
 			$settings = $this->core->settings->get_settings();
@@ -190,7 +190,7 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	public function get_from_post() {
 		$exclude_tables = array();
 
-		$include_tables = ! empty( $_POST['include_tables'] ) ?
+		$include_tables = ! empty( $_POST['include_tables'] ) ? // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			array_map( 'sanitize_text_field', $_POST['include_tables'] ) : array();
 
 		$all_tables = $this->core->db_get->prefixed();
@@ -219,7 +219,7 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	public function get_post_type() {
 		$key = 'table_inclusion_type';
 
-		return ! empty( $_POST[ $key ] ) && in_array( $_POST[ $key ], $this->valid_types, true ) ?
+		return ! empty( $_POST[ $key ] ) && in_array( $_POST[ $key ], $this->valid_types, true ) ? // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			sanitize_key( $_POST[ $key ] ) : null;
 	}
 

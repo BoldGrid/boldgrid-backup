@@ -12,7 +12,11 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP
+/*
+ * AJAX callback functions in this class have their nonce verified by authorize() in this class.
+ *
+ * phpcs:disable WordPress.VIP, WordPress.CSRF.NonceVerification.NoNonceVerification
+ */
 
 /**
  * Class: Boldgrid_Backup_Admin_Ftp_Hooks

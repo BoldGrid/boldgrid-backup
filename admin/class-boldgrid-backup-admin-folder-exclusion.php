@@ -12,7 +12,7 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP
+// phpcs:disable WordPress.VIP, WordPress.CSRF.NonceVerification.NoNonceVerification
 
 /**
  * Class: Boldgrid_Backup_Admin_Folder_Exclusion

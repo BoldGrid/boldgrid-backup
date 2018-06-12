@@ -608,7 +608,7 @@ class Boldgrid_Backup_Admin_Test {
 		}
 
 		// Avoid timeout caused when node_modules exist. Return 0 bytes.
-		if ( empty( $_GET['skip_node_modules'] ) ) {
+		if ( empty( $_GET['skip_node_modules'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			$node_modules_found = $this->node_modules_warning();
 			if ( true === $node_modules_found ) {
 				return 0;

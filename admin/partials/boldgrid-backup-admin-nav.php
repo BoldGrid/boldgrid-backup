@@ -20,6 +20,7 @@ defined( 'WPINC' ) || die;
 
 $active = 'nav-tab-active';
 
+// phpcs:disable WordPress.CSRF.NonceVerification.NoNonceVerification
 $navs = array(
 	array(
 		'title' => __( 'Backups', 'boldgrid-backup' ),
@@ -42,6 +43,7 @@ $navs = array(
 		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup-tools' === $_GET['page'] ? $active : '',
 	),
 );
+// phpcs:enable WordPress.CSRF.NonceVerification.NoNonceVerification
 
 /**
  * Allow the update of our nav menu items.
