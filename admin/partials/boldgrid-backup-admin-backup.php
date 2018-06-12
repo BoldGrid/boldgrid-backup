@@ -53,7 +53,9 @@ if ( $is_restore && $is_success ) {
 	 * to see it. We'll take care of the refresh for the user.
 	 */
 	if ( ! wp_doing_ajax() ) {
-		printf( '<script type="text/javascript">window.location.href = "%1$s";</script>', $redirect_url );
+		?>
+		<script type="text/javascript">window.location.href = "<?php echo esc_url( $redirect_url ); ?>";</script>
+		<?php
 		return;
 	}
 }

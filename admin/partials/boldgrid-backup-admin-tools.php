@@ -52,7 +52,6 @@ $col_container = apply_filters( 'Boldgrid\Library\Ui\render_col_container', $sec
 	<h1><?php esc_html_e( 'BoldGrid Backup and Restore Settings', 'boldgrid-backup' ); ?></h1>
 
 	<?php
-	echo $nav;
-	echo $col_container;
+	echo $nav . $col_container; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 	?>
 </div>

@@ -107,7 +107,8 @@ class Boldgrid_Backup_Admin_Notice {
 				</div>',
 				/* 1 */ $notice['class'],
 				/* 2 */ $this->add_container( $notice['message'] ),
-				/* 3 */ ! empty( $notice['heading'] ) ? sprintf( '<h2 class="header-notice">%1$s</h2>', $notice['heading'] ) : ''
+				/* 3 */ ! empty( $notice['heading'] ) ?
+					sprintf( '<h2 class="header-notice">%1$s</h2>', $notice['heading'] ) : '' // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 			);
 		}
 
@@ -127,9 +128,7 @@ class Boldgrid_Backup_Admin_Notice {
 			return;
 		}
 
-		$markup = $this->get_notice_markup( $class, $message );
-
-		echo $markup;
+		echo $this->get_notice_markup( $class, $message ); // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
 		$this->displayed_messages[] = $message;
 	}

@@ -120,7 +120,7 @@ wp_nonce_field( 'boldgrid_backup_settings' );
 	<h1><?php esc_html_e( 'BoldGrid Backup and Restore Settings', 'boldgrid-backup' ); ?></h1>
 
 	<?php
-	echo $nav;
+	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
 	/*
 	 * Print this text:
@@ -141,17 +141,17 @@ wp_nonce_field( 'boldgrid_backup_settings' );
 		),
 		esc_url( $url )
 	);
-	echo '<p>' . $link . '</p>';
+	echo '<p>' . esc_url( $link ) . '</p>';
 	?>
 
 	<hr />
 
 	<form id='schedule-form' method='post'>
 	<?php
-		echo $col_container;
+		echo $col_container; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 		wp_nonce_field( 'boldgrid-backup-settings', 'settings_auth' );
-		printf( '<input type="hidden" name="save_time" value="%1$s" />', time() );
 	?>
+		<input type="hidden" name="save_time" value="<?php echo esc_attr( time() ); ?>" />
 	</form>
 
 </div>

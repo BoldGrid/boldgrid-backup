@@ -50,8 +50,8 @@ $is_retention_set = ( isset( $settings['retention_count'] ) );
 
 				printf(
 					'<option value="%1$d" %2$s>%1$d</option>',
-					$x,
-					$selected
+					esc_attr( $x ),
+					esc_attr( $selected )
 				);
 			}
 			?>

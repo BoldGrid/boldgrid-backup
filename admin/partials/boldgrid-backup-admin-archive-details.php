@@ -249,4 +249,4 @@ $page = sprintf(
 	/* 6 */ $remote_meta_box
 );
 
-echo $page;
+echo $page; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped

@@ -28,7 +28,7 @@ ob_start();
 			<tr>
 				<th><?php esc_html_e( 'Notification email address', 'boldgrid-backup' ); ?></th>
 				<td>
-					<input id='notification-email' type='text' size='40' name='notification_email' value='<?php echo $settings['notification_email']; ?>'></td>
+					<input id='notification-email' type='text' size='40' name='notification_email' value='<?php echo esc_attr( $settings['notification_email'] ); ?>'></td>
 			</tr>
 			<tr>
 				<th><?php esc_html_e( 'Send an email when a backup completes', 'boldgrid-backup' ); ?></th>
@@ -40,7 +40,7 @@ ob_start();
 							echo ' checked';
 						}
 						?>
-						 />
+						/>
 				</td>
 			</tr>
 			<tr>
@@ -53,7 +53,7 @@ ob_start();
 							echo ' checked';
 						}
 						?>
-						 />
+						/>
 				</td>
 			</tr>
 		</table>

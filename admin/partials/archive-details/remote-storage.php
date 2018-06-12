@@ -63,13 +63,13 @@ foreach ( $this->remote_storage_li as $provider ) {
 		);
 	} elseif ( isset( $provider['is_setup'] ) && false === $provider['is_setup'] ) {
 		$upload = sprintf(
-			// translators: 1: Link, 2: Link text.
+			// translators: 1: HTML anchor open tag, 2: HTML anchor close tag, 3: Provider title.
 			esc_html__(
-				'Please go to your <a target="_parent" href="%1$s">%2$s</a> to configure %3$s.',
+				'Please go to your %1$ssettings page%2$s to configure %3$s.',
 				'boldgrid-backup'
 			),
-			'admin.php?page=boldgrid-backup-settings',
-			__( 'settings page', 'boldgrid-backup' ),
+			'<a target="_parent" href="admin.php?page=boldgrid-backup-settings">',
+			'</a>',
 			$provider['title']
 		);
 	} else {

@@ -819,11 +819,10 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 			return;
 		}
 
-		// Get the ISO time (in ISO 8601 format).
-		$iso_time = date( 'c', $deadline );
-
-		// Print a hidden div with the time, so that JavaScript can read it.
-		printf( '<div class="hidden" id="rollback-deadline">%1$s</div>', $iso_time );
+		// Print a hidden div with the time (in ISO 8601 format), so that JavaScript can read it.
+		?>
+		<div class="hidden" id="rollback-deadline"><?php echo esc_attr( date( 'c', $deadline ) ); ?></div>
+		<?php
 	}
 
 	/**
@@ -991,8 +990,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		}
 
 		// Convert the deadline to ISO time (in ISO 8601 format).
-		$iso_time = date( 'c', $deadline );
-		wp_die( $iso_time );
+		wp_die( esc_attr( date( 'c', $deadline ) ) );
 	}
 
 	/**

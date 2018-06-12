@@ -19,17 +19,17 @@ defined( 'WPINC' ) || die;
 
 $max_file_size = Boldgrid_Backup_Admin_Utility::get_upload_limit();
 
-$size_limit = esc_html__( 'File size limit', 'boldgrid-backup' ) . ': ' .
+$size_limit = __( 'File size limit', 'boldgrid-backup' ) . ': ' .
 	Boldgrid_Backup_Admin_Utility::bytes_to_human(
 		Boldgrid_Backup_Admin_Utility::get_upload_limit()
 	);
 
-$size_info = esc_html__(
+$size_info = __(
 	'To change the limit, you may be able to modify your server\'s php.ini or .htaccess file.  Please ask your web hosting provider if you need assistance.',
 	'boldgrid-backup'
 );
 
-$upload_info = esc_html__(
+$upload_info = __(
 	'You can upload a backup file that was created with BoldGrid Backup.
 			If you choose to restore an uploaded file from a different web location (URL), then we will try to ensure that references to URL address are updated.
 			There may be times when some items may need to be updated manually.',
@@ -63,12 +63,19 @@ $backup_id_notice = sprintf(
 	</p>
 
 	<p class="help wp-upload-form" data-id="upload-backup">
-		<?php printf( '%1$s<br />%2$s<br /><br />%3$s', $size_limit, $size_info, $upload_info ); ?>
+<?php
+printf(
+	'%1$s<br />%2$s<br /><br />%3$s',
+	esc_html( $size_limit ),
+	esc_html( $size_info ),
+	esc_html( $upload_info )
+);
+?>
 	</p>
 
 	<div id="upload-archive-section" class="wp-upload-form">
 		<form id="upload-archive-form" method="POST" enctype="multipart/form-data">
-			<input type="hidden" name="MAX_FILE_SIZE" value="<?php echo $max_file_size; ?>" />
+			<input type="hidden" name="MAX_FILE_SIZE" value="<?php echo esc_attr( $max_file_size ); ?>" />
 			<input type="hidden" name="uploading" value="1" />
 			<?php wp_nonce_field( 'upload_archive_file' ); ?>
 			<input name="file" type="file" />
@@ -77,11 +84,11 @@ $backup_id_notice = sprintf(
 		</form>
 
 		<p id="file_too_large" class="hidden">
-			<span class="dashicons dashicons-warning yellow"></span> <?php echo __( 'The file you selected is too large.', 'boldgrid-bacup' ); ?>
+			<span class="dashicons dashicons-warning yellow"></span> <?php echo esc_html__( 'The file you selected is too large.', 'boldgrid-bacup' ); ?>
 		</p>
 
 		<p id="bad_extension" class="hidden">
-			<span class="dashicons dashicons-warning yellow"></span> <?php echo __( 'Invalid file format. Please choose a .zip file.', 'boldgrid-bacup' ); ?>
+			<span class="dashicons dashicons-warning yellow"></span> <?php echo esc_html__( 'Invalid file format. Please choose a .zip file.', 'boldgrid-bacup' ); ?>
 		</p>
 	</div>
 
@@ -91,7 +98,7 @@ $backup_id_notice = sprintf(
 	</p>
 
 	<div class="help wp-upload-form" data-id="backup-id">
-		<?php echo $backup_id_notice; ?>
+		<?php echo $backup_id_notice; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped ?>
 	</div>
 
 </div>

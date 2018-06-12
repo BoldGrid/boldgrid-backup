@@ -57,22 +57,22 @@ $in_modal = false;
 
 	<h1 class="wp-heading-inline"><?php esc_html_e( 'Backup Archives', 'boldgrid-backup' ); ?></h1>
 
-	<a href="#TB_inline?width=800&amp;height=600&amp;inlineId=backup_now_content" class="thickbox page-title-action page-title-action-primary"><?php echo __( 'Backup Site Now', 'boldgrid-backup' ); ?></a>
+	<a href="#TB_inline?width=800&amp;height=600&amp;inlineId=backup_now_content" class="thickbox page-title-action page-title-action-primary"><?php echo esc_attr__( 'Backup Site Now', 'boldgrid-backup' ); ?></a>
 
-	<a class="page-title-action add-new"><?php echo __( 'Upload Backup', 'boldgrid-backup' ); ?></a>
+	<a class="page-title-action add-new"><?php echo esc_attr__( 'Upload Backup', 'boldgrid-backup' ); ?></a>
 
 	<?php
-	echo $nav;
+	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
 	require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
 
-	echo $table;
+	echo $table; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
-	echo $modal;
+	echo $modal; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
 	require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/note-pre-backup.php';
 
-	echo $ad;
+	echo $ad; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 	?>
 
 </div>

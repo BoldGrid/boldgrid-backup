@@ -98,7 +98,7 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 
 		switch ( $action ) {
 			case 'save':
-				echo $this->core->elements['long_checking_creds'];
+				esc_html( $this->core->elements['long_checking_creds'] );
 				ob_flush();
 				flush();
 

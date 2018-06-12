@@ -133,7 +133,7 @@ class Boldgrid_Backup_Admin_Archive_Details {
 
 		$filename = ! empty( $_GET['filename'] ) ? sanitize_file_name( $_GET['filename'] ) : false;
 		if ( ! $filename ) {
-			echo __( 'No archive specified.', 'boldgrid-backup' );
+			echo esc_attr__( 'No archive specified.', 'boldgrid-backup' );
 			return;
 		}
 

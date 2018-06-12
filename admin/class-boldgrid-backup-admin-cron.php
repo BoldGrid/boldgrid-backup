@@ -725,8 +725,7 @@ class Boldgrid_Backup_Admin_Cron {
 	public function print_cron_report( $archive_info ) {
 		// Validate mode.
 		if ( empty( $archive_info['mode'] ) ) {
-			esc_html_e( 'Error: A mode was not specified.', 'boldgrid-backup' );
-			wp_die();
+			wp_die( esc_html_e( 'Error: A mode was not specified.', 'boldgrid-backup' ) );
 		}
 
 		$valid_modes = array(
@@ -738,7 +737,7 @@ class Boldgrid_Backup_Admin_Cron {
 			printf(
 				// translators: 1: Archive mode ("backup" or "restore").
 				esc_html__( 'Error: Invalid mode "%s".', 'boldgrid-backup' ),
-				$archive_info['mode']
+				esc_attr( $archive_info['mode'] )
 			);
 			wp_die();
 		}
@@ -763,91 +762,81 @@ class Boldgrid_Backup_Admin_Cron {
 			// Error.
 			printf(
 				esc_html__( 'There was an error $s backup archive file.', 'boldgrid-backup' ),
-				$action_name
-			);
-
-			echo PHP_EOL;
+				esc_attr( $action_name )
+			) . PHP_EOL;
 
 			printf(
 				// translators: 1: Error message.
 				esc_html__( 'Error: %s', 'boldgrid-backup' ),
-				$archive_info['error']
-			);
-
-			echo PHP_EOL;
+				esc_html( $archive_info['error'] )
+			) . PHP_EOL;
 
 			if ( isset( $archive_info['error_message'] ) ) {
 				printf(
 					// translators: 1: Error message.
 					esc_html__( 'Error Message: %s', 'boldgrid-backup' ),
-					$archive_info['error_message']
+					esc_html( $archive_info['error_message'] )
 				);
 			}
 
 			if ( isset( $archive_info['error_code'] ) ) {
 				printf(
 					' (%s)',
-					$archive_info['error_code']
-				);
+					esc_attr( $archive_info['error_code'] )
+				) . PHP_EOL;
 			}
-
-			echo PHP_EOL;
 		} elseif ( ! empty( $archive_info['filesize'] ) || ! empty( $archive_info['dryrun'] ) ) {
 			// Dry run.
 			if ( ! empty( $archive_info['filepath'] ) ) {
 				printf(
 					// translators: 1: File path.
 					esc_html__( 'File Path: %s', 'boldgrid-backup' ),
-					$archive_info['filepath']
-				);
-
-				echo PHP_EOL;
+					esc_attr( $archive_info['filepath'] )
+				) . PHP_EOL;
 			}
 
 			if ( ! empty( $archive_info['filesize'] ) ) {
 				printf(
 					// translators: 1: File size.
 					esc_html__( 'File Size: %s', 'boldgrid-backup' ),
-					Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['filesize'] )
-				);
-
-				echo PHP_EOL;
+					esc_attr(
+						Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['filesize'] )
+					)
+				) . PHP_EOL;
 			}
 
 			if ( ! empty( $archive_info['total_size'] ) ) {
 				printf(
 					// translators: 1: Total backup size.
 					esc_html__( 'Total size: %s', 'boldgrid-backup' ),
-					Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] )
-				);
-
-				echo PHP_EOL;
+					esc_attr(
+						Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] )
+					)
+				) . PHP_EOL;
 			}
 
 			if ( ! empty( $archive_info['compressor'] ) ) {
 				printf(
 					// translators: 1: Compressor name.
 					esc_html__( 'Compressor: %s', 'boldgrid-backup' ),
-					$archive_info['compressor']
-				);
-
-				echo PHP_EOL;
+					esc_attr( $archive_info['compressor'] )
+				) . PHP_EOL;
 			}
 
 			// Show how long the website was paused for.
 			if ( isset( $archive_info['db_duration'] ) ) {
-				printf( $this->core->configs['lang']['est_pause'], $archive_info['db_duration'] );
-				echo PHP_EOL;
+				printf(
+					esc_html( $this->core->configs['lang']['est_pause'] ),
+					esc_attr( $archive_info['db_duration'] )
+				) . PHP_EOL;
 			}
 
 			if ( isset( $archive_info['duration'] ) ) {
 				printf(
 					// translators: 1: Backup duration.
 					esc_html__( 'Duration: %s seconds', 'boldgrid-backup' ),
-					$archive_info['duration']
-				);
-
-				echo PHP_EOL;
+					esc_attr( $archive_info['duration'] )
+				) . PHP_EOL;
 			}
 		} else {
 			// Unknown error.
@@ -857,10 +846,8 @@ class Boldgrid_Backup_Admin_Cron {
 					'There was an unknown error %s a backup archive file.',
 					'boldgrid-backup'
 				),
-				$action_name
-			);
-
-			echo PHP_EOL;
+				esc_attr( $action_name )
+			) . PHP_EOL;
 		}
 	}
 
@@ -961,10 +948,7 @@ class Boldgrid_Backup_Admin_Cron {
 	 */
 	public function backup() {
 		if ( ! $this->is_valid_call() ) {
-			wp_die(
-				__( 'Error: Invalid request.' ),
-				'boldgrid-backup'
-			);
+			wp_die( esc_html__( 'Error: Invalid request.', 'boldgrid-backup' ) );
 		}
 
 		$archive_info = $this->core->archive_files( true );
@@ -983,10 +967,7 @@ class Boldgrid_Backup_Admin_Cron {
 	 */
 	public function restore() {
 		if ( ! $this->is_valid_call() ) {
-			wp_die(
-				__( 'Error: Invalid request.' ),
-				'boldgrid-backup'
-			);
+			wp_die( esc_html__( 'Error: Invalid request.', 'boldgrid-backup' ) );
 		}
 
 		$archive_info = array(

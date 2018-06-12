@@ -36,7 +36,7 @@ ob_start();
 			 * this, it is not recommended that you change it again. You can find more help with setting
 			 * your backup directory <a>here</a>.
 			 */
-			$link = sprintf(
+			$link = printf(
 				wp_kses(
 					// translators: 1: URL address.
 					esc_html__(
@@ -52,14 +52,13 @@ ob_start();
 				),
 				esc_url( $this->core->configs['urls']['setting_directory'] )
 			);
-			echo $link;
 			?>
 		</p>
 
 		<table class='backup-directory form-table'>
 			<tr>
 				<th><?php esc_html_e( 'Directory to store backup archives', 'boldgrid-backup' ); ?>:</th>
-				<td><input id='backup-directory-path' type='text' size='40' name='backup_directory' value='<?php echo $settings['backup_directory']; ?>'></td>
+				<td><input id='backup-directory-path' type='text' size='40' name='backup_directory' value='<?php echo esc_attr( $settings['backup_directory'] ); ?>'></td>
 			</tr>
 			<tr id="move-backups" class="hidden">
 				<th><?php esc_html_e( 'If you change this directory, current backups will not show in the list. Would you like us to move the backups to the new directory?', 'boldgrid-backup' ); ?></th>

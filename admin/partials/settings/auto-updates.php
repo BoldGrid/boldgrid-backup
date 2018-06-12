@@ -21,7 +21,7 @@ ob_start();
 
 <div class="bg-box">
 	<div class="bg-box-top">
-		<?php echo __( 'Auto Updates and Rollback', 'boldgrid-inspirations' ); ?>
+		<?php esc_html_e( 'Auto Updates and Rollback', 'boldgrid-inspirations' ); ?>
 	</div>
 	<div class="bg-box-bottom">
 
@@ -112,7 +112,7 @@ ob_start();
 
 			 <tr>
 				 <th>
-						<?php echo __( 'Auto Backup<br />Before Updates', 'boldgrid-backup' ); ?>
+						<?php esc_html_e( 'Auto Backup<br />Before Updates', 'boldgrid-backup' ); ?>
 					 <span class='dashicons dashicons-editor-help' data-id='auto-backup'></span>
 
 					 <p class='help' data-id='auto-backup'>

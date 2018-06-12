@@ -96,9 +96,19 @@ function load_boldgrid_backup() {
 				add_action(
 					'admin_notices', function() {
 						?>
-				<div class="notice notice-error is-dismissible">
-					<p><?php _e( '<strong>BoldGrid Backup</strong> has been deactivated because the vendor folder is missing. Please run <strong>composer install</strong>, or contact your host for further assistance.', 'boldgrid-backup' ); ?></p>
-				</div>
+				<div class="notice notice-error is-dismissible"><p>
+						<?php
+						printf(
+							// translators: 1: HTML strong open tag, 2: HTML string close tag.
+							esc_html__(
+								'%1$sBoldGrid Backup%1$s has been deactivated because the vendor folder is missing. Please run %1$scomposer install%2$s, or contact your host for further assistance.',
+								'boldgrid-backup'
+							),
+							'<strong>',
+							'</strong>'
+						);
+						?>
+					</p></div>
 						<?php
 					}
 				);

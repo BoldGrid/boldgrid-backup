@@ -25,7 +25,7 @@ defined( 'WPINC' ) || die;
 	 *
 	 * Note: Backups use resources and <a>must pause your site</a> momentarily.  Use sparingly.
 	 */
-	$link = sprintf(
+	printf(
 		wp_kses(
 			// translators: 1: URL address.
 			__(
@@ -42,7 +42,6 @@ defined( 'WPINC' ) || die;
 		),
 		esc_url( $this->configs['urls']['resource_usage'] )
 	);
-	echo $link;
 
 	/*
 	 * Print this text:
@@ -52,10 +51,10 @@ defined( 'WPINC' ) || die;
 	 * make room for your new backup. We recommend you download a backup to your local computer.
 	 */
 	if ( count( $archives ) >= $settings['retention_count'] ) {
-		$link = sprintf(
+		printf(
 			wp_kses(
 				// translators: 1: Archive count, 2: Retention limit, 3: URL address.
-				esc_html__(
+				__(
 					'You currently have %1$s backups stored on your server, and your <a href="%3$s">backup settings</a> are only configured to store %2$s. Backing up your site now will delete your oldest backup to make room for your new backup. We recommend you download a backup to your local computer.',
 					'boldgrid-backup'
 				),
@@ -64,10 +63,9 @@ defined( 'WPINC' ) || die;
 				)
 			),
 			count( $archives ),
-			$settings['retention_count'],
-			get_admin_url( null, 'admin.php?page=boldgrid-backup-settings' )
+			esc_attr( $settings['retention_count'] ),
+			esc_url( get_admin_url( null, 'admin.php?page=boldgrid-backup-settings' ) )
 		);
-		echo $link;
 	}
 	?>
 </p>

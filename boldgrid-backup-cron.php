@@ -15,7 +15,7 @@
 
 // Abort if not being ran from the command line.
 if ( ! isset( $_SERVER['argv'], $_SERVER['argc'] ) || ! $_SERVER['argc'] ) {
-	die( 'Error: No parameters were passed.  A "siteurl", "mode", and "id" are required.' . PHP_EOL );
+	die( 'Error: No parameters were passed.  A "siteurl", "mode", and "id" are required.' . "\n" );
 }
 
 // Initialize $input and $error.
@@ -43,7 +43,7 @@ foreach ( $required_arguments as $required_argument ) {
 }
 
 if ( $error ) {
-	die( $error );
+	die( $error ); // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 }
 
 // Abort if not a valid mode.
@@ -53,7 +53,7 @@ $valid_modes = array(
 );
 
 if ( ! in_array( $input['mode'], $valid_modes, true ) ) {
-	die( 'Error: Invalid mode "' . $input['mode'] . '".' . PHP_EOL );
+	die( 'Error: Invalid mode "' . $input['mode'] . '".' . PHP_EOL ); // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 }
 
 // Make an ajax call to run jobs, and report status.
@@ -71,4 +71,4 @@ if ( false !== $result ) {
 	$message = 'Error: Could not reach URL address "' . $url . '".';
 }
 
-die( $message );
+die( $message ); // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped

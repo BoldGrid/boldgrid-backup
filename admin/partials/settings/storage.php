@@ -64,19 +64,29 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 
 <div class='bg-box'>
 	<div class='bg-box-top'>
-		<?php echo __( 'Backup Storage', 'boldgrid-backup' ); ?>
+		<?php esc_html_e( 'Backup Storage', 'boldgrid-backup' ); ?>
 		<?php echo '<span class="dashicons dashicons-editor-help" data-id="remote_storage"></span>'; ?>
 	</div>
 	<div class='bg-box-bottom'>
 		<p class="help" data-id="remote_storage">
-			<?php echo __( 'The following is a list of storage locations available to store your backup archives on. It is recommended to store your backups on at least 2 different storage locations. You can find more information <a href="admin.php?page=boldgrid-backup-tools&section=section_locations">here</a>.', 'boldgrid-backup' ); ?>
+			<?php
+			printf(
+				// translators: 1: HTML anchor open tag. 2: HTML anchor close tag.
+				esc_html__(
+					'The following is a list of storage locations available to store your backup archives on. It is recommended to store your backups on at least 2 different storage locations. You can find more information %1$shere%2$s.',
+					'boldgrid-backup'
+				),
+				'<a href="admin.php?page=boldgrid-backup-tools&section=section_locations">',
+				'</a>'
+			);
+			?>
 		</p>
 
 		<table id="storage_locations">
 		<?php
 		foreach ( $storage_locations as $location ) {
 			$tr = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/storage-location.php';
-			echo $tr;
+			echo $tr; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 		}
 		?>
 		</table>
@@ -84,10 +94,10 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 		<br />
 		<p class="hidden" id="no_storage">
 			<span class="dashicons dashicons-warning yellow"></span>
-			<?php echo __( 'Backup will not occur if no storage locations are selected.', 'boldgrid-backup' ); ?>
+			<?php esc_html_e( 'Backup will not occur if no storage locations are selected.', 'boldgrid-backup' ); ?>
 		</p>
 	</div>
-	<?php echo $premium_box; ?>
+	<?php echo $premium_box; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped ?>
 </div>
 
 <?php

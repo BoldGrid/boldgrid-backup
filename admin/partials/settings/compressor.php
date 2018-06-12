@@ -43,26 +43,26 @@ $extractor_php_zip_option   = ! in_array( 'php_zip', $available_compressors ) ? 
 
 		<p class="help" data-id="compressor">
 			<?php
-			echo __( 'These are advanced settings. You do not need to configure this setting.', 'boldgrid-backup' );
+			esc_html_e( 'These are advanced settings. You do not need to configure this setting.', 'boldgrid-backup' );
 			?>
 		</p>
 
 		<table class="form-table">
 			<tr>
-				<th><?php echo __( 'Compressor', 'boldgrid-backup' ); ?>:</th>
+				<th><?php esc_html_e( 'Compressor', 'boldgrid-backup' ); ?>:</th>
 				<td>
 					<select name="compressor">
-						<option value='pcl_zip' <?php echo $pcl_zip_selected; ?> >PclZip</option>
-						<?php echo $php_zip_option; ?>
+						<option value='pcl_zip' <?php echo esc_attr( $pcl_zip_selected ); ?> >PclZip</option>
+						<?php echo $php_zip_option; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped ?>
 					</select>
 				</td>
 			</tr>
 			<tr>
-				<th><?php echo __( 'Extractor', 'boldgrid-backup' ); ?>:</th>
+				<th><?php esc_html_e( 'Extractor', 'boldgrid-backup' ); ?>:</th>
 				<td>
 					<select name="extractor">
-						<option value='pcl_zip' <?php echo $extractor_pcl_zip_selected; ?> >PclZip</option>
-						<?php echo $extractor_php_zip_option; ?>
+						<option value='pcl_zip' <?php echo esc_attr( $extractor_pcl_zip_selected ); ?> >PclZip</option>
+						<?php echo $extractor_php_zip_option; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped ?>
 					</select>
 				</td>
 			</tr>

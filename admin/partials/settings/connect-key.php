@@ -39,18 +39,24 @@ ob_start();
 if ( $has_key_entered ) {
 	printf(
 		// translators: 1: Subscription type ("Premium" or "Free").
-		esc_html__( 'You have entered a <strong>%1$s</strong> BoldGrid Connect Key.', 'boldgrid-backup' ),
-		$this->core->config->get_is_premium() ? __( 'Premium', 'boldgrid-backup' ) : __( 'Free', 'boldgrid-backup' )
+		__( 'You have entered a <strong>%1$s</strong> BoldGrid Connect Key.', 'boldgrid-backup' ),
+		$this->core->config->get_is_premium() ?
+			esc_html__( 'Premium', 'boldgrid-backup' ) : esc_html__( 'Free', 'boldgrid-backup' )
 	);
 } elseif ( $is_dismissed ) {
-	_e(
-		'You have dismissed the prompt to enter a BoldGrid Connect Key.  Click <a class="undismissBoldgridNotice" href="#">here</a> to restore the prompt.',
-		'boldgrid-backup'
+	printf(
+		// translators: 1: HTML anchor open tag. 2: HTML anchor close taag.
+		esc_html__(
+			'You have dismissed the prompt to enter a BoldGrid Connect Key.  Click %1$shere%2$s to restore the prompt.',
+			'boldgrid-backup'
+		),
+		'<a class="undismissBoldgridNotice" href="#">',
+		'</a>'
 	);
 
 	wp_nonce_field( 'boldgrid_set_key', 'set_key_auth' );
 } else {
-	_e( 'Please enter your BoldGrid Connect Key in the form at the top of this page.', 'boldgrid-backup' );
+	esc_html_e( 'Please enter your BoldGrid Connect Key in the form at the top of this page.', 'boldgrid-backup' );
 }
 $output = ob_get_contents();
 ob_end_clean();

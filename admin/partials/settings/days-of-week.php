@@ -80,10 +80,12 @@ ob_start();
 		<?php
 			$url = $this->core->configs['urls']['resource_usage'];
 
-			$link = sprintf(
+			echo '<div id="use-sparingly" class="hidden"><p><span class="dashicons dashicons-warning yellow"></span> ';
+
+			printf(
 				wp_kses(
 					// translators: 1: HTML markup.
-					esc_html__(
+					__(
 						'Backups use resources and <a href="%s" target="_blank">must pause your site</a> momentarily. Use sparingly.',
 						'boldgrid-backup'
 					),
@@ -97,10 +99,7 @@ ob_start();
 				esc_url( $url )
 			);
 
-			printf(
-				'<div id="use-sparingly" class="hidden"><p><span class="dashicons dashicons-warning yellow"></span> %s</p></div>',
-				$link
-			);
+			echo '</p></div>';
 			?>
 	</div>
 </div>

@@ -383,14 +383,14 @@ $table .= '</table>';
 <div class="functionality-test-section wrap">
 
 	<?php
-	printf( '<h1>%1$s</h1>', __( 'BoldGrid Backup Preflight Check', 'boldgrid-backup' ) );
+	printf( '<h1>%1$s</h1>', esc_html__( 'BoldGrid Backup Preflight Check', 'boldgrid-backup' ) );
 
 	$nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
-	echo $nav;
+	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
-	echo $fail_tips;
+	echo $fail_tips; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
-	echo $table;
+	echo $table; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 	?>
 
 </div>
