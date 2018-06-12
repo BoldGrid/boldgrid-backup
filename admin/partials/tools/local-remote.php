@@ -14,6 +14,8 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
+// phpcs:disable WordPress.VIP
+
 defined( 'WPINC' ) || die;
 
 // @link https://github.com/cbschuld/Browser.php

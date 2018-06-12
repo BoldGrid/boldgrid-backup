@@ -14,6 +14,8 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
+// phpcs:disable WordPress.VIP
+
 /**
  * Class: Boldgrid_Backup
  *

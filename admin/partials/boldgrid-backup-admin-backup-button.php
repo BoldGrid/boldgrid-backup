@@ -14,6 +14,8 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
+// phpcs:disable WordPress.VIP
+
 defined( 'WPINC' ) || die;
 
 $core = isset( $this->core ) ? $this->core : $this;

@@ -13,6 +13,8 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
+// phpcs:disable WordPress.VIP
+
 // Abort if not being ran from the command line.
 if ( ! isset( $_SERVER['argv'], $_SERVER['argc'] ) || ! $_SERVER['argc'] ) {
 	die( 'Error: No parameters were passed.  A "siteurl", "mode", and "id" are required.' . "\n" );

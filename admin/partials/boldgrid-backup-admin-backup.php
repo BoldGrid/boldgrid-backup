@@ -14,6 +14,8 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
+// phpcs:disable WordPress.VIP
+
 defined( 'WPINC' ) || die;
 
 $is_restore   = ! empty( $_POST['restore_now'] ) && '1' === $_POST['restore_now'];
