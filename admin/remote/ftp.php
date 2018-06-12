@@ -868,7 +868,7 @@ class Boldgrid_Backup_Admin_Ftp {
 			 * such as ftp_put(): Quota exceeded. Make sure the user sees the
 			 * last error.
 			 */
-			if ( ! empty( $last_error['message'] ) && ! empty( $last_error['file'] ) && $last_error['file'] === __FILE__ ) {
+			if ( ! empty( $last_error['message'] ) && ! empty( $last_error['file'] ) && __FILE__ === $last_error['file'] ) {
 				$this->errors[] = $last_error['message'];
 			}
 

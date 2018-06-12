@@ -496,7 +496,8 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->doing_cron    = ( defined( 'DOING_CRON' ) && DOING_CRON ) || isset( $_GET['doing_wp_cron'] );
 		$this->doing_ajax    = is_admin() && defined( 'DOING_AJAX' ) && DOING_AJAX;
-		$this->doing_wp_cron = ! empty( $_SERVER['SCRIPT_FILENAME'] ) && $_SERVER['SCRIPT_FILENAME'] === trailingslashit( ABSPATH ) . 'wp-cron.php';
+		$this->doing_wp_cron = ! empty( $_SERVER['SCRIPT_FILENAME'] ) &&
+			trailingslashit( ABSPATH ) . 'wp-cron.php' === $_SERVER['SCRIPT_FILENAME'];
 
 		$this->wp_filesystem = $wp_filesystem;
 
