@@ -309,21 +309,11 @@ class Boldgrid_Backup_Admin_Utility {
 				if ( $wp_filesystem->is_dir( $filepath ) ) {
 					// Is a directory.
 					if ( ! $wp_filesystem->chmod( $filepath, 0755 ) ) {
-						// Error chmod 755 a directory.
-						error_log(
-							__METHOD__ . ': Error using chmod 0755 on directory "' . $filepath . '".'
-						);
-
 						return false;
 					}
 				} else {
 					// Is a file.
 					if ( ! $wp_filesystem->chmod( $filepath, 0644 ) ) {
-						// Error chmod 644 a file.
-						error_log(
-							__METHOD__ . ': Error using chmod 0644 on file "' . $filepath . '".'
-						);
-
 						return false;
 					}
 				}
@@ -364,7 +354,7 @@ class Boldgrid_Backup_Admin_Utility {
 		if ( $current_max < $max_execution_time ) {
 			set_time_limit( $max_execution_time );
 
-			if ( false === ini_set( 'max_execution_time', $max_execution_time ) ) {
+			if ( false === ini_set( 'max_execution_time', $max_execution_time ) ) { // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.runtime_configuration_ini_set
 				return false;
 			}
 		}
@@ -451,7 +441,7 @@ class Boldgrid_Backup_Admin_Utility {
 		// If the current memory limit is less than specified, then try to increase it.
 		// PHP default is "128M".
 		if ( $current_limit_int < $memory_limit_int ) {
-			if ( false === ini_set( 'memory_limit', $memory_limit_int ) ) {
+			if ( false === ini_set( 'memory_limit', $memory_limit_int ) ) { // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.runtime_configuration_ini_set
 				return false;
 			}
 		}

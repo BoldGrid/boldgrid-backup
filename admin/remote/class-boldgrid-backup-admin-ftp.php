@@ -731,7 +731,9 @@ class Boldgrid_Backup_Admin_Ftp {
 		 * and throw an Exception.
 		 */
 		$error_caught = false;
-		set_error_handler( array( 'Boldgrid_Backup_Admin_Utility', 'handle_error' ) );
+
+		set_error_handler( array( 'Boldgrid_Backup_Admin_Utility', 'handle_error' ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler
+
 		try {
 			switch ( $type ) {
 				case 'ftp':

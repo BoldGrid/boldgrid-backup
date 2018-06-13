@@ -73,18 +73,19 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 	 * Action to take when the wp-config.php file has been restored.
 	 *
 	 * @since 1.5.1
+	 *
+	 * @see Boldgrid_Backup_Admin_Utility::fix_wpconfig()
 	 */
 	public function post_restore_wpconfig() {
-		$result = Boldgrid_Backup_Admin_Utility::fix_wpconfig();
-
-		if ( ! $result ) {
-			$message = esc_html__( 'Could not update the WordPress configuration file.', 'boldgrid-backup' );
-
-			error_log( __METHOD__ . ': ' . $message );
-
-			if ( ! $this->doing_cron ) {
-				do_action( 'boldgrid_backup_notice', $message, 'notice notice-error is-dismissible' );
-			}
+		if ( ! Boldgrid_Backup_Admin_Utility::fix_wpconfig() && ! $this->doing_cron ) {
+			do_action(
+				'boldgrid_backup_notice',
+				esc_html__(
+					'Could not update the WordPress configuration file.',
+					'boldgrid-backup'
+				),
+				'notice notice-error is-dismissible'
+			);
 		}
 	}
 
@@ -208,7 +209,7 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 		$zip = new ZipArchive();
 
 		if ( $zip->open( $archive_filepath ) ) {
-			for ( $i = 0; $i < $zip->numFiles; $i++ ) {
+			for ( $i = 0; $i < $zip->numFiles; $i++ ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName
 				$data = $zip->statIndex( $i );
 
 				if ( empty( $data['name'] ) ) {

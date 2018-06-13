@@ -13,7 +13,7 @@
  * @author BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP
+// phpcs:disable WordPress.VIP, WordPress.WP.AlternativeFunctions
 
 /**
  * Class: Boldgrid_Backup_Url_Helper.

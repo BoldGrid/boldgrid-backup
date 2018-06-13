@@ -172,7 +172,7 @@ class Boldgrid_Backup_Admin_Archive_Log {
 			return false;
 		}
 
-		$written = $this->core->wp_filesystem->put_contents( $log_filepath, json_encode( $info ) );
+		$written = $this->core->wp_filesystem->put_contents( $log_filepath, wp_json_encode( $info ) );
 		if ( ! $written ) {
 			return false;
 		}

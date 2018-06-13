@@ -745,6 +745,8 @@ class Boldgrid_Backup_Admin_Core {
 		// Initialize $success.
 		$success = false;
 
+		// phpcs:disable WordPress.PHP.DiscouragedPHPFunctions, WordPress.WP.AlternativeFunctions
+
 		// Test getting output using available execution functions, until one is successful.
 		foreach ( $available_exec_functions as $exec_function ) {
 			switch ( $exec_function ) {
@@ -897,6 +899,8 @@ class Boldgrid_Backup_Admin_Core {
 					break;
 			}
 		}
+
+		// phpcs:enable WordPress.PHP.DiscouragedPHPFunctions, WordPress.WP.AlternativeFunctions
 
 		// If there is output, then trim it.
 		if ( ! empty( $output ) ) {
@@ -2470,7 +2474,9 @@ class Boldgrid_Backup_Admin_Core {
 		session_write_close();
 
 		// Send the file.  Not finding a replacement in $wp_filesystem.
+		// phpcs:disable
 		readfile( $filepath );
+		// phpcs:enable
 
 		// Exit.
 		wp_die();

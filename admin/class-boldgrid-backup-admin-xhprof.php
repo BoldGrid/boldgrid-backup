@@ -12,7 +12,7 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP
+// phpcs:disable WordPress.VIP, WordPress.PHP.DevelopmentFunctions
 
 /**
  * Class: Boldgrid_Backup_Admin_Xhprof
@@ -127,7 +127,5 @@ class Boldgrid_Backup_Admin_Xhprof {
 				);
 			}
 		}
-
-		return;
 	}
 }
