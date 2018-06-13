@@ -63,7 +63,7 @@ $url = $input['siteurl'] . '/wp-admin/admin-ajax.php?action=boldgrid_backup_run_
 	'&id=' . $input['id'] . '&secret=' . $input['secret'] . '&doing_wp_cron=' . time();
 
 // The helper class method will sanitize the url.
-require dirname( __FILE__ ) . '/cron/url-helper.php';
+require dirname( __FILE__ ) . '/cron/class-boldgrid-backup-url-helper.php';
 $url_helper = new Boldgrid_Backup_Url_Helper();
 $result     = $url_helper->call_url( $url );
 

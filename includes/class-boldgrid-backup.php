@@ -79,7 +79,7 @@ class Boldgrid_Backup {
 	 * Include the following files that make up the plugin:
 	 *
 	 * - Boldgrid_Backup_Loader. Orchestrates the hooks of the plugin.
-	 * - Boldgrid_Backup_i18n. Defines internationalization functionality.
+	 * - Boldgrid_Backup_I18n. Defines internationalization functionality.
 	 * - Boldgrid_Backup_Admin. Defines all hooks for the admin area.
 	 *
 	 * Create an instance of the loader which will be used to register the hooks
@@ -162,8 +162,8 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-compressor.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-compressors.php';
-		require_once BOLDGRID_BACKUP_PATH . '/admin/compressor/php_zip.php';
-		require_once BOLDGRID_BACKUP_PATH . '/admin/compressor/pcl_zip.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/compressor/class-boldgrid-backup-admin-compressor-php-zip.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/compressor/class-boldgrid-backup-admin-compressor-pcl-zip.php';
 
 		include BOLDGRID_BACKUP_PATH . '/vendor/ifsnop/mysqldump-php/src/Ifsnop/Mysqldump/Mysqldump.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-db-dump.php';
@@ -194,7 +194,7 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-remote.php';
 
-		require_once BOLDGRID_BACKUP_PATH . '/admin/storage/local.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/storage/class-boldgrid-backup-admin-storage-local.php';
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-email.php';
 
@@ -204,9 +204,9 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-in-progress.php';
 
-		require_once BOLDGRID_BACKUP_PATH . '/admin/remote/ftp.php';
-		require_once BOLDGRID_BACKUP_PATH . '/admin/remote/ftp-hooks.php';
-		require_once BOLDGRID_BACKUP_PATH . '/admin/remote/ftp-page.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/remote/class-boldgrid-backup-admin-ftp.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/remote/class-boldgrid-backup-admin-ftp-hooks.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/remote/class-boldgrid-backup-admin-ftp-page.php';
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-go-pro.php';
 
@@ -222,14 +222,14 @@ class Boldgrid_Backup {
 	/**
 	 * Define the locale for this plugin for internationalization.
 	 *
-	 * Uses the Boldgrid_Backup_i18n class in order to set the domain and to register the hook
+	 * Uses the Boldgrid_Backup_I18n class in order to set the domain and to register the hook
 	 * with WordPress.
 	 *
 	 * @since 1.0
 	 * @access private
 	 */
 	private function set_locale() {
-		$plugin_i18n = new Boldgrid_Backup_i18n();
+		$plugin_i18n = new Boldgrid_Backup_I18n();
 
 		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
 	}

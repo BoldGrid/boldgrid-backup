@@ -1,6 +1,6 @@
 <?php
 /**
- * File: php_zip.php
+ * File: class-boldgrid-backup-admin-compressor-php-zip.php
  *
  * PHP Zip Compressor.
  *

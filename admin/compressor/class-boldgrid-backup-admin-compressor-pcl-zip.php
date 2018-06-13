@@ -1,6 +1,6 @@
 <?php
 /**
- * File: pcl_zip.php
+ * File: class-boldgrid-backup-admin-compressor-pcl-zip.php
  *
  * Pcl Zip Compressor.
  *

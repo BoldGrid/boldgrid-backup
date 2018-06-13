@@ -17,7 +17,7 @@
  */
 
 // Require Boldgrid_Backup_Url_Helper class.
-require dirname( __FILE__ ) . '/url-helper.php';
+require dirname( __FILE__ ) . '/class-boldgrid-backup-url-helper.php';
 
 $url_helper = new Boldgrid_Backup_Url_Helper();
 

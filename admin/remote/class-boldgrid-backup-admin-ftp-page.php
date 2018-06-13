@@ -1,6 +1,6 @@
 <?php
 /**
- * File: ftp-page.php
+ * File: class-boldgrid-backup-admin-ftp-page.php
  *
  * @link  https://www.boldgrid.com
  * @since 1.6.0
@@ -115,7 +115,7 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 				$data = $post_data;
 		}
 
-		include BOLDGRID_BACKUP_PATH . '/admin/partials/remote/ftp.php';
+		include BOLDGRID_BACKUP_PATH . '/admin/partials/remote/class-boldgrid-backup-admin-ftp.php';
 	}
 
 	/**

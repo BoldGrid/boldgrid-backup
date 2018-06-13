@@ -64,11 +64,11 @@ $files = array(
 	'/admin/class-boldgrid-backup-admin-tools.php',
 	'/admin/class-boldgrid-backup-admin-time.php',
 	'/admin/class-boldgrid-backup-admin-crypt.php',
-	'/admin/storage/local.php',
-	'/admin/remote/ftp.php',
-	'/admin/remote/sftp.php',
-	'/admin/remote/ftp-hooks.php',
-	'/admin/remote/ftp-page.php',
+	'/admin/storage/class-boldgrid-backup-admin-storage-local.php',
+	'/admin/remote/class-boldgrid-backup-admin-ftp.php',
+	'/admin/remote/class-boldgrid-backup-admin-sftp.php',
+	'/admin/remote/class-boldgrid-backup-admin-ftp-hooks.php',
+	'/admin/remote/class-boldgrid-backup-admin-ftp-page.php',
 	'/vendor/phpseclib/phpseclib/phpseclib/Net/SSH2.php',
 );
 foreach( $files as $file ) {

@@ -30,12 +30,12 @@ class Boldgrid_Backup_Admin_Cron {
 	private $core;
 
 	/**
-	 * Path to run_jobs.php
+	 * Path to run-jobs.php
 	 *
 	 * @since 1.5.2
 	 * @var   string
 	 */
-	public $run_jobs = 'cron/run_jobs.php';
+	public $run_jobs = 'cron/run-jobs.php';
 
 	/**
 	 * A cron secret used to validate unauthenticated crontab jobs.
@@ -53,7 +53,7 @@ class Boldgrid_Backup_Admin_Cron {
 	 *
 	 * @var string
 	 */
-	public $crontab_version = '1.6.1';
+	public $crontab_version = '1.6.4';
 
 	/**
 	 * Constructor.
@@ -459,8 +459,8 @@ class Boldgrid_Backup_Admin_Cron {
 		 * conditionals below.
 		 *
 		 * As of @1.5.2, you can pass any other string to this method, such as
-		 * "cron/run_jobs.php", so that the pattern will become
-		 * /home/user/public_html/wp-content/plugins/boldgrid-backup/cron/run_jobs.php
+		 * "cron/run-jobs.php", so that the pattern will become
+		 * /home/user/public_html/wp-content/plugins/boldgrid-backup/cron/run-jobs.php
 		 *
 		 * As of @1.6.0 you can pass true as the $mode so that nothing else is
 		 * added to the pattern and ALL crons for this site will be removed.

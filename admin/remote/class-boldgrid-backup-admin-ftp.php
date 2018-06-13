@@ -1,6 +1,6 @@
 <?php
 /**
- * File: ftp.php
+ * File: class-boldgrid-backup-admin-ftp.php
  *
  * @link  https://www.boldgrid.com
  * @since 1.6.0

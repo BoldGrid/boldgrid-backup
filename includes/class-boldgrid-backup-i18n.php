@@ -17,7 +17,7 @@
  */
 
 /**
- * Class: Boldgrid_Backup_i18n
+ * Class: Boldgrid_Backup_I18n
  *
  * Define the internationalization functionality.
  * Loads and defines the internationalization files for this plugin
@@ -25,7 +25,7 @@
  *
  * @since 1.0
  */
-class Boldgrid_Backup_i18n {
+class Boldgrid_Backup_I18n {
 	/**
 	 * Load the plugin text domain for translation.
 	 *

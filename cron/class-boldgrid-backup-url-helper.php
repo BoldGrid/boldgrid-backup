@@ -1,6 +1,6 @@
 <?php
 /**
- * File: url-helper.php
+ * File: class-boldgrid-backup-url-helper.php
  *
  * Standalone URL address helper for Cron tasks.
  *

@@ -57,6 +57,9 @@ class Boldgrid_Backup_Admin_Scheduler {
 
 		$this->core->cron->delete_cron_entries();
 		$this->core->cron->delete_cron_entries( $this->core->cron->run_jobs );
+
+		// Remove old run_jobs cron.
+		$this->core->cron->delete_cron_entries( 'cron/run_jobs.php' );
 	}
 
 	/**

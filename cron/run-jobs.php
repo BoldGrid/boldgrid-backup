@@ -1,6 +1,6 @@
 <?php
 /**
- * File: run_jobs.php
+ * File: run-jobs.php
  *
  * BoldGrid Backup Run Jobs.
  *
@@ -50,7 +50,7 @@ $url = $input['siteurl'] . '/wp-admin/admin-ajax.php?action=boldgrid_backup_run_
 	$input['id'] . '&secret=' . $input['secret'] . '&doing_wp_cron=' . time();
 
 // The helper class method will sanitize the url.
-require dirname( __FILE__ ) . '/url-helper.php';
+require dirname( __FILE__ ) . '/class-boldgrid-backup-url-helper.php';
 $url_helper = new Boldgrid_Backup_Url_Helper();
 $result     = $url_helper->call_url( $url );
 
