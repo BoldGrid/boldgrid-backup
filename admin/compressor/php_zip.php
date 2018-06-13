@@ -201,7 +201,7 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 
 		$zip->addFile( $random_filename, 'test.txt' );
 
-		$zip_closed = @$zip->close();
+		$zip_closed = @$zip->close(); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
 
 		$this->core->test->delete_test_files( $backup_dir );
 

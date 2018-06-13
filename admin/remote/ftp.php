@@ -698,10 +698,10 @@ class Boldgrid_Backup_Admin_Ftp {
 
 		switch ( $type ) {
 			case 'ftp':
-				$connection = @ftp_connect( $host, $port, $this->timeout );
+				$connection = @ftp_connect( $host, $port, $this->timeout ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
 				break;
 			case 'sftp':
-				$connection = @new phpseclib\Net\SFTP( $host, $port, $this->timeout );
+				$connection = @new phpseclib\Net\SFTP( $host, $port, $this->timeout ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
 				break;
 		}
 		if ( ! $connection ) {
@@ -775,7 +775,7 @@ class Boldgrid_Backup_Admin_Ftp {
 
 		switch ( $this->type ) {
 			case 'ftp':
-				$this->logged_in = @ftp_login( $this->connection, $this->user, $this->pass );
+				$this->logged_in = @ftp_login( $this->connection, $this->user, $this->pass ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
 				break;
 			case 'sftp':
 				$this->logged_in = $this->connection->login( $this->user, $this->pass );

@@ -376,7 +376,7 @@ class Boldgrid_Backup_Admin_Sftp {
 			return false;
 		}
 
-		$logged_in = @$connection->login( $user, $pass );
+		$logged_in = @$connection->login( $user, $pass ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
 		if ( ! $logged_in ) {
 			$this->errors[] = __( 'Unable to connect and log in.', 'boldgrid-backup' );
 			return false;

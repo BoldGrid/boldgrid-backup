@@ -244,7 +244,7 @@ class Boldgrid_Backup_Admin_Settings {
 			$source      = $archive['filepath'];
 			$destination = $new_dir . $archive['filename'];
 
-			$success = @$this->core->wp_filesystem->move( $source, $destination );
+			$success = @$this->core->wp_filesystem->move( $source, $destination ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
 
 			if ( ! $success ) {
 				$fail_count++;
