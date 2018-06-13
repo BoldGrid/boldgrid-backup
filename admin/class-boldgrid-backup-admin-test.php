@@ -704,9 +704,11 @@ class Boldgrid_Backup_Admin_Test {
 		global $wpdb;
 
 		// Build query.
-		$query = $wpdb->prepare(
-			'SELECT SUM(`data_length` + `index_length`) FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA`=%s AND `TABLE_NAME` LIKE %s GROUP BY `TABLE_SCHEMA`;',
-			DB_NAME, $wpdb->get_blog_prefix( is_multisite() ) . '%'
+		$query = sprintf(
+			'SELECT SUM(`data_length` + `index_length`) FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA`=' .
+				"'%s'" . ' AND `TABLE_NAME` LIKE ' . "'%s'" . ' GROUP BY `TABLE_SCHEMA`;',
+			DB_NAME,
+			$wpdb->get_blog_prefix( is_multisite() ) . '%'
 		);
 
 		// Check query.
@@ -715,7 +717,7 @@ class Boldgrid_Backup_Admin_Test {
 		}
 
 		// Get the result.
-		$result = $wpdb->get_row( $query, ARRAY_N );
+		$result = $wpdb->get_row( $query, ARRAY_N ); // phpcs:ignore WordPress.WP.PreparedSQL.NotPrepared
 
 		// If there was an error or nothing returned, then fail.
 		if ( empty( $result ) ) {

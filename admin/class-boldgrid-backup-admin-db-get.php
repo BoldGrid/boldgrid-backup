@@ -45,18 +45,21 @@ class Boldgrid_Backup_Admin_Db_Get {
 	 *
 	 * @since 1.5.3
 	 *
-	 * @global $wpdb;
+	 * @global wpdb $wpdb The WordPress database class object.
 	 *
 	 * @return array
 	 */
 	public function prefixed() {
 		global $wpdb;
+
 		$prefix_tables = array();
 
-		$sql     = sprintf( 'SHOW TABLES LIKE "%1$s%%"', $wpdb->prefix );
-		$results = $wpdb->get_results( $sql, ARRAY_N );
+		$results = $wpdb->get_results(
+			"SHOW TABLES LIKE '{$wpdb->prefix}%';",
+			ARRAY_N
+		);
 
-		foreach ( $results as $k => $v ) {
+		foreach ( $results as $v ) {
 			$prefix_tables[] = $v[0];
 		}
 
@@ -71,17 +74,20 @@ class Boldgrid_Backup_Admin_Db_Get {
 	 *
 	 * @since 1.5.3
 	 *
+	 * @global wpdb $wpdb The WordPress database class object.
+	 *
 	 * @return array
 	 */
 	public function prefixed_count() {
 		global $wpdb;
+
 		$return = array();
 
 		$tables = $this->prefixed();
 
 		foreach ( $tables as $table ) {
-			$sql              = sprintf( 'SELECT COUNT(*) FROM %1$s;', $table );
-			$num              = $wpdb->get_var( $sql );
+			$num = $wpdb->get_var( 'SELECT COUNT(*) FROM `' . $table . '`;' ); // phpcs:ignore WordPress.WP.PreparedSQL.NotPrepared
+
 			$return[ $table ] = $num;
 		}
 

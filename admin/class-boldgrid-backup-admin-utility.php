@@ -727,6 +727,8 @@ class Boldgrid_Backup_Admin_Utility {
 		// Get the database prefix (blog id 1 or 0 gets the base prefix).
 		$db_prefix = $wpdb->get_blog_prefix( 1 );
 
+		// phpcs:disable WordPress.DB.PreparedSQLPlaceholders
+
 		// Replace the URL in wp_posts.
 		$wpdb->query(
 			$wpdb->prepare(
@@ -761,6 +763,8 @@ class Boldgrid_Backup_Admin_Utility {
 			),
 			ARRAY_N
 		);
+
+		// phpcs:enable WordPress.DB.PreparedSQLPlaceholders
 
 		// If there are no matches options, then return.
 		if ( ! $matched_options ) {
