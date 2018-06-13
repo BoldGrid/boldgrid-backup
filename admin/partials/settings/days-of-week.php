@@ -29,43 +29,43 @@ ob_start();
 		if ( ! empty( $settings['schedule']['dow_sunday'] ) ) {
 			echo ' checked'; }
 		?>
-		 /><?php esc_html_e( 'Sunday', 'boldgrid-backup' ); ?><br />
+		/><?php esc_html_e( 'Sunday', 'boldgrid-backup' ); ?><br />
 		<input id='dow-monday' type='checkbox' name='dow_monday' value='1'
 		<?php
 		if ( ! empty( $settings['schedule']['dow_monday'] ) ) {
 			echo ' checked'; }
 		?>
-		 /><?php esc_html_e( 'Monday', 'boldgrid-backup' ); ?><br />
+		/><?php esc_html_e( 'Monday', 'boldgrid-backup' ); ?><br />
 		<input id='dow-tuesday' type='checkbox' name='dow_tuesday' value='1'
 		<?php
 		if ( ! empty( $settings['schedule']['dow_tuesday'] ) ) {
 			echo ' checked'; }
 		?>
-		 /><?php esc_html_e( 'Tuesday', 'boldgrid-backup' ); ?><br />
+		/><?php esc_html_e( 'Tuesday', 'boldgrid-backup' ); ?><br />
 		<input id='dow-wednesday' type='checkbox' name='dow_wednesday' value='1'
 		<?php
 		if ( ! empty( $settings['schedule']['dow_wednesday'] ) ) {
 			echo ' checked'; }
 		?>
-		 /><?php esc_html_e( 'Wednesday', 'boldgrid-backup' ); ?><br />
+		/><?php esc_html_e( 'Wednesday', 'boldgrid-backup' ); ?><br />
 		<input id='dow-thursday' type='checkbox' name='dow_thursday' value='1'
 		<?php
 		if ( ! empty( $settings['schedule']['dow_thursday'] ) ) {
 			echo ' checked'; }
 		?>
-		 /><?php esc_html_e( 'Thursday', 'boldgrid-backup' ); ?><br />
+		/><?php esc_html_e( 'Thursday', 'boldgrid-backup' ); ?><br />
 		<input id='dow-friday' type='checkbox' name='dow_friday' value='1'
 		<?php
 		if ( ! empty( $settings['schedule']['dow_friday'] ) ) {
 			echo ' checked'; }
 		?>
-		 /><?php esc_html_e( 'Friday', 'boldgrid-backup' ); ?><br />
+		/><?php esc_html_e( 'Friday', 'boldgrid-backup' ); ?><br />
 		<input id='dow-saturday' type='checkbox' name='dow_saturday' value='1'
 		<?php
 		if ( ! empty( $settings['schedule']['dow_saturday'] ) ) {
 			echo ' checked'; }
 		?>
-		 /><?php esc_html_e( 'Saturday', 'boldgrid-backup' ); ?>
+		/><?php esc_html_e( 'Saturday', 'boldgrid-backup' ); ?>
 
 		<br /><br />
 
