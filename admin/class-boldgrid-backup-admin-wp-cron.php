@@ -151,8 +151,6 @@ class Boldgrid_Backup_Admin_WP_Cron {
 			$pending_rollback['deadline'] = $auto_restore_time;
 			update_site_option( 'boldgrid_backup_pending_rollback', $pending_rollback );
 		}
-
-		return;
 	}
 
 	/**

@@ -239,8 +239,6 @@ class Boldgrid_Backup {
 	 *
 	 * @since 1.0
 	 * @access private
-	 *
-	 * @return null
 	 */
 	private function define_admin_hooks() {
 		// Instantiate a Boldgrid_Backup_Admin class object.
@@ -395,8 +393,6 @@ class Boldgrid_Backup {
 		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_jobs', $plugin_admin_core->jobs, 'run' );
 		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_backup', $plugin_admin_core->cron, 'backup' );
 		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_restore', $plugin_admin_core->cron, 'restore' );
-
-		return;
 	}
 
 	/**

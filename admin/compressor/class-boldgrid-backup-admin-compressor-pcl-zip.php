@@ -498,7 +498,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 		$backup_dir = $this->core->backup_dir->get();
 
 		// Strings to help with creating test files.
-		$test_file_contents = $str = __( 'This is a test file from BoldGrid Backup. You can delete this file.', 'boldgrid-backup' );
+		$test_file_contents = __( 'This is a test file from BoldGrid Backup. You can delete this file.', 'boldgrid-backup' );
 		$safe_to_delete     = __( 'safe-to-delete', 'boldgrid-backup' );
 		$test_zip_file      = $this->core->test->test_prefix . '-zip';
 		$test_filename      = sprintf( '%1$s%5$s%2$s-%3$s-%4$s', $backup_dir, $test_zip_file, mt_rand(), $safe_to_delete, DIRECTORY_SEPARATOR );
@@ -548,6 +548,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 		$this->core->test->delete_test_files( $backup_dir );
 
 		self::$test_result = true;
+
 		return true;
 	}
 }

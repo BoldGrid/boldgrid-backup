@@ -922,8 +922,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * @since 1.0
 	 *
 	 * @global array $submenu
-	 *
-	 * @return null
 	 */
 	public function add_menu_items() {
 		global $submenu;
@@ -1046,8 +1044,6 @@ class Boldgrid_Backup_Admin_Core {
 				}
 			}
 		}
-
-		return;
 	}
 
 	/**
@@ -2332,8 +2328,6 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Include the home page template.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-home.php';
-
-		return;
 	}
 
 	/**
@@ -2489,8 +2483,6 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @global string $wp_version The WordPress version string.
 	 * @global wpdb $wpdb The WordPress database class object.
-	 *
-	 * @return null
 	 */
 	public function page_backup_test() {
 		// Perform functionality tests.
@@ -2548,8 +2540,6 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Load template view.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-test.php';
-
-		return;
 	}
 
 	/**
@@ -2694,9 +2684,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Perform the backup operation.
-		$archive_info = $this->archive_files( true );
-
-		return;
+		$this->archive_files( true );
 	}
 
 	/**
@@ -2759,7 +2747,5 @@ class Boldgrid_Backup_Admin_Core {
 			// Increment the counter.
 			$counter --;
 		}
-
-		return;
 	}
 }

@@ -198,8 +198,6 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @see Boldgrid_Backup_Admin_Test::is_windows()
 	 * @see BoldGrid_Backup_Admin_Core::get_backup_identifier()
 	 * @see BoldGrid_Backup_Admin_Cron::get_cron_secret()
-	 *
-	 * @return null
 	 */
 	public function add_restore_cron() {
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
@@ -266,8 +264,6 @@ class Boldgrid_Backup_Admin_Cron {
 
 			update_site_option( 'boldgrid_backup_pending_rollback', $pending_rollback );
 		}
-
-		return;
 	}
 
 	/**

@@ -56,17 +56,6 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 	public $zip;
 
 	/**
-	 * Constructor.
-	 *
-	 * @since 1.5.1
-	 *
-	 * @param Boldgrid_Backup_Admin_Core $core Boldgrid_Backup_Admin_Core Object.
-	 */
-	public function __construct( $core ) {
-		parent::__construct( $core );
-	}
-
-	/**
 	 * Add a file's directories to the zip.
 	 *
 	 * When you add a file, the parent directories are not always explicitly
@@ -176,23 +165,29 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 
 		$backup_dir = $this->core->backup_dir->get();
 
-		$test_file_contents = $str = __( 'This is a test file from BoldGrid Backup. You can delete this file.', 'boldgrid-backup' );
+		$test_file_contents = __(
+			'This is a test file from BoldGrid Backup. You can delete this file.',
+			'boldgrid-backup'
+		);
 
 		// translators: 1: A filename.
 		$cannot_open_zip = __( 'Unable to create zip file: %1$s', 'boldgrid-backup' );
+
 		// translators: 1: Backup directory path.
 		$cannot_close_zip = __( 'When testing ZipArchive functionality, we are able to create a zip file and add files to it, but we were unable to close the zip file.<br /><strong>Please be sure the following backup directory has modify permissions</strong>:<br />%1$s', 'boldgrid-backup' );
 		$safe_to_delete   = __( 'safe-to-delete', 'boldgrid-backup' );
-		$test_zip_file    = $test_zip_file = $this->core->test->test_prefix . '-zip';
+		$test_zip_file    = $this->core->test->test_prefix . '-zip';
 		$test_filename    = sprintf( '%1$s%5$s%2$s-%3$s-%4$s', $backup_dir, $test_zip_file, mt_rand(), $safe_to_delete, DIRECTORY_SEPARATOR );
 		$zip_filepath     = $test_filename . '.zip';
 		$random_filename  = $test_filename . '.txt';
 
 		$zip    = new ZipArchive();
 		$status = $zip->open( $zip_filepath, ZipArchive::CREATE );
+
 		if ( ! $status ) {
 			$this->test_errors[] = sprintf( $cannot_open_zip, $zip_filepath );
 			self::$test_result   = false;
+
 			return false;
 		}
 
@@ -208,10 +203,12 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 		if ( ! $zip_closed ) {
 			$this->test_errors[] = sprintf( $cannot_close_zip, $backup_dir );
 			self::$test_result   = false;
+
 			return false;
 		}
 
 		self::$test_result = true;
+
 		return true;
 	}
 }

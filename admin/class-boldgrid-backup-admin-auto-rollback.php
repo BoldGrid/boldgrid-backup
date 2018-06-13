@@ -465,8 +465,6 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		 */
 		$notice_markup = $this->notice_countdown_get();
 		do_action( 'boldgrid_backup_notice', $notice_markup, 'notice notice-warning is-dismissible boldgrid-backup-countdown' );
-
-		return;
 	}
 
 	/**
@@ -891,7 +889,8 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		}
 
 		// Customize our message for the "update theme" feature within the customizer.
-		$path = parse_url( wp_get_referer(), PHP_URL_PATH );
+		$path = wp_parse_url( wp_get_referer(), PHP_URL_PATH );
+
 		if ( defined( 'DOING_AJAX' ) && DOING_AJAX && 'customize.php' === substr( $path, -1 * strlen( 'customize.php' ) ) ) {
 			$message .= $theme_message;
 		}

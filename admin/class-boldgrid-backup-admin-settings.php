@@ -655,8 +655,6 @@ class Boldgrid_Backup_Admin_Settings {
 	 * Menu callback to display the Backup schedule page.
 	 *
 	 * @since 1.0
-	 *
-	 * @return null
 	 */
 	public function page_backup_settings() {
 		add_thickbox();
@@ -752,8 +750,6 @@ class Boldgrid_Backup_Admin_Settings {
 
 		// Include the page template.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-settings.php';
-
-		return;
 	}
 
 	/**
