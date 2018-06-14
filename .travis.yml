@@ -18,7 +18,8 @@ before_script:
 
 script:
   - phpunit --debug
-  # - yarn run php-codesniffer
+  - yarn run php-codesniffer
+  - yarn run js-lint
 
 deploy:
   - provider: script
