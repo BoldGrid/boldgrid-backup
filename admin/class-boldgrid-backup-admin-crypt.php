@@ -43,9 +43,9 @@ class Boldgrid_Backup_Admin_Crypt {
 		$iv             = substr( hash( 'sha256', SECURE_AUTH_KEY ), 0, 16 );
 
 		if ( 'e' === $action ) {
-			$output = base64_encode( openssl_encrypt( $string, $encrypt_method, $key, 0, $iv ) );
+			$output = base64_encode( openssl_encrypt( $string, $encrypt_method, $key, 0, $iv ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
 		} elseif ( 'd' === $action ) {
-			$output = openssl_decrypt( base64_decode( $string ), $encrypt_method, $key, 0, $iv );
+			$output = openssl_decrypt( base64_decode( $string ), $encrypt_method, $key, 0, $iv ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
 		}
 
 		return $output;

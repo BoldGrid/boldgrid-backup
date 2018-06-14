@@ -71,7 +71,7 @@ $files = array(
 	'/admin/remote/class-boldgrid-backup-admin-ftp-page.php',
 	'/vendor/phpseclib/phpseclib/phpseclib/Net/SSH2.php',
 );
-foreach( $files as $file ) {
+foreach ( $files as $file ) {
 	require_once BOLDGRID_BACKUP_PATH . $file;
 }
 
@@ -80,10 +80,10 @@ foreach( $files as $file ) {
  *
  * @since 1.6.0
  *
- * @param mixed
+ * @param mixed $var Message to write to STDERR.
  */
 function phpunit_error_log( $var ) {
-	fwrite( STDERR, "\n" . print_r( $var, 1 ) . "\n" );
+	fwrite( STDERR, "\n" . print_r( $var, 1 ) . "\n" ); // phpcs:ignore WordPress
 }
 
 require $_tests_dir . '/includes/bootstrap.php';

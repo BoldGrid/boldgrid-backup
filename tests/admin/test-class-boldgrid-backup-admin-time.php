@@ -59,45 +59,54 @@ class Test_Boldgrid_Backup_Admin_Time extends WP_UnitTestCase {
 		 * The returned time should be UTC. So, in our settings if we set:
 		 * 6:20 pm UTC-4, then actual UTC time should be 10:20 pm UTC.
 		 */
-		$settings_date = $this->core->time->get_settings_date( $settings, array( 'abbr' => 'UTC-4', ) );
-		$this->assertEquals( '2220', $settings_date->format( 'Hi') );
+		$settings_date = $this->core->time->get_settings_date( $settings, array( 'abbr' => 'UTC-4' ) );
+		$this->assertEquals( '2220', $settings_date->format( 'Hi' ) );
 
-		// UTC-4:30
-		$settings_date = $this->core->time->get_settings_date( $settings, array( 'abbr' => 'UTC-4.5', 'gmt_offset' => -4.5, ) );
-		$this->assertEquals( '2250', $settings_date->format( 'Hi') );
+		// UTC-4:30.
+		$settings_date = $this->core->time->get_settings_date(
+			$settings, array(
+				'abbr'       => 'UTC-4.5',
+				'gmt_offset' => -4.5,
+			)
+		);
+		$this->assertEquals( '2250', $settings_date->format( 'Hi' ) );
 
-		// UTC+4
-		$settings_date = $this->core->time->get_settings_date( $settings, array( 'abbr' => 'UTC+4', ) );
-		$this->assertEquals( '1420', $settings_date->format( 'Hi') );
+		// UTC+4.
+		$settings_date = $this->core->time->get_settings_date( $settings, array( 'abbr' => 'UTC+4' ) );
+		$this->assertEquals( '1420', $settings_date->format( 'Hi' ) );
 
-		// UTC+0
-		$settings_date = $this->core->time->get_settings_date( $settings, array( 'abbr' => 'UTC+0', ) );
-		$this->assertEquals( '1820', $settings_date->format( 'Hi') );
+		// UTC+0.
+		$settings_date = $this->core->time->get_settings_date( $settings, array( 'abbr' => 'UTC+0' ) );
+		$this->assertEquals( '1820', $settings_date->format( 'Hi' ) );
 
 		// Get New York time (18:20) and convert to UTC (22:20).
-		$settings_date = $this->core->time->get_settings_date( $settings, array( 'name' => 'America/New_York', ) );
+		$settings_date = $this->core->time->get_settings_date( $settings, array( 'name' => 'America/New_York' ) );
 		$settings_date->setTimezone( new DateTimeZone( 'UTC' ) );
-		$this->assertEquals( '2220', $settings_date->format( 'Hi') );
+		$this->assertEquals( '2220', $settings_date->format( 'Hi' ) );
 
 		// Pass bad data.
-		$settings_date = $this->core->time->get_settings_date( array(
-			'schedule' => array(
-				'tod_h' => 33,
-				'tod_m' => 111,
-				'tod_a' => 'catfish',
+		$settings_date = $this->core->time->get_settings_date(
+			array(
+				'schedule' => array(
+					'tod_h' => 33,
+					'tod_m' => 111,
+					'tod_a' => 'catfish',
+				),
 			)
-		));
+		);
 		$this->assertFalse( $settings_date );
 
 		// Pass bad data.
-		$settings_date = $this->core->time->get_settings_date( array(
-			'schedule' => array(
-				'tod_h' => 1,
-				// Should fail because 5:1am is wrong and 5:10 is correct.
-				'tod_m' => 1,
-				'tod_a' => 'am',
+		$settings_date = $this->core->time->get_settings_date(
+			array(
+				'schedule' => array(
+					'tod_h' => 1,
+					// Should fail because 5:1am is wrong and 5:10 is correct.
+					'tod_m' => 1,
+					'tod_a' => 'am',
+				),
 			)
-		));
+		);
 		$this->assertFalse( $settings_date );
 
 		// Pass bad data.
