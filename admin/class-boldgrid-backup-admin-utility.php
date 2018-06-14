@@ -766,14 +766,14 @@ class Boldgrid_Backup_Admin_Utility {
 			$option_value = get_option( $option_name[0] );
 
 			// Replace siteurl.
-			$option_value = Boldgrid_Backup_Admin_Utility::str_replace_recursive(
+			$option_value = self::str_replace_recursive(
 				$old_siteurl,
 				$new_siteurl,
 				$option_value
 			);
 
 			// Replace siteurl escaped with slashes.
-			$option_value = Boldgrid_Backup_Admin_Utility::str_replace_recursive(
+			$option_value = self::str_replace_recursive(
 				addslashes( $old_siteurl ),
 				addslashes( $new_siteurl ),
 				$option_value
@@ -803,7 +803,7 @@ class Boldgrid_Backup_Admin_Utility {
 		} elseif ( is_array( $subject ) ) {
 			foreach ( $subject as $index => $element ) {
 				// Recurse.
-				$subject[ $index ] = Boldgrid_Backup_Admin_Utility::str_replace_recursive(
+				$subject[ $index ] = self::str_replace_recursive(
 					$search,
 					$replace,
 					$element
@@ -812,7 +812,7 @@ class Boldgrid_Backup_Admin_Utility {
 		} elseif ( is_object( $subject ) ) {
 			foreach ( $subject as $index => $element ) {
 				// Recurse.
-				$subject->$index = Boldgrid_Backup_Admin_Utility::str_replace_recursive(
+				$subject->$index = self::str_replace_recursive(
 					$search,
 					$replace,
 					$element

@@ -15,7 +15,7 @@
 /*
  * AJAX callback functions in this class have their nonce verified by authorize() in this class.
  *
- * phpcs:disable WordPress.VIP, WordPress.CSRF.NonceVerification.NoNonceVerification
+ * phpcs:disable WordPress.VIP, WordPress.CSRF.NonceVerification.NoNonceVerification, WordPress.Security.NonceVerification.NoNonceVerification
  */
 
 /**

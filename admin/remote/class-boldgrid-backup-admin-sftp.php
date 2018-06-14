@@ -452,7 +452,7 @@ class Boldgrid_Backup_Admin_Sftp {
 			return false;
 		}
 
-		// phpcs:disable WordPress.CSRF.NonceVerification.NoNonceVerification
+		// phpcs:disable WordPress.CSRF.NonceVerification.NoNonceVerification, WordPress.Security.NonceVerification.NoNonceVerification
 
 		if ( empty( $_POST ) ) {
 			return false;
@@ -513,7 +513,7 @@ class Boldgrid_Backup_Admin_Sftp {
 			do_action( 'boldgrid_backup_notice', __( 'Settings saved.', 'boldgrid-backup' ), 'notice updated is-dismissible' );
 		}
 
-		// phpcs:enable WordPress.CSRF.NonceVerification.NoNonceVerification
+		// phpcs:enable WordPress.CSRF.NonceVerification.NoNonceVerification, WordPress.Security.NonceVerification.NoNonceVerification
 	}
 
 	/**

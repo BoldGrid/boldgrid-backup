@@ -429,7 +429,7 @@ class Boldgrid_Backup_Admin_Ftp {
 			),
 		);
 
-		// phpcs:disable WordPress.CSRF.NonceVerification.NoNonceVerification
+		// phpcs:disable WordPress.CSRF.NonceVerification.NoNonceVerification, WordPress.Security.NonceVerification.NoNonceVerification
 
 		foreach ( $values as $value ) {
 			$key      = $value['key'];
@@ -449,7 +449,7 @@ class Boldgrid_Backup_Admin_Ftp {
 			}
 		}
 
-		// phpcs:enable WordPress.CSRF.NonceVerification.NoNonceVerification
+		// phpcs:enable WordPress.CSRF.NonceVerification.NoNonceVerification, WordPress.Security.NonceVerification.NoNonceVerification
 
 		return $data;
 	}
