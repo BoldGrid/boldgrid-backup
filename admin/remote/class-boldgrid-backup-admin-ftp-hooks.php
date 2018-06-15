@@ -13,7 +13,7 @@
  */
 
 /*
- * AJAX callback functions in this class have their nonce verified by authorize() in this class.
+ * AJAX callback functions in this class have their nonce verified by validate_nonce() in the Boldgrid_Backup_Admin_Archive_Details class.
  *
  * phpcs:disable WordPress.VIP, WordPress.CSRF.NonceVerification.NoNonceVerification, WordPress.Security.NonceVerification.NoNonceVerification
  */
