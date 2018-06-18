@@ -36,7 +36,7 @@ ob_start();
 			 * this, it is not recommended that you change it again. You can find more help with setting
 			 * your backup directory <a>here</a>.
 			 */
-			$link = printf(
+			printf(
 				wp_kses(
 					// translators: 1: URL address.
 					esc_html__(

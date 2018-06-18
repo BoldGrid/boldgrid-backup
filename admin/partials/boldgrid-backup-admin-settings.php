@@ -129,8 +129,10 @@ wp_nonce_field( 'boldgrid_backup_settings' );
 	 * being afraid it will do something you cannot easily undo. We perform a Preflight Check to see
 	 * if the needed support is available on your web hosting account.
 	 */
-	$url  = admin_url( 'admin.php?page=boldgrid-backup-test' );
-	$link = sprintf(
+	?>
+	<p>
+	<?php
+	printf(
 		wp_kses(
 			// translators: 1: URL address.
 			esc_html__(
@@ -139,10 +141,10 @@ wp_nonce_field( 'boldgrid_backup_settings' );
 			),
 			array( 'a' => array( 'href' => array() ) )
 		),
-		esc_url( $url )
+		esc_url( admin_url( 'admin.php?page=boldgrid-backup-test' ) )
 	);
-	echo '<p>' . esc_url( $link ) . '</p>';
 	?>
+	</p>
 
 	<hr />
 

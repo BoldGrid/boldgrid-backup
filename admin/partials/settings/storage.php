@@ -71,13 +71,17 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 		<p class="help" data-id="remote_storage">
 			<?php
 			printf(
-				// translators: 1: HTML anchor open tag. 2: HTML anchor close tag.
-				esc_html__(
-					'The following is a list of storage locations available to store your backup archives on. It is recommended to store your backups on at least 2 different storage locations. You can find more information %1$shere%2$s.',
-					'boldgrid-backup'
+				wp_kses(
+					// translators: 1: URL address.
+					__(
+						'The following is a list of storage locations available to store your backup archives on. It is recommended to store your backups on at least 2 different storage locations. You can find more information <a href="%1$s">here</a>.',
+						'boldgrid-backup'
+					),
+					array( 'a' => array( 'href' => array() ) )
 				),
-				'<a href="admin.php?page=boldgrid-backup-tools&section=section_locations">',
-				'</a>'
+				esc_url( admin_url(
+					'admin.php?page=boldgrid-backup-tools&section=section_locations'
+				) )
 			);
 			?>
 		</p>

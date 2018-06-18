@@ -135,7 +135,7 @@ class Boldgrid_Backup_Admin_Archive_Details {
 
 		$filename = ! empty( $_GET['filename'] ) ? sanitize_file_name( $_GET['filename'] ) : false; // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 		if ( ! $filename ) {
-			echo esc_html__( 'No archive specified.', 'boldgrid-backup' );
+			esc_html_e( 'No archive specified.', 'boldgrid-backup' );
 			return;
 		}
 
