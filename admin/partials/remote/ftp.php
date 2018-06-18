@@ -22,7 +22,7 @@ $sftp_selected = 'sftp' === $data['type'] ? $selected : '';
 
 <form method="post">
 
-	<h1><?php echo esc_attr__( 'BoldGrid Backup - FTP Settings', 'boldgrid-backup' ); ?></h1>
+	<h1><?php esc_html_e( 'BoldGrid Backup - FTP Settings', 'boldgrid-backup' ); ?></h1>
 
 	<hr />
 
@@ -35,7 +35,7 @@ $sftp_selected = 'sftp' === $data['type'] ? $selected : '';
 						<label for="host">%1$s</label>
 						<input type="text" name="host" value="%2$s" minlength="5" title="%3$s" required />
 						',
-						esc_attr__( 'FTP Host', 'boldgrid-backup' ),
+						esc_html__( 'FTP Host', 'boldgrid-backup' ),
 						esc_attr( $data['host'] ),
 						esc_attr__( 'FTP host should be in the format of: example.com', 'boldgrid-backup' )
 					);
@@ -94,8 +94,8 @@ $sftp_selected = 'sftp' === $data['type'] ? $selected : '';
 
 	<p>
 		<input type="hidden" name="action" value="save" />
-		<input class="button button-primary" type="submit" value="<?php echo esc_attr__( 'Save changes', 'boldgrid-backup' ); ?>" />
-		<button class="button button-secondary"><?php echo esc_attr__( 'Delete settings', 'boldgrid-backup' ); ?></button>
+		<input class="button button-primary" type="submit" value="<?php esc_attr_e( 'Save changes', 'boldgrid-backup' ); ?>" />
+		<button class="button button-secondary"><?php esc_html_e( 'Delete settings', 'boldgrid-backup' ); ?></button>
 		<span class="spinner inline middle hidden"></span>
 	</p>
 

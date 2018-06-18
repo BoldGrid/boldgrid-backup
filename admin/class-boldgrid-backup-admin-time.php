@@ -344,7 +344,7 @@ class Boldgrid_Backup_Admin_Time {
 			'<a href="%1$s" title="%3$s">%2$s</a>',
 			admin_url( 'options-general.php' ),
 			__( 'Change timezone', 'boldgrid-backup' ),
-			esc_attr( __( 'WordPress timezone settings can be adjusted within Settings &raquo; General', 'boldgrid-backup' ) )
+			esc_html( __( 'WordPress timezone settings can be adjusted within Settings &raquo; General', 'boldgrid-backup' ) )
 		);
 
 		return $timezone_info;

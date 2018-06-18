@@ -240,7 +240,7 @@ class Boldgrid_Backup_Admin_Jobs {
 
 		// If not logged-in, then require a matching "id".
 		if ( ! $this->core->cron->is_valid_call() ) {
-			wp_die( esc_attr__( 'Error: Invalid request.', 'boldgrid-backup' ) );
+			wp_die( esc_html__( 'Error: Invalid request.', 'boldgrid-backup' ) );
 		}
 
 		// If there are no jobs or already running, then abort.

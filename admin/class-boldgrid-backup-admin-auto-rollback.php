@@ -820,7 +820,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 
 		// Print a hidden div with the time (in ISO 8601 format), so that JavaScript can read it.
 		?>
-		<div class="hidden" id="rollback-deadline"><?php echo esc_attr( date( 'c', $deadline ) ); ?></div>
+		<div class="hidden" id="rollback-deadline"><?php echo esc_html( date( 'c', $deadline ) ); ?></div>
 		<?php
 	}
 
@@ -990,7 +990,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		}
 
 		// Convert the deadline to ISO time (in ISO 8601 format).
-		wp_die( esc_attr( date( 'c', $deadline ) ) );
+		wp_die( esc_html( date( 'c', $deadline ) ) );
 	}
 
 	/**

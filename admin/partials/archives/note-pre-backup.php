@@ -63,7 +63,7 @@ defined( 'WPINC' ) || die;
 				)
 			),
 			count( $archives ),
-			esc_attr( $settings['retention_count'] ),
+			esc_html( $settings['retention_count'] ),
 			esc_url( get_admin_url( null, 'admin.php?page=boldgrid-backup-settings' ) )
 		);
 	}

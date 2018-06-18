@@ -34,7 +34,7 @@ ob_start();
 					echo ' selected';
 				}
 				?>
-			><?php echo esc_attr( $x ); ?></option>
+			><?php echo esc_html( $x ); ?></option>
 				<?php
 			}
 			?>
@@ -52,7 +52,7 @@ ob_start();
 					echo ' selected';
 				}
 				?>
-			><?php echo esc_attr( $x ); ?></option>
+			><?php echo esc_html( $x ); ?></option>
 				<?php
 			}
 			?>
