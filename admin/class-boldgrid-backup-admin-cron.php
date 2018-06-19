@@ -725,7 +725,7 @@ class Boldgrid_Backup_Admin_Cron {
 	public function print_cron_report( $archive_info ) {
 		// Validate mode.
 		if ( empty( $archive_info['mode'] ) ) {
-			wp_die( esc_html_e( 'Error: A mode was not specified.', 'boldgrid-backup' ) );
+			wp_die( esc_html__( 'Error: A mode was not specified.', 'boldgrid-backup' ) );
 		}
 
 		$valid_modes = array(
@@ -737,7 +737,7 @@ class Boldgrid_Backup_Admin_Cron {
 			printf(
 				// translators: 1: Archive mode ("backup" or "restore").
 				esc_html__( 'Error: Invalid mode "%s".', 'boldgrid-backup' ),
-				esc_html( $archive_info['mode'] )
+				$archive_info['mode'] // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 			);
 			wp_die();
 		}
@@ -762,20 +762,20 @@ class Boldgrid_Backup_Admin_Cron {
 			// Error.
 			printf(
 				esc_html__( 'There was an error $s backup archive file.', 'boldgrid-backup' ),
-				esc_html( $action_name )
+				$action_name // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 			) . PHP_EOL;
 
 			printf(
 				// translators: 1: Error message.
 				esc_html__( 'Error: %s', 'boldgrid-backup' ),
-				esc_html( $archive_info['error'] )
+				$archive_info['error'] // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 			) . PHP_EOL;
 
 			if ( isset( $archive_info['error_message'] ) ) {
 				printf(
 					// translators: 1: Error message.
 					esc_html__( 'Error Message: %s', 'boldgrid-backup' ),
-					esc_html( $archive_info['error_message'] )
+					$archive_info['error_message'] // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 				);
 			}
 
@@ -791,7 +791,7 @@ class Boldgrid_Backup_Admin_Cron {
 				printf(
 					// translators: 1: File path.
 					esc_html__( 'File Path: %s', 'boldgrid-backup' ),
-					esc_html( $archive_info['filepath'] )
+					$archive_info['filepath'] // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 				) . PHP_EOL;
 			}
 
@@ -799,9 +799,7 @@ class Boldgrid_Backup_Admin_Cron {
 				printf(
 					// translators: 1: File size.
 					esc_html__( 'File Size: %s', 'boldgrid-backup' ),
-					esc_html(
-						Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['filesize'] )
-					)
+					Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['filesize'] ) // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 				) . PHP_EOL;
 			}
 
@@ -809,9 +807,7 @@ class Boldgrid_Backup_Admin_Cron {
 				printf(
 					// translators: 1: Total backup size.
 					esc_html__( 'Total size: %s', 'boldgrid-backup' ),
-					esc_html(
-						Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] )
-					)
+					Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] ) // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 				) . PHP_EOL;
 			}
 
@@ -819,7 +815,7 @@ class Boldgrid_Backup_Admin_Cron {
 				printf(
 					// translators: 1: Compressor name.
 					esc_html__( 'Compressor: %s', 'boldgrid-backup' ),
-					esc_html( $archive_info['compressor'] )
+					$archive_info['compressor'] // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 				) . PHP_EOL;
 			}
 
@@ -827,7 +823,7 @@ class Boldgrid_Backup_Admin_Cron {
 			if ( isset( $archive_info['db_duration'] ) ) {
 				printf(
 					esc_html( $this->core->configs['lang']['est_pause'] ),
-					esc_html( $archive_info['db_duration'] )
+					$archive_info['db_duration'] // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 				) . PHP_EOL;
 			}
 
@@ -835,7 +831,7 @@ class Boldgrid_Backup_Admin_Cron {
 				printf(
 					// translators: 1: Backup duration.
 					esc_html__( 'Duration: %s seconds', 'boldgrid-backup' ),
-					esc_html( $archive_info['duration'] )
+					$archive_info['duration'] // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 				) . PHP_EOL;
 			}
 		} else {
@@ -846,7 +842,7 @@ class Boldgrid_Backup_Admin_Cron {
 					'There was an unknown error %s a backup archive file.',
 					'boldgrid-backup'
 				),
-				esc_html( $action_name )
+				$action_name // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 			) . PHP_EOL;
 		}
 	}
