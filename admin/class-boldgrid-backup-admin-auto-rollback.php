@@ -529,7 +529,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 					' .
 			sprintf(
 				// translators: 1: URL address.
-				esc_html__(
+				__(
 					'<strong>Update Protection</strong> for <em>future updates</em> can be configured on your <a href="%1$s">Settings</a> page.',
 					'boldgrid-backup'
 				),
