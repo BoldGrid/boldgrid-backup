@@ -636,7 +636,9 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 				$notice .= implode( '<br />', $li );
 				break;
 			case 'plugin':
-				foreach ( $trigger['plugins'] as $plugin ) {
+				$plugins = ! empty( $trigger['plugins'] ) ? $trigger['plugins'] : array( $trigger['plugin'] );
+
+				foreach ( $plugins as $plugin ) {
 					$data = $this->core->utility->get_plugin_data( $plugin );
 					$li[] = sprintf( '<strong>%1$s</strong> to version %2$s', $data['Name'], $data['Version'] );
 				}
