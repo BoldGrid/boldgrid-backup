@@ -30,6 +30,7 @@ WordPress backup and restoration with update protection.
 
 ### 1.6.4 In progress ###
 
+* Update:  Adjusted php-cli detection.
 * Update:  Satisfying CodeSniffer.
 
 ### 1.6.3 ###

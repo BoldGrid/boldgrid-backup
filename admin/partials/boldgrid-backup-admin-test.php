@@ -96,7 +96,7 @@ $tests = array(
 	),
 	array(
 		'k' => __( 'PHP in safe mode?', 'boldgrid-backup' ),
-		'v' => ( $this->test->is_php_safemode() ? sprintf( $error_span, $lang['no'] ) : $lang['yes'] ),
+		'v' => $this->test->is_php_safemode() ? sprintf( $error_span, $lang['yes'], '' ) : $lang['no'],
 	),
 	array(
 		'k' => __( 'WordPress version:', 'boldgrid-backup' ),

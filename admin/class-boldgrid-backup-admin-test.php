@@ -805,6 +805,6 @@ class Boldgrid_Backup_Admin_Test {
 
 		$has_php_cli = $this->core->wp_filesystem->exists( '/usr/local/bin/php' );
 
-		return $is_ea4 && $has_php_cli;
+		return $is_ea4 || $has_php_cli;
 	}
 }
