@@ -127,12 +127,11 @@ function load_boldgrid_backup() {
 	// Load Library.
 	$load = new Boldgrid\Library\Util\Load(
 		array(
-			'type'        => 'plugin',
-			'file'        => plugin_basename( __FILE__ ),
-			'loader'      => $loader,
-			'keyValidate' => true,
-			'licenseActivate',
-			false,
+			'type'            => 'plugin',
+			'file'            => plugin_basename( __FILE__ ),
+			'loader'          => $loader,
+			'keyValidate'     => true,
+			'licenseActivate' => false,
 		)
 	);
 

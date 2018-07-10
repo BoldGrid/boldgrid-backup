@@ -102,16 +102,16 @@
         },
         {
             "name": "ifsnop/mysqldump-php",
-            "version": "v2.4",
+            "version": "v2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ifsnop/mysqldump-php.git",
-                "reference": "2a633b3da5db1e5bdc39c1b71c697ef197c39eeb"
+                "reference": "8d063449981e3f7bd28a3a083842e21a24d1f4af"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ifsnop/mysqldump-php/zipball/2a633b3da5db1e5bdc39c1b71c697ef197c39eeb",
-                "reference": "2a633b3da5db1e5bdc39c1b71c697ef197c39eeb",
+                "url": "https://api.github.com/repos/ifsnop/mysqldump-php/zipball/8d063449981e3f7bd28a3a083842e21a24d1f4af",
+                "reference": "8d063449981e3f7bd28a3a083842e21a24d1f4af",
                 "shasum": ""
             },
             "require": {
@@ -150,7 +150,7 @@
                 "pdo",
                 "sqlite"
             ],
-            "time": "2018-03-07T22:27:23+00:00"
+            "time": "2018-06-30T19:40:05+00:00"
         },
         {
             "name": "phpseclib/phpseclib",
