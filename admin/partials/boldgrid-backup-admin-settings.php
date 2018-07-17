@@ -135,7 +135,7 @@ wp_nonce_field( 'boldgrid_backup_settings' );
 	printf(
 		wp_kses(
 			// translators: 1: URL address.
-			esc_html__(
+			__(
 				'The BoldGrid Backup and Restore system allows you to upgrade your themes and plugins without being afraid it will do something you cannot easily undo. We perform a <a href="%s">Preflight Check</a> to see if the needed support is available on your web hosting account.',
 				'boldgrid-backup'
 			),
