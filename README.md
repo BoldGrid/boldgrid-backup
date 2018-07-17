@@ -28,10 +28,13 @@ WordPress backup and restoration with update protection.
 
 ## Changelog ##
 
-### 1.6.4 In progress ###
+### 1.6.4 ###
 
-* Update:  Adjusted php-cli detection.
-* Update:  Satisfying CodeSniffer.
+Release Date: July 17th, 2018
+
+* Bug fix: Fixed and improved php-cli detection.
+* Bug fix: Fixed "Undefined index 'plugins'" bug.
+* Update: Cleaned up codebase to pass PHP CodeSniffer.
 
 ### 1.6.3 ###
 
