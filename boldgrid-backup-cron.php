@@ -15,8 +15,11 @@
 
 // phpcs:disable WordPress.VIP
 
+require dirname( __FILE__ ) . '/class-boldgrid-backup-cron-helper.php';
+$cron_helper = new Boldgrid_Backup_Cron_Helper();
+
 // Abort if not being ran from the command line.
-if ( ! isset( $_SERVER['argv'], $_SERVER['argc'] ) || ! $_SERVER['argc'] ) {
+if ( ! $cron_helper->is_cli() ) {
 	die( 'Error: No parameters were passed.  A "siteurl", "mode", and "id" are required.' . "\n" );
 }
 
