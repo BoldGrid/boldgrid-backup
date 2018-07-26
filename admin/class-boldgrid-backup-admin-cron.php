@@ -561,6 +561,27 @@ class Boldgrid_Backup_Admin_Cron {
 	}
 
 	/**
+	 * Delete all cron entries that contain a string.
+	 *
+	 * @since 1.6.5
+	 *
+	 * @param string $string The string to look for.
+	 */
+	public function entry_delete_contains( $string ) {
+		$all_entries = $this->get_all();
+
+		if ( ! is_array( $all_entries ) ) {
+			return;
+		}
+
+		foreach ( $all_entries as $entry ) {
+			if ( false !== strpos( $entry, $string ) ) {
+				$this->entry_delete( $entry );
+			}
+		}
+	}
+
+	/**
 	 * Determine if an entry exists in the crontab.
 	 *
 	 * @since 1.6.0

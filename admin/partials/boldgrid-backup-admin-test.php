@@ -40,13 +40,46 @@ $warning_span = '<span class="warning">%1$s</span><br />%2$s';
 $success_span = '<span class="success">%1$s</span>';
 
 $allowed_tags = array(
-	'span' => array(
-		'class' => array(
+	'span'   => array(
+		'class'   => array(
 			'error',
+			'dashicons',
+			'dashicons-editor-help',
+			'spinner',
+			'inline',
+		),
+		'data-id' => array(
+			'cron-time-zone',
 		),
 	),
-	'br'   => array(),
-	'pre'  => array(),
+	'br'     => array(),
+	'p'      => array(
+		'class'   => array(
+			'help',
+		),
+		'data-id' => array(
+			'cron-time-zone',
+		),
+	),
+	'pre'    => array(),
+	'form'   => array(
+		'method' => array(),
+		'action' => array(
+			'admin.php?page=boldgrid-backup-test',
+		),
+	),
+	'input'  => array(
+		'type'  => array(),
+		'name'  => array(
+			'cron_timezone_test',
+		),
+		'value' => array(),
+		'class' => array(
+			'button',
+		),
+		'style' => array(),
+	),
+	'strong' => array(),
 );
 
 $backup_dir_perms = $this->test->extensive_dir_test( $backup_directory );
@@ -256,6 +289,11 @@ $tests[] = array(
 );
 
 $tests[] = array(
+	'k' => __( 'Cron time zone matches server time zone? <span class="dashicons dashicons-editor-help" data-id="cron-time-zone"></span>', 'boldgrid-backup' ),
+	'v' => $this->cron_test->get_preflight_markup(),
+);
+
+$tests[] = array(
 	'k' => __( 'Cron jobs:', 'boldgrid-backup' ),
 	'v' => '<pre>' . implode( '<br /><br />', $our_crons ) . '</pre>',
 );
@@ -369,7 +407,7 @@ foreach ( $tests as $test ) {
 	} elseif ( isset( $test['k'] ) ) {
 		$table .= sprintf(
 			'<tr><td>%1$s</td><td><em>%2$s</em></td></tr>',
-			esc_html( $test['k'] ),
+			wp_kses( $test['k'], $allowed_tags ),
 			wp_kses( $test['v'], $allowed_tags )
 		);
 	} else {

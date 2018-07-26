@@ -133,6 +133,7 @@ class Boldgrid_Backup {
 		 * The class responsible for the cron functionality in the admin area.
 		 */
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-cron.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-cron-test.php';
 
 		/**
 		 * The class responsible for the core backup functionality in the admin area.

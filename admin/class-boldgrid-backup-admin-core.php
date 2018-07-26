@@ -201,6 +201,15 @@ class Boldgrid_Backup_Admin_Core {
 	public $cron;
 
 	/**
+	 * Cron test class.
+	 *
+	 * @since 1.6.5
+	 * @access public
+	 * @var Boldgrid_Backup_Admin_Cron_Test
+	 */
+	public $cron_test;
+
+	/**
 	 * The admin xhprof class object.
 	 *
 	 * @since 1.2
@@ -588,6 +597,8 @@ class Boldgrid_Backup_Admin_Core {
 		$this->tools = new Boldgrid_Backup_Admin_Tools( $this );
 
 		$this->time = new Boldgrid_Backup_Admin_Time( $this );
+
+		$this->cron_test = new Boldgrid_Backup_Admin_Cron_Test( $this );
 
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
@@ -2518,6 +2529,18 @@ class Boldgrid_Backup_Admin_Core {
 		$db_collate = $wpdb->collate;
 
 		$disk_space = $this->test->get_disk_space();
+
+		/*
+		 * Cron time zone testing.
+		 *
+		 * This set of code may modify cron jobs. Be sure to run before we get the cron jobs below
+		 * so that we give the user accurate info about which cron jobs are set.
+		 */
+		if ( ! empty( $_POST['cron_timezone_test'] ) && check_admin_referer( 'cron_timezone_text' ) ) { // Input var okay.
+			$this->cron_test->setup();
+		} elseif ( ! $this->cron_test->is_running() ) {
+			$this->cron_test->clean_up();
+		}
 
 		// Get our crons and ready them for display.
 		$our_crons = $this->cron->get_our_crons();
