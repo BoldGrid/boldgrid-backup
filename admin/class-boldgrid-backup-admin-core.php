@@ -2536,7 +2536,7 @@ class Boldgrid_Backup_Admin_Core {
 		 * This set of code may modify cron jobs. Be sure to run before we get the cron jobs below
 		 * so that we give the user accurate info about which cron jobs are set.
 		 */
-		if ( ! empty( $_POST['cron_timezone_test'] ) && check_admin_referer( 'cron_timezone_text' ) ) { // Input var okay.
+		if ( ! empty( $_POST['cron_timezone_test'] ) && check_admin_referer( 'cron_timezone_test' ) ) { // Input var okay.
 			$this->cron_test->setup();
 		} elseif ( ! $this->cron_test->is_running() ) {
 			$this->cron_test->clean_up();
