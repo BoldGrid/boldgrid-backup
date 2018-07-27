@@ -596,6 +596,27 @@ class Boldgrid_Backup_Admin_Cron {
 	}
 
 	/**
+	 * Search for cron entries that contain a specfic string.
+	 *
+	 * @since 1.6.5
+	 *
+	 * @param  string $search String to search for.
+	 * @return array          An array of matches.
+	 */
+	public function entry_search( $search ) {
+		$matches = array();
+		$entries = $this->get_all();
+
+		foreach ( $entries as $entry ) {
+			if ( false !== strpos( $entry, $search ) ) {
+				$matches[] = $entry;
+			}
+		}
+
+		return $matches;
+	}
+
+	/**
 	 * Get all entries in cron.
 	 *
 	 * @since 1.5.2

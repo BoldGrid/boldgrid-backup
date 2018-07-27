@@ -163,7 +163,9 @@ class Boldgrid_Backup_Admin_Cron_Test {
 	public function is_running() {
 		$config_exists = $this->core->wp_filesystem->exists( $this->cron_config );
 
-		return false === $this->get_offset() && $config_exists;
+		$matching_crons = $this->core->cron->entry_search( $this->cron_path );
+
+		return false === $this->get_offset() && $config_exists && ! empty( $matching_crons );
 	}
 
 	/**
