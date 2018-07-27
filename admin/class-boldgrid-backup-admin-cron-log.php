@@ -163,7 +163,8 @@ class Boldgrid_Backup_Admin_Cron_Log {
 				</thead>';
 
 			foreach ( $log as $item ) {
-				$time    = date( 'Y:m:d H:i:s', $item['time'] );
+				$this->core->time->init( $item['time'] );
+				$time    = $this->core->time->get_span();
 				$message = esc_html( $item['message'] );
 
 				$markup .= sprintf( '<tr><th>%1$s</th><td>%2$s</td></tr>', $time, $message );
