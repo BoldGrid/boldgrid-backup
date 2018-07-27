@@ -201,6 +201,15 @@ class Boldgrid_Backup_Admin_Core {
 	public $cron;
 
 	/**
+	 * Cron log class.
+	 *
+	 * @since 1.6.5
+	 * @access public
+	 * @var Boldgrid_Backup_Admin_Cron_Log
+	 */
+	public $cron_log;
+
+	/**
 	 * Cron test class.
 	 *
 	 * @since 1.6.5
@@ -599,6 +608,8 @@ class Boldgrid_Backup_Admin_Core {
 		$this->time = new Boldgrid_Backup_Admin_Time( $this );
 
 		$this->cron_test = new Boldgrid_Backup_Admin_Cron_Test( $this );
+
+		$this->cron_log = new Boldgrid_Backup_Admin_Cron_Log( $this );
 
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();

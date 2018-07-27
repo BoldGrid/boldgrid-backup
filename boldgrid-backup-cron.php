@@ -15,12 +15,15 @@
 
 // phpcs:disable WordPress.VIP
 
-require dirname( __FILE__ ) . '/class-boldgrid-backup-cron-helper.php';
+require dirname( __FILE__ ) . '/admin/class-boldgrid-backup-admin-cron-log.php';
+require dirname( __FILE__ ) . '/cron/class-boldgrid-backup-cron-helper.php';
 $cron_helper = new Boldgrid_Backup_Cron_Helper();
 
 // Abort if not being ran from the command line.
 if ( ! $cron_helper->is_cli() ) {
-	die( 'Error: No parameters were passed.  A "siteurl", "mode", and "id" are required.' . "\n" );
+	$error = 'Error: No parameters were passed.  A "siteurl", "mode", and "id" are required.';
+	Boldgrid_Backup_Admin_Cron_Log::add_log( $error );
+	die( $error . "\n" ); // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 }
 
 // Initialize $input and $error.
@@ -48,6 +51,7 @@ foreach ( $required_arguments as $required_argument ) {
 }
 
 if ( $error ) {
+	Boldgrid_Backup_Admin_Cron_Log::add_log( $error );
 	die( $error ); // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 }
 
@@ -58,7 +62,9 @@ $valid_modes = array(
 );
 
 if ( ! in_array( $input['mode'], $valid_modes, true ) ) {
-	die( 'Error: Invalid mode "' . $input['mode'] . '".' . PHP_EOL ); // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+	$error = 'Error: Invalid mode "' . $input['mode'] . '".';
+	Boldgrid_Backup_Admin_Cron_Log::add_log( $error );
+	die( $error ); // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 }
 
 // Make an ajax call to run jobs, and report status.
@@ -73,7 +79,9 @@ $result     = $url_helper->call_url( $url );
 if ( false !== $result ) {
 	$message = $result;
 } else {
-	$message = 'Error: Could not reach URL address "' . $url . '".';
+	$error = 'Error: Could not reach admin-ajax.php address';
+	Boldgrid_Backup_Admin_Cron_Log::add_log( $error );
+	$message = $error . ': "' . $url . '".';
 }
 
 die( $message ); // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped

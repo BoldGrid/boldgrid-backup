@@ -23,6 +23,11 @@ $sections = array(
 			'title'   => __( 'Local & Remote', 'boldgrid-backup' ),
 			'content' => include BOLDGRID_BACKUP_PATH . '/admin/partials/tools/local-remote.php',
 		),
+		array(
+			'id'      => 'section_cron_log',
+			'title'   => __( 'Cron Log', 'boldgrid-backup' ),
+			'content' => $this->core->cron_log->get_markup(),
+		),
 	),
 );
 

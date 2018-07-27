@@ -134,6 +134,7 @@ class Boldgrid_Backup {
 		 */
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-cron.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-cron-test.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-cron-log.php';
 
 		/**
 		 * The class responsible for the core backup functionality in the admin area.
@@ -394,6 +395,8 @@ class Boldgrid_Backup {
 		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_jobs', $plugin_admin_core->jobs, 'run' );
 		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_backup', $plugin_admin_core->cron, 'backup' );
 		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_restore', $plugin_admin_core->cron, 'restore' );
+
+		$this->loader->add_action( 'admin_notices', $plugin_admin_core->cron_log, 'admin_notice' );
 	}
 
 	/**
