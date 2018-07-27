@@ -107,12 +107,18 @@ class Boldgrid_Backup_Admin_Cron_Test {
 			</form>
 		</p>';
 
+		$no = sprintf(
+			'<span class="warning">%1$s</span><br />%2$s',
+			__( 'No', 'boldgrid-backup' ),
+			__( 'Please contact your server administrator for assistance with troubleshooting.' )
+		);
+
 		if ( $this->is_running() ) {
 			$markup .= '<p><span class="spinner inline"></span>' . __( 'This test is in progress, and may take up to 25 minutes to complete. Refresh this page for an update.', 'boldgrid-backup' ) . '</p>';
 		} elseif ( false === $cron_offset ) {
 			$markup .= sprintf( $run_test, esc_attr( __( 'Run test', 'boldgrid-backup' ) ) );
 		} else {
-			$match_markup = '<p>' . ( $offset_match ? __( 'Yes', 'boldgrid-backup' ) : __( 'No', 'boldgrid-backup' ) ) . '</p>';
+			$match_markup = '<p>' . ( $offset_match ? __( 'Yes', 'boldgrid-backup' ) : $no ) . '</p>';
 			$markup       = $match_markup . $markup;
 
 			$markup .= '<p>' . __( 'Server offset', 'boldgrid-backup' ) . ': ' . $server_offset . '<br />';
