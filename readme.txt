@@ -30,6 +30,7 @@ WordPress backup and restoration with update protection.
 
 = 1.6.5 In progress =
 
+* New feature: Preflight test to see if server time zone matches cron time.
 * Bug fix: argv variables missing, Enabled register_argc_argv within cron command.
 
 = 1.6.4 =
