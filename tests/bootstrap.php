@@ -31,6 +31,7 @@ $files = array(
 	'/admin/class-boldgrid-backup-admin-test.php',
 	'/admin/class-boldgrid-backup-admin-notice.php',
 	'/admin/class-boldgrid-backup-admin-cron.php',
+	'/admin/class-boldgrid-backup-admin-cron-log.php',
 	'/admin/class-boldgrid-backup-admin-cron-test.php',
 	'/admin/class-boldgrid-backup-admin-upload.php',
 	'/admin/class-boldgrid-backup-admin-xhprof.php',
