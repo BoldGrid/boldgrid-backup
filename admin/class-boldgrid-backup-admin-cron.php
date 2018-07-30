@@ -38,6 +38,20 @@ class Boldgrid_Backup_Admin_Cron {
 	public $run_jobs = 'cron/run-jobs.php';
 
 	/**
+	 * Cron command.
+	 *
+	 * This is the base of most of our cron commands.
+	 *
+	 * The following was added as of 1.6.5 for those hosts that have register_argc_argv disabled:
+	 * -d register_argc_argv="1"
+	 *
+	 * @since 1.6.5
+	 * @access private
+	 * @var string
+	 */
+	private $cron_command = 'php -d register_argc_argv="1" -qf';
+
+	/**
 	 * A cron secret used to validate unauthenticated crontab jobs.
 	 *
 	 * @since 1.6.1-rc.1
@@ -132,7 +146,7 @@ class Boldgrid_Backup_Admin_Cron {
 		// Build cron job line in crontab format.
 		$entry = $date->format( 'i G' ) . ' * * ';
 
-		$entry .= $days_scheduled_list . ' php -qf "' . dirname( dirname( __FILE__ ) ) .
+		$entry .= $days_scheduled_list . ' ' . $this->cron_command . ' "' . dirname( dirname( __FILE__ ) ) .
 			'/boldgrid-backup-cron.php" mode=backup siteurl=' . get_site_url() . ' id=' .
 			$this->core->get_backup_identifier() . ' secret=' . $this->get_cron_secret();
 
@@ -244,7 +258,7 @@ class Boldgrid_Backup_Admin_Cron {
 		}
 
 		// Build cron job line in crontab format.
-		$entry = date( $minute . ' ' . $hour, $deadline ) . ' * * ' . date( 'w' ) . ' php -qf "' .
+		$entry = date( $minute . ' ' . $hour, $deadline ) . ' * * ' . date( 'w' ) . ' ' . $this->cron_command . ' "' .
 			dirname( dirname( __FILE__ ) ) . '/boldgrid-backup-cron.php" mode=restore siteurl=' .
 			get_site_url() . ' id=' . $this->core->get_backup_identifier() . ' secret=' .
 			$this->get_cron_secret() . ' archive_key=' . $archive_key .
@@ -329,12 +343,13 @@ class Boldgrid_Backup_Admin_Cron {
 	 */
 	public function schedule_jobs() {
 		$entry = sprintf(
-			'*/5 * * * * php -qf "%1$s/%2$s" siteurl=%3$s id=%4$s secret=%5$s > /dev/null 2>&1',
+			'*/5 * * * * %6$s "%1$s/%2$s" siteurl=%3$s id=%4$s secret=%5$s > /dev/null 2>&1',
 			dirname( dirname( __FILE__ ) ),
 			$this->run_jobs,
 			get_site_url(),
 			$this->core->get_backup_identifier(),
-			$this->get_cron_secret()
+			$this->get_cron_secret(),
+			$this->cron_command
 		);
 
 		return $this->update_cron( $entry );
