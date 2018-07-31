@@ -28,6 +28,14 @@ WordPress backup and restoration with update protection.
 
 ## Changelog ##
 
+### 1.6.5 ###
+
+Release Date: July 31st, 2018
+
+* New feature: Preflight test to see if server time zone matches cron time.
+* Bug fix: argv variables missing, Enabled register_argc_argv within cron command.
+* Bug fix: Failed crons now write to log.
+
 ### 1.6.4 ###
 
 Release Date: July 17th, 2018
