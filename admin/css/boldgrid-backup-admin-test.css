@@ -8,6 +8,7 @@
 
 .functionality-test-section table tr td {
 	padding: 5px 10px;
+	vertical-align: top;
 }
 
 .functionality-test-section table tr td h2 {

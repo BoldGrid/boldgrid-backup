@@ -35,7 +35,7 @@ class Boldgrid_Backup_Admin_Cron_Test {
 	 * @access private
 	 * @var string
 	 */
-	private $cron_config;
+	private $cron_config_path;
 
 	/**
 	 * Path to php file, which is ran via cron.
@@ -53,7 +53,7 @@ class Boldgrid_Backup_Admin_Cron_Test {
 	 * @access private
 	 * @var string
 	 */
-	private $cron_result;
+	private $cron_result_path;
 
 	/**
 	 * Constructor.
@@ -65,9 +65,9 @@ class Boldgrid_Backup_Admin_Cron_Test {
 	public function __construct( $core ) {
 		$this->core = $core;
 
-		$this->cron_path   = trailingslashit( BOLDGRID_BACKUP_PATH ) . 'cron/cron-test.php';
-		$this->cron_config = trailingslashit( BOLDGRID_BACKUP_PATH ) . 'cron/cron-test.config';
-		$this->cron_result = trailingslashit( BOLDGRID_BACKUP_PATH ) . 'cron/cron-test.result';
+		$this->cron_path        = BOLDGRID_BACKUP_PATH . '/cron/cron-test.php';
+		$this->cron_config_path = BOLDGRID_BACKUP_PATH . '/cron/cron-test.config';
+		$this->cron_result_path = BOLDGRID_BACKUP_PATH . '/cron/cron-test.result';
 	}
 
 	/**
@@ -78,7 +78,7 @@ class Boldgrid_Backup_Admin_Cron_Test {
 	 * @since 1.6.5
 	 */
 	public function clean_up() {
-		wp_delete_file( $this->cron_config );
+		wp_delete_file( $this->cron_config_path );
 		$this->core->cron->entry_delete_contains( $this->cron_path );
 	}
 
@@ -93,7 +93,6 @@ class Boldgrid_Backup_Admin_Cron_Test {
 	 * @return string
 	 */
 	public function get_preflight_markup() {
-		$config_exists = $this->core->wp_filesystem->exists( $this->cron_config );
 		$server_offset = $this->core->time->get_server_offset();
 		$cron_offset   = $this->get_offset();
 		$offset_match  = (int) $server_offset === (int) $cron_offset;
@@ -118,7 +117,7 @@ class Boldgrid_Backup_Admin_Cron_Test {
 		} elseif ( false === $cron_offset ) {
 			$markup .= sprintf( $run_test, esc_attr( __( 'Run test', 'boldgrid-backup' ) ) );
 		} else {
-			$match_markup = '<p>' . ( $offset_match ? __( 'Yes', 'boldgrid-backup' ) : $no ) . '</p>';
+			$match_markup = ( $offset_match ? __( 'Yes', 'boldgrid-backup' ) : $no );
 			$markup       = $match_markup . $markup;
 
 			$markup .= '<p>' . __( 'Server offset', 'boldgrid-backup' ) . ': ' . $server_offset . '<br />';
@@ -143,7 +142,7 @@ class Boldgrid_Backup_Admin_Cron_Test {
 	 * @return mixed
 	 */
 	public function get_offset() {
-		$result = $this->core->wp_filesystem->get_contents( $this->cron_result );
+		$result = $this->core->wp_filesystem->get_contents( $this->cron_result_path );
 		if ( ! $result ) {
 			return false;
 		}
@@ -161,11 +160,11 @@ class Boldgrid_Backup_Admin_Cron_Test {
 	 * @return bool
 	 */
 	public function is_running() {
-		$config_exists = $this->core->wp_filesystem->exists( $this->cron_config );
+		$config_file_exists = $this->core->wp_filesystem->exists( $this->cron_config_path );
 
 		$matching_crons = $this->core->cron->entry_search( $this->cron_path );
 
-		return false === $this->get_offset() && $config_exists && ! empty( $matching_crons );
+		return false === $this->get_offset() && $config_file_exists && ! empty( $matching_crons );
 	}
 
 	/**
@@ -197,11 +196,13 @@ class Boldgrid_Backup_Admin_Cron_Test {
 
 		// Delete the log, the config file, and all existing crons.
 		$this->clean_up();
-		wp_delete_file( $this->cron_result );
+		wp_delete_file( $this->cron_result_path );
 
 		$time_data     = array();
 		$unix_time     = time();
 		$minutes_ahead = 3;
+		// When looping through offsets, begin at the user's offset so test completes faster.
+		$server_offset = (int)$this->core->time->get_server_offset();
 
 		/*
 		 * Add our cron jobs.
@@ -212,21 +213,33 @@ class Boldgrid_Backup_Admin_Cron_Test {
 		 *
 		 * @see https://www.timeanddate.com/time/time-zones-interesting.html
 		 */
-		for ( $x = -12; $x <= 12; $x++ ) {
-			$cron_time = $unix_time + ( $x * 60 * 60 ) + ( $minutes_ahead * 60 );
+		for ( $x = 1; $x <= 25; $x++ ) {
+			$cron_time = $unix_time + ( $server_offset * 60 * 60 ) + ( $minutes_ahead * 60 );
 
 			$time_data[] = array(
 				'time'   => $cron_time,
-				'offset' => $x,
+				'offset' => $server_offset,
 			);
 
 			// Add our cron. Use (int) to make sure our minutes do not have leading zero's.
 			$cron_command = (int) date( 'i', $cron_time ) . ' ' . date( 'G * * *', $cron_time ) . ' php -qf ' . $this->cron_path . ' > /dev/null 2>&1';
-			$this->core->cron->update_cron( $cron_command );
+			$all_crons_added = $this->core->cron->update_cron( $cron_command );
+
+			if ( ! $all_crons_added ) {
+				break;
+			}
 
 			$minutes_ahead++;
+			// Server offset must be between -12 and 12.
+			$server_offset = $server_offset === 12 ? $server_offset++ : -12;
 		}
 
-		$this->core->wp_filesystem->put_contents( $this->cron_config, wp_json_encode( $time_data ) );
+		if ( $all_crons_added ) {
+			$this->core->wp_filesystem->put_contents( $this->cron_config_path, wp_json_encode( $time_data ) );
+		} else {
+			$error = __( 'Failed to setup Cron time zone test.', 'boldgrid-backup' );
+			$this->core->notice->boldgrid_backup_notice( $error );
+			$this->clean_up();
+		}
 	}
 }

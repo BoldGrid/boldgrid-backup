@@ -139,6 +139,10 @@ $tests = array(
 		'k' => __( 'Server time zone:', 'boldgrid-backup' ),
 		'v' => $timezone,
 	),
+	array(
+		'k' => __( 'Server date:', 'boldgrid-backup' ),
+		'v' => $this->time->get_server_date(),
+	),
 );
 
 $tests[] = array(

@@ -75,6 +75,19 @@ class Boldgrid_Backup_Admin_Time {
 	}
 
 	/**
+	 * Get the server's current date.
+	 *
+	 * @since 1.6.5
+	 *
+	 * @return string
+	 */
+	public function get_server_date() {
+		$date = $this->core->execute_command( 'date' );
+
+		return ! $date ? __( 'Unknown', 'boldgrid-backup' ) : $date;
+	}
+
+	/**
 	 * Get a server's UTC offset.
 	 *
 	 * @since 1.6.0
