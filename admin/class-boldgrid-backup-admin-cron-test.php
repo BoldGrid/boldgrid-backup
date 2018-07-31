@@ -222,7 +222,7 @@ class Boldgrid_Backup_Admin_Cron_Test {
 			);
 
 			// Add our cron. Use (int) to make sure our minutes do not have leading zero's.
-			$cron_command    = (int) date( 'i', $cron_time ) . ' ' . date( 'G * * *', $cron_time ) . ' php -qf ' . $this->cron_path . ' > /dev/null 2>&1';
+			$cron_command    = (int) date( 'i', $cron_time ) . ' ' . date( 'G * * *', $cron_time ) . ' php -d register_argc_argv=1 -qf ' . $this->cron_path . ' > /dev/null 2>&1';
 			$all_crons_added = $this->core->cron->update_cron( $cron_command );
 
 			if ( ! $all_crons_added ) {
