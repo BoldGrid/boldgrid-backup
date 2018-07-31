@@ -607,6 +607,10 @@ class Boldgrid_Backup_Admin_Cron {
 	public function entry_exists( $entry ) {
 		$all_entries = $this->get_all();
 
+		if ( empty( $all_entries ) ) {
+			return false;
+		}
+
 		return false !== array_search( $entry, $all_entries, true );
 	}
 
@@ -621,6 +625,10 @@ class Boldgrid_Backup_Admin_Cron {
 	public function entry_search( $search ) {
 		$matches = array();
 		$entries = $this->get_all();
+
+		if ( empty( $entries ) ) {
+			return $matches;
+		}
 
 		foreach ( $entries as $entry ) {
 			if ( false !== strpos( $entry, $search ) ) {
@@ -650,8 +658,31 @@ class Boldgrid_Backup_Admin_Cron {
 			return false;
 		}
 
-		$command = 'crontab -l';
-		$crontab = $this->core->execute_command( $command, null, $success );
+		/*
+		 * Attempt to read the crontab.
+		 *
+		 * Historically, we just read the output of "crontab -l". In certain scenarious, this does
+		 * not return the full output of the command. Another solution would be to output that command
+		 * to a file, and then read the file.
+		 *
+		 * As of 1.6.5, we'll first try the latter option.
+		 */
+		if ( $this->core->backup_dir->can_exec_write() ) {
+			$crontab_file_path = $this->core->backup_dir->get_path_to( 'crontab' );
+
+			// Write crontab to temp file.
+			$command = sprintf( 'crontab -l > %1$s', $crontab_file_path );
+			$this->core->execute_command( $command, null, $success );
+
+			// Read the crontab from temp file.
+			$crontab = $this->core->wp_filesystem->get_contents( $crontab_file_path );
+			$success = false !== $crontab;
+
+			$this->core->wp_filesystem->delete( $crontab_file_path );
+		} else {
+			$command = 'crontab -l';
+			$crontab = $this->core->execute_command( $command, null, $success );
+		}
 
 		if ( ! $success ) {
 			return false;

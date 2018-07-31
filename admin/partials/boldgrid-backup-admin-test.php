@@ -303,6 +303,11 @@ $tests[] = array(
 );
 
 $tests[] = array(
+	'k' => __( 'Method used to read cron:', 'boldgrid-backup' ),
+	'v' => $this->backup_dir->can_exec_write() ? __( 'Crontab output to file.', 'boldgrid-backup' ) : __( 'Crontab read via exec function.', 'boldgrid-backup' ),
+);
+
+$tests[] = array(
 	'k' => __( 'WP Cron enabled?', 'boldgrid-backup' ),
 	'v' => ( $this->test->wp_cron_enabled() ? 'Yes' : 'No' ),
 );

@@ -136,6 +136,38 @@ class Boldgrid_Backup_Admin_Test {
 	}
 
 	/**
+	 * Find out if we can write a file with exec, and then modify it with wp_filesystem.
+	 *
+	 * @since 1.6.5
+	 *
+	 * @param  string $dir The directory to test.
+	 * @return bool
+	 */
+	public function can_exec_write( $dir ) {
+		if ( empty( $dir ) ) {
+			return false;
+		}
+
+		$file = trailingslashit( $dir ) . 'safe-to-delete.txt';
+		$txt  = 'This file is safe to delete.';
+
+		// Write the file with an exec method.
+		$command = sprintf( 'echo "%1$s" > %2$s', $txt, $file );
+		$this->core->execute_command( $command, array(), $success );
+		if ( ! $success ) {
+			return false;
+		}
+
+		// Read the file with wp_filesystem.
+		if ( trim( $this->core->wp_filesystem->get_contents( $file ) ) !== $txt ) {
+			return false;
+		}
+
+		// Delete the file with wp_filesystem.
+		return $this->core->wp_filesystem->delete( $file );
+	}
+
+	/**
 	 * Wrapper for wp_filesystem exists.
 	 *
 	 * @since 1.5.1

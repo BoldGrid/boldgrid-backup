@@ -67,6 +67,19 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	}
 
 	/**
+	 * Determine if exec can write to our backup directory.
+	 *
+	 * @since 1.6.5
+	 *
+	 * @return bool
+	 */
+	public function can_exec_write() {
+		$backup_dir = $this->get();
+
+		return $this->core->test->can_exec_write( $backup_dir );
+	}
+
+	/**
 	 * Create our backup directory and necessary files.
 	 *
 	 * @since 1.5.1
