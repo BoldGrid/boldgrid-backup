@@ -231,7 +231,8 @@ class Boldgrid_Backup_Admin_Cron_Test {
 
 			$minutes_ahead++;
 			// Server offset must be between -12 and 12.
-			$server_offset = 12 === $server_offset ? $server_offset++ : -12;
+			$server_offset++;
+			$server_offset = $server_offset > 12 ? -12 : $server_offset;
 		}
 
 		if ( $all_crons_added ) {
