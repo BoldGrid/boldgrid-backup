@@ -202,7 +202,7 @@ class Boldgrid_Backup_Admin_Cron_Test {
 		$unix_time     = time();
 		$minutes_ahead = 3;
 		// When looping through offsets, begin at the user's offset so test completes faster.
-		$server_offset = (int)$this->core->time->get_server_offset();
+		$server_offset = (int) $this->core->time->get_server_offset();
 
 		/*
 		 * Add our cron jobs.
@@ -222,7 +222,7 @@ class Boldgrid_Backup_Admin_Cron_Test {
 			);
 
 			// Add our cron. Use (int) to make sure our minutes do not have leading zero's.
-			$cron_command = (int) date( 'i', $cron_time ) . ' ' . date( 'G * * *', $cron_time ) . ' php -qf ' . $this->cron_path . ' > /dev/null 2>&1';
+			$cron_command    = (int) date( 'i', $cron_time ) . ' ' . date( 'G * * *', $cron_time ) . ' php -qf ' . $this->cron_path . ' > /dev/null 2>&1';
 			$all_crons_added = $this->core->cron->update_cron( $cron_command );
 
 			if ( ! $all_crons_added ) {
@@ -231,7 +231,7 @@ class Boldgrid_Backup_Admin_Cron_Test {
 
 			$minutes_ahead++;
 			// Server offset must be between -12 and 12.
-			$server_offset = $server_offset === 12 ? $server_offset++ : -12;
+			$server_offset = 12 === $server_offset ? $server_offset++ : -12;
 		}
 
 		if ( $all_crons_added ) {
