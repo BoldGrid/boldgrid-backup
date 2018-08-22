@@ -22,13 +22,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 return array(
-	'ajax_calls'            => array(
-		'get_plugin_version' => '/api/open/get-plugin-version',
-		'get_asset'          => '/api/open/get-asset',
-	),
-	'asset_server'          => 'https://wp-assets.boldgrid.com',
-
-	'urls'                  => array(
+	'urls'                 => array(
 		'compatibility'       => 'https://www.boldgrid.com/support/advanced-tutorials/backup-compatibility-guide',
 		'possible_issues'     => 'https://www.boldgrid.com/support/advanced-tutorials/backup-userguide#possible-issues',
 		'reduce_size_warning' => 'https://www.boldgrid.com/support/advanced-tutorials/backup-userguide#reduce-size-warning',
@@ -38,12 +32,9 @@ return array(
 		'restore'             => 'https://www.boldgrid.com/support/advanced-tutorials/restoring-boldgrid-backup/',
 		'setting_directory'   => 'https://www.boldgrid.com/support/advanced-tutorials/backup-userguide#setting-backup-directory',
 	),
-	'lang'                  => array(
+	'lang'                 => array(
 		// translators: 1: Number of seconds.
 		'est_pause' => esc_html__( 'Estimated Pause: %s seconds', 'boldgrid-backup' ),
 	),
-	'plugin_name'           => 'boldgrid-backup',
-	'plugin_key_code'       => 'backup',
-	'main_file_path'        => BOLDGRID_BACKUP_PATH . '/boldgrid-backup.php',
-	'plugin_transient_name' => 'boldgrid_backup_version_data',
+	'public_link_lifetime' => '1 HOUR',
 );

@@ -213,7 +213,6 @@ class Boldgrid_Backup_Admin_Archive {
 			$have_log = $this->core->archive_log->restore_by_zip( $this->filepath );
 		}
 
-		// Init our log.
 		if ( $have_log ) {
 			$this->log = $this->core->archive_log->get_by_zip( $this->filepath );
 		}
@@ -347,12 +346,102 @@ class Boldgrid_Backup_Admin_Archive {
 	 * timestamp from the log and configure the last modified appropriately.
 	 */
 	public function update_timestamp() {
-
 		// If we don't have what we need, abort.
 		if ( empty( $this->filepath ) || empty( $this->log['lastmodunix'] ) ) {
 			return false;
 		}
 
 		return $this->core->wp_filesystem->touch( $this->filepath, $this->log['lastmodunix'] );
+	}
+
+	/**
+	 * Validate a download link request.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @see Boldgrid_Backup_Admin_Archive::get_by_name()
+	 *
+	 * @param  string $filename
+	 * @return array
+	 */
+	public function validate_link_request( $filename ) {
+		$result['is_valid'] = true;
+
+		// Verify access permissions.
+		if ( ! current_user_can( 'update_plugins' ) ) {
+			$result['errors'][] = __( 'Insufficient permission', 'boldgrid-backup' );
+		}
+
+		// Validate archive filename.
+		if ( empty( $filename ) ) {
+			$result['errors'][] = __( 'Invalid archive filename', 'boldgrid-backup' );
+		}
+
+		// Check WP_Filesystem method; ensure it is "direct".
+		if ( 'direct' !== get_filesystem_method() ) {
+			$result['errors'][] = __(
+				'Filesystem access method is not "direct"',
+				'boldgrid-backup'
+			);
+		}
+
+		// Get archive details.
+		$archive = $this->get_by_name( $filename );
+
+		// Check if archive file was found.
+		if ( empty( $archive ) ) {
+			$result['errors'][] = __( 'Archive file not found', 'boldgrid-backup' );
+		}
+
+		$expires = strtotime( '+' . $this->core->configs['public_link_lifetime'] );
+
+		if ( ! $expires || $expires < time() ) {
+			$result['errors'][] = __(
+				'Invalid "public_link_lifetime" configuration setting',
+				'boldgrid-backup'
+			);
+		}
+
+		if ( ! empty( $result['errors'] ) ) {
+			$result['is_valid'] = false;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Generate a public link to download an archive file.
+	 *
+	 * The link is only valid for a limited time, which is configurable in a configuration file.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @see Boldgrid_Backup_Admin_Archive::validate_link_request()
+	 * @see Boldgrid_Backup_Authentication::create_token()
+	 *
+	 * @param  string $filename
+	 * @return string
+	 */
+	public function generate_download_link( $filename ) {
+		$validation_results = $this->validate_link_request( $filename );
+
+		if ( $validation_results['is_valid'] ) {
+			$expires = strtotime( '+' . $this->core->configs['public_link_lifetime'] );
+			$token   = Boldgrid_Backup_Authentication::create_token( $filename, $expires );
+
+			$response['download_url'] = get_site_url(
+				null,
+				'wp-admin/admin-ajax.php?action=boldgrid_backup_download&t=' . $token
+			);
+
+			$response['expires_when'] = human_time_diff(
+				$expires,
+				current_time( 'timestamp', true )
+			);
+		} else {
+			$response['error'] = implode( '<br />', $validation_results['errors'] );
+		}
+
+		return $response;
 	}
 }

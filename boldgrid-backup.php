@@ -84,7 +84,6 @@ function run_boldgrid_backup() {
  * @return bool
  */
 function load_boldgrid_backup() {
-
 	// Ensure we have our vendor/autoload.php file.
 	$exists_composer = file_exists( BOLDGRID_BACKUP_PATH . '/composer.json' );
 	$exists_autoload = file_exists( BOLDGRID_BACKUP_PATH . '/vendor/autoload.php' );
@@ -102,6 +101,37 @@ function load_boldgrid_backup() {
 							// translators: 1: HTML strong open tag, 2: HTML string close tag.
 							esc_html__(
 								'%1$sBoldGrid Backup%1$s has been deactivated because the vendor folder is missing. Please run %1$scomposer install%2$s, or contact your host for further assistance.',
+								'boldgrid-backup'
+							),
+							'<strong>',
+							'</strong>'
+						);
+						?>
+					</p></div>
+						<?php
+					}
+				);
+			}
+		);
+
+		return false;
+	}
+
+	// Ensure we have our build directory with a required file in it.
+	if ( ! file_exists( BOLDGRID_BACKUP_PATH . '/build/clipboard.min.js' ) ) {
+		add_action(
+			'admin_init', function() {
+				deactivate_plugins( 'boldgrid-backup/boldgrid-backup.php', true );
+
+				add_action(
+					'admin_notices', function() {
+						?>
+				<div class="notice notice-error is-dismissible"><p>
+						<?php
+						printf(
+							// translators: 1: HTML strong open tag, 2: HTML string close tag.
+							esc_html__(
+								'%1$sBoldGrid Backup%1$s has been deactivated because the build folder is missing. Please run %1$syarn install%2$s and %1$sgulp%2$s, or contact your host for further assistance.',
 								'boldgrid-backup'
 							),
 							'<strong>',

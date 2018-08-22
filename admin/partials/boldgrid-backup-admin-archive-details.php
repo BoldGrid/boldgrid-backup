@@ -38,6 +38,7 @@ $not_found   = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/n
 $delete_link     = $this->core->archive_actions->get_delete_link( $archive['filename'] );
 $download_button = $this->core->archive_actions->get_download_button( $archive['filename'] );
 $restore_button  = $this->core->archive_actions->get_restore_button( $archive['filename'] );
+$download_link   = $this->core->archive_actions->download_link_button( $archive['filename'] );
 
 if ( ! $archive_found ) {
 	$file_size     = '';
@@ -74,10 +75,9 @@ if ( ! $archive_found ) {
 	$major_actions = sprintf(
 		'
 		<div id="major-publishing-actions">
-			<div id="delete-action">
+			<div id="delete-action-link">
 				%1$s
 			</div>
-
 			<div style="clear:both;"></div>
 		</div>',
 		$delete_link
@@ -89,17 +89,11 @@ $main_meta_box = sprintf(
 	<div id="submitdiv" class="postbox">
 		<h2 class="hndle ui-sortable-handle"><span>%1$s</span></h2>
 		<div class="inside submitbox">
-
 			<div class="misc-pub-section">%2$s: <strong>%3$s</strong></div>
-
 			%4$s
-
 			%5$s
-
 			%6$s
-
 			%7$s
-
 		</div>
 	</div>',
 	/* 1 */ __( 'Backup Archive', 'boldgrid-backup' ),
@@ -118,14 +112,10 @@ $remote_meta_box = sprintf(
 			<span>%1$s</span>
 			<span class="dashicons dashicons-editor-help" data-id="remote-storage-help"></span>
 		</h2>
-
 		<div class="inside">
-
 			<p class="help" data-id="remote-storage-help">%4$s</p>
-
 			%2$s
 		</div>
-
 		%3$s
 	</div>',
 	/* 1 */ __( 'Remote Storage', 'boldgrid-backup' ),
@@ -163,7 +153,6 @@ $intro = $this->core->config->is_premium_done ? '' : sprintf(
 	'
 	<div class="bg-box-bottom premium" style="margin-bottom:15px;">
 		<strong>%1$s</strong>
-
 		<p>
 			%2$s
 			%3$s
@@ -176,33 +165,28 @@ $intro = $this->core->config->is_premium_done ? '' : sprintf(
 
 $main_content = '
 	<div id="postdivrich" class="postarea wp-editor-expand">
-
 		<div id="wp-content-wrap" class="wp-core-ui wp-editor-wrap tmce-active has-dfw">
-
 			<h2 style="font-size:initial; padding:0px;">
 				' . __( 'Download & Restore', 'boldgrid-backup' ) . '
 				<span class="dashicons dashicons-editor-help" data-id="download_and_restore"></span>
 			</h2>
-
 			<p class="help" data-id="download_and_restore">
 				<strong>' . __( 'Download to Local Machine', 'boldgrid-backup' ) . '</strong><br />
 				' . __( 'Backup archives generally should be stored in more locations than just your <strong>web server</strong>. Be sure to keep copies on your <strong>local machine</strong> and / or a <strong>remote storage</strong> provider. Learn more about these different locations <a href="admin.php?page=boldgrid-backup-tools&section=section_locations">here</a>.', 'boldgrid-backup' ) . '<br /><br />
 				<strong>' . __( 'Restore', 'boldgrid-backup' ) . '</strong><br />
-				' . __( 'Restore this backup. This will restore all the files and the database in this backup. Use the <strong>Backup Browser</strong> below to look at the backup archive and see what will be restored.', 'boldgrid-backup' ) . '
+				' . __( 'Restore this backup. This will restore all the files and the database in this backup. Use the <strong>Backup Browser</strong> below to look at the backup archive and see what will be restored.', 'boldgrid-backup' ) . '<br /><br />
+				<strong>' . __( 'Download Link', 'boldgrid-backup' ) . '</strong><br />
+				' . __( 'A public link that is used to download a backup archive file.  You can use it to migrate your website to another WordPress installation.', 'boldgrid-backup' ) . '
 			</p>
-
 			<p>
-				' . $download_button . ' ' . $restore_button . '
+				' . $download_button . ' ' . $restore_button . ' ' . $download_link . '
 			</p>
-
+			<p id="download-link-copy" class="notice notice-info"></p>
 			<hr class="separator" />
-
 			<h2 style="font-size:initial; padding:0px;">' . __( 'Backup Browser', 'boldgrid-backup' ) . '</h2>
-
 			<p>
 				' . __( 'Use the File & Folders and Database tools below to browse the contents of this backup file.', 'boldgrid-backup' ) . '
 			</p>
-
 			' . $intro . $editor_tools . $browser . $db['browser'] . '
 		</div>
 	</div>

@@ -58,7 +58,11 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 			'boldgrid-backup'
 		);
 
+		$link_error_text     = __( 'Could not generate link.', 'boldgrid-backup' );
+		$unknown_nerror_text = __( 'Unknown error.', 'boldgrid-backup' );
+
 		$handle = 'boldgrid-backup-admin-archive-actions';
+
 		wp_register_script(
 			$handle,
 			plugin_dir_url( __FILE__ ) . 'js/' . $handle . '.js',
@@ -71,6 +75,8 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 			'archiveNonce'       => $archive_nonce,
 			'deleteConfirmText'  => $delete_confirm_text,
 			'restoreConfirmText' => $restore_confirm_text,
+			'linkErrorText'      => $link_error_text,
+			'unknownErrorText'   => $unknown_nerror_text,
 		);
 		wp_localize_script( $handle, 'BoldGridBackupAdminArchiveActions', $translation );
 		wp_enqueue_script( $handle );
@@ -189,5 +195,139 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 		}
 
 		return $button;
+	}
+
+	/**
+	 * Return a button link to request to generate a public link to download an archive file.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param  string $filename Filename.
+	 * @return string
+	 */
+	public function download_link_button( $filename ) {
+		$link    = '';
+		$archive = $this->core->archive->get_by_name( $filename );
+
+		if ( ! empty( $archive ) ) {
+			$link = sprintf(
+				'<a
+					id="download-link-button"
+					class="button"
+					href="#"
+					data-filename="%2$s"
+					data-nonce="%3$s"
+					>
+					%4$s
+				</a>
+				<span class="spinner"></span>
+				',
+				/* 1 */ $archive['key'],
+				/* 2 */ $archive['filename'],
+				/* 3 */ wp_create_nonce( 'boldgrid_backup_download_link' ),
+				/* 4 */ __( 'Get Download Link', 'boldgrid-backup' )
+			);
+		}
+
+		return $link;
+	}
+
+	/**
+	 * Callback function for generating a public link to download an archive file.
+	 *
+	 * Used on the backup archive details page.  The link is only valid for a limited time, which
+	 * is configurable in a configuration file.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @see Boldgrid_Backup_Admin_Archive::generate_download_link()
+	 *
+	 * @uses $_POST['archive_filename'] Backup archive filename.
+	 *
+	 * @return string
+	 */
+	public function wp_ajax_generate_download_link() {
+		$archive_filename = ! empty( $_POST['archive_filename'] ) ?
+			sanitize_file_name( $_POST['archive_filename'] ) : null;
+
+		if ( check_admin_referer( 'boldgrid_backup_download_link', 'archive_auth' ) &&
+			current_user_can( 'update_plugins' ) && $archive_filename ) {
+				wp_send_json_success( $this->core->archive->generate_download_link(
+					$archive_filename
+				) );
+		} else {
+			wp_send_json_error();
+		}
+	}
+
+	/**
+	 * Callback function for downloading a backup archive file using a public link.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @see Boldgrid_Backup_Authentication::get_token_details()
+	 * @see Boldgrid_Backup_Admin_Archive::get_by_name()
+	 * @see Boldgrid_Backup_Admin_Archive_Actions::send_file()
+	 *
+	 * @uses $_GET['t'] Token.
+	 */
+	public function public_download() {
+		$token         = ! empty( $_GET['t'] ) ? sanitize_key( $_GET['t'] ) : null; // phpcs:ignore WordPress.CSRF.NonceVerification
+		$token_details = Boldgrid_Backup_Authentication::get_token_details( $token );
+
+		if ( $token_details['is_valid'] ) {
+			$archive = $this->core->archive->get_by_name( $token_details['id'] );
+
+			if ( ! empty( $archive ) ) {
+				// Send file and die nicely.
+				$this->send_file( $archive['filepath'], $archive['filesize'] );
+			}
+		}
+
+		wp_redirect( get_site_url(), 404 );
+	}
+
+	/**
+	 * Send a file for download and die.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param string $filepath File path.
+	 * @param int    $filesize File size (optional).
+	 */
+	public function send_file( $filepath, $filesize = null ) {
+		// phpcs:disable WordPress.VIP
+		if ( empty( $filepath ) || ! $this->core->wp_filesystem->exists( $filepath ) ) {
+			wp_redirect( get_site_url(), 404 );
+		}
+
+		$filename = basename( $filepath );
+
+		if ( empty( $filesize ) ) {
+			$filesize = $this->core->wp_filesystem->size( $filepath );
+		}
+
+		// Send header.
+		header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
+		header( 'Content-Transfer-Encoding: binary' );
+		header( 'Content-Type: binary/octet-stream' );
+		header( 'Content-Length: ' . $filesize );
+
+		// Check and flush output buffer if needed.
+		if ( 0 !== ob_get_level() ) {
+			ob_end_flush();
+		}
+
+		// Close any PHP session, so another session can open during the download.
+		session_write_close();
+
+		// Send the file.  Not finding a replacement in $wp_filesystem.
+		// phpcs:disable
+		readfile( $filepath );
+		// phpcs:enable
+
+		wp_die();
+
+		// phpcs:enable WordPress.VIP
 	}
 }

@@ -2475,27 +2475,8 @@ class Boldgrid_Backup_Admin_Core {
 
 		$filesize = $archives[ $download_key ]['filesize'];
 
-		// Send header.
-		header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
-		header( 'Content-Transfer-Encoding: binary' );
-		header( 'Content-Type: binary/octet-stream' );
-		header( 'Content-Length: ' . $filesize );
-
-		// Check and flush output buffer if needed.
-		if ( 0 !== ob_get_level() ) {
-			ob_end_flush();
-		}
-
-		// Close any PHP session, so another session can open during the download.
-		session_write_close();
-
-		// Send the file.  Not finding a replacement in $wp_filesystem.
-		// phpcs:disable
-		readfile( $filepath );
-		// phpcs:enable
-
-		// Exit.
-		wp_die();
+		// Send the file and die nicely.
+		$this->archive_actions->send_file( $filepath, $filesize );
 	}
 
 	/**

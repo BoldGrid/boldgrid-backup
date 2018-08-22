@@ -7,6 +7,7 @@ logs*
 .settings
 node_modules
 bower_components
+build/
 vendor/
 package-lock.json
 yarn-error.log

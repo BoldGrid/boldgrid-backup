@@ -8,4 +8,10 @@ gulp.task( 'readme', function() {
 		.pipe( gulp.dest( '.' ) );
 } );
 
-gulp.task( 'default', [ 'readme' ] );
+gulp.task( 'build', function() {
+	gulp
+		.src( [ 'node_modules/clipboard/dist/clipboard.min.js' ] )
+		.pipe( gulp.dest( './build' ) );
+} );
+
+gulp.task( 'default', [ 'readme', 'build' ] );

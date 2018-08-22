@@ -140,6 +140,18 @@ class Boldgrid_Backup_Admin {
 				BOLDGRID_BACKUP_VERSION
 			);
 		}
+
+		// Enqueue clipboard.
+		if ( isset( $_REQUEST['page'] ) && 'boldgrid-backup-archive-details' === $_REQUEST['page'] ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+			wp_enqueue_script(
+				'clipboard',
+				plugin_dir_url( BOLDGRID_BACKUP_PATH . '/boldgrid-backup.php' ) .
+					'/build/clipboard.min.js',
+				array( 'jquery' ),
+				'2.0.1',
+				true
+			);
+		}
 	}
 
 	/**

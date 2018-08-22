@@ -2,10 +2,10 @@
 /**
  * File: config.sample.php
  *
- * Plugin sample configuration file.
+ * Plugin sample local override configuration file.
  *
  * @link https://www.boldgrid.com
- * @since 1.0
+ * @since 1.0.0
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/includes
@@ -26,5 +26,5 @@ if ( ! defined( 'WPINC' ) ) {
  * to override.
  */
 return array(
-	'asset_server' => 'https://wp-assets-dev.boldgrid.com',
+	'public_link_lifetime' => '1 HOUR',
 );

@@ -151,6 +151,76 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 		return false;
 	};
 
+	/**
+	 * @summary Get a download link for a selected backup archive file.
+	 *
+	 * @since 1.7.0
+	 */
+	self.getDownloadLink = function( e ) {
+		var $this = $( this ),
+			data = {
+				action: 'boldgrid_backup_generate_download_link',
+				archive_filename: $this.attr( 'data-filename' ),
+				archive_auth: $this.attr( 'data-nonce' )
+			},
+			$spinner = $this.next(),
+			$downloadLink = $( '#download-link-copy' );
+
+		e.preventDefault();
+
+		$this.attr( 'disabled', 'disabled' );
+
+		$spinner.addClass( 'inline' );
+
+		$.post( ajaxurl, data, function( response ) {
+			var $copyLink;
+
+			if ( response.data !== undefined && response.data.download_url !== undefined ) {
+				$downloadLink.html( response.data.download_url );
+
+				$copyLink = $( '<button class="button" id="download-copy-button"' +
+					' data-clipboard-text="' + response.data.download_url +
+					'"> Copy Link <span class="dashicons dashicons-admin-links"></span></button>' )
+				$downloadLink.append( $copyLink );
+
+				$downloadLink.append( '<br />This link expires ' + response.data.expires_when +
+					' from now.' );
+
+				new ClipboardJS( $copyLink[0] );
+			} else if ( response.data !== undefined && response.data.error !== undefined ) {
+				$downloadLink.html( response.data.error );
+			} else {
+				$downloadLink.html( lang.linkErrorText );
+			}
+		} ).error( function() {
+			$this.html( lang.unknownErrorText );
+		} ).always( function() {
+			$downloadLink.show();
+			$spinner.removeClass( 'inline' );
+			$this.removeAttr( 'disabled' );
+		} );
+	};
+
+	/**
+	 * @summary Update the download link copy button after clicking, and then reset after 3 seconds.
+	 *
+	 * @since 1.7.0
+	 */
+	self.updateCopyText = function( e ) {
+		var $this = $( this ),
+			oldHtml = $this.html();
+
+		e.preventDefault();
+
+		$this.attr( 'disabled', 'disabled' );
+		$this.html( 'Copied!' );
+
+		setTimeout( function () {
+			$this.html( oldHtml );
+			$this.removeAttr( 'disabled' );
+		}, 3000 );
+	};
+
 	$( function() {
 		$body = $( 'body' );
 		$wpbody = $body.find( '#wpbody' );
@@ -158,6 +228,8 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 		$body.on( 'click', '.action-download', self.downloadArchive );
 		$body.on( 'click', '.restore-now', self.restoreArchiveConfirm );
 		$body.on( 'click', '#delete-action a', self.onClickDelete );
+		$body.on( 'click', '#download-link-button', self.getDownloadLink );
+		$body.on( 'click', '#download-copy-button', self.updateCopyText );
 	} );
 };
 

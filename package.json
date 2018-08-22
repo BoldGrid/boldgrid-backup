@@ -1,6 +1,6 @@
 {
  "scripts": {
-  "js-lint": "prettier-eslint **/*.js --list-different",
+  "js-lint": "prettier-eslint **/*.js --list-different --ignore **/build/**",
   "js-lint-fix": "prettier-eslint **/*.js --write",
   "install-codesniffs": "php node_modules/PHP_CodeSniffer/bin/phpcs --config-set installed_paths node_modules/WordPress-Coding-Standards/",
   "php-codesniffer": "npm run install-codesniffs && node_modules/PHP_CodeSniffer/bin/phpcs -p -s --report=emacs --report-width=220 --standard=WordPress-Docs --standard=WordPress-Extra --ignore=*/node_modules/*,*/vendor/* --extensions=php ."
@@ -17,5 +17,7 @@
   "prettier-eslint": "^8.8.1",
   "prettier-eslint-cli": "^4.7.1"
  },
- "dependencies": {}
+ "dependencies": {
+  "clipboard": "^2.0.1"
+ }
 }

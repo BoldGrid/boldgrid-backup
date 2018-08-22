@@ -127,3 +127,16 @@ h3 {
 input:invalid {
   border: 1px solid red;
 }
+
+#download-link-copy {
+	display: none;
+	padding: 10px;
+}
+
+#download-copy-button {
+	margin-left: 10px;
+}
+
+#download-copy-button .dashicons {
+	font-size: 16px;
+}
