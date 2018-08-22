@@ -9,9 +9,7 @@ gulp.task( 'readme', function() {
 } );
 
 gulp.task( 'build', function() {
-	gulp
-		.src( [ 'node_modules/clipboard/dist/clipboard.min.js' ] )
-		.pipe( gulp.dest( './build' ) );
+	gulp.src( [ 'node_modules/clipboard/dist/clipboard.min.js' ] ).pipe( gulp.dest( './build' ) );
 } );
 
 gulp.task( 'default', [ 'readme', 'build' ] );

@@ -178,13 +178,17 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 			if ( response.data !== undefined && response.data.download_url !== undefined ) {
 				$downloadLink.html( response.data.download_url );
 
-				$copyLink = $( '<button class="button" id="download-copy-button"' +
-					' data-clipboard-text="' + response.data.download_url +
-					'"> Copy Link <span class="dashicons dashicons-admin-links"></span></button>' )
+				$copyLink = $(
+					'<button class="button" id="download-copy-button"' +
+						' data-clipboard-text="' +
+						response.data.download_url +
+						'"> Copy Link <span class="dashicons dashicons-admin-links"></span></button>'
+				);
 				$downloadLink.append( $copyLink );
 
-				$downloadLink.append( '<br />This link expires ' + response.data.expires_when +
-					' from now.' );
+				$downloadLink.append(
+					'<br />This link expires ' + response.data.expires_when + ' from now.'
+				);
 
 				new ClipboardJS( $copyLink[0] );
 			} else if ( response.data !== undefined && response.data.error !== undefined ) {
@@ -192,13 +196,15 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 			} else {
 				$downloadLink.html( lang.linkErrorText );
 			}
-		} ).error( function() {
-			$this.html( lang.unknownErrorText );
-		} ).always( function() {
-			$downloadLink.show();
-			$spinner.removeClass( 'inline' );
-			$this.removeAttr( 'disabled' );
-		} );
+		} )
+			.error( function() {
+				$this.html( lang.unknownErrorText );
+			} )
+			.always( function() {
+				$downloadLink.show();
+				$spinner.removeClass( 'inline' );
+				$this.removeAttr( 'disabled' );
+			} );
 	};
 
 	/**
@@ -215,7 +221,7 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 		$this.attr( 'disabled', 'disabled' );
 		$this.html( 'Copied!' );
 
-		setTimeout( function () {
+		setTimeout( function() {
 			$this.html( oldHtml );
 			$this.removeAttr( 'disabled' );
 		}, 3000 );
