@@ -182,13 +182,25 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 					'<button class="button" id="download-copy-button"' +
 						' data-clipboard-text="' +
 						response.data.download_url +
-						'"> Copy Link <span class="dashicons dashicons-admin-links"></span></button>'
+						'"> ' +
+						lang.copyText +
+						' <span class="dashicons dashicons-admin-links"></span></button>'
 				);
 				$downloadLink.append( $copyLink );
 
+				$downloadLink.wrap( '<p></p>' );
+
 				$downloadLink.append(
-					'<br />This link expires ' + response.data.expires_when + ' from now.'
+					'<p>' +
+						lang.expiresText +
+						' ' +
+						response.data.expires_when +
+						' ' +
+						lang.fromNowText +
+						'.</p>'
 				);
+
+				$downloadLink.wrap( '<div></div>' );
 
 				new ClipboardJS( $copyLink[0] );
 			} else if ( response.data !== undefined && response.data.error !== undefined ) {

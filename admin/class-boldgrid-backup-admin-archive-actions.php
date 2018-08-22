@@ -60,6 +60,9 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 
 		$link_error_text     = __( 'Could not generate link.', 'boldgrid-backup' );
 		$unknown_nerror_text = __( 'Unknown error.', 'boldgrid-backup' );
+		$copy_text           = __( 'Copy Link', 'boldgrid-backup' );
+		$expires_text        = __( 'This link expires', 'boldgrid-backup' );
+		$from_now_text       = __( 'from now', 'boldgrid-backup' );
 
 		$handle = 'boldgrid-backup-admin-archive-actions';
 
@@ -70,6 +73,7 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 			BOLDGRID_BACKUP_VERSION,
 			false
 		);
+
 		$translation = array(
 			'accessType'         => $access_type,
 			'archiveNonce'       => $archive_nonce,
@@ -77,7 +81,11 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 			'restoreConfirmText' => $restore_confirm_text,
 			'linkErrorText'      => $link_error_text,
 			'unknownErrorText'   => $unknown_nerror_text,
+			'copyText'           => $copy_text,
+			'expiresText'        => $expires_text,
+			'fromNowText'        => $from_now_text,
 		);
+
 		wp_localize_script( $handle, 'BoldGridBackupAdminArchiveActions', $translation );
 		wp_enqueue_script( $handle );
 	}
