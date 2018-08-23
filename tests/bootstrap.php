@@ -66,9 +66,9 @@ $files = array(
 	'/admin/class-boldgrid-backup-admin-tools.php',
 	'/admin/class-boldgrid-backup-admin-time.php',
 	'/admin/class-boldgrid-backup-admin-crypt.php',
-	'/include/class-boldgrid-backup-authentication.php',
-	'/include/class-boldgrid-backup-download.php',
-	'/include/class-boldgrid-backup-file.php',
+	'/includes/class-boldgrid-backup-authentication.php',
+	'/includes/class-boldgrid-backup-download.php',
+	'/includes/class-boldgrid-backup-file.php',
 	'/admin/storage/class-boldgrid-backup-admin-storage-local.php',
 	'/admin/remote/class-boldgrid-backup-admin-ftp.php',
 	'/admin/remote/class-boldgrid-backup-admin-sftp.php',
@@ -76,6 +76,7 @@ $files = array(
 	'/admin/remote/class-boldgrid-backup-admin-ftp-page.php',
 	'/vendor/phpseclib/phpseclib/phpseclib/Net/SSH2.php',
 );
+
 foreach ( $files as $file ) {
 	require_once BOLDGRID_BACKUP_PATH . $file;
 }
