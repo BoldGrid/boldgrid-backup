@@ -219,6 +219,8 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-crypt.php';
 
 		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-authentication.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-download.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-file.php';
 
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
@@ -401,8 +403,8 @@ class Boldgrid_Backup {
 		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_restore', $plugin_admin_core->cron, 'restore' );
 
 		// For public downloads.
-		$this->loader->add_action( 'wp_ajax_boldgrid_backup_download', $plugin_admin_core->archive_actions, 'public_download' );
-		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_download', $plugin_admin_core->archive_actions, 'public_download' );
+		$this->loader->add_action( 'wp_ajax_boldgrid_backup_download', $plugin_admin_core->download, 'public_download' );
+		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_download', $plugin_admin_core->download, 'public_download' );
 
 		// Admin notices from cron log.
 		$this->loader->add_action( 'admin_notices', $plugin_admin_core->cron_log, 'admin_notice' );

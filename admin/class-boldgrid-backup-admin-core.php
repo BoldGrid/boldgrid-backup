@@ -500,16 +500,24 @@ class Boldgrid_Backup_Admin_Core {
 	public $scheduler;
 
 	/**
+	 * The public download class object.
+	 *
+	 * @since  1.7.0
+	 * @access public
+	 * @var    Boldgrid_Backup_Download
+	 */
+	public $download;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.0
 	 *
-	 * @global $wp_filesystem.
+	 * @global $wp_filesystem
 	 */
 	public function __construct() {
 		WP_Filesystem();
 		global $wp_filesystem;
-
 		global $pagenow;
 
 		$this->doing_cron    = ( defined( 'DOING_CRON' ) && DOING_CRON ) || isset( $_GET['doing_wp_cron'] ); // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
@@ -610,6 +618,8 @@ class Boldgrid_Backup_Admin_Core {
 		$this->cron_test = new Boldgrid_Backup_Admin_Cron_Test( $this );
 
 		$this->cron_log = new Boldgrid_Backup_Admin_Cron_Log( $this );
+
+		$this->download = new Boldgrid_Backup_Download( $this );
 
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
@@ -2414,6 +2424,8 @@ class Boldgrid_Backup_Admin_Core {
 	 * a message should be displayed with the path to download using an alternate method.
 	 *
 	 * @since 1.0
+	 *
+	 * @see Boldgrid_Backup_File::send_file()
 	 */
 	public function download_archive_file_callback() {
 		// Verify nonce, or die.
@@ -2476,7 +2488,7 @@ class Boldgrid_Backup_Admin_Core {
 		$filesize = $archives[ $download_key ]['filesize'];
 
 		// Send the file and die nicely.
-		$this->archive_actions->send_file( $filepath, $filesize );
+		Boldgrid_Backup_File::send_file( $filepath, $filesize );
 	}
 
 	/**

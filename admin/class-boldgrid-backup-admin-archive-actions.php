@@ -58,11 +58,15 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 			'boldgrid-backup'
 		);
 
-		$link_error_text     = __( 'Could not generate link.', 'boldgrid-backup' );
-		$unknown_nerror_text = __( 'Unknown error.', 'boldgrid-backup' );
-		$copy_text           = __( 'Copy Link', 'boldgrid-backup' );
-		$expires_text        = __( 'This link expires', 'boldgrid-backup' );
-		$from_now_text       = __( 'from now', 'boldgrid-backup' );
+		$link_error_text      = __( 'Could not generate link.', 'boldgrid-backup' );
+		$unknown_nerror_text  = __( 'Unknown error.', 'boldgrid-backup' );
+		$copy_text            = __( 'Copy Link', 'boldgrid-backup' );
+		$copied_text          = __( 'Copied!', 'boldgrid-backup' );
+		$expires_text         = __( 'This link expires in:', 'boldgrid-backup' );
+		$link_disclaimer_text = __(
+			'Please keep this link private, as the download file contains sensitive data.',
+			'boldgrid-backup'
+		);
 
 		$handle = 'boldgrid-backup-admin-archive-actions';
 
@@ -82,12 +86,23 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 			'linkErrorText'      => $link_error_text,
 			'unknownErrorText'   => $unknown_nerror_text,
 			'copyText'           => $copy_text,
+			'copiedText'         => $copied_text,
 			'expiresText'        => $expires_text,
-			'fromNowText'        => $from_now_text,
+			'linkDisclaimerText' => $link_disclaimer_text,
 		);
 
 		wp_localize_script( $handle, 'BoldGridBackupAdminArchiveActions', $translation );
 		wp_enqueue_script( $handle );
+
+		// Enqueue the external clipboard script.
+		wp_enqueue_script(
+			'clipboard',
+			plugin_dir_url( BOLDGRID_BACKUP_PATH . '/boldgrid-backup.php' ) .
+				'/build/clipboard.min.js',
+			array( 'jquery' ),
+			'2.0.1',
+			true
+		);
 	}
 
 	/**
@@ -213,7 +228,7 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 	 * @param  string $filename Filename.
 	 * @return string
 	 */
-	public function download_link_button( $filename ) {
+	public function get_download_link_button( $filename ) {
 		$link    = '';
 		$archive = $this->core->archive->get_by_name( $filename );
 
@@ -223,17 +238,16 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 					id="download-link-button"
 					class="button"
 					href="#"
-					data-filename="%2$s"
-					data-nonce="%3$s"
+					data-filename="%1$s"
+					data-nonce="%2$s"
 					>
-					%4$s
+					%3$s
 				</a>
 				<span class="spinner"></span>
 				',
-				/* 1 */ $archive['key'],
-				/* 2 */ $archive['filename'],
-				/* 3 */ wp_create_nonce( 'boldgrid_backup_download_link' ),
-				/* 4 */ __( 'Get Download Link', 'boldgrid-backup' )
+				/* 1 */ $archive['filename'],
+				/* 2 */ wp_create_nonce( 'boldgrid_backup_download_link' ),
+				/* 3 */ __( 'Get Download Link', 'boldgrid-backup' )
 			);
 		}
 
@@ -266,76 +280,5 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 		} else {
 			wp_send_json_error();
 		}
-	}
-
-	/**
-	 * Callback function for downloading a backup archive file using a public link.
-	 *
-	 * @since 1.7.0
-	 *
-	 * @see Boldgrid_Backup_Authentication::get_token_details()
-	 * @see Boldgrid_Backup_Admin_Archive::get_by_name()
-	 * @see Boldgrid_Backup_Admin_Archive_Actions::send_file()
-	 *
-	 * @uses $_GET['t'] Token.
-	 */
-	public function public_download() {
-		$token         = ! empty( $_GET['t'] ) ? sanitize_key( $_GET['t'] ) : null; // phpcs:ignore WordPress.CSRF.NonceVerification
-		$token_details = Boldgrid_Backup_Authentication::get_token_details( $token );
-
-		if ( $token_details['is_valid'] ) {
-			$archive = $this->core->archive->get_by_name( $token_details['id'] );
-
-			if ( ! empty( $archive ) ) {
-				// Send file and die nicely.
-				$this->send_file( $archive['filepath'], $archive['filesize'] );
-			}
-		}
-
-		wp_redirect( get_site_url(), 404 );
-	}
-
-	/**
-	 * Send a file for download and die.
-	 *
-	 * @since 1.7.0
-	 *
-	 * @param string $filepath File path.
-	 * @param int    $filesize File size (optional).
-	 */
-	public function send_file( $filepath, $filesize = null ) {
-		// phpcs:disable WordPress.VIP
-		if ( empty( $filepath ) || ! $this->core->wp_filesystem->exists( $filepath ) ) {
-			wp_redirect( get_site_url(), 404 );
-		}
-
-		$filename = basename( $filepath );
-
-		if ( empty( $filesize ) ) {
-			$filesize = $this->core->wp_filesystem->size( $filepath );
-		}
-
-		// Send header.
-		header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
-		header( 'Content-Transfer-Encoding: binary' );
-		header( 'Content-Type: binary/octet-stream' );
-		header( 'Content-Length: ' . $filesize );
-
-		// Check and flush output buffer if needed.
-		if ( 0 !== ob_get_level() ) {
-			ob_end_flush();
-		}
-
-		// Close any PHP session, so another session can open during the download.
-		session_write_close();
-
-		// Send the file.  Not finding a replacement in $wp_filesystem.
-		// phpcs:disable
-		readfile( $filepath );
-		// phpcs:enable
-
-		wp_die();
-
-		// phpcs:enable WordPress.VIP
 	}
 }

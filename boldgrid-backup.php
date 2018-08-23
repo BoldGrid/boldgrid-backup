@@ -98,13 +98,15 @@ function load_boldgrid_backup() {
 				<div class="notice notice-error is-dismissible"><p>
 						<?php
 						printf(
-							// translators: 1: HTML strong open tag, 2: HTML string close tag.
+							// translators: 1: HTML strong open tag, 2: HTML strong close tag.
 							esc_html__(
-								'%1$sBoldGrid Backup%1$s has been deactivated because the vendor folder is missing. Please run %1$scomposer install%2$s, or contact your host for further assistance.',
+								'%1$sBoldGrid Backup%2$s has been deactivated because the vendor folder is missing. Please run %1$s%3$scomposer install%4$s%2$s, or contact your host for further assistance.',
 								'boldgrid-backup'
 							),
 							'<strong>',
-							'</strong>'
+							'</strong>',
+							'<em>',
+							'</em>'
 						);
 						?>
 					</p></div>
@@ -129,13 +131,15 @@ function load_boldgrid_backup() {
 				<div class="notice notice-error is-dismissible"><p>
 						<?php
 						printf(
-							// translators: 1: HTML strong open tag, 2: HTML string close tag.
+							// translators: 1: HTML strong open tag, 2: HTML strong close tag.
 							esc_html__(
-								'%1$sBoldGrid Backup%1$s has been deactivated because the build folder is missing. Please run %1$syarn install%2$s and %1$sgulp%2$s, or contact your host for further assistance.',
+								'%1$sBoldGrid Backup%2$s has been deactivated because the build folder is missing. Please run %1$s%3$syarn install%4$s%2$s and %1$s%3$sgulp%4$s%2$s, or contact your host for further assistance.',
 								'boldgrid-backup'
 							),
 							'<strong>',
-							'</strong>'
+							'</strong>',
+							'<em>',
+							'</em>'
 						);
 						?>
 					</p></div>

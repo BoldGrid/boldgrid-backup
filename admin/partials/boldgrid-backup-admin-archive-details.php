@@ -38,7 +38,7 @@ $not_found   = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/n
 $delete_link     = $this->core->archive_actions->get_delete_link( $archive['filename'] );
 $download_button = $this->core->archive_actions->get_download_button( $archive['filename'] );
 $restore_button  = $this->core->archive_actions->get_restore_button( $archive['filename'] );
-$download_link   = $this->core->archive_actions->download_link_button( $archive['filename'] );
+$download_link   = $this->core->archive_actions->get_download_link_button( $archive['filename'] );
 
 if ( ! $archive_found ) {
 	$file_size     = '';
@@ -176,12 +176,12 @@ $main_content = '
 				<strong>' . __( 'Restore', 'boldgrid-backup' ) . '</strong><br />
 				' . __( 'Restore this backup. This will restore all the files and the database in this backup. Use the <strong>Backup Browser</strong> below to look at the backup archive and see what will be restored.', 'boldgrid-backup' ) . '<br /><br />
 				<strong>' . __( 'Download Link', 'boldgrid-backup' ) . '</strong><br />
-				' . __( 'A public link that is used to download a backup archive file.  You can use it to migrate your website to another WordPress installation.', 'boldgrid-backup' ) . '
+				' . __( 'A public link that is used to download a backup archive file.  You can use it to migrate your website to another WordPress installation.  Please keep download links private, as the download files contains sensitive data.', 'boldgrid-backup' ) . '
 			</p>
 			<p>
 				' . $download_button . ' ' . $restore_button . ' ' . $download_link . '
 			</p>
-			<p id="download-link-copy" class="notice notice-info"></p>
+			<div id="download-link-copy" class="notice notice-info inline"></div>
 			<hr class="separator" />
 			<h2 style="font-size:initial; padding:0px;">' . __( 'Backup Browser', 'boldgrid-backup' ) . '</h2>
 			<p>

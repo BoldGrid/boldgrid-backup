@@ -176,7 +176,10 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 			var $copyLink;
 
 			if ( response.data !== undefined && response.data.download_url !== undefined ) {
-				$downloadLink.html( response.data.download_url );
+				$downloadLink
+					.removeClass( 'notice-error' )
+					.addClass( 'notice-info' )
+					.html( response.data.download_url + ' ' );
 
 				$copyLink = $(
 					'<button class="button" id="download-copy-button"' +
@@ -188,29 +191,33 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 				);
 				$downloadLink.append( $copyLink );
 
-				$downloadLink.wrap( '<p></p>' );
+				$downloadLink.wrapInner( '<p></p>' );
 
 				$downloadLink.append(
 					'<p>' +
 						lang.expiresText +
 						' ' +
 						response.data.expires_when +
-						' ' +
-						lang.fromNowText +
-						'.</p>'
+						'</p><p>' +
+						lang.linkDisclaimerText +
+						'</p>'
 				);
-
-				$downloadLink.wrap( '<div></div>' );
 
 				new ClipboardJS( $copyLink[0] );
 			} else if ( response.data !== undefined && response.data.error !== undefined ) {
-				$downloadLink.html( response.data.error );
+				$downloadLink
+					.removeClass( 'notice-info' )
+					.addClass( 'notice-error' )
+					.html( response.data.error );
 			} else {
-				$downloadLink.html( lang.linkErrorText );
+				$downloadLink
+					.removeClass( 'notice-info' )
+					.addClass( 'notice-error' )
+					.html( lang.linkErrorText );
 			}
 		} )
 			.error( function() {
-				$this.html( lang.unknownErrorText );
+				$downloadLink.html( lang.unknownErrorText );
 			} )
 			.always( function() {
 				$downloadLink.show();
@@ -231,7 +238,7 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 		e.preventDefault();
 
 		$this.attr( 'disabled', 'disabled' );
-		$this.html( 'Copied!' );
+		$this.html( lang.copiedText );
 
 		setTimeout( function() {
 			$this.html( oldHtml );

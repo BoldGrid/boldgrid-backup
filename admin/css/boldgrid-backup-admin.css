@@ -130,11 +130,6 @@ input:invalid {
 
 #download-link-copy {
 	display: none;
-	padding: 10px;
-}
-
-#download-copy-button {
-	margin-left: 10px;
 }
 
 #download-copy-button .dashicons {
