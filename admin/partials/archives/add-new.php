@@ -19,13 +19,13 @@ defined( 'WPINC' ) || die;
 
 $max_file_size = Boldgrid_Backup_Admin_Utility::get_upload_limit();
 
-$size_limit = __( 'File size limit', 'boldgrid-backup' ) . ': ' .
+$size_limit = __( 'File upload size limit', 'boldgrid-backup' ) . ': ' .
 	Boldgrid_Backup_Admin_Utility::bytes_to_human(
 		Boldgrid_Backup_Admin_Utility::get_upload_limit()
 	);
 
 $size_info = __(
-	'To change the limit, you may be able to modify your server\'s php.ini or .htaccess file.  Please ask your web hosting provider if you need assistance.',
+	'Files uploaded from your computer are limited to a maximum size.  To change the limit, you may be able to modify your server\'s php.ini or .htaccess file.  Please ask your web hosting provider if you need assistance.  Uploads from URL addresses do not have a size limit.',
 	'boldgrid-backup'
 );
 
