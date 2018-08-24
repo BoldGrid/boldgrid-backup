@@ -273,13 +273,27 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 * @since 1.6.0
 	 */
 	public function enqueue_home_scripts() {
-		wp_enqueue_script(
-			'boldgrid-backup-admin-home',
+		$handle = 'boldgrid-backup-admin-home';
+
+		wp_register_script(
+			$handle,
 			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-home.js',
 			array( 'jquery' ),
 			BOLDGRID_BACKUP_VERSION,
 			false
 		);
+
+		$translation = array(
+			'savedTo'      => __( 'File saved to: ', 'boldgrid-backup' ),
+			'viewDetails'  => __( 'View details', 'boldgrid-backup' ),
+			'invalidUrl'   => __( 'You must entre valid a URL address.', 'boldgrid-backup' ),
+			'notZip'       => __( 'The URL address is not a ZIP file.', 'boldgrid-backup' ),
+			'unknownError' => __( 'Unknown error.', 'boldgrid-backup' ),
+			'ajaxError'    => __( 'Could not reach the URL address. HTTP error: ', 'boldgrid-backup' ),
+		);
+
+		wp_localize_script( $handle, 'BoldGridBackupAdminHome', $translation );
+		wp_enqueue_script( $handle );
 	}
 
 	/**

@@ -408,6 +408,9 @@ class Boldgrid_Backup {
 
 		// Admin notices from cron log.
 		$this->loader->add_action( 'admin_notices', $plugin_admin_core->cron_log, 'admin_notice' );
+
+		// For Ajax URL import.
+		$this->loader->add_action( 'wp_ajax_boldgrid_backup_url_upload', $plugin_admin_core->upload, 'ajax_url_import' );
 	}
 
 	/**

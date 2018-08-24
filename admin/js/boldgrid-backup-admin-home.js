@@ -18,6 +18,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 
 	// General Variables.
 	var self = this,
+		lang = BoldGridBackupAdminHome,
 		$fileInput = $( 'input:file' ),
 		$mineCount = $( '.mine' ),
 		$mineCountHelp = $( '.subsubsub' ).find( '.dashicons' );
@@ -50,6 +51,10 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 		$mineCount.on( 'click', self.onClickCount ).on( 'mouseover', function() {
 			$mineCountHelp.bgbuDrawAttention();
 		} );
+
+		$( '#url-import-section' )
+			.find( '.button' )
+			.on( 'click', self.urlUpload );
 	} );
 
 	/**
@@ -190,6 +195,85 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 		$( this )
 			.next( '.help' )
 			.toggle();
+	};
+
+	/**
+	 * Upload a file from a URL address.
+	 *
+	 * @since 1.7.0
+	 */
+	self.urlUpload = function( e ) {
+		var jqxhr,
+			$this = $( this ),
+			$spinner = $this.next(),
+			$notice = $( '#url-import-notice' ),
+			urlRegex = /^(http|https|ftp):\/\/[a-z0-9\-\.]+(\.[a-z]{2,5})?(:[0-9]{1,5})?(\/.*)?$/i,
+			data = {
+				action: 'boldgrid_backup_url_upload',
+				_wpnonce: $( '[name="_wpnonce"]' ).val(),
+				_wp_http_referer: $( '[name="_wp_http_referer"]' ).val(),
+				url: $( '[name="url"]' ).val()
+			};
+
+		e.preventDefault();
+
+		if ( ! urlRegex.test( data.url ) ) {
+			$notice
+				.removeClass( 'notice-info' )
+				.addClass( 'notice-error' )
+				.html( lang.invalidUrl )
+				.show();
+
+			return;
+		}
+
+		$notice
+			.removeClass( 'notice-error' )
+			.addClass( 'notice-info' )
+			.empty()
+			.hide();
+
+		$this.attr( 'disabled', 'disabled' );
+
+		$spinner.addClass( 'inline' );
+
+		jqxhr = $.post( ajaxurl, data, function( response ) {
+			if ( response.data !== undefined && response.data.filepath !== undefined ) {
+				$notice
+					.removeClass( 'notice-error' )
+					.addClass( 'notice-info' )
+					.html(
+						lang.savedTo +
+							response.data.filepath +
+							' <a class="button" href="' +
+							response.data.detailsUrl +
+							'">' +
+							lang.viewDetails +
+							'</a>'
+					);
+			} else if ( response.data !== undefined && response.data.error !== undefined ) {
+				$notice
+					.removeClass( 'notice-info' )
+					.addClass( 'notice-error' )
+					.html( response.data.error );
+			} else {
+				$notice
+					.removeClass( 'notice-info' )
+					.addClass( 'notice-error' )
+					.html( lang.unknownError );
+			}
+		} )
+			.error( function() {
+				$notice
+					.removeClass( 'notice-info' )
+					.addClass( 'notice-error' )
+					.html( lang.ajaxError + jqxhr.status + ' (' + jqxhr.statusText + ')' );
+			} )
+			.always( function() {
+				$notice.show();
+				$spinner.removeClass( 'inline' );
+				$this.removeAttr( 'disabled' );
+			} );
 	};
 };
 

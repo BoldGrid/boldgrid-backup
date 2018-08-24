@@ -59,7 +59,7 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 		);
 
 		$link_error_text      = __( 'Could not generate link.', 'boldgrid-backup' );
-		$unknown_nerror_text  = __( 'Unknown error.', 'boldgrid-backup' );
+		$unknown_error_text   = __( 'Unknown error.', 'boldgrid-backup' );
 		$copy_text            = __( 'Copy Link', 'boldgrid-backup' );
 		$copied_text          = __( 'Copied!', 'boldgrid-backup' );
 		$expires_text         = __( 'This link expires in:', 'boldgrid-backup' );
@@ -84,7 +84,7 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 			'deleteConfirmText'  => $delete_confirm_text,
 			'restoreConfirmText' => $restore_confirm_text,
 			'linkErrorText'      => $link_error_text,
-			'unknownErrorText'   => $unknown_nerror_text,
+			'unknownErrorText'   => $unknown_error_text,
 			'copyText'           => $copy_text,
 			'copiedText'         => $copied_text,
 			'expiresText'        => $expires_text,

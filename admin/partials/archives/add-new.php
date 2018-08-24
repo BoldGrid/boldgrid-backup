@@ -73,7 +73,16 @@ printf(
 ?>
 	</p>
 
+	<div id="url-import-section" class="wp-upload-form">
+		<p><?php esc_html_e( 'From a URL address:', 'boldgrid-backup' ); ?></p>
+		<input type="text" name="url" placeholder="Download URL address" size="30" />
+		<input class="button" type="submit" value="Upload" />
+		<span class='spinner'></span>
+		<div id="url-import-notice" class="notice notice-info inline"></div>
+	</div>
+
 	<div id="upload-archive-section" class="wp-upload-form">
+		<p><?php esc_html_e( 'From a file on your computer:', 'boldgrid-backup' ); ?></p>
 		<form id="upload-archive-form" method="POST" enctype="multipart/form-data">
 			<input type="hidden" name="MAX_FILE_SIZE" value="<?php echo esc_attr( $max_file_size ); ?>" />
 			<input type="hidden" name="uploading" value="1" />

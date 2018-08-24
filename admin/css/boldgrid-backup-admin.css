@@ -128,7 +128,7 @@ input:invalid {
   border: 1px solid red;
 }
 
-#download-link-copy {
+#download-link-copy, #url-import-notice {
 	display: none;
 }
 

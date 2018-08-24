@@ -221,43 +221,44 @@ class Boldgrid_Backup_Admin_Upload {
 	 * @see Boldgrid_Backup_Admin_Config::get_backup_identifier()
 	 * @see Boldgrid_Backup_Admin_Backup_Dir::get()
 	 *
-	 * @return string The file save path.
+	 * @param  string $filename Filename.
+	 * @return string
 	 */
-	public function get_save_path() {
-		// Get the upload file basename.
-		$file_basename = basename( $_FILES['file']['name'] );
-
-		// Get backup identifier.
+	public function get_save_path( $filename ) {
 		$backup_identifier = $this->core->get_backup_identifier();
 
-		// Get the backup directory.
-		$backup_directory = $this->core->backup_dir->get();
+		// Ensure that the input filename is a basename and remove any query string.
+		$filename = preg_replace( '/\?.*$/', '', basename( $filename ) );
 
 		// Create an array of strings to remove from the filename.
 		$remove_strings = array(
 			'boldgrid-backup-',
 			$backup_identifier,
 			'uploaded-',
+			'admin-ajax.php',
+			'.zip',
 		);
 
 		// Remove references from filename.
 		foreach ( $remove_strings as $remove_string ) {
-			$file_basename = str_replace( $remove_string, '', $file_basename );
+			$filename = str_replace( $remove_string, '', $filename );
+		}
+
+		// If the filename is now empty, then make is a unix timestamp.
+		if ( empty( $filename ) ) {
+			$filename = current_time( 'timestamp', true );
 		}
 
 		// Reformat the filename.
-		$file_basename = 'boldgrid-backup-' . $backup_identifier . '-uploaded-' . $file_basename;
+		$filename = 'boldgrid-backup-' . $backup_identifier . '-uploaded-' . $filename . '.zip';
 
 		// Remove extra dashes.
-		$file_basename = preg_replace( '#-+#', '-', $file_basename );
+		$filename = preg_replace( '#-+#', '-', $filename );
 
-		// Create the file save path.
-		$file_save_path = $backup_directory . DIRECTORY_SEPARATOR . $file_basename;
+		$backup_directory = $this->core->backup_dir->get();
 
-		// Update the base filename.
-		$_FILES['file']['name'] = $file_basename;
-
-		return $file_save_path;
+		// Return the full file path.
+		return $backup_directory . DIRECTORY_SEPARATOR . $filename;
 	}
 
 	/**
@@ -333,7 +334,10 @@ class Boldgrid_Backup_Admin_Upload {
 		}
 
 		// Create the file save path, and update the destination base filename..
-		$file_save_path = $this->get_save_path();
+		$file_save_path = $this->get_save_path( $_FILES['file']['name'] );
+
+		// Update the filename.
+		$_FILES['file']['name'] = basename( $file_save_path );
 
 		// Handle the upload.
 		$movefile = $this->handle_upload();
@@ -368,5 +372,80 @@ class Boldgrid_Backup_Admin_Upload {
 
 			return false;
 		}
+	}
+
+	/**
+	 * Callback function for importing a backup archive file via URL address.
+	 *
+	 * Used on the backup archives page.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @see Boldgrid_Backup_Admin_Backup_Dir::get()
+	 *
+	 * @uses $_POST['url'] URL address.
+	 *
+	 * @return string
+	 */
+	public function ajax_url_import() {
+		// Check user permissions.
+		if ( ! current_user_can( 'update_plugins' ) ) {
+			wp_send_json_error( array(
+				'error' => __( 'User access violation!', 'boldgrid-backup' ),
+			) );
+		}
+
+		// Check security nonce and referer.
+		if ( ! check_admin_referer( 'upload_archive_file' ) ) {
+			wp_send_json_error( array(
+				'error' => __( 'Security violation! Please try again.', 'boldgrid-backup' ),
+			) );
+		}
+
+		$url       = ! empty( $_POST['url'] ) ? esc_url_raw( $_POST['url'] ) : null;
+		$url_regex = '/^(http|https|ftp):\/\/[a-z0-9\-\.]+(\.[a-z]{2,5})?(:[0-9]{1,5})?(\/.*)?$/i';
+
+		if ( ! preg_match( $url_regex, $url ) ) {
+			wp_send_json_error( array(
+				'error' => __( 'Invalid URL address.', 'boldgrid-backup' ),
+			) );
+		}
+
+		$backup_directory = $this->core->backup_dir->get();
+
+		if ( empty( $backup_directory ) ) {
+			wp_send_json_error( array(
+				'error' => __( 'The backup directory is not configured.', 'boldgrid-backup' ),
+			) );
+		}
+
+		if ( ! $this->core->wp_filesystem->is_writable( $backup_directory ) ) {
+			wp_send_json_error( array(
+				'error' => __( 'The backup directory is not writable.', 'boldgrid-backup' ),
+			) );
+		}
+
+		$filepath = $this->get_save_path( basename( $url ) );
+
+		$response = wp_remote_get( $url, array(
+			'filename'  => $filepath,
+			'sslverify' => false,
+			'stream'    => true,
+			'timeout'   => MINUTE_IN_SECONDS * 20,
+		) );
+
+		if ( is_array( $response ) && ! is_wp_error( $response ) ) {
+			wp_send_json_success( array(
+				'filepath'   => $filepath,
+				'detailsUrl' => admin_url(
+					'admin.php?page=boldgrid-backup-archive-details&filename=' .
+					basename( $filepath )
+				),
+			) );
+		}
+
+		wp_send_json_error( array(
+			'error' => __( 'Could not retrieve the remote file.', 'boldgrid-backup' ),
+		) );
 	}
 }
