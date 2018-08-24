@@ -31,6 +31,7 @@ WordPress backup and restoration with update protection.
 ### 1.7.0 In progress ###
 
 * New feature: Added limited-lifetime download links for archive files.
+* New feature: Added import backup archive from URL address.
 
 ### 1.6.5 ###
 
