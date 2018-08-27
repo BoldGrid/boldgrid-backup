@@ -76,8 +76,8 @@ printf(
 	<div id="url-import-section" class="wp-upload-form">
 		<p><?php esc_html_e( 'From a URL address:', 'boldgrid-backup' ); ?></p>
 		<input type="text" name="url"
-			placeholder="<?php esc_attr_e( 'Download URL address', 'boldgrid-backup'); ?>" size="30" />
-		<input class="button" type="submit" value="<?php esc_attr_e( 'Upload', 'boldgrid-backup'); ?>" />
+			placeholder="<?php esc_attr_e( 'Download URL address', 'boldgrid-backup' ); ?>" size="30" />
+		<input class="button" type="submit" value="<?php esc_attr_e( 'Upload', 'boldgrid-backup' ); ?>" />
 		<span class='spinner'></span>
 		<div id="url-import-notice" class="notice notice-success inline"></div>
 	</div>
