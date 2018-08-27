@@ -75,10 +75,11 @@ printf(
 
 	<div id="url-import-section" class="wp-upload-form">
 		<p><?php esc_html_e( 'From a URL address:', 'boldgrid-backup' ); ?></p>
-		<input type="text" name="url" placeholder="Download URL address" size="30" />
-		<input class="button" type="submit" value="Upload" />
+		<input type="text" name="url"
+			placeholder="<?php esc_attr_e( 'Download URL address', 'boldgrid-backup'); ?>" size="30" />
+		<input class="button" type="submit" value="<?php esc_attr_e( 'Upload', 'boldgrid-backup'); ?>" />
 		<span class='spinner'></span>
-		<div id="url-import-notice" class="notice notice-info inline"></div>
+		<div id="url-import-notice" class="notice notice-success inline"></div>
 	</div>
 
 	<div id="upload-archive-section" class="wp-upload-form">
@@ -102,7 +103,7 @@ printf(
 	</div>
 
 	<p class="install-help">
-		<?php esc_html_e( 'Have a large site or want to FTP?', 'boldgrid-backup' ); ?>
+		<?php esc_html_e( 'Have a large file to upload or want to use FTP?', 'boldgrid-backup' ); ?>
 		<span class="dashicons dashicons-editor-help" data-id="backup-id"></span>
 	</p>
 

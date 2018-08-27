@@ -207,7 +207,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 			$this = $( this ),
 			$spinner = $this.next(),
 			$notice = $( '#url-import-notice' ),
-			urlRegex = /^(http|https|ftp):\/\/[a-z0-9\-\.]+(\.[a-z]{2,5})?(:[0-9]{1,5})?(\/.*)?$/i,
+			urlRegex = /^https?:\/\/[a-z0-9\-\.]+(\.[a-z]{2,5})?(:[0-9]{1,5})?(\/.*)?$/i,
 			data = {
 				action: 'boldgrid_backup_url_upload',
 				_wpnonce: $( '[name="_wpnonce"]' ).val(),
@@ -219,9 +219,10 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 
 		if ( ! urlRegex.test( data.url ) ) {
 			$notice
-				.removeClass( 'notice-info' )
+				.removeClass( 'notice-success' )
 				.addClass( 'notice-error' )
 				.html( lang.invalidUrl )
+				.wrapInner( '<p></p>' )
 				.show();
 
 			return;
@@ -229,7 +230,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 
 		$notice
 			.removeClass( 'notice-error' )
-			.addClass( 'notice-info' )
+			.addClass( 'notice-success' )
 			.empty()
 			.hide();
 
@@ -241,11 +242,11 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 			if ( response.data !== undefined && response.data.filepath !== undefined ) {
 				$notice
 					.removeClass( 'notice-error' )
-					.addClass( 'notice-info' )
+					.addClass( 'notice-success' )
 					.html(
 						lang.savedTo +
 							response.data.filepath +
-							' <a class="button" href="' +
+							' <a href="' +
 							response.data.detailsUrl +
 							'">' +
 							lang.viewDetails +
@@ -253,26 +254,31 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 					);
 			} else if ( response.data !== undefined && response.data.error !== undefined ) {
 				$notice
-					.removeClass( 'notice-info' )
+					.removeClass( 'notice-success' )
 					.addClass( 'notice-error' )
 					.html( response.data.error );
+
+				$this.removeAttr( 'disabled' );
 			} else {
 				$notice
-					.removeClass( 'notice-info' )
+					.removeClass( 'notice-success' )
 					.addClass( 'notice-error' )
 					.html( lang.unknownError );
+
+				$this.removeAttr( 'disabled' );
 			}
 		} )
 			.error( function() {
 				$notice
-					.removeClass( 'notice-info' )
+					.removeClass( 'notice-success' )
 					.addClass( 'notice-error' )
 					.html( lang.ajaxError + jqxhr.status + ' (' + jqxhr.statusText + ')' );
+
+				$this.removeAttr( 'disabled' );
 			} )
 			.always( function() {
-				$notice.show();
+				$notice.wrapInner( '<p></p>' ).show();
 				$spinner.removeClass( 'inline' );
-				$this.removeAttr( 'disabled' );
 			} );
 	};
 };

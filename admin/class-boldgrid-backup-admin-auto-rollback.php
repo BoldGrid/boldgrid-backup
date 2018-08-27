@@ -286,7 +286,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		$translation = array(
 			'savedTo'      => __( 'File saved to: ', 'boldgrid-backup' ),
 			'viewDetails'  => __( 'View details', 'boldgrid-backup' ),
-			'invalidUrl'   => __( 'You must entre valid a URL address.', 'boldgrid-backup' ),
+			'invalidUrl'   => __( 'You must enter valid a URL address.', 'boldgrid-backup' ),
 			'notZip'       => __( 'The URL address is not a ZIP file.', 'boldgrid-backup' ),
 			'unknownError' => __( 'Unknown error.', 'boldgrid-backup' ),
 			'ajaxError'    => __( 'Could not reach the URL address. HTTP error: ', 'boldgrid-backup' ),

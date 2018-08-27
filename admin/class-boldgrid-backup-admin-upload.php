@@ -382,6 +382,7 @@ class Boldgrid_Backup_Admin_Upload {
 	 * @since 1.7.0
 	 *
 	 * @see Boldgrid_Backup_Admin_Backup_Dir::get()
+	 * @see Boldgrid_Backup_Admin_Backup_Dir::is_valid()
 	 *
 	 * @uses $_POST['url'] URL address.
 	 *
@@ -403,7 +404,7 @@ class Boldgrid_Backup_Admin_Upload {
 		}
 
 		$url       = ! empty( $_POST['url'] ) ? esc_url_raw( $_POST['url'] ) : null;
-		$url_regex = '/^(http|https|ftp):\/\/[a-z0-9\-\.]+(\.[a-z]{2,5})?(:[0-9]{1,5})?(\/.*)?$/i';
+		$url_regex = '/^https?:\/\/[a-z0-9\-\.]+(\.[a-z]{2,5})?(:[0-9]{1,5})?(\/.*)?$/i';
 
 		if ( ! preg_match( $url_regex, $url ) ) {
 			wp_send_json_error( array(
@@ -413,39 +414,46 @@ class Boldgrid_Backup_Admin_Upload {
 
 		$backup_directory = $this->core->backup_dir->get();
 
-		if ( empty( $backup_directory ) ) {
+		if ( ! $this->core->backup_dir->is_valid( $backup_directory ) &&
+			! empty( $this->core->backup_dir->errors ) ) {
 			wp_send_json_error( array(
-				'error' => __( 'The backup directory is not configured.', 'boldgrid-backup' ),
-			) );
-		}
-
-		if ( ! $this->core->wp_filesystem->is_writable( $backup_directory ) ) {
-			wp_send_json_error( array(
-				'error' => __( 'The backup directory is not writable.', 'boldgrid-backup' ),
+				'error' => implode( '<br />', $this->core->backup_dir->errors ),
 			) );
 		}
 
 		$filepath = $this->get_save_path( basename( $url ) );
 
+		$allowed_content_types = array(
+			'binary/octet-stream',
+			'application/zip',
+		);
+
 		$response = wp_remote_get( $url, array(
 			'filename'  => $filepath,
+			'headers'   => 'Accept: ' . implode( ', ', $allowed_content_types ),
 			'sslverify' => false,
 			'stream'    => true,
 			'timeout'   => MINUTE_IN_SECONDS * 20,
 		) );
 
-		if ( is_array( $response ) && ! is_wp_error( $response ) ) {
-			wp_send_json_success( array(
-				'filepath'   => $filepath,
-				'detailsUrl' => admin_url(
-					'admin.php?page=boldgrid-backup-archive-details&filename=' .
-					basename( $filepath )
-				),
-			) );
+		if ( is_array( $response ) && ! is_wp_error( $response ) &&
+			in_array( $response['headers']['content-type'], $allowed_content_types, true ) ) {
+				wp_send_json_success( array(
+					'filepath'   => $filepath,
+					'detailsUrl' => admin_url(
+						'admin.php?page=boldgrid-backup-archive-details&filename=' .
+						basename( $filepath )
+					),
+				) );
+		} else {
+			$this->core->wp_filesystem->delete( $filepath );
 		}
 
 		wp_send_json_error( array(
-			'error' => __( 'Could not retrieve the remote file.', 'boldgrid-backup' ),
+			'error' => __(
+				'Could not retrieve the remote file.  It may not be a ZIP file, or the link is no longer valid.',
+				'boldgrid-backup'
+			),
 		) );
 	}
 }
