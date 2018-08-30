@@ -223,6 +223,9 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		wp_localize_script( $handle, 'localizeScriptData', $localize_script_data );
 
 		wp_enqueue_script( $handle );
+
+		wp_enqueue_script( 'heartbeat' );
+		wp_enqueue_script( 'jquery-ui-progressbar' );
 	}
 
 	/**

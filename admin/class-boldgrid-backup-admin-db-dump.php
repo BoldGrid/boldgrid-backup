@@ -54,6 +54,11 @@ class Boldgrid_Backup_Admin_Db_Dump {
 			return array( 'error' => esc_html__( 'No tables selected to backup.', 'boldgrid-backup' ) );
 		}
 
+		Boldgrid_Backup_Admin_In_Progress_Data::set_args( array(
+			'status' => 'Backing up database...',
+			'tables' => $include_tables,
+		));
+
 		/**
 		 * Take action before a database is dumped.
 		 *

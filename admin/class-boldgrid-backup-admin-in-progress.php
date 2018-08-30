@@ -146,6 +146,8 @@ class Boldgrid_Backup_Admin_In_Progress {
 			return false;
 		}
 
+		wp_enqueue_script( 'jquery-ui-progressbar' );
+
 		$notice = array(
 			'class'   => 'notice notice-warning boldgrid-backup-in-progress',
 			'message' => sprintf(
@@ -153,7 +155,10 @@ class Boldgrid_Backup_Admin_In_Progress {
 				__(
 					'BoldGrid Backup began archiving your website %1$s ago.',
 					'boldgrid-backup'
-				),
+				) . '<div id="boldgrid-backup-in-progress-bar">
+						<div class="progress-label">Loading...</div>
+						<div id="last_file_archived"></div>
+					</div>',
 				human_time_diff( $in_progress, time() )
 			),
 			'heading' => __( 'BoldGrid Backup - Backup in progress', 'boldgrid-backup' ),
@@ -205,6 +210,8 @@ class Boldgrid_Backup_Admin_In_Progress {
 
 		// Our "backup complete!" admin notice.
 		$response['boldgrid_backup_complete'] = $this->core->notice->get_backup_complete();
+
+		$response['in_progress_data'] = Boldgrid_Backup_Admin_In_Progress_Data::get_args();
 
 		return $response;
 	}

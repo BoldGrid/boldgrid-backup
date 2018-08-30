@@ -205,6 +205,7 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-core-files.php';
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-in-progress.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-in-progress-data.php';
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/remote/class-boldgrid-backup-admin-ftp.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/remote/class-boldgrid-backup-admin-ftp-hooks.php';

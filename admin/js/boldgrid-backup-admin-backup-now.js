@@ -208,6 +208,8 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 				}
 			}
 		} );
+		
+		$( 'body' ).trigger( 'boldgrid_backup_initiated' );
 
 		// Prevent default browser action.
 		e.preventDefault();

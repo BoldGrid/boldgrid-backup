@@ -40,9 +40,12 @@ return sprintf(
 			</p>
 		</form>
 	</div>
-	<div id="backup-site-now-results"></div>',
+	<div id="backup-site-now-results"></div>
+	%5$s
+	',
 	wp_nonce_field( 'boldgrid_backup_now', 'backup_auth', true, false ),
 	esc_html( 'Backup Site Now', 'boldgrid-backup' ),
 	$update_protection_ajax || $core->auto_rollback->on_update_page ? 'data-updating="true"' : '',
-	/* 4 */ __( 'You may leave this page, doing so will not stop your backup.', 'boldgrid-backup' )
+	/* 4 */ __( 'You may leave this page, doing so will not stop your backup.', 'boldgrid-backup' ),
+	Boldgrid_Backup_Admin_In_Progress_Data::get_markup()
 );

@@ -106,6 +106,10 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 	public function archive_files( $filelist, &$info ) {
 		$info['filepath'] = $this->core->generate_archive_path( 'zip' );
 
+		$number_files_archived = 0;
+		$number_files_todo = count( $filelist );
+		$last_x_files = array();
+
 		if ( $info['dryrun'] ) {
 			return true;
 		}
@@ -131,8 +135,24 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 				$this->zip->addFile( $fileinfo[0], $fileinfo[1] );
 				$this->add_dir( $fileinfo[1] );
 			}
-		}
 
+			$number_files_archived++;
+
+			if ( $number_files_archived %20 === 0 ) {
+				$last_x_files[] = $fileinfo[1];
+				if( count( $last_x_files ) > 5 ) {
+					array_shift( $last_x_files );
+				}
+			}
+
+			if ( $number_files_archived %100 === 0 || $number_files_archived >= $number_files_todo) {
+				Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'total_files_done', $number_files_archived );
+				Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'last_files', $last_x_files );
+			}
+		}
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'last_files', array() );
+
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'status', 'Closing archive...' );
 		if ( ! $this->zip->close() ) {
 			return array(
 				'error' => 'Cannot close ZIP archive file "' . $info['filepath'] . '".',

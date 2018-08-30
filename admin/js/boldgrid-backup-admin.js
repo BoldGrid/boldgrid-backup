@@ -48,6 +48,89 @@ BoldGrid.Backup = function( $ ) {
 			.closest( '.notice' )
 			.remove();
 	};
+	
+	/**
+	 * 
+	 */
+	self.onBackupInitiated = function() {
+		var shown_tables = false;
+		self.setupProgressHeartbeat();
+		
+		$( '#boldgrid-backup-in-progress-bar ')
+			.show()
+			.progressbar({
+				value: 0
+			});
+		
+		// When the heartbeat is received, check to see if the backup has completed.
+		$( document ).on( 'heartbeat-tick', function( e, data ) {
+			var timeout;
+
+			if ( undefined === data.boldgrid_backup_in_progress ) {
+				return;
+			}
+			
+			if( data.in_progress_data.tables ) {
+				
+				if( ! shown_tables ) {
+					
+					$( '.progress-label' ).text( data.in_progress_data.status );
+					
+					for( var i = 0; i < data.in_progress_data.tables.length; i++ ) {	
+						var table_name = data.in_progress_data.tables[i];
+						
+						timeout = (i+1) * 5000 / data.in_progress_data.tables.length;
+						
+						var show_database_tables = function( table_name ) {
+							$( '#last_file_archived' ).html( '<strong>Tables included in backup</strong>: ' + table_name );
+						};
+						
+						setTimeout( show_database_tables, timeout, table_name );
+					}
+					
+					shown_tables = true;	
+				} else {
+					setTimeout( function() {
+						$( '#last_file_archived' ).html( 'Completing database backup...' );	
+						}, timeout + 2000 );
+				}
+				
+			} else if ( data.in_progress_data.total_files_done && data.in_progress_data.total_files_todo ) {
+				var percentage = Math.floor( data.in_progress_data.total_files_done / data.in_progress_data.total_files_todo * 100 );
+					
+				$( '#boldgrid-backup-in-progress-bar ').progressbar({
+					value: percentage
+				});
+					
+				if( percentage >= 50 ) {
+					$( '.progress-label' ).addClass( 'over-50' );
+				}
+					
+				if( 100 === percentage && data.in_progress_data.status ) {
+					$( '.progress-label' ).text( data.in_progress_data.status );
+					$( '#last_file_archived' ).empty();
+				} else {
+					$( '.progress-label' ).text( percentage + '%' );	
+				}	
+			} else {
+				$( '.progress-label' ).text( data.in_progress_data.status );
+			}
+				
+			if( data.in_progress_data.last_files ) {
+				for( var i = 0; i < data.in_progress_data.last_files.length; i++ ) {
+						
+					var last_file_name = data.in_progress_data.last_files[i],
+						timeout = i * 1000 + 1;
+						
+					var show_last_file = function( last_file_name ) {
+						$( '#last_file_archived' ).text( last_file_name );
+					};
+					
+					setTimeout( show_last_file, timeout, last_file_name );
+				}
+			}
+		} );
+	}
 
 	/**
 	 * @summary Handle the clicking of a show / hide toggle.
@@ -87,26 +170,14 @@ BoldGrid.Backup = function( $ ) {
 	 * @since 1.6.0
 	 */
 	self.onInProgress = function() {
-		var complete = false,
-			$inProgressNotice = $( '.boldgrid-backup-in-progress' );
+		var $inProgressNotice = $( '.boldgrid-backup-in-progress' );
 
 		// If we're not actually showing an "in progress" notice, abort.
 		if ( 1 !== $inProgressNotice.length ) {
 			return;
 		}
 
-		// Increase the heartbeat so we can get an update sooner.
-		wp.heartbeat.interval( 'fast' );
-
-		/*
-		 * When the heartbeat is sent, include that we're looking for an update
-		 * on the in progress backup.
-		 */
-		$( document ).on( 'heartbeat-send', function( e, data ) {
-			if ( ! complete ) {
-				data['boldgrid_backup_in_progress'] = true;
-			}
-		} );
+		self.setupProgressHeartbeat();
 
 		// When the heartbeat is received, check to see if the backup has completed.
 		$( document ).on( 'heartbeat-tick', function( e, data ) {
@@ -125,13 +196,12 @@ BoldGrid.Backup = function( $ ) {
 
 				$inProgressNotice.slideUp();
 
-				wp.heartbeat.interval( 'standard' );
-				complete = true;
-
 				$( 'body' ).trigger( 'make_notices_dismissible' );
 				$( 'body' ).trigger( 'boldgrid_backup_complete' );
 			}
 		} );
+		
+		self.onBackupInitiated();
 	};
 
 	/**
@@ -167,6 +237,39 @@ BoldGrid.Backup = function( $ ) {
 			$el.append( $button );
 		} );
 	};
+	
+	/**
+	 * 
+	 */
+	self.setupProgressHeartbeat = function() {
+		// Increase the heartbeat so we can get an update sooner.
+		wp.heartbeat.interval( 'fast' );
+
+		/*
+		 * When the heartbeat is sent, include that we're looking for an update
+		 * on the in progress backup.
+		 */
+		$( document ).on( 'heartbeat-send', function( e, data ) {
+			data['boldgrid_backup_in_progress'] = true;
+			
+			$body = $( 'body' ).removeClass( 'heartbeat-lost-focus' )
+		} );
+		
+		var heartbeat_focus_interval = window.setInterval(
+			function(){
+				
+				var $body = $( 'body' ),
+					body_class = 'heartbeat-lost-focus';
+			
+				if( wp.heartbeat.hasFocus() ) {
+					$body.removeClass( body_class );
+				} else {
+					$body.addClass( body_class );
+				}
+			},
+			5000
+		);
+	}
 
 	$( function() {
 		self.bindHelpClick();
@@ -176,9 +279,14 @@ BoldGrid.Backup = function( $ ) {
 		/*
 		 * If and when a backup is in progress, we need to begin waiting to hear
 		 * for that backup to complete.
+		 * 
+		 * Event boldgrid_backup_progress_notice_added currently only triggered within the customizer.
+		 * When a user clicks on themes, we may dynamically show them a notice that a backup is in progress.
 		 */
 		self.onInProgress();
 		$( 'body' ).on( 'boldgrid_backup_progress_notice_added', self.onInProgress );
+		
+		$( 'body' ).on( 'boldgrid_backup_initiated', self.onBackupInitiated );
 
 		$( 'body' ).on( 'click', '[data-toggle-target]', self.onClickToggle );
 		$( 'body' ).on( 'make_notices_dismissible', self.makeNoticesDismissible );
