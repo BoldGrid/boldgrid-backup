@@ -207,7 +207,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 			$this = $( this ),
 			$spinner = $this.next(),
 			$notice = $( '#url-import-notice' ),
-			urlRegex = /^https?:\/\/[a-z0-9\-\.]+(\.[a-z]{2,5})?(:[0-9]{1,5})?(\/.*)?$/i,
+			urlRegex = new RegExp( lang.urlRegex, 'i' ),
 			data = {
 				action: 'boldgrid_backup_url_upload',
 				_wpnonce: $( '[name="_wpnonce"]' ).val(),

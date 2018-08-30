@@ -129,15 +129,18 @@ class Boldgrid_Backup_Admin_Archive_Log {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param string $filepath Archive file path.
+	 * @param string $filepath         Archive file path.
+	 * @param string $alt_log_filename Optional log file path.  Default is to get from filepath.
 	 */
-	public function restore_by_zip( $filepath ) {
+	public function restore_by_zip( $filepath, $alt_log_filename = null ) {
 		$log_filepath = $this->path_from_zip( $filepath );
-		$log_filename = basename( $log_filepath );
 
 		if ( $this->core->wp_filesystem->exists( $log_filepath ) ) {
 			return true;
 		}
+
+		$log_filename = ! empty( $alt_log_filename ) ?
+			$alt_log_filename : basename( $log_filepath );
 
 		// Extract the log file to ABSPATH.
 		$zip    = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this->core );
@@ -148,8 +151,9 @@ class Boldgrid_Backup_Admin_Archive_Log {
 
 		// Move the log file from the ABSPATH to the backup dir.
 		$old_path = ABSPATH . $log_filename;
-		$new_path = $this->core->backup_dir->get_path_to( $log_filename );
-		return $this->core->wp_filesystem->move( $old_path, $new_path );
+		$new_path = $this->core->backup_dir->get_path_to( basename( $log_filepath ) );
+
+		return $this->core->wp_filesystem->move( $old_path, $new_path, true );
 	}
 
 	/**

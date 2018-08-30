@@ -37,4 +37,5 @@ return array(
 		'est_pause' => esc_html__( 'Estimated Pause: %s seconds', 'boldgrid-backup' ),
 	),
 	'public_link_lifetime' => '1 HOUR',
+	'url_regex'            => '^https?:\/\/[a-z0-9\-\.]+(\.[a-z]{2,5})?(:[0-9]{1,5})?(\/.*)?$',
 );

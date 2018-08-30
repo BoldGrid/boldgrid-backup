@@ -80,19 +80,13 @@ class Boldgrid_Backup_Admin_Remote {
 	 *
 	 * @since 1.6.0
 	 *
+	 * @see Boldgrid_Backup_Admin_Archive::init()
+	 * @see Boldgrid_Backup_Admin_Archive::update_timestamp()
+	 *
 	 * @param string $filepath A file path.
 	 */
 	public function post_download( $filepath ) {
-		/*
-		 * Restore the log file from the archive so we can get all the juicy
-		 * meta data about the archive.
-		 */
-		$this->core->archive_log->restore_by_zip( $filepath );
-
-		/*
-		 * Now that we have the log, update the archive's timestamp based upon
-		 * time last modified time in the log.
-		 */
+		// Update the archive's timestamp based upon time last modified time in the log.
 		$this->core->archive->reset();
 		$this->core->archive->init( $filepath );
 		$this->core->archive->update_timestamp();

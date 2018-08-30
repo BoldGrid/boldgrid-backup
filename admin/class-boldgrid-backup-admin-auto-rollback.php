@@ -290,6 +290,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 			'notZip'       => __( 'The URL address is not a ZIP file.', 'boldgrid-backup' ),
 			'unknownError' => __( 'Unknown error.', 'boldgrid-backup' ),
 			'ajaxError'    => __( 'Could not reach the URL address. HTTP error: ', 'boldgrid-backup' ),
+			'urlRegex'     => $this->core->configs['url_regex'],
 		);
 
 		wp_localize_script( $handle, 'BoldGridBackupAdminHome', $translation );

@@ -190,7 +190,6 @@ class Boldgrid_Backup_Admin_Archive {
 	 * @param string $filepath File path.
 	 */
 	public function init( $filepath ) {
-
 		$filepath = strip_tags( $filepath );
 
 		if ( ! empty( $this->filepath ) && $filepath === $this->filepath ) {
@@ -198,8 +197,6 @@ class Boldgrid_Backup_Admin_Archive {
 		}
 
 		$this->reset();
-
-		$zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this->core );
 
 		$this->filepath = $filepath;
 		$this->filename = basename( $this->filepath );
@@ -226,8 +223,6 @@ class Boldgrid_Backup_Admin_Archive {
 		$this->compressor = ! empty( $this->log['compressor'] ) ? $this->log['compressor'] : 'php_zip';
 
 		$this->view_details_url = admin_url( 'admin.php?page=boldgrid-backup-archive-details&filename=' . $this->filename );
-
-		unset( $zip );
 	}
 
 	/**
