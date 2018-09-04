@@ -184,8 +184,10 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 
 		// If we have it in the settings, then use it.
 		$settings = $this->core->settings->get_settings();
-		if ( ! empty( $settings['backup_directory'] ) ) {
-			$this->set( $settings['backup_directory'] );
+		if ( ! empty( $settings['backup_directory'] ) &&
+			$this->core->wp_filesystem->is_writable( $settings['backup_directory'] ) ) {
+				$this->set( $settings['backup_directory'] );
+
 			return $this->backup_directory;
 		}
 
@@ -293,7 +295,10 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 
 		$this->set( $backup_directory );
 
+		$settings = $this->core->settings->get_settings();
+
 		$settings['backup_directory'] = $backup_directory;
+
 		$this->core->settings->save( $settings );
 
 		return $this->backup_directory;
