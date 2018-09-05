@@ -28,7 +28,6 @@ ob_start();
 
 		<p class="help" data-id="backup-dir">
 			<?php
-
 			/*
 			 * Print this text:
 			 *
@@ -37,20 +36,17 @@ ob_start();
 			 * your backup directory <a>here</a>.
 			 */
 			printf(
-				wp_kses(
-					// translators: 1: URL address.
-					esc_html__(
-						'For security purposes, please do not set this to a publicly available directory. Once you set this, it is not recommended that you change it again. You can find more help with setting your backup directory <a href="%s" target="_blank">here</a>.',
-						'boldgrid-backup'
-					),
-					array(
-						'a' => array(
-							'href'   => array(),
-							'target' => array(),
-						),
-					)
+				// translators: 1: URL address link.
+				esc_html__(
+					'For security purposes, please do not set this to a publicly available directory. Once you set this, it is not recommended that you change it again. You can find more help with setting your backup directory %1$s.',
+					'boldgrid-backup'
 				),
-				esc_url( $this->core->configs['urls']['setting_directory'] )
+				sprintf(
+					'<a target="_blank" href="' .
+						esc_url( $this->core->configs['urls']['setting_directory'] ) .
+						'">%1$s</a>',
+					esc_html__( 'here', 'boldgrid-backup' )
+				)
 			);
 			?>
 		</p>

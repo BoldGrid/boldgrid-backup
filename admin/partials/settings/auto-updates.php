@@ -36,10 +36,13 @@ ob_start();
 						printf(
 							// translators: 1: URL address.
 							esc_html__(
-								'Automatically perform all plugin updates when available. Enabling this feature adds the <a target="_blank" href="%1$s">auto_update_plugin filter</a>, which enables automatic plugin updates when an update is available.',
+								'Automatically perform all plugin updates when available. Enabling this feature adds the %1$s, which enables automatic plugin updates when an update is available.',
 								'boldgrid-backup'
 							),
-							'https://codex.wordpress.org/Configuring_Automatic_Background_Updates#Plugin_.26_Theme_Updates_via_Filter'
+							sprintf(
+								'<a target="_blank" href="https://codex.wordpress.org/Configuring_Automatic_Background_Updates#Plugin_.26_Theme_Updates_via_Filter">auto_update_plugin %1$s</a>',
+								esc_html__( 'filter', 'boldgrid-backup' )
+							)
 						);
 						?>
 					</p>
@@ -79,10 +82,13 @@ ob_start();
 						printf(
 							// translators: 1: URL address.
 							esc_html__(
-								'Automatically perform all theme updates when available. Enabling this feature adds the <a target="_blank" href="%1$s">auto_update_theme filter</a>, which enables automatic theme updates when an update is available.',
+								'Automatically perform all theme updates when available. Enabling this feature adds the %1$s, which enables automatic theme updates when an update is available.',
 								'boldgrid-backup'
 							),
-							'https://codex.wordpress.org/Configuring_Automatic_Background_Updates#Plugin_.26_Theme_Updates_via_Filter'
+							sprintf(
+								'<a target="_blank" href="https://codex.wordpress.org/Configuring_Automatic_Background_Updates#Plugin_.26_Theme_Updates_via_Filter">auto_update_theme %1$s</a>',
+								esc_html__( 'filter', 'boldgrid-backup' )
+							)
 						);
 						?>
 					<p>
@@ -113,7 +119,7 @@ ob_start();
 
 			<tr>
 				<th>
-						<?php esc_html_e( 'Auto Backup<br />Before Updates', 'boldgrid-backup' ); ?>
+						<?php esc_html_e( 'Auto Backup', 'boldgrid-backup' ); ?>
 					<span class='dashicons dashicons-editor-help' data-id='auto-backup'></span>
 
 					<p class='help' data-id='auto-backup'>
@@ -121,10 +127,13 @@ ob_start();
 						printf(
 							// translators: 1: URL address.
 							esc_html__(
-								'Automatically perform a backup before WordPress updates. When this feature is enabled, a full backup will be made during the <a target="_blank" href="%1$s">pre_auto_update action</a>. ',
+								'Automatically perform a backup before WordPress updates. When this feature is enabled, a full backup will be made during the %1$s.',
 								'boldgrid-backup'
 							),
-							'https://developer.wordpress.org/reference/hooks/pre_auto_update/'
+							sprintf(
+								'<a target="_blank" href="https://developer.wordpress.org/reference/hooks/pre_auto_update/">pre_auto_update %1$s</a>',
+								esc_html__( 'action', 'boldgrid-backup' )
+							)
 						);
 						?>
 					<p>
