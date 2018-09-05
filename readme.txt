@@ -32,7 +32,7 @@ WordPress backup and restoration with update protection.
 
 * New feature: Added limited-lifetime download links for archive files.
 * New feature: Added import backup archive from URL address.
-* Bug fix:     Set a default backup directory if path in settings is not valid.
+* Bug fix:     Set a default backup directory if path in settings is not valid.  Remove filters before fixing home and siteurl on restore.
 
 = 1.6.5 =
 
