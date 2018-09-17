@@ -30,6 +30,7 @@ WordPress backup and restoration with update protection.
 
 ### 1.7.0 In progress ###
 
+* New feature: Added auto-update settings for individual plugins and themes.
 * New feature: Added limited-lifetime download links for archive files.
 * New feature: Added import backup archive from URL address.
 * Update:      Update protection is now valid for 1 hour after a full backup from the WordPress Updates or Plugins page.

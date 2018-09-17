@@ -189,16 +189,6 @@ class Boldgrid_Backup_Admin_Settings {
 			$settings['auto_rollback']            = 1;
 		}
 
-		$boldgrid_settings = get_site_option( 'boldgrid_settings' );
-
-		$settings['plugin_autoupdate'] = (
-			! empty( $boldgrid_settings['plugin_autoupdate'] ) ? 1 : 0
-		);
-
-		$settings['theme_autoupdate'] = (
-			! empty( $boldgrid_settings['theme_autoupdate'] ) ? 1 : 0
-		);
-
 		if ( empty( $settings['remote'] ) ) {
 			$settings['remote'] = array();
 		}
@@ -268,8 +258,12 @@ class Boldgrid_Backup_Admin_Settings {
 	private function update_settings() {
 		$update_errors = array();
 
-		// Verify nonce.
-		check_admin_referer( 'boldgrid-backup-settings', 'settings_auth' );
+		// Check security nonce and referer.
+		if ( ! check_admin_referer( 'boldgrid-backup-settings', 'settings_auth' ) ) {
+			wp_send_json_error( array(
+				'error' => __( 'Security violation! Please try again.', 'boldgrid-backup' ),
+			) );
+		}
 
 		// Get the retention count.
 		if ( isset( $_POST['retention_count'] ) ) {
@@ -409,18 +403,6 @@ class Boldgrid_Backup_Admin_Settings {
 			sanitize_email( $_POST['notification_email'] ) !== $settings['notification_email'] ) {
 				$settings['notification_email'] = sanitize_email( $_POST['notification_email'] );
 			}
-
-			$boldgrid_settings['plugin_autoupdate'] = (
-				( isset( $_POST['plugin_autoupdate'] ) && '1' === $_POST['plugin_autoupdate'] ) ?
-				1 : 0
-			);
-
-			$boldgrid_settings['theme_autoupdate'] = (
-				( isset( $_POST['theme_autoupdate'] ) && '1' === $_POST['theme_autoupdate'] ) ?
-				1 : 0
-			);
-
-			unset( $settings['plugin_autoupdate'], $settings['theme_autoupdate'] );
 
 			// Get the current backup directory path.
 			$backup_dir_changed        = false;
@@ -603,11 +585,34 @@ class Boldgrid_Backup_Admin_Settings {
 			$settings['folder_exclusion_exclude'] = $this->core->folder_exclusion->from_post( 'exclude' );
 			$settings['folder_exclusion_type']    = $this->core->folder_exclusion->from_post( 'type' );
 
+			// Read BoldGrid settings form POST request, sanitize, and merge settings with saved.
+			$boldgrid_settings = array_merge(
+				get_option( 'boldgrid_settings' ),
+				\Boldgrid\Library\Library\Page\Connect::sanitizeSettings(
+					array(
+						'autoupdate'            => ! empty( $_POST['autoupdate'] ) ?
+							(array) $_POST['autoupdate'] : array(),
+						'release_channel'       => ! empty( $_POST['plugin_release_channel'] ) ?
+							sanitize_key( $_POST['plugin_release_channel'] ) : 'stable',
+						'theme_release_channel' => ! empty( $_POST['theme_release_channel'] ) ?
+							sanitize_key( $_POST['theme_release_channel'] ) : 'stable',
+					)
+				)
+			);
+
+			// Cleanup old settings.
+			unset(
+				$settings['plugin_autoupdate'],
+				$settings['theme_autoupdate'],
+				$boldgrid_settings['plugin_autoupdate'],
+				$boldgrid_settings['theme_autoupdate']
+			);
+
 			// If no errors, then save the settings.
 			if ( ! $update_error ) {
 				$settings['updated'] = time();
 				update_site_option( 'boldgrid_backup_settings', $settings );
-				$this->update_boldgrid_settings( $boldgrid_settings );
+				update_option( 'boldgrid_settings', $boldgrid_settings );
 			}
 		}
 
@@ -659,11 +664,9 @@ class Boldgrid_Backup_Admin_Settings {
 	public function page_backup_settings() {
 		add_thickbox();
 		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
-
 		wp_enqueue_style( 'bglib-ui-css' );
 		wp_enqueue_script( 'bglib-ui-js' );
 		wp_enqueue_script( 'bglib-sticky' );
-
 		wp_enqueue_script( 'bglib-license' );
 
 		if ( ! $this->is_saving_settings ) {
@@ -736,6 +739,32 @@ class Boldgrid_Backup_Admin_Settings {
 			false
 		);
 
+		// Enqueue JS for the toggles on the auto-updates section.
+		wp_enqueue_script(
+			'boldgrid-library-connect',
+			\Boldgrid\Library\Library\Configs::get( 'libraryUrl' ) . 'src/assets/js/connect.js',
+			array( 'jquery' ),
+			BOLDGRID_BACKUP_VERSION,
+			false
+		);
+
+		// Enqueue jquery-toggles JS.
+		wp_enqueue_script(
+			'jquery-toggles',
+			\Boldgrid\Library\Library\Configs::get( 'libraryUrl' ) . 'build/toggles.min.js',
+			array( 'jquery' ),
+			BOLDGRID_BACKUP_VERSION,
+			true
+		);
+
+		// Enqueue jquery-toggles CSS.
+		wp_enqueue_style(
+			'jquery-toggles-full',
+			\Boldgrid\Library\Library\Configs::get( 'libraryUrl' ) . 'build/toggles-full.css',
+			array(),
+			BOLDGRID_BACKUP_VERSION
+		);
+
 		$this->core->folder_exclusion->enqueue_scripts();
 		$this->core->db_omit->enqueue_scripts();
 
@@ -768,29 +797,5 @@ class Boldgrid_Backup_Admin_Settings {
 		}
 
 		return update_site_option( 'boldgrid_backup_settings', $settings );
-	}
-
-	/**
-	 * Update BoldGrid general settings.
-	 *
-	 * @since 1.3.11
-	 *
-	 * @param array $settings Array of BoldGrid settings.
-	 * @return bool
-	 */
-	public function update_boldgrid_settings( array $settings ) {
-		$boldgrid_settings = get_site_option( 'boldgrid_settings' );
-
-		$boldgrid_settings['plugin_autoupdate'] = (
-			( isset( $settings['plugin_autoupdate'] ) && 1 === $settings['plugin_autoupdate'] ) ?
-			1 : 0
-		);
-
-		$boldgrid_settings['theme_autoupdate'] = (
-			( isset( $settings['theme_autoupdate'] ) && 1 === $settings['theme_autoupdate'] ) ?
-			1 : 0
-		);
-
-		return update_site_option( 'boldgrid_settings', $boldgrid_settings );
 	}
 }
