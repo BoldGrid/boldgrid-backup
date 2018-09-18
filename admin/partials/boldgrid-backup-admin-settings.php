@@ -22,6 +22,7 @@ $scheduler        = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/sch
 $folders_include  = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/folders.php';
 $db               = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/db.php';
 $retention        = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/retention.php';
+$auto_rollback    = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/auto-rollback.php';
 $auto_updates     = include $library_dir . 'src/Library/Views/Connect/AutoUpdates.php';
 $update_channels  = include $library_dir . 'src/Library/Views/Connect/UpdateChannels.php';
 $notifications    = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/notifications.php';
@@ -53,6 +54,11 @@ $sections = array(
 			'id'      => 'section_retention',
 			'title'   => __( 'Retention', 'boldgrid-backup' ),
 			'content' => $retention,
+		),
+		array(
+			'id'      => 'section_auto_rollback',
+			'title'   => __( 'Auto Backup and Rollback', 'boldgrid-backup' ),
+			'content' => $auto_rollback,
 		),
 		array(
 			'id'      => 'section_auto_updates',
