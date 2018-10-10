@@ -773,15 +773,11 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		}
 
 		// If there is a pending rollback (backup within the last hour), then abort.
-		if ( ! empty( $pending_rollback['lastmodunix'] ) &&
-			strtotime( '-1 HOUR' ) <= $pending_rollback['lastmodunix'] ) {
-				$this->notice_activated_show();
+		if ( ! empty( $pending_rollback['lastmodunix'] ) ) {
+			$this->notice_activated_show();
 
 			return;
 		}
-
-		// Clear any pending rollback.
-		delete_site_option( 'boldgrid_backup_pending_rollback' );
 
 		$this->enqueue_backup_scripts();
 
@@ -1064,5 +1060,27 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		}
 
 		wp_send_json_success( $notice );
+	}
+
+	/**
+	 * Validate the rollback option when retrieved.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param  array|false WordPress option value for "boldgrid_backup_pending_rollback".
+	 * @param  string      Option name.
+	 * @return array|false
+	 */
+	public function validate_rollback_option( $value, $option ) {
+		$is_coutdown_active = ! empty( $value['deadline'] );
+		$is_recent_backup   = ! empty( $value['lastmodunix'] ) &&
+			strtotime( '-1 HOUR' ) <= $value['lastmodunix'];
+
+		if ( ! $is_recent_backup && ! $is_coutdown_active ) {
+			delete_site_option( $option );
+			$value = false;
+		}
+
+		return $value;
 	}
 }

@@ -412,6 +412,9 @@ class Boldgrid_Backup {
 
 		// For Ajax URL import.
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_url_upload', $plugin_admin_core->upload, 'ajax_url_import' );
+
+		// Filter the boldgrid_backup_pending_rollback site option.
+		$this->loader->add_filter( 'site_option_boldgrid_backup_pending_rollback', $plugin_admin_core->auto_rollback, 'validate_rollback_option', 10, 2 );
 	}
 
 	/**
