@@ -1716,7 +1716,8 @@ class Boldgrid_Backup_Admin_Core {
 				break;
 		}
 
-		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'status', 'Wrapping things up' );
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'status', __( 'Wrapping things up...', 'boldgrid-backup' ) );
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'percentage', 100 );
 
 		$info['total_size'] += $this->filelist->get_total_size( $filelist );
 
@@ -1799,7 +1800,7 @@ class Boldgrid_Backup_Admin_Core {
 			update_option( 'boldgrid_backup_latest_backup', $info );
 		}
 
-		Boldgrid_Backup_Admin_In_Progress_Data::set_args( array( 'status', 'Backup complete!' ) );
+		Boldgrid_Backup_Admin_In_Progress_Data::set_args( array( 'status' => __( 'Backup complete!', 'boldgrid-backup' ) ) );
 
 		// Return the array of archive information.
 		return $info;

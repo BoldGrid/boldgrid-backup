@@ -72,6 +72,8 @@ class Boldgrid_Backup_Admin_In_Progress {
 		 */
 		wp_enqueue_script( 'heartbeat' );
 
+		wp_enqueue_script( 'jquery-ui-progressbar' );
+
 		$elapsed = time() - $in_progress;
 		$limit   = 15 * MINUTE_IN_SECONDS;
 
@@ -146,21 +148,21 @@ class Boldgrid_Backup_Admin_In_Progress {
 			return false;
 		}
 
-		wp_enqueue_script( 'jquery-ui-progressbar' );
+		/*
+		 * Create our notice for atop the page.
+		 *
+		 * Initially started out as "backup in progress". Has expanded to include a progress bar.
+		 */
+		$loading = __( 'Loading...', 'bgtfw' );
+		$message = '<p>' . sprintf( __(
+			'BoldGrid Backup began archiving your website %1$s ago.', 'boldgrid-backup' ),
+			human_time_diff( $in_progress, time() )
+		) . '</p>';
+		$message .= Boldgrid_Backup_Admin_In_Progress_Data::get_markup( $loading );
 
 		$notice = array(
 			'class'   => 'notice notice-warning boldgrid-backup-in-progress',
-			'message' => sprintf(
-				// translators: 1: Time difference.
-				__(
-					'BoldGrid Backup began archiving your website %1$s ago.',
-					'boldgrid-backup'
-				) . '<div id="boldgrid-backup-in-progress-bar">
-						<div class="progress-label">Loading...</div>
-						<div id="last_file_archived"></div>
-					</div>',
-				human_time_diff( $in_progress, time() )
-			),
+			'message' => $message,
 			'heading' => __( 'BoldGrid Backup - Backup in progress', 'boldgrid-backup' ),
 		);
 
@@ -184,6 +186,27 @@ class Boldgrid_Backup_Admin_In_Progress {
 		}
 
 		return $markup;
+	}
+
+	/**
+	 *
+	 */
+	public function get_tmp() {
+		$data = array();
+
+		$dirlist = $this->core->backup_dir->dirlist_containing( '.zip.' );
+
+		if ( 1 === count( $dirlist ) ) {
+			$tmp_filename = key( $dirlist );
+
+			$data = array(
+				'size' => $dirlist[ $tmp_filename ]['size'],
+				'lastmodunix' => $dirlist[ $tmp_filename ]['lastmodunix'],
+				'size_format' => size_format( $dirlist[ $tmp_filename ]['size'] ),
+			);
+		}
+
+		return $data;
 	}
 
 	/**
@@ -212,6 +235,13 @@ class Boldgrid_Backup_Admin_In_Progress {
 		$response['boldgrid_backup_complete'] = $this->core->notice->get_backup_complete();
 
 		$response['in_progress_data'] = Boldgrid_Backup_Admin_In_Progress_Data::get_args();
+
+		if ( 3 === Boldgrid_Backup_Admin_In_Progress_Data::get_arg( 'step' ) ) {
+			$tmp = $this->get_tmp();
+			if( ! empty( $tmp ) ) {
+				$response['in_progress_data']['tmp'] = $tmp;
+			}
+		}
 
 		return $response;
 	}

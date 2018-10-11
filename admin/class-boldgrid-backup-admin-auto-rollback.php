@@ -224,6 +224,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 
 		wp_enqueue_script( $handle );
 
+		// Scripts required for showing backup in progress bar.
 		wp_enqueue_script( 'heartbeat' );
 		wp_enqueue_script( 'jquery-ui-progressbar' );
 	}

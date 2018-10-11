@@ -141,6 +141,8 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 					success && data.data !== undefined && data.data.callback !== undefined ?
 						data.data.callback :
 						null;
+			
+			$( 'body' ).trigger( 'boldgrid_backup_complete' );
 
 			switch ( callback ) {
 				case 'updateProtectionEnabled':
