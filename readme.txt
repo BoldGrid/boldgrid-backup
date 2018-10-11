@@ -28,6 +28,12 @@ WordPress backup and restoration with update protection.
 
 == Changelog ==
 
+= 1.6.6 =
+
+Release Date: October 11th, 2018
+
+* Bug fix: Fixed include path for ftp settings page.
+
 = 1.6.5 =
 
 Release Date: July 31st, 2018
