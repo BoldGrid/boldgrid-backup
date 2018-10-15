@@ -1515,7 +1515,9 @@ class Boldgrid_Backup_Admin_Core {
 	public function archive_files( $save = false, $dryrun = false ) {
 		$this->pre_auto_update = 'pre_auto_update' === current_filter();
 
-		Boldgrid_Backup_Admin_In_Progress_Data::set_args( array( 'status' => 'Initializing backup' ) );
+		Boldgrid_Backup_Admin_In_Progress_Data::set_args( array(
+			'status' => __( 'Initializing backup', 'boldgrid-backup' ),
+		));
 
 		/**
 		 * Actions to take before any archiving begins.
@@ -1801,7 +1803,9 @@ class Boldgrid_Backup_Admin_Core {
 			update_option( 'boldgrid_backup_latest_backup', $info );
 		}
 
-		Boldgrid_Backup_Admin_In_Progress_Data::set_args( array( 'status' => __( 'Backup complete!', 'boldgrid-backup' ) ) );
+		Boldgrid_Backup_Admin_In_Progress_Data::set_args( array(
+			'status' => __( 'Backup complete!', 'boldgrid-backup' ),
+		));
 
 		// Return the array of archive information.
 		return $info;

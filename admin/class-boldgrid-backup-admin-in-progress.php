@@ -240,6 +240,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 
 		$response['in_progress_data'] = Boldgrid_Backup_Admin_In_Progress_Data::get_args();
 
+		// Steps to take if we're on the last step, step 3, closing the archive.
 		if ( 3 === Boldgrid_Backup_Admin_In_Progress_Data::get_arg( 'step' ) ) {
 			$tmp = $this->get_tmp();
 			if ( ! empty( $tmp ) ) {

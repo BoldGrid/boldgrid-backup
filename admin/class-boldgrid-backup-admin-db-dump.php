@@ -55,7 +55,7 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		}
 
 		Boldgrid_Backup_Admin_In_Progress_Data::set_args( array(
-			'status' => 'Backing up database...',
+			'status' => __( 'Backing up database...', 'boldgrid-backup' ),
 			'tables' => $include_tables,
 			'step'   => 1,
 		));

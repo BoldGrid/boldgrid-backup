@@ -178,7 +178,7 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 		 *
 		 * Empty out the "last files archived" data, and set an appropriate status.
 		 */
-		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'last_files', array() );
+		Boldgrid_Backup_Admin_In_Progress_Data::delete_arg( 'last_files' );
 		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'step', 3 );
 
 		$close = $this->zip->close();

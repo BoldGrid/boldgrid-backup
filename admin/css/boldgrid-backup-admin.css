@@ -136,7 +136,11 @@ input:invalid {
 	font-size: 16px;
 }
 
-/* Progress bar */
+/**
+* Progress bar.
+*
+* When a backup is in progress, we show the user a progress bar.
+*/
 
 #boldgrid-backup-in-progress-bar:before {
 	transition: background-color 2s ease;

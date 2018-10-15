@@ -47,7 +47,7 @@ BoldGrid.Backup = function( $ ) {
 		$( 'a[href*="WordPress_Backups"]' )
 			.closest( '.notice' )
 			.remove();
-	};	
+	};
 
 	/**
 	 * @summary Handle the clicking of a show / hide toggle.
