@@ -36,6 +36,7 @@ WordPress backup and restoration with update protection.
 * Update:      Update protection is now valid for 1 hour after a full backup from the WordPress Updates or Plugins page.
 * Bug fix:     Set a default backup directory if path in settings is not valid.  Remove filters before fixing home and siteurl on restore.
 * Bug fix:     Some HTML was caught in translations.
+* Bug fix:     Duplicate emails were sent when a backup was complete, fixed.
 
 = 1.6.5 =
 
