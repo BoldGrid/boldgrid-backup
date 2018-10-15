@@ -16,12 +16,15 @@
 
 defined( 'WPINC' ) || die;
 
+$library_dir      = \Boldgrid\Library\Library\Configs::get( 'libraryDir' );
 $nav              = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
 $scheduler        = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/scheduler.php';
 $folders_include  = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/folders.php';
 $db               = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/db.php';
 $retention        = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/retention.php';
-$auto_updates     = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/auto-updates.php';
+$auto_rollback    = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/auto-rollback.php';
+$auto_updates     = include $library_dir . 'src/Library/Views/Connect/AutoUpdates.php';
+$update_channels  = include $library_dir . 'src/Library/Views/Connect/UpdateChannels.php';
 $notifications    = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/notifications.php';
 $backup_directory = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/backup-directory.php';
 $connect_key      = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/connect-key.php';
@@ -53,9 +56,19 @@ $sections = array(
 			'content' => $retention,
 		),
 		array(
-			'id'      => 'section_updates',
-			'title'   => __( 'Auto Updates & Rollback', 'boldgrid-backup' ),
+			'id'      => 'section_auto_rollback',
+			'title'   => __( 'Auto Backup and Rollback', 'boldgrid-backup' ),
+			'content' => $auto_rollback,
+		),
+		array(
+			'id'      => 'section_auto_updates',
+			'title'   => __( 'Auto-Updates', 'boldgrid-backup' ),
 			'content' => $auto_updates,
+		),
+		array(
+			'id'      => 'section_update_channels',
+			'title'   => __( 'Update Channels', 'boldgrid-backup' ),
+			'content' => $update_channels,
 		),
 		array(
 			'id'      => 'section_notifications',

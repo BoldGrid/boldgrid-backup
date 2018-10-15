@@ -1281,10 +1281,11 @@ class Boldgrid_Backup_Admin_Core {
 
 		// If changed, then restore the WP Option for "home".
 		if ( $restored_wp_home !== $wp_home ) {
-			// Ensure there are no trailing slashes in siteurl.
-			$wp_home = untrailingslashit( $wp_home );
 
-			update_option( 'home', $wp_home );
+			// There may be a filter, so remove it.
+			remove_all_filters( 'pre_update_option_home' );
+
+			update_option( 'home', untrailingslashit( $wp_home ) );
 		}
 
 		// Return success.

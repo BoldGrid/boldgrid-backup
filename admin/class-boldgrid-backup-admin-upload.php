@@ -382,7 +382,10 @@ class Boldgrid_Backup_Admin_Upload {
 	 * @since 1.7.0
 	 *
 	 * @see Boldgrid_Backup_Admin_Backup_Dir::get()
-	 * @see Boldgrid_Backup_Admin_Backup_Dir::is_valid()
+	 * @see Boldgrid_Backup_Admin_Backup_Dir::get_path_to()
+	 * @see Boldgrid_Backup_Admin_Archive_Log::path_from_zip()
+	 * @see Boldgrid_Backup_Admin_Archive_Log::restore_by_zip()
+	 * @see Boldgrid_Backup_Admin_Remote::post_download()
 	 *
 	 * @uses $_POST['url'] URL address.
 	 *
@@ -404,7 +407,7 @@ class Boldgrid_Backup_Admin_Upload {
 		}
 
 		$url       = ! empty( $_POST['url'] ) ? esc_url_raw( $_POST['url'] ) : null;
-		$url_regex = '/^https?:\/\/[a-z0-9\-\.]+(\.[a-z]{2,5})?(:[0-9]{1,5})?(\/.*)?$/i';
+		$url_regex = '/' . $this->core->configs['url_regex'] . '/i';
 
 		if ( ! preg_match( $url_regex, $url ) ) {
 			wp_send_json_error( array(
@@ -424,6 +427,7 @@ class Boldgrid_Backup_Admin_Upload {
 		$filepath = $this->get_save_path( basename( $url ) );
 
 		$allowed_content_types = array(
+			'application/octet-stream',
 			'binary/octet-stream',
 			'application/zip',
 		);
@@ -438,13 +442,32 @@ class Boldgrid_Backup_Admin_Upload {
 
 		if ( is_array( $response ) && ! is_wp_error( $response ) &&
 			in_array( $response['headers']['content-type'], $allowed_content_types, true ) ) {
-				wp_send_json_success( array(
-					'filepath'   => $filepath,
-					'detailsUrl' => admin_url(
-						'admin.php?page=boldgrid-backup-archive-details&filename=' .
-						basename( $filepath )
-					),
-				) );
+				// Determine the archive log file path.
+				$log_filepath = $filepath;
+
+			if ( ! empty( $response['headers']['content-disposition'] ) ) {
+				$log_filepath = trim( str_replace(
+					'attachment; filename=', '', $response['headers']['content-disposition']
+				), '"' );
+
+				$log_filepath = $this->core->backup_dir->get_path_to( $log_filepath );
+			}
+
+			$log_filepath = $this->core->archive_log->path_from_zip( $log_filepath );
+
+			// Restore the log file from the archive.
+			$this->core->archive_log->restore_by_zip( $filepath, basename( $log_filepath ) );
+
+			// Update the archive file modification time, based on the log file contents.
+			$this->core->remote->post_download( $filepath );
+
+			wp_send_json_success( array(
+				'filepath'   => $filepath,
+				'detailsUrl' => admin_url(
+					'admin.php?page=boldgrid-backup-archive-details&filename=' .
+					basename( $filepath )
+				),
+			) );
 		} else {
 			$this->core->wp_filesystem->delete( $filepath );
 		}

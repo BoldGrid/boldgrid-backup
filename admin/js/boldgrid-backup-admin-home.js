@@ -25,6 +25,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 
 	// Onload event listener.
 	$( function() {
+		var $urlImportSection = $( '#url-import-section' );
 
 		// On click action for the Upload button.
 		$( '#upload-archive-form' )
@@ -52,9 +53,16 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 			$mineCountHelp.bgbuDrawAttention();
 		} );
 
-		$( '#url-import-section' )
-			.find( '.button' )
-			.on( 'click', self.urlUpload );
+		$urlImportSection
+			.find( 'input' )
+			.first()
+			.keypress( function( e ) {
+				if ( 13 === e.which ) {
+					self.urlUpload( e );
+				}
+			} );
+
+		$urlImportSection.find( '.button' ).on( 'click', self.urlUpload );
 	} );
 
 	/**
@@ -207,7 +215,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 			$this = $( this ),
 			$spinner = $this.next(),
 			$notice = $( '#url-import-notice' ),
-			urlRegex = /^https?:\/\/[a-z0-9\-\.]+(\.[a-z]{2,5})?(:[0-9]{1,5})?(\/.*)?$/i,
+			urlRegex = new RegExp( lang.urlRegex, 'i' ),
 			data = {
 				action: 'boldgrid_backup_url_upload',
 				_wpnonce: $( '[name="_wpnonce"]' ).val(),

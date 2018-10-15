@@ -708,6 +708,9 @@ class Boldgrid_Backup_Admin_Utility {
 		$old_siteurl = untrailingslashit( $old_siteurl );
 		$new_siteurl = untrailingslashit( $new_siteurl );
 
+		// There may be a filter, so remove it.
+		remove_all_filters( 'pre_update_option_siteurl' );
+
 		// Update the WP otion "siteurl".
 		update_option( 'siteurl', $new_siteurl );
 
