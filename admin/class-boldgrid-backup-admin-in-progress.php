@@ -154,13 +154,10 @@ class Boldgrid_Backup_Admin_In_Progress {
 		 * Initially started out as "backup in progress". Has expanded to include a progress bar.
 		 */
 		$loading = __( 'Loading...', 'bgtfw' );
-		$message = '<p>' . sprintf( __(
-			'BoldGrid Backup began archiving your website %1$s ago.', 'boldgrid-backup' ),
-			human_time_diff( $in_progress, time() )
-		) . '</p>';
+		// translators: 1: The time since the last backup was initiated.
+		$message  = '<p>' . sprintf( __( 'BoldGrid Backup began archiving your website %1$s ago.', 'boldgrid-backup' ), human_time_diff( $in_progress, time() ) ) . '</p>';
 		$message .= Boldgrid_Backup_Admin_In_Progress_Data::get_markup( $loading );
-
-		$notice = array(
+		$notice   = array(
 			'class'   => 'notice notice-warning boldgrid-backup-in-progress',
 			'message' => $message,
 			'heading' => __( 'BoldGrid Backup - Backup in progress', 'boldgrid-backup' ),
@@ -189,7 +186,14 @@ class Boldgrid_Backup_Admin_In_Progress {
 	}
 
 	/**
+	 * Get details on our temporary zip file.
 	 *
+	 * For example, if we're in the middle of saving / closing our backup file, there should be a
+	 * file.zip.temp file in our backup directory. We are getting the details of that file.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return array
 	 */
 	public function get_tmp() {
 		$data = array();
@@ -200,7 +204,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 			$tmp_filename = key( $dirlist );
 
 			$data = array(
-				'size' => $dirlist[ $tmp_filename ]['size'],
+				'size'        => $dirlist[ $tmp_filename ]['size'],
 				'lastmodunix' => $dirlist[ $tmp_filename ]['lastmodunix'],
 				'size_format' => size_format( $dirlist[ $tmp_filename ]['size'] ),
 			);
@@ -238,7 +242,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 
 		if ( 3 === Boldgrid_Backup_Admin_In_Progress_Data::get_arg( 'step' ) ) {
 			$tmp = $this->get_tmp();
-			if( ! empty( $tmp ) ) {
+			if ( ! empty( $tmp ) ) {
 				$response['in_progress_data']['tmp'] = $tmp;
 			}
 		}

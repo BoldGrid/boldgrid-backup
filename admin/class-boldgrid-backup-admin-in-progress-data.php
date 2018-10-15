@@ -105,7 +105,7 @@ class Boldgrid_Backup_Admin_In_Progress_Data {
 	public static function set_arg( $arg, $value ) {
 		$args = self::get_args();
 
-		$args[$arg] = $value;
+		$args[ $arg ] = $value;
 
 		update_option( self::$option_name, $args );
 	}

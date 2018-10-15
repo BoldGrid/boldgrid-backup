@@ -108,9 +108,9 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 
 		// Init vars used for our "in progress" bar.
 		$number_files_archived = 0;
-		$total_size_archived = 0;
-		$number_files_todo = count( $filelist );
-		$last_x_files = array();
+		$total_size_archived   = 0;
+		$number_files_todo     = count( $filelist );
+		$last_x_files          = array();
 
 		if ( $info['dryrun'] ) {
 			return true;
@@ -150,9 +150,9 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 			 * Our list is only 5 long because we make hook into the heartbeat every 5 seconds to grab
 			 * the last 5 files, and we display each file for 1 second.
 			 */
-			if ( $number_files_archived %20 === 0 ) {
+			if ( 0 === $number_files_archived % 20 ) {
 				$last_x_files[] = $fileinfo[1];
-				if( count( $last_x_files ) > 5 ) {
+				if ( count( $last_x_files ) > 5 ) {
 					array_shift( $last_x_files );
 				}
 			}
@@ -164,7 +164,7 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 			 * 100 files.
 			 */
 			$all_files_archived = $number_files_archived >= $number_files_todo;
-			if ( $number_files_archived %100 === 0 || $all_files_archived ) {
+			if ( 0 === $number_files_archived % 100 || $all_files_archived ) {
 				Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'total_files_done', $number_files_archived );
 				Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'last_files', $last_x_files );
 				Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'total_size_archived', $total_size_archived );

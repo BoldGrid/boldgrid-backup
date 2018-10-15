@@ -180,7 +180,7 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 
 		$files = array();
 
-		if( $this->backup_directory ) {
+		if ( $this->backup_directory ) {
 			$files = $this->core->wp_filesystem->dirlist( $this->backup_directory );
 		}
 
@@ -188,16 +188,20 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	}
 
 	/**
+	 * Find files in backup directory where filename contains search string.
 	 *
-	 * @param unknown $str
+	 * @since 1.7.0
+	 *
+	 * @param  string $search The search string / needle.
+	 * @return array
 	 */
 	public function dirlist_containing( $search ) {
 		$matches = array();
 		$dirlist = $this->dirlist();
 
 		// Find all the files including $search in their filename.
-		foreach( $dirlist as $filename => $filedata ) {
-			if( false !== strpos( $filename, $search ) ) {
+		foreach ( $dirlist as $filename => $filedata ) {
+			if ( false !== strpos( $filename, $search ) ) {
 				$matches[ $filename ] = $filedata;
 			}
 		}
