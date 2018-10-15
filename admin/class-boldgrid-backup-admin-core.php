@@ -1772,8 +1772,16 @@ class Boldgrid_Backup_Admin_Core {
 		 */
 		do_action( 'boldgrid_backup_post_archive_files', $info );
 
-		// Send an email.
-		if ( $this->email->user_wants_notification( 'backup' ) && $this->doing_ajax ) {
+		/*
+		 * Send an email to the user, RIGHT NOW.
+		 *
+		 * Only send an email to the user now IF they are manually creating a backup. If this backup
+		 * was created during a scheduled backup, the user will get an email from the jobs queue.
+		 * Scheduled backups receive email notifications from the jobs queue because that email will
+		 * not only include the standard info about the backup (which we're sending now), it will
+		 * also include info about other jobs that were ran (such as uploading the backup remotely).
+		 */
+		if ( $this->email->user_wants_notification( 'backup' ) && ! $is_scheduled_backup ) {
 			$email_parts          = $this->email->post_archive_parts( $info );
 			$email_body           = $email_parts['body']['main'] . $email_parts['body']['signature'];
 			$info['mail_success'] = $this->email->send( $email_parts['subject'], $email_body );
