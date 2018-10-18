@@ -196,6 +196,20 @@ class Boldgrid_Backup_Admin_Archives {
 		);
 
 		foreach ( $this->core->archives_all->all as $archive ) {
+
+			/*
+			 * Determine the title of this archive to show.
+			 *
+			 * Prior to 1.7.0, each backup's "title" in the list of archives was just the timestamp
+			 * of the backup. As of 1.7.0, we're allowing the user to enter a title and description
+			 * for each backup. If the user enters a title, use that title, otherwise use the
+			 * timestamp.
+			 */
+			$filepath = $this->core->backup_dir->get_path_to( $archive['filename'] );
+			$this->core->archive->init( $filepath );
+			$title = $this->core->archive->get_attribute( 'title' );
+			$title = ! empty ( $title ) ? '<strong>' . esc_html( $title ) . '</strong>' : $this->core->time->get_span();
+
 			$locations = $this->get_locations( $archive );
 
 			// dirlist -> lastmodunix -> mtime (last_modified in unix time).
@@ -220,7 +234,7 @@ class Boldgrid_Backup_Admin_Archives {
 				</tr>
 				',
 				/* 1 */ $backup,
-				/* 2 */ $this->core->time->get_span(),
+				/* 2 */ $title,
 				/* 3 */ Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive['size'] ),
 				/* 4 */ $archive['filename'],
 				/* 5 */ $view_details,

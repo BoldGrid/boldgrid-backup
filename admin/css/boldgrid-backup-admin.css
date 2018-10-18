@@ -135,3 +135,17 @@ input:invalid {
 #download-copy-button .dashicons {
 	font-size: 16px;
 }
+
+/**
+* Backup Archive Details: title and description.
+*
+* This section contains styles for the title and description input fields.
+*/
+#titlediv #titlewrap #title {
+	margin-bottom: 15px;
+}
+[name="backup_description"] {
+	width: 100%;
+	height: 100px;
+	margin: 0px;
+}

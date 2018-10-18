@@ -415,6 +415,8 @@ class Boldgrid_Backup {
 
 		// Filter the boldgrid_backup_pending_rollback site option.
 		$this->loader->add_filter( 'site_option_boldgrid_backup_pending_rollback', $plugin_admin_core->auto_rollback, 'validate_rollback_option', 10, 2 );
+
+		$this->loader->add_filter( 'wp_ajax_boldgrid_backup_update_archive_details', $plugin_admin_core->archive_details, 'wp_ajax_update' );
 	}
 
 	/**
