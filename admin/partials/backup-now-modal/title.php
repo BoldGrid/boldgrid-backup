@@ -14,8 +14,6 @@
 
 defined( 'WPINC' ) || die;
 
-ob_start();
-
 return '
 <div class="bg-box">
 	<div class="bg-box-top">
