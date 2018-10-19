@@ -200,7 +200,18 @@ class Boldgrid_Backup_Admin_In_Progress {
 
 		$dirlist = $this->core->backup_dir->dirlist_containing( '.zip.' );
 
-		if ( 1 === count( $dirlist ) ) {
+		/*
+		 * We should only have one temp zip file. If we have multiple though, something may have
+		 * gone recently. Sort by timestamp and use the newest file.
+		 */
+		if ( 1 < count( $dirlist ) ) {
+			uasort( $dirlist, function( $item1, $item2 ) {
+				return $item1['lastmodunix'] < $item2['lastmodunix'] ? 1 : -1;
+			});
+		}
+
+		if ( 1 <= count( $dirlist ) ) {
+			reset( $dirlist );
 			$tmp_filename = key( $dirlist );
 
 			$data = array(
