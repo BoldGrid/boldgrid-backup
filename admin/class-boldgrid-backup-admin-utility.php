@@ -497,6 +497,22 @@ class Boldgrid_Backup_Admin_Utility {
 	}
 
 	/**
+	 * Determine whether or not the given $page is the current.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @global string $pagenow
+	 *
+	 * @param  string  $page The page to check for in $_GET.
+	 * @return boolean
+	 */
+	public static function is_admin_page( $page ) {
+		global $pagenow;
+
+		return 'admin.php' === $pagenow && ! empty( $_GET['page'] ) && $page === $_GET['page'];
+	}
+
+	/**
 	 * Check if a file is a ZIP archive file.
 	 *
 	 * @since 1.2.2

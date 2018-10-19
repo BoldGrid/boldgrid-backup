@@ -72,6 +72,8 @@ class Boldgrid_Backup_Admin_In_Progress {
 		 */
 		wp_enqueue_script( 'heartbeat' );
 
+		wp_enqueue_script( 'jquery-ui-progressbar' );
+
 		$elapsed = time() - $in_progress;
 		$limit   = 15 * MINUTE_IN_SECONDS;
 
@@ -146,16 +148,18 @@ class Boldgrid_Backup_Admin_In_Progress {
 			return false;
 		}
 
-		$notice = array(
+		/*
+		 * Create our notice for atop the page.
+		 *
+		 * Initially started out as "backup in progress". Has expanded to include a progress bar.
+		 */
+		$loading = __( 'Loading...', 'bgtfw' );
+		// translators: 1: The time since the last backup was initiated.
+		$message  = '<p>' . sprintf( __( 'BoldGrid Backup began archiving your website %1$s ago.', 'boldgrid-backup' ), human_time_diff( $in_progress, time() ) ) . '</p>';
+		$message .= Boldgrid_Backup_Admin_In_Progress_Data::get_markup( $loading );
+		$notice   = array(
 			'class'   => 'notice notice-warning boldgrid-backup-in-progress',
-			'message' => sprintf(
-				// translators: 1: Time difference.
-				__(
-					'BoldGrid Backup began archiving your website %1$s ago.',
-					'boldgrid-backup'
-				),
-				human_time_diff( $in_progress, time() )
-			),
+			'message' => $message,
 			'heading' => __( 'BoldGrid Backup - Backup in progress', 'boldgrid-backup' ),
 		);
 
@@ -182,6 +186,45 @@ class Boldgrid_Backup_Admin_In_Progress {
 	}
 
 	/**
+	 * Get details on our temporary zip file.
+	 *
+	 * For example, if we're in the middle of saving / closing our backup file, there should be a
+	 * file.zip.temp file in our backup directory. We are getting the details of that file.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return array
+	 */
+	public function get_tmp() {
+		$data = array();
+
+		$dirlist = $this->core->backup_dir->dirlist_containing( '.zip.' );
+
+		/*
+		 * We should only have one temp zip file. If we have multiple though, something may have
+		 * gone recently. Sort by timestamp and use the newest file.
+		 */
+		if ( 1 < count( $dirlist ) ) {
+			uasort( $dirlist, function( $item1, $item2 ) {
+				return $item1['lastmodunix'] < $item2['lastmodunix'] ? 1 : -1;
+			});
+		}
+
+		if ( 1 <= count( $dirlist ) ) {
+			reset( $dirlist );
+			$tmp_filename = key( $dirlist );
+
+			$data = array(
+				'size'        => $dirlist[ $tmp_filename ]['size'],
+				'lastmodunix' => $dirlist[ $tmp_filename ]['lastmodunix'],
+				'size_format' => size_format( $dirlist[ $tmp_filename ]['size'] ),
+			);
+		}
+
+		return $data;
+	}
+
+	/**
 	 * Take action when the heartbeat is received.
 	 *
 	 * Include data in the heartbeat to let the user know if their backup is
@@ -205,6 +248,16 @@ class Boldgrid_Backup_Admin_In_Progress {
 
 		// Our "backup complete!" admin notice.
 		$response['boldgrid_backup_complete'] = $this->core->notice->get_backup_complete();
+
+		$response['in_progress_data'] = Boldgrid_Backup_Admin_In_Progress_Data::get_args();
+
+		// Steps to take if we're on the last step, step 3, closing the archive.
+		if ( 3 === Boldgrid_Backup_Admin_In_Progress_Data::get_arg( 'step' ) ) {
+			$tmp = $this->get_tmp();
+			if ( ! empty( $tmp ) ) {
+				$response['in_progress_data']['tmp'] = $tmp;
+			}
+		}
 
 		return $response;
 	}

@@ -121,12 +121,31 @@ class Boldgrid_Backup_Admin {
 			'is_premium'      => ( true === $this->config->get_is_premium() ? 'true' : 'false' ),
 			'lang'            => $this->config->lang,
 			'spinner_loading' => $spinner . __( 'Loading', 'boldgrid-backup' ) . $dots,
+			'spinner'         => $spinner,
 			'get_premium_url' => Boldgrid_Backup_Admin_Go_Pro::$url,
 		);
 
 		wp_localize_script( 'boldgrid-backup-admin', 'BoldGridBackupAdmin', $translation );
 
 		wp_enqueue_script( 'boldgrid-backup-admin' );
+
+		// Enqueue "In Progress" script.
+		$handle = 'boldgrid-backup-admin-in-progress';
+		wp_register_script(
+			$handle,
+			plugin_dir_url( __FILE__ ) . 'js/' . $handle . '.js',
+			array( 'jquery' ),
+			BOLDGRID_BACKUP_VERSION,
+			false
+		);
+		$translation = array(
+			'archive_file_size'       => __( 'Archive file size: ', 'boldgrid_backup' ),
+			'size_before_compression' => __( 'File size before compression: ', 'boldgrid-backup' ),
+			'adding_tables'           => __( 'Adding tables.', 'boldgrid-backup' ),
+			'completing_database'     => __( 'Completing database backup...', 'boldgrid-backup' ),
+		);
+		wp_localize_script( $handle, 'BoldGridBackupAdminInProgress', $translation );
+		wp_enqueue_script( $handle );
 
 		// Used by admin.js to highlight / bounce elements.
 		wp_enqueue_script( 'jquery-effects-core' );

@@ -223,6 +223,10 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		wp_localize_script( $handle, 'localizeScriptData', $localize_script_data );
 
 		wp_enqueue_script( $handle );
+
+		// Scripts required for showing backup in progress bar.
+		wp_enqueue_script( 'heartbeat' );
+		wp_enqueue_script( 'jquery-ui-progressbar' );
 	}
 
 	/**
@@ -354,7 +358,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 * @since 1.6.0
 	 */
 	public function enqueue_update_selectors() {
-		if ( $this->on_update_page ) {
+		if ( $this->on_update_page || $this->core->utility->is_admin_page( 'boldgrid-backup' ) ) {
 			$handle = 'boldgrid-backup-admin-update-selectors';
 
 			wp_register_script(

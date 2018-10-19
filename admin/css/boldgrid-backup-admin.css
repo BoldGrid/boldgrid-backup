@@ -135,3 +135,104 @@ input:invalid {
 #download-copy-button .dashicons {
 	font-size: 16px;
 }
+
+/**
+* Progress bar.
+*
+* When a backup is in progress, we show the user a progress bar.
+*/
+
+#boldgrid-backup-in-progress-bar:before {
+	transition: background-color 2s ease;
+	background-color: transparent;
+}
+
+.heartbeat-lost-focus #boldgrid-backup-in-progress-bar:before {
+	content:"";
+    display: block;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba( 255, 255, 255, .9 );
+}
+
+.heartbeat-lost-focus #boldgrid-backup-in-progress-bar #last_file_archived,
+.heartbeat-lost-focus #boldgrid-backup-in-progress-bar .progress-label {
+	color: #ddd;
+}
+
+#boldgrid-backup-in-progress-bar {
+	position: relative;
+	background: #f7f7f7;
+	border: 1px solid #ccc;
+	clear:both;
+	overflow: visible;
+	height: 2em;
+	margin: 0px;
+	margin-bottom: 20px;
+}
+
+/* The actual progress bar that goes from 0% to 100%. */
+#boldgrid-backup-in-progress-bar .ui-progressbar-value {
+    background-color: #0085ba;    
+    -webkit-transition: width 1s ease-out;
+    -moz-transition: width 1s ease-out;
+    -o-transition: width 1s ease-out;
+    transition: width 1s ease-out;
+}
+
+#boldgrid-backup-in-progress-bar #last_file_archived {
+	font-size: 10px;
+	position: absolute;
+	bottom: -20px;
+	left: 0px;
+	white-space: nowrap;
+}
+
+#boldgrid-backup-in-progress-bar .spinner {
+	vertical-align: middle;
+    margin-top: -2px;
+}
+
+.ui-progressbar .ui-progressbar-value {
+	height: 100%;
+}
+
+.progress-label {
+	position: absolute;
+    top: 4px;
+    font-weight: bold;
+    text-shadow: 1px 1px 0 #fff;
+	left:0;
+	right:0;
+	font-weight: 600;
+	color: #0073aa;
+	text-align: center;
+}
+
+.progress-label.over-50 {
+	color: #fff;
+	text-shadow: none;
+}
+
+#boldgrid_backup_in_progress_steps .step {
+	float: left;
+	width: 33%;
+	text-align:center;
+	color: #ddd;
+}
+
+#boldgrid_backup_in_progress_steps .step:first-of-type {
+	text-align: left;
+}
+
+#boldgrid_backup_in_progress_steps .step:last-of-type {
+	text-align: right;
+}
+
+#boldgrid_backup_in_progress_steps .step.active {
+	color: #444;
+	font-weight: bold;
+}

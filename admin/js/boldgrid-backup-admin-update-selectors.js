@@ -50,7 +50,10 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			'#update-theme',
 
 			// BoldGrid Backup - Update Protection > "Backup Site Now" button.
-			'#backup-site-now'
+			'.notice #backup-site-now',
+
+			// Dashboard > BoldGrid Backup > Backup Archive > "Backup Site Now" button.
+			'.page-title-actions .page-title-action'
 		],
 
 		/**

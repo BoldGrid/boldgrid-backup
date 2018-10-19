@@ -79,62 +79,6 @@ BoldGrid.Backup = function( $ ) {
 	};
 
 	/**
-	 * @summary Action to take if we have a backup in progress.
-	 *
-	 * If we do have a backup in progress, we'll hook into the heartbeat and find
-	 * out when that backup has been completed.
-	 *
-	 * @since 1.6.0
-	 */
-	self.onInProgress = function() {
-		var complete = false,
-			$inProgressNotice = $( '.boldgrid-backup-in-progress' );
-
-		// If we're not actually showing an "in progress" notice, abort.
-		if ( 1 !== $inProgressNotice.length ) {
-			return;
-		}
-
-		// Increase the heartbeat so we can get an update sooner.
-		wp.heartbeat.interval( 'fast' );
-
-		/*
-		 * When the heartbeat is sent, include that we're looking for an update
-		 * on the in progress backup.
-		 */
-		$( document ).on( 'heartbeat-send', function( e, data ) {
-			if ( ! complete ) {
-				data['boldgrid_backup_in_progress'] = true;
-			}
-		} );
-
-		// When the heartbeat is received, check to see if the backup has completed.
-		$( document ).on( 'heartbeat-tick', function( e, data ) {
-			var $notice;
-
-			if ( undefined === data.boldgrid_backup_in_progress ) {
-				return;
-			}
-
-			if ( ! data.boldgrid_backup_in_progress ) {
-				$notice = $( data.boldgrid_backup_complete );
-				$notice
-					.css( 'display', 'none' )
-					.insertBefore( $inProgressNotice )
-					.slideDown();
-
-				$inProgressNotice.slideUp();
-
-				wp.heartbeat.interval( 'standard' );
-				complete = true;
-
-				$( 'body' ).trigger( 'make_notices_dismissible' );
-				$( 'body' ).trigger( 'boldgrid_backup_complete' );
-			}
-		} );
-	};
-
-	/**
 	 * @summary Make an admin notice dismissible.
 	 *
 	 * This is a core WordPress function copied from wp-admin/js/common.js.
@@ -172,13 +116,6 @@ BoldGrid.Backup = function( $ ) {
 		self.bindHelpClick();
 		self.hideBackupNotice();
 		self.updatePremiumLink();
-
-		/*
-		 * If and when a backup is in progress, we need to begin waiting to hear
-		 * for that backup to complete.
-		 */
-		self.onInProgress();
-		$( 'body' ).on( 'boldgrid_backup_progress_notice_added', self.onInProgress );
 
 		$( 'body' ).on( 'click', '[data-toggle-target]', self.onClickToggle );
 		$( 'body' ).on( 'make_notices_dismissible', self.makeNoticesDismissible );

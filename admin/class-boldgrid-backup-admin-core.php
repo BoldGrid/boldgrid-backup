@@ -1515,6 +1515,10 @@ class Boldgrid_Backup_Admin_Core {
 	public function archive_files( $save = false, $dryrun = false ) {
 		$this->pre_auto_update = 'pre_auto_update' === current_filter();
 
+		Boldgrid_Backup_Admin_In_Progress_Data::set_args( array(
+			'status' => __( 'Initializing backup', 'boldgrid-backup' ),
+		));
+
 		/**
 		 * Actions to take before any archiving begins.
 		 *
@@ -1671,6 +1675,10 @@ class Boldgrid_Backup_Admin_Core {
 		 */
 		$info = apply_filters( 'boldgrid_backup_pre_archive_info', $info );
 
+		Boldgrid_Backup_Admin_In_Progress_Data::set_args( array(
+			'total_files_todo' => count( $filelist ),
+		));
+
 		/*
 		 * Use the chosen compressor to build an archive.
 		 * If the is no available compressor, then return an error.
@@ -1710,6 +1718,9 @@ class Boldgrid_Backup_Admin_Core {
 				);
 				break;
 		}
+
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'status', __( 'Wrapping things up...', 'boldgrid-backup' ) );
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'percentage', 100 );
 
 		$info['total_size'] += $this->filelist->get_total_size( $filelist );
 
@@ -1799,6 +1810,10 @@ class Boldgrid_Backup_Admin_Core {
 
 			update_option( 'boldgrid_backup_latest_backup', $info );
 		}
+
+		Boldgrid_Backup_Admin_In_Progress_Data::set_args( array(
+			'status' => __( 'Backup complete!', 'boldgrid-backup' ),
+		));
 
 		// Return the array of archive information.
 		return $info;

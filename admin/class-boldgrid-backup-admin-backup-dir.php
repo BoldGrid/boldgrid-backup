@@ -169,6 +169,47 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	}
 
 	/**
+	 * Get a directory listing of our backup directory.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return array
+	 */
+	public function dirlist() {
+		$this->get();
+
+		$files = array();
+
+		if ( $this->backup_directory ) {
+			$files = $this->core->wp_filesystem->dirlist( $this->backup_directory );
+		}
+
+		return $files;
+	}
+
+	/**
+	 * Find files in backup directory where filename contains search string.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param  string $search The search string / needle.
+	 * @return array
+	 */
+	public function dirlist_containing( $search ) {
+		$matches = array();
+		$dirlist = $this->dirlist();
+
+		// Find all the files including $search in their filename.
+		foreach ( $dirlist as $filename => $filedata ) {
+			if ( false !== strpos( $filename, $search ) ) {
+				$matches[ $filename ] = $filedata;
+			}
+		}
+
+		return $matches;
+	}
+
+	/**
 	 * Get and return the backup directory path.
 	 *
 	 * @since 1.0
