@@ -14,3 +14,7 @@
 .subsubsub {
 	float: none;
 }
+
+.page-title-actions {
+	display: inline-block;
+}

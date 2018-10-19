@@ -57,9 +57,13 @@ $in_modal = false;
 
 	<h1 class="wp-heading-inline"><?php esc_html_e( 'Backup Archives', 'boldgrid-backup' ); ?></h1>
 
-	<a href="#TB_inline?width=800&amp;height=600&amp;inlineId=backup_now_content" class="thickbox page-title-action page-title-action-primary"><?php esc_html_e( 'Backup Site Now', 'boldgrid-backup' ); ?></a>
+	<div class="page-title-actions">
 
-	<a class="page-title-action add-new"><?php esc_html_e( 'Upload Backup', 'boldgrid-backup' ); ?></a>
+		<a href="#TB_inline?width=800&amp;height=600&amp;inlineId=backup_now_content" class="thickbox page-title-action page-title-action-primary"><?php esc_html_e( 'Backup Site Now', 'boldgrid-backup' ); ?></a>
+
+		<a class="page-title-action add-new"><?php esc_html_e( 'Upload Backup', 'boldgrid-backup' ); ?></a>
+
+	</div>
 
 	<?php
 	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
