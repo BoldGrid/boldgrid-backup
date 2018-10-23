@@ -46,26 +46,30 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 	 * @since 1.6.0
 	 */
 	public function enqueue_scripts() {
-		$handle = 'boldgrid-backup-admin-ftp-settings';
-		wp_register_script(
-			$handle,
-			plugin_dir_url( dirname( __FILE__ ) ) . 'js/' . $handle . '.js',
-			array( 'jquery' ),
-			BOLDGRID_BACKUP_VERSION,
-			false
-		);
-		$translation = array(
-			'default_port' => $this->core->ftp->default_port,
-		);
-		wp_localize_script( $handle, 'BoldGridBackupAdminFtpSettings', $translation );
-		wp_enqueue_script( $handle );
+		if ( $this->core->utility->is_admin_page( 'boldgrid-backup-ftp' ) ) {
+			$handle = 'boldgrid-backup-admin-ftp-settings';
+			wp_register_script(
+				$handle,
+				plugin_dir_url( dirname( __FILE__ ) ) . 'js/' . $handle . '.js',
+				array( 'jquery' ),
+				BOLDGRID_BACKUP_VERSION,
+				false
+			);
+			$translation = array(
+				'default_port' => $this->core->ftp->default_port,
+			);
+			wp_localize_script( $handle, 'BoldGridBackupAdminFtpSettings', $translation );
+			wp_enqueue_script( $handle );
 
-		wp_enqueue_style(
-			$handle,
-			plugin_dir_url( dirname( __FILE__ ) ) . 'css/' . $handle . '.css',
-			array(),
-			BOLDGRID_BACKUP_VERSION
-		);
+			wp_enqueue_style(
+				$handle,
+				plugin_dir_url( dirname( __FILE__ ) ) . 'css/' . $handle . '.css',
+				array(),
+				BOLDGRID_BACKUP_VERSION
+			);
+
+			wp_enqueue_style( 'boldgrid-backup-admin-hide-all' );
+		}
 	}
 
 	/**
@@ -78,8 +82,15 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 			return false;
 		}
 
-		$this->enqueue_scripts();
-		wp_enqueue_style( 'boldgrid-backup-admin-hide-all' );
+		// Used with wp_kses call below.
+		$allowed_html = array(
+			'div' => array(
+				'class' => array(),
+			),
+			'span' => array(
+				'class' => array(),
+			),
+		);
 
 		// Blank data, used when deleting settings.
 		$type       = $this->core->ftp->default_type;
@@ -100,8 +111,10 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 
 		switch ( $action ) {
 			case 'save':
-				esc_html( $this->core->elements['long_checking_creds'] );
-				ob_flush();
+				echo wp_kses( $this->core->elements['long_checking_creds'], $allowed_html );
+				if ( ob_get_level() > 0 ) {
+					ob_flush();
+				}
 				flush();
 
 				$this->settings_save();

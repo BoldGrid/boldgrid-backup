@@ -17,13 +17,13 @@ BoldGrid.FtpSettings = function( $ ) {
 
 	var self = this,
 		lang = BoldGridBackupAdminFtpSettings,
-		$action = $( '[name="action"]' ),
-		$port = $( '[name="port"]' ),
-		$type = $( '[name="type"]' ),
-		$form = $port.closest( 'form' ),
-		$saveButton = $form.find( '.button-primary' ),
-		$deleteButton = $form.find( '.button-secondary' ),
-		$spinner = $form.find( '.spinner' );
+		$action,
+		$port,
+		$type,
+		$form,
+		$saveButton,
+		$deleteButton,
+		$spinner;
 
 	/**
 	 * @summary Take action when the delete button is clicked.
@@ -60,6 +60,14 @@ BoldGrid.FtpSettings = function( $ ) {
 	};
 
 	$( function() {
+		$action = $( '[name="action"]' ),
+		$port = $( '[name="port"]' ),
+		$type = $( '[name="type"]' ),
+		$form = $port.closest( 'form' ),
+		$saveButton = $form.find( '.button-primary' ),
+		$deleteButton = $form.find( '.button-secondary' ),
+		$spinner = $form.find( '.spinner' );
+
 		$type.on( 'change', self.onTypeChange );
 		$form.on( 'submit', self.onSubmit );
 		$deleteButton.on( 'click', self.onClickDelete );
