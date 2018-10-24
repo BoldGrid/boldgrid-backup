@@ -508,16 +508,35 @@ class Boldgrid_Backup_Admin_Ftp {
 					continue;
 				}
 
-				// Get the timestamp.
-				$month = $exploded_item[ $count - 4 ];
-				$day   = $exploded_item[ $count - 3 ];
-				$time  = $exploded_item[ $count - 2 ];
-				$time  = strtotime( $month . ' ' . $day . ' ' . $time );
+				/*
+				 * Determine the format of our raw contents.
+				 *
+				 * There are for sure more than 2 formats (see notes at https://pastebin.com/eL5XpeYP),
+				 * but for now we're currently testing for:
+				 * # Windows 10-24-2018 11:12AM                       302501              boldgrid-backup-localhost_wordpress-90d7727c-20181024-175039.zip
+				 * # Linux   -rw-r--r-- 1       boldgrid4s boldgrid4s 997834 Oct 24 10:36 boldgrid-backup-domain.com-b2cf0453-20181024-143320.zip
+				 *
+				 * Flag as a windows ftp server if first item is a date in xx-xx-xxxx format.
+				 */
+				$is_windows = 1 === preg_match( "/(\d{2})-(\d{2})-(\d{4})/", $exploded_item[0] );
+
+				if ( $is_windows ) {
+					$time = strtotime( $exploded_item[0] . ' ' . $exploded_item[1] );
+					$size = $exploded_item[2];
+				} else {
+					// Get the timestamp.
+					$month = $exploded_item[ $count - 4 ];
+					$day   = $exploded_item[ $count - 3 ];
+					$time  = $exploded_item[ $count - 2 ];
+					$time  = strtotime( $month . ' ' . $day . ' ' . $time );
+
+					$size = $exploded_item[ $count - 5 ];
+				}
 
 				$backups[] = array(
 					'time'     => $time,
 					'filename' => $filename,
-					'size'     => $exploded_item[ $count - 5 ],
+					'size'     => $size,
 				);
 			}
 		}
@@ -581,7 +600,9 @@ class Boldgrid_Backup_Admin_Ftp {
 			}
 			return $item;
 		};
-		$contents = array_map( $fix_windows, $contents );
+		if ( is_array( $contents ) ) {
+			$contents = array_map( $fix_windows, $contents );
+		}
 
 		return $contents;
 	}
@@ -805,6 +826,26 @@ class Boldgrid_Backup_Admin_Ftp {
 		// If we tried to login and it failed, disconnect.
 		if ( ! $this->logged_in ) {
 			$this->disconnect();
+		} else {
+			$this->maybe_passive();
+		}
+	}
+
+	/**
+	 * Turn on passive mode, only if needed.
+	 *
+	 * Turning on passive mode can only be done after a successful login. This method assumes you've
+	 * already logged in.
+	 *
+	 * @since 1.7.0
+	 */
+	public function maybe_passive() {
+		if ( 'ftp' === $this->type ) {
+			$contents = $this->get_contents();
+
+			if ( ! is_array( $contents ) ) {
+				ftp_pasv( $this->connection, true );
+			}
 		}
 	}
 
