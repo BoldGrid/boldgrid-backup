@@ -155,6 +155,8 @@ class Boldgrid_Backup_Admin_Archive_Details {
 
 		// Initialize the archive. We will need it in our included template below.
 		$this->core->archive->init( $archive['filepath'] );
+		$title = $this->core->archive->get_attribute( 'title' );
+		$description = $this->core->archive->get_attribute( 'description' );
 
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-archive-details.php';
 	}
@@ -173,5 +175,32 @@ class Boldgrid_Backup_Admin_Archive_Details {
 	 */
 	public function validate_nonce() {
 		return check_ajax_referer( 'boldgrid_backup_remote_storage_upload', 'security', false );
+	}
+
+	/**
+	 * Handle the ajax request to "Update" from a backup archive page.
+	 *
+	 * @since 1.7.0
+	 */
+	public function wp_ajax_update() {
+		if ( ! $this->validate_nonce() ) {
+			wp_send_json_error( __( 'Permission denied.', 'boldgrid-backup' ) );
+		}
+
+		$filename = ! empty( $_POST['filename'] ) ? sanitize_file_name( $_POST['filename'] ) : false;
+		$filepath = $this->core->backup_dir->get_path_to( $filename );
+		if ( empty( $filename ) || ! $this->core->wp_filesystem->exists( $filepath ) ) {
+			wp_send_json_error( __( 'Invalid archive filepath.', 'boldgrid-backup' ) );
+		}
+
+		$this->core->archive->init( $filepath );
+
+		if ( ! empty( $_POST['attributes'] ) ) {
+			foreach ( $_POST['attributes'] as $key => $value ) {
+				$this->core->archive->set_attribute( $key, stripslashes( $value ) );
+			}
+		}
+
+		wp_send_json_success();
 	}
 }

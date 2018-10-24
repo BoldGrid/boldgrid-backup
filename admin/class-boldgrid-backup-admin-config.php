@@ -274,10 +274,15 @@ class Boldgrid_Backup_Admin_Config {
 	 */
 	public function set_lang() {
 		$this->lang = array(
-			'website_size'  => esc_html__( 'Website Size:', 'boldgrid-backup' ),
-			'database_size' => esc_html__( 'Database Size:', 'boldgrid-backup' ),
-			'of'            => esc_html__( 'of', 'boldgrid-backup' ),
-			'xmark'         => '&#10007;',
+			'website_size'     => esc_html__( 'Website Size:', 'boldgrid-backup' ),
+			'database_size'    => esc_html__( 'Database Size:', 'boldgrid-backup' ),
+			'of'               => esc_html__( 'of', 'boldgrid-backup' ),
+			'xmark'            => '&#10007;',
+			'update'           => esc_html__( 'Update', 'boldgrid-backup' ),
+			'updating'         => esc_html__( 'Updating...', 'boldgrid-backup' ),
+			'updated'          => esc_html__( 'Updated!', 'boldgrid-backup' ),
+			'failed_to_update' => esc_html__( 'Failed to update: ', 'boldgrid-backup' ),
+			'unknown_error'    => esc_html__( 'Unknown error.', 'boldgrid-backup' ),
 		);
 	}
 

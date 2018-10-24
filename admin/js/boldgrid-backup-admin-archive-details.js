@@ -6,7 +6,7 @@
  * @since 1.3.3
  */
 
-/* global ajaxurl,BoldGridBackupAdmin,jQuery */
+/* global ajaxurl,BoldGridBackupAdmin,jQuery,boldgrid_backup_archive_details */
 
 var BoldGrid = BoldGrid || {};
 
@@ -150,11 +150,84 @@ BoldGrid.ArchiveDetails = function( $ ) {
 	};
 
 	/**
+	 * @summary Action to take when the user clicks "Update".
+	 *
+	 * What are they updating? Not really the backup itself, but things like the title and
+	 * description of the backup.
+	 *
+	 * @since 1.7.0
+	 */
+	self.onClickUpdate = function() {
+		var request,
+			data = {
+				action:      'boldgrid_backup_update_archive_details',
+				filename:    $( '#filename' ).val(),
+				security:    $( '#_wpnonce' ).val(),
+				attributes: {
+					title:       $( '[name="backup_title"]' ).val(),
+					description: $( '[name="backup_description"]' ).val()
+				}
+			},
+			onFail,
+			onSuccess,
+			$actions = $( '#major-publishing-actions' ),
+			$button = $( this ),
+			$spinner = $button.siblings( '.spinner' );
+
+		onSuccess = function( response ) {
+			if ( false === response.success ) {
+				onFail( response.data );
+			} else {
+				// Animate things.
+				$spinner.removeClass( 'inline' );
+				$button.text( adminLang.updated );
+				setTimeout( function() {
+					$button
+						.text( adminLang.update )
+						.prop( 'disabled', false );
+				}, 1000 );
+			}
+		};
+
+		onFail = function( msg ) {
+			// Configure our error message.
+			if ( msg === undefined ) {
+				msg = adminLang.unknown_error;
+			} else if( 'object' === typeof msg && msg.statusText ) {
+				msg = msg.statusText;
+			}
+			msg = adminLang.failed_to_update + msg;
+
+			// Animate things.
+			$spinner.removeClass( 'inline' );
+			$button
+				.text( adminLang.update )
+				.prop( 'disabled', false );
+
+			// Add an error message and make it dissmissible.
+			$actions.prepend( '<div class="notice notice-error is-dismissible"><p>' + msg + '</p></div>' );
+			$( 'body' ).trigger( 'make_notices_dismissible' );
+		};
+
+		// Animate things.
+		$spinner.addClass( 'inline' );
+		$button
+			.text( adminLang.updating )
+			.prop( 'disabled', true );
+		$actions.find( '.notice' ).slideUp();
+
+		request = $.post( ajaxurl, data )
+			.done( onSuccess )
+			.fail( onFail );
+	};
+
+	/**
 	 * Init.
 	 */
 	$( function() {
 		$body.on( 'click', '.remote-storage a.upload', self.onClickUpload );
 		$body.on( 'click', '.remote-storage .download-to-server', self.onClickDownload );
+		$body.on( 'click', '#publishing-action button', self.onClickUpdate );
 		$editorTabs.on( 'click', self.onClickTab );
 		$downloadFirst.on( 'click', self.onClickDownloadFirst );
 	} );

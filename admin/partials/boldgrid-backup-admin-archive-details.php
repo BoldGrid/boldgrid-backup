@@ -78,9 +78,14 @@ if ( ! $archive_found ) {
 			<div id="delete-action-link">
 				%1$s
 			</div>
+			<div id="publishing-action">
+				<span class="spinner"></span>
+				<button class="button button-primary button-large">%2$s</button>
+			</div>
 			<div style="clear:both;"></div>
 		</div>',
-		$delete_link
+		$delete_link,
+		esc_html__( 'Update', 'boldgrid-backup' )
 	);
 }
 
@@ -192,6 +197,15 @@ $main_content = '
 	</div>
 ';
 
+$title_area = '
+<div id="titlediv">
+	<div id="titlewrap">
+		<input type="text" name="backup_title" size="30" value="' . esc_attr( $title ) . '" id="title" spellcheck="true" autocomplete="off" placeholder="' . esc_attr__( 'Unnamed Backup', 'boldgrid-backup' ) . '">
+	</div>
+</div>
+<textarea name="backup_description" placeholder="' . esc_attr__( 'Backup description.', 'boldgrid-backup' ) . '">' . esc_html( $description ) . '</textarea>
+';
+
 if ( ! $this->core->archive->is_stored_locally() ) {
 
 	if ( $this->core->archive->is_stored_remotely() ) {
@@ -211,6 +225,8 @@ $page = sprintf(
 		<div id="poststuff">
 			<div id="post-body" class="metabox-holder columns-2">
 				<div id="post-body-content" style="position: relative">
+					%7$s
+					<hr class="separator">
 					%4$s
 				</div>
 				<div id="postbox-container-1" class="postbox-container">
@@ -230,7 +246,8 @@ $page = sprintf(
 	/* 3 */ require BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php',
 	/* 4 */ $main_content,
 	/* 5 */ $main_meta_box,
-	/* 6 */ $remote_meta_box
+	/* 6 */ $remote_meta_box,
+	/* 7 */ $title_area
 );
 
 echo $page; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
