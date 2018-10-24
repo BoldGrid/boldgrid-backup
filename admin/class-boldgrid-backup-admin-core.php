@@ -1581,6 +1581,8 @@ class Boldgrid_Backup_Admin_Core {
 			'folder_include' => $this->folder_exclusion->from_settings( 'include' ),
 			'folder_exclude' => $this->folder_exclusion->from_settings( 'exclude' ),
 			'table_exclude'  => $this->db_omit->get_excluded_tables(),
+			'title'          => ! empty( $_POST['backup_title'] ) ? stripslashes( $_POST['backup_title'] ) : null,
+			'description'    => ! empty( $_POST['backup_description'] ) ? stripslashes( $_POST['backup_description'] ) : null,
 		);
 
 		// Determine how this backup was triggered.

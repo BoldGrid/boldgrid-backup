@@ -21,6 +21,8 @@ return sprintf(
 	<div id="backup_now_content" style="display:none;">
 		<h2>%1$s</h2>
 
+		%6$s
+
 		<p>%2$s</p>
 
 		%3$s
@@ -37,5 +39,6 @@ return sprintf(
 	/* 2 */ __( 'The <strong>Files and Folders</strong> and <strong>Database</strong> settings below customize which parts of your site to backup.', 'boldgrid-backup' ),
 	/* 3 */ require BOLDGRID_BACKUP_PATH . '/admin/partials/settings/folders.php',
 	/* 4 */ require BOLDGRID_BACKUP_PATH . '/admin/partials/settings/db.php',
-	/* 5 */ require BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-button.php'
+	/* 5 */ require BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-button.php',
+	/* 6 */ require BOLDGRID_BACKUP_PATH . '/admin/partials/backup-now-modal/title.php'
 );

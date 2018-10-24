@@ -421,6 +421,8 @@ class Boldgrid_Backup {
 
 		// Enable updating feature in the BoldGrid Library.
 		add_filter( 'Boldgrid\Library\Update\isEnalbed', '__return_true' );
+
+		$this->loader->add_filter( 'wp_ajax_boldgrid_backup_update_archive_details', $plugin_admin_core->archive_details, 'wp_ajax_update' );
 	}
 
 	/**

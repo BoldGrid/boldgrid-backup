@@ -122,6 +122,18 @@ class Boldgrid_Backup_Admin_Archive {
 	}
 
 	/**
+	 * Get an attribute from the log.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param  string $key Attributes are key / value pairs.
+	 * @return mixed
+	 */
+	public function get_attribute( $key ) {
+		return ! empty( $this->log[ $key ] ) ? $this->log[ $key ] : null;
+	}
+
+	/**
 	 * Get an archive by name.
 	 *
 	 * Please see @return for more information on what an archive actually is.
@@ -329,6 +341,21 @@ class Boldgrid_Backup_Admin_Archive {
 		$this->log_filename = null;
 		$this->log          = array();
 		$this->compressor   = null;
+	}
+
+	/**
+	 * Set an attribute in the log.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param  string $key   The key.
+	 * @param  string $value The value.
+	 * @return bool
+	 */
+	public function set_attribute( $key, $value ) {
+		$this->log[ $key ] = $value;
+
+		return $this->core->archive_log->write( $this->log );
 	}
 
 	/**

@@ -161,7 +161,9 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 			_wp_http_referer: wpHttpReferer,
 			is_updating: isUpdating,
 			backup_now: '1',
-			folder_exclusion_type: type
+			folder_exclusion_type: type,
+			backup_title: $( '[name="backup_title"]' ).val(),
+			backup_description: $( '[name="backup_description"]' ).val(),
 		};
 
 		/*

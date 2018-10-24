@@ -182,6 +182,9 @@ class Boldgrid_Backup_Admin_Archive_Log {
 		}
 
 		// Add the log file to the archive file, as of 1.5.4.
+		if ( ! class_exists( 'PclZip' ) ) {
+			require_once ( ABSPATH . 'wp-admin/includes/class-pclzip.php' );
+		}
 		$archive = new PclZip( $info['filepath'] );
 		if ( 0 === $archive ) {
 			return false;
@@ -197,6 +200,9 @@ class Boldgrid_Backup_Admin_Archive_Log {
 		if ( 0 === $status ) {
 			return false;
 		}
+
+		// Ensure the act updating the log file does not change the backup file's timestamp.
+		$this->core->wp_filesystem->touch( $info['filepath'], $info['lastmodunix'] );
 
 		return true;
 	}
