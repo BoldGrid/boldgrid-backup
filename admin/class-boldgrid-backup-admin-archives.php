@@ -196,6 +196,7 @@ class Boldgrid_Backup_Admin_Archives {
 		);
 
 		foreach ( $this->core->archives_all->all as $archive ) {
+			$this->core->time->init( $archive['last_modified'], 'utc' );
 
 			/*
 			 * Determine the title of this archive to show.
@@ -211,9 +212,6 @@ class Boldgrid_Backup_Admin_Archives {
 			$title = ! empty ( $title ) ? '<strong>' . esc_html( $title ) . '</strong>' : $this->core->time->get_span();
 
 			$locations = $this->get_locations( $archive );
-
-			// dirlist -> lastmodunix -> mtime (last_modified in unix time).
-			$this->core->time->init( $archive['last_modified'], 'utc' );
 
 			$table .= sprintf(
 				'
