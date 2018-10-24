@@ -535,6 +535,9 @@ class Boldgrid_Backup_Admin_Ftp {
 	/**
 	 * Get the remote contents / listing.
 	 *
+	 * This method allows for both ftp / sftp AND rawlist / nlist functions. The return data can
+	 * vary based on server. Example return data available here: https://pastebin.com/eL5XpeYP
+	 *
 	 * @since 1.6.0
 	 *
 	 * @param  bool   $raw   Whether to get the raw contents (ftp_rawlist) or not
@@ -553,19 +556,34 @@ class Boldgrid_Backup_Admin_Ftp {
 		switch ( $this->type ) {
 			case 'ftp':
 				if ( $raw ) {
-					return ftp_rawlist( $this->connection, $dir );
+					$contents = ftp_rawlist( $this->connection, $dir );
 				} else {
-					return ftp_nlist( $this->connection, $dir );
+					$contents = ftp_nlist( $this->connection, $dir );
 				}
 				break;
 			case 'sftp':
 				if ( $raw ) {
-					return $this->connection->rawlist( $dir );
+					$contents = $this->connection->rawlist( $dir );
 				} else {
-					return $this->connection->nlist( $dir );
+					$contents = $this->connection->nlist( $dir );
 				}
 				break;
 		}
+
+		/*
+		 * Some ftp servers respond with slightly different formats. In some scenarious on a Windows
+		 * FTP server, the folders will be prepended with a "./" (See comment in this method's
+		 * docblock). Before returning the data, remove "./" from the beginning of all items.
+		 */
+		$fix_windows = function( $item ) {
+			if ( './' === substr( $item, 0, 2 ) ) {
+				$item = substr( $item, 2 );
+			}
+			return $item;
+		};
+		$contents = array_map( $fix_windows, $contents );
+
+		return $contents;
 	}
 
 	/**
