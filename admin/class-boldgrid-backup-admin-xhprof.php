@@ -108,7 +108,7 @@ class Boldgrid_Backup_Admin_Xhprof {
 			}
 
 			// Configure the utils path.
-			$xhprof_utils_path = '/usr/share/pear/xhprof_lib/utils';
+			$xhprof_utils_path = BOLDGRID_BACKUP_PATH . '/vendor/lox/xhprof/xhprof_lib/utils';
 
 			// If the utility libraries exists, then load them.
 			if ( file_exists( $xhprof_utils_path . '/xhprof_lib.php' ) &&
@@ -122,8 +122,11 @@ class Boldgrid_Backup_Admin_Xhprof {
 
 				// Write the report URL to the error log.
 				error_log(
-					__METHOD__ . ': https://' . $_SERVER['HTTP_HOST'] .
-					'/xhprof/index.php?run=' . $run_id . '&source=xhprof_boldgrid_backup'
+					__METHOD__ . ': ' . plugins_url(
+						plugin_basename( BOLDGRID_BACKUP_PATH ) .
+							'/vendor/lox/xhprof/xhprof_html/index.php?run=' . $run_id .
+							'&source=xhprof_boldgrid_backup'
+					)
 				);
 			}
 		}
