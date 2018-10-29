@@ -2753,8 +2753,15 @@ class Boldgrid_Backup_Admin_Core {
 		// Get backup settings.
 		$settings = $this->settings->get_settings();
 
-		// Get archive list.
 		$archives = $this->get_archive_list();
+
+		// Remove from the list of archives any that have been flagged as being protected.
+		foreach ( $archives as $key => $archive ) {
+			$this->archive->init( $archive['filepath'] );
+			if ( '1' === $this->archive->get_attribute( 'protect' ) ) {
+				unset( $archives[ $key ] );
+			}
+		}
 
 		// Get the archives file count.
 		$archives_count = count( $archives );
@@ -2777,13 +2784,6 @@ class Boldgrid_Backup_Admin_Core {
 				! empty( $archives[ $counter ]['filepath'] ) ?
 				$archives[ $counter ]['filepath'] : null
 			);
-
-			$this->archive->init( $filepath );
-
-			// Continue if the user has chosen for this backup to be protected during retention.
-			if ( '1' === $this->archive->get_attribute( 'protect' ) ) {
-				continue;
-			}
 
 			// Delete the specified archive file.
 			$deleted = $this->archive->delete( $filepath );
