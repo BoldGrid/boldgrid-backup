@@ -103,11 +103,21 @@ class Boldgrid_Backup_Admin_Archives {
 
 			$title_attr = ! empty( $location['title_attr'] ) ? sprintf( 'title="%1$s"', esc_attr( $location['title_attr'] ) ) : '';
 
+			/*
+			 * As of 1.7.0, the user can flag an archive as protected (exluded from retention
+			 * process). Show a padlock next to those backups.
+			 */
+			$icon = '';
+			if ( 'on_web_server' === $location_type && '1' === $this->core->archive->get_attribute( 'protect' ) ) {
+				$icon = '<span class="dashicons dashicons-lock" title="' . esc_attr__( 'This backup will not be deleted automatically from your Web Server due to your retention settings.', 'boldgrid-backup' ) . '"></span>';
+			}
+
 			$locations[] = sprintf(
-				'<span %2$s %3$s>%1$s</span>',
+				'<span %2$s %3$s>%1$s%4$s</span>',
 				esc_html( $location['title'] ),
 				$data_attr,
-				$title_attr
+				$title_attr,
+				$icon
 			);
 		}
 

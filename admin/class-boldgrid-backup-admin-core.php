@@ -2778,6 +2778,13 @@ class Boldgrid_Backup_Admin_Core {
 				$archives[ $counter ]['filepath'] : null
 			);
 
+			$this->archive->init( $filepath );
+
+			// Continue if the user has chosen for this backup to be protected during retention.
+			if ( '1' === $this->archive->get_attribute( 'protect' ) ) {
+				continue;
+			}
+
 			// Delete the specified archive file.
 			$deleted = $this->archive->delete( $filepath );
 			if ( ! $deleted ) {

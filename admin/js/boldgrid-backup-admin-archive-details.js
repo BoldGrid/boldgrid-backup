@@ -165,7 +165,8 @@ BoldGrid.ArchiveDetails = function( $ ) {
 				security:    $( '#_wpnonce' ).val(),
 				attributes: {
 					title:       $( '[name="backup_title"]' ).val(),
-					description: $( '[name="backup_description"]' ).val()
+					description: $( '[name="backup_description"]' ).val(),
+					protect:     $( '[name="backup_protect"]' ).val(),
 				}
 			},
 			onFail,
