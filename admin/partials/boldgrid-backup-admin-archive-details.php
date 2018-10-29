@@ -197,14 +197,23 @@ $main_content = '
 	</div>
 ';
 
-$title_area = '
-<div id="titlediv">
-	<div id="titlewrap">
-		<input type="text" name="backup_title" size="30" value="' . esc_attr( $title ) . '" id="title" spellcheck="true" autocomplete="off" placeholder="' . esc_attr__( 'Unnamed Backup', 'boldgrid-backup' ) . '">
+
+/*
+ * Allow the user to enter a title and description for this backup.
+ *
+ * Prepend this to the main content area.
+ */
+if ( $archive_found ) {
+	$main_content = '
+	<div id="titlediv">
+		<div id="titlewrap">
+			<input type="text" name="backup_title" size="30" value="' . esc_attr( $title ) . '" id="title" spellcheck="true" autocomplete="off" placeholder="' . esc_attr__( 'Unnamed Backup', 'boldgrid-backup' ) . '">
+		</div>
 	</div>
-</div>
-<textarea name="backup_description" placeholder="' . esc_attr__( 'Backup description.', 'boldgrid-backup' ) . '">' . esc_html( $description ) . '</textarea>
-';
+	<textarea name="backup_description" placeholder="' . esc_attr__( 'Backup description.', 'boldgrid-backup' ) . '">' . esc_html( $description ) . '</textarea>
+	<hr class="separator">
+	' . $main_content;
+}
 
 if ( ! $this->core->archive->is_stored_locally() ) {
 
@@ -225,8 +234,6 @@ $page = sprintf(
 		<div id="poststuff">
 			<div id="post-body" class="metabox-holder columns-2">
 				<div id="post-body-content" style="position: relative">
-					%7$s
-					<hr class="separator">
 					%4$s
 				</div>
 				<div id="postbox-container-1" class="postbox-container">
@@ -246,8 +253,7 @@ $page = sprintf(
 	/* 3 */ require BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php',
 	/* 4 */ $main_content,
 	/* 5 */ $main_meta_box,
-	/* 6 */ $remote_meta_box,
-	/* 7 */ $title_area
+	/* 6 */ $remote_meta_box
 );
 
 echo $page; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped

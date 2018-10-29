@@ -214,6 +214,12 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 	public function wp_ajax_download() {
 		$error = __( 'Unable to download backup from FTP', 'bolgrid-bakcup' );
 
+		$allowed_html = array(
+			'h2' => array(),
+			'p' => array(),
+			'strong' => array(),
+		);
+
 		// Validation, user role.
 		if ( ! current_user_can( 'update_plugins' ) ) {
 			$this->core->notice->add_user_notice(
@@ -248,14 +254,14 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 
 		if ( $result ) {
 			$this->core->notice->add_user_notice(
-				sprintf(
+				wp_kses( sprintf(
 					// translators: 1: Filename.
-					esc_html__(
+					__(
 						'<h2>BoldGrid Backup Premium - FTP Download</h2><p>Backup file <strong>%1$s</strong> successfully downloaded from FTP.</p>',
 						'boldgrid-backup'
 					),
 					$filename
-				),
+				), $allowed_html ),
 				'notice notice-success'
 			);
 			wp_send_json_success();

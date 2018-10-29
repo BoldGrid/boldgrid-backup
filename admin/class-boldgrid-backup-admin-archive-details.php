@@ -149,7 +149,7 @@ class Boldgrid_Backup_Admin_Archive_Details {
 		} else {
 			$archive = array(
 				'filename' => $filename,
-				'filepath' => $this->core->backup_dir->get_path_to( $archive['filename'] ),
+				'filepath' => $this->core->backup_dir->get_path_to( $filename ),
 			);
 		}
 
