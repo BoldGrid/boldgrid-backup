@@ -26,6 +26,12 @@ wp_nonce_field( 'boldgrid_backup_remote_storage_upload' );
 
 $separator = '<hr class="separator">';
 
+$allowed_html = array(
+	'a' => array(
+		'href' => array(),
+	),
+);
+
 $details        = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/details.php';
 $remote_storage = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/remote-storage.php';
 $browser        = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/browser.php';
@@ -45,6 +51,7 @@ if ( ! $archive_found ) {
 	$backup_date   = '';
 	$more_info     = '';
 	$major_actions = '';
+	$protect       = '';
 } else {
 	$file_size = sprintf(
 		'<div class="misc-pub-section">%1$s: <strong>%2$s</strong></div>',
@@ -87,6 +94,38 @@ if ( ! $archive_found ) {
 		$delete_link,
 		esc_html__( 'Update', 'boldgrid-backup' )
 	);
+
+	$is_protected = $this->core->archive->get_attribute( 'protect' );
+	$is_protected = ! empty( $is_protected );
+	$protect = '
+	<div class="misc-pub-section bglib-misc-pub-section dashicons-lock">
+		' . esc_html__( 'Protect backup', 'boldgrid-backup' )  . ': <span class="value-displayed"></span>
+		<a class="edit" href="" style="display: inline;">
+			<span aria-hidden="true">' . esc_html__( 'Edit', 'boldgrid-backup' ) . '</span>
+		</a>
+		<div class="options" style="display: none;">
+			<p>
+				<em>
+					' . wp_kses( sprintf(
+							__( 'Protect this backup from being deleted due to %1$sretention settings%2$s. Applies only to backups stored on your %3$sWeb Server%4$s.', 'boldgrid-backup' ),
+						'<a href="' . get_admin_url( null, 'admin.php?page=boldgrid-backup-settings&section=section_retention' ) . '">',
+						'</a>',
+						'<a href="' . get_admin_url( null, 'admin.php?page=boldgrid-backup-tools&section=section_locations' ) . '">',
+						'</a>'
+					), $allowed_html ) . '
+				</em>
+			</p>
+			<select name="backup_protect">
+				<option value="0" ' . selected( $is_protected, false, false ) . '>' . esc_html__( 'No', 'boldgrid-backup' ) . '</option>
+				<option value="1" ' . selected( $is_protected, true, false ) . '>' . esc_html( 'Yes', 'boldgrid-backup' ) . '</option>
+			</select>
+			<p>
+				<a href="" class="button">' . esc_html__( 'OK', 'boldgrid-backup' ) . '</a>
+				<a href="" class="button-cancel">' . esc_html__( 'Cancel', 'boldgrid-backup' ) . '</a>
+			</p>
+		</div>
+	</div>
+	';
 }
 
 $main_meta_box = sprintf(
@@ -94,6 +133,7 @@ $main_meta_box = sprintf(
 	<div id="submitdiv" class="postbox">
 		<h2 class="hndle ui-sortable-handle"><span>%1$s</span></h2>
 		<div class="inside submitbox">
+			%8$s
 			<div class="misc-pub-section">%2$s: <strong>%3$s</strong></div>
 			%4$s
 			%5$s
@@ -107,7 +147,8 @@ $main_meta_box = sprintf(
 	/* 4 */ $file_size,
 	/* 5 */ $backup_date,
 	/* 6 */ $more_info,
-	/* 7 */ $major_actions
+	/* 7 */ $major_actions,
+	/* 8 */ $protect
 );
 
 $remote_meta_box = sprintf(

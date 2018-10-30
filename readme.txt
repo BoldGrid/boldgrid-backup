@@ -33,7 +33,9 @@ WordPress backup and restoration with update protection.
 * New feature: Added auto-update settings for individual plugins and themes.
 * New feature: Added limited-lifetime download links for archive files.
 * New feature: Added import backup archive from URL address.
-* New feature: Adding progress bar to show status of backups.
+* New feature: Added progress bar to show status of backups.
+* New feature: Adding the ability to set and title and description to a backup.
+* New feature: Adding the ability to flag a backup as being proteced (excluded from retention).
 * Update:      Update protection is now valid for 1 hour after a full backup from the WordPress Updates or Plugins page.
 * Bug fix:     Set a default backup directory if path in settings is not valid.  Remove filters before fixing home and siteurl on restore.
 * Bug fix:     Some HTML was caught in translations.

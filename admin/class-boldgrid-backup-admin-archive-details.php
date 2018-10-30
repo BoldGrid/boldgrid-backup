@@ -110,6 +110,9 @@ class Boldgrid_Backup_Admin_Archive_Details {
 
 		wp_enqueue_style( 'bglib-ui-css' );
 
+		wp_enqueue_script( 'bglib-attributes-js' );
+		wp_enqueue_style( 'bglib-attributes-css' );
+
 		/**
 		 * Allow other plugins to enqueue scripts on this page.
 		 *
