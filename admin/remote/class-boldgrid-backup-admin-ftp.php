@@ -600,7 +600,7 @@ class Boldgrid_Backup_Admin_Ftp {
 			}
 			return $item;
 		};
-		if ( is_array( $contents ) ) {
+		if ( 'ftp' === $this->type && is_array( $contents ) ) {
 			$contents = array_map( $fix_windows, $contents );
 		}
 
@@ -901,6 +901,8 @@ class Boldgrid_Backup_Admin_Ftp {
 	public function upload( $filepath ) {
 		$remote_file = $this->remote_dir . '/' . basename( $filepath );
 
+		$timestamp = filemtime( $filepath );
+
 		$this->connect();
 		$this->log_in();
 		if ( ! $this->logged_in ) {
@@ -916,9 +918,21 @@ class Boldgrid_Backup_Admin_Ftp {
 		switch ( $this->type ) {
 			case 'ftp':
 				$uploaded = ftp_put( $this->connection, $remote_file, $filepath, FTP_BINARY );
+
+				/*
+				 * Ensure the timestamp is unchanged.
+				 *
+				 * Not 100% accurate however. In testing, when setting a remote file's timestamp to
+				 * 11am UTC, that remote server convereted the UTC time to local time.
+				 */
+				$cmd = 'MFMT ' . date( 'YmdHis', $timestamp ) . ' ' . $remote_file;
+				ftp_raw( $this->connection, $cmd );
 				break;
 			case 'sftp':
 				$uploaded = $this->connection->put( $remote_file, $filepath, 1 );
+
+				// Adjust timestamp.
+				$this->connection->touch( $remote_file, $timestamp );
 				break;
 		}
 
