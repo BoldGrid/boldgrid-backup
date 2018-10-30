@@ -11,9 +11,9 @@
   version "0.0.0"
   resolved "https://github.com/squizlabs/PHP_CodeSniffer/#c056352b9c27a951775b526c01bf1223364df558"
 
-"WordPress-Coding-Standards@https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards.git#master":
+"WordPress-Coding-Standards@https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards.git#cf6b310caad735816caef7573295f8a534374706":
   version "0.0.0"
-  resolved "https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards.git#46d42828ce7355d8b3776e3171f2bda892d179b4"
+  resolved "https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards.git#cf6b310caad735816caef7573295f8a534374706"
 
 abbrev@1:
   version "1.1.1"

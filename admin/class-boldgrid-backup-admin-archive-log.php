@@ -183,7 +183,7 @@ class Boldgrid_Backup_Admin_Archive_Log {
 
 		// Add the log file to the archive file, as of 1.5.4.
 		if ( ! class_exists( 'PclZip' ) ) {
-			require_once ( ABSPATH . 'wp-admin/includes/class-pclzip.php' );
+			require_once ABSPATH . 'wp-admin/includes/class-pclzip.php';
 		}
 		$archive = new PclZip( $info['filepath'] );
 		if ( 0 === $archive ) {

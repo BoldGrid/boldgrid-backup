@@ -518,7 +518,7 @@ class Boldgrid_Backup_Admin_Ftp {
 				 *
 				 * Flag as a windows ftp server if first item is a date in xx-xx-xxxx format.
 				 */
-				$is_windows = 1 === preg_match( "/(\d{2})-(\d{2})-(\d{4})/", $exploded_item[0] );
+				$is_windows = 1 === preg_match( '/(\d{2})-(\d{2})-(\d{4})/', $exploded_item[0] );
 
 				if ( $is_windows ) {
 					$time = strtotime( $exploded_item[0] . ' ' . $exploded_item[1] );

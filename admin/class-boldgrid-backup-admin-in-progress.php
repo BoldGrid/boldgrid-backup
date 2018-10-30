@@ -205,9 +205,11 @@ class Boldgrid_Backup_Admin_In_Progress {
 		 * gone recently. Sort by timestamp and use the newest file.
 		 */
 		if ( 1 < count( $dirlist ) ) {
-			uasort( $dirlist, function( $item1, $item2 ) {
-				return $item1['lastmodunix'] < $item2['lastmodunix'] ? 1 : -1;
-			});
+			uasort(
+				$dirlist, function( $item1, $item2 ) {
+					return $item1['lastmodunix'] < $item2['lastmodunix'] ? 1 : -1;
+				}
+			);
 		}
 
 		if ( 1 <= count( $dirlist ) ) {

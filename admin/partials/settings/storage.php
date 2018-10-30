@@ -79,9 +79,11 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 					),
 					array( 'a' => array( 'href' => array() ) )
 				),
-				esc_url( admin_url(
-					'admin.php?page=boldgrid-backup-tools&section=section_locations'
-				) )
+				esc_url(
+					admin_url(
+						'admin.php?page=boldgrid-backup-tools&section=section_locations'
+					)
+				)
 			);
 			?>
 		</p>

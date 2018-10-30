@@ -14,7 +14,7 @@ env:
 before_script:
   - npm install -g gulp-cli
   - yarn install
-  - composer install
+  - composer install -o --no-dev
   - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
   - gulp
 

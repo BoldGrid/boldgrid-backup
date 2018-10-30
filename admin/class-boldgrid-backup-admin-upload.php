@@ -394,34 +394,42 @@ class Boldgrid_Backup_Admin_Upload {
 	public function ajax_url_import() {
 		// Check user permissions.
 		if ( ! current_user_can( 'update_plugins' ) ) {
-			wp_send_json_error( array(
-				'error' => __( 'User access violation!', 'boldgrid-backup' ),
-			) );
+			wp_send_json_error(
+				array(
+					'error' => __( 'User access violation!', 'boldgrid-backup' ),
+				)
+			);
 		}
 
 		// Check security nonce and referer.
 		if ( ! check_admin_referer( 'upload_archive_file' ) ) {
-			wp_send_json_error( array(
-				'error' => __( 'Security violation! Please try again.', 'boldgrid-backup' ),
-			) );
+			wp_send_json_error(
+				array(
+					'error' => __( 'Security violation! Please try again.', 'boldgrid-backup' ),
+				)
+			);
 		}
 
 		$url       = ! empty( $_POST['url'] ) ? esc_url_raw( $_POST['url'] ) : null;
 		$url_regex = '/' . $this->core->configs['url_regex'] . '/i';
 
 		if ( ! preg_match( $url_regex, $url ) ) {
-			wp_send_json_error( array(
-				'error' => __( 'Invalid URL address.', 'boldgrid-backup' ),
-			) );
+			wp_send_json_error(
+				array(
+					'error' => __( 'Invalid URL address.', 'boldgrid-backup' ),
+				)
+			);
 		}
 
 		$backup_directory = $this->core->backup_dir->get();
 
 		if ( ! $this->core->backup_dir->is_valid( $backup_directory ) &&
 			! empty( $this->core->backup_dir->errors ) ) {
-			wp_send_json_error( array(
-				'error' => implode( '<br />', $this->core->backup_dir->errors ),
-			) );
+			wp_send_json_error(
+				array(
+					'error' => implode( '<br />', $this->core->backup_dir->errors ),
+				)
+			);
 		}
 
 		$filepath = $this->get_save_path( basename( $url ) );
@@ -432,13 +440,15 @@ class Boldgrid_Backup_Admin_Upload {
 			'application/zip',
 		);
 
-		$response = wp_remote_get( $url, array(
-			'filename'  => $filepath,
-			'headers'   => 'Accept: ' . implode( ', ', $allowed_content_types ),
-			'sslverify' => false,
-			'stream'    => true,
-			'timeout'   => MINUTE_IN_SECONDS * 20,
-		) );
+		$response = wp_remote_get(
+			$url, array(
+				'filename'  => $filepath,
+				'headers'   => 'Accept: ' . implode( ', ', $allowed_content_types ),
+				'sslverify' => false,
+				'stream'    => true,
+				'timeout'   => MINUTE_IN_SECONDS * 20,
+			)
+		);
 
 		if ( is_array( $response ) && ! is_wp_error( $response ) &&
 			in_array( $response['headers']['content-type'], $allowed_content_types, true ) ) {
@@ -446,9 +456,11 @@ class Boldgrid_Backup_Admin_Upload {
 				$log_filepath = $filepath;
 
 			if ( ! empty( $response['headers']['content-disposition'] ) ) {
-				$log_filepath = trim( str_replace(
-					'attachment; filename=', '', $response['headers']['content-disposition']
-				), '"' );
+				$log_filepath = trim(
+					str_replace(
+						'attachment; filename=', '', $response['headers']['content-disposition']
+					), '"'
+				);
 
 				$log_filepath = $this->core->backup_dir->get_path_to( $log_filepath );
 			}
@@ -461,22 +473,26 @@ class Boldgrid_Backup_Admin_Upload {
 			// Update the archive file modification time, based on the log file contents.
 			$this->core->remote->post_download( $filepath );
 
-			wp_send_json_success( array(
-				'filepath'   => $filepath,
-				'detailsUrl' => admin_url(
-					'admin.php?page=boldgrid-backup-archive-details&filename=' .
-					basename( $filepath )
-				),
-			) );
+			wp_send_json_success(
+				array(
+					'filepath'   => $filepath,
+					'detailsUrl' => admin_url(
+						'admin.php?page=boldgrid-backup-archive-details&filename=' .
+						basename( $filepath )
+					),
+				)
+			);
 		} else {
 			$this->core->wp_filesystem->delete( $filepath );
 		}
 
-		wp_send_json_error( array(
-			'error' => __(
-				'Could not retrieve the remote file.  It may not be a ZIP file, or the link is no longer valid.',
-				'boldgrid-backup'
-			),
-		) );
+		wp_send_json_error(
+			array(
+				'error' => __(
+					'Could not retrieve the remote file.  It may not be a ZIP file, or the link is no longer valid.',
+					'boldgrid-backup'
+				),
+			)
+		);
 	}
 }

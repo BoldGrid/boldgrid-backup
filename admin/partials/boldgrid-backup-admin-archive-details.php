@@ -97,22 +97,24 @@ if ( ! $archive_found ) {
 
 	$is_protected = $this->core->archive->get_attribute( 'protect' );
 	$is_protected = ! empty( $is_protected );
-	$protect = '
+	$protect      = '
 	<div class="misc-pub-section bglib-misc-pub-section dashicons-lock">
-		' . esc_html__( 'Protect backup', 'boldgrid-backup' )  . ': <span class="value-displayed"></span>
+		' . esc_html__( 'Protect backup', 'boldgrid-backup' ) . ': <span class="value-displayed"></span>
 		<a class="edit" href="" style="display: inline;">
 			<span aria-hidden="true">' . esc_html__( 'Edit', 'boldgrid-backup' ) . '</span>
 		</a>
 		<div class="options" style="display: none;">
 			<p>
 				<em>
-					' . wp_kses( sprintf(
-							__( 'Protect this backup from being deleted due to %1$sretention settings%2$s. Applies only to backups stored on your %3$sWeb Server%4$s.', 'boldgrid-backup' ),
-						'<a href="' . get_admin_url( null, 'admin.php?page=boldgrid-backup-settings&section=section_retention' ) . '">',
-						'</a>',
-						'<a href="' . get_admin_url( null, 'admin.php?page=boldgrid-backup-tools&section=section_locations' ) . '">',
-						'</a>'
-					), $allowed_html ) . '
+					' .
+	wp_kses( sprintf(
+		// translators: 1: HTML anchor open tags, 2: HTML close tag, 3: HTML anchor open tags, 4: HTML close tag.
+		__( 'Protect this backup from being deleted due to %1$sretention settings%2$s. Applies only to backups stored on your %3$sWeb Server%4$s.', 'boldgrid-backup' ),
+		'<a href="' . get_admin_url( null, 'admin.php?page=boldgrid-backup-settings&section=section_retention' ) . '">',
+		'</a>',
+		'<a href="' . get_admin_url( null, 'admin.php?page=boldgrid-backup-tools&section=section_locations' ) . '">',
+		'</a>'
+	), $allowed_html ) . '
 				</em>
 			</p>
 			<select name="backup_protect">

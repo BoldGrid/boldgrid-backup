@@ -274,9 +274,11 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 
 		if ( check_admin_referer( 'boldgrid_backup_download_link', 'archive_auth' ) &&
 			current_user_can( 'update_plugins' ) && $archive_filename ) {
-				wp_send_json_success( $this->core->archive->generate_download_link(
-					$archive_filename
-				) );
+				wp_send_json_success(
+					$this->core->archive->generate_download_link(
+						$archive_filename
+					)
+				);
 		} else {
 			wp_send_json_error();
 		}

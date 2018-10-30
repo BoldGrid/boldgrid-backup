@@ -84,7 +84,7 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 
 		// Used with wp_kses call below.
 		$allowed_html = array(
-			'div' => array(
+			'div'  => array(
 				'class' => array(),
 			),
 			'span' => array(

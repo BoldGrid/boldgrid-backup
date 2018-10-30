@@ -509,7 +509,7 @@ class Boldgrid_Backup_Admin_Utility {
 	public static function is_admin_page( $page ) {
 		global $pagenow;
 
-		return 'admin.php' === $pagenow && ! empty( $_GET['page'] ) && $page === $_GET['page'];
+		return 'admin.php' === $pagenow && ! empty( $_GET['page'] ) && $page === $_GET['page']; // phpcs:ignore WordPress.CSRF.NonceVerification
 	}
 
 	/**

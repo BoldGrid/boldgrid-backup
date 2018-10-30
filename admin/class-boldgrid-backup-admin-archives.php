@@ -219,7 +219,7 @@ class Boldgrid_Backup_Admin_Archives {
 			$filepath = $this->core->backup_dir->get_path_to( $archive['filename'] );
 			$this->core->archive->init( $filepath );
 			$title = $this->core->archive->get_attribute( 'title' );
-			$title = ! empty ( $title ) ? '<strong>' . esc_html( $title ) . '</strong>' : $this->core->time->get_span();
+			$title = ! empty( $title ) ? '<strong>' . esc_html( $title ) . '</strong>' : $this->core->time->get_span();
 
 			$locations = $this->get_locations( $archive );
 

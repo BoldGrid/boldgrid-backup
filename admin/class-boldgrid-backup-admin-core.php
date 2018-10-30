@@ -1515,9 +1515,11 @@ class Boldgrid_Backup_Admin_Core {
 	public function archive_files( $save = false, $dryrun = false ) {
 		$this->pre_auto_update = 'pre_auto_update' === current_filter();
 
-		Boldgrid_Backup_Admin_In_Progress_Data::set_args( array(
-			'status' => __( 'Initializing backup', 'boldgrid-backup' ),
-		));
+		Boldgrid_Backup_Admin_In_Progress_Data::set_args(
+			array(
+				'status' => __( 'Initializing backup', 'boldgrid-backup' ),
+			)
+		);
 
 		/**
 		 * Actions to take before any archiving begins.
@@ -1581,8 +1583,8 @@ class Boldgrid_Backup_Admin_Core {
 			'folder_include' => $this->folder_exclusion->from_settings( 'include' ),
 			'folder_exclude' => $this->folder_exclusion->from_settings( 'exclude' ),
 			'table_exclude'  => $this->db_omit->get_excluded_tables(),
-			'title'          => ! empty( $_POST['backup_title'] ) ? stripslashes( $_POST['backup_title'] ) : null,
-			'description'    => ! empty( $_POST['backup_description'] ) ? stripslashes( $_POST['backup_description'] ) : null,
+			'title'          => ! empty( $_POST['backup_title'] ) ? stripslashes( $_POST['backup_title'] ) : null, // phpcs:ignore WordPress.CSRF.NonceVerification,WordPress.Arrays.ArrayDeclarationSpacing.ArrayItemNoNewLine
+			'description'    => ! empty( $_POST['backup_description'] ) ? stripslashes( $_POST['backup_description'] ) : null, // phpcs:ignore WordPress.CSRF.NonceVerification,WordPress.Arrays.ArrayDeclarationSpacing.ArrayItemNoNewLine
 		);
 
 		// Determine how this backup was triggered.
@@ -1677,9 +1679,11 @@ class Boldgrid_Backup_Admin_Core {
 		 */
 		$info = apply_filters( 'boldgrid_backup_pre_archive_info', $info );
 
-		Boldgrid_Backup_Admin_In_Progress_Data::set_args( array(
-			'total_files_todo' => count( $filelist ),
-		));
+		Boldgrid_Backup_Admin_In_Progress_Data::set_args(
+			array(
+				'total_files_todo' => count( $filelist ),
+			)
+		);
 
 		/*
 		 * Use the chosen compressor to build an archive.
@@ -1813,9 +1817,11 @@ class Boldgrid_Backup_Admin_Core {
 			update_option( 'boldgrid_backup_latest_backup', $info );
 		}
 
-		Boldgrid_Backup_Admin_In_Progress_Data::set_args( array(
-			'status' => __( 'Backup complete!', 'boldgrid-backup' ),
-		));
+		Boldgrid_Backup_Admin_In_Progress_Data::set_args(
+			array(
+				'status' => __( 'Backup complete!', 'boldgrid-backup' ),
+			)
+		);
 
 		// Return the array of archive information.
 		return $info;

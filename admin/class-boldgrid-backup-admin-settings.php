@@ -260,9 +260,11 @@ class Boldgrid_Backup_Admin_Settings {
 
 		// Check security nonce and referer.
 		if ( ! check_admin_referer( 'boldgrid-backup-settings', 'settings_auth' ) ) {
-			wp_send_json_error( array(
-				'error' => __( 'Security violation! Please try again.', 'boldgrid-backup' ),
-			) );
+			wp_send_json_error(
+				array(
+					'error' => __( 'Security violation! Please try again.', 'boldgrid-backup' ),
+				)
+			);
 		}
 
 		// Get the retention count.
