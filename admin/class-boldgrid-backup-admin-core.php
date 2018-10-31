@@ -2768,6 +2768,7 @@ class Boldgrid_Backup_Admin_Core {
 				unset( $archives[ $key ] );
 			}
 		}
+		$archives = array_values( $archives );
 
 		// Get the archives file count.
 		$archives_count = count( $archives );
