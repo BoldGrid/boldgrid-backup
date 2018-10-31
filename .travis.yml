@@ -17,7 +17,7 @@ before_script:
   - composer install -o --no-dev
   - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
   - gulp
-  - bash -c "cd vendor/boldgrid/library/; gulp build; pwd; ls -la build/"
+  - bash -c "cd vendor/boldgrid/library/; pwd; yarn install; gulp build; pwd; ls -la; ls -la build/"
 
 script:
   - find . -name composer -prune -o -name node_modules -prune -o -name '*.php' -exec php -lf {} \; > /dev/null
