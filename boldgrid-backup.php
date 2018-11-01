@@ -84,76 +84,20 @@ function run_boldgrid_backup() {
  * @return bool
  */
 function load_boldgrid_backup() {
-	// Ensure we have our vendor/autoload.php file.
-	$exists_composer = file_exists( BOLDGRID_BACKUP_PATH . '/composer.json' );
-	$exists_autoload = file_exists( BOLDGRID_BACKUP_PATH . '/vendor/autoload.php' );
-	if ( $exists_composer && ! $exists_autoload ) {
-		add_action(
-			'admin_init', function() {
-				deactivate_plugins( 'boldgrid-backup/boldgrid-backup.php', true );
+	require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-support.php';
+	$support = new Boldgrid_Backup_Admin_Support();
 
-				add_action(
-					'admin_notices', function() {
-						?>
-				<div class="notice notice-error is-dismissible"><p>
-						<?php
-						printf(
-							// translators: 1: HTML strong open tag, 2: HTML strong close tag.
-							esc_html__(
-								'%1$sBoldGrid Backup%2$s has been deactivated because the vendor folder is missing. Please run %1$s%3$scomposer install%4$s%2$s, or contact your host for further assistance.',
-								'boldgrid-backup'
-							),
-							'<strong>',
-							'</strong>',
-							'<em>',
-							'</em>'
-						);
-						?>
-					</p></div>
-						<?php
-					}
-				);
-			}
-		);
-
+	if ( ! $support->has_composer_installed() ) {
+		$error = __( 'The vendor folder is missing. Please run "composer install", or contact your host for further assistance.', 'boldgrid-backup' );
+		$support->deactivate( $error );
 		return false;
 	}
 
-	// Ensure we have our build directory with a required file in it.
-	if ( ! file_exists( BOLDGRID_BACKUP_PATH . '/build/clipboard.min.js' ) ) {
-		add_action(
-			'admin_init', function() {
-				deactivate_plugins( 'boldgrid-backup/boldgrid-backup.php', true );
-
-				add_action(
-					'admin_notices', function() {
-						?>
-				<div class="notice notice-error is-dismissible"><p>
-						<?php
-						printf(
-							// translators: 1: HTML strong open tag, 2: HTML strong close tag.
-							esc_html__(
-								'%1$sBoldGrid Backup%2$s has been deactivated because the build folder is missing. Please run %1$s%3$syarn install%4$s%2$s and %1$s%3$sgulp%4$s%2$s, or contact your host for further assistance.',
-								'boldgrid-backup'
-							),
-							'<strong>',
-							'</strong>',
-							'<em>',
-							'</em>'
-						);
-						?>
-					</p></div>
-						<?php
-					}
-				);
-			}
-		);
-
+	if ( ! $support->has_been_built() ) {
+		$error = __( 'The "build" folder is missing. Please run "yarn install" and "gulp", or contact your host for further assistance.', 'boldgrid-backup' );
+		$support->deactivate( $error );
 		return false;
 	}
-
-	register_activation_hook( __FILE__, 'activate_boldgrid_backup' );
-	register_deactivation_hook( __FILE__, 'deactivate_boldgrid_backup' );
 
 	// Include the autoloader to set plugin options and create instance.
 	$loader = require plugin_dir_path( __FILE__ ) . 'vendor/autoload.php';
@@ -168,6 +112,20 @@ function load_boldgrid_backup() {
 			'licenseActivate' => false,
 		)
 	);
+
+	// Check filesystem. This check MUST come after library is loaded (which loads the filesystem).
+	if ( ! $support->is_filesystem_supported() ) {
+		$error = sprintf(
+			/* translators: 1 is the file system method. */
+			__( 'Only "direct" filesystem method is currently supported. You are running, "%1$s".', 'boldgrid-backup ' ),
+			get_filesystem_method()
+		);
+		$support->deactivate( $error );
+		return false;
+	}
+
+	register_activation_hook( __FILE__, 'activate_boldgrid_backup' );
+	register_deactivation_hook( __FILE__, 'deactivate_boldgrid_backup' );
 
 	return true;
 }
