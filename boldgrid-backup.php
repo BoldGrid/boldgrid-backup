@@ -113,13 +113,11 @@ function load_boldgrid_backup() {
 		)
 	);
 
-	// Check filesystem. This check MUST come after library is loaded (which loads the filesystem).
-	if ( ! $support->is_filesystem_supported() ) {
-		$error = sprintf(
-			/* translators: 1 is the file system method. */
-			__( 'Only "direct" filesystem method is currently supported. You are running, "%1$s".', 'boldgrid-backup ' ),
-			get_filesystem_method()
-		);
+	if ( ! $load->isLoaded() ) {
+		$error = __( 'Unable to load the "BoldGrid Library".', 'boldgrid-backup' );
+		if ( ! $support->is_filesystem_supported() ) {
+			$error .= ' ' . __( 'Only the "direct" filesystem method is currently supported.', 'boldgrid-backup' );
+		}
 		$support->deactivate( $error );
 		return false;
 	}
