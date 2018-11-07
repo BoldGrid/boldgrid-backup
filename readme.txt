@@ -37,6 +37,7 @@ WordPress backup and restoration with update protection.
 * New feature: Adding the ability to set and title and description to a backup.
 * New feature: Adding the ability to flag a backup as being proteced (excluded from retention).
 * Update:      Update protection is now valid for 1 hour after a full backup from the WordPress Updates or Plugins page.
+* Update:      Made the Backup Archives page the default page in the admin menu.
 * Bug fix:     Set a default backup directory if path in settings is not valid.  Remove filters before fixing home and siteurl on restore.
 * Bug fix:     Some HTML was caught in translations.
 * Bug fix:     Duplicate emails were sent when a backup was complete, fixed.

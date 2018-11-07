@@ -2,9 +2,9 @@
 **Contributors:** boldgrid, joemoto, imh_brad, rramo012, timph, bgnicolepaschen
 **Tags:** boldgrid, backup, restore, migrate, migration
 **Requires at least:** 4.4
-**Tested up to:** 4.9.8
+**Tested up to:** 5.0.0
 **Requires PHP:** 5.3
-**Stable tag:** 1.6.5
+**Stable tag:** 1.6.6
 **License:** GPLv2 or later
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -33,10 +33,15 @@ WordPress backup and restoration with update protection.
 * New feature: Added auto-update settings for individual plugins and themes.
 * New feature: Added limited-lifetime download links for archive files.
 * New feature: Added import backup archive from URL address.
+* New feature: Added progress bar to show status of backups.
+* New feature: Adding the ability to set and title and description to a backup.
+* New feature: Adding the ability to flag a backup as being proteced (excluded from retention).
 * Update:      Update protection is now valid for 1 hour after a full backup from the WordPress Updates or Plugins page.
+* Update:      Made the Backup Archives page the default page in the admin menu.
 * Bug fix:     Set a default backup directory if path in settings is not valid.  Remove filters before fixing home and siteurl on restore.
 * Bug fix:     Some HTML was caught in translations.
 * Bug fix:     Duplicate emails were sent when a backup was complete, fixed.
+* Bug fix:     Preserve timestamp on ftp / sftp uploads.
 
 ### 1.6.5 ###
 
