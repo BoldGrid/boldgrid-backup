@@ -968,13 +968,7 @@ class Boldgrid_Backup_Admin_Core {
 		);
 
 		// The main slug all sub menu items are children of.
-		$main_slug = 'boldgrid-backup-settings';
-
-		// The callable function for the settings page.
-		$settings_page = array(
-			$this->settings,
-			'page_backup_settings',
-		);
+		$main_slug = 'boldgrid-backup';
 
 		// The capability required for these menu items to be displayed to the user.
 		$capability = 'administrator';
@@ -984,22 +978,11 @@ class Boldgrid_Backup_Admin_Core {
 			$lang['boldgrid_backup'],
 			$capability,
 			$main_slug,
-			$settings_page,
+			array(
+				$this,
+				'page_archives',
+			),
 			'none'
-		);
-
-		/*
-		 * Add "Settings", formally known as "Backup Settings".
-		 *
-		 * @link http://wordpress.stackexchange.com/questions/66498/add-menu-page-with-different-name-for-first-submenu-item
-		 */
-		add_submenu_page(
-			$main_slug,
-			$lang['boldgrid_backup'] . ' ' . $lang['settings'],
-			$lang['settings'],
-			$capability,
-			$main_slug,
-			$settings_page
 		);
 
 		// Add "Backup Archive", formally known as "BoldGrid Backup".
@@ -1012,6 +995,23 @@ class Boldgrid_Backup_Admin_Core {
 			array(
 				$this,
 				'page_archives',
+			)
+		);
+
+		/*
+		 * Add "Settings", formally known as "Backup Settings".
+		 *
+		 * @link http://wordpress.stackexchange.com/questions/66498/add-menu-page-with-different-name-for-first-submenu-item
+		 */
+		add_submenu_page(
+			$main_slug,
+			$lang['boldgrid_backup'] . ' ' . $lang['settings'],
+			$lang['settings'],
+			$capability,
+			'boldgrid-backup-settings',
+			array(
+				$this->settings,
+				'page_backup_settings',
 			)
 		);
 
