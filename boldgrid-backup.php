@@ -113,15 +113,6 @@ function load_boldgrid_backup() {
 		)
 	);
 
-	if ( ! $load->isLoaded() ) {
-		$error = __( 'Unable to load the "BoldGrid Library".', 'boldgrid-backup' );
-		if ( ! $support->is_filesystem_supported() ) {
-			$error .= ' ' . __( 'Only the "direct" filesystem method is currently supported.', 'boldgrid-backup' );
-		}
-		$support->deactivate( $error );
-		return false;
-	}
-
 	register_activation_hook( __FILE__, 'activate_boldgrid_backup' );
 	register_deactivation_hook( __FILE__, 'deactivate_boldgrid_backup' );
 
