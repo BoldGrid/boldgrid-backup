@@ -81,7 +81,7 @@ class Test_Boldgrid_Backup_Admin_Time extends WP_UnitTestCase {
 
 		// Get New York time (18:20) and convert to UTC (22:20 DST or 23:20 not DST).
 		$settings_date = $this->core->time->get_settings_date( $settings, array( 'name' => 'America/New_York' ) );
-		$expected = $settings_date->format( 'I' ) ? '2220' : '2320';
+		$expected      = $settings_date->format( 'I' ) ? '2220' : '2320';
 		$settings_date->setTimezone( new DateTimeZone( 'UTC' ) );
 		$this->assertEquals( $expected, $settings_date->format( 'Hi' ) );
 
