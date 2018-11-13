@@ -303,8 +303,14 @@ BoldGrid.Settings = function( $ ) {
 
 		$body.on( 'click', '#license_check_again', self.onClickCheckAgain );
 
-		/** Reverse dismiss action for the Conect Key prompt **/
+		/** Reverse dismiss action for the Connect Key prompt **/
 		$( '.undismissBoldgridNotice' ).on( 'click', self.undismissBoldgridNotice );
+
+		$body.find( 'form#schedule-form' ).on( 'submit', function() {
+			$( this )
+				.find( 'input[name="section"]' )
+				.val( $body.find( '.bg-left-nav .active' ).data( 'section-id' ) );
+		} );
 	} );
 };
 

@@ -156,12 +156,15 @@ wp_nonce_field( 'boldgrid_backup_settings' );
 		),
 		esc_url( admin_url( 'admin.php?page=boldgrid-backup-test' ) )
 	);
+
+	$show_section = ! empty( $_REQUEST['section'] ) ? sanitize_key( $_REQUEST['section'] ) : ''; // phpcs:ignore WordPress.CSRF.NonceVerification
 	?>
 	</p>
 
 	<hr />
 
 	<form id='schedule-form' method='post'>
+	<input type="hidden" name="section" value="<?php echo esc_attr( $show_section ); ?>" />
 	<?php
 		echo $col_container; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 		wp_nonce_field( 'boldgrid-backup-settings', 'settings_auth' );

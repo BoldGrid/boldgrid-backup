@@ -42,6 +42,7 @@ WordPress backup and restoration with update protection.
 * Bug fix:     Some HTML was caught in translations.
 * Bug fix:     Duplicate emails were sent when a backup was complete, fixed.
 * Bug fix:     Preserve timestamp on ftp / sftp uploads.
+* Update:      Save settings and reload to the current section.
 
 = 1.6.5 =
 
