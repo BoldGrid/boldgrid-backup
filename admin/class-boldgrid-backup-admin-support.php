@@ -85,12 +85,22 @@ class Boldgrid_Backup_Admin_Support {
 	 *
 	 * @since 1.7.0
 	 *
+	 * @global object $wp_filesystem
+	 *
 	 * @return boolean
 	 */
 	public function is_filesystem_supported() {
+		global $wp_filesystem;
+
 		$supported = true;
 
-		if ( ! function_exists( 'get_filesystem_method' ) || 'direct' !== get_filesystem_method() ) {
+		// Ensure that the WP Filesystem API is loaded.
+		if ( empty( $wp_filesystem ) ) {
+			require_once ABSPATH . '/wp-admin/includes/file.php';
+			WP_Filesystem();
+		}
+
+		if ( 'direct' !== get_filesystem_method() ) {
 			$supported = false;
 		}
 

@@ -88,6 +88,10 @@ $php_zip = new Boldgrid_Backup_Admin_Compressor_Php_Zip( $this );
 
 $pcl_zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this );
 
+$support = new Boldgrid_Backup_Admin_Support();
+
+$filesystem_method = get_filesystem_method();
+
 $valid_backup_dir = $backup_dir_perms['exists'] && $backup_dir_perms['read'] && $backup_dir_perms['write'] && $backup_dir_perms['rename'] && $backup_dir_perms['delete'] && $backup_dir_perms['dirlist'];
 
 $timezone = $this->time->get_server_timezone();
@@ -131,6 +135,9 @@ $tests = array(
 		'k' => __( 'PHP in safe mode?', 'boldgrid-backup' ),
 		'v' => $this->test->is_php_safemode() ? sprintf( $error_span, $lang['yes'], '' ) : $lang['no'],
 	),
+	array(
+		'k' => __( 'Filesystem Method', 'boldgrid-backup' ),
+		'v' => $support->is_filesystem_supported() ? $filesystem_method : sprintf( $error_span, $filesystem_method, __( 'Only "direct" filesystem supported.', 'boldgrid-backup' ) ) ),
 	array(
 		'k' => __( 'WordPress version:', 'boldgrid-backup' ),
 		'v' => $wp_version,
