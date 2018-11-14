@@ -137,7 +137,12 @@ $tests = array(
 	),
 	array(
 		'k' => __( 'Filesystem Method', 'boldgrid-backup' ),
-		'v' => $support->is_filesystem_supported() ? $filesystem_method : sprintf( $error_span, $filesystem_method, __( 'Only "direct" filesystem supported.', 'boldgrid-backup' ) ) ),
+		'v' => $support->is_filesystem_supported() ?
+			$filesystem_method : sprintf(
+				$error_span,
+				$filesystem_method, __( 'Only "direct" filesystem supported.', 'boldgrid-backup' )
+			),
+	),
 	array(
 		'k' => __( 'WordPress version:', 'boldgrid-backup' ),
 		'v' => $wp_version,
