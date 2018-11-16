@@ -304,7 +304,9 @@ class Boldgrid_Backup {
 			'wp_ajax_cancel'
 		);
 
-		$this->loader->add_action( 'admin_notices', $plugin_admin_core->auto_rollback, 'notice_backup_show' );
+		if ( $plugin_admin_core->test->run_functionality_tests() ) {
+			$this->loader->add_action( 'admin_notices', $plugin_admin_core->auto_rollback, 'notice_backup_show' );
+		}
 
 		// Add an action to add a cron job to restore after WordPress Updates, unless canceled.
 		$this->loader->add_action(
