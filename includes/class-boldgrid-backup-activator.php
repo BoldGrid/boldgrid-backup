@@ -32,10 +32,7 @@ class Boldgrid_Backup_Activator {
 	 * @see Boldgrid_Backup_Admin_Cron::add_all_crons()
 	 */
 	public static function activate() {
-		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-support.php';
-		$support = new Boldgrid_Backup_Admin_Support();
-
-		if ( $support->is_filesystem_supported() ) {
+		if ( Boldgrid_Backup_Admin_Test::is_filesystem_supported() ) {
 			$core      = new Boldgrid_Backup_Admin_Core();
 			$settings  = $core->settings->get_settings();
 			$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;

@@ -1047,7 +1047,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 * @since 1.6.0
 	 */
 	public function wp_ajax_get_protect_notice() {
-		if ( ! current_user_can( 'update_plugins' ) ) {
+		if ( ! current_user_can( 'update_plugins' ) || ! $this->core->test->run_functionality_tests() ) {
 			wp_send_json_error();
 		}
 
