@@ -95,15 +95,6 @@ class Boldgrid_Backup_Admin_Test {
 	private $is_php_safemode = null;
 
 	/**
-	 * Functionality tests completed?
-	 *
-	 * @since 1.0
-	 * @access private
-	 * @var bool
-	 */
-	private $functionality_tested = false;
-
-	/**
 	 * Is functional?
 	 *
 	 * @since 1.0
@@ -489,6 +480,19 @@ class Boldgrid_Backup_Admin_Test {
 	}
 
 	/**
+	 * Determine whether or not php_zip is suppored.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return bool
+	 */
+	public function is_php_zip_supported() {
+		$php_zip = new Boldgrid_Backup_Admin_Compressor_Php_Zip( $this->core );
+
+		return $php_zip->test( false );
+	}
+
+	/**
 	 * Determine if this is a plesk environment.
 	 *
 	 * @since 1.5.1
@@ -510,63 +514,33 @@ class Boldgrid_Backup_Admin_Test {
 	 *
 	 * @since 1.0
 	 *
-	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
-	 *
 	 * @return bool
 	 */
 	public function run_functionality_tests() {
-		// If functionality tests were already performed, then just return status.
-		if ( $this->functionality_tested && null !== $this->is_functional ) {
+		if ( null !== $this->is_functional ) {
 			return $this->is_functional;
 		}
 
-		// Connect to the WordPress Filesystem API.
-		global $wp_filesystem;
-
-		// If not writable, then mark as not functional.
-		if ( ! $this->get_is_abspath_writable() ) {
-			$this->is_functional = false;
-		}
-
-		// Configure the backup directory path, or mark as not functional.
-		if ( ! $this->core->backup_dir->get() ) {
-			$this->is_functional = false;
-		}
-
-		// Get available compressors.
 		$available_compressors = $this->core->config->get_available_compressors();
+		$compressor = $this->core->compressors->get();
 
-		// Test for available compressors, and add them to the array, or mark as not functional.
-		if ( empty( $available_compressors ) ) {
+		if ( ! self::is_filesystem_supported() ) {
 			$this->is_functional = false;
-		}
-
-		if ( 'php_zip' === $this->core->compressors->get() ) {
-			$php_zip = new Boldgrid_Backup_Admin_Compressor_Php_Zip( $this->core );
-			if ( ! $php_zip->test( false ) ) {
-				$this->is_functional = false;
-			}
-		}
-
-		if ( 'pcl_zip' === $this->core->compressors->get() ) {
-			$pcl_zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this->core );
-			if ( ! $pcl_zip->test( false ) ) {
-				$this->is_functional = false;
-			}
-		}
-
-		// Test for PHP safe mode.
-		if ( $this->is_php_safemode() ) {
+		} elseif ( ! $this->get_is_abspath_writable() ) {
 			$this->is_functional = false;
-		}
-
-		// Save result, if not previously saved.
-		if ( null === $this->is_functional ) {
+		} elseif ( ! $this->core->backup_dir->get() ) {
+			$this->is_functional = false;
+		} elseif ( empty( $available_compressors ) ) {
+			$this->is_functional = false;
+		} elseif ( 'php_zip' === $compressor && ! $this->is_php_zip_supported() ) {
+			$this->is_functional = false;
+		} elseif ( 'pcl_zip' === $compressor && ! $this->is_pcl_zip_supported() ) {
+			$this->is_functional = false;
+		} elseif ( $this->is_php_safemode() ) {
+			$this->is_functional = false;
+		} else {
 			$this->is_functional = true;
 		}
-
-		// Mark as completed.
-		$this->functionality_tested = true;
 
 		return $this->is_functional;
 	}
@@ -823,6 +797,19 @@ class Boldgrid_Backup_Admin_Test {
 	}
 
 	/**
+	 * Determine whether pcl_zip is supported.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return bool
+	 */
+	public function is_pcl_zip_supported() {
+		$pcl_zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this->core );
+
+		return $pcl_zip->test( false );
+	}
+
+	/**
 	 * Determine if this server has cPanel EasyApache 4 with php-cli installed.
 	 *
 	 * @since 1.6.3
@@ -838,5 +825,32 @@ class Boldgrid_Backup_Admin_Test {
 		$has_php_cli = $this->core->wp_filesystem->exists( '/usr/local/bin/php' );
 
 		return $is_ea4 || $has_php_cli;
+	}
+
+	/**
+	 * Determine whether or not the current filesystem is supported.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @global object $wp_filesystem
+	 *
+	 * @return boolean
+	 */
+	public static function is_filesystem_supported() {
+		global $wp_filesystem;
+
+		$supported = true;
+
+		// Ensure that the WP Filesystem API is loaded.
+		if ( empty( $wp_filesystem ) ) {
+			require_once ABSPATH . '/wp-admin/includes/file.php';
+			WP_Filesystem();
+		}
+
+		if ( 'direct' !== get_filesystem_method() ) {
+			$supported = false;
+		}
+
+		return $supported;
 	}
 }
