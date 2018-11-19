@@ -959,7 +959,7 @@ class Boldgrid_Backup_Admin_Core {
 		global $submenu;
 
 		$lang = array(
-			'backup_archive'  => __( 'Backup Archive', 'boldgrid-backup' ),
+			'backup_archive'  => __( 'Backup Archives', 'boldgrid-backup' ),
 			'boldgrid_backup' => __( 'BoldGrid Backup', 'boldgrid-backup' ),
 			'get_premium'     => __( 'Get Premium', 'boldgrid-bacukp' ),
 			'preflight_check' => __( 'Preflight Check', 'boldgrid-backup' ),
