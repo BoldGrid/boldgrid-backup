@@ -126,12 +126,29 @@ class Boldgrid_Backup_Admin_Go_Pro {
 	 * @param  string $text Button text.
 	 * @return string
 	 */
-	public function get_premium_button( $url = 'https://www.boldgrid.com/update-backup', $text = 'Get Premium' ) {
+	public function get_premium_button( $url = null, $text = 'Get Premium' ) {
+		$url = ! empty( $url ) ? $url : $this->get_premium_url();
+
 		return sprintf(
 			'
 			<a href="%1$s" class="button button-success" target="_blank">%2$s</a>',
 			esc_url( $url ),
 			$text
 		);
+	}
+
+	/**
+	 * Get a "Get Premium" url.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param  string $source Source to append to url.
+	 * @param  string $url    URL address for the upgrade page.
+	 * @return string
+	 */
+	public function get_premium_url( $source = 'bgbkup', $url = 'https://www.boldgrid.com/update-backup' ) {
+		$url = add_query_arg( 'source', $source, $url );
+
+		return $url;
 	}
 }
