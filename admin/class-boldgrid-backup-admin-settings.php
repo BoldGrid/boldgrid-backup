@@ -668,6 +668,14 @@ class Boldgrid_Backup_Admin_Settings {
 			false
 		);
 
+		wp_enqueue_script(
+			'boldgrid-backup-admin-settings-autoupdate',
+			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-settings-autoupdate.js',
+			array( 'jquery' ),
+			BOLDGRID_BACKUP_VERSION,
+			false
+		);
+
 		// Enqueue JS for the toggles on the auto-updates section.
 		wp_enqueue_script(
 			'boldgrid-library-connect',
