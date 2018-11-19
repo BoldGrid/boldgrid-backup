@@ -157,8 +157,7 @@ wp_nonce_field( 'boldgrid_backup_settings' );
 
 	<hr />
 
-	<form id='schedule-form' method='post'>
-	<input type="hidden" name="section" value="<?php echo esc_attr( $show_section ); ?>" />
+	<form id='bgb-settings-form' method='post'>
 	<?php
 		echo $col_container; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 		wp_nonce_field( 'boldgrid-backup-settings', 'settings_auth' );

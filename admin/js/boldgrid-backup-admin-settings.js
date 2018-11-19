@@ -278,12 +278,6 @@ BoldGrid.Settings = function( $ ) {
 		$body.on( 'click', '#storage_locations .thickbox', self.on_click_provider );
 
 		$body.on( 'click', '#license_check_again', self.onClickCheckAgain );
-
-		$body.find( 'form#schedule-form' ).on( 'submit', function() {
-			$( this )
-				.find( 'input[name="section"]' )
-				.val( $body.find( '.bg-left-nav .active' ).data( 'section-id' ) );
-		} );
 	} );
 };
 
