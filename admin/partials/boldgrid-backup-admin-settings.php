@@ -16,22 +16,21 @@
 
 defined( 'WPINC' ) || die;
 
-$library_dir      = \Boldgrid\Library\Library\Configs::get( 'libraryDir' );
-$nav              = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
-$scheduler        = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/scheduler.php';
-$folders_include  = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/folders.php';
-$db               = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/db.php';
-$retention        = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/retention.php';
-$auto_rollback    = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/auto-rollback.php';
-$auto_updates     = include $library_dir . 'src/Library/Views/Connect/AutoUpdates.php';
-$update_channels  = include $library_dir . 'src/Library/Views/Connect/UpdateChannels.php';
-$notifications    = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/notifications.php';
-$backup_directory = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/backup-directory.php';
-$connect_key      = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/connect-key.php';
+$library_dir     = \Boldgrid\Library\Library\Configs::get( 'libraryDir' );
+$nav             = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
+$scheduler       = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/scheduler.php';
+$folders_include = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/folders.php';
+$db              = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/db.php';
+$auto_backup     = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/auto-backup.php';
+$auto_rollback   = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/auto-rollback.php';
+$auto_updates    = include $library_dir . 'src/Library/Views/Connect/AutoUpdates.php';
+$update_channels = include $library_dir . 'src/Library/Views/Connect/UpdateChannels.php';
+$notifications   = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/notifications.php';
+$connect_key     = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/connect-key.php';
+$days_of_week    = '';
+$time_of_day     = '';
+$storage         = '';
 
-$days_of_week = '';
-$time_of_day  = '';
-$storage      = '';
 if ( $this->core->scheduler->is_available( 'cron' ) || $this->core->scheduler->is_available( 'wp-cron' ) ) {
 	$days_of_week = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/days-of-week.php';
 	$time_of_day  = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/time-of-day.php';
@@ -43,27 +42,27 @@ $sections = array(
 		array(
 			'id'      => 'section_schedule',
 			'title'   => __( 'Backup Schedule', 'boldgrid-backup' ),
-			'content' => $scheduler . $days_of_week . $time_of_day . $storage . $folders_include . $db,
+			'content' => $days_of_week . $time_of_day . $scheduler,
+		),
+		array(
+			'id'      => 'section_storage',
+			'title'   => __( 'Backup Storage', 'boldgrid-backup' ),
+			'content' => $storage . $folders_include . $db,
 		),
 		array(
 			'id'      => 'connect_key',
-			'title'   => __( 'BoldGrid Connect Key', 'boldgrid-bacup' ),
+			'title'   => __( 'BoldGrid Connect Key', 'boldgrid-backup' ),
 			'content' => $connect_key,
 		),
 		array(
-			'id'      => 'section_retention',
-			'title'   => __( 'Retention', 'boldgrid-backup' ),
-			'content' => $retention,
+			'id'      => 'section_auto_updates',
+			'title'   => __( 'Auto Updates', 'boldgrid-backup' ),
+			'content' => $auto_backup . $auto_updates,
 		),
 		array(
 			'id'      => 'section_auto_rollback',
-			'title'   => __( 'Auto Backup and Rollback', 'boldgrid-backup' ),
+			'title'   => __( 'Manual Updates', 'boldgrid-backup' ),
 			'content' => $auto_rollback,
-		),
-		array(
-			'id'      => 'section_auto_updates',
-			'title'   => __( 'Auto-Updates', 'boldgrid-backup' ),
-			'content' => $auto_updates,
 		),
 		array(
 			'id'      => 'section_update_channels',
@@ -74,11 +73,6 @@ $sections = array(
 			'id'      => 'section_notifications',
 			'title'   => __( 'Notifications', 'boldgrid-backup' ),
 			'content' => $notifications,
-		),
-		array(
-			'id'      => 'section_directory',
-			'title'   => __( 'Backup Directory', 'boldgrid-backup' ),
-			'content' => $backup_directory,
 		),
 	),
 	'post_col_right' => sprintf(

@@ -161,8 +161,21 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 	 * Process the user's request to update their FTP settings.
 	 *
 	 * @since 1.6.0
+	 *
+	 * @return bool
 	 */
 	public function settings_save() {
+		$success = true;
+
+		if ( ! check_ajax_referer( 'bgb-settings-ftp', 'ftp_auth' ) ) {
+			do_action(
+				'boldgrid_backup_notice',
+				__( 'Unauthorized request.', 'boldgrid-backup' ),
+				'notice error is-dismissible'
+			);
+
+			return false;
+		}
 
 		// Readability.
 		$ftp = $this->core->ftp;
@@ -171,7 +184,7 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 			return false;
 		}
 
-		if ( empty( $_POST ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification, WordPress.Security.NonceVerification.NoNonceVerification
+		if ( empty( $_POST ) ) {
 			return false;
 		}
 
@@ -197,9 +210,12 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 
 		if ( ! empty( $ftp->errors ) ) {
 			do_action( 'boldgrid_backup_notice', implode( '<br /><br />', $ftp->errors ) );
+			$success = false;
 		} else {
 			update_site_option( 'boldgrid_backup_settings', $settings );
 			do_action( 'boldgrid_backup_notice', __( 'Settings saved.', 'boldgrid-backup' ), 'notice updated is-dismissible' );
 		}
+
+		return $success;
 	}
 }

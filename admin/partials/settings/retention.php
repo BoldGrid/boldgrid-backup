@@ -16,9 +16,15 @@
 
 defined( 'WPINC' ) || die;
 
-ob_start();
+// Get retention count setting.  Limit 1-99, default is from config.
+$retention_count = isset( $settings['retention_count'] ) && 99 >= $settings['retention_count'] ?
+	$settings['retention_count'] : $this->core->config->get_default_retention();
 
-$is_retention_set = ( isset( $settings['retention_count'] ) );
+if ( $retention_count > 99 ) {
+	$retention_count = 99;
+}
+
+ob_start();
 ?>
 
 <div class="bg-box">
@@ -26,40 +32,20 @@ $is_retention_set = ( isset( $settings['retention_count'] ) );
 		<?php esc_html_e( 'Retention', 'boldgrid-backup' ); ?>
 	</div>
 	<div class="bg-box-bottom">
-			<?php esc_html_e( 'Number of backup archives to retain', 'boldgrid-backup' ); ?>
-
-			<select id='retention-count' name='retention_count'>
-			<?php
-			// Loop through each <option> and print it.
-			for ( $x = 1; $x <= 10; $x ++ ) {
-				// Is retention set and $x = that set retention?
-				$x_is_retention = ( $is_retention_set && $x === $settings['retention_count'] );
-
-				// Is retention not set and $x = the default retention?
-				$x_is_default = ( ! $is_retention_set && $this->core->config->get_default_retention() === $x );
-
-				// Should this option be 'selected'?
-				$selected = ( ( $x_is_retention || $x_is_default ) ? ' selected' : '' );
-
-				// Should we flag this option as "Requires Upgrade"?
-				if ( ! $this->core->config->get_is_premium() && ( $this->core->config->get_default_retention() + 1 ) === $x ) {
-					$requires_upgrade = esc_html__( '- Requires Upgrade', 'boldgrid-backup' );
-				} else {
-					$requires_upgrade = '';
-				}
-
-				printf(
-					'<option value="%1$d" %2$s>%1$d</option>',
-					esc_attr( $x ),
-					esc_attr( $selected )
-				);
-			}
-			?>
-			</select>
+<table class='form-table'>
+	<tr>
+		<th><label for="retention_count">
+		<?php esc_html_e( 'Number of backup archives to retain', 'boldgrid-backup' ); ?> (1 - 99):
+		</label></th>
+		<td><input type="number" id='retention-count' name='retention_count' min="1" max="99"
+			value="<?php echo esc_attr( $retention_count ); ?>" required /></td>
+	</tr>
+</table>
 	</div>
 </div>
 
 <?php
 $output = ob_get_contents();
 ob_end_clean();
+
 return $output;

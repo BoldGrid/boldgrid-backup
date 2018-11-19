@@ -142,7 +142,7 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-core.php';
 
 		/**
-		 * The class responsible for the backup settings in the admin area.
+		 * The class responsible for the backup  in the admin area.
 		 */
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-settings.php';
 
@@ -423,6 +423,9 @@ class Boldgrid_Backup {
 		add_filter( 'Boldgrid\Library\Update\isEnalbed', '__return_true' );
 
 		$this->loader->add_filter( 'wp_ajax_boldgrid_backup_update_archive_details', $plugin_admin_core->archive_details, 'wp_ajax_update' );
+
+		$this->loader->add_action( 'admin_menu', $plugin_admin_core->local, 'add_submenus' );
+		$this->loader->add_action( 'wp_ajax_boldgrid_backup_is_setup_local', $plugin_admin_core->local, 'is_setup_ajax' );
 	}
 
 	/**

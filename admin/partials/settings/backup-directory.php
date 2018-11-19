@@ -25,7 +25,6 @@ ob_start();
 		<span class='dashicons dashicons-editor-help' data-id='backup-dir'></span>
 	</div>
 	<div class="bg-box-bottom">
-
 		<p class="help" data-id="backup-dir">
 			<?php
 			/*
@@ -50,11 +49,15 @@ ob_start();
 			);
 			?>
 		</p>
-
 		<table class='backup-directory form-table'>
 			<tr>
-				<th><?php esc_html_e( 'Directory to store backup archives', 'boldgrid-backup' ); ?>:</th>
-				<td><input id='backup-directory-path' type='text' size='40' name='backup_directory' value='<?php echo esc_attr( $settings['backup_directory'] ); ?>'></td>
+				<th><label for="backup_directory">
+					<?php esc_html_e( 'Directory to store backup archives', 'boldgrid-backup' ); ?>:
+				</label></th>
+				<td>
+					<input id='backup-directory-path' type='text' size='40' name='backup_directory'
+						value='<?php echo esc_attr( $settings['backup_directory'] ); ?>'>
+				</td>
 			</tr>
 			<tr id="move-backups" class="hidden">
 				<th><?php esc_html_e( 'If you change this directory, current backups will not show in the list. Would you like us to move the backups to the new directory?', 'boldgrid-backup' ); ?></th>

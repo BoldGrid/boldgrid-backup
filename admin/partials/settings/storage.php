@@ -19,13 +19,9 @@ defined( 'WPINC' ) || die;
 
 ob_start();
 
+// Add the web server storage details.
 $storage_locations = array(
-	array(
-		'title'    => __( 'Web Server', 'boldgrid-backup' ),
-		'key'      => 'local',
-		'is_setup' => true,
-		'enabled'  => ! empty( $settings['remote']['local']['enabled'] ) && true === $settings['remote']['local']['enabled'],
-	),
+	$this->core->local->get_webserver_details(),
 );
 
 /**

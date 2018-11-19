@@ -258,30 +258,6 @@ BoldGrid.Settings = function( $ ) {
 		}
 	};
 
-	/**
-	 * Handle click of the undismissBoldgridNotice link for the key prompt.
-	 *
-	 * @since 1.6.0
-	 */
-	self.undismissBoldgridNotice = function() {
-		var data, nonce, wpHttpReferer;
-
-		// Get the wpnonce and referer values.
-		nonce = $( '#set_key_auth' ).val();
-		wpHttpReferer = $( '[name="_wp_http_referer"]' ).val();
-
-		data = {
-			action: 'undismissBoldgridNotice',
-			notice: 'bg-key-prompt',
-			set_key_auth: nonce,
-			_wp_http_referer: wpHttpReferer
-		};
-
-		$.post( ajaxurl, data, function() {
-			location.reload();
-		} );
-	};
-
 	// Onload event listener.
 	$( function() {
 
@@ -302,9 +278,6 @@ BoldGrid.Settings = function( $ ) {
 		$body.on( 'click', '#storage_locations .thickbox', self.on_click_provider );
 
 		$body.on( 'click', '#license_check_again', self.onClickCheckAgain );
-
-		/** Reverse dismiss action for the Connect Key prompt **/
-		$( '.undismissBoldgridNotice' ).on( 'click', self.undismissBoldgridNotice );
 
 		$body.find( 'form#schedule-form' ).on( 'submit', function() {
 			$( this )

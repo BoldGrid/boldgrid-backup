@@ -17,15 +17,11 @@
 $selected      = 'selected="selected"';
 $ftp_selected  = 'ftp' === $data['type'] ? $selected : '';
 $sftp_selected = 'sftp' === $data['type'] ? $selected : '';
-
 ?>
-
 <form method="post">
-
+	<?php wp_nonce_field( 'bgb-settings-ftp', 'ftp_auth' ); ?>
 	<h1><?php esc_html_e( 'BoldGrid Backup - FTP Settings', 'boldgrid-backup' ); ?></h1>
-
 	<hr />
-
 	<table class="widefat fixed striped">
 		<tr>
 			<td>
@@ -81,7 +77,6 @@ $sftp_selected = 'sftp' === $data['type'] ? $selected : '';
 			<td></td>
 		</tr>
 	</table>
-
 	<p>
 	<?php
 	echo $this->core->lang['icon_warning']; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
@@ -91,12 +86,10 @@ $sftp_selected = 'sftp' === $data['type'] ? $selected : '';
 	);
 	?>
 	</p>
-
 	<p>
 		<input type="hidden" name="action" value="save" />
 		<input class="button button-primary" type="submit" value="<?php esc_attr_e( 'Save changes', 'boldgrid-backup' ); ?>" />
 		<button class="button button-secondary"><?php esc_html_e( 'Delete settings', 'boldgrid-backup' ); ?></button>
 		<span class="spinner inline middle hidden"></span>
 	</p>
-
 </form>

@@ -157,13 +157,23 @@ class Boldgrid_Backup_Admin_Settings {
 			}
 
 			// Other settings.
-			$settings['auto_backup']   = (
+			$settings['auto_backup'] = (
 				! isset( $settings['auto_backup'] ) || ! empty( $settings['auto_backup'] ) ? 1 : 0
 			);
+
 			$settings['auto_rollback'] = (
 				! isset( $settings['auto_rollback'] ) || ! empty( $settings['auto_rollback'] ) ?
 				1 : 0
 			);
+
+			// Get retention count setting.  Limit 1-99, default is from config.
+			$settings['retention_count'] = ( isset( $settings['retention_count'] ) &&
+				99 >= $settings['retention_count'] ) ?
+				$settings['retention_count'] : $this->core->config->get_default_retention();
+
+			if ( $settings['retention_count'] > 99 ) {
+				$settings['retention_count'] = 99;
+			}
 		} else {
 			// Define defaults.
 			// Days of the week.
@@ -181,7 +191,7 @@ class Boldgrid_Backup_Admin_Settings {
 			$settings['schedule']['tod_a'] = 'AM';
 
 			// Other settings.
-			$settings['retention_count']          = 5;
+			$settings['retention_count']          = $this->core->config->get_default_retention();
 			$settings['notification_email']       = $this->core->config->get_admin_email();
 			$settings['notifications']['backup']  = 1;
 			$settings['notifications']['restore'] = 1;
@@ -265,13 +275,6 @@ class Boldgrid_Backup_Admin_Settings {
 					'error' => __( 'Security violation! Please try again.', 'boldgrid-backup' ),
 				)
 			);
-		}
-
-		// Get the retention count.
-		if ( isset( $_POST['retention_count'] ) ) {
-			$retention_count = intval( $_POST['retention_count'] );
-		} else {
-			$retention_count = $this->core->config->get_default_retention();
 		}
 
 		// Check for settings update.
@@ -380,10 +383,6 @@ class Boldgrid_Backup_Admin_Settings {
 			}
 
 			// Validate input for other settings.
-			$settings['retention_count'] = (
-				isset( $_POST['retention_count'] ) ? (int) $_POST['retention_count'] : 5
-			);
-
 			$settings['notifications']['backup'] = (
 				( isset( $_POST['notify_backup'] ) && '1' === $_POST['notify_backup'] ) ? 1 : 0
 			);
@@ -404,76 +403,6 @@ class Boldgrid_Backup_Admin_Settings {
 			if ( isset( $settings['notification_email'] ) &&
 			sanitize_email( $_POST['notification_email'] ) !== $settings['notification_email'] ) {
 				$settings['notification_email'] = sanitize_email( $_POST['notification_email'] );
-			}
-
-			// Get the current backup directory path.
-			$backup_dir_changed        = false;
-			$original_backup_directory = ! empty( $settings['backup_directory'] ) ? $settings['backup_directory'] : false;
-
-			if ( ! empty( $_POST['backup_directory'] ) ) {
-				$post_backup_directory = trim( $_POST['backup_directory'] );
-				$post_backup_directory = untrailingslashit( $post_backup_directory );
-				$post_backup_directory = str_replace( '\\\\', '\\', $post_backup_directory );
-			}
-
-			/*
-			 * Create the backup directory.
-			 *
-			 * Allow the user to submit a blank backup directory if they want
-			 * to set the backup directory to the default.
-			 */
-			if ( empty( $_POST['backup_directory'] ) ) {
-				// The get method validates and creates the backup directory.
-				$backup_directory = $this->core->backup_dir->guess_and_set();
-
-				$backup_dir_changed = $original_backup_directory !== $backup_directory;
-			} elseif ( $post_backup_directory !== $original_backup_directory ) {
-				$backup_directory = $post_backup_directory;
-
-				/*
-				 * Create the backup directory.
-				 *
-				 * Even if the backup directory already exists, we still want to
-				 * run the create method so that the necessary .htaccess and other
-				 * files are created to protect the directory.
-				 */
-				$backup_directory = $this->core->backup_dir->create( $backup_directory );
-
-				// Make sure that the backup directory has proper permissions.
-				$valid = $this->core->backup_dir->is_valid( $backup_directory );
-				if ( ! $valid ) {
-					$backup_directory = false;
-				}
-
-				$backup_dir_changed = true;
-			}
-
-			if ( $backup_dir_changed ) {
-				if ( false === $backup_directory ) {
-					$update_error       = true;
-					$backup_dir_changed = false;
-					$update_errors      = array_merge( $update_errors, $this->core->backup_dir->errors );
-				} else {
-					$settings['backup_directory'] = $backup_directory;
-				}
-			}
-
-			// Move backups to the new directory.
-			if ( $backup_dir_changed && isset( $_POST['move-backups'] ) && 'on' === $_POST['move-backups'] ) {
-				$backups_moved = $this->move_backups( $original_backup_directory, $backup_directory );
-
-				if ( ! $backups_moved ) {
-					$update_error    = true;
-					$update_errors[] = sprintf(
-						// translators: 1: Original backup directory, 2: New backup directory.
-						__(
-							'Unable to move backups from %1$s to %2$s',
-							'boldgrid-backup'
-						),
-						$original_backup_directory,
-						$backup_directory
-					);
-				}
 			}
 
 			/*
@@ -719,9 +648,7 @@ class Boldgrid_Backup_Admin_Settings {
 
 		// Check for settings update.
 		if ( $this->is_saving_settings ) {
-			// Verify nonce.
-			check_admin_referer( 'boldgrid-backup-settings', 'settings_auth' );
-
+			// The nonce is verified in the update_settings method.
 			$this->update_settings();
 		}
 
@@ -792,12 +719,6 @@ class Boldgrid_Backup_Admin_Settings {
 	 * @return bool True on success.
 	 */
 	public function save( $settings ) {
-
-		// For consistency, untrailingslashit the backup dir.
-		if ( isset( $settings['backup_directory'] ) ) {
-			$settings['backup_directory'] = untrailingslashit( $settings['backup_directory'] );
-		}
-
 		return update_site_option( 'boldgrid_backup_settings', $settings );
 	}
 }
