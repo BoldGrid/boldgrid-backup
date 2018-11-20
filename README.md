@@ -4,7 +4,7 @@
 **Requires at least:** 4.4
 **Tested up to:** 5.0.0
 **Requires PHP:** 5.3
-**Stable tag:** 1.6.6
+**Stable tag:** 1.7.0
 **License:** GPLv2 or later
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,6 +21,7 @@ WordPress backup and restoration with update protection.
 * PHP 5.3 or higher
 * At least one of the following PHP execution functions enabled: "popen", "proc_open", "exec", "shell_exec", "passthru", or "system".
 * A Cron system with the "crontab" utility, or WP Cron.
+* A WP_Filesystem FS_METHOD being "direct".
 
 ### Manually ###
 1. Upload the entire boldgrid-backup folder to the /wp-content/plugins/ directory.
@@ -28,7 +29,9 @@ WordPress backup and restoration with update protection.
 
 ## Changelog ##
 
-### 1.7.0 In progress ###
+### 1.7.0 ###
+
+Release date: Nov 20th, 2018
 
 * New feature: Added auto-update settings for individual plugins and themes.
 * New feature: Added limited-lifetime download links for archive files.
