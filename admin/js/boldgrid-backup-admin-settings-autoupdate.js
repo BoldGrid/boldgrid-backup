@@ -96,9 +96,15 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 					.val( $this.data( 'toggles' ).active ? 1 : 0 );
 			} );
 
-			$pluginsDefault.next( 'input' ).val( $pluginsDefault.data( 'toggles' ).active ? 1 : 0 );
+			$pluginsDefault
+				.parent()
+				.next( 'input' )
+				.val( $pluginsDefault.data( 'toggles' ).active ? 1 : 0 );
 
-			$themesDefault.next( 'input' ).val( $themesDefault.data( 'toggles' ).active ? 1 : 0 );
+			$themesDefault
+				.parent()
+				.next( 'input' )
+				.val( $themesDefault.data( 'toggles' ).active ? 1 : 0 );
 		},
 
 		/**
