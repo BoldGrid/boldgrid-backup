@@ -654,6 +654,9 @@ class Boldgrid_Backup_Admin_Test {
 			'has_url_fopen' => false,
 		);
 
+		// Set a file path for the cli-support script output.
+		$filepath = wp_normalize_path( $this->core->backup_dir->get() . '/cli-support.txt' );
+
 		// Configure an array of commands to run.
 		$cmds = array(
 			'php -qf ' . trailingslashit( BOLDGRID_BACKUP_PATH ) . 'cron/cli-support.php',
@@ -671,9 +674,13 @@ class Boldgrid_Backup_Admin_Test {
 
 		// Find a command that gives us an array.
 		foreach ( $cmds as $cmd ) {
-			$result = $this->core->execute_command( $cmd );
+			$this->core->execute_command( $cmd, array(), $null, $null, $filepath );
 
-			$result = json_decode( $result, true );
+			preg_match( '/{.*}/', $this->core->wp_filesystem->get_contents( $filepath ), $matches );
+
+			$result = is_array( $matches ) ? json_decode( $matches[0], true ) : null;
+
+			$this->core->wp_filesystem->delete( $filepath );
 
 			if ( ! is_array( $result ) ) {
 				continue;

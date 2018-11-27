@@ -752,13 +752,14 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @since 1.0
 	 *
-	 * @param string $command A command string to be executed.
-	 * @param array  $available_exec_functions An array of available execution functions.
-	 * @param bool   $success or failure of the operation, passed back to the caller.
-	 * @param int    $return_var If present, the return_var, passed back to the caller.
+	 * @param  string $command                  A command string to be executed.
+	 * @param  array  $available_exec_functions An array of available execution functions.
+	 * @param  bool   $success                  Success or failure of the operation, passed back.
+	 * @param  int    $return_var               If present, the return_var, passed back.
+	 * @param  string $filepath                 An optional file path to write the output.
 	 * @return string|bool Returns the command output or FALSE on error.
 	 */
-	public function execute_command( $command, $available_exec_functions = array(), &$success = false, &$return_var = 0 ) {
+	public function execute_command( $command, $available_exec_functions = array(), &$success = false, &$return_var = 0, $filepath = null ) {
 		// If no command was passed, then fail.
 		if ( empty( $command ) ) {
 			return false;
@@ -767,6 +768,11 @@ class Boldgrid_Backup_Admin_Core {
 		// If there are no supplied execution functions, then retrieve available ones.
 		if ( empty( $available_exec_functions ) ) {
 			$available_exec_functions = $this->get_execution_functions();
+		}
+
+		// If an output filepath is supplied, and the directory is writable, then write to file.
+		if ( $filepath && $this->wp_filesystem->is_writable( dirname( $filepath ) ) ) {
+			$command .= ' > ' . wp_normalize_path( $filepath );
 		}
 
 		// Disable stderr.
