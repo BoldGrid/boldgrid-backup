@@ -37,13 +37,14 @@ defined( 'WPINC' ) || die;
 $nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
 
 // Premium advertisement on the bottom of the archives page.
-$ad = $this->config->is_premium_done ? '' : sprintf(
+$premium_url = $this->go_pro->get_premium_url( 'bgbkup-archives-bottom' );
+$ad          = $this->config->is_premium_done ? '' : sprintf(
 	'
 	<div class="bg-box-bottom premium wp-clearfix">
 		%1$s
 		%2$s
 	</div>',
-	$this->go_pro->get_premium_button(),
+	$this->go_pro->get_premium_button( $premium_url ),
 	$this->lang['want_to']
 );
 

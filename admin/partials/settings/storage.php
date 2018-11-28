@@ -41,6 +41,7 @@ $storage_locations = array(
  */
 $storage_locations = apply_filters( 'boldgrid_backup_register_storage_location', $storage_locations );
 
+$premium_url = $this->core->go_pro->get_premium_url( 'bgbkup-settings-storage' );
 $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 	'
 	<div class="bg-box-bottom premium">
@@ -52,7 +53,7 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 		</p>
 	</div>',
 	/* 1 */ __( 'Amazon S3', 'boldgrid-backup' ),
-	/* 2 */ $this->core->go_pro->get_premium_button(),
+	/* 2 */ $this->core->go_pro->get_premium_button( $premium_url ),
 	/* 3 */ __( 'Upgrade to premium for more Storage Locations!', 'boldgrid-backup' )
 );
 

@@ -153,6 +153,7 @@ $main_meta_box = sprintf(
 	/* 8 */ $protect
 );
 
+$premium_url     = $this->core->go_pro->get_premium_url( 'bgbkup-archive-storage' );
 $remote_meta_box = sprintf(
 	'
 	<div class="postbox remote-storage">
@@ -174,7 +175,7 @@ $remote_meta_box = sprintf(
 			%1$s
 			%2$s
 		</div>',
-		/* 1 */ $this->core->go_pro->get_premium_button(),
+		/* 1 */ $this->core->go_pro->get_premium_button( $premium_url ),
 		/* 2 */ __( 'Upgrade to <strong>BoldGrid Backup Premium</strong> for more Storage Locations!', 'boldgrid-backup' )
 	),
 	/* 4 */ __( 'Secure your backups by keeping copies of them on <a href="admin.php?page=boldgrid-backup-tools&section=section_locations">remote storage</a>.', 'boldgrid-backup' )
@@ -197,7 +198,8 @@ $editor_tools = sprintf(
 	/* 3 */ __( 'Database', 'boldgrid-backup' )
 );
 
-$intro = $this->core->config->is_premium_done ? '' : sprintf(
+$premium_url = $this->core->go_pro->get_premium_url( 'bgbkup-archive-browser' );
+$intro       = $this->core->config->is_premium_done ? '' : sprintf(
 	'
 	<div class="bg-box-bottom premium" style="margin-bottom:15px;">
 		<strong>%1$s</strong>
@@ -207,7 +209,7 @@ $intro = $this->core->config->is_premium_done ? '' : sprintf(
 		</p>
 	</div>',
 	/* 1 */ __( 'One click file restorations', 'boldgrid-backup' ),
-	/* 2 */ $this->core->go_pro->get_premium_button(),
+	/* 2 */ $this->core->go_pro->get_premium_button( $premium_url ),
 	/* 3 */ __( 'Please note that most functionality for the Archive Browser, such as one click file restorations, is contained within the Premium version. For help with restoring a single file without this one click feature, please <a href="https://www.boldgrid.com/support" target="_blank">click here</a>.', 'boldgrid-backup' )
 );
 

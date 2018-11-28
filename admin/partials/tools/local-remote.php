@@ -179,13 +179,14 @@ printf(
 echo '</p>';
 
 if ( ! $this->core->config->is_premium_done ) {
+	$premium_url = $this->core->go_pro->get_premium_url( 'bgbkup-tools-faq-storage' );
 	printf(
 		'
 		<div class="bg-box-bottom premium wp-clearfix">
 			%1$s
 			%2$s
 		</div>',
-		$this->core->go_pro->get_premium_button(), // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+		$this->core->go_pro->get_premium_button( $premium_url ), // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 		sprintf(
 			// translators: 1: HTML strong open tag, 2: HTML strong close tag, 3: HTML em open tag, 4: HTML em close tag.
 			esc_html__(
