@@ -31,7 +31,7 @@ WordPress backup and restoration with update protection.
 
 = 1.7.0-rc.2 =
 
-I Bug fix:     Fixed CLI support detection on some EA4 servers.
+* Bug fix:     Fixed CLI support detection on some EA4 servers.
 
 = 1.7.0-rc.1 =
 
