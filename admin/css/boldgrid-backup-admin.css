@@ -109,8 +109,8 @@ hr.separator-small {
 }
 
 /* Get Premium link in the left nav. */
-.toplevel_page_boldgrid-backup-settings .get-premium,
-.toplevel_page_boldgrid-backup-settings .dashicons-dashboard {
+#adminmenu [class*=boldgrid-backup] .get-premium,
+#adminmenu [class*=boldgrid-backup] .dashicons-dashboard {
 	color: #ffb900;
 }
 

@@ -91,7 +91,7 @@ class Boldgrid_Backup_Admin_Go_Pro {
 				'message' => '<p>' . sprintf(
 					// translators: 1: URL address for the upgrade page.
 					__( 'Thank you for activating the <strong>BoldGrid Backup Premium Extension</strong>! Before you can begin using all of the premium features, you must <a href="%2$s">add your premium key</a>. If you are using an Official BoldGrid Host, contact them or login to their management system to retrieve your Premium key. Otherwise, please visit <a href="%1$s" target="_blank">BoldGrid Central</a> to upgrade.', 'boldgrid-backup' ),
-					self::$url,
+					$this->get_premium_url( 'bgbkup-premium-activate' ),
 					admin_url( 'admin.php?page=boldgrid-backup-settings&section=connect_key' )
 				) . '</p>',
 			),
