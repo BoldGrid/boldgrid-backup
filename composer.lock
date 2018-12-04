@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "boldgrid/library",
-            "version": "2.7.2",
+            "version": "2.7.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BoldGrid/library.git",
-                "reference": "dd137210587acbd8f34c74a148032da3ab468e83"
+                "reference": "59aa87fcf2cab210e605b922e0e12c7d897d01d5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BoldGrid/library/zipball/dd137210587acbd8f34c74a148032da3ab468e83",
-                "reference": "dd137210587acbd8f34c74a148032da3ab468e83",
+                "url": "https://api.github.com/repos/BoldGrid/library/zipball/59aa87fcf2cab210e605b922e0e12c7d897d01d5",
+                "reference": "59aa87fcf2cab210e605b922e0e12c7d897d01d5",
                 "shasum": ""
             },
             "type": "library",
@@ -53,7 +53,7 @@
                 }
             ],
             "description": "The BoldGrid Library for shared code used in official BoldGrid plugins and themes.",
-            "time": "2018-11-26T15:53:09+00:00"
+            "time": "2018-12-04T19:41:29+00:00"
         },
         {
             "name": "cbschuld/browser.php",
