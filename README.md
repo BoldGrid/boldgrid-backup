@@ -29,13 +29,9 @@ WordPress backup and restoration with update protection.
 
 ## Changelog ##
 
-### 1.7.0-rc.2 ###
+### 1.7.0 ###
 
-* Bug fix:     Fixed CLI support detection on some EA4 servers.
-
-### 1.7.0-rc.1 ###
-
-Release date: Nov 20th, 2018
+Release date: Dec 4th, 2018
 
 * New feature: Added auto-update settings for individual plugins and themes.
 * New feature: Added limited-lifetime download links for archive files.
@@ -49,6 +45,7 @@ Release date: Nov 20th, 2018
 * Bug fix:     Some HTML was caught in translations.
 * Bug fix:     Duplicate emails were sent when a backup was complete, fixed.
 * Bug fix:     Preserve timestamp on ftp / sftp uploads.
+* Bug fix:     Fixed CLI support detection on some EA4 servers.
 * Update:      Save settings and reload to the current section.
 * Update:      Reorganized settings sections.
 
