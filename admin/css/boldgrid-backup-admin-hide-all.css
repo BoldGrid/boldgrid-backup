@@ -4,21 +4,26 @@
 * This set of styles hides everything on the page except for what the plugin
 * displays. This helps make the page look better in an iframe / modal.
 */
+
+.update-nag,
 #adminmenumain,
 #wpadminbar,
 #wpfooter {
 	display: none;
 }
+
 #wpwrap {
 	position: absolute;
 	top: 0px;
 	left: 0px;
 }
+
 #wpwrap #wpcontent {
 	margin: 0px; !important;
 	padding-left: 10px; !important;
 	padding-right: 10px; !important;
 }
+
 #wpbody-content {
 	padding-bottom: 0px;
 }
