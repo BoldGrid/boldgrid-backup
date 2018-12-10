@@ -91,7 +91,7 @@ class Boldgrid_Backup_Admin_Support {
 	/**
 	 * Verify compatible PHP version.
 	 *
-	 * @vsince 1.7.1
+	 * @since 1.7.1
 	 *
 	 * @return bool
 	 */
@@ -144,5 +144,6 @@ class Boldgrid_Backup_Admin_Support {
 			return false;
 		}
 
+		return true;
 	}
 }
