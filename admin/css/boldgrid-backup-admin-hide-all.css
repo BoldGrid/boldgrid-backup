@@ -5,8 +5,10 @@
 * displays. This helps make the page look better in an iframe / modal.
 */
 
+.boldgrid-backup-in-progress,
 .update-nag,
 #adminmenumain,
+[id$="-tgmpa"],
 #wpadminbar,
 #wpfooter {
 	display: none;

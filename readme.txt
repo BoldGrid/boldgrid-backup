@@ -32,6 +32,7 @@ WordPress backup and restoration with update protection.
 = 1.7.1 In progress =
 
 * Update:      Added PHP version to compatibility checks.
+* Bug fix:     Hide certain update notices in storage configuration modal.
 
 = 1.7.0 =
 
