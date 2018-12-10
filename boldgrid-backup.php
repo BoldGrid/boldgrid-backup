@@ -81,21 +81,16 @@ function run_boldgrid_backup() {
  *
  * @since 1.6.0
  *
+ * @see Boldgrid_Backup_Admin_Support::run_tests()
+ *
  * @return bool
  */
 function load_boldgrid_backup() {
 	require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-support.php';
-	$support = new Boldgrid_Backup_Admin_Support();
+	$support      = new Boldgrid_Backup_Admin_Support();
+	$tests_passed = $support->run_tests();
 
-	if ( ! $support->has_composer_installed() ) {
-		$error = __( 'The vendor folder is missing. Please run "composer install", or contact your host for further assistance.', 'boldgrid-backup' );
-		$support->deactivate( $error );
-		return false;
-	}
-
-	if ( ! $support->has_been_built() ) {
-		$error = __( 'The "build" folder is missing. Please run "yarn install" and "gulp", or contact your host for further assistance.', 'boldgrid-backup' );
-		$support->deactivate( $error );
+	if ( ! $tests_passed ) {
 		return false;
 	}
 
@@ -131,12 +126,9 @@ function load_boldgrid_backup() {
  * Run the plugin only if on a wp-admin page or when DOING_CRON.
  */
 if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) || defined( 'WP_CLI' ) && WP_CLI ) {
-
 	// If we could not load boldgrid_backup (missing system requirements), abort.
-	if ( ! load_boldgrid_backup() ) {
-		return;
+	if ( load_boldgrid_backup() ) {
+		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup.php';
+		run_boldgrid_backup();
 	}
-
-	require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup.php';
-	run_boldgrid_backup();
 }
