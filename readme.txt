@@ -29,6 +29,10 @@ WordPress backup and restoration with update protection.
 
 == Changelog ==
 
+= 1.7.1 In progress =
+
+* Update:      Added PHP version to compatibility checks.
+
 = 1.7.0 =
 
 Release date: Dec 4th, 2018
