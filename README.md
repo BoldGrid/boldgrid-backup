@@ -2,9 +2,9 @@
 **Contributors:** boldgrid, joemoto, imh_brad, rramo012, timph, bgnicolepaschen
 **Tags:** boldgrid, backup, restore, migrate, migration
 **Requires at least:** 4.4
-**Tested up to:** 5.0.0
+**Tested up to:** 5.0.1
 **Requires PHP:** 5.4
-**Stable tag:** 1.7.0
+**Stable tag:** 1.7.1
 **License:** GPLv2 or later
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -29,7 +29,9 @@ WordPress backup and restoration with update protection.
 
 ## Changelog ##
 
-### 1.7.1 In progress ###
+### 1.7.1 ###
+
+Release date: Dec 18th, 2018
 
 * Update:      Added PHP version to compatibility checks.
 * Bug fix:     Hide certain update notices in storage configuration modal.
