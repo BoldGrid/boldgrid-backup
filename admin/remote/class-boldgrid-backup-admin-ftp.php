@@ -143,6 +143,15 @@ class Boldgrid_Backup_Admin_Ftp {
 	public $retention_count = 5;
 
 	/**
+	 * Settings class.
+	 *
+	 * @since 1.7.2
+	 * @access public
+	 * @var Boldgrid_Backup_Admin_Remote_Settings
+	 */
+	public $settings;
+
+	/**
 	 * Default timeout.
 	 *
 	 * @since 1.6.0
@@ -209,9 +218,10 @@ class Boldgrid_Backup_Admin_Ftp {
 	public function __construct( $core ) {
 		include_once BOLDGRID_BACKUP_PATH . '/vendor/phpseclib/phpseclib/phpseclib/Net/SFTP.php';
 
-		$this->core  = $core;
-		$this->hooks = new Boldgrid_Backup_Admin_Ftp_Hooks( $core );
-		$this->page  = new Boldgrid_Backup_Admin_Ftp_Page( $core );
+		$this->core     = $core;
+		$this->hooks    = new Boldgrid_Backup_Admin_Ftp_Hooks( $core );
+		$this->page     = new Boldgrid_Backup_Admin_Ftp_Page( $core );
+		$this->settings = new Boldgrid_Backup_Admin_Remote_Settings( $this->key );
 	}
 
 	/**
@@ -611,9 +621,12 @@ class Boldgrid_Backup_Admin_Ftp {
 	 * Get settings.
 	 *
 	 * @since 1.6.0
+	 *
+	 * @param bool $try_cache Whether or not to use last_login to validate the ftp account. Please
+	 *                        see param definition in $this->is_setup().
 	 */
-	public function get_details() {
-		$is_setup = $this->is_setup();
+	public function get_details( $try_cache = false ) {
+		$is_setup = $this->is_setup( $try_cache );
 
 		$settings = $this->core->settings->get_settings();
 
@@ -691,9 +704,19 @@ class Boldgrid_Backup_Admin_Ftp {
 	 *
 	 * @since 1.6.0
 	 *
+	 * @param  bool $try_cache Whether or not to use the last_login value to determine if we are
+	 *                         setup. For example, if $try_cache and we logged in an hour ago, no
+	 *                         need to try to connect and log in again, we logged in an hour ago so
+	 *                         assume all is still good.
 	 * @return bool
 	 */
-	public function is_setup() {
+	public function is_setup( $try_cache = false ) {
+
+		// If successfully logged in within last 24 hours, return true.
+		if ( $try_cache && $this->settings->is_last_login_valid() ) {
+			return true;
+		}
+
 		$this->connect();
 		$this->log_in();
 
@@ -828,6 +851,8 @@ class Boldgrid_Backup_Admin_Ftp {
 			$this->disconnect();
 		} else {
 			$this->maybe_passive();
+
+			$this->settings->set_last_login();
 		}
 	}
 

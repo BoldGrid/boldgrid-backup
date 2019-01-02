@@ -210,6 +210,7 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/remote/class-boldgrid-backup-admin-ftp.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/remote/class-boldgrid-backup-admin-ftp-hooks.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/remote/class-boldgrid-backup-admin-ftp-page.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/remote/class-boldgrid-backup-admin-remote-settings.php';
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-go-pro.php';
 
@@ -428,6 +429,8 @@ class Boldgrid_Backup {
 
 		$this->loader->add_action( 'admin_menu', $plugin_admin_core->local, 'add_submenus' );
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_is_setup_local', $plugin_admin_core->local, 'is_setup_ajax' );
+
+		$this->loader->add_filter( 'boldgrid_backup_get_core', $plugin_admin_core, 'get_core' );
 	}
 
 	/**

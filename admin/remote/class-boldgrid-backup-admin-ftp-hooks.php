@@ -165,7 +165,7 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 	 * @param array $storage_locations Storage locations.
 	 */
 	public function register_storage_location( $storage_locations ) {
-		$storage_locations[] = $this->core->ftp->get_details();
+		$storage_locations[] = $this->core->ftp->get_details( true );
 
 		return $storage_locations;
 	}
