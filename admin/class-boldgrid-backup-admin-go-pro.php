@@ -72,6 +72,8 @@ class Boldgrid_Backup_Admin_Go_Pro {
 
 		$is_premium = $this->core->config->get_is_premium();
 
+		$premium_plugin = new \Boldgrid\Library\Library\Plugin\Plugin( 'boldgrid-backup-premium' );
+
 		$notices = array(
 			array(
 				'id'      => 'boldgrid_backup_activate_premium',
@@ -99,12 +101,13 @@ class Boldgrid_Backup_Admin_Go_Pro {
 				'id'      => 'boldgrid_backup_download_premium',
 				'show'    => $is_premium && ! $this->core->config->is_premium_installed,
 				'message' => '<p>' . sprintf(
-					// translators: 1: URL address for BoldGrid Central.
+					// translators: 1: URL address to download the BoldGrid Backup Premium plugin 2: URL to plugin-installer.php
 					__(
-						'Hello there! We see that you have a <strong>Premium BoldGrid Connect Key</strong> and you have the <strong>BoldGrid Backup Plugin</strong> activated! Be sure to download the <strong>BoldGrid Backup Premium Extension</strong> from <a href="%1$s">BoldGrid Central</a> to gain access to more features!',
+						'Hello there! We see that you have a <strong>Premium BoldGrid Connect Key</strong> and you have the <strong>BoldGrid Backup Plugin</strong> activated! <a href="%1$s">Click here</a> to download the <strong>BoldGrid Backup Premium Extension</strong> and gain access to more features! After the download completes, go to <a href="%2$s">Plugins &raquo; Add New</a> and click the <em>Upload Plugin</em> button at the top of the page to upload your new plugin.',
 						'boldgrid-backup'
 					),
-					'https://www.boldgrid.com/central'
+					$premium_plugin->getDownloadUrl(),
+					admin_url( 'plugin-install.php' )
 				) . '</p>',
 			),
 		);

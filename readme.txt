@@ -29,6 +29,10 @@ WordPress backup and restoration with update protection.
 
 == Changelog ==
 
+= 1.7.2 =
+
+* Update:      Improve journey for downloading premium plugin.
+
 = 1.7.1 =
 
 Release date: Dec 18th, 2018
