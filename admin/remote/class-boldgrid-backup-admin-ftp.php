@@ -722,8 +722,6 @@ class Boldgrid_Backup_Admin_Ftp {
 
 		$logged_in = $this->logged_in;
 
-		$this->disconnect();
-
 		return $logged_in;
 	}
 
@@ -846,10 +844,7 @@ class Boldgrid_Backup_Admin_Ftp {
 				break;
 		}
 
-		// If we tried to login and it failed, disconnect.
-		if ( ! $this->logged_in ) {
-			$this->disconnect();
-		} else {
+		if ( $this->logged_in ) {
 			$this->maybe_passive();
 
 			$this->settings->set_last_login();
@@ -964,7 +959,6 @@ class Boldgrid_Backup_Admin_Ftp {
 		if ( ! $uploaded ) {
 			$last_error = error_get_last();
 
-			$this->disconnect();
 			$this->errors[] = __( 'Unable to upload file.', 'boldgrid-backup' );
 
 			/*
@@ -980,8 +974,6 @@ class Boldgrid_Backup_Admin_Ftp {
 		}
 
 		$this->enforce_retention();
-
-		$this->disconnect();
 
 		return true;
 	}

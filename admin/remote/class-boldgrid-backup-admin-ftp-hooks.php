@@ -192,6 +192,18 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 	}
 
 	/**
+	 * Hook into WordPress' shutdown action and close any open FTP connections.
+	 *
+	 * Closing the connections now, rather than when we're done with a specific ftp action, will
+	 * eliminate numerous ftp connections being opened on a single admin page.
+	 *
+	 * @since 1.7.2
+	 */
+	public function shutdown() {
+		$this->core->ftp->disconnect();
+	}
+
+	/**
 	 * Upload a file (triggered by jobs queue).
 	 *
 	 * The jobs queue will call this method to upload a file.
