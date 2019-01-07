@@ -684,6 +684,19 @@ class Boldgrid_Backup_Admin_Core {
 	}
 
 	/**
+	 * Get core.
+	 *
+	 * Callable via the boldgrid_backup_get_core filter.
+	 *
+	 * @since 1.7.2
+	 *
+	 * @return Boldgrid_Backup_Admin_Core object.
+	 */
+	public function get_core() {
+		return $this;
+	}
+
+	/**
 	 * Initialize the premium version of the plugin.
 	 *
 	 * @since 1.5.2
