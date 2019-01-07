@@ -202,6 +202,8 @@ class Boldgrid_Backup_Admin_Archive_Details {
 			foreach ( $_POST['attributes'] as $key => $value ) { // phpcs:ignore WordPress.CSRF.NonceVerification
 				$this->core->archive->set_attribute( $key, stripslashes( $value ) );
 			}
+
+			$this->core->activity->add( 'update_archive_attributes', 1, $this->core->rating_prompt_config );
 		}
 
 		wp_send_json_success();
