@@ -2,9 +2,9 @@
 **Contributors:** boldgrid, joemoto, imh_brad, rramo012, timph, bgnicolepaschen
 **Tags:** boldgrid, backup, restore, migrate, migration
 **Requires at least:** 4.4
-**Tested up to:** 5.0.1
+**Tested up to:** 5.0.2
 **Requires PHP:** 5.4
-**Stable tag:** 1.7.1
+**Stable tag:** 1.8.0
 **License:** GPLv2 or later
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -29,6 +29,14 @@ WordPress backup and restoration with update protection.
 
 ## Changelog ##
 
+### 1.8.0 In progress ###
+
+* New feature: Added emergency restoration process.
+
+### 1.7.2 ###
+
+* Update:      Improve journey for downloading premium plugin.
+
 ### 1.7.1 ###
 
 Release date: Dec 18th, 2018
@@ -45,7 +53,7 @@ Release date: Dec 4th, 2018
 * New feature: Added import backup archive from URL address.
 * New feature: Added progress bar to show status of backups.
 * New feature: Adding the ability to set and title and description to a backup.
-* New feature: Adding the ability to flag a backup as being proteced (excluded from retention).
+* New feature: Adding the ability to flag a backup as being protected (excluded from retention).
 * Update:      Update protection is now valid for 1 hour after a full backup from the WordPress Updates or Plugins page.
 * Update:      Made the Backup Archives page the default page in the admin menu.
 * Bug fix:     Set a default backup directory if path in settings is not valid.  Remove filters before fixing home and siteurl on restore.

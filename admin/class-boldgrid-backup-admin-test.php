@@ -861,4 +861,35 @@ class Boldgrid_Backup_Admin_Test {
 
 		return $supported;
 	}
+
+	/**
+	 * Save test information to a results JSON file.
+	 *
+	 * The emergency restoration process will read the test results JSON file.
+	 * This method is triggered by Boldgrid_Backup_Admin_Core::archive_files().
+	 *
+	 * @since 1.8.0
+	 *
+	 * @see Boldgrid_Backup_Admin_Backup_Dir::get()
+	 * @see Boldgrid_Backup_Admin_Cron::get_cron_secret()
+	 * @see Boldgrid_Backup_Admin_Core::archive_files()
+	 *
+	 * @param string $archive_filepath Backup archive file path.
+	 */
+	public function write_results_file( $archive_filepath ) {
+		$backup_dir = $this->core->backup_dir->get();
+
+		if ( $backup_dir && $this->core->wp_filesystem->is_writable( $backup_dir ) ) {
+			$filepath = wp_normalize_path( $backup_dir . '/test-results.json' );
+			$results  = array(
+				'backup_dir'       => $backup_dir,
+				'ABSPATH'          => ABSPATH,
+				'siteurl'          => site_url(),
+				'cron_secret'      => $this->core->cron->get_cron_secret(),
+				'archive_filepath' => $archive_filepath,
+			);
+
+			$this->core->wp_filesystem->put_contents( $filepath, wp_json_encode( $results ), 0600 );
+		}
+	}
 }

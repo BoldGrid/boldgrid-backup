@@ -1525,7 +1525,8 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @since 1.0
 	 *
-	 * @see Boldgrid_Backup_Admin_Core::backup_database().
+	 * @see Boldgrid_Backup_Admin_Core::backup_database()
+	 * @see Boldgrid_Backup_Admin_Test::write_results_file()
 	 *
 	 * @param bool $save A switch to save the archive file. Default is FALSE.
 	 * @param bool $dryrun An optional switch to perform a dry run test.
@@ -1770,6 +1771,9 @@ class Boldgrid_Backup_Admin_Core {
 
 			// Delete the temporary database dump file.
 			$this->wp_filesystem->delete( $this->db_dump_filepath, false, 'f' );
+
+			// Update test results JSON file.
+			$this->test->write_results_file( $info['filepath'] );
 		}
 
 		// Stop timer.
