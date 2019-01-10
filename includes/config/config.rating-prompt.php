@@ -85,8 +85,7 @@ $decisions = array(
 	),
 	'maybe_still_testing' => array(
 		'text' => __( 'Maybe later, I\'m still testing the plugin.', 'boldgrid-backup' ),
-		// 'snooze' => WEEK_IN_SECONDS,
-		'snooze' => 1,
+		'snooze' => WEEK_IN_SECONDS,
 		'slide' => 'maybe_later',
 	),
 	'already_did' => array(
