@@ -2,7 +2,7 @@
 Contributors: boldgrid, joemoto, imh_brad, rramo012, timph, bgnicolepaschen
 Tags: boldgrid, backup, restore, migrate, migration
 Requires at least: 4.4
-Tested up to: 5.0.1
+Tested up to: 5.0.3
 Requires PHP: 5.4
 Stable tag: 1.7.1
 License: GPLv2 or later
@@ -12,7 +12,52 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 
 == Description ==
 
-WordPress backup and restoration with update protection.
+The BoldGrid Backup Plugin will backup your entire WordPress site with just a couple of clicks right in your WordPress dashboard. Just select a time and day for backups to run automatically, or manually create a backup at any time with a single click.
+
+== Features ==
+
+The following features are available, of which you can find additional info for in the screenshots section below:
+* Schedule backups.
+* Create backups automatically before WordPress updates.
+* Store backups offsite.
+* Customize which files and folders are backed up.
+* Customize which tables are backed up.
+* WordPress core automatic update control.
+* Auto Rollback after WordPress, plugin, and theme updates.
+* Progress bar showing how far along your backup is.
+* Receive emails when backups are created and restored.
+* View a list of all of your backups, both on your Web Server and FTP/SFTP server.
+* One click to upload a backup to remote storage.
+* Add titles and descriptions to your backups.
+* Easily view the files in a backup using the Backup Browser.
+* View the tables and the number of records per table contained in a backup.
+* View all the details of a backup, including whether it is a scheduled backup or a backup triggered by a user.
+* Configure retention settings (only keep X number of backups).
+* Protect important backups by excluding them from retention settings.
+* Download and Upload backups using protected links, which makes transferring a website from one host to another an much easier process.
+
+== Screenshots ==
+
+1. Easily schedule backups using Cron or WP Cron. Set a time of day, select the days of the week, and BoldGrid Backup will automate backups for you. You will receive an email after each backup has been completed.
+2. Automatically perform a backup before WordPress auto updates itself. This feature hooks into the [pre_auto_update](https://developer.wordpress.org/reference/hooks/pre_auto_update/) action.
+3. After a scheduled backup completes, you can have it uploaded automatically to an FTP / SFTP server. Users who upgrade to premium can also store backups on Amazon S3.
+4. You can configure which files and folders and include in your backups. "Include" and "Exclude" filters are easy to set up, and you can click the "Preview" button to get a listing of which files and folders will actually be included in your backup.
+5. Have tables you don't want to back up? Within the list of database tables, uncheck the tables you want to be excluded from backups, and they won't be included.
+6. Take control of how WordPress automatically updates itself. Select whether to auto update for major updates, minor updates, development updates, and/or translation updates.
+7. Select which of your plugins to have automatically updated when updates are available.
+8. Select which of your themes to have automatically updated when updates are available.
+9. Before upgrading WordPress, or any plugins or themes, backup your site. After the upgrade, test your site for any issues. If any issues are found, you can one-click restore your website or wait for the countdown to end and your site will automatically restore itself.
+10. For large sites, backups can sometimes take a bit of time to complete. During backups, a progress bar is shown to keep you updated on the backup's status.
+11. When backups are completed, or when a backup is restored, BoldGrid Backup will send you an email.
+12. The Backup Archives page will list all of your backups, and show you where each backup is stored (Web Server, FTP/SFTP, etc).
+13. When viewing the details of a backup, click the "Upload" button to easily upload the backup archive to one of your remote storage providers, such as an FTP server.
+14. To help keep your backups organized, you can add titles and descriptions to each backup.
+15. Use the Backup Browser to view what files are contained in each of your backups.
+16. You can also use the Backup Browser to see which database tables are included in the backup and compare the # records to your current database.
+17. The right sidebar of the Backup Archive Details page shows information about a backup, including who made the backup, what was backed up, how long the backup took, and more.
+18. You can configure retention settings (only keep X number of backups) so that disk space used by your Web Server and/or your FTP/SFTP to store backups does not grow out of control.
+19. For backups you don't want to be deleted by your retention settings, you can configure them to be saved and not deleted when the retention process deletes the backup.
+20. Migrating websites from one host to another only takes a few steps. On the source server, generate a protected link for which a backup can be downloaded. Then, on the destination server, upload a backup using that protected link. All that's left is clicking restore!
 
 == Installation ==
 
@@ -31,7 +76,7 @@ WordPress backup and restoration with update protection.
 
 = 1.7.2 =
 
-* Update:      Improve journey for downloading premium plugin.
+* Update:      Improve journey for downloading the premium plugin.
 
 = 1.7.1 =
 
@@ -47,15 +92,15 @@ Release date: Dec 4th, 2018
 * New feature: Added auto-update settings for individual plugins and themes.
 * New feature: Added limited-lifetime download links for archive files.
 * New feature: Added import backup archive from URL address.
-* New feature: Added progress bar to show status of backups.
+* New feature: Added progress bar to show the status of backups.
 * New feature: Adding the ability to set and title and description to a backup.
-* New feature: Adding the ability to flag a backup as being proteced (excluded from retention).
+* New feature: Adding the ability to flag a backup as being protected (excluded from retention).
 * Update:      Update protection is now valid for 1 hour after a full backup from the WordPress Updates or Plugins page.
 * Update:      Made the Backup Archives page the default page in the admin menu.
-* Bug fix:     Set a default backup directory if path in settings is not valid.  Remove filters before fixing home and siteurl on restore.
+* Bug fix:     Set a default backup directory if the path in settings is not valid.  Remove filters before fixing home and siteurl on restore.
 * Bug fix:     Some HTML was caught in translations.
 * Bug fix:     Duplicate emails were sent when a backup was complete, fixed.
-* Bug fix:     Preserve timestamp on ftp / sftp uploads.
+* Bug fix:     Preserve timestamp on ftp/sftp uploads.
 * Bug fix:     Fixed CLI support detection on some EA4 servers.
 * Update:      Save settings and reload to the current section.
 * Update:      Reorganized settings sections.
@@ -108,11 +153,11 @@ Release Date: April 11th, 2018
 * New feature: Control which files and database tables are backed up.
 * Compatibility: PclZip support added for creating archives.
 * Compatibility: WP Cron support added for scheduled backups.
-* Compatibility: PHP Script used to backup database, rather than system commands.
+* Compatibility: PHP Script used to backup the database, rather than system commands.
 * Improvement: Update admin pages to use WP UI/UX standards.
 * Improvement: Improved UI in regards to time zones.
 * Improvement: Failed items on Preflight Check page are highlighted in red.
-* Improvement: Send email if backup fails via cron.
+* Improvement: Send an email if a backup fails via cron.
 * Improvement: More details in Preflight Check to help with troubleshooting.
 * Bug fix: Bug fixed with auto restoration feature.
 
@@ -138,7 +183,7 @@ Release Date: June 27th, 2017
 
 Release Date: May 16th, 2017
 
-* Bug fix: Fixed undefined property when pre-flight test fails.
+* Bug fix: Fixed undefined property when the pre-flight test fails.
 * Bug fix: Fixed an undefined index when home dir is not writable.
 * Bug fix: Fixed auto plugin update.
 
@@ -160,7 +205,7 @@ Release Date: February 20th, 2017
 
 * Bug fix: Fixed issue when installing plugins from the Tools Import page.
 * Bug fix: Fixed check for system tar and zip.
-* Bug fix: Fixed method of locating home directory.
+* Bug fix: Fixed method of locating the home directory.
 
 = 1.3.6 =
 
@@ -181,9 +226,9 @@ Release Date: February 7th, 2017
 
 Release Date: January 10th, 2017
 
-* Update: Update support urls.
-* Update: Close session on gathering disk space api call.
-* Bug fix: Fixed missing link in email.
+* Update: Update support URLs.
+* Update: Close session on gathering disk space API call.
+* Bug fix: Fixed missing link in an email template.
 * Bug fix: Uncaught TypeError: wp.template is not a function.
 * Testing: Tested on WordPress 4.7.
 
@@ -194,7 +239,7 @@ Release Date: December 20th, 2016
 * Update: Show backup limits to users.
 * Update: Misc notices.
 * Update: Disable backup now button.
-* Update: Prevent backup if account is too large.
+* Update: Prevent backup if the account is too large.
 
 = 1.3.2 =
 
@@ -202,7 +247,7 @@ Release Date: December 6th, 2016
 
 * Update: Move backups when changing backup directory.
 * Update: Improve time to calculate disk space.
-* Bug fix: Added double-quote encapsulation to password in mysqldump defaults file.
+* Bug fix: Added double-quote encapsulation to the password in the mysqldump defaults file.
 * Bug fix: Typo fix.
 
 
@@ -210,18 +255,18 @@ Release Date: December 6th, 2016
 
 Release Date: November 15th, 2016
 
-* Update: Modify 'last created archive' message with link to archives.
-* Update: Modify backup success message with link to settings.
+* Update: Modify 'last created archive' message with a link to archives.
+* Update: Modify backup success message with a link to settings.
 * Update: Modify BoldGrid Backup menus.
 * Update: Adjust display of preflight check.
 * Update: Free limitations to days of the week.
 * Update: Free limitations to retention.
 * Update: Standard tooltips.
-* Update: Add intro message to Archive page.
-* Update: Modify backup id section on archives page.
+* Update: Add intro message to the Archive page.
+* Update: Modify backup id section on the archives page.
 * Update: Modify Backup Site messages.
 * Update: Cache disk space data.
-* Update: Add free / premium messages next to disk / db sizes.
+* Update: Add free / premium messages next to disk / database sizes.
 * Misc: Added plugin requirements to readme.txt file.
 
 = 1.3 =
@@ -253,7 +298,7 @@ Release Date: September 7th, 2016
 Release Date: August 23rd, 2016
 
 * Bug fix: Updates via adminajax now updates the rollback timer.
-* Misc: Updated readme.txt for Tested up to: 4.6.
+* Misc: Updated readme.txt for Tested up to 4.6.
 
 = 1.2 =
 
@@ -261,7 +306,7 @@ Release Date: August 9th, 2016
 
 * New feature: Added XHProf for optional PHP profiling.  Can be enabled in "config.local.php" by setting "xhprof" to true.
 * Bug fix: Fixed auto-update action hook.
-* Bug fix: Changed restore and delete buttons to POST forms, to resolve issue with people reloading the restore URL.
+* Bug fix: Changed restore and delete buttons to POST forms, to resolve an issue with people reloading the restoration URL.
 * Bug fix: Reworked error notices for restoration. Emptying archive list before updating after performing a backup.
 * Bug fix: Disabled backup and restore buttons after starting a restoration.
 * Bug fix: Removed homedir not writable notice; moved info to the functionality test page.
@@ -283,18 +328,18 @@ Release Date: July 22nd, 2016
 
 Release Date: July 6th, 2016
 
-* New feature: Added setting for notification email address.
+* New feature: Added setting for a notification email address.
 * New feature: Added setting for backup directory.
-* New feature: Cancel auto-rollback if a restoration is performed.
+* New feature: Cancel auto-rollback if restoration is performed.
 * New feature: Added Rollback Site Now button in the rollback notice.
 * New feature: Made it possible to change siteurl and retain matched archives (backups made as of this update).
 * New feature: Added capability for auto-updates by BoldGrid API response.
-* Redesign:	Formatted the Functionality Test page.
-* Bug fix: Removed PHP SAPI check in cron script.
+* Redesign:    Formatted the Functionality Test page.
+* Bug fix: Removed PHP SAPI check in the cron script.
 * Bug fix: Restoration cron did not always complete.
-* Bug fix: Better aligned rollback countdown timer with cron job.
+* Bug fix: Better aligned rollback countdown timer with the cron job.
 * Bug fix: Provided message for empty archive list.
-* Bug fix: Rollback information is now removed after timer reaches 0:00.
+* Bug fix: Rollback information is now removed after the timer reaches 0:00.
 * Bug fix: Test for crontab now works when crontab is empty.
 * Bug fix: Now closing PHP session on backup, download, and restore, so that other PHP requests from the client may load.
 * Testing: Tested on WordPress 4.5.3.
@@ -304,34 +349,3 @@ Release Date: July 6th, 2016
 Release Date: June 21st, 2016
 
 * Initial public release.
-
-== Upgrade Notice ==
-
-
-== Technical Documentation ==
-
-
-= Auto Updates & Rollback Settings =
-
-#### Plugin Auto-Updates and Theme Auto-Updates
-
-Taken from WordPress' [Configuring Automatic Background Updates](https://codex.wordpress.org/Configuring_Automatic_Background_Updates#Plugin_.26_Theme_Updates_via_Filter)
-
-> By default, automatic background updates only happen for plugins and themes in special cases, as determined by the WordPress.org API response, which is controlled by the WordPress security team for patching critical vulnerabilities. To enable or disable updates in all cases, you can leverage the auto_update_$type filter, where $type would be replaced with "plugin" or "theme".
-
-When these features are enabled, BoldGrid Backup will add *auto_update_plugin* and *auto_update_theme* filters so that *any plugin that has an update available* will update.
-
-#### Auto Backup Before Updates
-
-Before WordPress does any auto updates, it fires the [pre_auto_update](https://developer.wordpress.org/reference/hooks/pre_auto_update/) hook. If the user has the **Auto Backup Before Updates** option enabled, then a backup will occur before the auto update.
-
-#### Auto Rollback
-
-*Auto Rollback* is the feature within the BoldGrid Backup plugin that recommends making updates before performing any updates. If you disable this feature, then BoldGrid Backup will not recommend updates.
-
-Example notice:
-> BoldGrid Backup - Update Protection
->
-> On this page you are able to update WordPress, Plugins, and Themes. It is recommended to backup your site before performing updates. If you perform a backup here, before performing updates, then an automatic rollback is possible.
->
-> Update protection not available until you click Backup Site Now and a backup is created.
