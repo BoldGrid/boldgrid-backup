@@ -1852,6 +1852,8 @@ class Boldgrid_Backup_Admin_Core {
 			)
 		);
 
+		$this->activity->add( 'any_backup_created', 1, $this->rating_prompt_config );
+
 		// Return the array of archive information.
 		return $info;
 	}

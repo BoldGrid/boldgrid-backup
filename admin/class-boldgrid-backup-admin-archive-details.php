@@ -203,7 +203,10 @@ class Boldgrid_Backup_Admin_Archive_Details {
 				$this->core->archive->set_attribute( $key, stripslashes( $value ) );
 			}
 
-			$this->core->activity->add( 'update_archive_attributes', 1, $this->core->rating_prompt_config );
+ 			// Take action if we've updated either the backup's title or description.
+			if ( ! empty( $_POST['attributes']['title'] ) || ! empty( $_POST['attributes']['description'] ) ) {
+				$this->core->activity->add( 'update_title_description', 1, $this->core->rating_prompt_config );
+			}
 		}
 
 		wp_send_json_success();
