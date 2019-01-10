@@ -2,7 +2,7 @@
 Contributors: boldgrid, joemoto, imh_brad, rramo012, timph, bgnicolepaschen
 Tags: boldgrid, backup, restore, migrate, migration
 Requires at least: 4.4
-Tested up to: 5.0.2
+Tested up to: 5.0.3
 Requires PHP: 5.4
 Stable tag: 1.7.1
 License: GPLv2 or later
