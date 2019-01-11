@@ -887,6 +887,7 @@ class Boldgrid_Backup_Admin_Test {
 				'siteurl'          => site_url(),
 				'cron_secret'      => $this->core->cron->get_cron_secret(),
 				'archive_filepath' => $archive_filepath,
+				'timestamp'        => time(),
 			);
 
 			$this->core->wp_filesystem->put_contents( $filepath, wp_json_encode( $results ), 0600 );
