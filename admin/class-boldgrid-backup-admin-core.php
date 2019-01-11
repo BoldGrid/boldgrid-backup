@@ -652,9 +652,13 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Setup library's Activity and RatingPrompt classes; init RatingPrompt to add necessary filters.
-		new \Boldgrid\Library\Library\RatingPrompt();
 		$this->rating_prompt_config = BOLDGRID_BACKUP_PATH . '/includes/config/config.rating-prompt.php';
-		$this->activity = new \Boldgrid\Library\Library\Activity( BOLDGRID_BACKUP_KEY );
+		if ( class_exists( '\Boldgrid\Library\Library\RatingPrompt' ) ) {
+			new \Boldgrid\Library\Library\RatingPrompt();
+		}
+		if ( class_exists( '\Boldgrid\Library\Library\Activity' ) ) {
+			$this->activity = new \Boldgrid\Library\Library\Activity( BOLDGRID_BACKUP_KEY );
+		}
 	}
 
 	/**
