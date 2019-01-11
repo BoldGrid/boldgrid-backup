@@ -190,21 +190,22 @@ class Boldgrid_Backup_Admin_Archive_Details {
 			wp_send_json_error( __( 'Permission denied.', 'boldgrid-backup' ) );
 		}
 
-		$filename = ! empty( $_POST['filename'] ) ? sanitize_file_name( $_POST['filename'] ) : false; // phpcs:ignore WordPress.CSRF.NonceVerification
-		$filepath = $this->core->backup_dir->get_path_to( $filename );
+		$attributes = ! empty( $_POST['attributes'] ) ? $_POST['attributes'] : array(); // phpcs:ignore WordPress.CSRF.NonceVerification
+		$filename   = ! empty( $_POST['filename'] ) ? sanitize_file_name( $_POST['filename'] ) : false; // phpcs:ignore WordPress.CSRF.NonceVerification
+		$filepath   = $this->core->backup_dir->get_path_to( $filename );
 		if ( empty( $filename ) || ! $this->core->wp_filesystem->exists( $filepath ) ) {
 			wp_send_json_error( __( 'Invalid archive filepath.', 'boldgrid-backup' ) );
 		}
 
 		$this->core->archive->init( $filepath );
 
-		if ( ! empty( $_POST['attributes'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification
-			foreach ( $_POST['attributes'] as $key => $value ) { // phpcs:ignore WordPress.CSRF.NonceVerification
+		if ( ! empty( $attributes ) ) {
+			foreach ( $attributes as $key => $value ) {
 				$this->core->archive->set_attribute( $key, stripslashes( $value ) );
 			}
 
 			// Take action if we've updated either the backup's title or description.
-			if ( ! empty( $_POST['attributes']['title'] ) || ! empty( $_POST['attributes']['description'] ) ) {
+			if ( ! empty( $attributes['title'] ) || ! empty( $attributes['description'] ) ) {
 				$this->core->activity->add( 'update_title_description', 1, $this->core->rating_prompt_config );
 			}
 		}
