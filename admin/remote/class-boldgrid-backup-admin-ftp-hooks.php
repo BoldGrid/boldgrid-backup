@@ -165,7 +165,7 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 	 * @param array $storage_locations Storage locations.
 	 */
 	public function register_storage_location( $storage_locations ) {
-		$storage_locations[] = $this->core->ftp->get_details();
+		$storage_locations[] = $this->core->ftp->get_details( true );
 
 		return $storage_locations;
 	}
@@ -189,6 +189,18 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 			'allow_upload' => $allow_upload,
 			'is_setup'     => $this->core->ftp->is_setup(),
 		);
+	}
+
+	/**
+	 * Hook into WordPress' shutdown action and close any open FTP connections.
+	 *
+	 * Closing the connections now, rather than when we're done with a specific ftp action, will
+	 * eliminate numerous ftp connections being opened on a single admin page.
+	 *
+	 * @since 1.7.2
+	 */
+	public function shutdown() {
+		$this->core->ftp->disconnect();
 	}
 
 	/**
