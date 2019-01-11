@@ -503,7 +503,7 @@ class Boldgrid_Backup_Admin_Utility {
 	 *
 	 * @global string $pagenow
 	 *
-	 * @param  string  $page The page to check for in $_GET.
+	 * @param  string $page The page to check for in $_GET.
 	 * @return boolean
 	 */
 	public static function is_admin_page( $page ) {
