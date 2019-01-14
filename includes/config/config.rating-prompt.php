@@ -122,7 +122,7 @@ return array(
 		'prompt'    => $title_description_prompt,
 	),
 	'download_to_local_machine' => array(
-		'threshold' => 5,
+		'threshold' => 2,
 		'prompt'    => $download_prompt,
 	),
 
