@@ -70,6 +70,13 @@ class Boldgrid_Backup_Admin_Go_Pro {
 			return;
 		}
 
+		// Avoid a fatal error.
+		if ( ! class_exists( '\Boldgrid\Library\Library\Plugin\Plugin' ) ) {
+			$message = __( 'Class "Boldgrid\Library\Library\Plugin\Plugin" not found. Please ensure you are running the lastest version of the BoldGrid Library.', 'boldgrid-backup' );
+			$this->core->notice->boldgrid_backup_notice( $message );
+			return;
+		}
+
 		$is_premium = $this->core->config->get_is_premium();
 
 		$premium_plugin = new \Boldgrid\Library\Library\Plugin\Plugin( 'boldgrid-backup-premium' );
