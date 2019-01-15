@@ -107,14 +107,16 @@ if ( ! $archive_found ) {
 			<p>
 				<em>
 					' .
-	wp_kses( sprintf(
-		// translators: 1: HTML anchor open tags, 2: HTML close tag, 3: HTML anchor open tags, 4: HTML close tag.
-		__( 'Protect this backup from being deleted due to %1$sretention settings%2$s. Applies only to backups stored on your %3$sWeb Server%4$s.', 'boldgrid-backup' ),
-		'<a href="' . get_admin_url( null, 'admin.php?page=boldgrid-backup-settings&section=section_storage' ) . '">',
-		'</a>',
-		'<a href="' . get_admin_url( null, 'admin.php?page=boldgrid-backup-tools&section=section_locations' ) . '">',
-		'</a>'
-	), $allowed_html ) . '
+	wp_kses(
+		sprintf(
+			// translators: 1: HTML anchor open tags, 2: HTML close tag, 3: HTML anchor open tags, 4: HTML close tag.
+			__( 'Protect this backup from being deleted due to %1$sretention settings%2$s. Applies only to backups stored on your %3$sWeb Server%4$s.', 'boldgrid-backup' ),
+			'<a href="' . get_admin_url( null, 'admin.php?page=boldgrid-backup-settings&section=section_storage' ) . '">',
+			'</a>',
+			'<a href="' . get_admin_url( null, 'admin.php?page=boldgrid-backup-tools&section=section_locations' ) . '">',
+			'</a>'
+		), $allowed_html
+	) . '
 				</em>
 			</p>
 			<select name="backup_protect">
