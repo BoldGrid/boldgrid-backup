@@ -35,32 +35,37 @@ class Boldgrid_Backup_Admin_Support {
 	 * @param string $error Error message.
 	 */
 	public function deactivate( $error ) {
-		add_action( 'admin_notices', function () use ( $error ) {
-			$allowed_html = array(
-				'p'      => array(),
-				'strong' => array(),
-				'br'     => array(),
-				'em'     => array(),
-			);
+		add_action(
+			'admin_notices', function () use ( $error ) {
+				$allowed_html = array(
+					'p'      => array(),
+					'strong' => array(),
+					'br'     => array(),
+					'em'     => array(),
+				);
 
-			$error = '<p>' . sprintf(
-				/* translators: 1 and 2 are opening and closing string tags. */
-				__( '%1$sBoldGrid Backup%2$s has been deactivated due to the following error:', 'boldgrid-backup' ),
-				'<strong>',
-			'</strong>' ) . '<br /><br />' . $error . '</p>';
+				$error = '<p>' . sprintf(
+					/* translators: 1 and 2 are opening and closing string tags. */
+					__( '%1$sBoldGrid Backup%2$s has been deactivated due to the following error:', 'boldgrid-backup' ),
+					'<strong>',
+					'</strong>'
+				) . '<br /><br />' . $error . '</p>';
 
-			// Echo our admin notice. Hide the "plugin activated" notice.
-			echo '
+				// Echo our admin notice. Hide the "plugin activated" notice.
+				echo '
 				<div class="notice notice-error is-dismissible">' . wp_kses( $error, $allowed_html ) . '</div>
 				<style type="text/css">
 					.updated.notice { display: none; }
 				</style>
 			';
-		} );
+			}
+		);
 
-		add_action( 'admin_init', function() {
-			deactivate_plugins( 'boldgrid-backup/boldgrid-backup.php', true );
-		} );
+		add_action(
+			'admin_init', function() {
+				deactivate_plugins( 'boldgrid-backup/boldgrid-backup.php', true );
+			}
+		);
 	}
 
 	/**
@@ -113,33 +118,39 @@ class Boldgrid_Backup_Admin_Support {
 	 */
 	public function run_tests() {
 		if ( ! $this->has_compatible_php() ) {
-			$this->deactivate( sprintf(
-				// Translators: 1: Current PHP version, 2: Minimum supported PHP version.
-				__(
-					'Your PHP version (%1$s) is not supported.  Please upgrade PHP to %2$s or higher, or contact your host for further assistance.',
-					'boldgrid-backup'
-				),
-				PHP_VERSION,
-				self::PHP_MIN_VER
-			) );
+			$this->deactivate(
+				sprintf(
+					// Translators: 1: Current PHP version, 2: Minimum supported PHP version.
+					__(
+						'Your PHP version (%1$s) is not supported.  Please upgrade PHP to %2$s or higher, or contact your host for further assistance.',
+						'boldgrid-backup'
+					),
+					PHP_VERSION,
+					self::PHP_MIN_VER
+				)
+			);
 
 			return false;
 		}
 
 		if ( ! $this->has_composer_installed() ) {
-			$this->deactivate( __(
-				'The vendor folder is missing. Please run "composer install", or contact your host for further assistance.',
-				'boldgrid-backup'
-			) );
+			$this->deactivate(
+				__(
+					'The vendor folder is missing. Please run "composer install", or contact your host for further assistance.',
+					'boldgrid-backup'
+				)
+			);
 
 			return false;
 		}
 
 		if ( ! $this->has_been_built() ) {
-			$this->deactivate( __(
-				'The "build" folder is missing. Please run "yarn install" and "gulp", or contact your host for further assistance.',
-				'boldgrid-backup'
-			) );
+			$this->deactivate(
+				__(
+					'The "build" folder is missing. Please run "yarn install" and "gulp", or contact your host for further assistance.',
+					'boldgrid-backup'
+				)
+			);
 
 			return false;
 		}

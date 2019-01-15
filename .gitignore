@@ -14,3 +14,4 @@ yarn-error.log
 cron/cron-test.config
 cron/cron-test.result
 boldgrid-backup-cron.log
+.ea-php-cli.cache

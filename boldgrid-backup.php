@@ -40,6 +40,11 @@ if ( ! defined( 'BOLDGRID_BACKUP_PATH' ) ) {
 	define( 'BOLDGRID_BACKUP_PATH', dirname( __FILE__ ) );
 }
 
+// Define boldgrid-backup key.
+if ( ! defined( 'BOLDGRID_BACKUP_KEY' ) ) {
+	define( 'BOLDGRID_BACKUP_KEY', 'boldgrid-backup' );
+}
+
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-boldgrid-backup-activator.php

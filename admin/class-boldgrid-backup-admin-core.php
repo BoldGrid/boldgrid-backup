@@ -482,6 +482,15 @@ class Boldgrid_Backup_Admin_Core {
 	public $local;
 
 	/**
+	 * Path to our config.rating-prompt.php file.
+	 *
+	 * @since  1.7.2
+	 * @access public
+	 * @var    string
+	 */
+	public $rating_prompt_config;
+
+	/**
 	 * The Restore Helper class.
 	 *
 	 * @since  1.6.1
@@ -507,6 +516,15 @@ class Boldgrid_Backup_Admin_Core {
 	 * @var    Boldgrid_Backup_Download
 	 */
 	public $download;
+
+	/**
+	 * An instance of the Boldgrid\Library\Library\Activity class.
+	 *
+	 * @since  1.7.2
+	 * @access public
+	 * @var    Boldgrid\Library\Library\Activity
+	 */
+	public $activity;
 
 	/**
 	 * Constructor.
@@ -631,6 +649,15 @@ class Boldgrid_Backup_Admin_Core {
 		// Need to construct class so necessary filters are added.
 		if ( class_exists( '\Boldgrid\Library\Library\Ui' ) ) {
 			$ui = new \Boldgrid\Library\Library\Ui();
+		}
+
+		// Setup library's Activity and RatingPrompt classes; init RatingPrompt to add necessary filters.
+		$this->rating_prompt_config = BOLDGRID_BACKUP_PATH . '/includes/config/config.rating-prompt.php';
+		if ( class_exists( '\Boldgrid\Library\Library\RatingPrompt' ) ) {
+			new \Boldgrid\Library\Library\RatingPrompt();
+		}
+		if ( class_exists( '\Boldgrid\Library\Library\Activity' ) ) {
+			$this->activity = new \Boldgrid\Library\Library\Activity( BOLDGRID_BACKUP_KEY );
 		}
 	}
 
@@ -1842,6 +1869,8 @@ class Boldgrid_Backup_Admin_Core {
 			)
 		);
 
+		$this->activity->add( 'any_backup_created', 1, $this->rating_prompt_config );
+
 		// Return the array of archive information.
 		return $info;
 	}
@@ -2539,6 +2568,7 @@ class Boldgrid_Backup_Admin_Core {
 		$filesize = $archives[ $download_key ]['filesize'];
 
 		// Send the file and die nicely.
+		$this->activity->add( 'download_to_local_machine', 1, $this->rating_prompt_config );
 		Boldgrid_Backup_File::send_file( $filepath, $filesize );
 	}
 
