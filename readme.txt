@@ -76,7 +76,12 @@ The following features are available, of which you can find additional info for 
 
 = 1.7.2 =
 
-* Update:      Improve journey for downloading the premium plugin.
+Release date: Jan 15th, 2019
+
+* Update:      Improved journey for downloading the premium plugin.
+* Update:      Reduced the number of FTP connections made on the settings page.
+* Update:      Overhauled this readme file, added more info on features and added screenshots.
+* Update:      New system that asks user for bug fixes / new features, or requests plugin rating.
 
 = 1.7.1 =
 
