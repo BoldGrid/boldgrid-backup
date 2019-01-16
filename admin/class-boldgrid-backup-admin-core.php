@@ -1798,9 +1798,6 @@ class Boldgrid_Backup_Admin_Core {
 
 			// Delete the temporary database dump file.
 			$this->wp_filesystem->delete( $this->db_dump_filepath, false, 'f' );
-
-			// Update test results JSON file.
-			$this->test->write_results_file( $info['filepath'] );
 		}
 
 		// Stop timer.
@@ -1821,7 +1818,7 @@ class Boldgrid_Backup_Admin_Core {
 		 *
 		 * @since 1.5.2
 		 *
-		 * @param array $info{
+		 * @param array $info {
 		 *     An array of info about the backup just created.
 		 *
 		 *     @type string $mode         backup

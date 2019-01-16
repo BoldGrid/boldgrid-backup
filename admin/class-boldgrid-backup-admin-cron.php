@@ -82,6 +82,15 @@ class Boldgrid_Backup_Admin_Cron {
 	}
 
 	/**
+	 * Get the cron command prefix.
+	 *
+	 * @return string
+	 */
+	public function get_cron_command() {
+		return $this->cron_command;
+	}
+
+	/**
 	 * Add cron entry for backups from stored settings.
 	 *
 	 * @since 1.2

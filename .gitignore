@@ -13,5 +13,6 @@ package-lock.json
 yarn-error.log
 cron/cron-test.config
 cron/cron-test.result
+cron/restore-info.json
 boldgrid-backup-cron.log
 .ea-php-cli.cache
