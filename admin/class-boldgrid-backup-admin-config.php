@@ -411,6 +411,8 @@ class Boldgrid_Backup_Admin_Config {
 	 *
 	 * @since 1.0
 	 *
+	 * @see Boldgrid_Backup_Admin_Core::execute_command()
+	 *
 	 * @return array
 	 */
 	public function get_available_compressors() {

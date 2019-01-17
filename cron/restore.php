@@ -55,18 +55,18 @@ if ( empty( $results['archive_filepath'] ) ) {
 	exit( 1 );
 }
 
-require __DIR__ . '/class-boldgrid-backup-cron-helper.php';
-$cron_helper = new Boldgrid_Backup_Cron_Helper();
 
 // Abort if not being ran from the command line.
-if ( ! $cron_helper->is_cli() ) {
+require __DIR__ . '/class-boldgrid-backup-cron-helper.php';
+if ( ! Boldgrid_Backup_Cron_Helper::is_cli() ) {
 	echo 'Error: This process must run from the CLI.' . PHP_EOL;
 	exit( 1 );
 }
 
-// Abort if execution functions are disabled.
-$exec_functions = $cron_helper->get_execution_functions();
 
+// Abort if execution functions are disabled.
+require dirname( __DIR__ ) . 'admin/class-boldgrid-backup-admin-cli.php';
+$exec_functions = Boldgrid_Backup_Admin_Cli::get_execution_functions();
 if ( empty( $exec_functions ) ) {
 	echo 'Error: No available PHP executable functions.' . PHP_EOL;
 	exit( 1 );
@@ -77,20 +77,21 @@ echo 'Attempting to restore "' . $results['siteurl'] . '" from backup archive fi
 
 // Check if the siteurl is reachable.
 require __DIR__ . '/class-boldgrid-backup-url-helper.php';
-$url_helper = new Boldgrid_Backup_Url_Helper();
-
+$url_helper           = new Boldgrid_Backup_Url_Helper();
 $is_siteurl_reachable = false !== $url_helper->call_url( $results['siteurl'] );
 $restore_cmd          = ! empty( $results['restore_cmd'] ) ? $results['restore_cmd'] : null;
 
 if ( $is_siteurl_reachable && $restore_cmd ) {
 	// Call the normal restore command.
 	echo 'Using URL address restoration process.' . PHP_EOL;
-	echo $cron_helper->execute_command( $restore_cmd, $success, $return_var ) . PHP_EOL;
+var_dump( $restore_cmd );
+	echo Boldgrid_Backup_Admin_Cli::call_command( $restore_cmd, $success, $return_var ) . PHP_EOL;
+var_dump( $success, $return_var );
 } else {
 	// Start the standalone restoration process.
 	echo 'Cannot reach the site URL; using standalone restoration process.' . PHP_EOL;
 	// @todo: Work on this section.
-	echo $cron_helper->execute_command( 'echo "Still working on this."', $success, $return_var ) . PHP_EOL;
+	echo Boldgrid_Backup_Admin_Cli::call_command( 'echo "Still working on this."', $success, $return_var ) . PHP_EOL;
 }
 
 // Check for success.
