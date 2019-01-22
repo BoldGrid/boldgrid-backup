@@ -523,6 +523,13 @@ class Boldgrid_Backup_Admin_Archive {
 					dirname( __DIR__ ) . '/boldgrid-backup-cron.php" mode=restore siteurl=' .
 					$siteurl . ' id=' . $backup_id . ' secret=' . $cron_secret . ' archive_key=' .
 					$archive_key . ' archive_filename=' . $archive_filename,
+				// Environment.
+				'gateway_interface'  => getenv( 'GATEWAY_INTERFACE' ),
+				'php_sapi_name'      => php_sapi_name(),
+				'php_uname'          => php_uname(),
+				'php_version'        => phpversion(),
+				'server_protocol'    => getenv( 'SERVER_PROTOCOL' ),
+				'server_software'    => getenv( 'SERVER_SOFTWARE' ),
 			);
 
 			$this->core->wp_filesystem->put_contents(

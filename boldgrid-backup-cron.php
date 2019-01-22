@@ -15,8 +15,6 @@
 
 // phpcs:disable WordPress.VIP,WordPress.XSS.EscapeOutput.OutputNotEscaped
 
-echo 'boldgrid-backup-cron.php: Start.' . PHP_EOL;
-
 require dirname( __FILE__ ) . '/admin/class-boldgrid-backup-admin-cron-log.php';
 require dirname( __FILE__ ) . '/cron/class-boldgrid-backup-cron-helper.php';
 $cron_helper = new Boldgrid_Backup_Cron_Helper();
@@ -89,7 +87,6 @@ $url = $input['siteurl'] . '/wp-admin/admin-ajax.php?' . http_build_query( $quer
 
 // The helper class method will sanitize the url.
 require dirname( __FILE__ ) . '/cron/class-boldgrid-backup-url-helper.php';
-echo 'Calling URL: ' . $url . PHP_EOL;
 $url_helper = new Boldgrid_Backup_Url_Helper();
 $result     = $url_helper->call_url( $url );
 
