@@ -84,6 +84,17 @@ class Boldgrid_Backup_Admin_Archive {
 	public $log_filepath = null;
 
 	/**
+	 * The unix timestamp of the backup file.
+	 *
+	 * Not the date the backup was created (though it should be), just the date created timestamp.
+	 *
+	 * @since 1.7.3
+	 * @access public
+	 * @var string
+	 */
+	public $timestamp = 0;
+
+	/**
 	 * URL to the details page of this backup.
 	 *
 	 * This property is available after calling init().
@@ -224,6 +235,8 @@ class Boldgrid_Backup_Admin_Archive {
 
 		if ( $have_log ) {
 			$this->log = $this->core->archive_log->get_by_zip( $this->filepath );
+
+			$this->timestamp = empty( $this->log['lastmodunix'] ) ? 0 : $this->log['lastmodunix'];
 		}
 
 		/*
@@ -235,6 +248,22 @@ class Boldgrid_Backup_Admin_Archive {
 		$this->compressor = ! empty( $this->log['compressor'] ) ? $this->log['compressor'] : 'php_zip';
 
 		$this->view_details_url = admin_url( 'admin.php?page=boldgrid-backup-archive-details&filename=' . $this->filename );
+	}
+
+	/**
+	 * Init an archive based on filename.
+	 *
+	 * This method's init() function requires a full filepath. This method is a helper function that
+	 * inits based on filename instead.
+	 *
+	 * @since 1.7.3
+	 *
+	 * @param string $filename
+	 */
+	public function init_by_filename( $filename ) {
+		$filepath = $this->core->backup_dir->get_path_to( $filename );
+
+		$this->init( $filepath );
 	}
 
 	/**

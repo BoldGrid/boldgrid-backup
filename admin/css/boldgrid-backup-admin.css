@@ -34,6 +34,11 @@ th .help[data-id] {
 	display: inline-block;
 }
 
+/* While thickbox is loading, show something rather than nothing. */
+#TB_iframeContent {
+	background: #f1f1f1;
+}
+
 /* Prevent clicks on disabled links. */
 a[disabled] {
 	pointer-events: none;

@@ -68,7 +68,7 @@ foreach ( $this->remote_storage_li as $provider ) {
 				'Please go to your %1$ssettings page%2$s to configure %3$s.',
 				'boldgrid-backup'
 			),
-			'<a target="_parent" href="admin.php?page=boldgrid-backup-settings">',
+			'<a target="_parent" href="admin.php?page=boldgrid-backup-settings&section=section_storage">',
 			'</a>',
 			$provider['title']
 		);
