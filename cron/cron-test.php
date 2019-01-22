@@ -9,7 +9,7 @@
  * @since 1.6.5
  *
  * @package    Boldgrid_Backup
- * @subpackage Boldgrid_Backup/admin
+ * @subpackage Boldgrid_Backup/cron
  * @copyright  BoldGrid
  * @version    $Id$
  * @author     BoldGrid <support@boldgrid.com>
@@ -56,4 +56,3 @@ foreach ( $configs as $config ) {
 		die();
 	}
 }
-

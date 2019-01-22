@@ -8,6 +8,7 @@
  * @since 1.6.3
  *
  * @package Boldgrid_Backup
+ * @subpackage Boldgrid_Backup/cron
  * @copyright BoldGrid
  * @version $Id$
  * @author BoldGrid <support@boldgrid.com>
