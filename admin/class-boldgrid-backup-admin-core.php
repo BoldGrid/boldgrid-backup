@@ -1352,17 +1352,29 @@ class Boldgrid_Backup_Admin_Core {
 		 * adjust which folders are actually included / excluded.
 		 */
 		$info = array(
-			'mode'           => 'backup',
-			'dryrun'         => $dryrun,
-			'compressor'     => null,
-			'filesize'       => 0,
-			'save'           => $save,
-			'total_size'     => 0,
-			'folder_include' => $this->folder_exclusion->from_settings( 'include' ),
-			'folder_exclude' => $this->folder_exclusion->from_settings( 'exclude' ),
-			'table_exclude'  => $this->db_omit->get_excluded_tables(),
-			'title'          => ! empty( $_POST['backup_title'] ) ? stripslashes( $_POST['backup_title'] ) : null, // phpcs:ignore WordPress.CSRF.NonceVerification,WordPress.Arrays.ArrayDeclarationSpacing.ArrayItemNoNewLine
-			'description'    => ! empty( $_POST['backup_description'] ) ? stripslashes( $_POST['backup_description'] ) : null, // phpcs:ignore WordPress.CSRF.NonceVerification,WordPress.Arrays.ArrayDeclarationSpacing.ArrayItemNoNewLine
+			'mode'              => 'backup',
+			'dryrun'            => $dryrun,
+			'compressor'        => null,
+			'filesize'          => 0,
+			'save'              => $save,
+			'total_size'        => 0,
+			'folder_include'    => $this->folder_exclusion->from_settings( 'include' ),
+			'folder_exclude'    => $this->folder_exclusion->from_settings( 'exclude' ),
+			'table_exclude'     => $this->db_omit->get_excluded_tables(),
+			'title'             => ! empty( $_POST['backup_title'] ) ? stripslashes( $_POST['backup_title'] ) : null, // phpcs:ignore WordPress.CSRF.NonceVerification,WordPress.Arrays.ArrayDeclarationSpacing.ArrayItemNoNewLine
+			'description'       => ! empty( $_POST['backup_description'] ) ? stripslashes( $_POST['backup_description'] ) : null, // phpcs:ignore WordPress.CSRF.NonceVerification,WordPress.Arrays.ArrayDeclarationSpacing.ArrayItemNoNewLine
+			// Information used for the emergency restoration process.
+			'ABSPATH'           => ABSPATH,
+			'backup_id'         => $this->get_backup_identifier(),
+			'siteurl'           => site_url(),
+			'timestamp'         => time(),
+			// Environment information.
+			'gateway_interface' => getenv( 'GATEWAY_INTERFACE' ),
+			'php_sapi_name'     => php_sapi_name(),
+			'php_uname'         => php_uname(),
+			'php_version'       => phpversion(),
+			'server_protocol'   => getenv( 'SERVER_PROTOCOL' ),
+			'server_software'   => getenv( 'SERVER_SOFTWARE' ),
 		);
 
 		// Determine how this backup was triggered.

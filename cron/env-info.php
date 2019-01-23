@@ -12,11 +12,11 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-var_dump( array(
-	'gateway_interface'  => getenv( 'GATEWAY_INTERFACE' ),
-	'php_sapi_name'      => php_sapi_name(),
-	'php_uname'          => php_uname(),
-	'php_version'        => phpversion(),
-	'server_protocol'    => getenv( 'SERVER_PROTOCOL' ),
-	'server_software'    => getenv( 'SERVER_SOFTWARE' ),
-) );
+return array(
+	'gateway_interface' => getenv( 'GATEWAY_INTERFACE' ),
+	'php_sapi_name'     => php_sapi_name(),
+	'php_uname'         => php_uname(),
+	'php_version'       => phpversion(),
+	'server_protocol'   => getenv( 'SERVER_PROTOCOL' ),
+	'server_software'   => getenv( 'SERVER_SOFTWARE' ),
+);

@@ -506,30 +506,18 @@ class Boldgrid_Backup_Admin_Archive {
 			$archive_filename  = basename( $archive_filepath );
 			$archive_info      = $this->core->archive->get_by_name( $archive_filename );
 			$archive_key       = isset( $archive_info['key'] ) ? $archive_info['key'] : null;
-			$backup_id         = $this->core->get_backup_identifier();
 			$cron_secret       = $this->core->cron->get_cron_secret();
-			$siteurl           = site_url();
 
 			$results = array(
-				'ABSPATH'            => ABSPATH,
-				'siteurl'            => $siteurl,
-				'backup_id'          => $backup_id,
-				'cron_secret'        => $cron_secret,
-				'archive_compressor' => ! empty( $info['compressor'] ) ? $info['compressor'] : null,
-				'archive_filepath'   => $archive_filepath,
-				'archive_key'        => $archive_key,
-				'timestamp'          => time(),
-				'restore_cmd'        => $this->core->cron->get_cron_command() . ' "' .
+				'cron_secret' => $cron_secret,
+				'filepath'    => $archive_filepath,
+				'archive_key' => $archive_key,
+				'timestamp'   => time(),
+				'restore_cmd' => $this->core->cron->get_cron_command() . ' "' .
 					dirname( __DIR__ ) . '/boldgrid-backup-cron.php" mode=restore siteurl=' .
-					$siteurl . ' id=' . $backup_id . ' secret=' . $cron_secret . ' archive_key=' .
-					$archive_key . ' archive_filename=' . $archive_filename,
-				// Environment.
-				'gateway_interface'  => getenv( 'GATEWAY_INTERFACE' ),
-				'php_sapi_name'      => php_sapi_name(),
-				'php_uname'          => php_uname(),
-				'php_version'        => phpversion(),
-				'server_protocol'    => getenv( 'SERVER_PROTOCOL' ),
-				'server_software'    => getenv( 'SERVER_SOFTWARE' ),
+					site_url() . ' id=' . $this->core->get_backup_identifier() . ' secret=' .
+					$cron_secret . ' archive_key=' . $archive_key . ' archive_filename=' .
+					$archive_filename,
 			);
 
 			$this->core->wp_filesystem->put_contents(
