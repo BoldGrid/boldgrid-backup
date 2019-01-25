@@ -89,7 +89,6 @@ class Boldgrid_Backup_Admin_Archive {
 	 * Not the date the backup was created (though it should be), just the date created timestamp.
 	 *
 	 * @since 1.7.3
-	 * @access public
 	 * @var string
 	 */
 	public $timestamp = 0;
