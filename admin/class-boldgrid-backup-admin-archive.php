@@ -507,17 +507,20 @@ class Boldgrid_Backup_Admin_Archive {
 			$archive_info      = $this->core->archive->get_by_name( $archive_filename );
 			$archive_key       = isset( $archive_info['key'] ) ? $archive_info['key'] : null;
 			$cron_secret       = $this->core->cron->get_cron_secret();
+			$siteurl           = site_url();
 
 			$results = array(
+				'ABSPATH'     => ABSPATH,
+				'archive_key' => $archive_key,
 				'cron_secret' => $cron_secret,
 				'filepath'    => $archive_filepath,
-				'archive_key' => $archive_key,
-				'timestamp'   => time(),
+				'siteurl'     => $siteurl,
 				'restore_cmd' => $this->core->cron->get_cron_command() . ' "' .
 					dirname( __DIR__ ) . '/boldgrid-backup-cron.php" mode=restore siteurl=' .
-					site_url() . ' id=' . $this->core->get_backup_identifier() . ' secret=' .
+					$siteurl . ' id=' . $this->core->get_backup_identifier() . ' secret=' .
 					$cron_secret . ' archive_key=' . $archive_key . ' archive_filename=' .
 					$archive_filename,
+				'timestamp'   => time(),
 			);
 
 			$this->core->wp_filesystem->put_contents(

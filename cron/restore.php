@@ -90,6 +90,8 @@ if ( empty( $exec_functions ) ) {
 	exit( 1 );
 }
 
+$do_restore = true;
+
 echo 'Attempting to restore "' . $info['siteurl'] . '" from backup archive file "' .
 	$info['filepath'] . '"...' . PHP_EOL;
 
@@ -98,6 +100,14 @@ require __DIR__ . '/class-boldgrid-backup-url-helper.php';
 $url_helper           = new Boldgrid_Backup_Url_Helper();
 $is_siteurl_reachable = false !== $url_helper->call_url( $info['siteurl'] );
 $restore_cmd          = ! empty( $info['restore_cmd'] ) ? $info['restore_cmd'] : null;
+
+// If site is reachable, then get environment information.
+if ( $is_siteurl_reachable ) {
+	$env_info = json_decode(
+		$url_helper->call_url( $info['siteurl'] . '/wp-content/plugins/boldgrid-backup/cron/env-info.php' ),
+		true
+	);
+}
 
 if ( $is_siteurl_reachable && $restore_cmd ) {
 	// Call the normal restore command.
