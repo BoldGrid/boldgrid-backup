@@ -1802,9 +1802,10 @@ class Boldgrid_Backup_Admin_Core {
 		// Stop timer.
 		$time_stop = microtime( true );
 
-		// Calculate duration.
+		// Calculate duration and MD5.
 		$info['duration']    = number_format( ( $time_stop - $time_start ), 2, '.', '' );
 		$info['db_duration'] = number_format( ( $db_time_stop - $time_start ), 2, '.', '' );
+		$info['file_md5']    = md5_file( $info['filepath'] );
 
 		/**
 		 * Actions to take after a backup has been created.
