@@ -32,10 +32,17 @@ defined( 'WPINC' ) || die;
 
 $configure = '';
 
+// Some storage locations need to be authorized, such as Google Drive.
+if ( ! empty( $location['authorized'] ) ) {
+	$configure = sprintf( '&#10003; %1$s | ', __( 'Authorized', 'boldgrid-backup' ) );
+} elseif ( ! empty( $location['authorize'] ) ) {
+	$configure .= '<a href="' . esc_url( $location['authorize'] ) . '">' . __( 'Authorize', 'boldgrid-backup' ) . '</a> | ';
+}
+
 $configure_link = '<a href="%1$s&TB_iframe=true&width=600&height=550" class="thickbox">%2$s</a>';
 
 if ( $location['is_setup'] && ! empty( $location['configure'] ) ) {
-	$configure  = sprintf( '&#10003; %1$s', __( 'Configured', 'boldgrid-backup' ) );
+	$configure .= sprintf( '&#10003; %1$s', __( 'Configured', 'boldgrid-backup' ) );
 	$configure .= ' (' . sprintf( $configure_link, $location['configure'], __( 'update', 'boldgrid-backup' ) ) . ')';
 } elseif ( ! empty( $location['configure'] ) ) {
 	$configure .= sprintf( $configure_link, $location['configure'], __( 'Configure', 'boldgrid-backup' ) );

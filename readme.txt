@@ -78,6 +78,13 @@ The following features are available, of which you can find additional info for 
 
 * New feature: Added emergency restoration process.
 
+= 1.7.3-rc.1 =
+
+Release date: Jan 29th, 2019
+
+* Update:      Change thickbox background color to inform user something is loading.
+* Update:      Misc updates required for next version of BoldGrid Backup Premium.
+
 = 1.7.2 =
 
 Release date: Jan 15th, 2019
