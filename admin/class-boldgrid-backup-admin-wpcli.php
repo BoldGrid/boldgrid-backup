@@ -172,7 +172,7 @@ class Boldgrid_Backup_Admin_Wpcli {
 			'dow_thursday'  => in_array( '4', $days_arr, true ) ? 1 : 0,
 			'dow_friday'    => in_array( '5', $days_arr, true ) ? 1 : 0,
 			'dow_satday'    => in_array( '6', $days_arr, true ) ? 1 : 0,
-			'tod_h'         => date( 'g', $time ),
+			'tod_h'         => (int) date( 'g', $time ),
 			'tod_m'         => date( 'i', $time ),
 			'tod_a'         => date( 'A', $time ),
 		];
