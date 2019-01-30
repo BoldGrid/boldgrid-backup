@@ -31,7 +31,7 @@ WP_CLI::add_command( 'bgb', 'Boldgrid_Backup_Admin_Wpcli' );
  */
 class Boldgrid_Backup_Admin_Wpcli {
 	/**
-	 * Print the backup schedule.
+	 * Print and manipulate the backup schedule.
 	 *
 	 * ## OPTIONS
 	 *
