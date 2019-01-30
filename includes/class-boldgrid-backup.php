@@ -261,6 +261,11 @@ class Boldgrid_Backup {
 		// Instantiate the admin core.
 		$plugin_admin_core = new Boldgrid_Backup_Admin_Core();
 
+		// WP-CLI support.
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			Boldgrid_Backup_Admin_Wpcli::$core = $plugin_admin_core;
+		}
+
 		// Add nav menu items.
 		$this->loader->add_action(
 			'admin_menu', $plugin_admin_core,

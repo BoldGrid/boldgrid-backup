@@ -456,16 +456,10 @@ class Boldgrid_Backup_Admin_Settings {
 			 *
 			 * @since 1.5.1
 			 */
-			$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
-			if ( 'wp-cron' === $scheduler ) {
-				$crons_added = $this->core->wp_cron->add_all_crons( $settings );
-			} elseif ( 'cron' === $scheduler ) {
-				$crons_added                 = $this->core->cron->add_all_crons( $settings );
-				$settings['crontab_version'] = $this->core->cron->crontab_version;
-				$settings['cron_secret']     = $this->core->cron->get_cron_secret();
-			}
+			$settings = $this->update_cron( $settings );
+
 			// Take action if we tried and failed to add crons.
-			if ( isset( $crons_added ) && ! $crons_added ) {
+			if ( $settings['crons_added'] ) {
 				$update_error    = true;
 				$update_errors[] = esc_html__( 'An error occurred when modifying cron jobs. Please try again.', 'boldgrid-backup' );
 			}
@@ -728,5 +722,29 @@ class Boldgrid_Backup_Admin_Settings {
 	 */
 	public function save( $settings ) {
 		return update_site_option( 'boldgrid_backup_settings', $settings );
+	}
+
+	/**
+	 * Update CRON jobs.
+	 *
+	 * @since 1.8.0
+	 *
+	 * @param  array $settings BoldGrid Backup settings.
+	 * @return array
+	 */
+	public function update_cron( array $settings ) {
+		$settings['crons_added'] = false;
+
+		$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
+
+		if ( 'wp-cron' === $scheduler ) {
+			$settings['crons_added'] = $this->core->wp_cron->add_all_crons( $settings );
+		} elseif ( 'cron' === $scheduler ) {
+			$settings['crons_added']     = $this->core->cron->add_all_crons( $settings );
+			$settings['crontab_version'] = $this->core->cron->crontab_version;
+			$settings['cron_secret']     = $this->core->cron->get_cron_secret();
+		}
+
+		return $settings;
 	}
 }

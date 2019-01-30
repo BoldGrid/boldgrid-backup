@@ -31,7 +31,17 @@ WP_CLI::add_command( 'bgb', 'Boldgrid_Backup_Admin_Wpcli' );
  */
 class Boldgrid_Backup_Admin_Wpcli {
 	/**
-	 * Print and manipulate the backup schedule.
+	 * Boldgrid_Backup_Admin_Core object.
+	 *
+	 * @since 1.8.0
+	 *
+	 * @var Boldgrid_Backup_Admin_Core
+	 * @staticvar
+	 */
+	public static $core;
+
+	/**
+	 * Print the backup schedule.
 	 *
 	 * ## OPTIONS
 	 *
@@ -84,11 +94,12 @@ class Boldgrid_Backup_Admin_Wpcli {
 	 * @access protected
 	 */
 	protected function schedule_clear() {
-		$settings = get_option( 'boldgrid_backup_settings', [] );
+		$settings = self::$core->settings->get_settings();
 
 		$settings['schedule'] = null;
 
-		update_option( 'boldgrid_backup_settings', $settings, false );
+		self::$core->scheduler->clear_all_schedules();
+		self::$core->settings->save( $settings );
 	}
 
 	/**
@@ -99,11 +110,9 @@ class Boldgrid_Backup_Admin_Wpcli {
 	 */
 	protected function schedule_list() {
 		$backup_days = [];
-		$settings    = get_option( 'boldgrid_backup_settings', [] );
-		$schedule    = isset( $settings['schedule']['dow_sunday'] ) ?
-			$settings['schedule'] : [];
+		$settings    = self::$core->settings->get_settings();
 
-		foreach ( $schedule as $key => $value ) {
+		foreach ( $settings['schedule'] as $key => $value ) {
 			if ( 0 === strpos( $key, 'dow_' ) && $value ) {
 				$backup_days[] = ucfirst( str_replace( 'dow_', '', $key ) );
 			}
@@ -112,13 +121,15 @@ class Boldgrid_Backup_Admin_Wpcli {
 		$backup_days = implode( ', ', $backup_days );
 		$backup_days = $backup_days ? $backup_days : 'None';
 
-		echo 'Backup schedule: ' . $backup_days . ' at ';
+		echo 'Backup schedule: ' . $backup_days;
 
-		if ( isset( $schedule['tod_h'], $schedule['tod_m'], $schedule['tod_a'] ) ) {
-			echo $schedule['tod_h'] . ':' . $schedule['tod_m'] . ' ' .
-				$schedule['tod_a'] . ' (system/server time)';
-		} else {
-			echo 'unknown time';
+		if ( 'None' !== $backup_days ) {
+			if ( isset( $settings['schedule']['tod_h'], $settings['schedule']['tod_m'], $settings['schedule']['tod_a'] ) ) {
+				echo ' at ' . $settings['schedule']['tod_h'] . ':' . $settings['schedule']['tod_m'] . ' ' .
+					$settings['schedule']['tod_a'] . ' (system/server time)';
+			} else {
+				echo ' at unknown time';
+			}
 		}
 
 		echo PHP_EOL;
@@ -151,7 +162,7 @@ class Boldgrid_Backup_Admin_Wpcli {
 			return false;
 		}
 
-		$settings = get_option( 'boldgrid_backup_settings', [] );
+		$settings = self::$core->settings->get_settings();
 
 		$settings['schedule'] = [
 			'dow_sunday'    => in_array( '0', $days_arr, true ) ? 1 : 0,
@@ -166,7 +177,8 @@ class Boldgrid_Backup_Admin_Wpcli {
 			'tod_a'         => date( 'A', $time ),
 		];
 
-		update_option( 'boldgrid_backup_settings', $settings, false );
+		self::$core->settings->update_cron( $settings );
+		self::$core->settings->save( $settings );
 
 		return true;
 	}
