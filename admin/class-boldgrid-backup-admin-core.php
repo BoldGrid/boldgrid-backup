@@ -1805,7 +1805,6 @@ class Boldgrid_Backup_Admin_Core {
 		// Calculate duration and MD5.
 		$info['duration']    = number_format( ( $time_stop - $time_start ), 2, '.', '' );
 		$info['db_duration'] = number_format( ( $db_time_stop - $time_start ), 2, '.', '' );
-		$info['file_md5']    = md5_file( $info['filepath'] );
 
 		/**
 		 * Actions to take after a backup has been created.
@@ -1857,6 +1856,8 @@ class Boldgrid_Backup_Admin_Core {
 			update_site_option( 'boldgrid_backup_last_backup', time() );
 
 			$this->archive_log->write( $info );
+
+			$info['file_md5'] = md5_file( $info['filepath'] );
 
 			// Enforce retention setting.
 			$this->enforce_retention();
