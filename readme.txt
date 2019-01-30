@@ -74,6 +74,10 @@ The following features are available, of which you can find additional info for 
 
 == Changelog ==
 
+= 1.8.0 In progress =
+
+* New feature: Added WP-CLI support for backup schedule.
+
 = 1.7.3-rc.1 =
 
 Release date: Jan 29th, 2019

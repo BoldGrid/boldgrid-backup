@@ -89,7 +89,6 @@ class Boldgrid_Backup {
 	 * @access private
 	 */
 	private function load_dependencies() {
-
 		require_once BOLDGRID_BACKUP_PATH . '/vendor/autoload.php';
 
 		/**
@@ -223,6 +222,11 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-authentication.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-download.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-file.php';
+
+		// WP-CLI support.
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-wpcli.php';
+		}
 
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
