@@ -542,6 +542,7 @@ class Boldgrid_Backup_Admin_Archive {
 				'archive_key' => $archive_key,
 				'cron_secret' => $cron_secret,
 				'filepath'    => $archive_filepath,
+				'file_md5'    => $info['file_md5'],
 				'siteurl'     => $siteurl,
 				'restore_cmd' => $this->core->cron->get_cron_command() . ' "' .
 					dirname( __DIR__ ) . '/boldgrid-backup-cron.php" mode=restore siteurl=' .
