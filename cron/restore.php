@@ -45,6 +45,13 @@ if ( empty( $results['filepath'] ) ) {
 	exit( 1 );
 }
 
+// Check if archive exists.
+if ( ! file_exists( $results['filepath'] ) ) {
+	echo 'Error: No backup archive file ("' . $results['filepath'] . '").' . PHP_EOL;
+	exit( 1 );
+}
+
+// Get the archive log file and merge info.
 $archive_log_filepath = preg_replace( '/\.zip$/', '.log', $results['filepath'] );
 
 if ( ! file_exists( $archive_log_filepath ) ) {
@@ -90,7 +97,11 @@ if ( empty( $exec_functions ) ) {
 	exit( 1 );
 }
 
-$do_restore = true;
+// Check archive checksum.
+if ( empty( $info['file_md5'] ) || md5_file( $info['filepath'] ) !== $info['file_md5'] ) {
+	echo 'Error: Failed archive file checksum.' . PHP_EOL;
+	exit( 1 );
+}
 
 echo 'Attempting to restore "' . $info['siteurl'] . '" from backup archive file "' .
 	$info['filepath'] . '"...' . PHP_EOL;

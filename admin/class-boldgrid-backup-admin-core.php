@@ -1608,7 +1608,7 @@ class Boldgrid_Backup_Admin_Core {
 
 			$info['file_md5'] = md5_file( $info['filepath'] );
 
-			$this->core->archive->write_results_file( $info );
+			$this->archive->write_results_file( $info );
 
 			// Enforce retention setting.
 			$this->enforce_retention();
