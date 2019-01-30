@@ -81,6 +81,7 @@ class Boldgrid_Backup_Admin_Wpcli {
 	 * Clear the backup schedule.
 	 *
 	 * @since 1.8.0
+	 * @access protected
 	 */
 	protected function schedule_clear() {
 		$settings = get_option( 'boldgrid_backup_settings', [] );
@@ -94,6 +95,7 @@ class Boldgrid_Backup_Admin_Wpcli {
 	 * Print the backup schedule.
 	 *
 	 * @since 1.8.0
+	 * @access protected
 	 */
 	protected function schedule_list() {
 		$backup_days = [];
@@ -126,6 +128,7 @@ class Boldgrid_Backup_Admin_Wpcli {
 	 * Set the backup schedule.
 	 *
 	 * @since 1.8.0
+	 * @access protected
 	 *
 	 * @param  array $assoc_args Associative array of arguments.
 	 * @return bool
