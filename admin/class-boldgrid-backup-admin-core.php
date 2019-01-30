@@ -1284,7 +1284,7 @@ class Boldgrid_Backup_Admin_Core {
 	 * @since 1.0
 	 *
 	 * @see Boldgrid_Backup_Admin_Core::backup_database()
-	 * @see Boldgrid_Backup_Admin_Test::write_results_file()
+	 * @see Boldgrid_Backup_Admin_Archive::write_results_file()
 	 *
 	 * @param bool $save A switch to save the archive file. Default is FALSE.
 	 * @param bool $dryrun An optional switch to perform a dry run test.
@@ -1607,6 +1607,8 @@ class Boldgrid_Backup_Admin_Core {
 			$this->archive_log->write( $info );
 
 			$info['file_md5'] = md5_file( $info['filepath'] );
+
+			$this->core->archive->write_results_file( $info );
 
 			// Enforce retention setting.
 			$this->enforce_retention();

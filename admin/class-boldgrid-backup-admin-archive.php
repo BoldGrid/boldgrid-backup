@@ -499,8 +499,7 @@ class Boldgrid_Backup_Admin_Archive {
 	 * Save backup information to a JSON file.
 	 *
 	 * The emergency restoration process will read the JSON file.
-	 * This method is triggered by the do_action( 'boldgrid_backup_post_archive_files' ) in
-	 * Boldgrid_Backup_Admin_Core::archive_files().
+	 * This method is called by Boldgrid_Backup_Admin_Core::archive_files().
 	 *
 	 * @since 1.8.0
 	 *
