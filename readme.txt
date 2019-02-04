@@ -14,7 +14,7 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 
 The BoldGrid Backup Plugin will backup your entire WordPress site with just a couple of clicks right in your WordPress dashboard. Just select a time and day for backups to run automatically, or manually create a backup at any time with a single click.
 
-Try out the [BoldGrid Backup Plugin](https://www.boldgrid.com/central/get-it-now?plugins=boldgrid-backup&redirect_url=wp-admin%2Fadmin.php%3Fpage%3Dboldgrid-backup-settings) on Cloud WordPress to see for yourself!
+Try out the [BoldGrid Backup Plugin](https://www.boldgrid.com/central/get-it-now?plugins=boldgrid-backup&redirect_url=wp-admin%2Fadmin.php%3Fpage%3Dboldgrid-backup) on Cloud WordPress to see for yourself!
 
 == Features ==
 
