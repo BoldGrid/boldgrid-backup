@@ -1554,6 +1554,7 @@ class Boldgrid_Backup_Admin_Core {
 		// Calculate duration and MD5.
 		$info['duration']    = number_format( ( $time_stop - $time_start ), 2, '.', '' );
 		$info['db_duration'] = number_format( ( $db_time_stop - $time_start ), 2, '.', '' );
+		$info['db_filename'] = basename( $this->db_dump_filepath );
 
 		/**
 		 * Actions to take after a backup has been created.
