@@ -44,6 +44,26 @@ class BoldGrid_Backup_Restore {
 	private $errors = [];
 
 	/**
+	 * Boldgrid_Backup_Url_Helper object.
+	 *
+	 * @since 1.8.0
+	 * @access private
+	 *
+	 * @var Boldgrid_Backup_Url_Helper
+	 */
+	private $url_helper;
+
+	/**
+	 * Constructor.
+	 *
+	 * @since 1.8.0
+	 */
+	public function __construct() {
+		require __DIR__ . '/class-boldgrid-backup-url-helper.php';
+		$this->url_helper = new Boldgrid_Backup_Url_Helper();
+	}
+
+	/**
 	 * Run the restoration process.
 	 *
 	 * @since 1.8.0
@@ -62,7 +82,7 @@ class BoldGrid_Backup_Restore {
 		echo 'Attempting to restore "' . $this->info['siteurl'] . '" from backup archive file "' .
 			$this->info['filepath'] . '"...' . PHP_EOL;
 
-		echo ( $this->restore() ? 'Success' : 'Error: Could not perform restoration.' ) . PHP_EOL;
+		echo ( $this->restore() ? 'Success.' : 'Error: Could not perform restoration.' ) . PHP_EOL;
 	}
 
 	/**
@@ -76,6 +96,7 @@ class BoldGrid_Backup_Restore {
 	private function get_restore_info() {
 		if ( ini_get( 'safe_mode' ) ) {
 			$this->errors[] = 'Error: Cannot continue in PHP safe mode.';
+			return;
 		}
 
 		// Get the backup results file.
@@ -83,7 +104,7 @@ class BoldGrid_Backup_Restore {
 
 		if ( ! file_exists( $results_file_path ) ) {
 			$this->errors[] = 'Error: No backup results file ("' . $results_file_path . '").';
-			return [];
+			return;
 		}
 
 		$results = json_decode( file_get_contents( $results_file_path ), true );
@@ -91,28 +112,28 @@ class BoldGrid_Backup_Restore {
 		// Validate results file content.
 		if ( empty( $results ) ) {
 			$this->errors[] = 'Error: No backup results found.';
-			return [];
+			return;
 		}
 
 		if ( empty( $results['filepath'] ) ) {
 			$this->errors[] = 'Error: Unknown backup archive file path.';
-			return [];
+			return;
 		}
 
 		if ( empty( $results['file_md5'] ) ) {
 			$this->errors[] = 'Error: Missing archive file checksum.';
-			return [];
+			return;
 		}
 
-		// Check if archive exists.
+		// Check if archive exists, and matches checksum.
 		if ( ! file_exists( $results['filepath'] ) ) {
 			$this->errors[] = 'Error: No backup archive file ("' . $results['filepath'] . '").';
-			return [];
+			return;
 		}
 
 		if ( md5_file( $results['filepath'] ) !== $results['file_md5'] ) {
 			$this->errors[] = 'Error: Failed archive file checksum.';
-			return [];
+			return;
 		}
 
 		// Get the archive log file and merge info.
@@ -121,7 +142,7 @@ class BoldGrid_Backup_Restore {
 		if ( ! file_exists( $archive_log_filepath ) ) {
 			$this->errors[] = 'Error: Backup archive log file "' . $archive_log_filepath .
 				'" does not exist.';
-			return [];
+			return;
 		}
 
 		$this->info = json_decode( file_get_contents( $archive_log_filepath ), true );
@@ -130,19 +151,40 @@ class BoldGrid_Backup_Restore {
 		if ( empty( $this->info ) ) {
 			$this->errors[] = 'Error: No backup information found in the log file "' .
 				$archive_log_filepath . '".';
-			return [];
+			return;
 		}
 
 		// Merge info and results arrays.
 		$this->info = array_merge( $this->info, $results );
 
 		// Validate more data.
+		if ( empty( $this->info['ABSPATH'] ) ) {
+			$this->errors[] = 'Error: Unknown ABSPATH.';
+			return;
+		}
+
+		if ( ! is_dir( $this->info['ABSPATH'] ) ) {
+			$this->errors[] = 'Error: ABSPATH directory "' . $this->info['ABSPATH'] .
+				'" does not exist or is not a directory.';
+		}
+
+		if ( ! is_writable( $this->info['ABSPATH'] ) ) {
+			$this->errors[] = 'Error: ABSPATH directory "' . $this->info['ABSPATH'] .
+				'" is not writable.';
+		}
+
 		if ( empty( $this->info['siteurl'] ) ) {
 			$this->errors[] = 'Error: Unknown siteurl.';
 		}
 
 		if ( empty( $this->info['cron_secret'] ) ) {
 			$this->errors[] = 'Error: Unknown cron_secret.';
+		}
+
+		if ( empty( $this->info['db_filename'] ) ) {
+			$this->errors[] = 'Error: Unknown database dump filename.';
+		} else {
+			$this->info['db_filepath'] = $this->info['ABSPATH'] . $this->info['db_filename'];
 		}
 	}
 
@@ -204,11 +246,7 @@ class BoldGrid_Backup_Restore {
 	 * @return bool;
 	 */
 	private function is_siteurl_reachable() {
-		require __DIR__ . '/class-boldgrid-backup-url-helper.php';
-
-		$url_helper = new Boldgrid_Backup_Url_Helper();
-
-		return false !== $url_helper->call_url( $this->info['siteurl'] );
+		return false !== $this->url_helper->call_url( $this->info['siteurl'] );
 	}
 
 	/**
@@ -248,8 +286,31 @@ class BoldGrid_Backup_Restore {
 	 */
 	private function set_time_limit( $time_limit = 900 ) {
 		$max_execution_time = ini_get( 'max_execution_time' );
+		set_time_limit( $max_execution_time > $time_limit ? $max_execution_time : $time_limit );
+	}
 
-		set_time_limit( ( $max_execution_time > $time_limit ? $max_execution_time : $time_limit ) );
+	/**
+	 * Get database config from wp-config.php file.
+	 *
+	 * @since 1.8.0
+	 * @access private
+	 *
+	 * @return bool
+	 */
+	private function get_db_config() {
+		$wpconfig = file_get_contents( $this->info['ABSPATH'] . 'wp-config.php' );
+
+		if ( $wpconfig ) {
+			preg_match_all( '/define\(.+DB_(NAME|USER|PASSWORD|HOST).+\);/', $wpconfig, $matches1 );
+			foreach ( $matches1[0] as $match1 ) {
+				preg_match_all( '/\'(.+?)\'/', $match1, $matches2 );
+				if ( ! empty( $matches2[1] ) ) {
+						define( $matches2[1][0], $matches2[1][1] );
+				}
+			}
+		}
+
+		return defined( 'DB_NAME' ) && defined( 'DB_USER' ) && defined( 'DB_PASSWORD' ) && defined( 'DB_HOST' );
 	}
 
 	/**
@@ -258,31 +319,156 @@ class BoldGrid_Backup_Restore {
 	 * @since 1.8.0
 	 * @access private
 	 *
+	 * @see Boldgrid_Backup_Admin_Cli::call_command()
+	 * @see self::restore_files()
+	 * @see self::restore_database()
+	 *
 	 * @return bool;
 	 */
 	private function restore() {
-		$restore_cmd          = ! empty( $this->info['restore_cmd'] ) ? $this->info['restore_cmd'] : null;
-		$is_siteurl_reachable = $this->is_siteurl_reachable( $this->info );
+		$is_siteurl_reachable = 0&&$this->is_siteurl_reachable();
+		$restore_cmd          = ! empty( $this->info['restore_cmd'] ) ?
+			$this->info['restore_cmd'] : null;
 
 		if ( $is_siteurl_reachable && $restore_cmd ) {
 			// Get environment information.
 			$env_info = json_decode(
-				$url_helper->call_url( $this->info['siteurl'] . '/wp-content/plugins/boldgrid-backup/cron/env-info.php' ),
+				$this->url_helper->call_url(
+					$this->info['siteurl'] . '/wp-content/plugins/boldgrid-backup/cron/env-info.php'
+				),
 				true
 			);
 
 			// Call the normal restore command.
-			echo 'Using URL address restoration process.' . PHP_EOL .
-				Boldgrid_Backup_Admin_Cli::call_command( $restore_cmd, $success, $return_var ) . PHP_EOL;
+			echo 'Using URL address restoration process...' . PHP_EOL .
+				Boldgrid_Backup_Admin_Cli::call_command( $restore_cmd, $success, $return_var ) .
+				PHP_EOL;
 		} else {
 			// Start the standalone restoration process.
-			echo 'Cannot reach the site URL; using standalone restoration process.' . PHP_EOL;
+			echo 'Cannot reach the site URL; using standalone restoration process...' . PHP_EOL;
 
+			ignore_user_abort( true );
 			$this->set_time_limit();
-
-			echo Boldgrid_Backup_Admin_Cli::call_command( 'echo "Still working on standalone."', $success, $return_var ) . PHP_EOL;
+			$success = $this->restore_files() && $this->restore_database();
 		}
 
-		return ( $success && 0 === $return_var );
+		return $success;
+	}
+
+	/**
+	 * Perform restoration of files.
+	 *
+	 * @since 1.8.0
+	 * @access private
+	 *
+	 * @see Boldgrid_Backup_Admin_Cli::call_command()
+	 * @see ZipArchive::open()
+	 * @see ZipArchive::extractTo()
+	 * @see PclZip::extract()
+	 *
+	 * @return bool
+	 */
+	private function restore_files() {
+		$success = false;
+
+		switch ( true ) {
+			case false://class_exists( 'ZipArchive' ):
+				echo 'Attempting file restoration using PHP ZipArchive...' . PHP_EOL;
+				$archive = new ZipArchive();
+				if ( true === $archive->open( $this->info['filepath'] ) ) {
+					$success = $archive->extractTo( $this->info['ABSPATH'] );
+				}
+				break;
+
+			case false://file_exists( $this->info['ABSPATH'] . 'wp-admin/includes/class-pclzip.php' ):
+				echo 'Attempting file restoration using PHP PCLZip...' . PHP_EOL;
+				require $this->info['ABSPATH'] . 'wp-admin/includes/class-pclzip.php';
+				$archive = new PclZip( $this->info['filepath'] );
+				$result  = $archive->extract( $this->info['ABSPATH'] );
+				$success = is_array( $result ) && ! empty( $result );
+				break;
+
+			case Boldgrid_Backup_Admin_Cli::call_command( 'unzip', $success, $return_var ) || $success || 0 === $return_var:
+				echo 'Attempting file restoration using unzip (CLI)...' . PHP_EOL;
+				// Assuming Linux.
+				$cmd = 'cd ' . $this->info['ABSPATH'] . ';unzip -oqq ' .
+					$this->info['filepath'] . ';for item in $(unzip -Z1 ' . $this->info['filepath'] .
+					' | sed -e "/^\.\/$/d" -e "s~/$~~"); do test -d "$i" && chmod 755 "$i";test -f "$i" && chmod 644 "$i"; done';
+
+				Boldgrid_Backup_Admin_Cli::call_command(
+					$cmd,
+					$success,
+					$return_var
+				);
+				break;
+
+			default:
+				echo 'Error: Could not extract files; ZipArchive, PCLZip, and unzip (CLI) unavailable.' .
+					PHP_EOL;
+				break;
+		}
+
+		echo ( $success ? 'Success.' : 'Failed.' ) . PHP_EOL;
+
+		return $success;
+	}
+
+	/**
+	 * Perform restoration of database.
+	 *
+	 * @since 1.8.0
+	 * @access private
+	 *
+	 * @see Boldgrid_Backup_Admin_Db_Import::import()
+	 * @see Boldgrid_Backup_Admin_Cli::call_command()
+	 *
+	 * @return bool;
+	 */
+	private function restore_database() {
+		if ( ! file_exists( $this->info['db_filepath'] ) ) {
+			$this->errors[] = 'Error: Database dump file "' . $this->info['db_filepath'] .
+				'" does not exist.';
+			$success        = false;
+		} else {
+			$success = $this->get_db_config();
+		}
+
+		switch ( true ) {
+			case ! $success:
+				echo 'Error: Could not get database credentials from "' .
+					$this->info['ABSPATH'] . 'wp-config.php".' . PHP_EOL;
+				break;
+
+			case false://class_exists( 'PDO' ):
+				echo 'Attempting to restore database using PHP PDO...' . PHP_EOL;
+				require dirname( __DIR__ ) . '/admin/class-boldgrid-backup-admin-db-import.php';
+				$importer = new Boldgrid_Backup_Admin_Db_Import();
+				$success  = $importer->import( $this->info['ABSPATH'] . $this->info['db_filename'] );
+
+				if ( ! $success ) {
+					echo 'Error: Could not import database (using PDO).' . PHP_EOL;
+				}
+				break;
+
+			case Boldgrid_Backup_Admin_Cli::call_command( 'mysql -V', $success, $return_var ) || $success || 0 === $return_var:
+				echo 'Attempting to restore database using mysql client (CLI)...' . PHP_EOL;
+				$cmd = 'mysql -h ' . DB_HOST . ' -p' . DB_PASSWORD . ' -u ' . DB_USER . ' ' .
+					DB_NAME . ' < "' . $this->info['db_filepath'] . '"';
+
+				Boldgrid_Backup_Admin_Cli::call_command( $cmd, $success, $return_var );
+
+				if ( ! $success ) {
+					echo 'Error: Could not import database (using mysql client).' . PHP_EOL;
+				}
+				break;
+
+			default:
+				echo 'Error: Could not import database; PDO and mysql client (CLI) unavailable.' .
+					PHP_EOL;
+				$success = false;
+				break;
+		}
+
+		return $success;
 	}
 }
