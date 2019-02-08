@@ -146,6 +146,11 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 			return false;
 		}
 
+		// Do not allow the "cron/restore-info.json" file used for emergency restorations.
+		if ( $this->is_match( 'cron/restore-info.json', $file ) ) {
+			return false;
+		}
+
 		// Get comma-delimited lists from user input or settings.  Sanitizing is done below.
 		$include = $this->in_ajax_preview ? $_POST['include'] : $this->from_settings( 'include' );
 		$exclude = $this->in_ajax_preview ? $_POST['exclude'] : $this->from_settings( 'exclude' );
