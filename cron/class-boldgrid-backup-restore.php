@@ -390,16 +390,24 @@ class BoldGrid_Backup_Restore {
 
 			case Boldgrid_Backup_Admin_Cli::call_command( 'unzip', $success, $return_var ) || $success || 0 === $return_var:
 				echo 'Attempting file restoration using unzip (CLI)...' . PHP_EOL;
-				// Assuming Linux.
 				$cmd = 'cd ' . $this->info['ABSPATH'] . ';unzip -oqq ' .
-					$this->info['filepath'] . ';for item in $(unzip -Z1 ' . $this->info['filepath'] .
-					' | sed -e "/^\.\/$/d" -e "s~/$~~"); do test -d "$i" && chmod 755 "$i";test -f "$i" && chmod 644 "$i"; done';
-
+					$this->info['filepath'];
 				Boldgrid_Backup_Admin_Cli::call_command(
 					$cmd,
 					$success,
 					$return_var
 				);
+
+				echo 'Checking/fixing permissions...' . PHP_EOL;
+				// Assuming Linux.
+				$cmd = 'for i in $(unzip -Z1 ' . $this->info['filepath'] .
+				' | sed -e "/^\.\/$/d" -e "s~/$~~"); do test -d "$i" && chmod 755 "$i";test -f "$i" && chmod 644 "$i"; done';
+				Boldgrid_Backup_Admin_Cli::call_command(
+					$cmd,
+					$success2,
+					$return_var2
+				);
+
 				break;
 
 			default:
