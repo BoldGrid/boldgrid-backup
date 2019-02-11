@@ -189,7 +189,7 @@ class BoldGrid_Backup_Restore {
 	}
 
 	/**
-	 * Validate.
+	 * Validate, before performing restoration.
 	 *
 	 * @since 1.8.0
 	 * @access private
@@ -263,11 +263,9 @@ class BoldGrid_Backup_Restore {
 				for ( $i = 0; $i < $zip->numFiles; $i++ ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName
 					$data = $zip->statIndex( $i );
 
-					if ( empty( $data['name'] ) ) {
-						continue;
+					if ( ! empty( $data['name'] ) ) {
+						chmod( $this->info['ABSPATH'] . $data['name'], 0644 );
 					}
-
-					chmod( $this->info['ABSPATH'] . $data['name'], 0644 );
 				}
 			}
 		}
@@ -326,7 +324,7 @@ class BoldGrid_Backup_Restore {
 	 * @return bool;
 	 */
 	private function restore() {
-		$is_siteurl_reachable = 0&&$this->is_siteurl_reachable();
+		$is_siteurl_reachable = $this->is_siteurl_reachable();
 		$restore_cmd          = ! empty( $this->info['restore_cmd'] ) ?
 			$this->info['restore_cmd'] : null;
 
@@ -372,7 +370,7 @@ class BoldGrid_Backup_Restore {
 		$success = false;
 
 		switch ( true ) {
-			case false://class_exists( 'ZipArchive' ):
+			case class_exists( 'ZipArchive' ):
 				echo 'Attempting file restoration using PHP ZipArchive...' . PHP_EOL;
 				$archive = new ZipArchive();
 				if ( true === $archive->open( $this->info['filepath'] ) ) {
@@ -380,7 +378,7 @@ class BoldGrid_Backup_Restore {
 				}
 				break;
 
-			case false://file_exists( $this->info['ABSPATH'] . 'wp-admin/includes/class-pclzip.php' ):
+			case file_exists( $this->info['ABSPATH'] . 'wp-admin/includes/class-pclzip.php' ):
 				echo 'Attempting file restoration using PHP PCLZip...' . PHP_EOL;
 				require $this->info['ABSPATH'] . 'wp-admin/includes/class-pclzip.php';
 				$archive = new PclZip( $this->info['filepath'] );
@@ -390,8 +388,7 @@ class BoldGrid_Backup_Restore {
 
 			case Boldgrid_Backup_Admin_Cli::call_command( 'unzip', $success, $return_var ) || $success || 0 === $return_var:
 				echo 'Attempting file restoration using unzip (CLI)...' . PHP_EOL;
-				$cmd = 'cd ' . $this->info['ABSPATH'] . ';unzip -oqq ' .
-					$this->info['filepath'];
+				$cmd = 'cd ' . $this->info['ABSPATH'] . ';unzip -oqq ' . $this->info['filepath'];
 				Boldgrid_Backup_Admin_Cli::call_command(
 					$cmd,
 					$success,
@@ -447,7 +444,7 @@ class BoldGrid_Backup_Restore {
 					$this->info['ABSPATH'] . 'wp-config.php".' . PHP_EOL;
 				break;
 
-			case false://class_exists( 'PDO' ):
+			case class_exists( 'PDO' ):
 				echo 'Attempting to restore database using PHP PDO...' . PHP_EOL;
 				require dirname( __DIR__ ) . '/admin/class-boldgrid-backup-admin-db-import.php';
 				$importer = new Boldgrid_Backup_Admin_Db_Import();
@@ -462,7 +459,6 @@ class BoldGrid_Backup_Restore {
 				echo 'Attempting to restore database using mysql client (CLI)...' . PHP_EOL;
 				$cmd = 'mysql -h ' . DB_HOST . ' -p' . DB_PASSWORD . ' -u ' . DB_USER . ' ' .
 					DB_NAME . ' < "' . $this->info['db_filepath'] . '"';
-
 				Boldgrid_Backup_Admin_Cli::call_command( $cmd, $success, $return_var );
 
 				if ( ! $success ) {
