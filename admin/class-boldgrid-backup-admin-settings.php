@@ -458,8 +458,8 @@ class Boldgrid_Backup_Admin_Settings {
 			 */
 			$settings = $this->update_cron( $settings );
 
-			// Take action if we tried and failed to add crons.
-			if ( $settings['crons_added'] ) {
+			// Add a notice if we tried and failed to add crons.
+			if ( ! $settings['crons_added'] ) {
 				$update_error    = true;
 				$update_errors[] = esc_html__( 'An error occurred when modifying cron jobs. Please try again.', 'boldgrid-backup' );
 			}
