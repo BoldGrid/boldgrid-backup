@@ -89,7 +89,6 @@ class Boldgrid_Backup {
 	 * @access private
 	 */
 	private function load_dependencies() {
-
 		require_once BOLDGRID_BACKUP_PATH . '/vendor/autoload.php';
 
 		/**
@@ -226,6 +225,11 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-cli.php';
 
+		// WP-CLI support.
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-wpcli.php';
+		}
+
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
 
@@ -258,6 +262,11 @@ class Boldgrid_Backup {
 
 		// Instantiate the admin core.
 		$plugin_admin_core = new Boldgrid_Backup_Admin_Core();
+
+		// WP-CLI support.
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			Boldgrid_Backup_Admin_Wpcli::$core = $plugin_admin_core;
+		}
 
 		// Add nav menu items.
 		$this->loader->add_action(

@@ -30,7 +30,7 @@ ob_start();
 				?>
 			<option value='<?php echo esc_attr( $x ); ?>'
 				<?php
-				if ( ! empty( $settings['schedule']['tod_h'] ) && $x === $settings['schedule']['tod_h'] ) {
+				if ( ! empty( $settings['schedule']['tod_h'] ) && $x == $settings['schedule']['tod_h'] ) { // phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
 					echo ' selected';
 				}
 				?>
