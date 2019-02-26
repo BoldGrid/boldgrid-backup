@@ -66,6 +66,7 @@ $files = array(
 	'/admin/class-boldgrid-backup-admin-tools.php',
 	'/admin/class-boldgrid-backup-admin-time.php',
 	'/admin/class-boldgrid-backup-admin-crypt.php',
+	'/admin/class-boldgrid-backup-admin-cli.php',
 	'/includes/class-boldgrid-backup-authentication.php',
 	'/includes/class-boldgrid-backup-download.php',
 	'/includes/class-boldgrid-backup-file.php',
