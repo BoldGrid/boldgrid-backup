@@ -1,23 +1,22 @@
 <?php
 /**
- * File: restore.php
+ * File: bgbkup-cli.php
  *
- * Emergency restoration script.  This script is used when there is a severe issue with the site
- * which requires immediate restoration from the latest backup archive.
+ * Performs site integrity checks and manual and emergency restoration.
  *
  * @link https://www.boldgrid.com
- * @since 1.8.0
+ * @since 1.9.0
  *
  * @package    Boldgrid_Backup
- * @subpackage Boldgrid_Backup/cron
+ * @subpackage Boldgrid_Backup\Cron
  * @copyright  BoldGrid
- * @version    $Id$
  * @author     BoldGrid <support@boldgrid.com>
  *
  * phpcs:disable WordPress.VIP,WordPress.XSS.EscapeOutput
  */
 
-// Ensure PHP compatibility.
+namespace Boldgrid\Backup\Cron;
+
 $php_min_version = '5.4';
 
 if ( version_compare( PHP_VERSION, $php_min_version, '<' ) ) {
@@ -26,7 +25,15 @@ if ( version_compare( PHP_VERSION, $php_min_version, '<' ) ) {
 	exit( 1 );
 }
 
-// Run the restoration.
-require __DIR__ . '/class-boldgrid-backup-restore.php';
-$restore = new BoldGrid_Backup_Restore();
-$restore->run();
+require __DIR__ . '/class-info.php';
+require __DIR__ . '/class-site-check.php';
+
+if ( Info::has_errors() ) {
+	Info::print_errors();
+	exit( 1 );
+}
+
+if ( Site_Check::should_restore() ) {
+	require __DIR__ . '/class-site-restore.php';
+	( new Site_Restore() )->run();
+}

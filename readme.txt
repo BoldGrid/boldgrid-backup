@@ -2,7 +2,7 @@
 Contributors: boldgrid, joemoto, imh_brad, rramo012, timph, bgnicolepaschen
 Tags: boldgrid, backup, restore, migrate, migration
 Requires at least: 4.4
-Tested up to: 5.0.3
+Tested up to: 5.1
 Requires PHP: 5.4
 Stable tag: 1.8.0
 License: GPLv2 or later
@@ -76,7 +76,7 @@ The following features are available, of which you can find additional info for 
 
 == Changelog ==
 
-= 1.8.0 In progress =
+= 1.9.0 In progress =
 
 * New feature: Added emergency restoration process.
 * New feature: Added WP-CLI support for backup schedule.
