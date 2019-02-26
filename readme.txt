@@ -78,13 +78,13 @@ The following features are available, of which you can find additional info for 
 
 = 1.9.0 In progress =
 
-* New feature: Added emergency restoration process.
+* New feature: Added emergency/standalone restoration CLI process.
+
+= 1.8.0 =
+
+Release date: Feb 14th, 2019
+
 * New feature: Added WP-CLI support for backup schedule.
-
-= 1.7.3-rc.1 =
-
-Release date: Jan 29th, 2019
-
 * Update:      Change thickbox background color to inform user something is loading.
 * Update:      Misc updates required for next version of BoldGrid Backup Premium.
 
