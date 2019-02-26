@@ -138,6 +138,7 @@ class Info {
 	 * Get the operational mode.
 	 *
 	 * A specific mode is required.
+	 * "help" will print usage and exit.  This is the default option.
 	 * "check" will check issues and restore if needed.
 	 * "restore" will force a restoration.
 	 *
@@ -150,12 +151,29 @@ class Info {
 	 */
 	public static function get_mode() {
 		if ( ! isset( self::$info['operation'] ) ) {
-			self::$info['operation'] = self::has_arg_flag( 'restore' ) ?
-				'restore' : ( self::has_arg_flag( 'check' ) ? 'check' : false );
+			switch ( true ) {
+				case self::has_arg_flag( 'help' ):
+					self::$info['operation'] = 'help';
+					break;
+				case self::has_arg_flag( 'restore' ):
+					self::$info['operation'] = 'restore';
+					break;
+				case self::has_arg_flag( 'check' ):
+					self::$info['operation'] = 'check';
+					break;
+				default:
+					self::$info['operation'] = false;
+					break;
+			}
 
-			if ( ! self::$info['operation'] ) {
+			if ( 'help' === self::$info['operation'] ) {
+				self::$info['errors']['help'] =
+					'Usage: php bgbkup-cli.php <check|restore> [zip=<path/to/backup.zip>]';
+			} elseif ( ! self::$info['operation'] ) {
 				self::$info['errors']['mode'] =
 					'Error: An operational mode (check/restore) is required.';
+				self::$info['errors']['help'] =
+					'Usage: php bgbkup-cli.php <check|restore> [zip=<path/to/backup.zip>]';
 			}
 		}
 

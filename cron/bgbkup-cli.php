@@ -36,4 +36,6 @@ if ( Info::has_errors() ) {
 if ( Site_Check::should_restore() ) {
 	require __DIR__ . '/class-site-restore.php';
 	( new Site_Restore() )->run();
+} else {
+	echo 'Info: No action taken.' . PHP_EOL;
 }
