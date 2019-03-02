@@ -205,7 +205,8 @@ class Boldgrid_Backup_Admin_Archive_Details {
 			}
 
 			// Take action if we've updated either the backup's title or description.
-			if ( ! empty( $attributes['title'] ) || ! empty( $attributes['description'] ) ) {
+			$title_description_update = ! empty( $attributes['title'] ) || ! empty( $attributes['description'] );
+			if ( $title_description_update && isset( $this->core->activity ) ) {
 				$this->core->activity->add( 'update_title_description', 1, $this->core->rating_prompt_config );
 			}
 		}
