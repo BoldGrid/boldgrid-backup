@@ -313,8 +313,12 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 			/*
 			 * Create the directory and all applicable files needed within for security,
 			 * such as .htaccess / etc.
+			 *
+			 * If directory is the wp-content directory, add additional random characters so that
+			 * the backup directory is not simply wp-content/boldgrid_backup.
 			 */
-			$possible_dir    .= DIRECTORY_SEPARATOR . 'boldgrid_backup';
+			$append           = $possible_dir !== WP_CONTENT_DIR ? '' : '_' . wp_generate_password( 12, false );
+			$possible_dir    .= DIRECTORY_SEPARATOR . 'boldgrid_backup' . $append;
 			$backup_directory = $this->create( $possible_dir );
 			if ( ! $backup_directory ) {
 				continue;
