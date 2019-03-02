@@ -4,7 +4,7 @@ Tags: boldgrid, backup, restore, migrate, migration
 Requires at least: 4.4
 Tested up to: 5.0.3
 Requires PHP: 5.4
-Stable tag: 1.7.2
+Stable tag: 1.8.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -76,14 +76,11 @@ The following features are available, of which you can find additional info for 
 
 == Changelog ==
 
-= 1.8.0 In progress =
+= 1.8.0 =
+
+Release date: Feb 14th, 2019
 
 * New feature: Added WP-CLI support for backup schedule.
-
-= 1.7.3-rc.1 =
-
-Release date: Jan 29th, 2019
-
 * Update:      Change thickbox background color to inform user something is loading.
 * Update:      Misc updates required for next version of BoldGrid Backup Premium.
 
