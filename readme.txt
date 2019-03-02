@@ -76,6 +76,10 @@ The following features are available, of which you can find additional info for 
 
 == Changelog ==
 
+= 1.8.1 In progress =
+
+* Bug fix: Ensure library's activity class is available before using it.
+
 = 1.8.0 =
 
 Release date: Feb 14th, 2019
