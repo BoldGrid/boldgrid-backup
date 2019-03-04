@@ -80,6 +80,20 @@ class Boldgrid_Backup_Admin_Settings {
 	}
 
 	/**
+	 * Get a setting from the settings.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param  string $key The setting name.
+	 * @return mixed
+	 */
+	public function get_setting( $key ) {
+		$settings = $this->get_settings();
+
+		return isset( $settings[$key] ) ? $settings[$key] : null;
+	}
+
+	/**
 	 * Get settings using defaults.
 	 *
 	 * @since 1.0
@@ -218,6 +232,55 @@ class Boldgrid_Backup_Admin_Settings {
 
 		// Return the settings array.
 		return $settings;
+	}
+
+	/**
+	 * Whether or not we are backing up all files, as defined in the settings.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return bool
+	 */
+	public function is_all_files() {
+		$is_all = true;
+
+		$folder_exclusion_exclude = $this->get_setting( 'folder_exclusion_exclude' );
+		$folder_exclusion_include = $this->get_setting( 'folder_exclusion_include' );
+
+		if ( $this->core->folder_exclusion->default_include !== $folder_exclusion_include ) {
+			$is_all = false;
+		}
+
+		if ( $this->core->folder_exclusion->default_exclude !== $folder_exclusion_exclude ) {
+			$is_all = false;
+		}
+
+		/**
+		 * Filter whether or not the backup is considered backing up all files.
+		 *
+		 * For example, an advanced user may have custom include / exclude settings, and wants this
+		 * to be considered a backup of all their files.
+		 *
+		 * @since 1.9.0
+		 *
+		 * @param bool $is_all The current value of $is_all.
+		 */
+		apply_filters( 'boldgrid_backup_settings_is_all_files', $is_all );
+
+		return $is_all;
+	}
+
+	/**
+	 * Whether or not we are backing up all tables, as defined in the settings.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return bool
+	 */
+	public function is_all_tables() {
+		$exclude_tables = $this->get_setting( 'exclude_tables' );
+
+		return empty( $exclude_tables );
 	}
 
 	/**

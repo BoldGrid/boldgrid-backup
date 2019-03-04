@@ -21,6 +21,14 @@
  */
 class Boldgrid_Backup_Admin_Core {
 	/**
+	 * Archiver Utility class.
+	 *
+	 * @since 1.9.0
+	 * @var Boldgrid_Backup_Admin_Archiver_Utility
+	 */
+	public $archiver_utility;
+
+	/**
 	 * Auto Rollback class.
 	 *
 	 * @since  1.5.2
@@ -420,6 +428,14 @@ class Boldgrid_Backup_Admin_Core {
 	public $is_archiving_update_protection = false;
 
 	/**
+	 * Whether or not we are in a scheduled backup (IE a cron backup).
+	 *
+	 * @since 1.9.0
+	 * @var bool
+	 */
+	public $is_scheduled_backup;
+
+	/**
 	 * Common elements.
 	 *
 	 * @since 1.5.3
@@ -545,6 +561,8 @@ class Boldgrid_Backup_Admin_Core {
 		$this->archive_details = new Boldgrid_Backup_Admin_Archive_Details( $this );
 
 		$this->archive_fail = new Boldgrid_Backup_Admin_Archive_Fail( $this );
+
+		$this->archiver_utility = new Boldgrid_Backup_Admin_Archiver_Utility( $this );
 
 		$this->wp_cron = new Boldgrid_Backup_Admin_WP_Cron( $this );
 
@@ -1293,6 +1311,8 @@ class Boldgrid_Backup_Admin_Core {
 	public function archive_files( $save = false, $dryrun = false ) {
 		$this->pre_auto_update = 'pre_auto_update' === current_filter();
 
+		$this->is_scheduled_backup = $this->doing_cron && ! $this->pre_auto_update;
+
 		Boldgrid_Backup_Admin_In_Progress_Data::set_args(
 			array(
 				'status' => __( 'Initializing backup', 'boldgrid-backup' ),
@@ -1310,8 +1330,6 @@ class Boldgrid_Backup_Admin_Core {
 			$this->in_progress->set();
 		}
 
-		$is_scheduled_backup = $this->doing_cron && ! $this->pre_auto_update;
-
 		/*
 		 * If this is a scheduled backup and no location is selected to save the
 		 * backup to, abort.
@@ -1321,7 +1339,7 @@ class Boldgrid_Backup_Admin_Core {
 		 * wanted to change their retention settings but did not want to schedule
 		 * backups, validating storage locations would be problematic.
 		 */
-		if ( $is_scheduled_backup && ! $this->remote->any_enabled() ) {
+		if ( $this->is_scheduled_backup && ! $this->remote->any_enabled() ) {
 			$error = __( 'No backup locations selected! While we could create a backup archive, you have not selected where the backup archive should be saved to. Please choose a storage location in your BoldGrid Backup Settings to save this backup archive to.', 'boldgrid-backup' );
 			$this->archive_fail->schedule_fail_email( $error );
 			return array(
@@ -1594,7 +1612,7 @@ class Boldgrid_Backup_Admin_Core {
 		 * not only include the standard info about the backup (which we're sending now), it will
 		 * also include info about other jobs that were ran (such as uploading the backup remotely).
 		 */
-		if ( $this->email->user_wants_notification( 'backup' ) && ! $is_scheduled_backup ) {
+		if ( $this->email->user_wants_notification( 'backup' ) && ! $this->is_scheduled_backup ) {
 			$email_parts          = $this->email->post_archive_parts( $info );
 			$email_body           = $email_parts['body']['main'] . $email_parts['body']['signature'];
 			$info['mail_success'] = $this->email->send( $email_parts['subject'], $email_body );
@@ -1609,12 +1627,15 @@ class Boldgrid_Backup_Admin_Core {
 
 			$info['file_md5'] = md5_file( $info['filepath'] );
 
-			$this->archive->write_results_file( $info );
-
 			// Enforce retention setting.
 			$this->enforce_retention();
 
 			update_option( 'boldgrid_backup_latest_backup', $info );
+		}
+
+		// Actions to take if we're creating a full site backup.
+		if ( ! $dryrun && $this->archiver_utility->is_full_backup() ) {
+			$this->archive->write_results_file( $info );
 		}
 
 		Boldgrid_Backup_Admin_In_Progress_Data::set_args(
@@ -2225,8 +2246,9 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->is_backup_now = true;
 
-		$key                  = 'folder_exclusion_type';
-		$this->is_backup_full = isset( $_POST[ $key ] ) && 'full' === $_POST[ $key ];
+		$is_all_files         = isset( $_POST['folder_exclusion_type'] ) && 'full' === $_POST['folder_exclusion_type'];
+		$is_all_tables        = isset( $_POST['table_exclusion_type'] ) && 'full' === $_POST['table_exclusion_type'];
+		$this->is_backup_full = $is_all_files && $is_all_tables;
 
 		$this->is_archiving_update_protection = ! empty( $_POST['is_updating'] ) &&
 			'true' === $_POST['is_updating'];
