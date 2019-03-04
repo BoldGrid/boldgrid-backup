@@ -90,7 +90,7 @@ class Boldgrid_Backup_Admin_Settings {
 	public function get_setting( $key ) {
 		$settings = $this->get_settings();
 
-		return isset( $settings[$key] ) ? $settings[$key] : null;
+		return isset( $settings[ $key ] ) ? $settings[ $key ] : null;
 	}
 
 	/**

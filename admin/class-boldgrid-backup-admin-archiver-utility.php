@@ -55,13 +55,13 @@ class Boldgrid_Backup_Admin_Archiver_Utility {
 
 		if ( $this->core->is_archiving_update_protection ) {
 			return true;
-		};
+		}
 
 		if ( $this->core->is_backup_full ) {
 			return true;
 		}
 
-		if ( $this->core->doing_cron && $this->core->settings->is_all_files() && $this->core->settings->is_all_tables() ) {
+		if ( $this->core->is_scheduled_backup && $this->core->settings->is_all_files() && $this->core->settings->is_all_tables() ) {
 			return true;
 		}
 
