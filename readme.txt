@@ -76,6 +76,10 @@ The following features are available, of which you can find additional info for 
 
 == Changelog ==
 
+= 1.8.1 In progress =
+
+* Update: When storing backups in wp-content dir, make "boldgrid_backup" dir name more unique.
+
 = 1.8.0 =
 
 Release date: Feb 14th, 2019
