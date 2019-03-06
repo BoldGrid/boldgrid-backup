@@ -209,6 +209,7 @@ echo '
 	<p>' .
 	wp_kses(
 		sprintf(
+			// translators: 1 The opening anchor tag linking to the User Community, 2 its closing anchor tag.
 			__( 'If you have questions on best backup practices, join our User Community %1$sBoldGrid Team Orange%2$s.', 'boldgrid-backup' ),
 			'<a href="https://www.facebook.com/groups/BGTeamOrange" target="_blank">',
 			'</a>'
