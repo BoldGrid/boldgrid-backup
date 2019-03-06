@@ -201,6 +201,22 @@ if ( ! $this->core->config->is_premium_done ) {
 	);
 }
 
+echo '
+	<hr />
+
+	<h3> ' . esc_html__( 'Questions?', 'boldgrid-backup' ) . '</h3>
+
+	<p>' .
+	wp_kses(
+		sprintf(
+			__( 'If you have questions on best backup practices, join our User Community %1$sBoldGrid Team Orange%2$s.', 'boldgrid-backup' ),
+			'<a href="https://www.facebook.com/groups/BGTeamOrange" target="_blank">',
+			'</a>'
+		),
+		Boldgrid_Backup_Admin_Utility::$allowed_html
+	) .
+	'</p>';
+
 $output = ob_get_contents();
 ob_end_clean();
 

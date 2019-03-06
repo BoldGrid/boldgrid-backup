@@ -21,6 +21,21 @@
  */
 class Boldgrid_Backup_Admin_Utility {
 	/**
+	 * Allowed html for general usage in wp_kses calls.
+	 *
+	 * @since 1.9.0
+	 * @var array
+	 */
+	public static $allowed_html = array(
+		'a'      => array(
+			'href'   => array(),
+			'target' => array(),
+		),
+		'strong' => array(),
+		'em'     => array(),
+	);
+
+	/**
 	 * Convert bytes to a human-readable measure.
 	 *
 	 * @since 1.0
