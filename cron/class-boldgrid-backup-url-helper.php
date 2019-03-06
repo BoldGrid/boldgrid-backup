@@ -4,14 +4,13 @@
  *
  * Standalone URL address helper for Cron tasks.
  *
- * @link https://www.boldgrid.com
- * @since 1.6.3
+ * @link       https://www.boldgrid.com
+ * @since      1.6.3
  *
- * @package Boldgrid_Backup
+ * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/cron
- * @copyright BoldGrid
- * @version $Id$
- * @author BoldGrid <support@boldgrid.com>
+ * @copyright  BoldGrid
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 // phpcs:disable WordPress.VIP, WordPress.WP.AlternativeFunctions

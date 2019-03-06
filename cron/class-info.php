@@ -4,8 +4,8 @@
  *
  * Get information needed for cron processes.
  *
- * @link https://www.boldgrid.com
- * @since 1.9.0
+ * @link       https://www.boldgrid.com
+ * @since      1.9.0
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Cron
@@ -26,7 +26,7 @@ class Info {
 	/**
 	 * Archive and environment information.
 	 *
-	 * @since 1.9.0
+	 * @since  1.9.0
 	 * @access private
 	 *
 	 * @var array
@@ -37,7 +37,7 @@ class Info {
 	/**
 	 * Backup result information JSON file path.
 	 *
-	 * @since.1.8.0
+	 * @since. 1.8.0
 	 * @access private
 	 * @staticvar
 	 *
@@ -68,6 +68,7 @@ class Info {
 	 * @see self::get_zip_arg()
 	 * @see self::have_execution_functions()
 	 * @see self::get_restore_info()
+	 * @see self::choose_method()
 	 *
 	 * @return array
 	 */
@@ -78,6 +79,7 @@ class Info {
 			self::get_zip_arg();
 			self::have_execution_functions();
 			self::get_restore_info();
+			self::choose_method(); // Requires data from self::get_restore_info().
 		}
 
 		return self::$info;
@@ -100,7 +102,7 @@ class Info {
 	}
 
 	/**
-	 * Print errors.
+	 * Print errors (to STDERR / FD2).
 	 *
 	 * @since 1.9.0
 	 * @static
@@ -109,7 +111,7 @@ class Info {
 	 */
 	public static function print_errors() {
 		if ( self::has_errors() ) {
-			echo implode( PHP_EOL, self::$info['errors'] ) . PHP_EOL;
+			fwrite( STDERR, implode( PHP_EOL, self::$info['errors'] ) . PHP_EOL );
 		}
 	}
 
@@ -166,14 +168,14 @@ class Info {
 					break;
 			}
 
+			$usage = 'Usage: php bgbkup-cli.php <check|restore> [method=ajax|cli|pclzip|ziparchive] [zip=<path/to/backup.zip>]';
+
 			if ( 'help' === self::$info['operation'] ) {
-				self::$info['errors']['help'] =
-					'Usage: php bgbkup-cli.php <check|restore> [zip=<path/to/backup.zip>]';
+				self::$info['errors']['help'] = $usage;
 			} elseif ( ! self::$info['operation'] ) {
 				self::$info['errors']['mode'] =
 					'Error: An operational mode (check/restore) is required.';
-				self::$info['errors']['help'] =
-					'Usage: php bgbkup-cli.php <check|restore> [zip=<path/to/backup.zip>]';
+				self::$info['errors']['help'] = $usage;
 			}
 		}
 
@@ -268,7 +270,8 @@ class Info {
 	 * @since 1.9.0
 	 * @static
 	 *
-	 * @see self::get_cli_args()
+	 * @see self::get_arg_value()
+	 * @see self::has_arg_flag()
 	 *
 	 * @return string|false
 	 */
@@ -289,6 +292,84 @@ class Info {
 		}
 
 		return self::$info['zip'];
+	}
+
+	/**
+	 * Determine the restoration method.
+	 *
+	 * This method either validates and usees the specified method, or determines one to use.
+	 * Valid values are: "ajax", "ziparchive", "pclzip", "cli".
+	 * This method triggers reading the CLI arguments and appends to the self:$info array.
+	 *
+	 * @since 1.9.0
+	 * @static
+	 *
+	 * @see self::get_arg_value()
+	 * @see Site_Check::is_siteurl_reachable()
+	 * @see \Boldgrid_Backup_Admin_Cli::call_command()
+	 *
+	 * @return string|false
+	 */
+	public static function choose_method() {
+		if ( ! isset( self::$info['method'] ) ) {
+			self::$info['method'] = false;
+			$method_arg           = self::get_arg_value( 'method' );
+			$unavail_msg          = 'Error: The method "' . $method_arg . '" is not available.';
+
+			switch ( $method_arg ) {
+				case 'ajax':
+					if ( ! ( Site_Check::is_siteurl_reachable() && ! empty( self::$info['restore_cmd'] ) ) ) {
+						self::$info['errors']['method_unavailable'] = $unavail_msg;
+						break;
+					}
+					self::$info['method'] = $method_arg;
+					break;
+				case 'cli':
+					if ( ! ( \Boldgrid_Backup_Admin_Cli::call_command( 'unzip', $success, $return_var ) || $success || 0 === $return_var ) ) {
+						self::$info['errors']['method_unavailable'] = $unavail_msg;
+						break;
+					}
+					self::$info['method'] = $method_arg;
+					break;
+				case 'pclzip':
+					if ( empty( self::$info['ABSPATH'] ) || ! file_exists( self::$info['ABSPATH'] . 'wp-admin/includes/class-pclzip.php' ) ) {
+						self::$info['errors']['method_unavailable'] = $unavail_msg;
+						break;
+					}
+					self::$info['method'] = $method_arg;
+					break;
+				case 'ziparchive':
+					if ( ! class_exists( 'ZipArchive' ) ) {
+						self::$info['errors']['method_unavailable'] = $unavail_msg;
+						break;
+					}
+					self::$info['method'] = $method_arg;
+					break;
+				case '':
+					// Determine method.
+					switch ( true ) {
+						case class_exists( 'ZipArchive' ):
+							self::$info['method'] = 'ziparchive';
+							break;
+						case file_exists( $info['ABSPATH'] . 'wp-admin/includes/class-pclzip.php' ):
+							self::$info['method'] = 'pclzip';
+							break;
+						case \Boldgrid_Backup_Admin_Cli::call_command( 'unzip', $success, $return_var ) || $success || 0 === $return_var:
+							self::$info['method'] = 'cli';
+							break;
+						default:
+							self::$info['method'] = 'ajax';
+							break;
+					}
+					break;
+				default:
+					self::$info['errors']['method_invalid'] =
+						'Error: The specified restoration method is invalid; must be one of the following: ajax, cli, pclzip, ziparchive.';
+					break;
+			}
+		}
+
+		return self::$info['method'];
 	}
 
 	/**
@@ -334,52 +415,77 @@ class Info {
 	}
 
 	/**
+	 * Extarct a file from a backup archive ZIP file.
+	 *
+	 * @since 1.9.0
+	 * @static
+	 *
+	 * @param  string $extract_dir Extraction directory.
+	 * @param  string $file        File to be extracted.
+	 * @return bool
+	 */
+	public static function extract_file( $extract_dir, $file ) {
+		$success = false;
+
+		switch ( true ) {
+			case class_exists( 'ZipArchive' ):
+				$zip = new \ZipArchive();
+				if ( true === $zip->open( self::$info['filepath'] ) ) {
+					$success = $zip->extractTo( $extract_dir, $file );
+					$zip->close();
+				} else {
+					self::$info['errors'][] = 'Error: Could not open the specified ZIP file path "' .
+						self::$info['filepath'] . '".';
+				}
+				break;
+			// @todo: Add PCLZip and unzip (CLI).
+			default:
+				self::$info['errors'][] = 'Error: Could not extract files; ZipArchive unavailable.';
+		}
+
+		if ( ! $success || ! file_exists( $extract_dir . '/' . $file ) ) {
+			self::$info['errors'][] = 'Error: The file "' . $file .
+				'" does not exist in the specified ZIP file path "' . self::$info['filepath'] .
+				'".';
+
+			$success = false;
+		}
+
+		return $success;
+	}
+
+	/**
 	 * Read an archive log JSON file from inside of a backup archive ZIP file, and return the
 	 * contents in an array.
 	 *
 	 * @since 1.9.0
 	 * @static
 	 *
-	 * @param  string $filepath Backup Archive ZIP file path.
+	 * @see self::extract_file()
+	 * @see self::read_json_file()
+	 *
 	 * @return array
 	 */
-	public static function read_zip_log( $filepath ) {
-		if ( ! preg_match( '/\.zip$/', $filepath ) ) {
+	public static function read_zip_log() {
+		if ( ! preg_match( '/\.zip$/', self::$info['filepath'] ) ) {
 			self::$info['errors']['zip_path_invalid'] =
 				'Error: Invalid ZIP file path specified; must end with ".zip".';
 			return [];
 		}
 
-		// Determine the log filename.
-		$archive_log_file = basename( preg_replace( '/\.zip$/', '.log', $filepath ) );
-
-		$extract_dir      = dirname( $filepath );
+		$log_info         = [];
+		$extract_dir      = dirname( self::$info['filepath'] );
+		$archive_log_file = basename( preg_replace( '/\.zip$/', '.log', self::$info['filepath'] ) );
 		$extract_filepath = $extract_dir . '/' . $archive_log_file;
 
 		if ( ! file_exists( $extract_filepath ) ) {
 			// Extract the log file.
-			switch ( true ) {
-				case class_exists( 'ZipArchive' ):
-					$archive = new \ZipArchive();
-					if ( true === $archive->open( self::$info['filepath'] ) ) {
-						$success = $archive->extractTo( $extract_dir, $archive_log_file );
-						$archive->close();
-					}
-					break;
-				// @todo: Add PCLZip and unzip (CLI).
-				default:
-					self::$info['errors'][] = 'Error: Could not extract files; ZipArchive unavailable.';
-					return [];
-			}
+			$success = self::extract_file( $extract_dir, $archive_log_file );
 
-			if ( ! file_exists( $extract_filepath ) ) {
-				self::$info['errors'][] = 'Error: Backup archive log file "' . $archive_log_file .
-					'" does not exist in the specified ZIP file path "' . $filepath . '".';
-				return [];
+			if ( $success && file_exists( $extract_filepath ) ) {
+				$log_info = self::read_json_file( $extract_filepath );
+				unlink( $extract_filepath );
 			}
-
-			$log_info = self::read_json_file( $extract_filepath );
-			unlink( $extract_filepath );
 		} else {
 			// Log file already existed, so just read it.
 			$log_info = self::read_json_file( $extract_filepath );
@@ -406,15 +512,18 @@ class Info {
 	/**
 	 * Retrieve validated restoration information.
 	 *
-	 * If validation failes, then errors are saved in the $info['errors'] class property.
+	 * If validation fails, then errors are saved in the $info['errors'] class property.
 	 *
-	 * @since 1.9.0
+	 * @since  1.9.0
 	 * @access private
 	 * @static
 	 *
-	 * @see self::get_zip_arg()
+	 * @see self::get_zip_info()
+	 * @see self::get_latest_info()
 	 * @see self::read_json_file()
 	 * @see self::read_zip_log()
+	 *
+	 * @return bool
 	 */
 	private static function get_restore_info() {
 		self::$info['checked'] = time();
@@ -425,113 +534,26 @@ class Info {
 		// Check for PHP safe mode.
 		if ( ini_get( 'safe_mode' ) ) {
 			self::$info['errors'][] = 'Error: Cannot continue in PHP safe mode.';
-			return;
+			return false;
 		}
 
 		if ( self::has_arg_flag( 'zip' ) ) {
 			// Use the specified ZIP archive file path from the CLI arguments.
-			self::$info['filepath'] = self::get_zip_arg();
-
-			if ( empty( self::$info['filepath'] ) ) {
-				// Error already added by self::get_zip_arg().
-				return;
+			if ( ! self::get_zip_info() ) {
+				// Error already added by self::get_zip_info().
+				return false;
 			}
-
-			self::$info['archive_key'] = 0;
-			self::$info['restore_cmd'] = null;
-
-			$results = self::read_json_file( self::$results_file_path );
-
-			self::$info['cron_secret'] = isset( $results['cron_secret'] ) ?
-				$results['cron_secret'] : null;
-
-			// Retrieve information from the log file in the ZIP archive.
-			$log_info = self::read_zip_log( self::$info['filepath'] );
-
-			if ( empty( $log_info ) ) {
-				// Error already added by self::read_zip_log().
-				return;
-			}
-
-			self::$info = array_merge( self::$info, $log_info );
-
-			if ( self::$info['siteurl'] && self::$info['backup_id'] && self::$info['cron_secret'] ) {
-				// Build the restore command.
-				self::$info['restore_cmd'] = 'php -d register_argc_argv=1 -qf "' . dirname( __DIR__ ) .
-					'/boldgrid-backup-cron.php" mode=restore siteurl=' . self::$info['siteurl'] .
-					' id=' . self::$info['backup_id'] . ' secret=' . self::$info['cron_secret'] .
-					' archive_key=' . self::$info['archive_key'] . ' archive_filename=' .
-					basename( self::$info['filepath'] );
-			}
-
-				self::$info['timestamp'] = time();
 		} else {
 			// Use the latest backup archive created by the plugin.  Get the backup results file.
-			if ( ! file_exists( self::$results_file_path ) ) {
-				self::$info['errors'][] = 'Error: Missing backup results file ("' .
-					self::$results_file_path . '").';
-				return;
-			}
-
-			$results = self::read_json_file( self::$results_file_path );
-
-			// Validate results file content.
-			if ( empty( $results ) ) {
-				self::$info['errors'][] = 'Error: No backup results found.';
-				return;
-			}
-
-			if ( empty( $results['filepath'] ) ) {
-				self::$info['errors'][] = 'Error: Unknown backup archive file path.';
-				return;
-			}
-
-			if ( empty( $results['file_md5'] ) ) {
-				self::$info['errors'][] = 'Error: Missing archive file checksum.';
-				return;
-			}
-
-			// Check if archive exists, and matches checksum.
-			if ( ! file_exists( $results['filepath'] ) ) {
-				self::$info['errors'][] = 'Error: Backup archive file "' .
-					$results['filepath'] . '" does not exist.';
-				return;
-			}
-
-			if ( md5_file( $results['filepath'] ) !== $results['file_md5'] ) {
-				self::$info['errors'][] = 'Error: Failed archive file checksum.';
-				return;
-			}
-
-			// Get the archive log file and merge info.
-			$archive_log_filepath = preg_replace( '/\.zip$/', '.log', $results['filepath'] );
-
-			if ( ! file_exists( $archive_log_filepath ) ) {
-				self::$info['errors'][] = 'Error: Backup archive log file "' . $archive_log_filepath .
-					'" does not exist.';
-				return;
-			}
-
-			$log_info = self::read_json_file( $archive_log_filepath );
-
-			// Validate results file content.
-			if ( empty( $log_info ) ) {
-				self::$info['errors'][] = 'Error: No backup information found in the log file "' .
-					$archive_log_filepath . '".';
-				return;
-			}
-
-			// Merge info and results arrays.
-			self::$info = array_merge( self::$info, $log_info, $results );
-
-			if ( empty( self::$info['cron_secret'] ) ) {
-				self::$info['errors'][] = 'Error: Unknown cron_secret.';
+			if ( ! self::get_latest_info() ) {
+				// Error already added by self::get_latest_info().
+				return false;
 			}
 		}
 
 		if ( empty( self::$info['ABSPATH'] ) ) {
 			self::$info['errors'][] = 'Error: Unknown ABSPATH.';
-			return;
+			return false;
 		}
 
 		if ( ! is_dir( self::$info['ABSPATH'] ) ) {
@@ -555,5 +577,150 @@ class Info {
 		}
 
 		self::get_env_info();
+
+		return true;
+	}
+
+	/**
+	 * Retrieve validated restoration information from the specified ZIP file path.
+	 *
+	 * If validation fails, then errors are saved in the $info['errors'] class property.
+	 *
+	 * @since  1.9.0
+	 * @access private
+	 * @static
+	 *
+	 * @see self::get_zip_arg()
+	 * @see self::read_json_file()
+	 * @see self::read_zip_log()
+	 *
+	 * @return bool
+	 */
+	private static function get_zip_info() {
+		$zip_filepath = self::get_zip_arg();
+
+		if ( empty( $zip_filepath ) ) {
+			// Error already added by self::get_zip_arg().
+			return false;
+		}
+
+		self::$info['filepath']    = $zip_filepath;
+		self::$info['archive_key'] = 0;
+		self::$info['restore_cmd'] = null;
+
+		// Attempt to read information from the last backup's result file.
+		$results                   = self::read_json_file( self::$results_file_path );
+		self::$info['cron_secret'] = isset( $results['cron_secret'] ) ? $results['cron_secret'] : null;
+
+		// Retrieve information from the log file in the ZIP archive.
+		$log_info = self::read_zip_log();
+
+		if ( empty( $log_info ) ) {
+			// Error already added by self::read_zip_log().
+			return false;
+		}
+
+		self::$info = array_merge( self::$info, $log_info );
+
+		if ( self::$info['siteurl'] && self::$info['backup_id'] && self::$info['cron_secret'] ) {
+			// Build the restore command.
+			self::$info['restore_cmd'] = 'php -d register_argc_argv=1 -qf "' . dirname( __DIR__ ) .
+				'/boldgrid-backup-cron.php" ' .
+				http_build_query(
+					[
+						'mode'             => 'restore',
+						'siteurl'          => self::$info['siteurl'],
+						'id'               => self::$info['backup_id'],
+						'secret'           => self::$info['cron_secret'],
+						'archive_key'      => self::$info['archive_key'],
+						'archive_filename' => basename( self::$info['filepath'] ),
+					],
+					'',
+					' '
+				);
+		}
+
+			self::$info['timestamp'] = time();
+
+			return true;
+	}
+
+	/**
+	 * Retrieve validated restoration information from the latest backup archive.
+	 *
+	 * If validation fails, then errors are saved in the $info['errors'] class property.
+	 *
+	 * @since  1.9.0
+	 * @access private
+	 * @static
+	 *
+	 * @see self::read_json_file()
+	 * @see self::read_zip_log()
+	 *
+	 * @return bool
+	 */
+	private static function get_latest_info() {
+		if ( ! file_exists( self::$results_file_path ) ) {
+			self::$info['errors'][] = 'Error: Missing backup results file ("' .
+				self::$results_file_path . '").';
+			return false;
+		}
+
+		$results = self::read_json_file( self::$results_file_path );
+
+		// Validate results file content.
+		if ( empty( $results ) ) {
+			self::$info['errors'][] = 'Error: No backup results found.';
+			return false;
+		}
+
+		if ( empty( $results['filepath'] ) ) {
+			self::$info['errors'][] = 'Error: Unknown backup archive file path.';
+			return false;
+		}
+
+		if ( empty( $results['file_md5'] ) ) {
+			self::$info['errors'][] = 'Error: Missing archive file checksum.';
+			return false;
+		}
+
+		// Check if archive exists, and matches checksum.
+		if ( ! file_exists( $results['filepath'] ) ) {
+			self::$info['errors'][] = 'Error: Backup archive file "' .
+				$results['filepath'] . '" does not exist.';
+			return false;
+		}
+
+		if ( md5_file( $results['filepath'] ) !== $results['file_md5'] ) {
+			self::$info['errors'][] = 'Error: Failed archive file checksum.';
+			return false;
+		}
+
+		// Get the archive log file and merge info.
+		$archive_log_filepath = preg_replace( '/\.zip$/', '.log', $results['filepath'] );
+
+		if ( ! file_exists( $archive_log_filepath ) ) {
+			self::$info['errors'][] = 'Error: Backup archive log file "' . $archive_log_filepath .
+				'" does not exist.';
+			return false;
+		}
+
+		$log_info = self::read_json_file( $archive_log_filepath );
+
+		// Validate results file content.
+		if ( empty( $log_info ) ) {
+			self::$info['errors'][] = 'Error: No backup information found in the log file "' .
+				$archive_log_filepath . '".';
+			return false;
+		}
+
+		// Merge info and results arrays.
+		self::$info = array_merge( self::$info, $log_info, $results );
+
+		if ( empty( self::$info['cron_secret'] ) ) {
+			self::$info['errors'][] = 'Error: Unknown cron_secret.';
+		}
+
+		return true;
 	}
 }

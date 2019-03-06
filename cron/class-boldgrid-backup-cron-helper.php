@@ -2,14 +2,13 @@
 /**
  * File: class-boldgrid-backup-cron-helper.php
  *
- * @link https://www.boldgrid.com
- * @since 1.6.5
+ * @link       https://www.boldgrid.com
+ * @since      1.6.5
  *
- * @package Boldgrid_Backup
+ * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/cron
- * @copyright BoldGrid
- * @version $Id$
- * @author BoldGrid <support@boldgrid.com>
+ * @copyright  BoldGrid
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 /**

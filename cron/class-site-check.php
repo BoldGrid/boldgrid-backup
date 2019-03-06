@@ -4,8 +4,8 @@
  *
  * Check the integrity of the website.
  *
- * @link https://www.boldgrid.com
- * @since 1.9.0
+ * @link       https://www.boldgrid.com
+ * @since      1.9.0
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Cron
@@ -24,7 +24,7 @@ class Site_Check {
 	/**
 	 * Maximum restoration attempts.
 	 *
-	 * @since 1.9.0
+	 * @since  1.9.0
 	 * @access private
 	 * @static
 	 *

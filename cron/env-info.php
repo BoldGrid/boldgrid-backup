@@ -8,7 +8,6 @@
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/cron
  * @copyright  BoldGrid
- * @version    $Id$
  * @author     BoldGrid <support@boldgrid.com>
  *
  * phpcs:disable WordPress.WP.AlternativeFunctions

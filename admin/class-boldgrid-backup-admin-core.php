@@ -2247,7 +2247,7 @@ class Boldgrid_Backup_Admin_Core {
 		$this->is_backup_now = true;
 
 		$is_all_files         = isset( $_POST['folder_exclusion_type'] ) && 'full' === $_POST['folder_exclusion_type'];
-		$is_all_tables        = isset( $_POST['table_exclusion_type'] ) && 'full' === $_POST['table_exclusion_type'];
+		$is_all_tables        = isset( $_POST['table_inclusion_type'] ) && 'full' === $_POST['table_inclusion_type'];
 		$this->is_backup_full = $is_all_files && $is_all_tables;
 
 		$this->is_archiving_update_protection = ! empty( $_POST['is_updating'] ) &&

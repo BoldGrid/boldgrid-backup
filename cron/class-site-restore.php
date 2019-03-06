@@ -5,13 +5,12 @@
  * Used when there is a severe issue with the site which requires immediate restoration from the
  * latest backup archive.  A restoration can be forced using the "restore" flag.
  *
- * @link https://www.boldgrid.com
- * @since 1.9.0
+ * @link       https://www.boldgrid.com
+ * @since      1.9.0
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Cron
  * @copyright  BoldGrid
- * @version    $Id$
  * @author     BoldGrid <support@boldgrid.com>
  *
  * phpcs:disable WordPress.VIP,WordPress.XSS.EscapeOutput,WordPress.WP.AlternativeFunctions
@@ -43,7 +42,7 @@ class Site_Restore {
 	/**
 	 * Ensure that archive file destinations are writable.
 	 *
-	 * @since 1.9.0
+	 * @since  1.9.0
 	 * @access private
 	 *
 	 * @see ZipArchive()
@@ -71,7 +70,7 @@ class Site_Restore {
 	 * Various places within this class use to set the timeout limit to 300 seconds. This timeout
 	 * limit has been increased to 900 seconds and moved into its own method.
 	 *
-	 * @since 1.9.0
+	 * @since  1.9.0
 	 * @access private
 	 *
 	 * @param int $time_limit Limit in seconds.
@@ -84,7 +83,7 @@ class Site_Restore {
 	/**
 	 * Get database config from wp-config.php file.
 	 *
-	 * @since 1.9.0
+	 * @since  1.9.0
 	 * @access private
 	 *
 	 * @see \Boldgrid\Backup\Cron\Info::get_info()
@@ -110,11 +109,11 @@ class Site_Restore {
 	/**
 	 * Perform restoration.
 	 *
-	 * @since 1.9.0
+	 * @since  1.9.0
 	 * @access private
 	 *
-	 * @see \Boldgrid\Backup\Cron\Site_Check::is_siteurl_reachable()
 	 * @see \Boldgrid\Backup\Cron\Info::get_info()
+	 * @see \Boldgrid\Backup\Cron\Info::choose_method()
 	 * @see \Boldgrid_Backup_Admin_Cli::call_command()
 	 * @see self::set_time_limit()
 	 * @see self::restore_files()
@@ -124,13 +123,12 @@ class Site_Restore {
 	 * @return bool;
 	 */
 	private function restore() {
-		$is_siteurl_reachable = Site_Check::is_siteurl_reachable();
-		$restore_cmd          = ! empty( Info::get_info()['restore_cmd'] ) ?
+		$restore_cmd = ! empty( Info::get_info()['restore_cmd'] ) ?
 			Info::get_info()['restore_cmd'] : null;
 
-		if ( $is_siteurl_reachable && $restore_cmd ) {
+		if ( 'ajax' === Info::choose_method() ) {
 			// Call the normal restore command.
-			echo 'Using URL address restoration process...' . PHP_EOL;
+			echo 'Using Ajax URL address restoration process...' . PHP_EOL;
 			\Boldgrid_Backup_Admin_Cli::call_command( $restore_cmd, $success, $return_var );
 		} else {
 			// Start the standalone restoration process.
@@ -148,7 +146,7 @@ class Site_Restore {
 	/**
 	 * Perform restoration of files.
 	 *
-	 * @since 1.9.0
+	 * @since  1.9.0
 	 * @access private
 	 *
 	 * @see \Boldgrid\Backup\Cron\Info::get_info()
@@ -162,6 +160,7 @@ class Site_Restore {
 	private function restore_files() {
 		$success = false;
 		$info    = Info::get_info();
+		$method  = Info::choose_method();
 
 		switch ( true ) {
 			case class_exists( 'ZipArchive' ):
@@ -223,7 +222,7 @@ class Site_Restore {
 	/**
 	 * Perform restoration of database.
 	 *
-	 * @since 1.9.0
+	 * @since  1.9.0
 	 * @access private
 	 *
 	 * @see \Boldgrid\Backup\Cron\Info::get_info()
@@ -285,7 +284,7 @@ class Site_Restore {
 	/**
 	 * Increment restore attemps counter and update results file.
 	 *
-	 * @since 1.9.0
+	 * @since  1.9.0
 	 * @access private
 	 *
 	 * @see \Boldgrid\Backup\Cron\Info::get_results_filepath()

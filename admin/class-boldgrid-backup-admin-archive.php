@@ -498,7 +498,10 @@ class Boldgrid_Backup_Admin_Archive {
 	/**
 	 * Save backup information to a JSON file.
 	 *
-	 * The emergency restoration process will read the JSON file.
+	 * The emergency restoration process will read the JSON file to discover the information about
+	 * the last full backup created.  Since the standalone restoration process does not know about
+	 * the WordPress installation or the backup archives created, the contents of this file created
+	 * will provide the facts.
 	 * This method is called by Boldgrid_Backup_Admin_Core::archive_files().
 	 *
 	 * @since 1.8.0
@@ -507,7 +510,7 @@ class Boldgrid_Backup_Admin_Archive {
 	 * @see Boldgrid_Backup_Admin_Cron::get_cron_secret()
 	 * @see Boldgrid_Backup_Admin_Core::archive_files()
 	 *
-	 * @param array $info {
+	 * @param  array $info {
 	 *     An array of info about the backup just created.
 	 *
 	 *     @type string $mode         backup
@@ -522,19 +525,33 @@ class Boldgrid_Backup_Admin_Archive {
 	 *     @type int    $db_duration  0.35
 	 *     @type bool   $mail_success
 	 * }
+	 * @return bool
 	 */
 	public function write_results_file( $info ) {
-		$archive_filepath  = ! empty( $info['filepath'] ) ? $info['filepath'] : null;
-		$results_file_path = BOLDGRID_BACKUP_PATH . '/cron/restore-info.json';
-		$is_dir_writable   = $this->core->wp_filesystem->is_writable( dirname( $results_file_path ) );
+		$success          = false;
+		$archive_filepath = ! empty( $info['filepath'] ) ? $info['filepath'] : null;
+		$results_filepath = BOLDGRID_BACKUP_PATH . '/cron/restore-info.json';
+		$is_dir_writable  = $this->core->wp_filesystem->is_writable( dirname( $results_filepath ) );
 
 		if ( $archive_filepath && $is_dir_writable ) {
-			$results_file_path = wp_normalize_path( $results_file_path );
-			$archive_filename  = basename( $archive_filepath );
-			$archive_info      = $this->core->archive->get_by_name( $archive_filename );
-			$archive_key       = isset( $archive_info['key'] ) ? $archive_info['key'] : null;
-			$cron_secret       = $this->core->cron->get_cron_secret();
-			$siteurl           = site_url();
+			$results_filepath = wp_normalize_path( $results_filepath );
+			$archive_filename = basename( $archive_filepath );
+			$archive_info     = $this->core->archive->get_by_name( $archive_filename );
+			$archive_key      = isset( $archive_info['key'] ) ? $archive_info['key'] : null;
+			$cron_secret      = $this->core->cron->get_cron_secret();
+			$siteurl          = site_url();
+			$restore_cmd      = http_build_query(
+				[
+					'mode'             => 'restore',
+					'siteurl'          => $siteurl,
+					'id'               => $this->core->get_backup_identifier(),
+					'secret'           => $cron_secret,
+					'archive_key'      => $archive_key,
+					'archive_filename' => $archive_filename,
+				],
+				'',
+				' '
+			);
 
 			$results = array(
 				'ABSPATH'     => ABSPATH,
@@ -543,19 +560,18 @@ class Boldgrid_Backup_Admin_Archive {
 				'filepath'    => $archive_filepath,
 				'file_md5'    => $info['file_md5'],
 				'siteurl'     => $siteurl,
-				'restore_cmd' => $this->core->cron->get_cron_command() . ' "' .
-					dirname( __DIR__ ) . '/boldgrid-backup-cron.php" mode=restore siteurl=' .
-					$siteurl . ' id=' . $this->core->get_backup_identifier() . ' secret=' .
-					$cron_secret . ' archive_key=' . $archive_key . ' archive_filename=' .
-					$archive_filename,
+				'restore_cmd' => $this->core->cron->get_cron_command() . ' "' . dirname( __DIR__ ) .
+					'/boldgrid-backup-cron.php" ' . $restore_cmd,
 				'timestamp'   => time(),
 			);
 
-			$this->core->wp_filesystem->put_contents(
-				$results_file_path,
+			$success = $this->core->wp_filesystem->put_contents(
+				$results_filepath,
 				wp_json_encode( $results ),
 				0600
 			);
 		}
+
+		return $success;
 	}
 }

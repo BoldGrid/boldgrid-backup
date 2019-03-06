@@ -4,8 +4,8 @@
  *
  * Performs site integrity checks and manual and emergency restoration.
  *
- * @link https://www.boldgrid.com
- * @since 1.9.0
+ * @link       https://www.boldgrid.com
+ * @since      1.9.0
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup\Cron

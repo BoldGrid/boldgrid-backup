@@ -134,7 +134,7 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 			);
 		}
 
-		$set_attr = method_exists( $this->zip, 'setExternalAttributesName' );
+		$has_setexternalattributesname = method_exists( $this->zip, 'setExternalAttributesName' );
 
 		foreach ( $filelist as $fileinfo ) {
 			$is_dir = ! empty( $fileinfo[3] ) && 'd' === $fileinfo[3];
@@ -146,8 +146,14 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 				$this->add_dir( $fileinfo[1] );
 			}
 
-			// ZipArchive::setExternalAttributesName() is avaiable in PHP >= 5.6.
-			if ( $set_attr ) {
+			/*
+			 * ZipArchive::setExternalAttributesName() is avaiable in PHP >= 5.6.
+			 * If available, use the method to set the permissions for items in the ZIP archive.
+			 * By default, items in a ZIP file are extracted with loose (777/666) modes, which can
+			 * cause issues on Linux systems using suEXEX/suPHP or other mechanisms requiring
+			 * tighter (755/644; world non-writable permissions) modes on directories and files.
+			 */
+			if ( $has_setexternalattributesname ) {
 				$this->zip->setExternalAttributesName(
 					$is_dir ? $fileinfo[1] . '/' : $fileinfo[1],
 					ZipArchive::OPSYS_UNIX,
