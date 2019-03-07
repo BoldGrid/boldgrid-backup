@@ -5,6 +5,7 @@
  * Performs site integrity checks and manual and emergency restoration.
  *
  * @link       https://www.boldgrid.com
+ * @link       https://github.com/BoldGrid/boldgrid-backup/wiki/Restorations-outside-of-WordPress
  * @since      1.9.0
  *
  * @package    Boldgrid_Backup
