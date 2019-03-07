@@ -65,7 +65,7 @@ class Test_Boldgrid_Backup_Cron_Info extends WP_UnitTestCase {
 			'siteurl=http://localhost',
 		);
 
-		$_SERVER["argv"] = $dummy_argv;
+		$_SERVER['argv'] = $dummy_argv;
 	}
 
 	/**
@@ -136,7 +136,7 @@ class Test_Boldgrid_Backup_Cron_Info extends WP_UnitTestCase {
 	 * @since 1.9.0
 	 */
 	public function test_get_mode() {
-		$this->assertEquals( 'help', $this->info::get_mode() );
+		$this->assertEquals( 'help', $this->info->get_mode() );
 	}
 
 	/**
@@ -168,7 +168,7 @@ class Test_Boldgrid_Backup_Cron_Info extends WP_UnitTestCase {
 	 */
 	public function test_has_errors() {
 		// @todo More testing needed here.
-		$this->assertTrue( $this->info::has_errors() );
+		$this->assertTrue( $this->info->has_errors() );
 	}
 
 	/**
@@ -178,7 +178,7 @@ class Test_Boldgrid_Backup_Cron_Info extends WP_UnitTestCase {
 	 */
 	public function test_is_cli() {
 		// @todo More testing needed here.
-		$this->assertTrue( $this->info::is_cli() );
+		$this->assertTrue( $this->info->is_cli() );
 	}
 
 	/**
@@ -218,7 +218,7 @@ class Test_Boldgrid_Backup_Cron_Info extends WP_UnitTestCase {
 		$data = $this->info->read_json_file( $file_path );
 		$this->assertTrue( empty( $data ) );
 
-		file_put_contents( $file_path, json_encode( $dummy_data ) );
+		file_put_contents( $file_path, json_encode( $dummy_data ) ); // phpcs:ignore
 		$data = $this->info->read_json_file( $file_path );
 		$this->assertEquals( $dummy_data, $data );
 
