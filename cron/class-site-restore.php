@@ -132,7 +132,7 @@ class Site_Restore {
 			\Boldgrid_Backup_Admin_Cli::call_command( $restore_cmd, $success, $return_var );
 		} else {
 			// Start the standalone restoration process.
-			echo 'Cannot reach the site URL; using standalone restoration process...' . PHP_EOL;
+			echo 'Using standalone restoration process...' . PHP_EOL;
 			ignore_user_abort( true );
 			$this->set_time_limit();
 			$success = $this->restore_files() && $this->restore_database();

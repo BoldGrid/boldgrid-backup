@@ -654,12 +654,19 @@ class Info {
 	 * @access private
 	 * @static
 	 *
+	 * @see self::has_arg_flag()
 	 * @see self::read_json_file()
 	 * @see self::read_zip_log()
 	 *
 	 * @return bool
 	 */
 	private static function get_latest_info() {
+		// If mode is not check or restore, then the restore info is not needed.
+		if ( ! self::has_arg_flag( 'check' ) && ! self::has_arg_flag( 'restore' ) ) {
+			return false;
+		}
+
+		// We require the results info file from the last full backup.
 		if ( ! file_exists( self::$results_file_path ) ) {
 			self::$info['errors'][] = 'Error: Missing backup results file ("' .
 				self::$results_file_path . '").';
