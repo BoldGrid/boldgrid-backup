@@ -82,6 +82,15 @@ class Boldgrid_Backup_Admin_Cron {
 	}
 
 	/**
+	 * Get the cron command prefix.
+	 *
+	 * @return string
+	 */
+	public function get_cron_command() {
+		return $this->cron_command;
+	}
+
+	/**
 	 * Add cron entry for backups from stored settings.
 	 *
 	 * @since 1.2
@@ -395,6 +404,8 @@ class Boldgrid_Backup_Admin_Cron {
 	 *
 	 * @since 1.6.0
 	 *
+	 * @see Boldgrid_Backup_Admin_Core::execute_command()
+	 *
 	 * @param  string $crontab A string of crons, similar to raw output of crontab -l.
 	 * @return bool
 	 */
@@ -429,7 +440,7 @@ class Boldgrid_Backup_Admin_Cron {
 		// Write crontab.
 		$command = 'crontab ' . $temp_crontab_path;
 
-		$crontab = $this->core->execute_command( $command, null, $success );
+		$crontab = $this->core->execute_command( $command, $success );
 
 		// Remove temp crontab file.
 		$deleted = $this->core->wp_filesystem->delete( $temp_crontab_path, false, 'f' );
@@ -441,6 +452,8 @@ class Boldgrid_Backup_Admin_Cron {
 	 * Delete boldgrid-backup cron entries from the system user crontab.
 	 *
 	 * @since 1.2
+	 *
+	 * @see Boldgrid_Backup_Admin_Core::execute_command()
 	 *
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
@@ -491,7 +504,7 @@ class Boldgrid_Backup_Admin_Cron {
 			// Read crontab.
 			$command = 'crontab -l';
 
-			$crontab = $this->core->execute_command( $command, null, $success );
+			$crontab = $this->core->execute_command( $command, $success );
 
 			// If the command to retrieve crontab failed, then abort.
 			if ( ! $success ) {
@@ -540,7 +553,7 @@ class Boldgrid_Backup_Admin_Cron {
 			// Write crontab.
 			$command = 'crontab ' . $temp_crontab_path;
 
-			$crontab = $this->core->execute_command( $command, null, $success );
+			$crontab = $this->core->execute_command( $command, $success );
 
 			// Remove temp crontab file.
 			$wp_filesystem->delete( $temp_crontab_path, false, 'f' );
@@ -644,6 +657,8 @@ class Boldgrid_Backup_Admin_Cron {
 	 *
 	 * @since 1.5.2
 	 *
+	 * @see Boldgrid_Backup_Admin_Core::execute_command()
+	 *
 	 * @param  bool $raw Return a string of crons when true, an array when false.
 	 * @return mixed
 	 */
@@ -672,7 +687,7 @@ class Boldgrid_Backup_Admin_Cron {
 
 			// Write crontab to temp file.
 			$command = sprintf( 'crontab -l > %1$s', $crontab_file_path );
-			$this->core->execute_command( $command, null, $success );
+			$this->core->execute_command( $command, $success );
 
 			// Read the crontab from temp file.
 			$crontab = $this->core->wp_filesystem->get_contents( $crontab_file_path );
@@ -681,7 +696,7 @@ class Boldgrid_Backup_Admin_Cron {
 			$this->core->wp_filesystem->delete( $crontab_file_path );
 		} else {
 			$command = 'crontab -l';
-			$crontab = $this->core->execute_command( $command, null, $success );
+			$crontab = $this->core->execute_command( $command, $success );
 		}
 
 		if ( ! $success ) {

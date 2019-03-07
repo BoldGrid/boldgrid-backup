@@ -26,7 +26,6 @@ class Boldgrid_Backup_Admin_Test {
 	 * When we create test files, this is the prefix for all of them.
 	 *
 	 * @since  1.5.1
-	 * @access public
 	 * @var    string
 	 */
 	public $test_prefix = 'boldgrid-backup-test-file-';
@@ -109,7 +108,6 @@ class Boldgrid_Backup_Admin_Test {
 	 * Default value is 300 seconds (5 minutes).
 	 *
 	 * @since  1.3.1
-	 * @access public
 	 * @var    int
 	 */
 	public $transient_time = 300;
@@ -144,7 +142,7 @@ class Boldgrid_Backup_Admin_Test {
 
 		// Write the file with an exec method.
 		$command = sprintf( 'echo "%1$s" > %2$s', $txt, $file );
-		$this->core->execute_command( $command, array(), $success );
+		$this->core->execute_command( $command, $success );
 		if ( ! $success ) {
 			return false;
 		}
@@ -674,7 +672,7 @@ class Boldgrid_Backup_Admin_Test {
 
 		// Find a command that gives us an array.
 		foreach ( $cmds as $cmd ) {
-			$this->core->execute_command( $cmd, array(), $null, $null, $filepath );
+			$this->core->execute_command( $cmd, $null, $null, $filepath );
 
 			// Our command may have resulted in unexpected output. Look for a json string.
 			preg_match( '/{.*}/', $this->core->wp_filesystem->get_contents( $filepath ), $matches );

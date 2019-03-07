@@ -165,14 +165,17 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 	/**
 	 * Prepare for a restoration via cron job.
 	 *
+	 * The restoration request is validated elsewhere.
+	 *
 	 * @since 1.6.1
 	 *
 	 * @return bool
 	 */
 	public function prepare_restore() {
+		// phpcs:disable WordPress.CSRF.NonceVerification.NoNonceVerification,WordPress.VIP
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
 
-		if ( empty( $pending_rollback ) ) {
+		if ( empty( $pending_rollback ) && empty( $_GET['archive_filename'] ) ) {
 			return false;
 		}
 
@@ -182,9 +185,12 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 		 * The archive_key and the archive_filename must match.
 		 */
 		$_POST['restore_now']      = 1;
-		$_POST['archive_key']      = 0;
-		$_POST['archive_filename'] = basename( $pending_rollback['filepath'] );
+		$_POST['archive_key']      = ( ! empty( $_GET['archive_key'] ) && is_numeric( $_GET['archive_key'] ) ) ?
+			(int) $_GET['archive_key'] : 0;
+		$_POST['archive_filename'] = ! empty( $pending_rollback['filepath'] ) ?
+			basename( $pending_rollback['filepath'] ) : $_GET['archive_filename'];
 
+		// phpcs:enable WordPress.CSRF.NonceVerification.NoNonceVerification,WordPress.VIP
 		return true;
 	}
 

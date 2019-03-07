@@ -13,7 +13,7 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP
+// phpcs:disable WordPress.VIP,WordPress.XSS.EscapeOutput.OutputNotEscaped
 
 require dirname( __FILE__ ) . '/admin/class-boldgrid-backup-admin-cron-log.php';
 require dirname( __FILE__ ) . '/cron/class-boldgrid-backup-cron-helper.php';
@@ -23,7 +23,7 @@ $cron_helper = new Boldgrid_Backup_Cron_Helper();
 if ( ! $cron_helper->is_cli() ) {
 	$error = 'Error: No parameters were passed.  A "siteurl", "mode", and "id" are required.';
 	Boldgrid_Backup_Admin_Cron_Log::add_log( $error );
-	die( $error . "\n" ); // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+	die( $error . PHP_EOL );
 }
 
 // Initialize $input and $error.
@@ -52,7 +52,7 @@ foreach ( $required_arguments as $required_argument ) {
 
 if ( $error ) {
 	Boldgrid_Backup_Admin_Cron_Log::add_log( $error );
-	die( $error ); // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+	die( $error );
 }
 
 // Abort if not a valid mode.
@@ -64,12 +64,26 @@ $valid_modes = array(
 if ( ! in_array( $input['mode'], $valid_modes, true ) ) {
 	$error = 'Error: Invalid mode "' . $input['mode'] . '".';
 	Boldgrid_Backup_Admin_Cron_Log::add_log( $error );
-	die( $error ); // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+	die( $error );
 }
 
 // Make an ajax call to run jobs, and report status.
-$url = $input['siteurl'] . '/wp-admin/admin-ajax.php?action=boldgrid_backup_run_' . $input['mode'] .
-	'&id=' . $input['id'] . '&secret=' . $input['secret'] . '&doing_wp_cron=' . time();
+$query_string = array(
+	'action'        => 'boldgrid_backup_run_' . $input['mode'],
+	'id'            => $input['id'],
+	'secret'        => $input['secret'],
+	'doing_wp_cron' => time(),
+);
+
+if ( ! empty( $input['archive_filename'] ) ) {
+	$query_string['archive_filename'] = $input['archive_filename'];
+}
+
+if ( isset( $input['archive_key'] ) && is_numeric( $input['archive_key'] ) ) {
+	$query_string['archive_key'] = (int) $input['archive_key'];
+}
+
+$url = $input['siteurl'] . '/wp-admin/admin-ajax.php?' . http_build_query( $query_string );
 
 // The helper class method will sanitize the url.
 require dirname( __FILE__ ) . '/cron/class-boldgrid-backup-url-helper.php';
@@ -84,4 +98,4 @@ if ( false !== $result ) {
 	$message = $error . ': "' . $url . '".';
 }
 
-die( $message ); // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+die( $message );

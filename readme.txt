@@ -2,7 +2,7 @@
 Contributors: boldgrid, joemoto, imh_brad, rramo012, timph, bgnicolepaschen
 Tags: boldgrid, backup, restore, migrate, migration
 Requires at least: 4.4
-Tested up to: 5.0.3
+Tested up to: 5.1
 Requires PHP: 5.4
 Stable tag: 1.8.0
 License: GPLv2 or later
@@ -76,9 +76,12 @@ The following features are available, of which you can find additional info for 
 
 == Changelog ==
 
-= 1.8.1 In progress =
+= 1.9.0-rc.1 =
 
-* Update: When storing backups in wp-content dir, make "boldgrid_backup" dir name more unique.
+Release date: Mar 7th, 2019
+
+* New feature: Added emergency/standalone restoration CLI process.
+* Update:      When storing backups in wp-content dir, make "boldgrid_backup" dir name more unique.
 
 = 1.8.0 =
 

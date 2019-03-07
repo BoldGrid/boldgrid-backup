@@ -21,9 +21,12 @@ before_script:
 
 script:
   - find . -name composer -prune -o -name node_modules -prune -o -name '*.php' -exec php -lf {} \; > /dev/null
-  - phpunit --debug
+  - phpunit --debug --coverage-clover=coverage.xml
   - yarn run php-codesniffer
   - yarn run js-lint
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
 
 deploy:
   - provider: script

@@ -4,13 +4,13 @@
  *
  * BoldGrid Backup Run Jobs.
  *
- * @link  https://www.boldgrid.com
- * @since 1.5.2
+ * @link       https://www.boldgrid.com
+ * @since      1.5.2
  *
- * @package   Boldgrid_Backup
- * @copyright BoldGrid
- * @version   $Id$
- * @author    BoldGrid <support@boldgrid.com>
+ * @package    Boldgrid_Backup
+ * @subpackage Boldgrid_Backup/cron
+ * @copyright  BoldGrid
+ * @author     BoldGrid <support@boldgrid.com>
  */
 
 // Abort if not being ran from the command line.

@@ -4,13 +4,12 @@
  *
  * Test for support from the command line.
  *
- * @link https://www.boldgrid.com
- * @since 1.6.2
+ * @link       https://www.boldgrid.com
+ * @since      1.6.2
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/cron
  * @copyright  BoldGrid
- * @version    $Id$
  * @author     BoldGrid <support@boldgrid.com>
  *
  * @see Boldgrid_Backup_Admin_Test::get_cli_support().
