@@ -82,6 +82,7 @@ Release date: Mar 7th, 2019
 
 * New feature: Added emergency/standalone restoration CLI process.
 * Update:      When storing backups in wp-content dir, make "boldgrid_backup" dir name more unique.
+* Bug fix:     Ensure library's activity class is available before using it.
 
 = 1.8.0 =
 

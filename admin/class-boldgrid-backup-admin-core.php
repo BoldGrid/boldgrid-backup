@@ -1644,7 +1644,9 @@ class Boldgrid_Backup_Admin_Core {
 			)
 		);
 
-		$this->activity->add( 'any_backup_created', 1, $this->rating_prompt_config );
+		if ( isset( $this->activity ) ) {
+			$this->activity->add( 'any_backup_created', 1, $this->rating_prompt_config );
+		}
 
 		// Return the array of archive information.
 		return $info;
@@ -2343,8 +2345,11 @@ class Boldgrid_Backup_Admin_Core {
 
 		$filesize = $archives[ $download_key ]['filesize'];
 
+		if ( isset( $this->activity ) ) {
+			$this->activity->add( 'download_to_local_machine', 1, $this->rating_prompt_config );
+		}
+
 		// Send the file and die nicely.
-		$this->activity->add( 'download_to_local_machine', 1, $this->rating_prompt_config );
 		Boldgrid_Backup_File::send_file( $filepath, $filesize );
 	}
 
