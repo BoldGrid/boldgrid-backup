@@ -37,7 +37,7 @@ class Info {
 	/**
 	 * Backup result information JSON file path.
 	 *
-	 * @since. 1.8.0
+	 * @since  1.8.0
 	 * @access private
 	 * @staticvar
 	 *
@@ -297,7 +297,7 @@ class Info {
 	/**
 	 * Determine the restoration method.
 	 *
-	 * This method either validates and usees the specified method, or determines one to use.
+	 * This method either validates and uses the specified method, or determines one to use.
 	 * Valid values are: "ajax", "ziparchive", "pclzip", "cli".
 	 * This method triggers reading the CLI arguments and appends to the self:$info array.
 	 *
