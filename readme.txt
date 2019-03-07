@@ -76,9 +76,10 @@ The following features are available, of which you can find additional info for 
 
 == Changelog ==
 
-= 1.9.0 In progress =
+= 1.9.0-rc.1 =
 
 * New feature: Added emergency/standalone restoration CLI process.
+* Update:      When storing backups in wp-content dir, make "boldgrid_backup" dir name more unique.
 
 = 1.8.0 =
 
