@@ -78,6 +78,8 @@ $files = array(
 	'/admin/remote/class-boldgrid-backup-admin-ftp-page.php',
 	'/admin/remote/class-boldgrid-backup-admin-remote-settings.php',
 	'/vendor/phpseclib/phpseclib/phpseclib/Net/SSH2.php',
+	// cron
+	'/cron/class-info.php',
 );
 
 foreach ( $files as $file ) {
