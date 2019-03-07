@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fbf581314cce170292b6bdb6e708bf82",
+    "content-hash": "595d822f769cd2905b18f0e98b3f3392",
     "packages": [
         {
             "name": "boldgrid/library",
-            "version": "2.7.7",
+            "version": "2.8.0-rc.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BoldGrid/library.git",
-                "reference": "e6b781f06c8b221c5139b05c980a8a84471fe7d7"
+                "reference": "a6016b7bdd8a1ce90d77afba5149ae29dbecaf62"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BoldGrid/library/zipball/e6b781f06c8b221c5139b05c980a8a84471fe7d7",
-                "reference": "e6b781f06c8b221c5139b05c980a8a84471fe7d7",
+                "url": "https://api.github.com/repos/BoldGrid/library/zipball/a6016b7bdd8a1ce90d77afba5149ae29dbecaf62",
+                "reference": "a6016b7bdd8a1ce90d77afba5149ae29dbecaf62",
                 "shasum": ""
             },
             "type": "library",
@@ -53,7 +53,7 @@
                 }
             ],
             "description": "The BoldGrid Library for shared code used in official BoldGrid plugins and themes.",
-            "time": "2019-01-15T17:43:46+00:00"
+            "time": "2019-03-05T19:36:25+00:00"
         },
         {
             "name": "cbschuld/browser.php",
@@ -102,23 +102,22 @@
         },
         {
             "name": "ifsnop/mysqldump-php",
-            "version": "v2.5",
+            "version": "v2.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ifsnop/mysqldump-php.git",
-                "reference": "8d063449981e3f7bd28a3a083842e21a24d1f4af"
+                "reference": "d830857e93c3f309fd63768c0fe6d13d9240fc70"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ifsnop/mysqldump-php/zipball/8d063449981e3f7bd28a3a083842e21a24d1f4af",
-                "reference": "8d063449981e3f7bd28a3a083842e21a24d1f4af",
+                "url": "https://api.github.com/repos/ifsnop/mysqldump-php/zipball/d830857e93c3f309fd63768c0fe6d13d9240fc70",
+                "reference": "d830857e93c3f309fd63768c0fe6d13d9240fc70",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "3.7.*",
                 "squizlabs/php_codesniffer": "1.*"
             },
             "type": "library",
@@ -129,7 +128,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "MIT"
+                "GPL-3.0-or-later"
             ],
             "authors": [
                 {
@@ -138,32 +137,35 @@
                     "role": "Developer"
                 }
             ],
-            "description": "This is a php version of linux's mysqldump in terminal \"$ mysqldump -u username -p...\"",
+            "description": "PHP version of mysqldump cli that comes with MySQL",
             "homepage": "https://github.com/ifsnop/mysqldump-php",
             "keywords": [
-                "backup",
+                "PHP7",
                 "database",
-                "dump",
-                "export",
+                "hhvm",
+                "mariadb",
                 "mysql",
+                "mysql-backup",
                 "mysqldump",
                 "pdo",
-                "sqlite"
+                "php",
+                "php5",
+                "sql"
             ],
-            "time": "2018-06-30T19:40:05+00:00"
+            "time": "2018-12-27T00:33:19+00:00"
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "2.0.12",
+            "version": "2.0.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "8814dc7841db159daed0b32c2b08fb7e03c6afe7"
+                "reference": "8ebfcadbf30524aeb75b2c446bc2519d5b321478"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/8814dc7841db159daed0b32c2b08fb7e03c6afe7",
-                "reference": "8814dc7841db159daed0b32c2b08fb7e03c6afe7",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/8ebfcadbf30524aeb75b2c446bc2519d5b321478",
+                "reference": "8ebfcadbf30524aeb75b2c446bc2519d5b321478",
                 "shasum": ""
             },
             "require": {
@@ -242,7 +244,7 @@
                 "x.509",
                 "x509"
             ],
-            "time": "2018-11-04T05:45:48+00:00"
+            "time": "2019-01-27T19:37:29+00:00"
         }
     ],
     "packages-dev": [
@@ -286,9 +288,17 @@
             "time": "2015-08-31T22:07:48+00:00"
         }
     ],
-    "aliases": [],
+    "aliases": [
+        {
+            "alias": "2.8.0",
+            "alias_normalized": "2.8.0.0",
+            "version": "2.8.0.0-RC1",
+            "package": "boldgrid/library"
+        }
+    ],
     "minimum-stability": "stable",
     "stability-flags": {
+        "boldgrid/library": 5,
         "cbschuld/browser.php": 20,
         "lox/xhprof": 20
     },

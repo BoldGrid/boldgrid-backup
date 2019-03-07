@@ -78,6 +78,8 @@ The following features are available, of which you can find additional info for 
 
 = 1.9.0-rc.1 =
 
+Release date: Mar 7th, 2019
+
 * New feature: Added emergency/standalone restoration CLI process.
 * Update:      When storing backups in wp-content dir, make "boldgrid_backup" dir name more unique.
 
