@@ -21,10 +21,17 @@
  */
 class Boldgrid_Backup_Admin_Core {
 	/**
+	 * Archiver Utility class.
+	 *
+	 * @since 1.9.0
+	 * @var Boldgrid_Backup_Admin_Archiver_Utility
+	 */
+	public $archiver_utility;
+
+	/**
 	 * Auto Rollback class.
 	 *
 	 * @since  1.5.2
-	 * @access public
 	 * @var    Boldgrid_Backup_Admin_Auto_Rollback
 	 */
 	public $auto_rollback;
@@ -33,7 +40,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * The settings class object.
 	 *
 	 * @since 1.0
-	 * @access public
 	 * @var Boldgrid_Backup_Admin_Settings
 	 */
 	public $settings;
@@ -42,7 +48,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * The configuration class object.
 	 *
 	 * @since 1.0
-	 * @access public
 	 * @var Boldgrid_Backup_Admin_Config
 	 */
 	public $config;
@@ -51,7 +56,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * Plugin configs.
 	 *
 	 * @since  1.3.4
-	 * @access plublic
 	 * @var    array
 	 */
 	public $configs;
@@ -60,7 +64,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * Core Files class.
 	 *
 	 * @since 1.6.0
-	 * @access public
 	 * @var    Boldgrid_Backup_Admin_Core_Files
 	 */
 	public $core_files;
@@ -72,7 +75,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * this->archive_files runs, it reports doing_ajax as true.
 	 *
 	 * @since  1.5.2
-	 * @access public
 	 * @var    bool
 	 */
 	public $doing_ajax;
@@ -84,7 +86,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * true.
 	 *
 	 * @since  1.5.1
-	 * @access public
 	 * @var    bool
 	 */
 	public $doing_cron;
@@ -109,7 +110,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * Email.
 	 *
 	 * @since  1.5.2
-	 * @access public
 	 * @var    Boldgrid_Backup_Admin_Email
 	 */
 	public $email;
@@ -121,7 +121,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * language strings.
 	 *
 	 * @since  1.5.3
-	 * @access public
 	 * @var    Boldgrid_Backup_Admin_Email
 	 */
 	public $elements = array();
@@ -130,7 +129,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * The functionality test class object.
 	 *
 	 * @since 1.0
-	 * @access public
 	 * @var Boldgrid_Backup_Admin_Test
 	 */
 	public $test;
@@ -139,7 +137,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * The Time class object.
 	 *
 	 * @since 1.6.0
-	 * @access public
 	 * @var Boldgrid_Backup_Admin_Time
 	 */
 	public $time;
@@ -148,7 +145,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * An instance of Boldgrid_Backup_Admin_Tools.
 	 *
 	 * @since 1.6.0
-	 * @access public
 	 * @var    Boldgrid_Backup_Admin_Tools
 	 */
 	public $tools;
@@ -157,7 +153,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * An instance of Boldgrid_Backup_Admin_Utility.
 	 *
 	 * @since  1.5.3
-	 * @access public
 	 * @var    Boldgrid_Backup_Admin_Utility
 	 */
 	public $utility;
@@ -166,7 +161,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * The admin notice class object.
 	 *
 	 * @since 1.0
-	 * @access public
 	 * @var Boldgrid_Backup_Admin_Notice
 	 */
 	public $notice;
@@ -175,7 +169,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * WordPress' global pagenow.
 	 *
 	 * @since  1.6.0
-	 * @access public
 	 * @var    string
 	 */
 	public $pagenow;
@@ -186,7 +179,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * WordPress does an auto upgrade).
 	 *
 	 * @since  1.6.0
-	 * @access public
 	 * @var    bool
 	 */
 	public $pre_auto_update = false;
@@ -195,7 +187,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * The admin cron class object.
 	 *
 	 * @since 1.0
-	 * @access public
 	 * @var Boldgrid_Backup_Admin_Cron
 	 */
 	public $cron;
@@ -204,7 +195,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * Cron log class.
 	 *
 	 * @since 1.6.5
-	 * @access public
 	 * @var Boldgrid_Backup_Admin_Cron_Log
 	 */
 	public $cron_log;
@@ -213,7 +203,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * Cron test class.
 	 *
 	 * @since 1.6.5
-	 * @access public
 	 * @var Boldgrid_Backup_Admin_Cron_Test
 	 */
 	public $cron_test;
@@ -222,7 +211,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * The admin xhprof class object.
 	 *
 	 * @since 1.2
-	 * @access public
 	 * @var Boldgrid_Backup_Admin_Xhprof
 	 */
 	public $xhprof;
@@ -231,7 +219,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * WP Cron class.
 	 *
 	 * @since  1.5.1
-	 * @access public
 	 * @var    Boldgrid_Backup_Admin_WP_Cron
 	 */
 	public $wp_cron;
@@ -240,7 +227,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * An instance of the filesystem.
 	 *
 	 * @since  1.5.1
-	 * @access public
 	 * @var    WP_Filesystem
 	 */
 	public $wp_filesystem;
@@ -249,7 +235,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * An instance of the Boldgrid_Backup_Admin_Archive class.
 	 *
 	 * @since  1.5.3
-	 * @access public
 	 * @var    Boldgrid_Backup_Admin_Archive
 	 */
 	public $archive;
@@ -258,7 +243,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * An instance of the Boldgrid_Backup_Admin_Archives class.
 	 *
 	 * @since 1.6.0
-	 * @access public
 	 * @var    Boldgrid_Backup_Admin_Archives
 	 */
 	public $archives;
@@ -267,7 +251,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * An instance of the Boldgrid_Backup_Admin_Archives_All class.
 	 *
 	 * @since 1.6.0
-	 * @access public
 	 * @var    Boldgrid_Backup_Admin_Archives_All
 	 */
 	public $archives_all;
@@ -276,7 +259,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * An instance of the Boldgrid_Backup_Admin_Archive_Actions class.
 	 *
 	 * @since 1.6.0
-	 * @access public
 	 * @var    Boldgrid_Backup_Admin_Archive_Actions
 	 */
 	public $archive_actions;
@@ -285,7 +267,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * An instance of the Boldgrid_Backup_Admin_Archive_Browser class.
 	 *
 	 * @since  1.5.2
-	 * @access public
 	 * @var    Boldgrid_Backup_Admin_Archive_Browser
 	 */
 	public $archive_browser;
@@ -294,7 +275,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * An instance of the Archive Log class.
 	 *
 	 * @since  1.5.1
-	 * @access public
 	 * @var    Boldgrid_Backup_Admin_Archive_Log
 	 */
 	public $archive_log;
@@ -303,7 +283,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * An instance of the Archive Details class.
 	 *
 	 * @since  1.5.1
-	 * @access public
 	 * @var    Boldgrid_Backup_Admin_Archive_Details
 	 */
 	public $archive_details;
@@ -312,25 +291,14 @@ class Boldgrid_Backup_Admin_Core {
 	 * An instance of the Archive Fail class.
 	 *
 	 * @since  1.5.2
-	 * @access public
 	 * @var    Boldgrid_Backup_Admin_Archive_Fail
 	 */
 	public $archive_fail;
 
 	/**
-	 * Available execution functions.
-	 *
-	 * @since 1.0
-	 * @access private
-	 * @var array
-	 */
-	private $available_exec_functions = null;
-
-	/**
 	 * Db Dump.
 	 *
 	 * @since  1.5.3
-	 * @access public
 	 * @var    Boldgrid_Backup_Admin_Db_Dump
 	 */
 	public $db_dump;
@@ -339,7 +307,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * Database backup file path.
 	 *
 	 * @since 1.0
-	 * @access public
 	 * @var string
 	 */
 	public $db_dump_filepath = '';
@@ -348,7 +315,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * Db Get.
 	 *
 	 * @since  1.5.3
-	 * @access public
 	 * @var    Boldgrid_Backup_Admin_Db_Dump
 	 */
 	public $db_get;
@@ -357,7 +323,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * An instance of Boldgrid_Backup_Admin_Db_Omit.
 	 *
 	 * @since  1.5.3
-	 * @access public
 	 * @var    Boldgrid_Backup_Admin_Db_Omit
 	 */
 	public $db_omit;
@@ -425,7 +390,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * choosing a full backup.
 	 *
 	 * @since 1.6.0
-	 * @access public
 	 * @var    bool
 	 */
 	public $is_backup_full = false;
@@ -434,7 +398,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * Value indicating we are in the Backup Site Now callback.
 	 *
 	 * @since 1.6.0
-	 * @access public
 	 * @var    bool
 	 */
 	public $is_backup_now = false;
@@ -465,6 +428,14 @@ class Boldgrid_Backup_Admin_Core {
 	public $is_archiving_update_protection = false;
 
 	/**
+	 * Whether or not we are in a scheduled backup (IE a cron backup).
+	 *
+	 * @since 1.9.0
+	 * @var bool
+	 */
+	public $is_scheduled_backup;
+
+	/**
 	 * Common elements.
 	 *
 	 * @since 1.5.3
@@ -476,7 +447,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * Local storage.
 	 *
 	 * @since  1.5.2
-	 * @access public
 	 * @var    Boldgrid_Backup_Admin_Storage_Local
 	 */
 	public $local;
@@ -485,7 +455,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * Path to our config.rating-prompt.php file.
 	 *
 	 * @since  1.7.2
-	 * @access public
 	 * @var    string
 	 */
 	public $rating_prompt_config;
@@ -494,7 +463,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * The Restore Helper class.
 	 *
 	 * @since  1.6.1
-	 * @access public
 	 * @var    Boldgrid_Backup_Admin_Restore_Helper
 	 */
 	public $restore_helper;
@@ -503,7 +471,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * The scheduler class object.
 	 *
 	 * @since  1.5.1
-	 * @access public
 	 * @var    Boldgrid_Backup_Admin_Scheduler
 	 */
 	public $scheduler;
@@ -512,7 +479,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * The public download class object.
 	 *
 	 * @since  1.7.0
-	 * @access public
 	 * @var    Boldgrid_Backup_Download
 	 */
 	public $download;
@@ -521,7 +487,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * An instance of the Boldgrid\Library\Library\Activity class.
 	 *
 	 * @since  1.7.2
-	 * @access public
 	 * @var    Boldgrid\Library\Library\Activity
 	 */
 	public $activity;
@@ -596,6 +561,8 @@ class Boldgrid_Backup_Admin_Core {
 		$this->archive_details = new Boldgrid_Backup_Admin_Archive_Details( $this );
 
 		$this->archive_fail = new Boldgrid_Backup_Admin_Archive_Fail( $this );
+
+		$this->archiver_utility = new Boldgrid_Backup_Admin_Archiver_Utility( $this );
 
 		$this->wp_cron = new Boldgrid_Backup_Admin_WP_Cron( $this );
 
@@ -744,70 +711,22 @@ class Boldgrid_Backup_Admin_Core {
 	}
 
 	/**
-	 * Get the available execution functions.
-	 *
-	 * @since 1.0
-	 *
-	 * @return array An array of function names.
-	 */
-	public function get_execution_functions() {
-		// If the array already has elements, then return the array.
-		if ( $this->available_exec_functions ) {
-			return $this->available_exec_functions;
-		}
-
-		// If PHP is in safe mode, then return an empty array.
-		if ( $this->test->is_php_safemode() ) {
-			return array();
-		}
-
-		// Get the PHP disable_functions list.
-		$disabled = explode( ',', ini_get( 'disable_functions' ) );
-
-		// Make an array of execution functions.
-		$exec_functions = array(
-			'popen',
-			'proc_open',
-			'exec',
-			'shell_exec',
-			'passthru',
-			'system',
-		);
-
-		// Iterate through the array and remove disabled functions.
-		foreach ( $exec_functions as $exec_function ) {
-			if ( in_array( $exec_function, $disabled, true ) ) {
-				unset( $exec_functions[ $exec_function ] );
-			}
-		}
-
-		// Save the array of execution functions.
-		$this->available_exec_functions = $exec_functions;
-
-		return $exec_functions;
-	}
-
-	/**
 	 * Execute a system command using an array of execution functions.
 	 *
 	 * @since 1.0
 	 *
+	 * @see Boldgrid_Backup_Admin_Cli::call_command()
+	 *
 	 * @param  string $command                  A command string to be executed.
-	 * @param  array  $available_exec_functions An array of available execution functions.
 	 * @param  bool   $success                  Success or failure of the operation, passed back.
 	 * @param  int    $return_var               If present, the return_var, passed back.
 	 * @param  string $filepath                 An optional file path to write the output.
 	 * @return string|bool Returns the command output or FALSE on error.
 	 */
-	public function execute_command( $command, $available_exec_functions = array(), &$success = false, &$return_var = 0, $filepath = null ) {
+	public function execute_command( $command, &$success = false, &$return_var = 0, $filepath = null ) {
 		// If no command was passed, then fail.
 		if ( empty( $command ) ) {
 			return false;
-		}
-
-		// If there are no supplied execution functions, then retrieve available ones.
-		if ( empty( $available_exec_functions ) ) {
-			$available_exec_functions = $this->get_execution_functions();
 		}
 
 		// If an output filepath is supplied, and the directory is writable, then write to file.
@@ -820,177 +739,8 @@ class Boldgrid_Backup_Admin_Core {
 			$command .= ' 2>/dev/null';
 		}
 
-		// Initialize $success.
-		$success = false;
+		$output = Boldgrid_Backup_Admin_Cli::call_command( $command, $success, $return_var );
 
-		// phpcs:disable WordPress.PHP.DiscouragedPHPFunctions, WordPress.WP.AlternativeFunctions
-
-		// Test getting output using available execution functions, until one is successful.
-		foreach ( $available_exec_functions as $exec_function ) {
-			switch ( $exec_function ) {
-				case 'exec':
-					exec( $command, $out, $return_var );
-
-					// If the exit status is int(0), then it was successful.
-					if ( 0 === $return_var ) {
-						$output = implode( PHP_EOL, $out );
-
-						$success = true;
-
-						break 2;
-					} else {
-						$output = false;
-					}
-
-					break 2;
-
-				case 'passthru':
-					// If output buffering is enabled, then use passthru.
-					if ( ob_start() ) {
-						passthru( $command, $return_var );
-
-						// Get current buffer contents and delete current output buffer.
-						$output = ob_get_clean();
-
-						// If the exit status is int(0), then it was successful.
-						if ( 0 === $return_var ) {
-							$success = true;
-
-							break 2;
-						} else {
-							$output = false;
-						}
-					}
-
-					break 2;
-
-				case 'popen':
-					$handle = popen( $command, 'r' );
-
-					$output = fread( $handle, 4096 );
-
-					/*
-					 * If handle is a valid resource, then check for success.
-					 */
-					if ( false !== $handle ) {
-						// Close the process handle and get the return status.
-						$return_var = pclose( $handle );
-
-						// If the exit status is int(0), then it was successful.
-						if ( 0 === $return_var ) {
-							$success = true;
-
-							break 2;
-						} else {
-							// Bad exit status code (non-zero).
-							$output = false;
-						}
-					} else {
-						// Failed to create a process handle.
-						$output = false;
-					}
-
-					break 2;
-
-				case 'proc_open':
-					// Create the descriptor spec array.
-					$descriptorspec = array(
-						0 => array(
-							'pipe',
-							'r',
-						),
-						1 => array(
-							'pipe',
-							'w',
-						),
-						2 => array(
-							'pipe',
-							'w',
-						),
-					);
-
-					// Open a process handle.
-					$handle = proc_open( $command, $descriptorspec, $pipes );
-
-					if ( is_resource( $handle ) ) {
-						// Close unused pipes[0].
-						fclose( $pipes[0] );
-
-						// Read output from pipes[1].
-						$output = stream_get_contents( $pipes[1] );
-
-						// Close pipes[1].
-						fclose( $pipes[1] );
-
-						// Close unused pipes[0].
-						fclose( $pipes[2] );
-
-						// Close the process handle and get the return status.
-						$return_var = proc_close( $handle );
-
-						// If the exit status is int(0), then it was successful.
-						if ( 0 === $return_var ) {
-							$success = true;
-
-							break 2;
-						} else {
-							$output = false;
-						}
-					}
-
-					break 2;
-
-				case 'shell_exec':
-					$output = shell_exec( $command );
-
-					if ( false === strpos( $output, 'command not found' ) ) {
-						$success = true;
-
-						break 2;
-					} else {
-						$output = false;
-					}
-
-					break 2;
-
-				case 'system':
-					// If output buffering is enabled, then use system.
-					if ( ob_start() ) {
-						system( $command, $return_var );
-
-						// Get current buffer contents and delete current output buffer.
-						$output = ob_get_clean();
-
-						// If the exit status is int(0), then it was successful.
-						if ( 0 === $return_var ) {
-							$success = true;
-
-							break 2;
-						} else {
-							$output = false;
-						}
-					}
-
-					break 2;
-
-				default:
-					break;
-			}
-		}
-
-		// phpcs:enable WordPress.PHP.DiscouragedPHPFunctions, WordPress.WP.AlternativeFunctions
-
-		// If there is output, then trim it.
-		if ( ! empty( $output ) ) {
-			$output = trim( $output );
-		}
-
-		// If the command was not successful, then return FALSE.
-		if ( ! $success ) {
-			return false;
-		}
-
-		// Success.
 		return $output;
 	}
 
@@ -1241,7 +991,6 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @see Boldgrid_Backup_Admin_Test::run_functionality_tests()
 	 * @see Boldgrid_Backup_Admin_Backup_Dir::get()
-	 * @see Boldgrid_Backup_Admin_Core::execute_command()
 	 * @see Boldgrid_Backup_Admin_Utility::update_siteurl()
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 * @global wpdb $wpdb The WordPress database class object.
@@ -1552,7 +1301,8 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @since 1.0
 	 *
-	 * @see Boldgrid_Backup_Admin_Core::backup_database().
+	 * @see Boldgrid_Backup_Admin_Core::backup_database()
+	 * @see Boldgrid_Backup_Admin_Archive::write_results_file()
 	 *
 	 * @param bool $save A switch to save the archive file. Default is FALSE.
 	 * @param bool $dryrun An optional switch to perform a dry run test.
@@ -1560,6 +1310,8 @@ class Boldgrid_Backup_Admin_Core {
 	 */
 	public function archive_files( $save = false, $dryrun = false ) {
 		$this->pre_auto_update = 'pre_auto_update' === current_filter();
+
+		$this->is_scheduled_backup = $this->doing_cron && ! $this->pre_auto_update;
 
 		Boldgrid_Backup_Admin_In_Progress_Data::set_args(
 			array(
@@ -1578,8 +1330,6 @@ class Boldgrid_Backup_Admin_Core {
 			$this->in_progress->set();
 		}
 
-		$is_scheduled_backup = $this->doing_cron && ! $this->pre_auto_update;
-
 		/*
 		 * If this is a scheduled backup and no location is selected to save the
 		 * backup to, abort.
@@ -1589,7 +1339,7 @@ class Boldgrid_Backup_Admin_Core {
 		 * wanted to change their retention settings but did not want to schedule
 		 * backups, validating storage locations would be problematic.
 		 */
-		if ( $is_scheduled_backup && ! $this->remote->any_enabled() ) {
+		if ( $this->is_scheduled_backup && ! $this->remote->any_enabled() ) {
 			$error = __( 'No backup locations selected! While we could create a backup archive, you have not selected where the backup archive should be saved to. Please choose a storage location in your BoldGrid Backup Settings to save this backup archive to.', 'boldgrid-backup' );
 			$this->archive_fail->schedule_fail_email( $error );
 			return array(
@@ -1620,17 +1370,34 @@ class Boldgrid_Backup_Admin_Core {
 		 * adjust which folders are actually included / excluded.
 		 */
 		$info = array(
-			'mode'           => 'backup',
-			'dryrun'         => $dryrun,
-			'compressor'     => null,
-			'filesize'       => 0,
-			'save'           => $save,
-			'total_size'     => 0,
-			'folder_include' => $this->folder_exclusion->from_settings( 'include' ),
-			'folder_exclude' => $this->folder_exclusion->from_settings( 'exclude' ),
-			'table_exclude'  => $this->db_omit->get_excluded_tables(),
-			'title'          => ! empty( $_POST['backup_title'] ) ? stripslashes( $_POST['backup_title'] ) : null, // phpcs:ignore WordPress.CSRF.NonceVerification,WordPress.Arrays.ArrayDeclarationSpacing.ArrayItemNoNewLine
-			'description'    => ! empty( $_POST['backup_description'] ) ? stripslashes( $_POST['backup_description'] ) : null, // phpcs:ignore WordPress.CSRF.NonceVerification,WordPress.Arrays.ArrayDeclarationSpacing.ArrayItemNoNewLine
+			'mode'              => 'backup',
+			'dryrun'            => $dryrun,
+			'compressor'        => null,
+			'filesize'          => 0,
+			'save'              => $save,
+			'total_size'        => 0,
+			'folder_include'    => $this->folder_exclusion->from_settings( 'include' ),
+			'folder_exclude'    => $this->folder_exclusion->from_settings( 'exclude' ),
+			'table_exclude'     => $this->db_omit->get_excluded_tables(),
+			'title'             => ! empty( $_POST['backup_title'] ) ? stripslashes( $_POST['backup_title'] ) : null, // phpcs:ignore WordPress.CSRF.NonceVerification,WordPress.Arrays.ArrayDeclarationSpacing.ArrayItemNoNewLine
+			'description'       => ! empty( $_POST['backup_description'] ) ? stripslashes( $_POST['backup_description'] ) : null, // phpcs:ignore WordPress.CSRF.NonceVerification,WordPress.Arrays.ArrayDeclarationSpacing.ArrayItemNoNewLine
+			// Information used for the emergency restoration process.
+			'ABSPATH'           => ABSPATH,
+			'backup_id'         => $this->get_backup_identifier(),
+			'siteurl'           => site_url(),
+			'timestamp'         => time(),
+			// Environment information.
+			'gateway_interface' => getenv( 'GATEWAY_INTERFACE' ),
+			'http_host'         => getenv( 'HTTP_HOST' ),
+			'php_sapi_name'     => php_sapi_name(),
+			'php_uname'         => php_uname(),
+			'php_version'       => phpversion(),
+			'server_addr'       => getenv( 'SERVER_ADDR' ) ? getenv( 'SERVER_ADDR' ) : getenv( 'LOCAL_ADDR' ),
+			'server_name'       => getenv( 'SERVER_NAME' ),
+			'server_protocol'   => getenv( 'SERVER_PROTOCOL' ),
+			'server_software'   => getenv( 'SERVER_SOFTWARE' ),
+			'uid'               => getmyuid(),
+			'username'          => get_current_user(),
 		);
 
 		// Determine how this backup was triggered.
@@ -1805,6 +1572,7 @@ class Boldgrid_Backup_Admin_Core {
 		// Calculate duration and MD5.
 		$info['duration']    = number_format( ( $time_stop - $time_start ), 2, '.', '' );
 		$info['db_duration'] = number_format( ( $db_time_stop - $time_start ), 2, '.', '' );
+		$info['db_filename'] = basename( $this->db_dump_filepath );
 
 		/**
 		 * Actions to take after a backup has been created.
@@ -1817,7 +1585,7 @@ class Boldgrid_Backup_Admin_Core {
 		 *
 		 * @since 1.5.2
 		 *
-		 * @param array $info{
+		 * @param array $info {
 		 *     An array of info about the backup just created.
 		 *
 		 *     @type string $mode         backup
@@ -1844,7 +1612,7 @@ class Boldgrid_Backup_Admin_Core {
 		 * not only include the standard info about the backup (which we're sending now), it will
 		 * also include info about other jobs that were ran (such as uploading the backup remotely).
 		 */
-		if ( $this->email->user_wants_notification( 'backup' ) && ! $is_scheduled_backup ) {
+		if ( $this->email->user_wants_notification( 'backup' ) && ! $this->is_scheduled_backup ) {
 			$email_parts          = $this->email->post_archive_parts( $info );
 			$email_body           = $email_parts['body']['main'] . $email_parts['body']['signature'];
 			$info['mail_success'] = $this->email->send( $email_parts['subject'], $email_body );
@@ -1863,6 +1631,11 @@ class Boldgrid_Backup_Admin_Core {
 			$this->enforce_retention();
 
 			update_option( 'boldgrid_backup_latest_backup', $info );
+		}
+
+		// Actions to take if we're creating a full site backup.
+		if ( ! $dryrun && $this->archiver_utility->is_full_backup() ) {
+			$this->archive->write_results_file( $info );
 		}
 
 		Boldgrid_Backup_Admin_In_Progress_Data::set_args(
@@ -2475,8 +2248,9 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->is_backup_now = true;
 
-		$key                  = 'folder_exclusion_type';
-		$this->is_backup_full = isset( $_POST[ $key ] ) && 'full' === $_POST[ $key ];
+		$is_all_files         = isset( $_POST['folder_exclusion_type'] ) && 'full' === $_POST['folder_exclusion_type'];
+		$is_all_tables        = isset( $_POST['table_inclusion_type'] ) && 'full' === $_POST['table_inclusion_type'];
+		$this->is_backup_full = $is_all_files && $is_all_tables;
 
 		$this->is_archiving_update_protection = ! empty( $_POST['is_updating'] ) &&
 			'true' === $_POST['is_updating'];

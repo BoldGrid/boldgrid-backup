@@ -5,13 +5,12 @@
  * For a full description of what this test is doing and why, please see
  * Boldgrid_Backup_Admin_Cron_Test::setup()
  *
- * @link https://www.boldgrid.com
- * @since 1.6.5
+ * @link       https://www.boldgrid.com
+ * @since      1.6.5
  *
  * @package    Boldgrid_Backup
- * @subpackage Boldgrid_Backup/admin
+ * @subpackage Boldgrid_Backup/cron
  * @copyright  BoldGrid
- * @version    $Id$
  * @author     BoldGrid <support@boldgrid.com>
  */
 
@@ -56,4 +55,3 @@ foreach ( $configs as $config ) {
 		die();
 	}
 }
-

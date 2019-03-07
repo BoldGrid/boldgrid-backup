@@ -91,9 +91,15 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 	 *
 	 * @see Boldgrid_Backup_Admin_Filelist::get_total_size()
 	 *
-	 * @param array $filelist File list.
+	 * @param array $filelist {
+	 *     File details.
+	 *
+	 *     @type string 0 Path.  Example: ""/home/user/public_html/readme.html".
+	 *     @type string 1 basename.  Example: "readme.html".
+	 *     @type int    2 File size (in bytes). Example: "7413".
+	 * }
 	 * @param array $info {
-	 *     An array of data about the backup archive we are generating.
+	 *     Data about the backup archive we are generating.
 	 *
 	 *     @type string mode       backup
 	 *     @type bool   dryrun
@@ -128,6 +134,8 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 			);
 		}
 
+		$has_setexternalattributesname = method_exists( $this->zip, 'setExternalAttributesName' );
+
 		foreach ( $filelist as $fileinfo ) {
 			$is_dir = ! empty( $fileinfo[3] ) && 'd' === $fileinfo[3];
 
@@ -136,6 +144,21 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 			} else {
 				$this->zip->addFile( $fileinfo[0], $fileinfo[1] );
 				$this->add_dir( $fileinfo[1] );
+			}
+
+			/*
+			 * ZipArchive::setExternalAttributesName() is avaiable in PHP >= 5.6.
+			 * If available, use the method to set the permissions for items in the ZIP archive.
+			 * By default, items in a ZIP file are extracted with loose (777/666) modes, which can
+			 * cause issues on Linux systems using suEXEX/suPHP or other mechanisms requiring
+			 * tighter (755/644; world non-writable permissions) modes on directories and files.
+			 */
+			if ( $has_setexternalattributesname ) {
+				$this->zip->setExternalAttributesName(
+					$is_dir ? $fileinfo[1] . '/' : $fileinfo[1],
+					ZipArchive::OPSYS_UNIX,
+					fileperms( $fileinfo[0] ) << 16
+				);
 			}
 
 			$number_files_archived++;

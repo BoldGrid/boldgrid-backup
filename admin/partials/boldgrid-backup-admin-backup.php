@@ -62,9 +62,11 @@ if ( $is_restore && $is_success ) {
 	}
 }
 
+$archive_filepath = ! empty( $archive_info['filepath'] ) ? $archive_info['filepath'] : null;
+
 $core = isset( $this->core ) ? $this->core : $this;
 
-$core->archive->init( $archive_info['filepath'] );
+$core->archive->init( $archive_filepath );
 
 /**
  * If data exists in the $archive_info array, then print results, else show an error message.
