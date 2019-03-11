@@ -76,6 +76,12 @@ The following features are available, of which you can find additional info for 
 
 == Changelog ==
 
+= 1.9.0-rc.2 =
+
+Release date: Mar 11th, 2019
+
+* Update:      Updated library.
+
 = 1.9.0-rc.1 =
 
 Release date: Mar 7th, 2019

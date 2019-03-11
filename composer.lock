@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "595d822f769cd2905b18f0e98b3f3392",
+    "content-hash": "0c76af2b3bde032261c491cbc9f194fa",
     "packages": [
         {
             "name": "boldgrid/library",
-            "version": "2.8.0-rc.1",
+            "version": "2.8.0-rc.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BoldGrid/library.git",
-                "reference": "a6016b7bdd8a1ce90d77afba5149ae29dbecaf62"
+                "reference": "fdd0fed20674355f59f39e1841386a63790494d5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BoldGrid/library/zipball/a6016b7bdd8a1ce90d77afba5149ae29dbecaf62",
-                "reference": "a6016b7bdd8a1ce90d77afba5149ae29dbecaf62",
+                "url": "https://api.github.com/repos/BoldGrid/library/zipball/fdd0fed20674355f59f39e1841386a63790494d5",
+                "reference": "fdd0fed20674355f59f39e1841386a63790494d5",
                 "shasum": ""
             },
             "type": "library",
@@ -53,7 +53,7 @@
                 }
             ],
             "description": "The BoldGrid Library for shared code used in official BoldGrid plugins and themes.",
-            "time": "2019-03-05T19:36:25+00:00"
+            "time": "2019-03-11T13:10:11+00:00"
         },
         {
             "name": "cbschuld/browser.php",
@@ -156,16 +156,16 @@
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "2.0.14",
+            "version": "2.0.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "8ebfcadbf30524aeb75b2c446bc2519d5b321478"
+                "reference": "11cf67cf78dc4acb18dc9149a57be4aee5036ce0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/8ebfcadbf30524aeb75b2c446bc2519d5b321478",
-                "reference": "8ebfcadbf30524aeb75b2c446bc2519d5b321478",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/11cf67cf78dc4acb18dc9149a57be4aee5036ce0",
+                "reference": "11cf67cf78dc4acb18dc9149a57be4aee5036ce0",
                 "shasum": ""
             },
             "require": {
@@ -244,7 +244,7 @@
                 "x.509",
                 "x509"
             ],
-            "time": "2019-01-27T19:37:29+00:00"
+            "time": "2019-03-10T16:53:45+00:00"
         }
     ],
     "packages-dev": [
@@ -292,7 +292,7 @@
         {
             "alias": "2.8.0",
             "alias_normalized": "2.8.0.0",
-            "version": "2.8.0.0-RC1",
+            "version": "2.8.0.0-RC3",
             "package": "boldgrid/library"
         }
     ],
