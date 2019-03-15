@@ -2,9 +2,9 @@
 Contributors: boldgrid, joemoto, imh_brad, rramo012, timph, bgnicolepaschen
 Tags: boldgrid, backup, restore, migrate, migration
 Requires at least: 4.4
-Tested up to: 5.0.3
+Tested up to: 5.1
 Requires PHP: 5.4
-Stable tag: 1.8.0
+Stable tag: 1.8.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -76,7 +76,9 @@ The following features are available, of which you can find additional info for 
 
 == Changelog ==
 
-= 1.8.1 In progress =
+= 1.8.1 =
+
+Release date: Mar 15th, 2019
 
 * Bug fix: Ensure library's activity class is available before using it.
 
