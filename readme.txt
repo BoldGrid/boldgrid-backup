@@ -38,6 +38,11 @@ The following features are available, of which you can find additional info for 
 * Protect important backups by excluding them from retention settings.
 * Download and Upload backups using protected links, which makes transferring a website from one host to another an much easier process.
 
+== Getting Started & Support ==
+
+If you have any questions on getting started with BoldGrid Backup, please visit our [Getting Started Guide](https://www.boldgrid.com/support/boldgrid-backup/).
+We also suggest joining our [Team Orange User Group community](https://www.facebook.com/groups/BGTeamOrange) for free support, tips and tricks.
+
 == Screenshots ==
 
 1. Easily schedule backups using Cron or WP Cron. Set a time of day, select the days of the week, and BoldGrid Backup will automate backups for you. You will receive an email after each backup has been completed.
