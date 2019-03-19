@@ -747,6 +747,8 @@ class Boldgrid_Backup_Admin_Core {
 	/**
 	 * Add menu items.
 	 *
+	 * This method added during the admin_menu hook.
+	 *
 	 * @since 1.0
 	 *
 	 * @global array $submenu

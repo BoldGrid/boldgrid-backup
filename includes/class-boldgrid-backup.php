@@ -220,6 +220,8 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-crypt.php';
 
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-help.php';
+
 		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-authentication.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-download.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-file.php';
@@ -444,6 +446,11 @@ class Boldgrid_Backup {
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_is_setup_local', $plugin_admin_core->local, 'is_setup_ajax' );
 
 		$this->loader->add_filter( 'boldgrid_backup_get_core', $plugin_admin_core, 'get_core' );
+
+		$help = new Boldgrid_Backup_Admin_Help();
+		foreach ( $help->screen_ids as $screen ) {
+			$this->loader->add_action( 'load-' . $screen, $help, 'add' );
+		}
 	}
 
 	/**
