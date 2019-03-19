@@ -1569,7 +1569,7 @@ class Boldgrid_Backup_Admin_Core {
 		// Stop timer.
 		$time_stop = microtime( true );
 
-		// Calculate duration and MD5.
+		// Calculate duration.
 		$info['duration']    = number_format( ( $time_stop - $time_start ), 2, '.', '' );
 		$info['db_duration'] = number_format( ( $db_time_stop - $time_start ), 2, '.', '' );
 		$info['db_filename'] = basename( $this->db_dump_filepath );
@@ -1624,8 +1624,6 @@ class Boldgrid_Backup_Admin_Core {
 			update_site_option( 'boldgrid_backup_last_backup', time() );
 
 			$this->archive_log->write( $info );
-
-			$info['file_md5'] = md5_file( $info['filepath'] );
 
 			// Enforce retention setting.
 			$this->enforce_retention();

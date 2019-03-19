@@ -9,7 +9,7 @@
 
 "PHP_CodeSniffer@https://github.com/squizlabs/PHP_CodeSniffer/":
   version "0.0.0"
-  resolved "https://github.com/squizlabs/PHP_CodeSniffer/#8c8c4ff2566630e79c52278ceb6e383795c9f443"
+  resolved "https://github.com/squizlabs/PHP_CodeSniffer/#2241c64ce0529b35b4eab43d1488087657ab96e9"
 
 "WordPress-Coding-Standards@https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards.git#cf6b310caad735816caef7573295f8a534374706":
   version "0.0.0"

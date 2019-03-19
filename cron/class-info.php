@@ -686,20 +686,10 @@ class Info {
 			return false;
 		}
 
-		if ( empty( $results['file_md5'] ) ) {
-			self::$info['errors'][] = 'Error: Missing archive file checksum.';
-			return false;
-		}
-
-		// Check if archive exists, and matches checksum.
+		// Check if archive exists.
 		if ( ! file_exists( $results['filepath'] ) ) {
 			self::$info['errors'][] = 'Error: Backup archive file "' .
 				$results['filepath'] . '" does not exist.';
-			return false;
-		}
-
-		if ( md5_file( $results['filepath'] ) !== $results['file_md5'] ) {
-			self::$info['errors'][] = 'Error: Failed archive file checksum.';
 			return false;
 		}
 
