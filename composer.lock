@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0c76af2b3bde032261c491cbc9f194fa",
+    "content-hash": "559f69b659d3dee2eeaa1b8da20d152a",
     "packages": [
         {
             "name": "boldgrid/library",
-            "version": "2.8.0-rc.3",
+            "version": "2.7.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BoldGrid/library.git",
-                "reference": "fdd0fed20674355f59f39e1841386a63790494d5"
+                "reference": "e6b781f06c8b221c5139b05c980a8a84471fe7d7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BoldGrid/library/zipball/fdd0fed20674355f59f39e1841386a63790494d5",
-                "reference": "fdd0fed20674355f59f39e1841386a63790494d5",
+                "url": "https://api.github.com/repos/BoldGrid/library/zipball/e6b781f06c8b221c5139b05c980a8a84471fe7d7",
+                "reference": "e6b781f06c8b221c5139b05c980a8a84471fe7d7",
                 "shasum": ""
             },
             "type": "library",
@@ -53,7 +53,7 @@
                 }
             ],
             "description": "The BoldGrid Library for shared code used in official BoldGrid plugins and themes.",
-            "time": "2019-03-11T13:10:11+00:00"
+            "time": "2019-01-15T17:43:46+00:00"
         },
         {
             "name": "cbschuld/browser.php",
@@ -288,17 +288,9 @@
             "time": "2015-08-31T22:07:48+00:00"
         }
     ],
-    "aliases": [
-        {
-            "alias": "2.8.0",
-            "alias_normalized": "2.8.0.0",
-            "version": "2.8.0.0-RC3",
-            "package": "boldgrid/library"
-        }
-    ],
+    "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "boldgrid/library": 5,
         "cbschuld/browser.php": 20,
         "lox/xhprof": 20
     },

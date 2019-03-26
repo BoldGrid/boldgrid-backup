@@ -1,10 +1,10 @@
 === BoldGrid Backup ===
 Contributors: boldgrid, joemoto, imh_brad, rramo012, timph, bgnicolepaschen
-Tags: boldgrid, backup, restore, migrate, migration
+Tags: boldgrid, backup, restore, migrate, migration, update, updates
 Requires at least: 4.4
 Tested up to: 5.1
 Requires PHP: 5.4
-Stable tag: 1.8.0
+Stable tag: 1.9.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -81,15 +81,9 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 
 == Changelog ==
 
-= 1.9.0-rc.2 =
+= 1.9.0 =
 
-Release date: Mar 11th, 2019
-
-* Update:      Updated library.
-
-= 1.9.0-rc.1 =
-
-Release date: Mar 7th, 2019
+Release date: Mar 26th, 2019
 
 * New feature: Added emergency/standalone restoration CLI process.
 * Update:      When storing backups in wp-content dir, make "boldgrid_backup" dir name more unique.
