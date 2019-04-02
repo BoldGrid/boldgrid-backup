@@ -10,7 +10,6 @@
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
  * @copyright  BoldGrid
- * @version    $Id$
  * @author     BoldGrid <support@boldgrid.com>
  */
 
@@ -20,7 +19,6 @@
  * @since 1.7.0
  */
 class Boldgrid_Backup_Admin_In_Progress_Data {
-
 	/**
 	 * Option name in which data is stored.
 	 *
@@ -51,6 +49,7 @@ class Boldgrid_Backup_Admin_In_Progress_Data {
 	 *
 	 * @since 1.7.0
 	 *
+	 * @param  string $key Index/key.
 	 * @return mixed
 	 */
 	public static function get_arg( $key ) {
@@ -76,6 +75,8 @@ class Boldgrid_Backup_Admin_In_Progress_Data {
 	 * Generally displayed under a "Backup Now" button.
 	 *
 	 * @since 1.7.0
+	 *
+	 * @param string $label Progress label.
 	 */
 	public static function get_markup( $label = null ) {
 		$label = ! empty( $label ) ? $label : __( 'Initializing backup...', 'boldgrid-backup' );

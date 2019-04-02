@@ -8,7 +8,6 @@
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
  * @copyright  BoldGrid
- * @version    $Id$
  * @author     BoldGrid <support@boldgrid.com>
  */
 
@@ -21,7 +20,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 	/**
 	 * The core class object.
 	 *
-	 * @since 1.6.0
+	 * @since  1.6.0
 	 * @access private
 	 * @var    Boldgrid_Backup_Admin_Core
 	 */
