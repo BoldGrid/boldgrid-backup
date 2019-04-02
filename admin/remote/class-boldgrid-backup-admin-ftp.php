@@ -952,9 +952,10 @@ class Boldgrid_Backup_Admin_Ftp {
 		$site_url = get_site_url();
 		$site_url = str_replace( 'https://', '', $site_url );
 		$site_url = str_replace( 'http://', '', $site_url );
-		$site_url = str_replace( '/', '_', $site_url );
+		$site_url = str_replace( '/', '-', $site_url );
+		$site_url = str_replace( '.', '-', $site_url );
 
-		$this->default_folder_name = 'boldgrid-backup_' . $site_url;
+		$this->default_folder_name = sanitize_file_name( 'boldgrid-backup-' . $site_url );
 	}
 
 	/**
