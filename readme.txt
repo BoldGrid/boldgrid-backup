@@ -81,6 +81,10 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 
 == Changelog ==
 
+= 1.9.1 In-progress =
+
+* Bug fix:     Honor bgbkup-cli method argument.
+
 = 1.9.0 =
 
 Release date: Mar 26th, 2019
