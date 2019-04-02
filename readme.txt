@@ -85,6 +85,7 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 
 Release date: Apr 2nd, 2019
 
+* New feature: Users can now specify a custom folder name for FTP uploads.
 * Update:      Increased precision of "Archive file size" value within progress bar to better show a backup is still occurring and didn't freeze.
 
 = 1.9.0 =
