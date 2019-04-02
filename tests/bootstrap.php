@@ -73,7 +73,6 @@ $files = array(
 	'/includes/class-boldgrid-backup-file.php',
 	'/admin/storage/class-boldgrid-backup-admin-storage-local.php',
 	'/admin/remote/class-boldgrid-backup-admin-ftp.php',
-	'/admin/remote/class-boldgrid-backup-admin-sftp.php',
 	'/admin/remote/class-boldgrid-backup-admin-ftp-hooks.php',
 	'/admin/remote/class-boldgrid-backup-admin-ftp-page.php',
 	'/admin/remote/class-boldgrid-backup-admin-remote-settings.php',

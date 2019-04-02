@@ -92,7 +92,11 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 			),
 		);
 
-		// Blank data, used when deleting settings.
+		/*
+		 * Blank data, used when deleting settings.
+		 *
+		 * If we are deleting our settings, this data will be used to repopulate the form.
+		 */
 		$type       = $this->core->ftp->default_type;
 		$blank_data = array(
 			'type'            => $type,
@@ -100,6 +104,7 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 			'port'            => $this->core->ftp->default_port[ $type ],
 			'user'            => null,
 			'pass'            => null,
+			'folder_name'     => $this->core->ftp->default_folder_name,
 			'retention_count' => $this->core->ftp->retention_count,
 			'nickname'        => '',
 		);
@@ -193,6 +198,7 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 			$settings['remote'][ $ftp->key ] = array();
 		}
 
+		// This method has default values for each setting and also handles sanitization.
 		$data = $ftp->get_from_post();
 
 		$valid_credentials = $ftp->is_valid_credentials( $data['host'], $data['user'], $data['pass'], $data['port'], $data['type'] );
@@ -207,6 +213,7 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 
 		$settings['remote'][ $ftp->key ]['retention_count'] = $data['retention_count'];
 		$settings['remote'][ $ftp->key ]['nickname']        = $data['nickname'];
+		$settings['remote'][ $ftp->key ]['folder_name']     = $data['folder_name'];
 
 		if ( ! empty( $ftp->errors ) ) {
 			do_action( 'boldgrid_backup_notice', implode( '<br /><br />', $ftp->errors ) );

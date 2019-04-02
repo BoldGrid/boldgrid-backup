@@ -2,7 +2,10 @@
 /**
  * File: ftp.php
  *
- * The file handles the rendering of the remove FTP/SFTP options on the settings page.
+ * This file handles the rendering of the remote FTP/SFTP options on the settings page.
+ *
+ * The $data array on this page used to fill in the form fields is generated in
+ * Boldgrid_Backup_Admin_Ftp_Page->settings().
  *
  * @link https://www.boldgrid.com
  * @since 1.6.0
@@ -60,6 +63,13 @@ $sftp_selected = 'sftp' === $data['type'] ? $selected : '';
 			<td>
 				<?php esc_html_e( 'FTP Password', 'boldgrid-backup' ); ?><br />
 				<input type="password" name="pass" value="<?php echo esc_attr( $data['pass'] ); ?>" required />
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<?php esc_html_e( 'Folder name', 'boldgrid-backup' ); ?><br />
+				<?php esc_html_e( 'A folder in your FTP/SFTP server to store your backups, will be created if it doesn\'t exist. Please only use letters, numbers, dashes, and underscores.', 'boldgrid-backup' ); ?><br />
+				<input type="text" name="folder_name" value="<?php echo esc_attr( $data['folder_name'] ); ?>" min="1" required pattern="[A-Za-z0-9-_]+">
 			</td>
 		</tr>
 		<tr>
