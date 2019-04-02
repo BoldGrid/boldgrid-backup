@@ -1,10 +1,10 @@
 === BoldGrid Backup ===
 Contributors: boldgrid, joemoto, imh_brad, rramo012, timph, bgnicolepaschen
-Tags: boldgrid, backup, restore, migrate, migration, update, updates
+Tags: boldgrid, backup, restore, restoration, migrate, migration, update, updates
 Requires at least: 4.4
 Tested up to: 5.1
 Requires PHP: 5.4
-Stable tag: 1.9.0
+Stable tag: 1.9.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -81,12 +81,13 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 
 == Changelog ==
 
-= 1.9.1 In progress =
+= 1.9.1 =
 
 Release date: Apr 2nd, 2019
 
 * New feature: Users can now specify a custom folder name for FTP uploads.
 * Update:      Increased precision of "Archive file size" value within progress bar to better show a backup is still occurring and didn't freeze.
+* Bug fix:     Honor bgbkup-cli method argument.
 
 = 1.9.0 =
 
