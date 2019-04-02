@@ -81,6 +81,12 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 
 == Changelog ==
 
+= 1.9.2 In progress =
+
+Release date: tbd
+
+* Update:      Within rating prompt, link to Team Orange user group.
+
 = 1.9.1 =
 
 Release date: Apr 2nd, 2019

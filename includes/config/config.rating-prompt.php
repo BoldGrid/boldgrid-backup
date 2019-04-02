@@ -60,8 +60,13 @@ $default_prompt = array(
 					'snooze' => WEEK_IN_SECONDS,
 					'slide'  => 'maybe_later',
 				),
+				'user_group'          => array(
+					'text'   => __( 'Maybe later, I\'d first like to post a question to the Team Orange User Group.', 'boldgrid-backup' ),
+					'snooze' => WEEK_IN_SECONDS,
+					'link'   => 'https://www.facebook.com/groups/BGTeamOrange',
+				),
 				'already_did'         => array(
-					'text'  => __( 'I already did', 'boldgrid-backup' ),
+					'text'  => __( 'I already did.', 'boldgrid-backup' ),
 					'slide' => 'already_did',
 				),
 			),
@@ -125,7 +130,6 @@ return array(
 		'threshold' => 2,
 		'prompt'    => $download_prompt,
 	),
-
 	'any_backup_created'        => array(
 		'threshold' => 10,
 		'prompt'    => $any_backup_prompt,
