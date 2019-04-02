@@ -191,7 +191,7 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 				Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'total_files_done', $number_files_archived );
 				Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'last_files', $last_x_files );
 				Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'total_size_archived', $total_size_archived );
-				Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'total_size_archived_size_format', size_format( $total_size_archived ) );
+				Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'total_size_archived_size_format', size_format( $total_size_archived, 2 ) );
 				Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'step', 2 );
 			}
 		}

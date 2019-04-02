@@ -219,7 +219,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 			$data = array(
 				'size'        => $dirlist[ $tmp_filename ]['size'],
 				'lastmodunix' => $dirlist[ $tmp_filename ]['lastmodunix'],
-				'size_format' => size_format( $dirlist[ $tmp_filename ]['size'] ),
+				'size_format' => size_format( $dirlist[ $tmp_filename ]['size'], 2 ),
 			);
 		}
 

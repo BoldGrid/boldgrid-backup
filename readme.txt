@@ -81,6 +81,12 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 
 == Changelog ==
 
+= 1.9.1 In progress =
+
+Release date: Apr 2nd, 2019
+
+* Update:      Increased precision of "Archive file size" value within progress bar to better show a backup is still occurring and didn't freeze.
+
 = 1.9.0 =
 
 Release date: Mar 26th, 2019
