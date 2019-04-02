@@ -163,7 +163,7 @@ class Site_Restore {
 		$method  = Info::choose_method();
 
 		switch ( true ) {
-			case class_exists( 'ZipArchive' ):
+			case ( ! $method || 'ziparchive' === $method ) && class_exists( 'ZipArchive' ):
 				echo 'Attempting file restoration using PHP ZipArchive...' . PHP_EOL;
 				$archive = new \ZipArchive();
 				if ( true === $archive->open( $info['filepath'] ) ) {
@@ -172,7 +172,7 @@ class Site_Restore {
 				}
 				break;
 
-			case file_exists( $info['ABSPATH'] . 'wp-admin/includes/class-pclzip.php' ):
+			case ( ! $method || 'pclzip' === $method ) && file_exists( $info['ABSPATH'] . 'wp-admin/includes/class-pclzip.php' ):
 				echo 'Attempting file restoration using PHP PCLZip...' . PHP_EOL;
 				require $info['ABSPATH'] . 'wp-admin/includes/class-pclzip.php';
 				$archive = new \PclZip( $info['filepath'] );
@@ -187,7 +187,7 @@ class Site_Restore {
 				}
 				break;
 
-			case \Boldgrid_Backup_Admin_Cli::call_command( 'unzip', $success, $return_var ) || $success || 0 === $return_var:
+			case ( ! $method || 'cli' === $method ) && ( \Boldgrid_Backup_Admin_Cli::call_command( 'unzip', $success, $return_var ) || $success || 0 === $return_var ):
 				echo 'Attempting file restoration using unzip (CLI)...' . PHP_EOL;
 				$cmd = 'cd ' . $info['ABSPATH'] . ';unzip -oqq ' . $info['filepath'];
 				\Boldgrid_Backup_Admin_Cli::call_command(
