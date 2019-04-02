@@ -430,7 +430,7 @@ class Boldgrid_Backup_Admin_Ftp {
 		 */
 		$version = $has_settings && ! $has_folder_set ? 1 : 2;
 
-		switch( $version ) {
+		switch ( $version ) {
 			case 1:
 				$this->folder_name = 'boldgrid_backup';
 				break;
