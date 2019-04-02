@@ -432,7 +432,7 @@ class Boldgrid_Backup_Admin_Ftp {
 
 		switch( $version ) {
 			case 1:
-				$this->folder_name = 'boldgrid-backup';
+				$this->folder_name = 'boldgrid_backup';
 				break;
 			case 2:
 				$this->folder_name = $has_folder_set ? $settings['remote'][ $this->key ]['folder_name'] : $this->default_folder_name;
