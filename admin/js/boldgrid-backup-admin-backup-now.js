@@ -132,6 +132,9 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 		/**
 		 * @summary backupNow success callback.
 		 *
+		 * This is the success callback function for the boldgrid_backup_now ajax call, which is
+		 * handled by $Boldgrid_Backup_Admin_Core->boldgrid_backup_now_callback().
+		 *
 		 * @since 1.5.3
 		 */
 		successCallback = function( response ) {
@@ -141,7 +144,7 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 					success && data.data !== undefined && data.data.callback !== undefined ?
 						data.data.callback :
 						null;
-			
+
 			$( 'body' ).trigger( 'boldgrid_backup_complete' );
 
 			switch ( callback ) {
@@ -212,7 +215,7 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 				}
 			}
 		} );
-		
+
 		$( 'body' ).trigger( 'boldgrid_backup_initiated' );
 
 		// Prevent default browser action.

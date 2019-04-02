@@ -75,7 +75,7 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 	 * @since 1.6.0
 	 */
 	public function filter_get_all() {
-		$contents = $this->core->ftp->get_contents( true, $this->core->ftp->remote_dir );
+		$contents = $this->core->ftp->get_contents( true, $this->core->ftp->get_folder_name() );
 		$contents = $this->core->ftp->format_raw_contents( $contents );
 
 		foreach ( $contents as $item ) {
