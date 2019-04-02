@@ -39,6 +39,16 @@ class Boldgrid_Backup_Admin_Ftp {
 	private $core;
 
 	/**
+	 * Default folder name.
+	 *
+	 * Set using Boldgrid_Backup_Admin_Ftp->set_default_folder_name(), within the constructor.
+	 *
+	 * @since 1.9.1
+	 * @var string
+	 */
+	public $default_folder_name;
+
+	/**
 	 * Default port numbers.
 	 *
 	 * @since 1.6.0
@@ -67,6 +77,16 @@ class Boldgrid_Backup_Admin_Ftp {
 	 * @var    array
 	 */
 	public $errors = array();
+
+	/**
+	 * The folder on the remote FTP server where backups are stored.
+	 *
+	 * Handled by Boldgrid_Backup_Admin_Ftp->get_folder_name().
+	 *
+	 * @since 1.9.1
+	 * @var string
+	 */
+	public $folder_name;
 
 	/**
 	 * Hooks class.
@@ -123,15 +143,6 @@ class Boldgrid_Backup_Admin_Ftp {
 	 * @var    string
 	 */
 	private $pass = null;
-
-	/**
-	 * FTP remote directory.
-	 *
-	 * @since 1.6.0
-	 * @access public
-	 * @var    string
-	 */
-	public $remote_dir = 'boldgrid_backup';
 
 	/**
 	 * Retention count.
@@ -222,6 +233,8 @@ class Boldgrid_Backup_Admin_Ftp {
 		$this->hooks    = new Boldgrid_Backup_Admin_Ftp_Hooks( $core );
 		$this->page     = new Boldgrid_Backup_Admin_Ftp_Page( $core );
 		$this->settings = new Boldgrid_Backup_Admin_Remote_Settings( $this->key );
+
+		$this->set_default_folder_name();
 	}
 
 	/**
@@ -268,16 +281,16 @@ class Boldgrid_Backup_Admin_Ftp {
 		if ( ! $contents || ! is_array( $contents ) ) {
 			$this->errors[] = __( 'Unable to get a directory listing from FTP server.', 'boldgrid-backup' );
 			return false;
-		} elseif ( in_array( $this->remote_dir, $contents, true ) ) {
+		} elseif ( in_array( $this->get_folder_name(), $contents, true ) ) {
 			return true;
 		}
 
 		switch ( $this->type ) {
 			case 'ftp':
-				$created = ftp_mkdir( $this->connection, $this->remote_dir );
+				$created = ftp_mkdir( $this->connection, $this->get_folder_name() );
 				break;
 			case 'sftp':
-				$created = $this->connection->mkdir( $this->remote_dir );
+				$created = $this->connection->mkdir( $this->get_folder_name() );
 				break;
 		}
 
@@ -288,7 +301,7 @@ class Boldgrid_Backup_Admin_Ftp {
 					'Unable to create the following directory on FTP server: %1$s',
 					'boldgrid-backup'
 				),
-				$this->remote_dir
+				$this->get_folder_name()
 			);
 		}
 
@@ -320,7 +333,7 @@ class Boldgrid_Backup_Admin_Ftp {
 		$this->connect();
 
 		$local_filepath  = $this->core->backup_dir->get_path_to( $filename );
-		$server_filepath = $this->remote_dir . '/' . $filename;
+		$server_filepath = $this->get_folder_name() . '/' . $filename;
 		$success         = false;
 
 		$this->log_in();
@@ -351,7 +364,7 @@ class Boldgrid_Backup_Admin_Ftp {
 			return;
 		}
 
-		$contents = $this->get_contents( true, $this->remote_dir );
+		$contents = $this->get_contents( true, $this->get_folder_name() );
 		$backups  = $this->format_raw_contents( $contents );
 
 		$count_to_delete = count( $backups ) - $this->retention_count;
@@ -368,7 +381,7 @@ class Boldgrid_Backup_Admin_Ftp {
 
 		for ( $x = 0; $x < $count_to_delete; $x++ ) {
 			$filename = $backups[ $x ]['filename'];
-			$path     = $this->remote_dir . '/' . $filename;
+			$path     = $this->get_folder_name() . '/' . $filename;
 
 			switch ( $this->type ) {
 				case 'ftp':
@@ -393,7 +406,46 @@ class Boldgrid_Backup_Admin_Ftp {
 	}
 
 	/**
+	 * Get our ftp folder name.
+	 *
+	 * @since 1.9.1
+	 *
+	 * @return string
+	 */
+	public function get_folder_name() {
+		if ( ! empty( $this->folder_name ) ) {
+			return $this->folder_name;
+		}
+
+		$settings       = $this->core->settings->get_settings();
+		$has_settings   = isset( $settings['remote'][ $this->key ] );
+		$has_folder_set = ! empty( $settings['remote'][ $this->key ]['folder_name'] );
+
+		/*
+		 * In version 1, no folder name was configurable by the user and it defaulted to
+		 * "boldgrid-backup" ($this->remote_dir, which was removed in 1.9.1). In version 2, the user
+		 * can set a custom folder name.
+		 *
+		 * This is for backwards compatibility.
+		 */
+		$version = $has_settings && ! $has_folder_set ? 1 : 2;
+
+		switch( $version ) {
+			case 1:
+				$this->folder_name = 'boldgrid-backup';
+				break;
+			case 2:
+				$this->folder_name = $has_folder_set ? $settings['remote'][ $this->key ]['folder_name'] : $this->default_folder_name;
+				break;
+		}
+
+		return $this->folder_name;
+	}
+
+	/**
 	 * Get our settings from $_POST.
+	 *
+	 * For example, if we are saving our FTP settings, get all the data the user set from $_POST.
 	 *
 	 * @since 1.6.0
 	 *
@@ -416,6 +468,11 @@ class Boldgrid_Backup_Admin_Ftp {
 			array(
 				'key'     => 'pass',
 				'default' => null,
+			),
+			array(
+				'key'      => 'folder_name',
+				'default'  => $this->get_folder_name(),
+				'callback' => 'sanitize_file_name',
 			),
 			array(
 				'key'      => 'type',
@@ -887,6 +944,20 @@ class Boldgrid_Backup_Admin_Ftp {
 	}
 
 	/**
+	 * Set our default_folder_name.
+	 *
+	 * @since 1.9.1
+	 */
+	public function set_default_folder_name() {
+		$site_url = get_site_url();
+		$site_url = str_replace( 'https://', '', $site_url );
+		$site_url = str_replace( 'http://', '', $site_url );
+		$site_url = str_replace( '/', '_', $site_url );
+
+		$this->default_folder_name = 'boldgrid-backup_' . $site_url;
+	}
+
+	/**
 	 * Set our ftp password.
 	 *
 	 * @since 1.6.0
@@ -905,7 +976,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	 * @param string $filepath File path.
 	 */
 	public function is_uploaded( $filepath ) {
-		$contents = $this->get_contents( false, $this->remote_dir );
+		$contents = $this->get_contents( false, $this->get_folder_name() );
 
 		return ! is_array( $contents ) ? false : in_array( basename( $filepath ), $contents, true );
 	}
@@ -919,7 +990,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	 * @return bool
 	 */
 	public function upload( $filepath ) {
-		$remote_file = $this->remote_dir . '/' . basename( $filepath );
+		$remote_file = $this->get_folder_name() . '/' . basename( $filepath );
 
 		$timestamp = filemtime( $filepath );
 
