@@ -38,7 +38,9 @@ The following features are available, of which you can find additional info for 
 * Protect important backups by excluding them from retention settings.
 * Download and Upload backups using protected links, which makes transferring a website from one host to another an much easier process.
 
-== Getting Started & Support ==
+== Frequently Asked Questions ==
+
+= Where can I find more help? =
 
 If you have any questions on getting started with BoldGrid Backup, please visit our [Getting Started Guide](https://www.boldgrid.com/support/boldgrid-backup/).
 We also suggest joining our [Team Orange User Group community](https://www.facebook.com/groups/BGTeamOrange) for free support, tips and tricks.
