@@ -83,6 +83,10 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 
 == Changelog ==
 
+= 1.10.1 In progress =
+
+* Update:      Improved site/URL checking.
+
 = 1.9.1 =
 
 Release date: Apr 2nd, 2019

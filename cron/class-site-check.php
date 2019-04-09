@@ -87,10 +87,24 @@ class Site_Check {
 	 * @return bool;
 	 */
 	public static function is_siteurl_reachable() {
+		$result = false;
+
 		require_once __DIR__ . '/class-boldgrid-backup-url-helper.php';
 
-		return ! empty( Info::get_info()['siteurl'] ) &&
-			false !== ( new \Boldgrid_Backup_Url_Helper() )->call_url( Info::get_info()['siteurl'] );
+		if ( ! empty( Info::get_info()['siteurl'] ) ) {
+			$response = ( new \Boldgrid_Backup_Url_Helper() )->call_url(
+				Info::get_info()['siteurl'],
+				$status,
+				$errorno,
+				$error
+			);
+
+			if ( 200 === $status ) {
+				$result = true;
+			}
+		}
+
+		return $result;
 	}
 
 	/**
