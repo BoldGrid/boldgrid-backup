@@ -64,7 +64,6 @@ class Site_Check {
 			// If WordPress cannot be loaded via PHP.
 			if ( ! self::does_wp_load() ) {
 				$should_restore = true;
-die( 'RESTORE' );
 			}
 		}
 
