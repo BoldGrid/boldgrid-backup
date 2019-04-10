@@ -64,6 +64,7 @@ class Site_Check {
 			// If WordPress cannot be loaded via PHP.
 			if ( ! self::does_wp_load() ) {
 				$should_restore = true;
+die( 'RESTORE' );
 			}
 		}
 
@@ -113,18 +114,17 @@ class Site_Check {
 	 * @since 1.9.0
 	 * @static
 	 *
-	 * @see \Boldgrid\Backup\Cron\Info::get_info()
+	 * @see \Boldgrid_Backup_Admin_Cli::call_command()
 	 *
 	 * @return bool
 	 */
 	public static function does_wp_load() {
-		chdir( Info::get_info()['ABSPATH'] );
+		\Boldgrid_Backup_Admin_Cli::call_command(
+			'cd ' . __DIR__ . '; php -qf wp-test.php',
+			$success,
+			$return_var
+		);
 
-		try {
-			require 'wp-load.php';
-			return true;
-		} catch ( Exception $e ) {
-			return false;
-		}
+		return $success || 0 === $return_var;
 	}
 }
