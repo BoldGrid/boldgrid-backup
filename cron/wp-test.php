@@ -18,6 +18,20 @@
 
 use Boldgrid\Backup\Cron\Info;
 
+// Track if there was an exception.  This is not the greatest idea, but works for now.
+$had_exception = false;
+
+/**
+ * Clean (erase) the output buffer and turn off output buffering for all levels.
+ *
+ * @since 1.10.0
+ */
+function ob_clean_all() {
+	while ( ob_get_level() > 0 ) {
+		ob_end_clean();
+	}
+}
+
 /**
  * Handle fatal errors on PHP shutdown.
  *
@@ -25,7 +39,9 @@ use Boldgrid\Backup\Cron\Info;
  *
  * @link https://www.php.net/manual/en/errorfunc.constants.php
  */
-function handle_fatal() {
+function handle_shutdown() {
+	global $had_exception;
+
 	$error      = error_get_last();
 	$error_nums = [
 		1, // E_ERROR.
@@ -35,12 +51,18 @@ function handle_fatal() {
 	];
 
 	if ( ! empty( $error['type'] ) && in_array( $error['type'], $error_nums, true ) ) {
+		ob_clean_all();
 		echo json_encode( $error );
 		exit( 255 );
+	} elseif ( ! $had_exception && null === $error ) {
+		// Success.
+		ob_clean_all();
+		echo json_encode( [ 'success' => true ] );
+		exit( 0 );
 	}
 }
 
-register_shutdown_function( 'handle_fatal' );
+register_shutdown_function( 'handle_shutdown' );
 
 require __DIR__ . '/class-info.php';
 
@@ -57,14 +79,48 @@ if ( empty( $info['ABSPATH'] ) ) {
 	exit( 1 );
 }
 
-// Run test.
+// Start output buffering.
+ob_start();
+
+// Change to the WordPress ABSPATH (root/installation) directory.
 chdir( $info['ABSPATH'] );
 
+// Disable WP Cron for the tests.
+defined( 'DISABLE_WP_CRON' ) || define( 'DISABLE_WP_CRON', true );
+
+// Test loading WordPress front-end.
 try {
 	require 'wp-load.php';
-	echo json_encode( [ 'success' => true ] );
-	exit( 0 );
 } catch ( Exception $e ) {
-	echo json_encode( [ 'success' => false ] );
+	$had_exception = true;
+	ob_clean_all();
+	echo json_encode( [
+		'success' => false,
+		'message' => 'Could not load the WordPress site front-end. Exception message: "' .
+			$e->getMessage() . '" (File: "' . $e->getFile() . '" Line: "' . $e->getLine() . '")',
+	] );
+	exit( 1 );
+}
+
+// Test loading WordPress admin back-end.
+$test_uri                   = 'wp-admin/admin-ajax.php';
+$url_parts                  = parse_url( $info['siteurl'] );
+$_SERVER['HTTP_HOST']       = $url_parts['host'];
+$_SERVER['SERVER_PROTOCOL'] = $url_parts['scheme'];
+$_SERVER['PHP_SELF']        = ( ! empty( $url_parts['path'] ) ? $url_parts['path'] : '' ) . '/' . $test_uri;
+$_SERVER['REQUEST_METHOD']  = 'GET';
+$_SERVER['SERVER_NAME']     = '';
+$_SERVER['SERVER_PORT']     = 'https' === $url_parts['scheme'] ? '443' : '80';
+
+try {
+	require $test_uri;
+} catch ( Exception $e ) {
+	$had_exception = true;
+	ob_clean_all();
+	echo json_encode( [
+		'success' => false,
+		'message' => 'Could not load the WordPress admin back-end. Exception message: "' .
+			$e->getMessage() . '" (File: "' . $e->getFile() . '" Line: "' . $e->getLine() . '")',
+	] );
 	exit( 1 );
 }

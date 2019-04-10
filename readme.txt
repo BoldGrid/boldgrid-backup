@@ -85,6 +85,7 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 
 = 1.10.1 In progress =
 
+* New feature: Added site front-end and back-end checking.
 * Update:      Improved site/URL checking.
 
 = 1.9.1 =
