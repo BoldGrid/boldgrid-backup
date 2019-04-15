@@ -37,7 +37,7 @@ ob_start();
 						<?php
 						if ( ! isset( $settings['notifications']['backup'] ) ||
 								0 !== $settings['notifications']['backup'] ) {
-							echo ' checked';
+							echo ' checked'; // Default.
 						}
 						?>
 						/>
@@ -50,7 +50,20 @@ ob_start();
 						<?php
 						if ( ! isset( $settings['notifications']['restore'] ) ||
 								0 !== $settings['notifications']['restore'] ) {
-							echo ' checked';
+							echo ' checked'; // Default.
+						}
+						?>
+						/>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Send an email when there is a failed site check', 'boldgrid-backup' ); ?></th>
+				<td>
+					<input id='notification-site-check' type='checkbox' name='notify_site_check' value='1'
+						<?php
+						if ( ! isset( $settings['notifications']['site_check'] ) ||
+								0 !== $settings['notifications']['site_check'] ) {
+							echo ' checked'; // Default.
 						}
 						?>
 						/>

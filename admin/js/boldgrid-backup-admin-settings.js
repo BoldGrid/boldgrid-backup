@@ -23,7 +23,8 @@ BoldGrid.Settings = function( $ ) {
 		$backupDir,
 		$body = $( 'body' ),
 		tb_unload_count,
-		$moveBackups;
+		$moveBackups,
+		$siteCheck;
 
 	/**
 	 * Directory to store backups.
@@ -258,9 +259,27 @@ BoldGrid.Settings = function( $ ) {
 		}
 	};
 
+	/**
+	 * @summary Toggle site check options.
+	 *
+	 * @since 1.10.0
+	 */
+	self.toggleSiteCheck = function() {
+		if ( '1' === $siteCheck.filter( ':checked' ).val() ) {
+			// Site Check is enabled.
+			$( 'input[name="site_check_logger"]' ).removeAttr( 'disabled' );
+			$( 'input[name="auto_recovery"]' ).removeAttr( 'disabled' );
+			$( '#notification-site-check' ).removeAttr( 'disabled' );
+		} else {
+			// Site Check is disabled.
+			$( 'input[name="site_check_logger"]' ).attr( 'disabled', true );
+			$( 'input[name="auto_recovery"]' ).attr( 'disabled', true );
+			$( '#notification-site-check' ).attr( 'disabled', true );
+		}
+	};
+
 	// Onload event listener.
 	$( function() {
-
 		// Check if any days or the week are checked, toggle notice.
 		self.toggleNoBackupDays();
 
@@ -278,6 +297,10 @@ BoldGrid.Settings = function( $ ) {
 		$body.on( 'click', '#storage_locations .thickbox', self.on_click_provider );
 
 		$body.on( 'click', '#license_check_again', self.onClickCheckAgain );
+
+		$siteCheck = $( 'input[name="site_check"]' );
+		self.toggleSiteCheck();
+		$body.on( 'click', $siteCheck, self.toggleSiteCheck );
 	} );
 };
 

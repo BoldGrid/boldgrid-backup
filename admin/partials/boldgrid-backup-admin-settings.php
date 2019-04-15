@@ -27,6 +27,7 @@ $auto_updates    = include $library_dir . 'src/Library/Views/Connect/AutoUpdates
 $update_channels = include $library_dir . 'src/Library/Views/Connect/UpdateChannels.php';
 $notifications   = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/notifications.php';
 $connect_key     = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/connect-key.php';
+$site_check      = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/site_check.php';
 $days_of_week    = '';
 $time_of_day     = '';
 $storage         = '';
@@ -68,6 +69,11 @@ $sections = array(
 			'id'      => 'section_update_channels',
 			'title'   => __( 'Update Channels', 'boldgrid-backup' ),
 			'content' => $update_channels,
+		),
+		array(
+			'id'      => 'section_site_check',
+			'title'   => __( 'Site Check', 'boldgrid-backup' ),
+			'content' => $site_check,
 		),
 		array(
 			'id'      => 'section_notifications',
