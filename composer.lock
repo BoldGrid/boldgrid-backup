@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "559f69b659d3dee2eeaa1b8da20d152a",
+    "content-hash": "056ea2df0a2a66a9b07baf034045b1a9",
     "packages": [
         {
             "name": "boldgrid/library",
@@ -54,6 +54,108 @@
             ],
             "description": "The BoldGrid Library for shared code used in official BoldGrid plugins and themes.",
             "time": "2019-01-15T17:43:46+00:00"
+        },
+        {
+            "name": "boldgrid/unimposter",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/BoldGrid/unimposter.git",
+                "reference": "451b6c0c943d901e90e7fa427340e170f513d7de"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/BoldGrid/unimposter/zipball/451b6c0c943d901e90e7fa427340e170f513d7de",
+                "reference": "451b6c0c943d901e90e7fa427340e170f513d7de",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Boldgrid\\Unimposter\\": "src/Unimposter"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Tim Elsass",
+                    "email": "dev@tim.ph",
+                    "homepage": "http://tim.ph",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Joe C",
+                    "email": "joec@boldgrid.com",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Rafael Ramos",
+                    "email": "rafaelh@boldgrid.com",
+                    "homepage": "http://rafael-ramos.com",
+                    "role": "Developer"
+                },
+                {
+                    "name": "bwmarkle",
+                    "email": "bradm@boldgrid.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A composer package for BoldGrid Unimposter.",
+            "time": "2019-04-15T14:37:10+00:00"
+        },
+        {
+            "name": "boldgrid/wp-help-tabs",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/BoldGrid/wp-help-tabs.git",
+                "reference": "6df7fa34d7274a8821d638b5623b62e4ca1ae2ed"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/BoldGrid/wp-help-tabs/zipball/6df7fa34d7274a8821d638b5623b62e4ca1ae2ed",
+                "reference": "6df7fa34d7274a8821d638b5623b62e4ca1ae2ed",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Boldgrid\\WpHelpTabs\\": "src/WpHelpTabs"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Tim Elsass",
+                    "email": "dev@tim.ph",
+                    "homepage": "http://tim.ph",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Joe C",
+                    "email": "joec@boldgrid.com",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Rafael Ramos",
+                    "email": "rafaelh@boldgrid.com",
+                    "homepage": "http://rafael-ramos.com",
+                    "role": "Developer"
+                },
+                {
+                    "name": "bwmarkle",
+                    "email": "bradm@boldgrid.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A composer package for BoldGrid Help Tabs.",
+            "time": "2019-04-09T15:07:43+00:00"
         },
         {
             "name": "cbschuld/browser.php",
@@ -245,6 +347,137 @@
                 "x509"
             ],
             "time": "2019-03-10T16:53:45+00:00"
+        },
+        {
+            "name": "typisttech/imposter",
+            "version": "0.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/TypistTech/imposter.git",
+                "reference": "ab4fad90cfd7dc01fc9d952a76d18a6d53d519af"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/TypistTech/imposter/zipball/ab4fad90cfd7dc01fc9d952a76d18a6d53d519af",
+                "reference": "ab4fad90cfd7dc01fc9d952a76d18a6d53d519af",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": "^7.1"
+            },
+            "require-dev": {
+                "codeception/base": "^2.3",
+                "mockery/mockery": "^1.1",
+                "squizlabs/php_codesniffer": "^3.2"
+            },
+            "suggest": {
+                "typisttech/imposter-plugin": "Composer plugin to integrate composer and imposter"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.3.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "TypistTech\\Imposter\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Tang Rufus",
+                    "email": "tangrufus@gmail.com",
+                    "homepage": "https://typist.tech",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Typist Tech",
+                    "email": "imposter@typist.tech",
+                    "homepage": "https://typist.tech"
+                }
+            ],
+            "description": "Wrapping all composer vendor packages inside your own namespace. Intended for WordPress plugins",
+            "homepage": "https://typist.tech/projects/imposter",
+            "keywords": [
+                "composer",
+                "dependency",
+                "monkey-patching",
+                "namespace",
+                "wordpress"
+            ],
+            "time": "2018-09-24T23:25:48+00:00"
+        },
+        {
+            "name": "typisttech/imposter-plugin",
+            "version": "0.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/TypistTech/imposter-plugin.git",
+                "reference": "ccca62af8b04623a6ae7077c21e8ced4c09558ae"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/TypistTech/imposter-plugin/zipball/ccca62af8b04623a6ae7077c21e8ced4c09558ae",
+                "reference": "ccca62af8b04623a6ae7077c21e8ced4c09558ae",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^1.1",
+                "php": "^7.1",
+                "typisttech/imposter": "^0.3.1"
+            },
+            "require-dev": {
+                "codeception/base": "^2.3",
+                "composer/composer": "^1.5",
+                "squizlabs/php_codesniffer": "^3.2",
+                "typisttech/codeception-composer-project-module": "^0.1.1"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.3.x-dev"
+                },
+                "class": "TypistTech\\Imposter\\Plugin\\ImposterPlugin"
+            },
+            "autoload": {
+                "psr-4": {
+                    "TypistTech\\Imposter\\Plugin\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Tang Rufus",
+                    "email": "tangrufus@gmail.com",
+                    "homepage": "https://www.typist.tech",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Typist Tech",
+                    "email": "imposter-plugin@typist.tech",
+                    "homepage": "https://www.typist.tech"
+                }
+            ],
+            "description": "Composer plugin that wraps all composer vendor packages inside your own namespace. Intended for WordPress plugins",
+            "homepage": "https://www.typist.tech/projects/imposter-plugin",
+            "keywords": [
+                "composer",
+                "composer-plugin",
+                "dependency",
+                "monkey-patching",
+                "namespace",
+                "wordpress"
+            ],
+            "time": "2018-09-25T02:15:58+00:00"
         }
     ],
     "packages-dev": [

@@ -16,6 +16,8 @@
 
 // phpcs:disable WordPress.VIP
 
+use Boldgrid\Backup\Boldgrid\WpHelpTabs\Tabs;
+
 /**
  * Class: Boldgrid_Backup
  *
@@ -219,8 +221,6 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-time.php';
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-crypt.php';
-
-		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-help.php';
 
 		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-authentication.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-download.php';
@@ -447,10 +447,9 @@ class Boldgrid_Backup {
 
 		$this->loader->add_filter( 'boldgrid_backup_get_core', $plugin_admin_core, 'get_core' );
 
-		$help = new Boldgrid_Backup_Admin_Help();
-		foreach ( $help->screen_ids as $screen ) {
-			$this->loader->add_action( 'load-' . $screen, $help, 'add' );
-		}
+		$help_tabs_config = include BOLDGRID_BACKUP_PATH . '/includes/config/config.help-tabs.php';
+		$help_tabs        = new Tabs();
+		$help_tabs->init( $help_tabs_config );
 	}
 
 	/**
