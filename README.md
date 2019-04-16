@@ -18,3 +18,13 @@ WordPress backup and restoration with update protection.
 ### Manually ###
 1. Upload the entire boldgrid-backup folder to the /wp-content/plugins/ directory.
 1. Activate the plugin through the Plugins menu in WordPress.
+
+## Development ##
+
+Before you can use the development version of this plugin you must install the dependencies.
+
+```
+yarn install
+composer install -o
+gulp
+```
