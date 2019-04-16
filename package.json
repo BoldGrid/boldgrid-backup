@@ -4,7 +4,8 @@
   "js-lint-fix": "prettier-eslint **/*.js --write --ignore **/build/**",
   "install-codesniffs": "php node_modules/PHP_CodeSniffer/bin/phpcs --config-set installed_paths node_modules/WordPress-Coding-Standards/",
   "php-codesniffer": "npm run install-codesniffs && node_modules/PHP_CodeSniffer/bin/phpcs -p -s --report=emacs --report-width=220 --standard=WordPress-Docs --standard=WordPress-Extra --ignore=*/node_modules/*,*/vendor/* --extensions=php .",
-  "unimposter": "php -r \"include 'vendor/boldgrid/unimposter/src/Unimposter/Unimposter.php'; Boldgrid\\Unimposter\\unimposter::run();\""
+  "imposter": "php -r \"include 'vendor/boldgrid/imposter/src/Imposter/Imposter.php'; \\$imposter = new Boldgrid\\Imposter\\Imposter(); \\$imposter->imposter();\"",
+  "unimposter": "php -r \"include 'vendor/boldgrid/imposter/src/Imposter/Imposter.php'; \\$imposter = new Boldgrid\\Imposter\\Imposter(); \\$imposter->unimposter();\""
  },
  "devDependencies": {
   "@boldgrid/wordpress-tag-sync": "^1.3.0",

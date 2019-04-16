@@ -4,23 +4,16 @@
         "ifsnop/mysqldump-php" : "2.*",
         "phpseclib/phpseclib" : "~2.0",
         "cbschuld/browser.php" : "~1.0-dev",
-        "boldgrid/wp-help-tabs": "^1.0",
-        "typisttech/imposter": "^0.3.1",
-        "typisttech/imposter-plugin": "^0.3.1",
-        "boldgrid/unimposter": "^1.0"
+        "boldgrid/wp-help-tabs": "^1.0"
     },
     "require-dev": {
         "lox/xhprof": "dev-master"
     },
     "extra": {
-        "imposter": {
+        "boldgrid_imposter": {
             "namespace": "Boldgrid\\Backup",
-            "excludes": [
-                "boldgrid/library",
-                "boldgrid/unimposter",
-                "ifsnop/mysqldump-php",
-                "phpseclib/phpseclib",
-                "cbschuld/browser.php"
+            "namespaces": [
+                "Boldgrid\\WpHelpTabs"
             ]
         }
     }
