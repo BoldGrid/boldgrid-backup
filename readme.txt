@@ -4,7 +4,7 @@ Tags: boldgrid, backup, restore, restoration, migrate, migration, update, update
 Requires at least: 4.4
 Tested up to: 5.1
 Requires PHP: 5.4
-Stable tag: 1.9.1
+Stable tag: 1.9.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -83,7 +83,9 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 
 == Changelog ==
 
-= 1.9.2 In progress =
+= 1.9.2 =
+
+Release date: Apr 16th, 2019
 
 * Bug fix:     Prevent duplicate emails when backups are made before an auto update.
 
