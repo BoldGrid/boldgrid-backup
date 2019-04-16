@@ -1,6 +1,6 @@
 <?php
 /**
- * File: site_check.php
+ * File: site-check.php
  *
  * Show "Site Check" on settings page.
  *
