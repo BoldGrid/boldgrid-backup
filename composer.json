@@ -7,5 +7,10 @@
     },
     "require-dev": {
         "lox/xhprof": "dev-master"
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "composer run-script post-autoload-dump -d ./vendor/boldgrid/library"
+        ]
     }
 }

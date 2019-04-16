@@ -150,10 +150,10 @@ class Boldgrid_Backup_Admin_Jobs {
 	public function post_archive_files( $info ) {
 		/*
 		 * We only want to add this to the jobs queue if we're in the middle of
-		 * an automatic backup. If the user simply clicked on "Backup site now",
-		 * we don't want to email the user, we'll already be doing that.
+		 * an automatic backup (one that has been scheduled). If the user simply clicked on
+		 * "Backup site now", we don't want to email the user, we'll already be doing that.
 		 */
-		if ( ! $this->core->doing_cron ) {
+		if ( ! $this->core->is_scheduled_backup ) {
 			return;
 		}
 
