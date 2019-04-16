@@ -82,8 +82,7 @@ class Boldgrid_Backup_Admin_Core {
 	/**
 	 * Whether or not we're doing cron.
 	 *
-	 * When we're generating a backup, both via cron and wpcron, doing_cron is
-	 * true.
+	 * Please see $this->set_doing_cron() for further clarification.
 	 *
 	 * @since  1.5.1
 	 * @var    bool
@@ -503,7 +502,8 @@ class Boldgrid_Backup_Admin_Core {
 		global $wp_filesystem;
 		global $pagenow;
 
-		$this->doing_cron    = ( defined( 'DOING_CRON' ) && DOING_CRON ) || isset( $_GET['doing_wp_cron'] ); // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		$this->set_doing_cron();
+
 		$this->doing_ajax    = is_admin() && defined( 'DOING_AJAX' ) && DOING_AJAX;
 		$this->doing_wp_cron = ! empty( $_SERVER['SCRIPT_FILENAME'] ) &&
 			trailingslashit( ABSPATH ) . 'wp-cron.php' === $_SERVER['SCRIPT_FILENAME'];
@@ -1311,6 +1311,12 @@ class Boldgrid_Backup_Admin_Core {
 	public function archive_files( $save = false, $dryrun = false ) {
 		$this->pre_auto_update = 'pre_auto_update' === current_filter();
 
+		/*
+		 * A scheduled backup is a backup triggered by the user's BoldGrid Backup Settings,
+		 * specifically BoldGrid Backup > Settings > Backup Schedule. If the user clicked "Backup
+		 * Site Now" or this is a backup before an auto update occurs, this is not a scheduled
+		 * backup.
+		 */
 		$this->is_scheduled_backup = $this->doing_cron && ! $this->pre_auto_update;
 
 		Boldgrid_Backup_Admin_In_Progress_Data::set_args(
@@ -2427,6 +2433,23 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Load template view.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-test.php';
+	}
+
+	/**
+	 * Set doing_cron.
+	 *
+	 * $this->doing_cron specifies whether or not we're doing cron.
+	 *
+	 * When we're generating a backup, both via cron and wpcron, doing_cron is true.
+	 *
+	 * $_GET['doing_wp_cron'] is the timestamp the cron has been triggered. Please see:
+	 * @link https://github.com/WordPress/WordPress/blob/5.1.1/wp-cron.php#L84-L96
+	 * @link https://github.com/WordPress/WordPress/blob/5.1.1/wp-includes/cron.php#L635-L639
+	 *
+	 * @since  1.9.2
+	 */
+	public function set_doing_cron() {
+		$this->doing_cron = ( defined( 'DOING_CRON' ) && DOING_CRON ) || isset( $_GET['doing_wp_cron'] ); // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 	}
 
 	/**

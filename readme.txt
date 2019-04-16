@@ -83,6 +83,10 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 
 == Changelog ==
 
+= 1.9.2 In progress =
+
+* Bug fix:     Prevent duplicate emails when backups are made before an auto update.
+
 = 1.9.1 =
 
 Release date: Apr 2nd, 2019
