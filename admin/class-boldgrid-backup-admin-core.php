@@ -2443,8 +2443,8 @@ class Boldgrid_Backup_Admin_Core {
 	 * When we're generating a backup, both via cron and wpcron, doing_cron is true.
 	 *
 	 * $_GET['doing_wp_cron'] is the timestamp the cron has been triggered. Please see:
-	 * # https://github.com/WordPress/WordPress/blob/5.1.1/wp-cron.php#L84-L96
-	 * # https://github.com/WordPress/WordPress/blob/5.1.1/wp-includes/cron.php#L635-L639
+	 * @link https://github.com/WordPress/WordPress/blob/5.1.1/wp-cron.php#L84-L96
+	 * @link https://github.com/WordPress/WordPress/blob/5.1.1/wp-includes/cron.php#L635-L639
 	 *
 	 * @since  1.9.2
 	 */
