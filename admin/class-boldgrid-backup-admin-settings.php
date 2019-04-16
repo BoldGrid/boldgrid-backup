@@ -235,6 +235,24 @@ class Boldgrid_Backup_Admin_Settings {
 		$settings['folder_exclusion_include'] = $this->core->folder_exclusion->from_settings( 'include', $settings );
 		$settings['folder_exclusion_exclude'] = $this->core->folder_exclusion->from_settings( 'exclude', $settings );
 
+		// Site Check settings.
+		$settings['site_check']['enabled'] = ! empty( $settings['site_check']['enabled'] ) ?
+			(bool) $settings['site_check']['enabled'] : true;
+
+		$settings['site_check']['logger'] = ! empty( $settings['site_check']['logger'] ) ?
+			(bool) $settings['site_check']['logger'] : true;
+
+		$settings['site_check']['auto_recovery'] = ! empty( $settings['site_check']['auto_recovery'] ) ?
+			(bool) $settings['site_check']['auto_recovery'] : false;
+
+		$settings['notifications']['site_check'] = ! empty( $settings['notifications']['site_check'] ) ?
+			(bool) $settings['notifications']['site_check'] : true;
+
+		// Site Check interval (in minutes); 5-59, defaults to 15.
+		$settings['site_check']['interval'] = ( ! empty( $settings['site_check']['interval'] ) &&
+			4 < $settings['site_check']['interval'] && 60 > $settings['site_check']['interval'] ) ?
+			$settings['site_check']['interval'] : 15;
+
 		// Return the settings array.
 		return $settings;
 	}
@@ -474,6 +492,10 @@ class Boldgrid_Backup_Admin_Settings {
 			$settings['site_check']['enabled'] = (
 				( isset( $_POST['site_check'] ) && '1' === $_POST['site_check'] ) ? 1 : 0
 			);
+
+			$settings['site_check']['interval'] = isset( $_POST['site_check_interval'] ) &&
+				4 < $_POST['site_check_interval'] && 60 > $_POST['site_check_interval'] ?
+				(int) $_POST['site_check_interval'] : 15;
 
 			$settings['site_check']['logger'] = (
 				( isset( $_POST['site_check_logger'] ) && '1' === $_POST['site_check_logger'] ) ? 1 : 0

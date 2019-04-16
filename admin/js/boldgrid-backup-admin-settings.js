@@ -267,11 +267,13 @@ BoldGrid.Settings = function( $ ) {
 	self.toggleSiteCheck = function() {
 		if ( '1' === $siteCheck.filter( ':checked' ).val() ) {
 			// Site Check is enabled.
+			$( '#site-check-interval' ).removeAttr( 'disabled' );
 			$( 'input[name="site_check_logger"]' ).removeAttr( 'disabled' );
 			$( 'input[name="auto_recovery"]' ).removeAttr( 'disabled' );
 			$( '#notification-site-check' ).removeAttr( 'disabled' );
 		} else {
 			// Site Check is disabled.
+			$( '#site-check-interval' ).attr( 'disabled', true );
 			$( 'input[name="site_check_logger"]' ).attr( 'disabled', true );
 			$( 'input[name="auto_recovery"]' ).attr( 'disabled', true );
 			$( '#notification-site-check' ).attr( 'disabled', true );

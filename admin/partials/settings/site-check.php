@@ -35,8 +35,7 @@ ob_start();
 				<td>
 					<input id='site_check-enabled' type='radio' name='site_check' value='1'
 					<?php
-					if ( ! isset( $settings['site_check']['enabled'] ) ||
-						1 === $settings['site_check']['enabled'] ) {
+					if ( $settings['site_check']['enabled'] ) {
 							echo ' checked'; // Default.
 					}
 					?>
@@ -44,8 +43,7 @@ ob_start();
 					id='site_check-disabled' type='radio' name='site_check'
 					value='0'
 					<?php
-					if ( isset( $settings['site_check']['enabled'] ) &&
-						0 === $settings['site_check']['enabled'] ) {
+					if ( ! $settings['site_check']['enabled'] ) {
 							echo ' checked';
 					}
 					?>
@@ -53,12 +51,31 @@ ob_start();
 				</td>
 			</tr>
 			<tr>
+				<th><?php esc_html_e( 'Check Interval (in minutes)', 'boldgrid-backup' ); ?></th>
+				<td>
+					<select id='site-check-interval' name='site_check_interval'>
+						<?php
+						for ( $x = 5; $x <= 59; $x ++ ) {
+							?>
+						<option value='<?php echo esc_attr( $x ); ?>'
+							<?php
+							if ( $x === $settings['site_check']['interval'] ) {
+								echo ' selected';
+							}
+							?>
+						><?php echo esc_html( $x ); ?></option>
+							<?php
+						}
+						?>
+					</select>
+				</td>
+			</tr>
+			<tr>
 				<th><?php esc_html_e( 'Logger', 'boldgrid-backup' ); ?></th>
 				<td>
 					<input id='site-check-logger-enabled' type='radio' name='site_check_logger' value='1'
 					<?php
-					if ( empty( $settings['site_check']['site_check_logger'] ) ||
-						1 === $settings['site_check']['site_check_logger'] ) {
+					if ( $settings['site_check']['logger'] ) {
 							echo ' checked'; // Default.
 					}
 					?>
@@ -66,8 +83,7 @@ ob_start();
 					id='site-check-logger-disabled' type='radio' name='site_check_logger'
 					value='0'
 					<?php
-					if ( isset( $settings['site_check']['site_check_logger'] ) &&
-						0 === $settings['site_check']['site_check_logger'] ) {
+					if ( ! $settings['site_check']['logger'] ) {
 							echo ' checked';
 					}
 					?>
@@ -79,8 +95,7 @@ ob_start();
 				<td>
 					<input id='auto-recovery-enabled' type='radio' name='auto_recovery' value='1'
 					<?php
-					if ( isset( $settings['site_check']['auto_recovery'] ) &&
-						1 === $settings['site_check']['auto_recovery'] ) {
+					if ( $settings['site_check']['auto_recovery'] ) {
 							echo ' checked';
 					}
 					?>
@@ -88,7 +103,7 @@ ob_start();
 					id='auto-recovery-disabled' type='radio' name='auto_recovery'
 					value='0'
 					<?php
-					if ( empty( $settings['site_check']['auto_recovery'] ) ) {
+					if ( ! $settings['site_check']['auto_recovery'] ) {
 						echo ' checked'; // Default.
 					}
 					?>

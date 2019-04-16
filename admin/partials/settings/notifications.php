@@ -61,8 +61,7 @@ ob_start();
 				<td>
 					<input id='notification-site-check' type='checkbox' name='notify_site_check' value='1'
 						<?php
-						if ( ! isset( $settings['notifications']['site_check'] ) ||
-								0 !== $settings['notifications']['site_check'] ) {
+						if ( $settings['notifications']['site_check'] ) {
 							echo ' checked'; // Default.
 						}
 						?>
