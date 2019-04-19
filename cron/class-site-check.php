@@ -56,6 +56,11 @@ class Site_Check {
 			return false;
 		}
 
+		// If the "auto_recovery" argument is passed and set to "0", then do not restore.
+		if ( Info::has_arg_flag( 'auto_recovery' ) && '0' === Info::get_cli_args()['auto_recovery'] ) {
+			return false;
+		}
+
 		$mode              = Info::get_mode();
 		$attempts_exceeded = Info::get_info()['restore_attempts'] >= self::$max_restore_attempts;
 
