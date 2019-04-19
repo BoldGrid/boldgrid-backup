@@ -193,21 +193,21 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @param  array $settings BoldGrid Backup settings.
 	 * @return bool
 	 */
-	public function add_all_crons( $settings ) {
+	public function add_all_crons( array $settings ) {
 		$success = false;
 
 		$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
 		$schedule  = ! empty( $settings['schedule'] ) ? $settings['schedule'] : null;
 
-		if ( 'cron' === $scheduler && $this->core->scheduler->is_available( $scheduler ) && ! empty( $schedule ) ) {
-			$site_check_interval = ! empty( $settings['site_check']['interval'] ) ?
-				$settings['site_check']['interval'] : 15;
-
+		if ( 'cron' === $scheduler && $this->core->scheduler->is_available( $scheduler ) ) {
 			$this->core->scheduler->clear_all_schedules();
 
-			$scheduled      = $this->add_cron_entry( $settings );
+			if ( ! empty( $schedule ) ) {
+				$scheduled = $this->add_cron_entry( $settings );
+			}
+
 			$jobs_scheduled = $this->schedule_jobs();
-			// phpcs:ignore @todo $site_check     = $this->schedule_site_check( $settings );
+			$site_check     = $this->schedule_site_check( $settings );
 
 			$success = $scheduled && $jobs_scheduled;
 
@@ -398,12 +398,24 @@ class Boldgrid_Backup_Admin_Cron {
 			$settings = $this->core->settings->get_settings();
 		}
 
+		if ( ! $settings['site_check']['enabled'] ) {
+			return false;
+		}
+
+		$args = [
+			'auto_recovery' => ! empty( $settings['site_check']['auto_recovery'] ) ? 1 : 0,
+			'email'         => $settings['notification_email'],
+			'log'           => ! empty( $settings['site_check']['logger'] ) ? 1 : 0,
+			'notify'        => ! empty( $settings['notifications']['site_check'] ) ? 1 : 0,
+		];
+
 		$entry = sprintf(
-			'*/%1$u * * * * %2$s "%3$s/%4$s" >/dev/null 2>&1',
+			'*/%1$u * * * * %2$s "%3$s/%4$s" check %5$s >/dev/null 2>&1',
 			$settings['site_check']['interval'],
 			$this->cron_command,
 			dirname( dirname( __FILE__ ) ),
-			$this->site_check
+			$this->site_check,
+			http_build_query( $args, '', ' ' )
 		);
 
 		return $this->update_cron( $entry );

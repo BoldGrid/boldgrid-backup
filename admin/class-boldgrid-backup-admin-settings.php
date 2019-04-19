@@ -165,11 +165,6 @@ class Boldgrid_Backup_Admin_Settings {
 				! empty( $settings['notifications']['restore'] ) ? 1 : 0
 			);
 
-			$settings['notifications']['site_check'] = (
-				! isset( $settings['notifications']['site_check'] ) ||
-				! empty( $settings['notifications']['site_check'] ) ? 1 : 0
-			);
-
 			// Notification email address.
 			if ( empty( $settings['notification_email'] ) ) {
 				$settings['notification_email'] = $this->core->config->get_admin_email();
@@ -236,20 +231,20 @@ class Boldgrid_Backup_Admin_Settings {
 		$settings['folder_exclusion_exclude'] = $this->core->folder_exclusion->from_settings( 'exclude', $settings );
 
 		// Site Check settings.
-		$settings['site_check']['enabled'] = ! empty( $settings['site_check']['enabled'] ) ?
+		$settings['site_check']['enabled'] = isset( $settings['site_check']['enabled'] ) ?
 			(bool) $settings['site_check']['enabled'] : true;
 
-		$settings['site_check']['logger'] = ! empty( $settings['site_check']['logger'] ) ?
+		$settings['site_check']['logger'] = isset( $settings['site_check']['logger'] ) ?
 			(bool) $settings['site_check']['logger'] : true;
 
-		$settings['site_check']['auto_recovery'] = ! empty( $settings['site_check']['auto_recovery'] ) ?
+		$settings['site_check']['auto_recovery'] = isset( $settings['site_check']['auto_recovery'] ) ?
 			(bool) $settings['site_check']['auto_recovery'] : false;
 
-		$settings['notifications']['site_check'] = ! empty( $settings['notifications']['site_check'] ) ?
+		$settings['notifications']['site_check'] = isset( $settings['notifications']['site_check'] ) ?
 			(bool) $settings['notifications']['site_check'] : true;
 
 		// Site Check interval (in minutes); 5-59, defaults to 15.
-		$settings['site_check']['interval'] = ( ! empty( $settings['site_check']['interval'] ) &&
+		$settings['site_check']['interval'] = ( isset( $settings['site_check']['interval'] ) &&
 			4 < $settings['site_check']['interval'] && 60 > $settings['site_check']['interval'] ) ?
 			$settings['site_check']['interval'] : 15;
 
@@ -478,7 +473,8 @@ class Boldgrid_Backup_Admin_Settings {
 			);
 
 			$settings['notifications']['site_check'] = (
-				( isset( $_POST['notify_site_check'] ) && '1' === $_POST['notify_site_check'] ) ? 1 : 0
+				( isset( $_POST['notify_site_check'] ) && '1' === $_POST['notify_site_check'] ) ?
+					true : false
 			);
 
 			$settings['auto_backup'] = (
@@ -489,21 +485,18 @@ class Boldgrid_Backup_Admin_Settings {
 				( ! isset( $_POST['auto_rollback'] ) || '1' === $_POST['auto_rollback'] ) ? 1 : 0
 			);
 
-			$settings['site_check']['enabled'] = (
-				( isset( $_POST['site_check'] ) && '1' === $_POST['site_check'] ) ? 1 : 0
-			);
+			$settings['site_check']['enabled'] = isset( $_POST['site_check'] ) &&
+				'1' === $_POST['site_check'] ? true : false;
 
 			$settings['site_check']['interval'] = isset( $_POST['site_check_interval'] ) &&
 				4 < $_POST['site_check_interval'] && 60 > $_POST['site_check_interval'] ?
 				(int) $_POST['site_check_interval'] : 15;
 
-			$settings['site_check']['logger'] = (
-				( isset( $_POST['site_check_logger'] ) && '1' === $_POST['site_check_logger'] ) ? 1 : 0
-			);
+			$settings['site_check']['logger'] = isset( $_POST['site_check_logger'] ) &&
+				'1' === $_POST['site_check_logger'] ? true : false;
 
-			$settings['site_check']['auto_recovery'] = (
-				( isset( $_POST['auto_recovery'] ) && '1' === $_POST['auto_recovery'] ) ? 1 : 0
-			);
+			$settings['site_check']['auto_recovery'] = isset( $_POST['auto_recovery'] ) &&
+				'1' === $_POST['auto_recovery'] ? true : false;
 
 			// Update notification email address, if changed.
 			if ( isset( $settings['notification_email'] ) &&
