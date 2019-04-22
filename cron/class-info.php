@@ -65,6 +65,8 @@ class Info {
 	 *
 	 * @see self::is_cli()
 	 * @see self::get_mode()
+	 * @see self::get_notify_flag()
+	 * @see self::get_email_arg()
 	 * @see self::get_zip_arg()
 	 * @see self::have_execution_functions()
 	 * @see self::get_restore_info()
@@ -76,6 +78,9 @@ class Info {
 		if ( empty( self::$info['checked'] ) ) {
 			self::is_cli();
 			self::get_mode();
+			self::get_log_flag();
+			self::get_notify_flag();
+			self::get_email_arg();
 			self::get_zip_arg();
 			self::have_execution_functions();
 			self::get_restore_info();
@@ -168,7 +173,7 @@ class Info {
 					break;
 			}
 
-			$usage = 'Usage: php bgbkup-cli.php <check|restore> [method=ajax|cli|pclzip|ziparchive] [zip=<path/to/backup.zip>]';
+			$usage = 'Usage: php bgbkup-cli.php <check|restore> [log] [notify] [email=<email_address>] [method=ajax|cli|pclzip|ziparchive] [zip=<path/to/backup.zip>]';
 
 			if ( 'help' === self::$info['operation'] ) {
 				self::$info['errors']['help'] = $usage;
@@ -256,9 +261,69 @@ class Info {
 	 */
 	public static function get_arg_value( $name ) {
 		$args  = self::get_cli_args();
-		$value = isset( $args[ $name ] ) ? $args[ $name ] : null;
+		$value = isset( $args[ $name ] ) ? urldecode( $args[ $name ] ) : null;
 
 		return $value;
+	}
+
+	/**
+	 * Get the log flag spcified in CLI arguments.
+	 *
+	 * This method triggers reading the CLI arguments and appends to the self:$info array.
+	 *
+	 * @since 1.10.0
+	 * @static
+	 *
+	 * @see self::has_arg_flag()
+	 *
+	 * @return bool
+	 */
+	public static function get_log_flag() {
+		if ( ! isset( self::$info['log'] ) ) {
+			self::$info['log'] = self::has_arg_flag( 'log' );
+		}
+
+		return self::$info['log'];
+	}
+
+	/**
+	 * Get the notification flag spcified in CLI arguments.
+	 *
+	 * This method triggers reading the CLI arguments and appends to the self:$info array.
+	 *
+	 * @since 1.10.0
+	 * @static
+	 *
+	 * @see self::has_arg_flag()
+	 *
+	 * @return bool
+	 */
+	public static function get_notify_flag() {
+		if ( ! isset( self::$info['notify'] ) ) {
+			self::$info['notify'] = self::has_arg_flag( 'notify' );
+		}
+
+		return self::$info['notify'];
+	}
+
+	/**
+	 * Get the notification email address spcified in CLI arguments.
+	 *
+	 * This method triggers reading the CLI arguments and appends to the self:$info array.
+	 *
+	 * @since 1.10.0
+	 * @static
+	 *
+	 * @see self::get_arg_value()
+	 *
+	 * @return string|false
+	 */
+	public static function get_email_arg() {
+		if ( ! isset( self::$info['email'] ) ) {
+			self::$info['email'] = self::get_arg_value( 'email' );
+		}
+
+		return self::$info['email'];
 	}
 
 	/**
