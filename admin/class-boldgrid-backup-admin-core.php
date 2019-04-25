@@ -37,6 +37,14 @@ class Boldgrid_Backup_Admin_Core {
 	public $auto_rollback;
 
 	/**
+	 * Dashboard widget.
+	 *
+	 * @since 1.10.0
+	 * @var Boldgrid_Backup_Admin_Dashboard_Widget
+	 */
+	public $dashboard_widget;
+
+	/**
 	 * The settings class object.
 	 *
 	 * @since 1.0
@@ -605,6 +613,8 @@ class Boldgrid_Backup_Admin_Core {
 		$this->cron_log = new Boldgrid_Backup_Admin_Cron_Log( $this );
 
 		$this->download = new Boldgrid_Backup_Download( $this );
+
+		$this->dashboard_widget = new Boldgrid_Backup_Admin_Dashboard_Widget( $this );
 
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();

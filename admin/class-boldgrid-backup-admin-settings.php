@@ -235,6 +235,72 @@ class Boldgrid_Backup_Admin_Settings {
 	}
 
 	/**
+	 * Determine whether or not the user has full site protection.
+	 *
+	 * Generally, this means they have scheduled backups that upload backups to a remote server.
+	 *
+	 * @since 1.10.0
+	 *
+	 * @return bool
+	 */
+	public function has_full_protection() {
+		return $this->has_scheduled_backups() && $this->has_remote_configured();
+	}
+
+	/**
+	 * Determine whether or not the user has any remote storage options enabled.
+	 *
+	 * @since 1.10.0
+	 *
+	 * @return bool
+	 */
+	public function has_remote_configured() {
+		$remotes = $this->get_setting( 'remote', array() );
+
+		$has_remote = false;
+
+		foreach ( $remotes as $id => $config ) {
+			if ( 'local' === $id ) {
+				continue;
+			}
+
+			if ( ! empty( $config['enabled'] ) ) {
+				$has_remote = true;
+			}
+		}
+
+		return $has_remote;
+	}
+
+	/**
+	 * Whether or not the user has backups scheduled.
+	 *
+	 * This method is not exhaustive, and insteads returns true if the user has any days of the week
+	 * selected.
+	 *
+	 * @since 1.10.0
+	 *
+	 * @return bool
+	 */
+	public function has_scheduled_backups() {
+		$settings = $this->get_settings();
+
+		$schedule = empty( $settings['schedule'] ) ? array() : $settings['schedule'];
+
+		$days_scheduled = 0;
+
+		foreach ( $schedule as $key => $value ) {
+			if ( 'dow_' !== substr( $key, 0, 4 ) ) {
+				continue;
+			}
+
+			$days_scheduled += empty( $value ) ? 0 : 1;
+		}
+
+		return ! empty( $days_scheduled );
+	}
+
+	/**
 	 * Whether or not we are backing up all files, as defined in the settings.
 	 *
 	 * @since 1.9.0

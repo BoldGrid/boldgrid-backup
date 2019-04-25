@@ -19,6 +19,11 @@ $nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav
 $sections = array(
 	'sections' => array(
 		array(
+			'id'      => 'section_full_protection',
+			'title'   => __( 'Full Protection', 'boldgrid-backup' ),
+			'content' => include BOLDGRID_BACKUP_PATH . '/admin/partials/tools/full-protection.php',
+		),
+		array(
 			'id'      => 'section_locations',
 			'title'   => __( 'Local & Remote', 'boldgrid-backup' ),
 			'content' => include BOLDGRID_BACKUP_PATH . '/admin/partials/tools/local-remote.php',

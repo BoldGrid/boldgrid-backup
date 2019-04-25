@@ -226,6 +226,8 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-cli.php';
 
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-dashboard-widget.php';
+
 		// WP-CLI support.
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-wpcli.php';
@@ -444,6 +446,8 @@ class Boldgrid_Backup {
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_is_setup_local', $plugin_admin_core->local, 'is_setup_ajax' );
 
 		$this->loader->add_filter( 'boldgrid_backup_get_core', $plugin_admin_core, 'get_core' );
+
+		$this->loader->add_filter( 'Boldgrid\Library\Notifications\DashboardWidget\displayWidget\plugin-boldgrid-backup', $plugin_admin_core->dashboard_widget, 'filter_item' );
 	}
 
 	/**

@@ -83,6 +83,12 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 
 == Changelog ==
 
+= 1.10.0 =
+
+Release date: ??? ??, 2019
+
+* New feature: New tool to inform users whether or not they have full site protection, and if not, how to.
+
 = 1.9.2 =
 
 Release date: Apr 16th, 2019
