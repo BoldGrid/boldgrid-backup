@@ -28,6 +28,7 @@ if ( version_compare( PHP_VERSION, $php_min_version, '<' ) ) {
 
 require __DIR__ . '/class-info.php';
 require __DIR__ . '/class-site-check.php';
+require __DIR__ . '/class-log.php';
 
 if ( Info::has_errors() ) {
 	Info::print_errors();
@@ -38,5 +39,7 @@ if ( Site_Check::should_restore() ) {
 	require __DIR__ . '/class-site-restore.php';
 	( new Site_Restore() )->run();
 } else {
-	echo 'Info: No action taken.' . PHP_EOL;
+	$message = 'Info: No action taken.';
+	echo $message . PHP_EOL;
+	Log::write( $message, LOG_INFO );
 }

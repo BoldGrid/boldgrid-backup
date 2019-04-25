@@ -33,10 +33,20 @@ class Site_Restore {
 	 * @see self::restore()
 	 */
 	public function run() {
-		echo 'Starting restoration process...' . PHP_EOL;
-		echo 'Attempting to restore "' . Info::get_info()['siteurl'] .
-			'" from backup archive file "' . Info::get_info()['filepath'] . '"...' . PHP_EOL;
-		echo ( $this->restore() ? 'Success.' : 'Error: Could not perform restoration.' ) . PHP_EOL;
+		$message = 'Starting restoration process...';
+		Log::write( $message, LOG_INFO );
+		echo $message . PHP_EOL;
+
+		$message = 'Attempting to restore "' . Info::get_info()['siteurl'] .
+			'" from backup archive file "' . Info::get_info()['filepath'] . '"...';
+		echo $message . PHP_EOL;
+		Log::write( $message, LOG_INFO );
+
+		$success = $this->restore();
+
+		$message = ( $success ? 'Success.' : 'Error: Could not perform restoration.' );
+		Log::write( $message, ( $success ? LOG_INFO : LOG_ERR ) );
+		echo $message . PHP_EOL;
 	}
 
 	/**
@@ -50,6 +60,7 @@ class Site_Restore {
 	 */
 	private function set_writable_permissions() {
 		if ( class_exists( 'ZipArchive' ) ) {
+			Log::write( 'Setting file permissions.', LOG_DEBUG );
 			$zip = new \ZipArchive();
 
 			if ( $zip->open( Info::get_info()['filepath'] ) ) {
@@ -128,11 +139,15 @@ class Site_Restore {
 
 		if ( 'ajax' === Info::choose_method() ) {
 			// Call the normal restore command.
-			echo 'Using Ajax URL address restoration process...' . PHP_EOL;
+			$message = 'Using Ajax URL address restoration process...';
+			echo $message . PHP_EOL;
+			Log::write( $message, LOG_INFO );
 			\Boldgrid_Backup_Admin_Cli::call_command( $restore_cmd, $success, $return_var );
 		} else {
 			// Start the standalone restoration process.
-			echo 'Using standalone restoration process...' . PHP_EOL;
+			$message = 'Using standalone restoration process...';
+			echo $message . PHP_EOL;
+			Log::write( $message, LOG_INFO );
 			ignore_user_abort( true );
 			$this->set_time_limit();
 			$success = $this->restore_files() && $this->restore_database();

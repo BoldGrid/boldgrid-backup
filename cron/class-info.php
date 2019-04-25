@@ -79,12 +79,14 @@ class Info {
 			self::is_cli();
 			self::get_mode();
 			self::get_log_flag();
+			self::get_log_level();
 			self::get_notify_flag();
 			self::get_email_arg();
 			self::get_zip_arg();
 			self::have_execution_functions();
 			self::get_restore_info();
 			self::choose_method(); // Requires data from self::get_restore_info().
+			Log::write( 'Gathered information.', LOG_DEBUG );
 		}
 
 		return self::$info;
@@ -107,12 +109,13 @@ class Info {
 	}
 
 	/**
-	 * Print errors (to STDERR / FD2).
+	 * Print errors (to STDERR / FD2) and log (if enabled).
 	 *
 	 * @since 1.9.0
 	 * @static
 	 *
 	 * @see self::has_errors()
+	 * @see Log::write()
 	 */
 	public static function print_errors() {
 		if ( self::has_errors() ) {
@@ -135,6 +138,7 @@ class Info {
 
 		if ( ! \Boldgrid_Backup_Cron_Helper::is_cli() ) {
 			self::$info['errors']['cli'] = 'Error: This process must run from the CLI.';
+			Log::write( self::$info['errors']['cli'], LOG_ERR );
 			return false;
 		} else {
 			return true;
@@ -173,7 +177,7 @@ class Info {
 					break;
 			}
 
-			$usage = 'Usage: php bgbkup-cli.php <check|restore> [log] [notify] [email=<email_address>] [method=ajax|cli|pclzip|ziparchive] [zip=<path/to/backup.zip>]';
+			$usage = 'Usage: php bgbkup-cli.php <check|restore> [log] [notify] [email=<email_address>] [method=<ajax|cli|pclzip|ziparchive>] [zip=<path/to/backup.zip>] [log_level=<(LOG_EMERG|LOG_ALERT|LOG_CRIT|LOG_ERR|LOG_WARNING|LOG_NOTICE|LOG_INFO|LOG_DEBUG)|(0-7)>]';
 
 			if ( 'help' === self::$info['operation'] ) {
 				self::$info['errors']['help'] = $usage;
@@ -181,6 +185,8 @@ class Info {
 				self::$info['errors']['mode'] =
 					'Error: An operational mode (check/restore) is required.';
 				self::$info['errors']['help'] = $usage;
+			} else {
+				Log::write( 'Operational mode set to "' . self::$info['operation'] . '".', LOG_INFO );
 			}
 		}
 
@@ -204,6 +210,7 @@ class Info {
 
 		if ( empty( $exec_functions ) ) {
 			self::$info['errors']['no_exec'] = 'Error: No available PHP executable functions.';
+			Log::write( self::$info['errors']['no_exec'], LOG_ERR );
 			return false;
 		} else {
 			return true;
@@ -284,6 +291,47 @@ class Info {
 		}
 
 		return self::$info['log'];
+	}
+
+	/**
+	 * Get the log level argument spcified in CLI arguments.
+	 *
+	 * This method triggers reading the CLI arguments and appends to the self:$info array.
+	 *
+	 * @since 1.10.0
+	 * @static
+	 *
+	 * @see self::get_arg_value()
+	 *
+	 * @return int
+	 */
+	public static function get_log_level() {
+		$allowed = [
+			'LOG_EMERG', // 0.
+			'LOG_ALERT', // 1.
+			'LOG_CRIT', // 2.
+			'LOG_ERR', // 3.
+			'LOG_WARNING', // 4.
+			'LOG_NOTICE', // 5 -- Our default.
+			'LOG_INFO', // 6.
+			'LOG_DEBUG', // 7.
+		];
+
+		if ( ! isset( self::$info['log_level'] ) ) {
+			self::$info['log_level'] = self::get_arg_value( 'log_level' );
+
+			// Validate the log level.
+			if ( in_array( self::$info['log_level'], $allowed, true ) ) {
+				// Convert string to the constant integer value.
+				self::$info['log_level'] = constant( self::$info['log_level'] );
+			} elseif ( ! is_numeric( self::$info['log_level'] ) ||
+				self::$info['log_level'] < LOG_EMERG || self::$info['log_level'] > LOG_DEBUG ) {
+					// Invalid or no input value; set to the default.
+					self::$info['log_level'] = LOG_NOTICE;
+			}
+		}
+
+		return (int) self::$info['log_level'];
 	}
 
 	/**
@@ -434,6 +482,8 @@ class Info {
 			}
 		}
 
+		Log::write( 'Chosen restoration method: "' . self::$info['method'] . '".', LOG_INFO );
+
 		return self::$info['method'];
 	}
 
@@ -492,6 +542,8 @@ class Info {
 	public static function extract_file( $extract_dir, $file ) {
 		$success = false;
 
+		Log::write( 'Extracting "' . $file . '" into "' . $extract_dir . '".', LOG_DEBUG );
+
 		switch ( true ) {
 			case class_exists( 'ZipArchive' ):
 				$zip = new \ZipArchive();
@@ -499,21 +551,26 @@ class Info {
 					$success = $zip->extractTo( $extract_dir, $file );
 					$zip->close();
 				} else {
-					self::$info['errors'][] = 'Error: Could not open the specified ZIP file path "' .
+					$message                = 'Error: Could not open the specified ZIP file path "' .
 						self::$info['filepath'] . '".';
+					self::$info['errors'][] = $message;
+					Log::write( $message, LOG_ERR );
 				}
 				break;
 			// @todo: Add PCLZip and unzip (CLI).
 			default:
-				self::$info['errors'][] = 'Error: Could not extract files; ZipArchive unavailable.';
+				$message                = 'Error: Could not extract files; ZipArchive unavailable.';
+				self::$info['errors'][] = $message;
+				Log::write( $message, LOG_ERR );
 		}
 
 		if ( ! $success || ! file_exists( $extract_dir . '/' . $file ) ) {
-			self::$info['errors'][] = 'Error: The file "' . $file .
+			$success                = false;
+			$message                = 'Error: The file "' . $file .
 				'" does not exist in the specified ZIP file path "' . self::$info['filepath'] .
 				'".';
-
-			$success = false;
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
 		}
 
 		return $success;
@@ -535,6 +592,7 @@ class Info {
 		if ( ! preg_match( '/\.zip$/', self::$info['filepath'] ) ) {
 			self::$info['errors']['zip_path_invalid'] =
 				'Error: Invalid ZIP file path specified; must end with ".zip".';
+			Log::write( self::$info['errors']['zip_path_invalid'], LOG_ERR );
 			return [];
 		}
 
@@ -598,7 +656,9 @@ class Info {
 
 		// Check for PHP safe mode.
 		if ( ini_get( 'safe_mode' ) ) {
-			self::$info['errors'][] = 'Error: Cannot continue in PHP safe mode.';
+			$message                = 'Error: Cannot continue in PHP safe mode.';
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
 			return false;
 		}
 
@@ -617,26 +677,36 @@ class Info {
 		}
 
 		if ( empty( self::$info['ABSPATH'] ) ) {
-			self::$info['errors'][] = 'Error: Unknown ABSPATH.';
+			$message                = 'Error: Unknown ABSPATH.';
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
 			return false;
 		}
 
 		if ( ! is_dir( self::$info['ABSPATH'] ) ) {
-			self::$info['errors'][] = 'Error: ABSPATH directory "' . self::$info['ABSPATH'] .
+			$message                = 'Error: ABSPATH directory "' . self::$info['ABSPATH'] .
 				'" does not exist or is not a directory.';
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
 		}
 
 		if ( ! is_writable( self::$info['ABSPATH'] ) ) {
-			self::$info['errors'][] = 'Error: ABSPATH directory "' . self::$info['ABSPATH'] .
+			$message                = 'Error: ABSPATH directory "' . self::$info['ABSPATH'] .
 				'" is not writable.';
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
 		}
 
 		if ( empty( self::$info['siteurl'] ) ) {
-			self::$info['errors'][] = 'Error: Unknown siteurl.';
+			$message                = 'Error: Unknown siteurl.';
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
 		}
 
 		if ( empty( self::$info['db_filename'] ) ) {
-			self::$info['errors'][] = 'Error: Unknown database dump filename.';
+			$message                = 'Error: Unknown database dump filename.';
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
 		} else {
 			self::$info['db_filepath'] = self::$info['ABSPATH'] . self::$info['db_filename'];
 		}
@@ -733,8 +803,10 @@ class Info {
 
 		// We require the results info file from the last full backup.
 		if ( ! file_exists( self::$results_file_path ) ) {
-			self::$info['errors'][] = 'Error: Missing backup results file ("' .
+			$message                = 'Error: Missing backup results file ("' .
 				self::$results_file_path . '").';
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
 			return false;
 		}
 
@@ -742,19 +814,25 @@ class Info {
 
 		// Validate results file content.
 		if ( empty( $results ) ) {
-			self::$info['errors'][] = 'Error: No backup results found.';
+			$message                = 'Error: No backup results found.';
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
 			return false;
 		}
 
 		if ( empty( $results['filepath'] ) ) {
-			self::$info['errors'][] = 'Error: Unknown backup archive file path.';
+			$message                = 'Error: Unknown backup archive file path.';
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
 			return false;
 		}
 
 		// Check if archive exists.
 		if ( ! file_exists( $results['filepath'] ) ) {
-			self::$info['errors'][] = 'Error: Backup archive file "' .
+			$message                = 'Error: Backup archive file "' .
 				$results['filepath'] . '" does not exist.';
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
 			return false;
 		}
 
@@ -762,8 +840,10 @@ class Info {
 		$archive_log_filepath = preg_replace( '/\.zip$/', '.log', $results['filepath'] );
 
 		if ( ! file_exists( $archive_log_filepath ) ) {
-			self::$info['errors'][] = 'Error: Backup archive log file "' . $archive_log_filepath .
+			$message                = 'Error: Backup archive log file "' . $archive_log_filepath .
 				'" does not exist.';
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
 			return false;
 		}
 
@@ -771,8 +851,10 @@ class Info {
 
 		// Validate results file content.
 		if ( empty( $log_info ) ) {
-			self::$info['errors'][] = 'Error: No backup information found in the log file "' .
+			$message                = 'Error: No backup information found in the log file "' .
 				$archive_log_filepath . '".';
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
 			return false;
 		}
 
@@ -780,7 +862,9 @@ class Info {
 		self::$info = array_merge( self::$info, $log_info, $results );
 
 		if ( empty( self::$info['cron_secret'] ) ) {
-			self::$info['errors'][] = 'Error: Unknown cron_secret.';
+			$message                = 'Error: Unknown cron_secret.';
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
 		}
 
 		return true;
