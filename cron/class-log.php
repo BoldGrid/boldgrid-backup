@@ -94,8 +94,9 @@ class Log {
 	 * @since 1.10.0
 	 * @static
 	 *
-	 * @see Info::get_log_flag()
-	 * @see Info::get_log_level()
+	 * @see \Boldgrid\Backup\Cron\Info::get_log_flag()
+	 * @see \Boldgrid\Backup\Cron\Info::get_log_level()
+	 * @see self::get_level_label()
 	 *
 	 * @param  string $message Message.
 	 * @param  int    $log_level Log level. Default: LOG_NOTICE.

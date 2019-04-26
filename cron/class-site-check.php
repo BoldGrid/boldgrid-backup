@@ -139,7 +139,7 @@ class Site_Check {
 	 * @since 1.10.0
 	 * @static
 	 *
-	 * @see https://www.php.net/manual/en/function.fsockopen.php
+	 * @link https://www.php.net/manual/en/function.fsockopen.php
 	 *
 	 * @param  int    $port    Port number (1-65535).
 	 * @param  string $host    Optional hostname; defaults to "localhost".

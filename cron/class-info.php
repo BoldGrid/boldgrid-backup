@@ -71,6 +71,7 @@ class Info {
 	 * @see self::have_execution_functions()
 	 * @see self::get_restore_info()
 	 * @see self::choose_method()
+	 * @see \Boldgrid\Backup\Cron\Log::write()
 	 *
 	 * @return array
 	 */
@@ -115,7 +116,6 @@ class Info {
 	 * @static
 	 *
 	 * @see self::has_errors()
-	 * @see Log::write()
 	 */
 	public static function print_errors() {
 		if ( self::has_errors() ) {
@@ -130,6 +130,7 @@ class Info {
 	 * @static
 	 *
 	 * @see \Boldgrid_Backup_Cron_Helper::is_cli()
+	 * @see \Boldgrid\Backup\Cron\Log::write()
 	 *
 	 * @return bool
 	 */
@@ -157,6 +158,7 @@ class Info {
 	 * @static
 	 *
 	 * @see self::has_arg_flag()
+	 * @see \Boldgrid\Backup\Cron\Log::write()
 	 *
 	 * @return string|false
 	 */
@@ -200,6 +202,7 @@ class Info {
 	 * @static
 	 *
 	 * @see \Boldgrid_Backup_Admin_Cli::get_execution_functions()
+	 * @see \Boldgrid\Backup\Cron\Log::write()
 	 *
 	 * @return bool
 	 */
@@ -420,6 +423,7 @@ class Info {
 	 * @see self::get_arg_value()
 	 * @see Site_Check::is_siteurl_reachable()
 	 * @see \Boldgrid_Backup_Admin_Cli::call_command()
+	 * @see \Boldgrid\Backup\Cron\Log::write()
 	 *
 	 * @return string|false
 	 */
@@ -535,6 +539,8 @@ class Info {
 	 * @since 1.9.0
 	 * @static
 	 *
+	 * @see \Boldgrid\Backup\Cron\Log::write()
+	 *
 	 * @param  string $extract_dir Extraction directory.
 	 * @param  string $file        File to be extracted.
 	 * @return bool
@@ -583,6 +589,7 @@ class Info {
 	 * @since 1.9.0
 	 * @static
 	 *
+	 * @see \Boldgrid\Backup\Cron\Log::write()
 	 * @see self::extract_file()
 	 * @see self::read_json_file()
 	 *
@@ -641,6 +648,7 @@ class Info {
 	 * @access private
 	 * @static
 	 *
+	 * @see \Boldgrid\Backup\Cron\Log::write()
 	 * @see self::get_zip_info()
 	 * @see self::get_latest_info()
 	 * @see self::read_json_file()
@@ -790,6 +798,7 @@ class Info {
 	 * @static
 	 *
 	 * @see self::has_arg_flag()
+	 * @see \Boldgrid\Backup\Cron\Log::write()
 	 * @see self::read_json_file()
 	 * @see self::read_zip_log()
 	 *

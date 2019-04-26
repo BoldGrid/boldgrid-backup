@@ -13,6 +13,12 @@
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
  *
+ * @see \Boldgrid\Backup\Cron\Info::has_errors()
+ * @see \Boldgrid\Backup\Cron\Info::print_errors()
+ * @see \Boldgrid\Backup\Cron\Site_Check::should_restore()
+ * @see \Boldgrid\Backup\Cron\Site_Restore::run()
+ * @see \Boldgrid\Backup\Cron\Log::write()
+ *
  * phpcs:disable WordPress.VIP,WordPress.XSS.EscapeOutput
  */
 
