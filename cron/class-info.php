@@ -754,6 +754,7 @@ class Info {
 		// Attempt to read information from the last backup's result file.
 		$results                   = self::read_json_file( self::$results_file_path );
 		self::$info['cron_secret'] = isset( $results['cron_secret'] ) ? $results['cron_secret'] : null;
+		self::$info['site_title']  = isset( $results['site_title'] ) ? $results['site_title'] : null;
 
 		// Retrieve information from the log file in the ZIP archive.
 		$log_info = self::read_zip_log();
@@ -874,6 +875,11 @@ class Info {
 			$message                = 'Error: Unknown cron_secret.';
 			self::$info['errors'][] = $message;
 			Log::write( $message, LOG_ERR );
+		}
+
+		// Ensure that there is a site title.
+		if ( empty( self::$info['site_title'] ) ) {
+			self::$info['site_title'] = 'WordPress';
 		}
 
 		return true;

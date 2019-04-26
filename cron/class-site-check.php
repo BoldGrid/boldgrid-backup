@@ -45,6 +45,8 @@ class Site_Check {
 	 * @see \Boldgrid\Backup\Cron\Info::has_errors()
 	 * @see self::does_wp_load()
 	 * @see \Boldgrid\Backup\Cron\Info::has_arg_flag()
+	 * @see \Boldgrid\Backup\Cron\Info::get_notify_flag()
+	 * @see \Boldgrid\Backup\Cron\Info::get_email_arg()
 	 *
 	 * @return bool
 	 */
@@ -56,14 +58,9 @@ class Site_Check {
 			return false;
 		}
 
-		// If the "auto_recovery" argument is not passed or set to "0", then do not restore.
-		if ( false === Info::has_arg_flag( 'auto_recovery' ) ||
-			'0' === Info::get_cli_args()['auto_recovery'] ) {
-				return false;
-		}
-
 		$mode              = Info::get_mode();
-		$attempts_exceeded = Info::get_info()['restore_attempts'] >= self::$max_restore_attempts;
+		$restore_attempts  = Info::get_info()['restore_attempts'];
+		$attempts_exceeded = $restore_attempts >= self::$max_restore_attempts;
 
 		// If "check" flag was passed and there have not been too many restoration attempts.
 		if ( 'check' === $mode && ! $attempts_exceeded ) {
@@ -71,9 +68,26 @@ class Site_Check {
 			if ( ! self::does_wp_load() ) {
 				$should_restore = true;
 			}
+
+			// If a check has failed for the first time, then send an email notification, if enabled.
+			$should_notify = $should_restore && ! $restore_attempts && Info::get_notify_flag() &&
+				Info::get_email_arg();
+
+			if ( $should_notify ) {
+				$recipient = Info::get_info()['site_title'] . ' <' . Info::get_email_arg() . '>';
+				$subject   = 'Failed Site Check for ' . Info::get_info()['siteurl'];
+				$message   = "A site Check has failed.  You should check your site and can perform a manual restoration, if needed.\r\n\r\nFor assistance, please visit: https://www.boldgrid.com/support/\r\n";
+				( new Email( $recipient ) )->send( $subject, $message );
+			}
 		}
 
-		// If "Restore" flag was possed, which forces a restoration.
+		// If the "auto_recovery" argument is not passed or set to "0", then do not restore.
+		if ( false === Info::has_arg_flag( 'auto_recovery' ) ||
+			'0' === Info::get_cli_args()['auto_recovery'] ) {
+				$should_restore = false;
+		}
+
+		// If "Restore" flag was possed, it is a  forced restoration.
 		if ( 'restore' === $mode ) {
 			$should_restore = true;
 		}

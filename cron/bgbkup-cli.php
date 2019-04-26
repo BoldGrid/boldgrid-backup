@@ -35,6 +35,7 @@ if ( version_compare( PHP_VERSION, $php_min_version, '<' ) ) {
 require __DIR__ . '/class-info.php';
 require __DIR__ . '/class-site-check.php';
 require __DIR__ . '/class-log.php';
+require __DIR__ . '/class-email.php';
 
 if ( Info::has_errors() ) {
 	Info::print_errors();

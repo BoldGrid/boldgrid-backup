@@ -80,6 +80,7 @@ $files = array(
 	// cron.
 	'/cron/class-info.php',
 	'/cron/class-log.php',
+	'/cron/class-email.php',
 );
 
 foreach ( $files as $file ) {
