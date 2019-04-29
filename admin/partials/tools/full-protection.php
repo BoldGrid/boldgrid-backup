@@ -21,7 +21,7 @@ defined( 'WPINC' ) || die;
 ob_start();
 ?>
 
-<h2><?php esc_html_e( 'Am I fully protected?', 'boldgrid-backup' ); ?></h2>
+<h2 class="site-health-hidden"><?php esc_html_e( 'Am I fully protected?', 'boldgrid-backup' ); ?></h2>
 <p><?php esc_html_e( 'To be fully protected, you should have you website backed up regularly with an automatic backup, and you should store those backups offsite.', 'boldgrid-backup' ); ?></p>
 <ul>
 	<li>
@@ -74,12 +74,19 @@ switch ( $this->core->settings->has_remote_configured() ) {
 			case false:
 				echo wp_kses(
 					sprintf(
-						// translators: 1 the opening anchor to backup storage settings, 2 its closing anchor tag.
-						__( 'BoldGrid Backup offers FTP/SFTP as a remote storage provider, which you can configure within your %1$sbackup storage settings%2$s. However, for more robust storage providers, such as Google Drive and Amazon S3, we recommend that you upgrade to BoldGrid Backup Premium.', 'boldgrid-backup' ),
+						// translators: 1 the opening anchor to backup storage settings, 2 its closing anchor tag, 3 the opening anchor tag to a link for upgrading to premium, 4 its closing tag.
+						__( 'BoldGrid Backup offers FTP/SFTP as a remote storage provider, which you can configure within your %1$sbackup storage settings%2$s. However, for more robust storage providers, such as Google Drive and Amazon S3, we recommend that you %3$supgrade to BoldGrid Backup Premium%4$s.', 'boldgrid-backup' ),
 						'<a href="' . esc_url( admin_url( 'admin.php?page=boldgrid-backup-settings&section=section_storage' ) ) . '">',
+						'</a>',
+						'<a href="' . esc_url( $this->core->go_pro->get_premium_url( 'bgbkup-tools-protection' ) ) . '" target="_blank">',
 						'</a>'
 					),
-					array( 'a' => array( 'href' => array() ) )
+					array(
+						'a' => array(
+							'href'   => array(),
+							'target' => array(),
+						),
+					)
 				);
 				break;
 		}
@@ -92,10 +99,10 @@ switch ( $this->core->settings->has_remote_configured() ) {
 // Show the final .alert that says yes/no on being fully protected.
 switch ( $this->core->settings->has_full_protection() ) {
 	case true:
-		echo '<div class="notice notice-success inline"><p>' . esc_html__( 'Yes, your website is fully protected!', 'boldgrid-backup' ) . '</p></div>';
+		echo '<div class="notice notice-success inline site-health-hidden"><p>' . esc_html__( 'Yes, your website is fully protected!', 'boldgrid-backup' ) . '</p></div>';
 		break;
 	case false:
-		echo '<div class="notice notice-error inline"><p>' . esc_html__( 'No, your website is not fully protected. Please follow the steps above to configure full protection.', 'boldgrid-backup' ) . '</p></div>';
+		echo '<div class="notice notice-error inline site-health-hidden"><p>' . esc_html__( 'No, your website is not fully protected. Please follow the steps above to configure full protection.', 'boldgrid-backup' ) . '</p></div>';
 		break;
 }
 
@@ -104,7 +111,7 @@ if ( ! $this->core->settings->has_remote_configured() && ! $this->core->config->
 	$premium_url = $this->core->go_pro->get_premium_url( 'bgbkup-tools-protection' );
 	printf(
 		'
-		<div class="bg-box-bottom premium wp-clearfix">
+		<div class="bg-box-bottom premium wp-clearfix site-health-hidden">
 			%1$s
 			%2$s
 		</div>',

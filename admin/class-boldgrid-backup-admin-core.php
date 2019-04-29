@@ -53,6 +53,14 @@ class Boldgrid_Backup_Admin_Core {
 	public $settings;
 
 	/**
+	 * An instance of Boldgrid_Backup_Admin_Site_Health.
+	 *
+	 * @since 1.10.0
+	 * @var Boldgrid_Backup_Admin_Site_Health
+	 */
+	public $site_health;
+
+	/**
 	 * The configuration class object.
 	 *
 	 * @since 1.0
@@ -615,6 +623,8 @@ class Boldgrid_Backup_Admin_Core {
 		$this->download = new Boldgrid_Backup_Download( $this );
 
 		$this->dashboard_widget = new Boldgrid_Backup_Admin_Dashboard_Widget( $this );
+
+		$this->site_health = new Boldgrid_Backup_Admin_Site_Health( $this );
 
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();

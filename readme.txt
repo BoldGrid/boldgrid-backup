@@ -88,6 +88,7 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 Release date: ??? ??, 2019
 
 * New feature: New tool to inform users whether or not they have full site protection, and if not, how to.
+* Update: Full Site Protection info added to WordPress' 5.2 Site Health page.
 
 = 1.9.2 =
 

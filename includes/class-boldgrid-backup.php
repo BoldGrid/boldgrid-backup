@@ -228,6 +228,8 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-dashboard-widget.php';
 
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-site-health.php';
+
 		// WP-CLI support.
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-wpcli.php';
@@ -448,6 +450,10 @@ class Boldgrid_Backup {
 		$this->loader->add_filter( 'boldgrid_backup_get_core', $plugin_admin_core, 'get_core' );
 
 		$this->loader->add_filter( 'Boldgrid\Library\Notifications\DashboardWidget\displayWidget\plugin-boldgrid-backup', $plugin_admin_core->dashboard_widget, 'filter_item' );
+
+		// Site health.
+		$this->loader->add_filter( 'site_status_tests', $plugin_admin_core->site_health, 'site_status_tests' );
+		$this->loader->add_filter( 'admin_enqueue_scripts', $plugin_admin_core->site_health, 'admin_enqueue_scripts' );
 	}
 
 	/**
