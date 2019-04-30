@@ -37,6 +37,14 @@ class Boldgrid_Backup_Admin_Core {
 	public $auto_rollback;
 
 	/**
+	 * An instance of Boldgrid_Backup_Admin_Dashboard
+	 *
+	 * @since xxx
+	 * @var   Boldgrid_Backup_Admin_Dashboard
+	 */
+	public $dashboard;
+
+	/**
 	 * Dashboard widget.
 	 *
 	 * @since 1.10.0
@@ -616,6 +624,8 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->dashboard_widget = new Boldgrid_Backup_Admin_Dashboard_Widget( $this );
 
+		$this->dashboard = new Boldgrid_Backup_Admin_Dashboard( $this );
+
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
 
@@ -789,6 +799,19 @@ class Boldgrid_Backup_Admin_Core {
 				'page_archives',
 			),
 			'none'
+		);
+
+		// Add our "Dashboard" page.
+		add_submenu_page(
+			$main_slug,
+			__( 'Dashboard', 'boldgrid-backup' ),
+			__( 'Dashboard', 'boldgrid-backup' ),
+			$capability,
+			'boldgrid-backup-dashboard',
+			array(
+				$this->dashboard,
+				'page',
+			)
 		);
 
 		// Add "Backup Archive", formally known as "BoldGrid Backup".

@@ -228,6 +228,8 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-dashboard-widget.php';
 
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-dashboard.php';
+
 		// WP-CLI support.
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-wpcli.php';
