@@ -253,6 +253,7 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 
 				if ( ! $wp_filesystem->chmod( $full_path ) ) {
 					$this->errors[] = sprintf(
+						// translators: 1 The path to a file that cannot be restored due to file permissions.
 						__( 'Permission denied. Unable to restore the following file: %1$s', 'boldgrid-backup' ),
 						$full_path
 					);
