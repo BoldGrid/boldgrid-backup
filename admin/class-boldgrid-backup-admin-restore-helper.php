@@ -251,6 +251,11 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 
 				$full_path = ABSPATH . $data['name'];
 
+				// If the file does not exists, no need to check its permissions.
+				if ( ! $wp_filesystem->exists( $full_path ) ) {
+					continue;
+				}
+
 				if ( ! $wp_filesystem->chmod( $full_path ) ) {
 					$this->errors[] = sprintf(
 						// translators: 1 The path to a file that cannot be restored due to file permissions.
