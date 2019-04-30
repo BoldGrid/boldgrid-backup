@@ -19,6 +19,15 @@
  */
 class Boldgrid_Backup_Admin_Restore_Helper {
 	/**
+	 * An array of error messages.
+	 *
+	 * @since 1.9.3
+	 * @access private
+	 * @var array
+	 */
+	private $errors;
+
+	/**
 	 * Whether or not we are doing cron.
 	 *
 	 * @since 1.5.1
@@ -58,6 +67,23 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 	 */
 	public function __construct() {
 		$this->doing_cron = defined( 'DOING_CRON' ) && DOING_CRON;
+	}
+
+	/**
+	 * Get the last error message.
+	 *
+	 * @since 1.9.3
+	 *
+	 * @return string
+	 */
+	public function get_last_error() {
+		$last_error = '';
+
+		if ( ! empty( $this->errors ) ) {
+			$last_error = end( $this->errors );
+		}
+
+		return $last_error;
 	}
 
 	/**
@@ -197,7 +223,7 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 	/**
 	 * Update permissions so an archive is safe to restore.
 	 *
-	 * The most common failure thus for when extracting an archive is file
+	 * The most common failure thus far when extracting an archive is file
 	 * permissions related. If WordPress cannot restore a file because the current
 	 * file's permissions don't allow editing, then the restoration both (1) fails
 	 * and (2) gives us a half restored site.
@@ -208,6 +234,7 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 	 * @since 1.6.0
 	 *
 	 * @param string $archive_filepath Full path to an archive file.
+	 * @return bool True if permissions were able to be updated successfully.
 	 */
 	public function set_writable_permissions( $archive_filepath ) {
 		global $wp_filesystem;
@@ -222,9 +249,19 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 					continue;
 				}
 
-				$wp_filesystem->chmod( ABSPATH . $data['name'] );
+				$full_path = ABSPATH . $data['name'];
+
+				if ( ! $wp_filesystem->chmod( $full_path ) ) {
+					$this->errors[] = sprintf(
+						__( 'Permission denied. Unable to restore the following file: %1$s', 'boldgrid-backup' ),
+						$full_path
+					);
+					return false;
+				}
 			}
 		}
+
+		return true;
 	}
 
 	/**
