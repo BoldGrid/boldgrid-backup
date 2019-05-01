@@ -868,7 +868,7 @@ class Boldgrid_Backup_Admin_Core {
 			// Change the url (2 is key of the menu item's slug / url).
 			foreach ( $submenu[ $main_slug ] as &$item ) {
 				if ( $menu_slug === $item[2] ) {
-					$item[2] = Boldgrid_Backup_Admin_Go_Pro::$url;
+					$item[2] = $this->go_pro->get_premium_url( 'bgbkup-nav' );
 				}
 			}
 		}
@@ -2055,7 +2055,15 @@ class Boldgrid_Backup_Admin_Core {
 		 */
 		do_action( 'boldgrid_backup_pre_restore', $info );
 
-		$this->restore_helper->set_writable_permissions( $info['filepath'] );
+		/*
+		 * Attempt to fix any permissions related issues before the restoration begins. If we're
+		 * unable to, the restoration will not continue.
+		 */
+		if ( ! $this->restore_helper->set_writable_permissions( $info['filepath'] ) ) {
+			return array(
+				'error' => $this->restore_helper->get_last_error(),
+			);
+		}
 
 		$unzip_status = ! $dryrun ? unzip_file( $info['filepath'], ABSPATH ) : null;
 
