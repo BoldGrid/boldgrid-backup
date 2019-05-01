@@ -2,9 +2,9 @@
 Contributors: boldgrid, joemoto, imh_brad, rramo012, timph, bgnicolepaschen
 Tags: boldgrid, backup, restore, restoration, migrate, migration, update, updates
 Requires at least: 4.4
-Tested up to: 5.1
+Tested up to: 5.2
 Requires PHP: 5.4
-Stable tag: 1.9.2
+Stable tag: 1.9.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -88,6 +88,15 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 * New feature: Added site front-end and back-end checking.
 * New feature: Added settings for Site Check.
 * Update:      Improved site/URL checking.
+
+= 1.9.3 =
+
+Release date: Apr 30th, 2019
+
+* Bug fix:     Avoid "Cannot close ZIP archive file" error by skipping files that are unreadable.
+* Bug fix:     Ensure adequate permissions before attempting any restoration.
+* Update:      Add source to Get Premium nav item.
+* Update:      Fixed FTP support (when using FTPES: Explicit FTP over SSL/TLS).
 
 = 1.9.2 =
 
