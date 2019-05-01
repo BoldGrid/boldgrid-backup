@@ -88,7 +88,7 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 Release date: Apr 30th, 2019
 
 * Bug fix:     Avoid "Cannot close ZIP archive file" error by skipping files that are unreadable.
-* Bug fix:     Ensure adaquate permissions before attempting any restoration.
+* Bug fix:     Ensure adequate permissions before attempting any restoration.
 * Update:      Add source to Get Premium nav item.
 * Update:      Fixed FTP support (when using FTPES: Explicit FTP over SSL/TLS).
 
