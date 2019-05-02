@@ -56,19 +56,15 @@ class Site_Check {
 			return false;
 		}
 
-		// If the "auto_recovery" argument is not passed or set to "0", then do not restore.
-		if ( false === Info::has_arg_flag( 'auto_recovery' ) ||
-			'0' === Info::get_cli_args()['auto_recovery'] ) {
-				return false;
-		}
-
+		// If the "auto_recovery" argument is passed and set to "1", then set-up for auto-restore.
+		$auto_restore      = false !== Info::has_arg_flag( 'auto_recovery' ) &&
+			'1' === Info::get_cli_args()['auto_recovery'];
 		$mode              = Info::get_mode();
 		$attempts_exceeded = Info::get_info()['restore_attempts'] >= self::$max_restore_attempts;
 
 		// If "check" flag was passed and there have not been too many restoration attempts.
 		if ( 'check' === $mode && ! $attempts_exceeded ) {
-			// If WordPress cannot be loaded via PHP.
-			if ( ! self::does_wp_load() ) {
+			if ( ! self::check() && $auto_restore ) {
 				$should_restore = true;
 			}
 		}
@@ -162,5 +158,34 @@ class Site_Check {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Perform a site check.
+	 *
+	 * @since 1.10.0
+	 * @static
+	 *
+	 * @see self::does_wp_load()
+	 * @see Log::write()
+	 *
+	 * @todo More checks and login coming soon.
+	 *
+	 * @param  bool $print Print status information.  Defaults to TRUE.
+	 * @return bool
+	 */
+	public static function check( $print = true ) {
+		$message = 'Site Check: ';
+
+		$result = self::does_wp_load();
+
+		$message .= $result ? 'Ok' : 'Failed';
+		Log::write( $message, ( $result ? LOG_INFO : LOG_ERR ) );
+
+		if ( $print ) {
+			echo $message . PHP_EOL; // phpcs:ignore WordPress.XSS.EscapeOutput
+		}
+
+		return $result;
 	}
 }
