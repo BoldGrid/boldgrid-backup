@@ -13,7 +13,7 @@
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
  *
- * phpcs:disable WordPress.WP.AlternativeFunctions
+ * phpcs:disable WordPress.WP.AlternativeFunctions,WordPress.PHP.DevelopmentFunctions
  */
 
 use Boldgrid\Backup\Cron\Info;
@@ -52,7 +52,10 @@ function handle_shutdown() {
 
 	if ( ! empty( $error['type'] ) && in_array( $error['type'], $error_nums, true ) ) {
 		ob_clean_all();
-		echo json_encode( $error );
+		echo json_encode( [
+			'success' => false,
+			'error'   => $error,
+		] );
 		exit( 255 );
 	} elseif ( ! $had_exception && null === $error ) {
 		// Success.
@@ -95,9 +98,10 @@ try {
 	$had_exception = true;
 	ob_clean_all();
 	echo json_encode( [
-		'success' => false,
-		'message' => 'Could not load the WordPress site front-end. Exception message: "' .
+		'success'         => false,
+		'message'         => 'Could not load the WordPress site front-end. Exception message: "' .
 			$e->getMessage() . '" (File: "' . $e->getFile() . '" Line: "' . $e->getLine() . '")',
+		'debug_backtrace' => debug_backtrace( 0 ),
 	] );
 	exit( 1 );
 }
@@ -118,9 +122,10 @@ try {
 	$had_exception = true;
 	ob_clean_all();
 	echo json_encode( [
-		'success' => false,
-		'message' => 'Could not load the WordPress admin back-end. Exception message: "' .
+		'success'         => false,
+		'message'         => 'Could not load the WordPress admin back-end. Exception message: "' .
 			$e->getMessage() . '" (File: "' . $e->getFile() . '" Line: "' . $e->getLine() . '")',
+		'debug_backtrace' => debug_backtrace( 0 ),
 	] );
 	exit( 1 );
 }

@@ -35,6 +35,17 @@ class Site_Check {
 	private static $max_restore_attempts = 2;
 
 	/**
+	 * Test resukt output from the wp-test script.
+	 *
+	 * @since  1.10.0
+	 * @access private
+	 * @static
+	 *
+	 * @var string
+	 */
+	private static $wp_test_result;
+
+	/**
 	 * Run the site check process, to determine if the site needs to be restored from backup.
 	 *
 	 * Decide if a restoration should be completed.
@@ -120,13 +131,12 @@ class Site_Check {
 	 * @return bool
 	 */
 	public static function does_wp_load() {
-		\Boldgrid_Backup_Admin_Cli::call_command(
+		self::$wp_test_result = \Boldgrid_Backup_Admin_Cli::call_command(
 			'cd ' . __DIR__ . '; php -qf wp-test.php',
-			$success,
-			$return_var
+			$success
 		);
 
-		return $success || 0 === $return_var;
+		return $success;
 	}
 
 	/**
@@ -175,17 +185,16 @@ class Site_Check {
 	 * @return bool
 	 */
 	public static function check( $print = true ) {
-		$message = 'Site Check: ';
-
-		$result = self::does_wp_load();
-
-		$message .= $result ? 'Ok' : 'Failed';
-		Log::write( $message, ( $result ? LOG_INFO : LOG_ERR ) );
+		$status  = self::does_wp_load();
+		$output  = json_decode( self::$wp_test_result, true );
+		$message = 'Site Check: ' . ( $status ? 'Ok' : 'Failed' ) .
+			( ! $status && is_array( $output ) ? ': ' . self::$wp_test_result : '' );
+		Log::write( $message, ( $status ? LOG_INFO : LOG_ERR ) );
 
 		if ( $print ) {
 			echo $message . PHP_EOL; // phpcs:ignore WordPress.XSS.EscapeOutput
 		}
 
-		return $result;
+		return $status;
 	}
 }
