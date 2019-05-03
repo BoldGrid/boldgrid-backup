@@ -90,7 +90,7 @@ ob_start();
 					/> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
 				</td>
 			</tr>
-			<tr>
+			<tr id='auto-recovery-tr'>
 				<th><?php esc_html_e( 'Auto Recovery', 'boldgrid-backup' ); ?></th>
 				<td>
 					<input id='auto-recovery-enabled' type='radio' name='auto_recovery' value='1'
