@@ -230,6 +230,14 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-dashboard.php';
 
+		// Cron Module.
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-cron.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/cron/class-crontab.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/cron/entry/class-entry.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/cron/entry/class-base.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/cron/entry/class-crontab.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/cron/entry/class-wpcron.php';
+
 		// WP-CLI support.
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-wpcli.php';

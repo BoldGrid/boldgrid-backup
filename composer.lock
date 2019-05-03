@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "559f69b659d3dee2eeaa1b8da20d152a",
+    "content-hash": "69de0c4f4777ac42430fd5eb7a649542",
     "packages": [
         {
             "name": "boldgrid/library",
@@ -99,6 +99,17 @@
                 "user agent"
             ],
             "time": "2018-11-05T16:46:30+00:00"
+        },
+        {
+            "name": "chland/tdcron",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/chland/tdcron",
+                "reference": "origin/master"
+            },
+            "type": "library",
+            "time": "2018-01-23T14:06:12+00:00"
         },
         {
             "name": "ifsnop/mysqldump-php",
@@ -292,6 +303,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "cbschuld/browser.php": 20,
+        "chland/tdcron": 20,
         "lox/xhprof": 20
     },
     "prefer-stable": false,

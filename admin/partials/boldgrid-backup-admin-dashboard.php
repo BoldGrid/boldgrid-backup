@@ -20,22 +20,30 @@ $nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav
 ?>
 
 <div class='wrap'>
-	<h1><?php esc_html_e( 'BoldGrid Backup and Restore Settings', 'boldgrid-backup' ); ?></h1>
+	<h1><?php esc_html_e( 'BoldGrid Backup Dashboard', 'boldgrid-backup' ); ?></h1>
 
 	<?php
 	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+
+	/*
+	 * Get our next runtime and display it.
+	 *
+	 * This code is temporary. It is not translatable, it's not being displayed properly, etc...
+	 */
+	$cron = new Boldgrid\Backup\Admin\Cron();
+
+	$backup_entry = $cron->get_entry( 'backup' );
+
+	$next_runtime = 'No backup is scheduled';
+	if ( ! empty( $backup_entry ) && $backup_entry->is_set() ) {
+		$this->core->time->init( $backup_entry->get_next_runtime(), 'utc' );
+		$next_runtime = $this->core->time->get_span( 'D, M jS, g:ia' );
+	}
+
+	echo '
+		<p>
+			<strong>Next backup scheduled to run</strong>:
+			<em>' . esc_html( $next_runtime ) . '</em>
+		</p>';
 	?>
-
-	<p></p>
-
-	<div class="bg-box">
-		<div class="bg-box-top">
-			<?php esc_html_e( 'Full Site Protection', 'boldgrid-backup' ); ?>
-		</div>
-		<div class="bg-box-bottom">
-			<?php
-				echo ( include BOLDGRID_BACKUP_PATH . '/admin/partials/tools/full-protection.php' );
-			?>
-		</div>
-	</div>
 </div>
