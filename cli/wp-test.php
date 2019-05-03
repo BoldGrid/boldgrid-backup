@@ -9,14 +9,14 @@
  * @since      1.10.0
  *
  * @package    Boldgrid_Backup
- * @subpackage Boldgrid_Backup\Cron
+ * @subpackage Boldgrid_Backup\Cli
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
  *
  * phpcs:disable WordPress.WP.AlternativeFunctions,WordPress.PHP.DevelopmentFunctions
  */
 
-use Boldgrid\Backup\Cron\Info;
+use Boldgrid\Backup\Cli\Info;
 
 // Track if there was an exception.  This is not the greatest idea, but works for now.
 $had_exception = false;

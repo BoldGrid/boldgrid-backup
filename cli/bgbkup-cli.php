@@ -9,20 +9,20 @@
  * @since      1.9.0
  *
  * @package    Boldgrid_Backup
- * @subpackage Boldgrid_Backup\Cron
+ * @subpackage Boldgrid_Backup\Cli
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
  *
- * @see \Boldgrid\Backup\Cron\Info::has_errors()
- * @see \Boldgrid\Backup\Cron\Info::print_errors()
- * @see \Boldgrid\Backup\Cron\Site_Check::should_restore()
- * @see \Boldgrid\Backup\Cron\Site_Restore::run()
- * @see \Boldgrid\Backup\Cron\Log::write()
+ * @see \Boldgrid\Backup\Cli\Info::has_errors()
+ * @see \Boldgrid\Backup\Cli\Info::print_errors()
+ * @see \Boldgrid\Backup\Cli\Site_Check::should_restore()
+ * @see \Boldgrid\Backup\Cli\Site_Restore::run()
+ * @see \Boldgrid\Backup\Cli\Log::write()
  *
  * phpcs:disable WordPress.VIP,WordPress.XSS.EscapeOutput
  */
 
-namespace Boldgrid\Backup\Cron;
+namespace Boldgrid\Backup\Cli;
 
 $php_min_version = '5.4';
 

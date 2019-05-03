@@ -9,14 +9,14 @@
  * @since      1.9.0
  *
  * @package    Boldgrid\Backup
- * @subpackage Boldgrid\Backup\Cron
+ * @subpackage Boldgrid\Backup\Cli
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
  *
  * phpcs:disable WordPress.VIP,WordPress.XSS.EscapeOutput,WordPress.WP.AlternativeFunctions
  */
 
-namespace Boldgrid\Backup\Cron;
+namespace Boldgrid\Backup\Cli;
 
 /**
  * Class: Site_Restore.
@@ -29,8 +29,8 @@ class Site_Restore {
 	 *
 	 * @since 1.9.0
 	 *
-	 * @see \Boldgrid\Backup\Cron\Log::write()
-	 * @see \Boldgrid\Backup\Cron\Info::get_info()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
+	 * @see \Boldgrid\Backup\Cli\Info::get_info()
 	 * @see self::restore()
 	 */
 	public function run() {
@@ -57,8 +57,8 @@ class Site_Restore {
 	 * @access private
 	 *
 	 * @see ZipArchive()
-	 * @see \Boldgrid\Backup\Cron\Info::get_info()
-	 * @see \Boldgrid\Backup\Cron\Log::write()
+	 * @see \Boldgrid\Backup\Cli\Info::get_info()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 */
 	private function set_writable_permissions() {
 		if ( class_exists( 'ZipArchive' ) ) {
@@ -99,7 +99,7 @@ class Site_Restore {
 	 * @since  1.9.0
 	 * @access private
 	 *
-	 * @see \Boldgrid\Backup\Cron\Info::get_info()
+	 * @see \Boldgrid\Backup\Cli\Info::get_info()
 	 *
 	 * @return bool
 	 */
@@ -125,14 +125,14 @@ class Site_Restore {
 	 * @since  1.9.0
 	 * @access private
 	 *
-	 * @see \Boldgrid\Backup\Cron\Info::get_info()
-	 * @see \Boldgrid\Backup\Cron\Info::choose_method()
+	 * @see \Boldgrid\Backup\Cli\Info::get_info()
+	 * @see \Boldgrid\Backup\Cli\Info::choose_method()
 	 * @see \Boldgrid_Backup_Admin_Cli::call_command()
 	 * @see self::set_time_limit()
 	 * @see self::restore_files()
 	 * @see self::restore_database()
 	 * @see self::increment_restore_attempts()
-	 * @see \Boldgrid\Backup\Cron\Log::write()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 *
 	 * @return bool;
 	 */
@@ -167,12 +167,12 @@ class Site_Restore {
 	 * @since  1.9.0
 	 * @access private
 	 *
-	 * @see \Boldgrid\Backup\Cron\Info::get_info()
+	 * @see \Boldgrid\Backup\Cli\Info::get_info()
 	 * @see \Boldgrid_Backup_Admin_Cli::call_command()
 	 * @see \ZipArchive::open()
 	 * @see \ZipArchive::extractTo()
 	 * @see \PclZip::extract()
-	 * @see \Boldgrid\Backup\Cron\Log::write()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 *
 	 * @return bool
 	 */
@@ -253,11 +253,11 @@ class Site_Restore {
 	 * @since  1.9.0
 	 * @access private
 	 *
-	 * @see \Boldgrid\Backup\Cron\Info::get_info()
+	 * @see \Boldgrid\Backup\Cli\Info::get_info()
 	 * @see self::get_db_config()
 	 * @see \Boldgrid_Backup_Admin_Db_Import::import()
 	 * @see \Boldgrid_Backup_Admin_Cli::call_command()
-	 * @see \Boldgrid\Backup\Cron\Log::write()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 *
 	 * @return bool;
 	 */
@@ -328,8 +328,8 @@ class Site_Restore {
 	 * @since  1.9.0
 	 * @access private
 	 *
-	 * @see \Boldgrid\Backup\Cron\Info::get_results_filepath()
-	 * @see \Boldgrid\Backup\Cron\Info::set_info_item()
+	 * @see \Boldgrid\Backup\Cli\Info::get_results_filepath()
+	 * @see \Boldgrid\Backup\Cli\Info::set_info_item()
 	 */
 	private function increment_restore_attempts() {
 		$results = json_decode( file_get_contents( Info::get_results_filepath() ), true );

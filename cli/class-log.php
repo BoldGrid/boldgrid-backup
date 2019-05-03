@@ -8,14 +8,14 @@
  * @since      1.10.0
  *
  * @package    Boldgrid\Backup
- * @subpackage Boldgrid\Backup\Cron
+ * @subpackage Boldgrid\Backup\Cli
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
  *
  * phpcs:disable WordPress.VIP,WordPress.WP.AlternativeFunctions
  */
 
-namespace Boldgrid\Backup\Cron;
+namespace Boldgrid\Backup\Cli;
 
 /**
  * Class: Log
@@ -94,8 +94,8 @@ class Log {
 	 * @since 1.10.0
 	 * @static
 	 *
-	 * @see \Boldgrid\Backup\Cron\Info::get_log_flag()
-	 * @see \Boldgrid\Backup\Cron\Info::get_log_level()
+	 * @see \Boldgrid\Backup\Cli\Info::get_log_flag()
+	 * @see \Boldgrid\Backup\Cli\Info::get_log_level()
 	 * @see self::get_level_label()
 	 *
 	 * @param  string $message Message.

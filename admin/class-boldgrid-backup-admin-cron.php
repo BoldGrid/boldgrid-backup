@@ -43,7 +43,7 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @since 1.10.0
 	 * @var   string
 	 */
-	public $site_check = 'cron/bgbkup-cli.php';
+	public $site_check = 'cli/bgbkup-cli.php';
 
 	/**
 	 * Cron command.

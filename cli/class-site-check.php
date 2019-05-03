@@ -8,14 +8,14 @@
  * @since      1.9.0
  *
  * @package    Boldgrid\Backup
- * @subpackage Boldgrid\Backup\Cron
+ * @subpackage Boldgrid\Backup\Cli
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
  *
  * phpcs:disable WordPress.WP.AlternativeFunctions
  */
 
-namespace Boldgrid\Backup\Cron;
+namespace Boldgrid\Backup\Cli;
 
 /**
  * Class: Site_Check.
@@ -53,9 +53,9 @@ class Site_Check {
 	 * @since 1.9.0
 	 * @static
 	 *
-	 * @see \Boldgrid\Backup\Cron\Info::has_errors()
+	 * @see \Boldgrid\Backup\Cli\Info::has_errors()
 	 * @see self::does_wp_load()
-	 * @see \Boldgrid\Backup\Cron\Info::has_arg_flag()
+	 * @see \Boldgrid\Backup\Cli\Info::has_arg_flag()
 	 *
 	 * @return bool
 	 */
@@ -94,7 +94,7 @@ class Site_Check {
 	 * @since 1.9.0
 	 * @static
 	 *
-	 * @see \Boldgrid\Backup\Cron\Info::get_info()
+	 * @see \Boldgrid\Backup\Cli\Info::get_info()
 	 * @see \Boldgrid_Backup_Url_Helper::call_url()
 	 *
 	 * @return bool;
@@ -102,7 +102,7 @@ class Site_Check {
 	public static function is_siteurl_reachable() {
 		$result = false;
 
-		require_once __DIR__ . '/class-boldgrid-backup-url-helper.php';
+		require_once dirname( __DIR__ ) . '/cron/class-boldgrid-backup-url-helper.php';
 
 		if ( ! empty( Info::get_info()['siteurl'] ) ) {
 			$response = ( new \Boldgrid_Backup_Url_Helper() )->call_url(

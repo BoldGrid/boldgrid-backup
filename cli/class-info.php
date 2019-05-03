@@ -2,20 +2,20 @@
 /**
  * File: class-info.php
  *
- * Get information needed for cron processes.
+ * Get information needed for CLI processes.
  *
  * @link       https://www.boldgrid.com
  * @since      1.9.0
  *
  * @package    Boldgrid\Backup
- * @subpackage Boldgrid\Backup\Cron
+ * @subpackage Boldgrid\Backup\Cli
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
  *
  * phpcs:disable WordPress.VIP,WordPress.WP.AlternativeFunctions,WordPress.XSS.EscapeOutput
  */
 
-namespace Boldgrid\Backup\Cron;
+namespace Boldgrid\Backup\Cli;
 
 /**
  * Class: Info.
@@ -43,7 +43,7 @@ class Info {
 	 *
 	 * @var string
 	 */
-	private static $results_file_path = __DIR__ . '/restore-info.json';
+	private static $results_file_path;
 
 	/**
 	 * Get the results file path.
@@ -54,6 +54,10 @@ class Info {
 	 * @return string
 	 */
 	public static function get_results_filepath() {
+		if ( null === self::$results_file_path ) {
+			self::$results_file_path = dirname( __DIR__ ) . '/cron/restore-info.json';
+		}
+
 		return self::$results_file_path;
 	}
 
@@ -63,6 +67,7 @@ class Info {
 	 * @since 1.9.0
 	 * @static
 	 *
+	 * @see self::get_results_filepath()
 	 * @see self::is_cli()
 	 * @see self::get_mode()
 	 * @see self::get_notify_flag()
@@ -71,12 +76,13 @@ class Info {
 	 * @see self::have_execution_functions()
 	 * @see self::get_restore_info()
 	 * @see self::choose_method()
-	 * @see \Boldgrid\Backup\Cron\Log::write()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 *
 	 * @return array
 	 */
 	public static function get_info() {
 		if ( empty( self::$info['checked'] ) ) {
+			self::get_results_filepath();
 			self::is_cli();
 			self::get_mode();
 			self::get_log_flag();
@@ -130,12 +136,12 @@ class Info {
 	 * @static
 	 *
 	 * @see \Boldgrid_Backup_Cron_Helper::is_cli()
-	 * @see \Boldgrid\Backup\Cron\Log::write()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 *
 	 * @return bool
 	 */
 	public static function is_cli() {
-		require_once __DIR__ . '/class-boldgrid-backup-cron-helper.php';
+		require_once dirname( __DIR__ ) . '/cron/class-boldgrid-backup-cron-helper.php';
 
 		if ( ! \Boldgrid_Backup_Cron_Helper::is_cli() ) {
 			self::$info['errors']['cli'] = 'Error: This process must run from the CLI.';
@@ -158,7 +164,7 @@ class Info {
 	 * @static
 	 *
 	 * @see self::has_arg_flag()
-	 * @see \Boldgrid\Backup\Cron\Log::write()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 *
 	 * @return string|false
 	 */
@@ -202,7 +208,7 @@ class Info {
 	 * @static
 	 *
 	 * @see \Boldgrid_Backup_Admin_Cli::get_execution_functions()
-	 * @see \Boldgrid\Backup\Cron\Log::write()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 *
 	 * @return bool
 	 */
@@ -423,7 +429,7 @@ class Info {
 	 * @see self::get_arg_value()
 	 * @see Site_Check::is_siteurl_reachable()
 	 * @see \Boldgrid_Backup_Admin_Cli::call_command()
-	 * @see \Boldgrid\Backup\Cron\Log::write()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 *
 	 * @return string|false
 	 */
@@ -503,12 +509,12 @@ class Info {
 	 */
 	public static function get_env_info() {
 		if ( empty( self::$info['env'] ) ) {
-			require_once __DIR__ . '/class-boldgrid-backup-url-helper.php';
+			require_once dirname( __DIR__ ) . '/cron/class-boldgrid-backup-url-helper.php';
 			$url_helper = new \Boldgrid_Backup_Url_Helper();
 
 			self::$info['env'] = json_decode(
 				$url_helper->call_url(
-					self::$info['siteurl'] . '/wp-content/plugins/boldgrid-backup/cron/env-info.php'
+					self::$info['siteurl'] . '/wp-content/plugins/boldgrid-backup/cli/env-info.php'
 				),
 				true
 			);
@@ -539,7 +545,7 @@ class Info {
 	 * @since 1.9.0
 	 * @static
 	 *
-	 * @see \Boldgrid\Backup\Cron\Log::write()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 *
 	 * @param  string $extract_dir Extraction directory.
 	 * @param  string $file        File to be extracted.
@@ -589,7 +595,7 @@ class Info {
 	 * @since 1.9.0
 	 * @static
 	 *
-	 * @see \Boldgrid\Backup\Cron\Log::write()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 * @see self::extract_file()
 	 * @see self::read_json_file()
 	 *
@@ -648,7 +654,7 @@ class Info {
 	 * @access private
 	 * @static
 	 *
-	 * @see \Boldgrid\Backup\Cron\Log::write()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 * @see self::get_zip_info()
 	 * @see self::get_latest_info()
 	 * @see self::read_json_file()
@@ -798,7 +804,7 @@ class Info {
 	 * @static
 	 *
 	 * @see self::has_arg_flag()
-	 * @see \Boldgrid\Backup\Cron\Log::write()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 * @see self::read_json_file()
 	 * @see self::read_zip_log()
 	 *
