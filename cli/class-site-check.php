@@ -12,7 +12,7 @@
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
  *
- * phpcs:disable WordPress.WP.AlternativeFunctions
+ * phpcs:disable WordPress.WP.AlternativeFunctions,WordPress.XSS.EscapeOutput
  */
 
 namespace Boldgrid\Backup\Cli;
@@ -59,7 +59,6 @@ class Site_Check {
 	 * @see \Boldgrid\Backup\Cli\Info::get_notify_flag()
 	 * @see \Boldgrid\Backup\Cli\Info::get_email_arg()
 	 * @see \Boldgrid\Backup\Cli\Info::get_info()
-	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 *
 	 * @return bool
 	 */
@@ -80,24 +79,17 @@ class Site_Check {
 
 		// If "check" flag was passed and there have not been too many restoration attempts.
 		if ( 'check' === $mode && ! $attempts_exceeded ) {
-			if ( ! self::check() && $auto_restore ) {
+			$result = self::check();
+
+			if ( ! $result && $auto_restore ) {
 				$should_restore = true;
 			}
 
-			// If a check has failed for the first time, then send an email notification, if enabled.
-			$should_notify = Info::get_notify_flag() && Info::get_email_arg();
+			// If a check has failed, then send an email notification, if enabled.
+			$should_notify = ! $result && Info::get_notify_flag() && Info::get_email_arg();
 
 			if ( $should_notify ) {
-				$recipient = Info::get_info()['site_title'] . ' <' . Info::get_email_arg() . '>';
-				$subject   = 'Failed Site Check for ' . Info::get_info()['siteurl'];
-				$message   = "A site Check has failed.  You should check your site and can perform a manual restoration, if needed.\r\n\r\nFor assistance, please visit: https://www.boldgrid.com/support/\r\n";
-				Log::write( 'Sending email notification for failed site check to "' . $recipient . '".', LOG_INFO );
-
-				if ( ! empty( json_decode( self::$wp_test_result, true ) ) ) {
-					$message .= "\r\nError information:\r\n" . self::$wp_test_result . "\r\n";
-				}
-
-				( new Email( $recipient ) )->send( $subject, $message );
+				self::send_notification();
 			}
 		}
 
@@ -219,9 +211,36 @@ class Site_Check {
 		Log::write( $message, ( $status ? LOG_INFO : LOG_ERR ) );
 
 		if ( $print ) {
-			echo $message . PHP_EOL; // phpcs:ignore WordPress.XSS.EscapeOutput
+			echo $message . PHP_EOL;
 		}
 
 		return $status;
+	}
+
+	/**
+	 * Send a notification email message.
+	 *
+	 * @since 1.10.0
+	 * @static
+	 *
+	 * @see \Boldgrid\Backup\Cli\Info::get_email_arg()
+	 * @see \Boldgrid\Backup\Cli\Info::get_info()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
+	 * @see \Boldgrid\Backup\Cli\Email::send()
+	 *
+	 * @return bool
+	 */
+	public static function send_notification() {
+		$recipient = Info::get_info()['site_title'] . ' <' . Info::get_email_arg() . '>';
+		$subject   = 'Failed Site Check for ' . Info::get_info()['siteurl'];
+		$message   = "A site Check has failed.  You should check your site and can perform a manual restoration, if needed.\r\n\r\nFor assistance, please visit: https://www.boldgrid.com/support/\r\n";
+		Log::write( 'Sending email notification for failed site check to "' . $recipient . '".', LOG_INFO );
+
+		if ( ! empty( json_decode( self::$wp_test_result, true ) ) ) {
+			$message .= "\r\nError information:\r\n" . self::$wp_test_result . "\r\n";
+		}
+
+		echo 'Info: Sending notification email to "' . $recipient . '".' . PHP_EOL;
+		return ( new Email( $recipient ) )->send( $subject, $message );
 	}
 }
