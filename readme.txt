@@ -88,6 +88,7 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 * New feature: Added site front-end and back-end checking.
 * New feature: Added settings for Site Check.
 * Update:      Improved site/URL checking.
+* New feature: Added email notification for failed site checks.
 
 = 1.9.3 =
 

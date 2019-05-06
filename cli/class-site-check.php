@@ -56,6 +56,10 @@ class Site_Check {
 	 * @see \Boldgrid\Backup\Cli\Info::has_errors()
 	 * @see self::does_wp_load()
 	 * @see \Boldgrid\Backup\Cli\Info::has_arg_flag()
+	 * @see \Boldgrid\Backup\Cli\Info::get_notify_flag()
+	 * @see \Boldgrid\Backup\Cli\Info::get_email_arg()
+	 * @see \Boldgrid\Backup\Cli\Info::get_info()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 *
 	 * @return bool
 	 */
@@ -71,16 +75,39 @@ class Site_Check {
 		$auto_restore      = false !== Info::has_arg_flag( 'auto_recovery' ) &&
 			'1' === Info::get_cli_args()['auto_recovery'];
 		$mode              = Info::get_mode();
-		$attempts_exceeded = Info::get_info()['restore_attempts'] >= self::$max_restore_attempts;
+		$restore_attempts  = Info::get_info()['restore_attempts'];
+		$attempts_exceeded = $restore_attempts >= self::$max_restore_attempts;
 
 		// If "check" flag was passed and there have not been too many restoration attempts.
 		if ( 'check' === $mode && ! $attempts_exceeded ) {
 			if ( ! self::check() && $auto_restore ) {
 				$should_restore = true;
 			}
+
+			// If a check has failed for the first time, then send an email notification, if enabled.
+			$should_notify = Info::get_notify_flag() && Info::get_email_arg();
+
+			if ( $should_notify ) {
+				$recipient = Info::get_info()['site_title'] . ' <' . Info::get_email_arg() . '>';
+				$subject   = 'Failed Site Check for ' . Info::get_info()['siteurl'];
+				$message   = "A site Check has failed.  You should check your site and can perform a manual restoration, if needed.\r\n\r\nFor assistance, please visit: https://www.boldgrid.com/support/\r\n";
+				Log::write( 'Sending email notification for failed site check to "' . $recipient . '".', LOG_INFO );
+
+				if ( ! empty( json_decode( self::$wp_test_result, true ) ) ) {
+					$message .= "\r\nError information:\r\n" . self::$wp_test_result . "\r\n";
+				}
+
+				( new Email( $recipient ) )->send( $subject, $message );
+			}
 		}
 
-		// If "Restore" flag was possed, which forces a restoration.
+		// If the "auto_recovery" argument is not passed or set to "0", then do not restore.
+		if ( false === Info::has_arg_flag( 'auto_recovery' ) ||
+			'0' === Info::get_cli_args()['auto_recovery'] ) {
+				$should_restore = false;
+		}
+
+		// If "Restore" flag was possed, it is a  forced restoration.
 		if ( 'restore' === $mode ) {
 			$should_restore = true;
 		}
@@ -177,7 +204,7 @@ class Site_Check {
 	 * @static
 	 *
 	 * @see self::does_wp_load()
-	 * @see Log::write()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 *
 	 * @todo More checks and login coming soon.
 	 *
