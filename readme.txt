@@ -1,6 +1,6 @@
 === BoldGrid Backup ===
 Contributors: boldgrid, joemoto, imh_brad, rramo012, timph, bgnicolepaschen
-Tags: boldgrid, backup, restore, restoration, migrate, migration, update, updates
+Tags: backup, cloud backup, database backup, restore, wordpress backup
 Requires at least: 4.4
 Tested up to: 5.2
 Requires PHP: 5.4
