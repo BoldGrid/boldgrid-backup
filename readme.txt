@@ -83,6 +83,12 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 
 == Changelog ==
 
+= 1.9.4 =
+
+Release date: May 16th, 2019
+
+* Bug fix:     Ensure archive exists before attempting to upload via ftp.
+
 = 1.9.3 =
 
 Release date: Apr 30th, 2019

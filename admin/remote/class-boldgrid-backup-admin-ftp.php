@@ -1042,6 +1042,16 @@ class Boldgrid_Backup_Admin_Ftp {
 	 * @return bool
 	 */
 	public function upload( $filepath ) {
+		// Make sure our backup file exists.
+		if ( ! $this->core->wp_filesystem->exists( $filepath ) ) {
+			$this->last_error = sprintf(
+				// translators: 1 The filepath to a backup file.
+				__( 'Archive does not exist: $1$s', 'boldgrid-backup' ),
+				$filepath
+			);
+			return false;
+		}
+
 		$remote_file = $this->get_folder_name() . '/' . basename( $filepath );
 
 		$timestamp = filemtime( $filepath );
