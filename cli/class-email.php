@@ -2,7 +2,7 @@
 /**
  * File: class-email.php
  *
- * Log functions
+ * Email functions
  *
  * @link       https://www.boldgrid.com
  * @since      1.10.0

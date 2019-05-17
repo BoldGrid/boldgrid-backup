@@ -21,11 +21,24 @@ ob_start();
 		<span class='dashicons dashicons-editor-help' data-id='site_check'></span>
 	</div>
 	<div class="bg-box-bottom">
-		<p class='help' data-id='site_check'>
+		<p class="help" data-id="site_check">
 			<?php
-			esc_html_e(
-				'If something goes wrong with your WordPress site, information can be logged, emailed to you, and your site automatically restore the last full backup archive.',
-				'boldgrid-backup'
+			printf(
+				wp_kses(
+					/* translators: 1: Log file path, 2: Wiki page URL address. */
+					__(
+						'Site Check is a feature that can be enabled to periodically check your site for errors. If an error is found, it can be logged and an email alert can be sent to you. If logging is enabled, then activity is logged to a file "%1$s". More information on Site Check and the commands used can be found in the <a target="_blank" href="%2$s">wiki</a>.',
+						'boldgrid-backup'
+					),
+					[
+						'a' => [
+							'target' => [],
+							'href'   => [],
+						],
+					]
+				),
+				esc_url( BOLDGRID_BACKUP_PATH . '/cli/bgbkup-cli.log' ),
+				esc_url( 'https://github.com/BoldGrid/boldgrid-backup/wiki/CLI-Commands' )
 			);
 			?>
 		</p>
@@ -33,81 +46,65 @@ ob_start();
 			<tr>
 				<th><?php esc_html_e( 'Site Checker', 'boldgrid-backup' ); ?></th>
 				<td>
-					<input id='site_check-enabled' type='radio' name='site_check' value='1'
+					<input id="site-check-enabled" type="radio" name="site_check" value="1"
 					<?php
 					if ( $settings['site_check']['enabled'] ) {
 							echo ' checked'; // Default.
 					}
 					?>
-					/> <?php esc_html_e( 'Enabled', 'boldgrid-backup' ); ?> &nbsp; <input
-					id='site_check-disabled' type='radio' name='site_check'
-					value='0'
+					/> <label for="site-check-enabled"><?php esc_html_e( 'Enabled', 'boldgrid-backup' ); ?></label>
+					&nbsp; <input id="site-check-disabled" type="radio" name="site_check" value="0"
 					<?php
 					if ( ! $settings['site_check']['enabled'] ) {
 							echo ' checked';
 					}
 					?>
-					/> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
+					/> <label for="site-check-disabled"><?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?></label>
 				</td>
 			</tr>
 			<tr>
 				<th><?php esc_html_e( 'Check Interval (in minutes)', 'boldgrid-backup' ); ?></th>
 				<td>
-					<select id='site-check-interval' name='site_check_interval'>
-						<?php
-						for ( $x = 5; $x <= 59; $x ++ ) {
-							?>
-						<option value='<?php echo esc_attr( $x ); ?>'
-							<?php
-							if ( $x === $settings['site_check']['interval'] ) {
-								echo ' selected';
-							}
-							?>
-						><?php echo esc_html( $x ); ?></option>
-							<?php
-						}
-						?>
-					</select>
+					<input id="site-check-interval" name="site_check_interval" type="number"
+						min="5" max="59" value="<?php echo esc_attr( $settings['site_check']['interval'] ); ?>" />
 				</td>
 			</tr>
 			<tr>
 				<th><?php esc_html_e( 'Logger', 'boldgrid-backup' ); ?></th>
 				<td>
-					<input id='site-check-logger-enabled' type='radio' name='site_check_logger' value='1'
+					<input id="site-check-logger-enabled" type="radio" name="site_check_logger" value="1"
 					<?php
 					if ( $settings['site_check']['logger'] ) {
 							echo ' checked'; // Default.
 					}
 					?>
-					/> <?php esc_html_e( 'Enabled', 'boldgrid-backup' ); ?> &nbsp; <input
-					id='site-check-logger-disabled' type='radio' name='site_check_logger'
-					value='0'
+					/> <label for="site-check-logger-enabled"><?php esc_html_e( 'Enabled', 'boldgrid-backup' ); ?></label>
+					&nbsp; <input id="site-check-logger-disabled" type="radio" name="site_check_logger" value="0"
 					<?php
 					if ( ! $settings['site_check']['logger'] ) {
 							echo ' checked';
 					}
 					?>
-					/> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
+					/> <label for="site-check-logger-disabled"><?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?></label>
 				</td>
 			</tr>
-			<tr id='auto-recovery-tr'>
+			<tr id="auto-recovery-tr">
 				<th><?php esc_html_e( 'Auto Recovery', 'boldgrid-backup' ); ?></th>
 				<td>
-					<input id='auto-recovery-enabled' type='radio' name='auto_recovery' value='1'
+					<input id="auto-recovery-enabled" type="radio" name="auto_recovery" value="1"
 					<?php
 					if ( $settings['site_check']['auto_recovery'] ) {
 							echo ' checked';
 					}
 					?>
-					/> <?php esc_html_e( 'Enabled', 'boldgrid-backup' ); ?> &nbsp; <input
-					id='auto-recovery-disabled' type='radio' name='auto_recovery'
-					value='0'
+					/> <label for="auto-recovery-enabled"><?php esc_html_e( 'Enabled', 'boldgrid-backup' ); ?></label>
+					&nbsp; <input id="auto-recovery-disabled" type="radio" name="auto_recovery" value="0"
 					<?php
 					if ( ! $settings['site_check']['auto_recovery'] ) {
 						echo ' checked'; // Default.
 					}
 					?>
-					/> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
+					/> <label for="auto-recovery-enabled"><?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?></label>
 				</td>
 			</tr>
 		</table>
