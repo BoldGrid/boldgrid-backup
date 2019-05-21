@@ -83,17 +83,11 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 
 == Changelog ==
 
-= 1.10.1 In progress =
+= 1.10.0-alpha.1 =
 
-* New feature: Added site front-end and back-end checking.
-* New feature: Added settings for Site Check.
-* Update:      Improved site/URL checking.
-* New feature: Added email notification for failed site checks.
+Release date:  May 21, 2019
 
-= 1.9.4 =
-
-Release date: May 16th, 2019
-
+* New feature: Added settings section, logging, and email notifications for Site Check (bgbkup-cli).
 * Bug fix:     Ensure archive exists before attempting to upload via ftp.
 
 = 1.9.3 =
