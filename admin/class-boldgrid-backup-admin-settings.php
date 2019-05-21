@@ -230,6 +230,24 @@ class Boldgrid_Backup_Admin_Settings {
 		$settings['folder_exclusion_include'] = $this->core->folder_exclusion->from_settings( 'include', $settings );
 		$settings['folder_exclusion_exclude'] = $this->core->folder_exclusion->from_settings( 'exclude', $settings );
 
+		// Site Check settings.
+		$settings['site_check']['enabled'] = isset( $settings['site_check']['enabled'] ) ?
+			(bool) $settings['site_check']['enabled'] : true;
+
+		$settings['site_check']['logger'] = isset( $settings['site_check']['logger'] ) ?
+			(bool) $settings['site_check']['logger'] : true;
+
+		$settings['site_check']['auto_recovery'] = isset( $settings['site_check']['auto_recovery'] ) ?
+			(bool) $settings['site_check']['auto_recovery'] : false;
+
+		$settings['notifications']['site_check'] = isset( $settings['notifications']['site_check'] ) ?
+			(bool) $settings['notifications']['site_check'] : true;
+
+		// Site Check interval (in minutes); 5-59, defaults to 15.
+		$settings['site_check']['interval'] = ( isset( $settings['site_check']['interval'] ) &&
+			4 < $settings['site_check']['interval'] && 60 > $settings['site_check']['interval'] ) ?
+			$settings['site_check']['interval'] : 15;
+
 		// Return the settings array.
 		return $settings;
 	}
@@ -446,26 +464,38 @@ class Boldgrid_Backup_Admin_Settings {
 			}
 
 			// Validate input for other settings.
-			$settings['notifications']['backup'] = (
-				( isset( $_POST['notify_backup'] ) && '1' === $_POST['notify_backup'] ) ? 1 : 0
-			);
+			$settings['notifications']['backup'] = isset( $_POST['notify_backup'] ) &&
+				'1' === $_POST['notify_backup'] ? 1 : 0;
 
-			$settings['notifications']['restore'] = (
-				( isset( $_POST['notify_restore'] ) && '1' === $_POST['notify_restore'] ) ? 1 : 0
-			);
+			$settings['notifications']['restore'] = isset( $_POST['notify_restore'] ) &&
+				'1' === $_POST['notify_restore'] ? 1 : 0;
 
-			$settings['auto_backup'] = (
-				( ! isset( $_POST['auto_backup'] ) || '1' === $_POST['auto_backup'] ) ? 1 : 0
-			);
+			$settings['notifications']['site_check'] = isset( $_POST['notify_site_check'] ) &&
+				'1' === $_POST['notify_site_check'];
 
-			$settings['auto_rollback'] = (
-				( ! isset( $_POST['auto_rollback'] ) || '1' === $_POST['auto_rollback'] ) ? 1 : 0
-			);
+			$settings['auto_backup'] = ! isset( $_POST['auto_backup'] ) ||
+				'1' === $_POST['auto_backup'] ? 1 : 0;
+
+			$settings['auto_rollback'] = ! isset( $_POST['auto_rollback'] ) ||
+				'1' === $_POST['auto_rollback'] ? 1 : 0;
+
+			$settings['site_check']['enabled'] = isset( $_POST['site_check'] ) &&
+				'1' === $_POST['site_check'];
+
+			$settings['site_check']['interval'] = isset( $_POST['site_check_interval'] ) &&
+				4 < $_POST['site_check_interval'] && 60 > $_POST['site_check_interval'] ?
+				(int) $_POST['site_check_interval'] : 15;
+
+			$settings['site_check']['logger'] = isset( $_POST['site_check_logger'] ) &&
+				'1' === $_POST['site_check_logger'];
+
+			$settings['site_check']['auto_recovery'] = isset( $_POST['auto_recovery'] ) &&
+				'1' === $_POST['auto_recovery'];
 
 			// Update notification email address, if changed.
 			if ( isset( $settings['notification_email'] ) &&
-			sanitize_email( $_POST['notification_email'] ) !== $settings['notification_email'] ) {
-				$settings['notification_email'] = sanitize_email( $_POST['notification_email'] );
+				sanitize_email( $_POST['notification_email'] ) !== $settings['notification_email'] ) {
+					$settings['notification_email'] = sanitize_email( $_POST['notification_email'] );
 			}
 
 			/*

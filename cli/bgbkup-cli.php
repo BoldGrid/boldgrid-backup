@@ -9,14 +9,20 @@
  * @since      1.9.0
  *
  * @package    Boldgrid_Backup
- * @subpackage Boldgrid_Backup\Cron
+ * @subpackage Boldgrid_Backup\Cli
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
+ *
+ * @see \Boldgrid\Backup\Cli\Info::has_errors()
+ * @see \Boldgrid\Backup\Cli\Info::print_errors()
+ * @see \Boldgrid\Backup\Cli\Site_Check::should_restore()
+ * @see \Boldgrid\Backup\Cli\Site_Restore::run()
+ * @see \Boldgrid\Backup\Cli\Log::write()
  *
  * phpcs:disable WordPress.VIP,WordPress.XSS.EscapeOutput
  */
 
-namespace Boldgrid\Backup\Cron;
+namespace Boldgrid\Backup\Cli;
 
 $php_min_version = '5.4';
 
@@ -28,6 +34,8 @@ if ( version_compare( PHP_VERSION, $php_min_version, '<' ) ) {
 
 require __DIR__ . '/class-info.php';
 require __DIR__ . '/class-site-check.php';
+require __DIR__ . '/class-log.php';
+require __DIR__ . '/class-email.php';
 
 if ( Info::has_errors() ) {
 	Info::print_errors();
@@ -38,5 +46,7 @@ if ( Site_Check::should_restore() ) {
 	require __DIR__ . '/class-site-restore.php';
 	( new Site_Restore() )->run();
 } else {
-	echo 'Info: No action taken.' . PHP_EOL;
+	$message = 'Info: No action taken.';
+	echo $message . PHP_EOL;
+	Log::write( $message, LOG_INFO );
 }

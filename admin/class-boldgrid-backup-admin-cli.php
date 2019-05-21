@@ -85,7 +85,7 @@ class Boldgrid_Backup_Admin_Cli {
 	 * @param  string $command                  A command string to be executed.
 	 * @param  bool   $success                  Success or failure of the operation, passed back.
 	 * @param  int    $return_var               If present, the return_var, passed back.
-	 * @return string|bool Returns the command output or FALSE on error.
+	 * @return string Returns the command output
 	 */
 	public static function call_command( $command, &$success = false, &$return_var = 0 ) {
 		$success = false;
@@ -107,8 +107,6 @@ class Boldgrid_Backup_Admin_Cli {
 						$success = true;
 
 						break 2;
-					} else {
-						$output = false;
 					}
 
 					break 2;
@@ -126,8 +124,6 @@ class Boldgrid_Backup_Admin_Cli {
 							$success = true;
 
 							break 2;
-						} else {
-							$output = false;
 						}
 					}
 
@@ -150,13 +146,7 @@ class Boldgrid_Backup_Admin_Cli {
 							$success = true;
 
 							break 2;
-						} else {
-							// Bad exit status code (non-zero).
-							$output = false;
 						}
-					} else {
-						// Failed to create a process handle.
-						$output = false;
 					}
 
 					break 2;
@@ -202,8 +192,6 @@ class Boldgrid_Backup_Admin_Cli {
 							$success = true;
 
 							break 2;
-						} else {
-							$output = false;
 						}
 					}
 
@@ -216,8 +204,6 @@ class Boldgrid_Backup_Admin_Cli {
 						$success = true;
 
 						break 2;
-					} else {
-						$output = false;
 					}
 
 					break 2;
@@ -235,8 +221,6 @@ class Boldgrid_Backup_Admin_Cli {
 							$success = true;
 
 							break 2;
-						} else {
-							$output = false;
 						}
 					}
 
@@ -251,10 +235,6 @@ class Boldgrid_Backup_Admin_Cli {
 
 		if ( ! empty( $output ) ) {
 			$output = trim( $output );
-		}
-
-		if ( ! $success ) {
-			$output = false;
 		}
 
 		return $output;

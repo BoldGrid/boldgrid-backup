@@ -548,6 +548,7 @@ class Boldgrid_Backup_Admin_Archive {
 					'secret'           => $cron_secret,
 					'archive_key'      => $archive_key,
 					'archive_filename' => $archive_filename,
+					'site_title'       => get_bloginfo( 'name' ),
 				],
 				'',
 				' '

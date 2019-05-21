@@ -11,3 +11,7 @@
 .bgb-unbold {
 	font-weight: normal;
 }
+
+#auto-recovery-tr {
+	display: none;
+}

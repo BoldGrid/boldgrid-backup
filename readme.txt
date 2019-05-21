@@ -83,6 +83,13 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 
 == Changelog ==
 
+= 1.10.1 In progress =
+
+* New feature: Added site front-end and back-end checking.
+* New feature: Added settings for Site Check.
+* Update:      Improved site/URL checking.
+* New feature: Added email notification for failed site checks.
+
 = 1.9.4 =
 
 Release date: May 16th, 2019
