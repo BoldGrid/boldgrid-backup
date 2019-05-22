@@ -12,8 +12,7 @@ var BOLDGRID = BOLDGRID || {};
 
 BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 
-( function ( $ ) {
-
+( function( $ ) {
 	'use strict';
 
 	var self;
@@ -68,8 +67,9 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		 * @since 1.7.0
 		 */
 		_onReady: function() {
-			$( function(){
-				if( typeof wp.heartbeat !== 'undefined' ) {
+			$( function() {
+				if ( 'undefined' !== typeof wp.heartbeat ) {
+
 					/*
 					 * Check for a backup in progress.
 					 *
@@ -102,8 +102,8 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		 */
 		isStepActive: function( step ) {
 			return $( '#boldgrid_backup_in_progress_steps' )
-					.find( '[data-step="' + step + '"]' )
-					.hasClass( 'active' );
+				.find( '[data-step="' + step + '"]' )
+				.hasClass( 'active' );
 		},
 
 		/**
@@ -134,6 +134,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		 * @since 1.7.0
 		 */
 		onComplete: function() {
+
 			// Hide "in progress" notices.
 			self.$inProgressNotice.slideUp();
 			$( '#boldgrid_backup_in_progress_container' ).slideUp();
@@ -167,7 +168,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			 * a really big site, once that heartbeat goes back to 60, it's going to look like
 			 * this froze.
 			 */
-			if( 5 !== wp.heartbeat.interval ) {
+			if ( 5 !== wp.heartbeat.interval ) {
 				wp.heartbeat.interval( 'fast' );
 			}
 
@@ -190,6 +191,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 
 			// Steps to take when we no longer have a backup in progress.
 			if ( null === data.boldgrid_backup_in_progress ) {
+
 				// Create our success notice and show it.
 				$notice = $( data.boldgrid_backup_complete );
 				$notice
@@ -227,7 +229,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		 * @param object In progress data received from ajax call.
 		 */
 		onStepAddingFiles: function( data ) {
-			var percentage = Math.floor( data.total_files_done / data.total_files_todo * 100 );
+			var percentage = Math.floor( ( data.total_files_done / data.total_files_todo ) * 100 );
 
 			self.setStepActive( 2 );
 
@@ -239,11 +241,11 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			 * Different styles are needed as the progress bar reaches 50% and begins to overlap
 			 * the status text.
 			 */
-			if( percentage >= 50 ) {
+			if ( 50 <= percentage ) {
 				self.$label.addClass( 'over-50' );
 			}
 
-			if( 100 === percentage && data.status ) {
+			if ( 100 === percentage && data.status ) {
 				self.setSubText();
 			}
 
@@ -251,9 +253,9 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			 * If we have "last files" data within our "in progress data", loop through and use a
 			 * setTimeout to display each one.
 			 */
-			if( data.last_files ) {
-				for( var i = 0; i < data.last_files.length; i++ ) {
-					setTimeout( self.setSubText, ( i * 1000 + 1 ), data.last_files[i] );
+			if ( data.last_files ) {
+				for ( var i = 0; i < data.last_files.length; i++ ) {
+					setTimeout( self.setSubText, i * 1000 + 1, data.last_files[i] );
 				}
 			}
 		},
@@ -277,11 +279,11 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			 * We only run this step once, the first time we know that database tables are being
 			 * backed up.
 			 */
-			if( ! stepIsActive ) {
+			if ( ! stepIsActive ) {
 				self.setSubText( self.i18n.adding_tables );
 
-				for( var i = 0; i < data.tables.length; i++ ) {
-					timeout = (i+1) * 5000 / data.tables.length;
+				for ( var i = 0; i < data.tables.length; i++ ) {
+					timeout = ( ( i + 1 ) * 5000 ) / data.tables.length;
 					setTimeout( self.setLabel, timeout, data.tables[i] );
 				}
 
@@ -306,7 +308,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		 * @param object In progress data received from ajax call.
 		 */
 		onStepSaving: function( data ) {
-			var percentage = Math.floor( data.tmp.size / data.total_size_archived * 100 );
+			var percentage = Math.floor( ( data.tmp.size / data.total_size_archived ) * 100 );
 
 			self.setStepActive( 3 );
 
@@ -339,11 +341,11 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		setPercentage: function( percentage ) {
 			$( '#boldgrid-backup-in-progress-bar' )
 				.show()
-				.progressbar({
+				.progressbar( {
 					value: percentage
-				});
+				} );
 
-			if( percentage >= 50 ) {
+			if ( 50 <= percentage ) {
 				self.$label.addClass( 'over-50' );
 			} else {
 				self.$label.removeClass( 'over-50' );
@@ -361,13 +363,13 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			var $container = $( '#boldgrid_backup_in_progress_steps' ),
 				$steps = $container.find( '[data-step]' );
 
-			if( step && self.isStepActive( step ) ) {
+			if ( step && self.isStepActive( step ) ) {
 				return;
 			}
 
 			$steps.removeClass( 'active' );
 
-			if( step ) {
+			if ( step ) {
 				$container.find( '[data-step="' + step + '"]' ).addClass( 'active' );
 			}
 		},
@@ -385,7 +387,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		setSubText: function( text ) {
 			var $lastFileArchived = $( '#last_file_archived' );
 
-			if( text ) {
+			if ( text ) {
 				$lastFileArchived.text( text );
 			} else {
 				$lastFileArchived.empty();
@@ -408,11 +410,13 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		 * @since 1.7.0
 		 */
 		heartbeatStart: function() {
+
 			// Increase the heartbeat so we can get an update sooner.
 			wp.heartbeat.interval( 'fast' );
 
 			// Modify the heartbeat and ask for an update on our in progress backup.
 			$( document ).on( 'heartbeat-send', self.heartbeatModify );
+
 			// Now that we've modified the heartbeat, we need to listen for its tick.
 			$( document ).on( 'heartbeat-tick', self.onHeartbeatTick );
 
@@ -424,19 +428,16 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			 * This method adds a class to the body to indicate that the heartbeat has lost focus.
 			 * The class will lighten the progress bar, to show that it's not currently active.
 			 */
-			window.setInterval(
-				function(){
-					var $body = $( 'body' ),
-						body_class = 'heartbeat-lost-focus';
+			window.setInterval( function() {
+				var $body = $( 'body' ),
+					body_class = 'heartbeat-lost-focus';
 
-					if( wp.heartbeat.hasFocus() ) {
-						$body.removeClass( body_class );
-					} else {
-						$body.addClass( body_class );
-					}
-				},
-				5000
-			);
+				if ( wp.heartbeat.hasFocus() ) {
+					$body.removeClass( body_class );
+				} else {
+					$body.addClass( body_class );
+				}
+			}, 5000 );
 		}
 	};
 
