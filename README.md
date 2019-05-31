@@ -1,5 +1,7 @@
 # BoldGrid Backup #
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/BoldGrid/boldgrid-backup.svg)](https://greenkeeper.io/)
+
 BoldGrid Backup provides WordPress backup and restoration with update protection.
 
 ## Description ##
