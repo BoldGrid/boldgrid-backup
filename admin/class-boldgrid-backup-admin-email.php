@@ -86,7 +86,7 @@ class Boldgrid_Backup_Admin_Email {
 		$this->ads = array(
 			'generic' => $this->core->config->get_is_premium() ? '' : sprintf(
 				// translators: 1: URL address.
-				__( 'Want to store your backups on Amazon S3, restore individual files with just a click, and have access to more tools? Get BoldGrid Backup Premium! - %1$s', 'boldgrid-backup' ),
+				__( 'Want to store your backups on Google Drive and Amazon S3, restore individual files with just a click, and have access to more tools? Get BoldGrid Backup Premium! - %1$s', 'boldgrid-backup' ),
 				$this->core->go_pro->get_premium_url( 'bgbkup-email' )
 			) . "\n\n",
 		);

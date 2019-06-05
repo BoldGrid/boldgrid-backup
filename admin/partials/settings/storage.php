@@ -45,16 +45,18 @@ $premium_url = $this->core->go_pro->get_premium_url( 'bgbkup-settings-storage' )
 $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 	'
 	<div class="bg-box-bottom premium">
-		<input type="checkbox" disabled="true" /> <strong>%1$s</strong>
+		<input type="checkbox" disabled="true" /> <strong>%1$s</strong><br />
+		<input type="checkbox" disabled="true" /> <strong>%4$s</strong>
 
 		<p>
 			%2$s
 			%3$s
 		</p>
 	</div>',
-	/* 1 */ __( 'Amazon S3', 'boldgrid-backup' ),
+	/* 1 */ __( 'Google Drive', 'boldgrid-backup' ),
 	/* 2 */ $this->core->go_pro->get_premium_button( $premium_url ),
-	/* 3 */ __( 'Upgrade to premium for more Storage Locations!', 'boldgrid-backup' )
+	/* 3 */ __( 'Upgrade to premium for more Storage Locations!', 'boldgrid-backup' ),
+	/* 4 */ __( 'Amazon S3', 'boldgrid-backup' )
 );
 
 ?>

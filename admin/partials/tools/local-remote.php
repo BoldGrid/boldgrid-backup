@@ -168,7 +168,7 @@ echo '<p>';
 printf(
 	// translators: 1: HTML strong open tag, 2: HTML strong close tag, 3: HTML em open tag, 4: HTML em close tag.
 	esc_html__(
-		'%1$sRemote Storage%2$s providers are servers other than your %3$sLocal Machine%4$s and %3$sWeb Server%4$s where you can store files. For example, %3$sFTP%4$s, %3$sSFTP%4$s, and %3$sAmazon S3%4$s are all considered Remote Storage Providers.',
+		'%1$sRemote Storage%2$s providers are servers other than your %3$sLocal Machine%4$s and %3$sWeb Server%4$s where you can store files. For example, %3$sFTP%4$s, %3$sGoogle Drive%4$s, and %3$sAmazon S3%4$s are all considered Remote Storage Providers.',
 		'boldgrid-backup'
 	),
 	'<strong>',
