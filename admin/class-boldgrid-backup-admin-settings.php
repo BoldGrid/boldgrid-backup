@@ -253,6 +253,17 @@ class Boldgrid_Backup_Admin_Settings {
 	}
 
 	/**
+	 * Get the url to the settings pages.
+	 *
+	 * @since xxx
+	 *
+	 * @return string
+	 */
+	public function get_settings_url() {
+		return admin_url( 'admin.php?page=boldgrid-backup-settings' );
+	}
+
+	/**
 	 * Whether or not we are backing up all files, as defined in the settings.
 	 *
 	 * @since 1.9.0
