@@ -233,7 +233,9 @@ class Site_Check {
 	public static function send_notification() {
 		$recipient = Info::get_info()['site_title'] . ' <' . Info::get_email_arg() . '>';
 		$subject   = 'Failed Site Check for ' . Info::get_info()['siteurl'];
-		$message   = "A site Check has failed.  You should check your site and can perform a manual restoration, if needed.\r\n\r\nYou can manage notifications in your WordPress admin panel, under BoldGrid Backup Settings.\r\n\r\nFor assistance, please visit: https://www.boldgrid.com/support/boldgrid-backup/what-to-do-when-boldgrid-backup-site-check-fails/\r\n";
+		$message   = "A Site Check has failed.  You should check your site and can perform a manual restoration.\r\n\r\nFor help, please visit: https://www.boldgrid.com/support/boldgrid-backup/what-to-do-when-boldgrid-backup-site-check-fails/\r\n\r\nYou can manage notifications in your WordPress admin panel, under BoldGrid Backup Settings at:\r\n" .
+			Info::get_info()['siteurl'] .
+			"/wp-admin/admin.php?page=boldgrid-backup-settings\r\n";
 		Log::write( 'Sending email notification for failed site check to "' . $recipient . '".', LOG_INFO );
 
 		$result = json_decode( self::$wp_test_result, true );
