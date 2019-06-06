@@ -35,6 +35,17 @@ if ( empty( $this->remote_storage_li ) ) {
 	return $data;
 }
 
+// This is the template used to render each remote storage provider.
+$entry_template = '%5$s
+	<div data-remote-provider="%3$s">
+		<span style="float:left; width:calc(50%% - 10px);" %6$s><strong>%1$s</strong></span>
+		<span style="float:right; width:50%%;">%2$s</span>
+
+		<div style="clear:both;"></div>
+
+		<p>%4$s</p>
+	</div>';
+
 $count = 0;
 foreach ( $this->remote_storage_li as $provider ) {
 	$count++;
@@ -77,17 +88,7 @@ foreach ( $this->remote_storage_li as $provider ) {
 	}
 
 	$data['postbox'] .= sprintf(
-		'
-		%5$s
-		<div data-remote-provider="%3$s">
-			<span style="float:left;" %6$s><strong>%1$s</strong></span>
-			<span style="float:right;max-width:50%%;">%2$s</span>
-
-			<div style="clear:both;"></div>
-
-			<p>%4$s</p>
-		</div>
-		',
+		$entry_template,
 		/* 1 */ esc_html( $provider['title'] ),
 		/* 2 */ $upload,
 		/* 3 */ $provider['id'],
@@ -95,6 +96,21 @@ foreach ( $this->remote_storage_li as $provider ) {
 		/* 5 */ 1 !== $count ? '<hr class="separator-small" />' : '',
 		/* 6 */ empty( $provider['title_attr'] ) ? '' : sprintf( 'title="%1$s"', esc_attr( $provider['title_attr'] ) )
 	);
+}
+
+// If the user is not on pro, show the remote storage providers available in pro.
+if ( ! $this->core->config->get_is_premium() ) {
+	foreach ( $this->core->configs['premium_remote'] as $provider ) {
+		$data['postbox'] .= sprintf(
+			$entry_template,
+			/* 1 */ esc_html( $provider['title'] ),
+			/* 2 */ esc_html__( 'Premium Feature', 'boldgrid-backup' ),
+			/* 3 */ '',
+			/* 4 */ '',
+			/* 5 */ '<hr class="separator-small" />',
+			/* 6 */ ''
+		);
+	}
 }
 
 return $data;

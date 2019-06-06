@@ -49,4 +49,18 @@ return array(
 	 * setup this last login cache and check against it.
 	 */
 	'last_login_lifetime'  => DAY_IN_SECONDS,
+	/*
+	 * As array of premium remote storage providers.
+	 *
+	 * This config is not needed for any premium features to work. Instead, it is holding the info
+	 * we need to help inform users about the glory that awaits them after upgrading.
+	 */
+	'premium_remote'       => [
+		'google_drive' => [
+			'title' => __( 'Google Drive', 'boldgrid-backup' ),
+		],
+		'amazon_s3'    => [
+			'title' => __( 'Amazon S3', 'boldgrid-backup' ),
+		],
+	],
 );
