@@ -83,6 +83,10 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 
 == Changelog ==
 
+= 1.10.0-alpha.2 In progress =
+
+* Update:      Removed duplicate build for toggles dependency.
+
 = 1.10.0-alpha.1 =
 
 Release date:  May 21, 2019
