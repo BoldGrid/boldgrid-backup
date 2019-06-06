@@ -60,13 +60,13 @@ BoldGrid.FtpSettings = function( $ ) {
 	};
 
 	$( function() {
-		$action = $( '[name="action"]' ),
-		$port = $( '[name="port"]' ),
-		$type = $( '[name="type"]' ),
-		$form = $port.closest( 'form' ),
-		$saveButton = $form.find( '.button-primary' ),
-		$deleteButton = $form.find( '.button-secondary' ),
-		$spinner = $form.find( '.spinner' );
+		( $action = $( '[name="action"]' ) ),
+			( $port = $( '[name="port"]' ) ),
+			( $type = $( '[name="type"]' ) ),
+			( $form = $port.closest( 'form' ) ),
+			( $saveButton = $form.find( '.button-primary' ) ),
+			( $deleteButton = $form.find( '.button-secondary' ) ),
+			( $spinner = $form.find( '.spinner' ) );
 
 		$type.on( 'change', self.onTypeChange );
 		$form.on( 'submit', self.onSubmit );
