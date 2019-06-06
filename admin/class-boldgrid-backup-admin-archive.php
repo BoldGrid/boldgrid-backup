@@ -540,6 +540,7 @@ class Boldgrid_Backup_Admin_Archive {
 			$archive_key      = isset( $archive_info['key'] ) ? $archive_info['key'] : null;
 			$cron_secret      = $this->core->cron->get_cron_secret();
 			$siteurl          = site_url();
+			$site_title       = get_bloginfo( 'name' );
 			$restore_cmd      = http_build_query(
 				[
 					'mode'             => 'restore',
@@ -548,7 +549,7 @@ class Boldgrid_Backup_Admin_Archive {
 					'secret'           => $cron_secret,
 					'archive_key'      => $archive_key,
 					'archive_filename' => $archive_filename,
-					'site_title'       => get_bloginfo( 'name' ),
+					'site_title'       => $site_title,
 				],
 				'',
 				' '
@@ -560,6 +561,7 @@ class Boldgrid_Backup_Admin_Archive {
 				'cron_secret' => $cron_secret,
 				'filepath'    => $archive_filepath,
 				'siteurl'     => $siteurl,
+				'site_title'  => $site_title,
 				'restore_cmd' => $this->core->cron->get_cron_command() . ' "' . dirname( __DIR__ ) .
 					'/boldgrid-backup-cron.php" ' . $restore_cmd,
 				'timestamp'   => time(),
