@@ -721,6 +721,14 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 			return;
 		}
 
+		/*
+		 * If we just activated the plugin, we'll be showing a, "Thanks for installing!" notice. We
+		 * don't want to bombard the user with notices, so don't show this notice too.
+		 */
+		if ( Boldgrid_Backup_Activator::on_post_activate() ) {
+			return;
+		}
+
 		$display = false;
 
 		$configs = array(

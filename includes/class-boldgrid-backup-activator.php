@@ -89,7 +89,7 @@ class Boldgrid_Backup_Activator {
 	 *
 	 * @return bool
 	 */
-	public function on_post_activate() {
+	public static function on_post_activate() {
 		return ! self::$just_activated && '1' === get_option( self::$option );
 	}
 
