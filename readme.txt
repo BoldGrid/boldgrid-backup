@@ -83,12 +83,15 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 
 == Changelog ==
 
-= 1.10.0 In progress =
+= 1.10.0 =
 
-* Update:      Updated content for the failed Site Check email notification message.
-* Update:      Removed duplicate build for toggles dependency.
+Release date: June 10th, 2019
+
 * New feature: Added settings section, logging, and email notifications for Site Check (bgbkup-cli).
 * Bug fix:     Ensure archive exists before attempting to upload via ftp.
+* Update:      Updated dependencies.
+* Update:      Updated content for the failed Site Check email notification message.
+* Update:      Removed duplicate build for toggles dependency.
 
 = 1.9.3 =
 

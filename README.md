@@ -29,5 +29,4 @@ Before you can use the development version of this plugin you must install the d
 ```
 yarn install
 composer install -o
-gulp
 ```
