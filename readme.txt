@@ -83,6 +83,9 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 
 == Changelog ==
 
+= 1.10.1 In progress =
+* Update:      Updated dev dependencies.
+
 = 1.10.0 =
 
 Release date: June 10th, 2019
