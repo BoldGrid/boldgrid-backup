@@ -2504,7 +2504,16 @@ class Boldgrid_Backup_Admin_Core {
 			'Remote'                    => __( 'Remote', 'boldgrid-backup' ),
 			'spinner'                   => '<span class="spinner"></span>',
 			'spinner_inline'            => '<span class="spinner inline"></span>',
-			'want_to'                   => __( 'Want to store your backups on Amazon S3, restore individual files with just a click, and have access to more tools? Get <strong>BoldGrid Backup Premium</strong>!', 'boldgrid-backup' ),
+			/*
+			 * The "want_to" string is a generic "why you should upgrade" string used for general
+			 * purposes. For example, it's currently used at the bottom of the backups page.
+			 */
+			'want_to'                   => sprintf(
+				// translators: 1 Markup showing a "Google Drive" logo, 2 Markup showing an "Amazon S3" logo.
+				__( 'Want to store your backups on %1$s and %2$s, restore individual files with just a click, and have access to more tools? Get <strong>BoldGrid Backup Premium</strong>!', 'boldgrid-backup' ),
+				'<span class="bgbkup-remote-logo bgbkup-gdrive-logo" title="Google Drive"></span>',
+				'<span class="bgbkup-remote-logo amazon-s3-logo" title="Amazon S3"></span>'
+			),
 			// Mine count, number of backups on local web server.
 			'Web_Server'                => __( 'Web Server', 'boldgrid-backup' ),
 		);

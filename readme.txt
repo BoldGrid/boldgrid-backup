@@ -4,7 +4,7 @@ Tags: backup, cloud backup, database backup, restore, wordpress backup
 Requires at least: 4.4
 Tested up to: 5.2
 Requires PHP: 5.4
-Stable tag: 1.10.0
+Stable tag: 1.10.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -83,10 +83,14 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 
 == Changelog ==
 
-= 1.10.1 In progress =
+= 1.10.1 =
 
-Release date: June 18th, 2019.
+Release date: Jun 18th, 2019
 
+* Update:      Added helpful links to the plugin's row on Plugins > Install Plugins.
+* Update:      Updating verbiage in several places to help inform user of Google Drive support.
+* Update:      Show a getting started message to users after they've activated the plugin.
+* Update:      Improved usability on "Backup Archives" page when there are no backups.
 * New feature: Added a subpage for support.
 * Update:      Updated Travis CI config and dev dependencies.
 * Update:      Moved auto-rollback setting to the auto-updates page.
