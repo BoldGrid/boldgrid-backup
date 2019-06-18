@@ -166,7 +166,7 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 			backup_now: '1',
 			folder_exclusion_type: type,
 			backup_title: $( '[name="backup_title"]' ).val(),
-			backup_description: $( '[name="backup_description"]' ).val(),
+			backup_description: $( '[name="backup_description"]' ).val()
 		};
 
 		/*

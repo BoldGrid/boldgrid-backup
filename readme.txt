@@ -4,7 +4,7 @@ Tags: backup, cloud backup, database backup, restore, wordpress backup
 Requires at least: 4.4
 Tested up to: 5.2
 Requires PHP: 5.4
-Stable tag: 1.9.3
+Stable tag: 1.10.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -83,12 +83,18 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 
 == Changelog ==
 
-= 1.10.0-alpha.1 =
+= 1.10.1 In progress =
+* Update:      Updated Travis CI config and dev dependencies.
 
-Release date:  May 21, 2019
+= 1.10.0 =
+
+Release date: June 10th, 2019
 
 * New feature: Added settings section, logging, and email notifications for Site Check (bgbkup-cli).
 * Bug fix:     Ensure archive exists before attempting to upload via ftp.
+* Update:      Updated dependencies.
+* Update:      Updated content for the failed Site Check email notification message.
+* Update:      Removed duplicate build for toggles dependency.
 
 = 1.9.3 =
 

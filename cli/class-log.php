@@ -62,7 +62,7 @@ class Log {
 	 * @var string
 	 * @staticvar
 	 */
-	private static $log_file_path = __DIR__ . '/bgbkup-cli.log';
+	private static $log_filename = '/bgbkup-cli.log';
 
 	/**
 	 * Log timestamp format.
@@ -114,7 +114,7 @@ class Log {
 		if ( Info::get_log_flag() && Info::get_log_level() >= $log_level ) {
 			$message = date( self::$date_format ) . ' [' . self::get_level_label( $log_level ) . '] ' .
 				$message . PHP_EOL;
-			$success = false !== file_put_contents( self::$log_file_path, $message, FILE_APPEND );
+			$success = false !== file_put_contents( __DIR__ . self::$log_filename, $message, FILE_APPEND );
 		}
 
 		return $success;

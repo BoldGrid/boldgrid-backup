@@ -69,17 +69,6 @@ class Boldgrid_Backup_Admin_Support {
 	}
 
 	/**
-	 * Determine whether or not we have our build directory.
-	 *
-	 * @since 1.7.0
-	 *
-	 * @return bool
-	 */
-	public function has_been_built() {
-		return file_exists( BOLDGRID_BACKUP_PATH . '/build/clipboard.min.js' );
-	}
-
-	/**
 	 * Determine whether or not composer has been setup.
 	 *
 	 * @since 1.7.0
@@ -111,7 +100,6 @@ class Boldgrid_Backup_Admin_Support {
 	 *
 	 * @see has_compatible_php()
 	 * @see Boldgrid_Backup_Admin_Support::has_composer_installed()
-	 * @see Boldgrid_Backup_Admin_Support::has_been_built()
 	 * @see Boldgrid_Backup_Admin_Support::deactivate()
 	 *
 	 * @return bool
@@ -137,17 +125,6 @@ class Boldgrid_Backup_Admin_Support {
 			$this->deactivate(
 				__(
 					'The vendor folder is missing. Please run "composer install", or contact your host for further assistance.',
-					'boldgrid-backup'
-				)
-			);
-
-			return false;
-		}
-
-		if ( ! $this->has_been_built() ) {
-			$this->deactivate(
-				__(
-					'The "build" folder is missing. Please run "yarn install" and "gulp", or contact your host for further assistance.',
 					'boldgrid-backup'
 				)
 			);

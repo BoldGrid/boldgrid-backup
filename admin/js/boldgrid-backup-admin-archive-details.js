@@ -46,8 +46,7 @@ BoldGrid.ArchiveDetails = function( $ ) {
 			$a.parent().html( message );
 		};
 
-		$a
-			.attr( 'disabled', 'disabled' )
+		$a.attr( 'disabled', 'disabled' )
 			.text( lang.uploading + '...' )
 			.after( ' <span class="spinner inline"></span>' );
 
@@ -160,13 +159,13 @@ BoldGrid.ArchiveDetails = function( $ ) {
 	self.onClickUpdate = function() {
 		var request,
 			data = {
-				action:      'boldgrid_backup_update_archive_details',
-				filename:    $( '#filename' ).val(),
-				security:    $( '#_wpnonce' ).val(),
+				action: 'boldgrid_backup_update_archive_details',
+				filename: $( '#filename' ).val(),
+				security: $( '#_wpnonce' ).val(),
 				attributes: {
-					title:       $( '[name="backup_title"]' ).val(),
+					title: $( '[name="backup_title"]' ).val(),
 					description: $( '[name="backup_description"]' ).val(),
-					protect:     $( '[name="backup_protect"]' ).val(),
+					protect: $( '[name="backup_protect"]' ).val()
 				}
 			},
 			onFail,
@@ -179,31 +178,29 @@ BoldGrid.ArchiveDetails = function( $ ) {
 			if ( false === response.success ) {
 				onFail( response.data );
 			} else {
+
 				// Animate things.
 				$spinner.removeClass( 'inline' );
 				$button.text( adminLang.updated );
 				setTimeout( function() {
-					$button
-						.text( adminLang.update )
-						.prop( 'disabled', false );
+					$button.text( adminLang.update ).prop( 'disabled', false );
 				}, 1000 );
 			}
 		};
 
 		onFail = function( msg ) {
+
 			// Configure our error message.
 			if ( msg === undefined ) {
 				msg = adminLang.unknown_error;
-			} else if( 'object' === typeof msg && msg.statusText ) {
+			} else if ( 'object' === typeof msg && msg.statusText ) {
 				msg = msg.statusText;
 			}
 			msg = adminLang.failed_to_update + msg;
 
 			// Animate things.
 			$spinner.removeClass( 'inline' );
-			$button
-				.text( adminLang.update )
-				.prop( 'disabled', false );
+			$button.text( adminLang.update ).prop( 'disabled', false );
 
 			// Add an error message and make it dissmissible.
 			$actions.prepend( '<div class="notice notice-error is-dismissible"><p>' + msg + '</p></div>' );
@@ -212,9 +209,7 @@ BoldGrid.ArchiveDetails = function( $ ) {
 
 		// Animate things.
 		$spinner.addClass( 'inline' );
-		$button
-			.text( adminLang.updating )
-			.prop( 'disabled', true );
+		$button.text( adminLang.updating ).prop( 'disabled', true );
 		$actions.find( '.notice' ).slideUp();
 
 		request = $.post( ajaxurl, data )

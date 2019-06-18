@@ -266,12 +266,14 @@ BoldGrid.Settings = function( $ ) {
 	 */
 	self.toggleSiteCheck = function() {
 		if ( '1' === $siteCheck.filter( ':checked' ).val() ) {
+
 			// Site Check is enabled.
 			$( '#site-check-interval' ).removeAttr( 'disabled' );
 			$( 'input[name="site_check_logger"]' ).removeAttr( 'disabled' );
 			$( 'input[name="auto_recovery"]' ).removeAttr( 'disabled' );
 			$( '#notification-site-check' ).removeAttr( 'disabled' );
 		} else {
+
 			// Site Check is disabled.
 			$( '#site-check-interval' ).attr( 'disabled', true );
 			$( 'input[name="site_check_logger"]' ).attr( 'disabled', true );
@@ -282,6 +284,7 @@ BoldGrid.Settings = function( $ ) {
 
 	// Onload event listener.
 	$( function() {
+
 		// Check if any days or the week are checked, toggle notice.
 		self.toggleNoBackupDays();
 
