@@ -25,7 +25,7 @@ class Boldgrid_Backup_Admin_Plugins {
 	 *
 	 * @since 1.10.1
 	 *
-	 * @param string $actions     An array of plugin action links. By default this can include 'activate',
+	 * @param array  $actions     An array of plugin action links. By default this can include 'activate',
 	 *                            'deactivate', and 'delete'. With Multisite active this can also include
 	 *                            'network_active' and 'network_only' items.
 	 * @param string $plugin_file Path to the plugin file relative to the plugins directory.
