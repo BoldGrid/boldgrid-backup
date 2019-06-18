@@ -103,10 +103,20 @@ class Boldgrid_Backup_Activator {
 			$core = apply_filters( 'boldgrid_backup_get_core', null );
 
 			echo '<div class="notice notice-success">
-					<h2>' . esc_html__( 'Thank you for installing BoldGrid Backup!', 'boldgrid-backup' ) . '</h2>
-					<p>' . esc_html__( 'To get started, we recommend going to your BoldGrid Backup Settings page and configuring scheduled backups.', 'boldgrid-backup' ) . '</p>
-					<p><a href="' . esc_url( $core->settings->get_settings_url() ) . '" class="button button-primary">' . esc_html__( 'Configure BoldGrid Backup Now', 'boldgrid-backup' ) . '</a></p>
-				</div>';
+				<h2>' . esc_html__( 'Thank you for installing BoldGrid Backup!', 'boldgrid-backup' ) . '</h2>
+				<p>';
+			echo wp_kses(
+				sprintf(
+					// translators: 1 An opening strong tag, 2 its closing strong tag.
+					__( 'Creating your first backup is easy! Simply go to your %1$sBackup Archives%2$s page and click %1$sBackup Site Now%2$s.', 'boldgrid-backup' ),
+					'<strong>',
+					'</strong>'
+				),
+				array( 'strong' => array() )
+			);
+			echo '</p>
+				<p><a href="' . esc_url( admin_url( 'admin.php?page=boldgrid-backup' ) ) . '" class="button button-primary">' . esc_html__( 'Create your first Backup now!', 'boldgrid-backup' ) . '</a></p>
+			</div>';
 		}
 	}
 
