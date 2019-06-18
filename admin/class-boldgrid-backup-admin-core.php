@@ -149,6 +149,14 @@ class Boldgrid_Backup_Admin_Core {
 	public $tools;
 
 	/**
+	 * An instance of Boldgrid_Backup_Admin_Support.
+	 *
+	 * @since 1.10.1
+	 * @var    Boldgrid_Backup_Admin_Support
+	 */
+	public $support;
+
+	/**
 	 * An instance of Boldgrid_Backup_Admin_Utility.
 	 *
 	 * @since  1.5.3
@@ -598,6 +606,8 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->tools = new Boldgrid_Backup_Admin_Tools( $this );
 
+		$this->support = new Boldgrid_Backup_Admin_Support( $this );
+
 		$this->time = new Boldgrid_Backup_Admin_Time( $this );
 
 		$this->cron_test = new Boldgrid_Backup_Admin_Cron_Test( $this );
@@ -754,14 +764,15 @@ class Boldgrid_Backup_Admin_Core {
 	public function add_menu_items() {
 		global $submenu;
 
-		$lang = array(
+		$lang = [
 			'backup_archive'  => __( 'Backup Archives', 'boldgrid-backup' ),
 			'boldgrid_backup' => __( 'BoldGrid Backup', 'boldgrid-backup' ),
 			'get_premium'     => __( 'Get Premium', 'boldgrid-bacukp' ),
 			'preflight_check' => __( 'Preflight Check', 'boldgrid-backup' ),
 			'settings'        => __( 'Settings', 'boldgrid-backup' ),
 			'tools'           => __( 'Tools', 'boldgrid-backup' ),
-		);
+			'support'         => __( 'Support', 'boldgrid-backup' ),
+		];
 
 		// The main slug all sub menu items are children of.
 		$main_slug = 'boldgrid-backup';
@@ -774,10 +785,10 @@ class Boldgrid_Backup_Admin_Core {
 			$lang['boldgrid_backup'],
 			$capability,
 			$main_slug,
-			array(
+			[
 				$this,
 				'page_archives',
-			),
+			],
 			'none'
 		);
 
@@ -788,10 +799,10 @@ class Boldgrid_Backup_Admin_Core {
 			$lang['backup_archive'],
 			$capability,
 			'boldgrid-backup',
-			array(
+			[
 				$this,
 				'page_archives',
-			)
+			]
 		);
 
 		/*
@@ -805,10 +816,10 @@ class Boldgrid_Backup_Admin_Core {
 			$lang['settings'],
 			$capability,
 			'boldgrid-backup-settings',
-			array(
+			[
 				$this->settings,
 				'page_backup_settings',
-			)
+			]
 		);
 
 		// Add "Preflight Check" page, formally know as "Functionality Test".
@@ -818,35 +829,49 @@ class Boldgrid_Backup_Admin_Core {
 			$lang['preflight_check'],
 			$capability,
 			'boldgrid-backup-test',
-			array(
+			[
 				$this,
 				'page_backup_test',
-			)
+			]
 		);
 
+		// Add "Backup Archive Details" page.
 		add_submenu_page(
 			null,
 			'BoldGrid ' . $lang['backup_archive'],
 			$lang['backup_archive'],
 			$capability,
 			'boldgrid-backup-archive-details',
-			array(
+			[
 				$this->archive_details,
 				'render_archive',
-			)
+			]
 		);
 
-		// Add "Preflight Check" page, formally know as "Functionality Test".
+		// Add "Tools" page.
 		add_submenu_page(
 			$main_slug,
 			$lang['boldgrid_backup'] . ' ' . $lang['tools'],
 			$lang['tools'],
 			$capability,
 			'boldgrid-backup-tools',
-			array(
+			[
 				$this->tools,
 				'page',
-			)
+			]
+		);
+
+		// Add "Support" page.
+		add_submenu_page(
+			$main_slug,
+			$lang['boldgrid_backup'] . ' ' . $lang['support'],
+			$lang['support'],
+			$capability,
+			'boldgrid-backup-support',
+			[
+				$this->support,
+				'page',
+			]
 		);
 
 		/*
