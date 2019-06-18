@@ -98,12 +98,22 @@ foreach ( $this->remote_storage_li as $provider ) {
 	);
 }
 
-// If the user is not on pro, show the remote storage providers available in pro.
+/*
+ * If the user is not on pro, show the remote storage providers available in pro.
+ *
+ * This is done by looping through the "premium_remote" settings in the configs.
+ */
 if ( ! $this->core->config->get_is_premium() ) {
 	foreach ( $this->core->configs['premium_remote'] as $provider ) {
+		// Determine if we should show the title or the logo of the remote storage provider.
+		$provider_title = esc_html( $provider['title'] );
+		if ( ! empty( $provider['logo_class'] ) ) {
+			$provider_title = '<span class="' . esc_attr( $provider['logo_class'] ) . ' ' . esc_attr( $provider['logo_class'] ) . '-smaller" title="' . esc_attr( $provider['title'] ) . '"></span>';
+		}
+
 		$data['postbox'] .= sprintf(
 			$entry_template,
-			/* 1 */ esc_html( $provider['title'] ),
+			/* 1 */ $provider_title,
 			/* 2 */ esc_html__( 'Premium Feature', 'boldgrid-backup' ),
 			/* 3 */ '',
 			/* 4 */ '',

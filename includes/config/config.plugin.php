@@ -49,18 +49,29 @@ return array(
 	 * setup this last login cache and check against it.
 	 */
 	'last_login_lifetime'  => DAY_IN_SECONDS,
+
 	/*
 	 * As array of premium remote storage providers.
 	 *
 	 * This config is not needed for any premium features to work. Instead, it is holding the info
 	 * we need to help inform users about the glory that awaits them after upgrading.
+	 *
+	 * @param array premium_remote {
+	 * 		An array of premium remote storage providers.
+	 *
+	 * 		@type string title      The title of the provider.
+	 * 		@type string logo_class The class used to display the logo, used in the following way:
+	 *                              <span class="bgbkup-gdrive-logo" title="Google Drive"></span>
+	 * }
 	 */
 	'premium_remote'       => [
 		'google_drive' => [
-			'title' => __( 'Google Drive', 'boldgrid-backup' ),
+			'title'      => __( 'Google Drive', 'boldgrid-backup' ),
+			'logo_class' => 'bgbkup-gdrive-logo',
 		],
 		'amazon_s3'    => [
-			'title' => __( 'Amazon S3', 'boldgrid-backup' ),
+			'title'      => __( 'Amazon S3', 'boldgrid-backup' ),
+			'logo_class' => 'amazon-s3-logo',
 		],
 	],
 );

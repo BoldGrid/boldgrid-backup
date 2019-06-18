@@ -256,3 +256,40 @@ input:invalid {
 	height: 100px;
 	margin: 0px;
 }
+
+/*
+ * Remote Storage providers.
+ *
+ * More specifically, logos for remote storage providers.
+ */
+.bgbkup-gdrive-logo {
+	background-image: url('../image/remote/google-drive-logo.png');
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+	width: calc(292px / 2.3);
+	height: calc(50px / 2.3);
+	display: inline-block;
+}
+
+.bgbkup-gdrive-logo-smaller {
+	width: calc(292px / 2.8);
+	height: calc(50px / 2.8);
+}
+
+.amazon-s3-logo {
+	background-image: url('../image/remote/amazon-s3-logo.png');
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+	width: calc(195px / 2.3);
+	height: calc(50px / 2.3);
+	display: inline-block;
+}
+
+.amazon-s3-logo-smaller {
+	width: calc(195px / 2.8);
+	height: calc(50px / 2.8);
+}
+
+p > .bgbkup-remote-logo {
+	vertical-align: bottom;
+}

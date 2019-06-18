@@ -42,7 +42,7 @@ $ad          = $this->config->is_premium_done ? '' : sprintf(
 	'
 	<div class="bg-box-bottom premium wp-clearfix">
 		%1$s
-		%2$s
+		<p style="margin:0;">%2$s</p>
 	</div>',
 	$this->go_pro->get_premium_button( $premium_url ),
 	$this->lang['want_to']

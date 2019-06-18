@@ -41,22 +41,39 @@ $storage_locations = array(
  */
 $storage_locations = apply_filters( 'boldgrid_backup_register_storage_location', $storage_locations );
 
+/*
+ * Create markup containing a list of premium storage providers. These will only be shown to the user
+ * if they are on the free version.
+ */
+$premium_inputs = '';
+if ( ! $this->core->config->is_premium_done ) {
+	foreach ( $this->core->configs['premium_remote'] as $provider ) {
+		$premium_inputs .= '<p><input type="checkbox" disabled="true" /> ';
+
+		if ( ! empty( $provider['logo_class'] ) ) {
+			$premium_inputs .= '<span style="vertical-align:top;" title="' . esc_attr( $provider['title'] ) . '" class="' . esc_attr( $provider['logo_class'] ) . '"></span>';
+		} else {
+			$premium_inputs .= '<strong>' . esc_html( $provider['title'] ) . '</strong>';
+		}
+
+		$premium_inputs .= '</p>';
+	}
+}
+
 $premium_url = $this->core->go_pro->get_premium_url( 'bgbkup-settings-storage' );
 $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 	'
 	<div class="bg-box-bottom premium">
-		<input type="checkbox" disabled="true" /> <strong>%1$s</strong><br />
-		<input type="checkbox" disabled="true" /> <strong>%4$s</strong>
+		%1$s
 
 		<p>
 			%2$s
 			%3$s
 		</p>
 	</div>',
-	/* 1 */ __( 'Google Drive', 'boldgrid-backup' ),
+	/* 1 */ $premium_inputs,
 	/* 2 */ $this->core->go_pro->get_premium_button( $premium_url ),
-	/* 3 */ __( 'Upgrade to premium for more Storage Locations!', 'boldgrid-backup' ),
-	/* 4 */ __( 'Amazon S3', 'boldgrid-backup' )
+	/* 3 */ __( 'Upgrade to premium for more Storage Locations!', 'boldgrid-backup' )
 );
 
 ?>
