@@ -79,7 +79,7 @@ $in_modal = false;
 	// require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/note-pre-backup.php';
 
 	// Bombard the user with an ad before they've even made their first backup. I mean, don't.
-	if ( ! empty( $this->core->archives_all->all ) ) {
+	if ( ! empty( $this->archives_all->all ) ) {
 		echo $ad; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 	}
 	?>
