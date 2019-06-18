@@ -84,7 +84,14 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 == Changelog ==
 
 = 1.10.1 In progress =
+
+Release date: Jun 18th, 2019
+
 * Update:      Updated Travis CI config and dev dependencies.
+* Update:      Added helpful links to the plugin's row on Plugins > Install Plugins.
+* Update:      Updating verbiage in several places to help inform user of Google Drive support.
+* Update:      Show a getting started message to users after they've activated the plugin.
+* Update:      Improved usability on "Backup Archives" page when there are no backups.
 
 = 1.10.0 =
 
