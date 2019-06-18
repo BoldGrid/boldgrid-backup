@@ -121,7 +121,7 @@ hr.separator-small {
 
 /* Needed style for bouncing help icon in mine count. */
 .subsubsub .ui-effects-wrapper {
-	display: inline-block;	
+	display: inline-block;
 }
 
 /* WordPress by default has both the h2 and h3 tags set to the same font size. */
@@ -181,7 +181,7 @@ input:invalid {
 
 /* The actual progress bar that goes from 0% to 100%. */
 #boldgrid-backup-in-progress-bar .ui-progressbar-value {
-    background-color: #0085ba;    
+    background-color: #0085ba;
     -webkit-transition: width 1s ease-out;
     -moz-transition: width 1s ease-out;
     -o-transition: width 1s ease-out;
@@ -255,4 +255,35 @@ input:invalid {
 	width: 100%;
 	height: 100px;
 	margin: 0px;
+}
+
+/**
+ * Support tab.
+ */
+.bgbkup-support-page {
+	display: flex;
+	margin-top: 1em;
+}
+
+.bgbkup-support-page ul {
+	line-height: 1.4;
+	margin: 0;
+}
+
+/* @todo For reusability, these styles handling the bg-box display can be moved to library/src/assets/css/ui.css */
+.bgbkup-support-page .bg-box {
+	margin: 1em;
+	width: 50%;
+}
+
+.bgbkup-premium-support .bgbkup-upgrade-message {
+	text-align: center;
+}
+
+.bgbkup-premium-support .bgbkup-upgrade-message p:first-of-type {
+	margin-top: 0;
+}
+
+.bgbkup-support-page .bg-box-bottom p, .bgbkup-support-page .bg-box-bottom li {
+	font-size: 1.2em;
 }

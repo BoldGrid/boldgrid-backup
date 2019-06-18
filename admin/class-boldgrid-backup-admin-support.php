@@ -28,6 +28,26 @@ class Boldgrid_Backup_Admin_Support {
 	const PHP_MIN_VER = '5.4.0';
 
 	/**
+	 * The core class object.
+	 *
+	 * @since 1.10.1
+	 * @access private
+	 * @var    Boldgrid_Backup_Admin_Core
+	 */
+	private $core;
+
+	/**
+	 * Constructor.
+	 *
+	 * @since 1.10.1
+	 *
+	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
+	 */
+	public function __construct( $core = null ) {
+		$this->core = $core;
+	}
+
+	/**
 	 * Deactivate and show an error.
 	 *
 	 * @since 1.7.0
@@ -133,5 +153,16 @@ class Boldgrid_Backup_Admin_Support {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Render the support page.
+	 *
+	 * @since 1.10.1
+	 */
+	public function page() {
+		wp_enqueue_style( 'bglib-ui-css' );
+
+		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-support.php';
 	}
 }

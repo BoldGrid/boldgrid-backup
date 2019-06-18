@@ -84,6 +84,10 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 == Changelog ==
 
 = 1.10.1 In progress =
+
+Release date: June 18th, 2019.
+
+* New feature: Added a subpage for support.
 * Update:      Updated Travis CI config and dev dependencies.
 
 = 1.10.0 =
