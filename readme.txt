@@ -89,6 +89,7 @@ Release date: June 18th, 2019.
 
 * New feature: Added a subpage for support.
 * Update:      Updated Travis CI config and dev dependencies.
+* Update:      Moved auto-rollback setting to the auto-updates page.
 
 = 1.10.0 =
 
