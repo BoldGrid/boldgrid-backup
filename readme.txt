@@ -85,6 +85,7 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 
 = 1.10.1 In progress =
 * Update:      Updated Travis CI config and dev dependencies.
+* Update:      Moved auto-rollback setting to the auto-updates page.
 
 = 1.10.0 =
 
