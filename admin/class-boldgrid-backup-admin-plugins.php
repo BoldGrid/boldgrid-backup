@@ -3,7 +3,7 @@
  * File: class-boldgrid-backup-admin-plugins.php
  *
  * @link  https://www.boldgrid.com
- * @since xxx
+ * @since 1.10.1
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
@@ -17,13 +17,13 @@
  * This is a generic class designed to help manage how BoldGrid Backup behaves within the scope of
  * "WordPress Dashboard > Plugins > *".
  *
- * @since xxx
+ * @since 1.10.1
  */
 class Boldgrid_Backup_Admin_Plugins {
 	/**
 	 * Filter the links under "BoldGrid Backup" within WP Dashboard > Plugins > Installed Plugins.
 	 *
-	 * @since xxx
+	 * @since 1.10.1
 	 *
 	 * @param string $actions     An array of plugin action links. By default this can include 'activate',
 	 *                            'deactivate', and 'delete'. With Multisite active this can also include

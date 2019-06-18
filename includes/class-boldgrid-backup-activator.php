@@ -26,7 +26,7 @@ class Boldgrid_Backup_Activator {
 	 * The option is meant to be read immediately following plugin activation, since that is when
 	 * this plugin can actually take action.
 	 *
-	 * @since xxx
+	 * @since 1.10.1
 	 * @var string
 	 */
 	public static $option = 'boldgrid_backup_activate';
@@ -38,7 +38,7 @@ class Boldgrid_Backup_Activator {
 	 * this second, as in we're within the "register_activation_hook". It's a little different than
 	 * our static $option value.
 	 *
-	 * @since xxx
+	 * @since 1.10.1
 	 * @var bool
 	 */
 	public static $just_activated = false;
@@ -85,7 +85,7 @@ class Boldgrid_Backup_Activator {
 	 *
 	 * For example, this should return true when on wp-admin/plugins.php and it says "Plugin activated".
 	 *
-	 * @since xxx
+	 * @since 1.10.1
 	 *
 	 * @return bool
 	 */
@@ -96,7 +96,7 @@ class Boldgrid_Backup_Activator {
 	/**
 	 * Display admin notices immediately after activating the plugin.
 	 *
-	 * @since xxx
+	 * @since 1.10.1
 	 */
 	public function post_activate_notice() {
 		if ( $this->on_post_activate() ) {
@@ -123,7 +123,7 @@ class Boldgrid_Backup_Activator {
 	/**
 	 * Shutdown action.
 	 *
-	 * @since xxx
+	 * @since 1.10.1
 	 */
 	public function shutdown() {
 		// Delete the option that signifies we just activated BoldGrid Backup.

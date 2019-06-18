@@ -255,7 +255,7 @@ class Boldgrid_Backup_Admin_Settings {
 	/**
 	 * Get the url to the settings pages.
 	 *
-	 * @since xxx
+	 * @since 1.10.1
 	 *
 	 * @return string
 	 */
