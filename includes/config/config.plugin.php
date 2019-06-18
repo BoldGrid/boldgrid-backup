@@ -51,7 +51,7 @@ return array(
 	'last_login_lifetime'  => DAY_IN_SECONDS,
 
 	/*
-	 * As array of premium remote storage providers.
+	 * An array of premium remote storage providers.
 	 *
 	 * This config is not needed for any premium features to work. Instead, it is holding the info
 	 * we need to help inform users about the glory that awaits them after upgrading.
