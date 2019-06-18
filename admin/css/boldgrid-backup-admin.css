@@ -257,6 +257,9 @@ input:invalid {
 	margin: 0px;
 }
 
+/**
+ * Support tab.
+ */
 .bgbkup-support-page {
 	display: flex;
 	margin-top: 1em;
