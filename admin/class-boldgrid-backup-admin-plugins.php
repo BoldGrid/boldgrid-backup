@@ -43,7 +43,7 @@ class Boldgrid_Backup_Admin_Plugins {
 		];
 
 		if ( ! $core->config->get_is_premium() ) {
-			$row_actions[] = '<a href="' . esc_url( $core->go_pro->get_premium_url( 'plugin-actions' ) ) . '" target="_blank">' . esc_html__( 'Get Premium', 'boldgrid-backup' ) . '</a>';
+			$row_actions[] = '<a href="' . esc_url( $core->go_pro->get_premium_url( 'bgbkup-plugin-actions' ) ) . '" target="_blank">' . esc_html__( 'Get Premium', 'boldgrid-backup' ) . '</a>';
 		}
 
 		$actions = array_merge( $row_actions, $actions );
