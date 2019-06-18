@@ -270,6 +270,7 @@ input:invalid {
 	margin: 0;
 }
 
+/* @todo For reusability, these styles handling the bg-box display can be moved to library/src/assets/css/ui.css */
 .bgbkup-support-page .bg-box {
 	margin: 1em;
 	width: 50%;
