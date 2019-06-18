@@ -75,9 +75,13 @@ $in_modal = false;
 
 	echo $modal; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
-	require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/note-pre-backup.php';
+	// @todo Revisit the usefulness of this notice in this location. Commented out @since 1.10.1
+	// require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/note-pre-backup.php';
 
-	echo $ad; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+	// Bombard the user with an ad before they've even made their first backup. I mean, don't.
+	if ( ! empty( $this->core->archives_all->all ) ) {
+		echo $ad; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+	}
 	?>
 
 </div>
