@@ -17,12 +17,10 @@
 defined( 'WPINC' ) || die;
 
 $allowed_tags = [
-	'a'  => [
+	'a' => [
 		'href'   => [],
 		'target' => [],
 	],
-	'ul' => [],
-	'li' => [],
 ];
 
 $nav      = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
@@ -30,68 +28,63 @@ $reseller = get_option( 'boldgrid_reseller' );
 
 if ( ! empty( $reseller ) ) {
 	// Is under a reseller.
-	$premium_markup = sprintf(
+	$premium_markup = '<ul><li>' . sprintf(
 		wp_kses(
-			/* translators: 1: HTML tags, 2: Anchored URL address for reseller support, 3: Reseller title/name, 4: HTML anchor close tag, 5: HTML line item close tag. */
+			/* translators: 1: Anchored URL address for reseller support, 2: Reseller title/name, 3: HTML anchor close tag. */
 			__(
-				'%1$sYou can receive premium support from your official reseller %2$s%3$s%4$s%5$s',
+				'You can receive premium support from your official reseller %1$s%2$s%3$s',
 				'boldgrid-backup'
 			),
 			$allowed_tags
 		),
-		'<ul><li>',
 		'<a href="' . esc_url( $reseller['reseller_support_url'] ) . '" target="_blank">',
 		$reseller['reseller_title'],
-		'</a>',
-		'</li>'
-	);
+		'</a>'
+	) . '</li>';
 
 	if ( ! empty( $reseller['reseller_phone'] ) ) {
-		$premium_markup .= sprintf(
+		$premium_markup .= '<li>' . sprintf(
 			wp_kses(
-				/* translators: 1: HTML line item open tag, 2: Reseller telephone number, 3: HTML line item close tag. */
+				/* translators: 1: Reseller telephone number */
 				__(
-					'%1$sTelephone: %2$s%3$s',
+					'Telephone: %1$s',
 					'boldgrid-backup'
 				),
 				$allowed_tags
 			),
-			'<li>',
-			$reseller['reseller_phone'],
-			'</li>'
-		);
+			$reseller['reseller_phone']
+		) . '</li>';
 	}
 
 	if ( ! empty( $reseller['reseller_email'] ) ) {
-		$premium_markup .= sprintf(
+		$premium_markup .= '<li>' . sprintf(
 			wp_kses(
 				/* translators: Reseller email address. */
 				__(
-					'%1$sEmail: %2$s%3$s',
+					'Email: %1$s',
 					'boldgrid-backup'
 				),
 				$allowed_tags
 			),
-			'<li>',
-			'<a href="mailto:' . esc_attr( $reseller['reseller_email'] ) . '">' . esc_attr( $reseller['reseller_email'] ) . '</a>',
-			'</li>'
-		);
+			'<a href="mailto:' . esc_attr( $reseller['reseller_email'] ) . '">' . esc_attr( $reseller['reseller_email'] ) . '</a>'
+		) . '</li>';
 	}
 
 	$premium_markup .= '</ul>';
 } elseif ( $this->core->config->is_premium_done ) {
 	// Is BoldGrid Premium.
-	$premium_markup = sprintf(
+	$premium_markup = '<ul><li>' . sprintf(
 		wp_kses(
-			/* translators: 1: URL address for BoldGrid Central. */
+			/* translators: 1: HTML anchor for the URL address for BoldGrid Central, 2: HTML anchor close tag.. */
 			__(
-				'<ul><li>You can receive premium support using <a href="%1$s" target="_blank">BoldGrid Central</a></li>',
+				'You can receive premium support using %1$sBoldGrid Central%2$s',
 				'boldgrid-backup'
 			),
 			$allowed_tags
 		),
-		'https://www.boldgrid.com/central/'
-	);
+		'<a href="https://www.boldgrid.com/central/" target="_blank">',
+		'</a>'
+	) . '</li>';
 } else {
 	$premium_button = $this->core->go_pro->get_premium_button(
 		$this->core->go_pro->get_premium_url( 'bgbkup-support' )
