@@ -9,7 +9,7 @@
   "@boldgrid/wordpress-tag-sync": "^1.3.0",
   "PHP_CodeSniffer": "https://github.com/squizlabs/PHP_CodeSniffer/",
   "WordPress-Coding-Standards": "https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards.git#cf6b310caad735816caef7573295f8a534374706",
-  "eslint": "^4.19.1",
+  "eslint": "^6.0.0",
   "eslint-config-wordpress": "^2.0.0",
   "eslint-plugin-html": "^4.0.2",
   "gulp": "^3.9.1",
