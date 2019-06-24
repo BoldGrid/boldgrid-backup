@@ -83,6 +83,9 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 
 == Changelog ==
 
+= 1.11.0 In progress =
+* New feature: Added A BoldGrid RSS feed to the dashboard.
+
 = 1.10.1 =
 
 Release date: Jun 18th, 2019

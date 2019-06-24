@@ -13,7 +13,7 @@
  */
 
 /**
- * Class: Boldgrid_Backup_Admin_Core
+ * Class: Boldgrid_Backup_Admin_Cli
  *
  * @since 1.8.0
  */
