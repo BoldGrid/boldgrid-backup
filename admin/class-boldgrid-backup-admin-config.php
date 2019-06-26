@@ -234,6 +234,8 @@ class Boldgrid_Backup_Admin_Config {
 	/**
 	 * Get is_premium.
 	 *
+	 * The is_premium class property is set within the constructor.
+	 *
 	 * @since 1.3.1
 	 *
 	 * @return bool
