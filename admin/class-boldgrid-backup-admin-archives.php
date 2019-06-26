@@ -247,12 +247,44 @@ class Boldgrid_Backup_Admin_Archives {
 			</table>
 		';
 
+		/*
+		 * Create message for users who have no backups.
+		 *
+		 * If a user has no backups, instead of saying, "Hey, you have no backups", we should inform
+		 * the user (1) how they can create their first backup and (2) how they can schedule backups.
+		 */
 		if ( empty( $this->core->archives_all->all ) ) {
-			$table = sprintf(
-				'
-				<p>%1$s</p>',
-				__( 'You currently do not have any backups.', 'boldgrid-backup' )
+			$table  = '
+			<div class="notice notice-warning inline" style="margin:15px 0">
+				<p>
+					<strong>
+					' . esc_html( 'It looks like you don\'t have any backups! That\'s ok, let\'s fix that now. Here\'s what we recommend you do:', 'boldgrid-backup' ) . '
+					</strong>
+				</p>
+				<ol>
+					<li>';
+			$table .= wp_kses(
+				sprintf(
+					// translators: 1 an opening strong tag, 2 its closing strong tag.
+					__( 'Create a backup of your site right now by clicking the %1$sBackup Site Now%2$s button at the top of the page.', 'boldgrid-backup' ),
+					'<strong>',
+					'</strong>'
+				),
+				array( 'strong' => array() )
 			);
+			$table .= '</li><li>';
+			$table .= wp_kses(
+				sprintf(
+					// translators: 1 the opening anchor tag linking to the settings page, 2 its closing anchor tag.
+					__( 'After the backup is created, go to your %1$ssettings%2$s page and setup backups so they\'re create automatically on a set schedule.', 'boldgrid-backup' ),
+					'<a href="' . $this->core->settings->get_settings_url() . '">',
+					'</a>'
+				),
+				array( 'a' => array( 'href' => array() ) )
+			);
+			$table .= '</li>
+				</ol>
+			</div>';
 		}
 
 		return $table;
