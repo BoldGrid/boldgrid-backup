@@ -10,6 +10,9 @@ notifications:
 php:
   - 5.6
 
+matrix:
+  - NODE=8.12.0 TEST="nvm install-latest-npm"
+
 env:
   - WP_VERSION=latest WP_MULTISITE=0
 
