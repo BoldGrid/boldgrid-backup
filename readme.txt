@@ -83,6 +83,12 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 
 == Changelog ==
 
+= 1.10.2 =
+
+Release date: July 1st, 2019
+
+* Bug fix:     Fixed format of the Site Check cron entry.
+
 = 1.10.1 =
 
 Release date: Jun 18th, 2019

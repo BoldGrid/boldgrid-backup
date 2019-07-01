@@ -402,12 +402,15 @@ class Boldgrid_Backup_Admin_Cron {
 			return false;
 		}
 
-		$args = [
-			'auto_recovery' => ! empty( $settings['site_check']['auto_recovery'] ) ? 1 : 0,
-			'email'         => $settings['notification_email'],
-			'log'           => ! empty( $settings['site_check']['logger'] ) ? 1 : 0,
-			'notify'        => ! empty( $settings['notifications']['site_check'] ) ? 1 : 0,
-		];
+		$args = implode(
+			' ',
+			[
+				'auto_recovery=' . ( ! empty( $settings['site_check']['auto_recovery'] ) ? 1 : 0 ),
+				'email=' . $settings['notification_email'],
+				'log=' . ( ! empty( $settings['site_check']['logger'] ) ? 1 : 0 ),
+				'notify=' . ( ! empty( $settings['notifications']['site_check'] ) ? 1 : 0 ),
+			]
+		);
 
 		$entry = sprintf(
 			'*/%1$u * * * * %2$s "%3$s/%4$s" check %5$s >/dev/null 2>&1',
@@ -415,7 +418,7 @@ class Boldgrid_Backup_Admin_Cron {
 			$this->cron_command,
 			dirname( dirname( __FILE__ ) ),
 			$this->site_check,
-			http_build_query( $args, '', ' ' )
+			$args
 		);
 
 		return $this->update_cron( $entry );
