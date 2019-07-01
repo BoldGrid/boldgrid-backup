@@ -4,7 +4,7 @@ Tags: backup, cloud backup, database backup, restore, wordpress backup
 Requires at least: 4.4
 Tested up to: 5.2
 Requires PHP: 5.4
-Stable tag: 1.10.1
+Stable tag: 1.10.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -85,6 +85,12 @@ We also suggest joining our [Team Orange User Group community](https://www.faceb
 
 = 1.11.0 In progress =
 * New feature: Added A BoldGrid RSS feed to the dashboard.
+
+= 1.10.2 =
+
+Release date: July 1st, 2019
+
+* Bug fix:     Fixed format of the Site Check cron entry.
 
 = 1.10.1 =
 
