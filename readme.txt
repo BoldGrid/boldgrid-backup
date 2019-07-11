@@ -12,38 +12,87 @@ BoldGrid Backup provides WordPress backup and restoration with update protection
 
 == Description ==
 
-The BoldGrid Backup Plugin will backup your entire WordPress site with just a couple of clicks right in your WordPress dashboard. Just select a time and day for backups to run automatically, or manually create a backup at any time with a single click.
+> "... and just like that, my entire website was just gone and I had no way to get anything back."
+
+Website crashes happen more than you think and even if you’re doing everything "right," like keeping your WordPress and plugins updated, there’s so many things outside of your control that could totally wipe out your website without any warning.
+
+When it comes to keeping your website safe, you’ll need more than just a "backup plugin." You need a solution that helps prevent catastrophic data loss in the first place, and if the worst occurs, provides you with the tools to easily, quickly and painlessly get your site up and running again.
+
+BoldGrid Backup is a full 360 solution that keeps your data safe and protects your website from catastrophic data loss. Features include:
+
+* Automated and manual backups
+* Full file and database backup or customize settings based on your needs
+* Remote backups via FTP / SFTP, Amazon S3 and Google Drive (Premium)
+* BoldGrid Backup checks to ensure that your webserver has the necessary features to properly create backup archives, which protects the integrity of your backups
+* Clone, duplicate and/or migrate your site with just a few clicks
+* Site Check monitors your site for issues that could lead to site crashes, provides a toolset to restore your site even if your WordPress installation is inaccessible
+* Auto rollback feature creates a backup before updates, restores your site to the last backup if an update fails
+* Create staging sites to test new plugins or themes with BoldGrid Backup + Cloud WordPress
+
+> "I’m Intrigued! Tell Me More About Your Features…"
+
+**Supports Both Automated and Manual Backups**
+Simply select a date and time for automatic backups and BoldGrid Backup will create a backup archive of your entire WordPress installation and its database. If a full website or database backup isn’t required, you can choose to backup only certain files, folders and database tables.
+
+**Remote Backups**
+Safely store backups remotely via FTP / SFTP. The premium version of BoldGrid Backup allows you to automatically upload archives to Amazon S3 or Google Drive.
+
+**Easy Site Restoration and Website Migration**
+Download, restore, or delete backups with a single click from the BoldGrid Backup Dashboard.
+
+*Restore Your Website Even If WordPress Is Down*
+Use our restoration script to restore a backup from outside of WordPress in the event WordPress itself has been corrupted.
+
+*Restore Entire Archive or Single Files*
+Need to restore only one file from a backup? BoldGrid Backup Premium gives you the option to restore a single file within the backup browser.
+
+*Historical Versions*
+Do you have a file that needs to be restored, but not sure which backup it's in? The Historical Versions feature allows you to view a list of all of your backups containing that file and provides an easy way to restore the file.
+
+**Easily Clone or Migrate Your Websites**
+BoldGrid Backup allows you to easily clone a website and migrate it to another WordPress installation with just a few clicks. Install BoldGrid Backup on both WordPress sites, create a backup archive on the first site, then restore that backup on your second site using a protected link - simply copy and paste the link! It’s the easiest and fastest way to duplicate / clone your website.
+
+**Site Check**
+Site Check monitors your site at specified intervals for errors that could lead to catastrophic data loss. If Site Check detects an error, it will send you an email alert and auto restore your website using your latest backup.
+
+*Built-in Diagnostic Tools*
+Site Check keeps a running historical error log, allowing you to easily diagnose and troubleshoot website issues.
+
+*Powerful Website Restoration Functionality*
+You can configure Site Check’s settings from the BoldGrid Backup settings page, or via command line. If your site is totally non-functional, you can use the command line to easily restore your website from the last full backup archive.
+
+**Auto Rollback**
+You can set BoldGrid Backup to automatically backup your site before updates, and automatically rollback your site to the last backup if an update fails. Automatic updates can be set for WordPress core, plugins, and themes individually.
+
+**Create Staging Sites with BoldGrid Backup + Cloud WordPress**
+Cloud WordPress allows you to create a fully functional free WordPress demo (with or without BoldGrid) in just a few clicks. Use BoldGrid Backup to clone and migrate your website to a Cloud WordPress installation, where you can test themes, plugins and other website changes without fear of breaking your live site.
 
 Try out the [BoldGrid Backup Plugin](https://www.boldgrid.com/central/get-it-now?plugins=boldgrid-backup&redirect_url=wp-admin%2Fadmin.php%3Fpage%3Dboldgrid-backup) on Cloud WordPress to see for yourself!
 
-== Features ==
-
-The following features are available, of which you can find additional info for in the screenshots section below:
-* Schedule backups.
-* Create backups automatically before WordPress updates.
-* Store backups offsite.
-* Customize which files and folders are backed up.
-* Customize which tables are backed up.
-* WordPress core automatic update control.
-* Auto Rollback after WordPress, plugin, and theme updates.
-* Progress bar showing how far along your backup is.
-* Receive emails when backups are created and restored.
-* View a list of all of your backups, both on your Web Server and FTP/SFTP server.
-* One click to upload a backup to remote storage.
-* Add titles and descriptions to your backups.
-* Easily view the files in a backup using the Backup Browser.
-* View the tables and the number of records per table contained in a backup.
-* View all the details of a backup, including whether it is a scheduled backup or a backup triggered by a user.
-* Configure retention settings (only keep X number of backups).
-* Protect important backups by excluding them from retention settings.
-* Download and Upload backups using protected links, which makes transferring a website from one host to another an much easier process.
-
 == Frequently Asked Questions ==
 
-= Where can I find more help? =
+= How does BoldGrid Backup differ from other backup plugins? =
 
-If you have any questions on getting started with BoldGrid Backup, please visit our [Getting Started Guide](https://www.boldgrid.com/support/boldgrid-backup/).
-We also suggest joining our [Team Orange User Group community](https://www.facebook.com/groups/BGTeamOrange) for free support, tips and tricks.
+BoldGrid Backup is more than just a "backup plugin." It’s a full 360 solution with tools and features that helps prevent website crashes from happening in the first place. In addition to all the features you’ve come to expect from a plugin with website backup functionality, BoldGrid Backup also offers:
+
+* Site Check monitors your site for issues that could lead to site crashes, provides a toolset to restore your site even if your WordPress installation is inaccessible
+* Auto rollback feature creates a backup before updates, restores your site to the last backup if an update fails
+* Create staging sites to test new plugins or themes with BoldGrid Backup + Cloud WordPress
+
+= What do I get with BoldGrid Backup Premium? =
+
+BoldGrid Backup Premium gives you extra tools to prevent website crashes, as well as additional troubleshooting and diagnostic tools.
+
+* Additional remote backup options (Amazon S3, Google Drive)
+* Single file restoration
+* Historical versions
+* Search for recently modified files
+* Save a copy of a file before updating
+* Comprehensive update history
+
+= Where can I find support for BoldGrid Backup? =
+
+Have a problem? First, take a look at our [Getting Started](https://www.boldgrid.com/support/boldgrid-backup/) guide. If that doesn’t answer your question, you can receive support for BoldGrid Backup at the [support forum](https://wordpress.org/support/plugin/boldgrid-backup/), the [Team Orange User Group](https://www.facebook.com/groups/BGTeamOrange/), our [comprehensive support library](https://www.boldgrid.com/support/), or our [official questions portal](https://www.boldgrid.com/feedback/communities/20-questions).
 
 == Screenshots ==
 
