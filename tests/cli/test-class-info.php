@@ -10,14 +10,16 @@
  * @copyright  BoldGrid
  * @version    $Id$
  * @author     BoldGrid <support@boldgrid.com>
+ *
+ * phpcs:disable WordPress.VIP
  */
 
 /**
- * Class: Test_Boldgrid_Backup_Cron_Info
+ * Class: Test_Boldgrid_Backup_Cli_Info
  *
  * @since 1.9.0
  */
-class Test_Boldgrid_Backup_Cron_Info extends WP_UnitTestCase {
+class Test_Boldgrid_Backup_Cli_Info extends WP_UnitTestCase {
 
 	/**
 	 * Memory limit, dummy data.
@@ -42,10 +44,8 @@ class Test_Boldgrid_Backup_Cron_Info extends WP_UnitTestCase {
 	 */
 	public function setUp() {
 		$this->original_argv = $_SERVER['argv'];
-
 		$this->change_server_argv();
-
-		$this->info = new \Boldgrid\Backup\Cron\Info();
+		$this->info = new \Boldgrid\Backup\Cli\Info();
 	}
 
 	/**
@@ -83,7 +83,7 @@ class Test_Boldgrid_Backup_Cron_Info extends WP_UnitTestCase {
 	 * @since 1.9.0
 	 */
 	public function test_choose_method() {
-		//@todo More testing needed here.
+		// @todo More testing needed here.
 		$method = $this->info->choose_method();
 
 		$this->assertEquals( 'ziparchive', $method );

@@ -21,33 +21,38 @@ defined( 'WPINC' ) || die;
 $active = 'nav-tab-active';
 
 // phpcs:disable WordPress.CSRF.NonceVerification.NoNonceVerification
-$navs = array(
-	array(
+$navs = [
+	[
 		'title' => __( 'Dashboard', 'boldgrid-backup' ),
 		'href'  => 'admin.php?page=boldgrid-backup-dashboard',
 		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup-dashboard' === $_GET['page'] ? $active : '',
-	),
-	array(
+	],
+	[
 		'title' => __( 'Backups', 'boldgrid-backup' ),
 		'href'  => 'admin.php?page=boldgrid-backup',
 		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup' === $_GET['page'] ? $active : '',
-	),
-	array(
+	],
+	[
 		'title' => __( 'Settings', 'boldgrid-backup' ),
 		'href'  => 'admin.php?page=boldgrid-backup-settings',
 		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup-settings' === $_GET['page'] ? $active : '',
-	),
-	array(
+	],
+	[
 		'title' => __( 'Preflight Check', 'boldgrid-backup' ),
 		'href'  => 'admin.php?page=boldgrid-backup-test',
 		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup-test' === $_GET['page'] ? $active : '',
-	),
-	array(
+	],
+	[
 		'title' => __( 'Tools', 'boldgrid-backup' ),
 		'href'  => 'admin.php?page=boldgrid-backup-tools',
 		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup-tools' === $_GET['page'] ? $active : '',
-	),
-);
+	],
+	[
+		'title' => __( 'Support', 'boldgrid-backup' ),
+		'href'  => 'admin.php?page=boldgrid-backup-support',
+		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup-support' === $_GET['page'] ? $active : '',
+	],
+];
 // phpcs:enable WordPress.CSRF.NonceVerification.NoNonceVerification
 
 /**

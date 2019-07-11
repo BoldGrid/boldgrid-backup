@@ -2,20 +2,20 @@
 /**
  * File: class-info.php
  *
- * Get information needed for cron processes.
+ * Get information needed for CLI processes.
  *
  * @link       https://www.boldgrid.com
  * @since      1.9.0
  *
  * @package    Boldgrid\Backup
- * @subpackage Boldgrid\Backup\Cron
+ * @subpackage Boldgrid\Backup\Cli
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
  *
  * phpcs:disable WordPress.VIP,WordPress.WP.AlternativeFunctions,WordPress.XSS.EscapeOutput
  */
 
-namespace Boldgrid\Backup\Cron;
+namespace Boldgrid\Backup\Cli;
 
 /**
  * Class: Info.
@@ -43,7 +43,7 @@ class Info {
 	 *
 	 * @var string
 	 */
-	private static $results_file_path = __DIR__ . '/restore-info.json';
+	private static $results_file_path;
 
 	/**
 	 * Get the results file path.
@@ -54,6 +54,10 @@ class Info {
 	 * @return string
 	 */
 	public static function get_results_filepath() {
+		if ( null === self::$results_file_path ) {
+			self::$results_file_path = dirname( __DIR__ ) . '/cron/restore-info.json';
+		}
+
 		return self::$results_file_path;
 	}
 
@@ -63,23 +67,33 @@ class Info {
 	 * @since 1.9.0
 	 * @static
 	 *
+	 * @see self::get_results_filepath()
 	 * @see self::is_cli()
 	 * @see self::get_mode()
+	 * @see self::get_notify_flag()
+	 * @see self::get_email_arg()
 	 * @see self::get_zip_arg()
 	 * @see self::have_execution_functions()
 	 * @see self::get_restore_info()
 	 * @see self::choose_method()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 *
 	 * @return array
 	 */
 	public static function get_info() {
 		if ( empty( self::$info['checked'] ) ) {
+			self::get_results_filepath();
 			self::is_cli();
 			self::get_mode();
+			self::get_log_flag();
+			self::get_log_level();
+			self::get_notify_flag();
+			self::get_email_arg();
 			self::get_zip_arg();
 			self::have_execution_functions();
 			self::get_restore_info();
 			self::choose_method(); // Requires data from self::get_restore_info().
+			Log::write( 'Gathered information.', LOG_DEBUG );
 		}
 
 		return self::$info;
@@ -102,7 +116,7 @@ class Info {
 	}
 
 	/**
-	 * Print errors (to STDERR / FD2).
+	 * Print errors (to STDERR / FD2) and log (if enabled).
 	 *
 	 * @since 1.9.0
 	 * @static
@@ -122,14 +136,16 @@ class Info {
 	 * @static
 	 *
 	 * @see \Boldgrid_Backup_Cron_Helper::is_cli()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 *
 	 * @return bool
 	 */
 	public static function is_cli() {
-		require_once __DIR__ . '/class-boldgrid-backup-cron-helper.php';
+		require_once dirname( __DIR__ ) . '/cron/class-boldgrid-backup-cron-helper.php';
 
 		if ( ! \Boldgrid_Backup_Cron_Helper::is_cli() ) {
 			self::$info['errors']['cli'] = 'Error: This process must run from the CLI.';
+			Log::write( self::$info['errors']['cli'], LOG_ERR );
 			return false;
 		} else {
 			return true;
@@ -148,6 +164,7 @@ class Info {
 	 * @static
 	 *
 	 * @see self::has_arg_flag()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 *
 	 * @return string|false
 	 */
@@ -168,7 +185,7 @@ class Info {
 					break;
 			}
 
-			$usage = 'Usage: php bgbkup-cli.php <check|restore> [method=ajax|cli|pclzip|ziparchive] [zip=<path/to/backup.zip>]';
+			$usage = 'Usage: php bgbkup-cli.php <check|restore> [log] [notify] [email=<email_address>] [method=<ajax|cli|pclzip|ziparchive>] [zip=<path/to/backup.zip>] [log_level=<(LOG_EMERG|LOG_ALERT|LOG_CRIT|LOG_ERR|LOG_WARNING|LOG_NOTICE|LOG_INFO|LOG_DEBUG)|(0-7)>]';
 
 			if ( 'help' === self::$info['operation'] ) {
 				self::$info['errors']['help'] = $usage;
@@ -176,6 +193,8 @@ class Info {
 				self::$info['errors']['mode'] =
 					'Error: An operational mode (check/restore) is required.';
 				self::$info['errors']['help'] = $usage;
+			} else {
+				Log::write( 'Operational mode set to "' . self::$info['operation'] . '".', LOG_INFO );
 			}
 		}
 
@@ -189,6 +208,7 @@ class Info {
 	 * @static
 	 *
 	 * @see \Boldgrid_Backup_Admin_Cli::get_execution_functions()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 *
 	 * @return bool
 	 */
@@ -199,6 +219,7 @@ class Info {
 
 		if ( empty( $exec_functions ) ) {
 			self::$info['errors']['no_exec'] = 'Error: No available PHP executable functions.';
+			Log::write( self::$info['errors']['no_exec'], LOG_ERR );
 			return false;
 		} else {
 			return true;
@@ -256,9 +277,110 @@ class Info {
 	 */
 	public static function get_arg_value( $name ) {
 		$args  = self::get_cli_args();
-		$value = isset( $args[ $name ] ) ? $args[ $name ] : null;
+		$value = isset( $args[ $name ] ) ? urldecode( $args[ $name ] ) : null;
 
 		return $value;
+	}
+
+	/**
+	 * Get the log flag spcified in CLI arguments.
+	 *
+	 * This method triggers reading the CLI arguments and appends to the self:$info array.
+	 *
+	 * @since 1.10.0
+	 * @static
+	 *
+	 * @see self::has_arg_flag()
+	 *
+	 * @return bool
+	 */
+	public static function get_log_flag() {
+		if ( ! isset( self::$info['log'] ) ) {
+			self::$info['log'] = self::has_arg_flag( 'log' );
+		}
+
+		return self::$info['log'];
+	}
+
+	/**
+	 * Get the log level argument spcified in CLI arguments.
+	 *
+	 * This method triggers reading the CLI arguments and appends to the self:$info array.
+	 *
+	 * @since 1.10.0
+	 * @static
+	 *
+	 * @see self::get_arg_value()
+	 *
+	 * @return int
+	 */
+	public static function get_log_level() {
+		$allowed = [
+			'LOG_EMERG', // 0.
+			'LOG_ALERT', // 1.
+			'LOG_CRIT', // 2.
+			'LOG_ERR', // 3.
+			'LOG_WARNING', // 4.
+			'LOG_NOTICE', // 5 -- Our default.
+			'LOG_INFO', // 6.
+			'LOG_DEBUG', // 7.
+		];
+
+		if ( ! isset( self::$info['log_level'] ) ) {
+			self::$info['log_level'] = self::get_arg_value( 'log_level' );
+
+			// Validate the log level.
+			if ( in_array( self::$info['log_level'], $allowed, true ) ) {
+				// Convert string to the constant integer value.
+				self::$info['log_level'] = constant( self::$info['log_level'] );
+			} elseif ( ! is_numeric( self::$info['log_level'] ) ||
+				self::$info['log_level'] < LOG_EMERG || self::$info['log_level'] > LOG_DEBUG ) {
+					// Invalid or no input value; set to the default.
+					self::$info['log_level'] = LOG_NOTICE;
+			}
+		}
+
+		return (int) self::$info['log_level'];
+	}
+
+	/**
+	 * Get the notification flag spcified in CLI arguments.
+	 *
+	 * This method triggers reading the CLI arguments and appends to the self:$info array.
+	 *
+	 * @since 1.10.0
+	 * @static
+	 *
+	 * @see self::has_arg_flag()
+	 *
+	 * @return bool
+	 */
+	public static function get_notify_flag() {
+		if ( ! isset( self::$info['notify'] ) ) {
+			self::$info['notify'] = self::has_arg_flag( 'notify' );
+		}
+
+		return self::$info['notify'];
+	}
+
+	/**
+	 * Get the notification email address spcified in CLI arguments.
+	 *
+	 * This method triggers reading the CLI arguments and appends to the self:$info array.
+	 *
+	 * @since 1.10.0
+	 * @static
+	 *
+	 * @see self::get_arg_value()
+	 *
+	 * @return string|false
+	 */
+	public static function get_email_arg() {
+		if ( ! isset( self::$info['email'] ) ) {
+			self::$info['email'] = self::get_arg_value( 'email' );
+		}
+
+		return self::$info['email'];
 	}
 
 	/**
@@ -307,6 +429,7 @@ class Info {
 	 * @see self::get_arg_value()
 	 * @see Site_Check::is_siteurl_reachable()
 	 * @see \Boldgrid_Backup_Admin_Cli::call_command()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 *
 	 * @return string|false
 	 */
@@ -369,6 +492,8 @@ class Info {
 			}
 		}
 
+		Log::write( 'Chosen restoration method: "' . self::$info['method'] . '".', LOG_INFO );
+
 		return self::$info['method'];
 	}
 
@@ -384,12 +509,12 @@ class Info {
 	 */
 	public static function get_env_info() {
 		if ( empty( self::$info['env'] ) ) {
-			require_once __DIR__ . '/class-boldgrid-backup-url-helper.php';
+			require_once dirname( __DIR__ ) . '/cron/class-boldgrid-backup-url-helper.php';
 			$url_helper = new \Boldgrid_Backup_Url_Helper();
 
 			self::$info['env'] = json_decode(
 				$url_helper->call_url(
-					self::$info['siteurl'] . '/wp-content/plugins/boldgrid-backup/cron/env-info.php'
+					self::$info['siteurl'] . '/wp-content/plugins/boldgrid-backup/cli/env-info.php'
 				),
 				true
 			);
@@ -420,12 +545,16 @@ class Info {
 	 * @since 1.9.0
 	 * @static
 	 *
+	 * @see \Boldgrid\Backup\Cli\Log::write()
+	 *
 	 * @param  string $extract_dir Extraction directory.
 	 * @param  string $file        File to be extracted.
 	 * @return bool
 	 */
 	public static function extract_file( $extract_dir, $file ) {
 		$success = false;
+
+		Log::write( 'Extracting "' . $file . '" into "' . $extract_dir . '".', LOG_DEBUG );
 
 		switch ( true ) {
 			case class_exists( 'ZipArchive' ):
@@ -434,21 +563,26 @@ class Info {
 					$success = $zip->extractTo( $extract_dir, $file );
 					$zip->close();
 				} else {
-					self::$info['errors'][] = 'Error: Could not open the specified ZIP file path "' .
+					$message                = 'Error: Could not open the specified ZIP file path "' .
 						self::$info['filepath'] . '".';
+					self::$info['errors'][] = $message;
+					Log::write( $message, LOG_ERR );
 				}
 				break;
 			// @todo: Add PCLZip and unzip (CLI).
 			default:
-				self::$info['errors'][] = 'Error: Could not extract files; ZipArchive unavailable.';
+				$message                = 'Error: Could not extract files; ZipArchive unavailable.';
+				self::$info['errors'][] = $message;
+				Log::write( $message, LOG_ERR );
 		}
 
 		if ( ! $success || ! file_exists( $extract_dir . '/' . $file ) ) {
-			self::$info['errors'][] = 'Error: The file "' . $file .
+			$success                = false;
+			$message                = 'Error: The file "' . $file .
 				'" does not exist in the specified ZIP file path "' . self::$info['filepath'] .
 				'".';
-
-			$success = false;
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
 		}
 
 		return $success;
@@ -461,6 +595,7 @@ class Info {
 	 * @since 1.9.0
 	 * @static
 	 *
+	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 * @see self::extract_file()
 	 * @see self::read_json_file()
 	 *
@@ -470,6 +605,7 @@ class Info {
 		if ( ! preg_match( '/\.zip$/', self::$info['filepath'] ) ) {
 			self::$info['errors']['zip_path_invalid'] =
 				'Error: Invalid ZIP file path specified; must end with ".zip".';
+			Log::write( self::$info['errors']['zip_path_invalid'], LOG_ERR );
 			return [];
 		}
 
@@ -518,6 +654,7 @@ class Info {
 	 * @access private
 	 * @static
 	 *
+	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 * @see self::get_zip_info()
 	 * @see self::get_latest_info()
 	 * @see self::read_json_file()
@@ -533,7 +670,9 @@ class Info {
 
 		// Check for PHP safe mode.
 		if ( ini_get( 'safe_mode' ) ) {
-			self::$info['errors'][] = 'Error: Cannot continue in PHP safe mode.';
+			$message                = 'Error: Cannot continue in PHP safe mode.';
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
 			return false;
 		}
 
@@ -552,26 +691,36 @@ class Info {
 		}
 
 		if ( empty( self::$info['ABSPATH'] ) ) {
-			self::$info['errors'][] = 'Error: Unknown ABSPATH.';
+			$message                = 'Error: Unknown ABSPATH.';
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
 			return false;
 		}
 
 		if ( ! is_dir( self::$info['ABSPATH'] ) ) {
-			self::$info['errors'][] = 'Error: ABSPATH directory "' . self::$info['ABSPATH'] .
+			$message                = 'Error: ABSPATH directory "' . self::$info['ABSPATH'] .
 				'" does not exist or is not a directory.';
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
 		}
 
 		if ( ! is_writable( self::$info['ABSPATH'] ) ) {
-			self::$info['errors'][] = 'Error: ABSPATH directory "' . self::$info['ABSPATH'] .
+			$message                = 'Error: ABSPATH directory "' . self::$info['ABSPATH'] .
 				'" is not writable.';
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
 		}
 
 		if ( empty( self::$info['siteurl'] ) ) {
-			self::$info['errors'][] = 'Error: Unknown siteurl.';
+			$message                = 'Error: Unknown siteurl.';
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
 		}
 
 		if ( empty( self::$info['db_filename'] ) ) {
-			self::$info['errors'][] = 'Error: Unknown database dump filename.';
+			$message                = 'Error: Unknown database dump filename.';
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
 		} else {
 			self::$info['db_filepath'] = self::$info['ABSPATH'] . self::$info['db_filename'];
 		}
@@ -611,6 +760,7 @@ class Info {
 		// Attempt to read information from the last backup's result file.
 		$results                   = self::read_json_file( self::$results_file_path );
 		self::$info['cron_secret'] = isset( $results['cron_secret'] ) ? $results['cron_secret'] : null;
+		self::$info['site_title']  = isset( $results['site_title'] ) ? $results['site_title'] : null;
 
 		// Retrieve information from the log file in the ZIP archive.
 		$log_info = self::read_zip_log();
@@ -655,6 +805,7 @@ class Info {
 	 * @static
 	 *
 	 * @see self::has_arg_flag()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 * @see self::read_json_file()
 	 * @see self::read_zip_log()
 	 *
@@ -668,8 +819,10 @@ class Info {
 
 		// We require the results info file from the last full backup.
 		if ( ! file_exists( self::$results_file_path ) ) {
-			self::$info['errors'][] = 'Error: Missing backup results file ("' .
+			$message                = 'Error: Missing backup results file ("' .
 				self::$results_file_path . '").';
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
 			return false;
 		}
 
@@ -677,19 +830,25 @@ class Info {
 
 		// Validate results file content.
 		if ( empty( $results ) ) {
-			self::$info['errors'][] = 'Error: No backup results found.';
+			$message                = 'Error: No backup results found.';
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
 			return false;
 		}
 
 		if ( empty( $results['filepath'] ) ) {
-			self::$info['errors'][] = 'Error: Unknown backup archive file path.';
+			$message                = 'Error: Unknown backup archive file path.';
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
 			return false;
 		}
 
 		// Check if archive exists.
 		if ( ! file_exists( $results['filepath'] ) ) {
-			self::$info['errors'][] = 'Error: Backup archive file "' .
+			$message                = 'Error: Backup archive file "' .
 				$results['filepath'] . '" does not exist.';
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
 			return false;
 		}
 
@@ -697,8 +856,10 @@ class Info {
 		$archive_log_filepath = preg_replace( '/\.zip$/', '.log', $results['filepath'] );
 
 		if ( ! file_exists( $archive_log_filepath ) ) {
-			self::$info['errors'][] = 'Error: Backup archive log file "' . $archive_log_filepath .
+			$message                = 'Error: Backup archive log file "' . $archive_log_filepath .
 				'" does not exist.';
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
 			return false;
 		}
 
@@ -706,8 +867,10 @@ class Info {
 
 		// Validate results file content.
 		if ( empty( $log_info ) ) {
-			self::$info['errors'][] = 'Error: No backup information found in the log file "' .
+			$message                = 'Error: No backup information found in the log file "' .
 				$archive_log_filepath . '".';
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
 			return false;
 		}
 
@@ -715,7 +878,14 @@ class Info {
 		self::$info = array_merge( self::$info, $log_info, $results );
 
 		if ( empty( self::$info['cron_secret'] ) ) {
-			self::$info['errors'][] = 'Error: Unknown cron_secret.';
+			$message                = 'Error: Unknown cron_secret.';
+			self::$info['errors'][] = $message;
+			Log::write( $message, LOG_ERR );
+		}
+
+		// Ensure that there is a site title.
+		if ( empty( self::$info['site_title'] ) ) {
+			self::$info['site_title'] = 'WordPress';
 		}
 
 		return true;

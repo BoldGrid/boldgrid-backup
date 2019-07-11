@@ -9,14 +9,14 @@
  * @since      1.9.0
  *
  * @package    Boldgrid\Backup
- * @subpackage Boldgrid\Backup\Cron
+ * @subpackage Boldgrid\Backup\Cli
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
  *
  * phpcs:disable WordPress.VIP,WordPress.XSS.EscapeOutput,WordPress.WP.AlternativeFunctions
  */
 
-namespace Boldgrid\Backup\Cron;
+namespace Boldgrid\Backup\Cli;
 
 /**
  * Class: Site_Restore.
@@ -29,14 +29,25 @@ class Site_Restore {
 	 *
 	 * @since 1.9.0
 	 *
-	 * @see \Boldgrid\Backup\Cron\Info::get_info()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
+	 * @see \Boldgrid\Backup\Cli\Info::get_info()
 	 * @see self::restore()
 	 */
 	public function run() {
-		echo 'Starting restoration process...' . PHP_EOL;
-		echo 'Attempting to restore "' . Info::get_info()['siteurl'] .
-			'" from backup archive file "' . Info::get_info()['filepath'] . '"...' . PHP_EOL;
-		echo ( $this->restore() ? 'Success.' : 'Error: Could not perform restoration.' ) . PHP_EOL;
+		$message = 'Starting restoration process...';
+		Log::write( $message, LOG_INFO );
+		echo $message . PHP_EOL;
+
+		$message = 'Attempting to restore "' . Info::get_info()['siteurl'] .
+			'" from backup archive file "' . Info::get_info()['filepath'] . '"...';
+		echo $message . PHP_EOL;
+		Log::write( $message, LOG_INFO );
+
+		$success = $this->restore();
+
+		$message = ( $success ? 'Success.' : 'Error: Could not perform restoration.' );
+		Log::write( $message, ( $success ? LOG_INFO : LOG_ERR ) );
+		echo $message . PHP_EOL;
 	}
 
 	/**
@@ -46,10 +57,12 @@ class Site_Restore {
 	 * @access private
 	 *
 	 * @see ZipArchive()
-	 * @see \Boldgrid\Backup\Cron\Info::get_info()
+	 * @see \Boldgrid\Backup\Cli\Info::get_info()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 */
 	private function set_writable_permissions() {
 		if ( class_exists( 'ZipArchive' ) ) {
+			Log::write( 'Setting file permissions.', LOG_DEBUG );
 			$zip = new \ZipArchive();
 
 			if ( $zip->open( Info::get_info()['filepath'] ) ) {
@@ -86,7 +99,7 @@ class Site_Restore {
 	 * @since  1.9.0
 	 * @access private
 	 *
-	 * @see \Boldgrid\Backup\Cron\Info::get_info()
+	 * @see \Boldgrid\Backup\Cli\Info::get_info()
 	 *
 	 * @return bool
 	 */
@@ -112,13 +125,14 @@ class Site_Restore {
 	 * @since  1.9.0
 	 * @access private
 	 *
-	 * @see \Boldgrid\Backup\Cron\Info::get_info()
-	 * @see \Boldgrid\Backup\Cron\Info::choose_method()
+	 * @see \Boldgrid\Backup\Cli\Info::get_info()
+	 * @see \Boldgrid\Backup\Cli\Info::choose_method()
 	 * @see \Boldgrid_Backup_Admin_Cli::call_command()
 	 * @see self::set_time_limit()
 	 * @see self::restore_files()
 	 * @see self::restore_database()
 	 * @see self::increment_restore_attempts()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 *
 	 * @return bool;
 	 */
@@ -128,11 +142,15 @@ class Site_Restore {
 
 		if ( 'ajax' === Info::choose_method() ) {
 			// Call the normal restore command.
-			echo 'Using Ajax URL address restoration process...' . PHP_EOL;
+			$message = 'Using Ajax URL address restoration process...';
+			echo $message . PHP_EOL;
+			Log::write( $message, LOG_INFO );
 			\Boldgrid_Backup_Admin_Cli::call_command( $restore_cmd, $success, $return_var );
 		} else {
 			// Start the standalone restoration process.
-			echo 'Using standalone restoration process...' . PHP_EOL;
+			$message = 'Using standalone restoration process...';
+			echo $message . PHP_EOL;
+			Log::write( $message, LOG_INFO );
 			ignore_user_abort( true );
 			$this->set_time_limit();
 			$success = $this->restore_files() && $this->restore_database();
@@ -149,11 +167,12 @@ class Site_Restore {
 	 * @since  1.9.0
 	 * @access private
 	 *
-	 * @see \Boldgrid\Backup\Cron\Info::get_info()
+	 * @see \Boldgrid\Backup\Cli\Info::get_info()
 	 * @see \Boldgrid_Backup_Admin_Cli::call_command()
 	 * @see \ZipArchive::open()
 	 * @see \ZipArchive::extractTo()
 	 * @see \PclZip::extract()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 *
 	 * @return bool
 	 */
@@ -164,7 +183,9 @@ class Site_Restore {
 
 		switch ( true ) {
 			case ( ! $method || 'ziparchive' === $method ) && class_exists( 'ZipArchive' ):
-				echo 'Attempting file restoration using PHP ZipArchive...' . PHP_EOL;
+				$message = 'Attempting file restoration using PHP ZipArchive...';
+				echo $message . PHP_EOL;
+				Log::write( $message, LOG_INFO );
 				$archive = new \ZipArchive();
 				if ( true === $archive->open( $info['filepath'] ) ) {
 					$success = $archive->extractTo( $info['ABSPATH'] );
@@ -173,7 +194,9 @@ class Site_Restore {
 				break;
 
 			case ( ! $method || 'pclzip' === $method ) && file_exists( $info['ABSPATH'] . 'wp-admin/includes/class-pclzip.php' ):
-				echo 'Attempting file restoration using PHP PCLZip...' . PHP_EOL;
+				$message = 'Attempting file restoration using PHP PCLZip...';
+				echo $message . PHP_EOL;
+				Log::write( $message, LOG_INFO );
 				require $info['ABSPATH'] . 'wp-admin/includes/class-pclzip.php';
 				$archive = new \PclZip( $info['filepath'] );
 				$result  = $archive->extract(
@@ -188,7 +211,9 @@ class Site_Restore {
 				break;
 
 			case ( ! $method || 'cli' === $method ) && ( \Boldgrid_Backup_Admin_Cli::call_command( 'unzip', $success, $return_var ) || $success || 0 === $return_var ):
-				echo 'Attempting file restoration using unzip (CLI)...' . PHP_EOL;
+				$message = 'Attempting file restoration using unzip (CLI)...';
+				echo $message . PHP_EOL;
+				Log::write( $message, LOG_INFO );
 				$cmd = 'cd ' . $info['ABSPATH'] . ';unzip -oqq ' . $info['filepath'];
 				\Boldgrid_Backup_Admin_Cli::call_command(
 					$cmd,
@@ -209,12 +234,15 @@ class Site_Restore {
 				break;
 
 			default:
-				echo 'Error: Could not extract files; ZipArchive, PCLZip, and unzip (CLI) unavailable.' .
-					PHP_EOL;
+				$message = 'Error: Could not extract files; ZipArchive, PCLZip, and unzip (CLI) unavailable.';
+				echo $message . PHP_EOL;
+				Log::write( $message, LOG_ERR );
 				break;
 		}
 
-		echo ( $success ? 'Success.' : 'Failed.' ) . PHP_EOL;
+		$message = ( $success ? 'Success.' : 'Failed.' );
+		Log::write( $message, ( $success ? LOG_INFO : LOG_ERR ) );
+		echo $message . PHP_EOL;
 
 		return $success;
 	}
@@ -225,10 +253,11 @@ class Site_Restore {
 	 * @since  1.9.0
 	 * @access private
 	 *
-	 * @see \Boldgrid\Backup\Cron\Info::get_info()
+	 * @see \Boldgrid\Backup\Cli\Info::get_info()
 	 * @see self::get_db_config()
 	 * @see \Boldgrid_Backup_Admin_Db_Import::import()
 	 * @see \Boldgrid_Backup_Admin_Cli::call_command()
+	 * @see \Boldgrid\Backup\Cli\Log::write()
 	 *
 	 * @return bool;
 	 */
@@ -236,8 +265,9 @@ class Site_Restore {
 		$info = Info::get_info();
 
 		if ( ! file_exists( $info['db_filepath'] ) ) {
-			echo 'Error: Database dump file "' . $info['db_filepath'] . '" does not exist.' .
-				PHP_EOL;
+			$message = 'Error: Database dump file "' . $info['db_filepath'] . '" does not exist.';
+			echo $message . PHP_EOL;
+			Log::write( $message, LOG_ERR );
 			$success = false;
 		} else {
 			$success = $this->get_db_config();
@@ -245,35 +275,46 @@ class Site_Restore {
 
 		switch ( true ) {
 			case ! $success:
-				echo 'Error: Could not get database credentials from "' .
-					$info['ABSPATH'] . 'wp-config.php".' . PHP_EOL;
+				$message = 'Error: Could not get database credentials from "' . $info['ABSPATH'] .
+					'wp-config.php".';
+				echo $message . PHP_EOL;
+				Log::write( $message, LOG_ERR );
 				break;
 
 			case class_exists( 'PDO' ):
-				echo 'Attempting to restore database using PHP PDO...' . PHP_EOL;
+				$message = 'Attempting to restore database using PHP PDO...';
+				echo $message . PHP_EOL;
+				Log::write( $message, LOG_INFO );
 				require dirname( __DIR__ ) . '/admin/class-boldgrid-backup-admin-db-import.php';
 				$importer = new \Boldgrid_Backup_Admin_Db_Import();
 				$success  = $importer->import( $info['ABSPATH'] . $info['db_filename'] );
 
 				if ( ! $success ) {
-					echo 'Error: Could not import database (using PDO).' . PHP_EOL;
+					$message = 'Error: Could not import database (using PDO).';
+					echo $message . PHP_EOL;
+					Log::write( $message, LOG_ERR );
 				}
 				break;
 
 			case \Boldgrid_Backup_Admin_Cli::call_command( 'mysql -V', $success, $return_var ) || $success || 0 === $return_var:
-				echo 'Attempting to restore database using mysql client (CLI)...' . PHP_EOL;
+				$message = 'Attempting to restore database using mysql client (CLI)...';
+				echo $message . PHP_EOL;
+				Log::write( $message, LOG_INFO );
 				$cmd = 'mysql -h ' . DB_HOST . ' -p' . DB_PASSWORD . ' -u ' . DB_USER . ' ' .
 					DB_NAME . ' < "' . $info['db_filepath'] . '"';
 				\Boldgrid_Backup_Admin_Cli::call_command( $cmd, $success, $return_var );
 
 				if ( ! $success ) {
-					echo 'Error: Could not import database (using mysql client).' . PHP_EOL;
+					$message = 'Error: Could not import database (using mysql client).';
+					echo $message . PHP_EOL;
+					Log::write( $message, LOG_ERR );
 				}
 				break;
 
 			default:
-				echo 'Error: Could not import database; PDO and mysql client (CLI) unavailable.' .
-					PHP_EOL;
+				$message = 'Error: Could not import database; PDO and mysql client (CLI) unavailable.';
+				echo $message . PHP_EOL;
+				Log::write( $message, LOG_ERR );
 				$success = false;
 				break;
 		}
@@ -287,8 +328,8 @@ class Site_Restore {
 	 * @since  1.9.0
 	 * @access private
 	 *
-	 * @see \Boldgrid\Backup\Cron\Info::get_results_filepath()
-	 * @see \Boldgrid\Backup\Cron\Info::set_info_item()
+	 * @see \Boldgrid\Backup\Cli\Info::get_results_filepath()
+	 * @see \Boldgrid\Backup\Cli\Info::set_info_item()
 	 */
 	private function increment_restore_attempts() {
 		$results = json_decode( file_get_contents( Info::get_results_filepath() ), true );

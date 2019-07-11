@@ -30,12 +30,20 @@ class Boldgrid_Backup_Admin_Cron {
 	private $core;
 
 	/**
-	 * Path to run-jobs.php
+	 * Path to run-jobs.php.
 	 *
 	 * @since 1.5.2
 	 * @var   string
 	 */
 	public $run_jobs = 'cron/run-jobs.php';
+
+	/**
+	 * Path to the bgbkup-cli script.
+	 *
+	 * @since 1.10.0
+	 * @var   string
+	 */
+	public $site_check = 'cli/bgbkup-cli.php';
 
 	/**
 	 * Cron command.
@@ -103,7 +111,7 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @param  array $settings BoldGrid Backup settings.
 	 * @return bool  Success.
 	 */
-	public function add_cron_entry( $settings = array() ) {
+	public function add_cron_entry( array $settings = [] ) {
 		if ( empty( $settings ) ) {
 			$settings = $this->core->settings->get_settings();
 		}
@@ -185,17 +193,21 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @param  array $settings BoldGrid Backup settings.
 	 * @return bool
 	 */
-	public function add_all_crons( $settings ) {
+	public function add_all_crons( array $settings ) {
 		$success = false;
 
 		$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
 		$schedule  = ! empty( $settings['schedule'] ) ? $settings['schedule'] : null;
 
-		if ( 'cron' === $scheduler && $this->core->scheduler->is_available( $scheduler ) && ! empty( $schedule ) ) {
+		if ( 'cron' === $scheduler && $this->core->scheduler->is_available( $scheduler ) ) {
 			$this->core->scheduler->clear_all_schedules();
 
-			$scheduled      = $this->add_cron_entry( $settings );
+			if ( ! empty( $schedule ) ) {
+				$scheduled = $this->add_cron_entry( $settings );
+			}
+
 			$jobs_scheduled = $this->schedule_jobs();
+			$site_check     = $this->schedule_site_check( $settings );
 
 			$success = $scheduled && $jobs_scheduled;
 
@@ -349,6 +361,8 @@ class Boldgrid_Backup_Admin_Cron {
 	 *
 	 * @see BoldGrid_Backup_Admin_Core::get_backup_identifier()
 	 * @see BoldGrid_Backup_Admin_Cron::get_cron_secret()
+	 *
+	 * @return bool Success.
 	 */
 	public function schedule_jobs() {
 		$entry = sprintf(
@@ -359,6 +373,52 @@ class Boldgrid_Backup_Admin_Cron {
 			$this->core->get_backup_identifier(),
 			$this->get_cron_secret(),
 			$this->cron_command
+		);
+
+		return $this->update_cron( $entry );
+	}
+
+	/**
+	 * Schedule Site Check.
+	 *
+	 * This method is usually ran after saving the BoldGrid Backup settings. If
+	 * (after save) cron is our scheduler, then we need to make sure we have
+	 * the "run_jobs" wp-cron scheduled.
+	 *
+	 * @since 1.10.0
+	 *
+	 * @see BoldGrid_Backup_Admin_Core::get_backup_identifier()
+	 * @see BoldGrid_Backup_Admin_Cron::get_cron_secret()
+	 *
+	 * @param  array $settings Settings.
+	 * @return bool
+	 */
+	public function schedule_site_check( array $settings = [] ) {
+		if ( empty( $settings ) ) {
+			$settings = $this->core->settings->get_settings();
+		}
+
+		if ( ! $settings['site_check']['enabled'] ) {
+			return false;
+		}
+
+		$args = implode(
+			' ',
+			[
+				'auto_recovery=' . ( ! empty( $settings['site_check']['auto_recovery'] ) ? 1 : 0 ),
+				'email=' . $settings['notification_email'],
+				'log=' . ( ! empty( $settings['site_check']['logger'] ) ? 1 : 0 ),
+				'notify=' . ( ! empty( $settings['notifications']['site_check'] ) ? 1 : 0 ),
+			]
+		);
+
+		$entry = sprintf(
+			'*/%1$u * * * * %2$s "%3$s/%4$s" check %5$s >/dev/null 2>&1',
+			$settings['site_check']['interval'],
+			$this->cron_command,
+			dirname( dirname( __FILE__ ) ),
+			$this->site_check,
+			$args
 		);
 
 		return $this->update_cron( $entry );

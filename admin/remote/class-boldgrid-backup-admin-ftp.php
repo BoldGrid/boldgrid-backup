@@ -21,6 +21,151 @@
  */
 class Boldgrid_Backup_Admin_Ftp {
 	/**
+	 * Default folder name.
+	 *
+	 * Set using Boldgrid_Backup_Admin_Ftp->set_default_folder_name(), within the constructor.
+	 *
+	 * @since 1.9.1
+	 * @var string
+	 */
+	public $default_folder_name;
+
+	/**
+	 * Default port numbers.
+	 *
+	 * @since 1.6.0
+	 * @var    array
+	 */
+	public $default_port = [
+		'ftp'   => 21,
+		'ftpes' => 21,
+		'sftp'  => 22,
+	];
+
+	/**
+	 * Default type.
+	 *
+	 * @since 1.6.0
+	 * @var    string
+	 */
+	public $default_type = 'sftp';
+
+	/**
+	 * Errors.
+	 *
+	 * @since 1.6.0
+	 * @var    array
+	 */
+	public $errors = [];
+
+	/**
+	 * The folder on the remote FTP server where backups are stored.
+	 *
+	 * Handled by Boldgrid_Backup_Admin_Ftp->get_folder_name().
+	 *
+	 * @since 1.9.1
+	 * @var string
+	 */
+	public $folder_name;
+
+	/**
+	 * Hooks class.
+	 *
+	 * @since 1.6.0
+	 * @var    Boldgrid_Backup_Admin_Ftp_Hooks
+	 */
+	public $hooks;
+
+	/**
+	 * Whether or not we have logged in.
+	 *
+	 * @since 1.6.0
+	 * @var    bool
+	 */
+	public $logged_in = false;
+
+	/**
+	 * Nickname.
+	 *
+	 * So the user can refer to their ftp account as something other than ftp.
+	 *
+	 * @since  1.6.0
+	 * @var    string
+	 */
+	public $nickname;
+
+	/**
+	 * Our key / label for ftp.
+	 *
+	 * @since 1.6.0
+	 * @var    string
+	 */
+	public $key = 'ftp';
+
+	/**
+	 * Retention count.
+	 *
+	 * @since 1.6.0
+	 * @var    int $retention_count
+	 */
+	public $retention_count = 5;
+
+	/**
+	 * Settings class.
+	 *
+	 * @since 1.7.2
+	 * @var Boldgrid_Backup_Admin_Remote_Settings
+	 */
+	public $settings;
+
+	/**
+	 * Default timeout.
+	 *
+	 * @since 1.6.0
+	 * @var    int
+	 */
+	public $timeout = 10;
+
+	/**
+	 * Our title / label for ftp.
+	 *
+	 * @since 1.6.0
+	 * @var    string
+	 */
+	public $title = 'FTP / SFTP';
+
+	/**
+	 * Title attribute.
+	 *
+	 * If you are using a nickname, hovering over the nickname should show this
+	 * more clear title.
+	 *
+	 * @since  1.6.0
+	 * @var    string
+	 */
+	public $title_attr;
+
+	/**
+	 * Our FTP type, ftp or sftp.
+	 *
+	 * @since 1.6.0
+	 * @var    string
+	 */
+	public $type = null;
+
+	/**
+	 * Valid types.
+	 *
+	 * @since 1.6.0
+	 * @var    array
+	 */
+	public $valid_types = [
+		'ftp',
+		'ftpes',
+		'sftp',
+	];
+
+	/**
 	 * An FTP connection.
 	 *
 	 * @since 1.6.0
@@ -39,65 +184,6 @@ class Boldgrid_Backup_Admin_Ftp {
 	private $core;
 
 	/**
-	 * Default folder name.
-	 *
-	 * Set using Boldgrid_Backup_Admin_Ftp->set_default_folder_name(), within the constructor.
-	 *
-	 * @since 1.9.1
-	 * @var string
-	 */
-	public $default_folder_name;
-
-	/**
-	 * Default port numbers.
-	 *
-	 * @since 1.6.0
-	 * @access public
-	 * @var    array
-	 */
-	public $default_port = array(
-		'ftp'  => 21,
-		'sftp' => 22,
-	);
-
-	/**
-	 * Default type.
-	 *
-	 * @since 1.6.0
-	 * @access public
-	 * @var    string
-	 */
-	public $default_type = 'sftp';
-
-	/**
-	 * Errors.
-	 *
-	 * @since 1.6.0
-	 * @access public
-	 * @var    array
-	 */
-	public $errors = array();
-
-	/**
-	 * The folder on the remote FTP server where backups are stored.
-	 *
-	 * Handled by Boldgrid_Backup_Admin_Ftp->get_folder_name().
-	 *
-	 * @since 1.9.1
-	 * @var string
-	 */
-	public $folder_name;
-
-	/**
-	 * Hooks class.
-	 *
-	 * @since 1.6.0
-	 * @access public
-	 * @var    Boldgrid_Backup_Admin_Ftp_Hooks
-	 */
-	public $hooks;
-
-	/**
 	 * FTP host.
 	 *
 	 * @since 1.6.0
@@ -105,35 +191,6 @@ class Boldgrid_Backup_Admin_Ftp {
 	 * @var    string
 	 */
 	private $host = null;
-
-	/**
-	 * Whether or not we have logged in.
-	 *
-	 * @since 1.6.0
-	 * @access public
-	 * @var    bool
-	 */
-	public $logged_in = false;
-
-	/**
-	 * Nickname.
-	 *
-	 * So the user can refer to their ftp account as something other than ftp.
-	 *
-	 * @since  1.6.0
-	 * @access public
-	 * @var    string
-	 */
-	public $nickname;
-
-	/**
-	 * Our key / label for ftp.
-	 *
-	 * @since 1.6.0
-	 * @access public
-	 * @var    string
-	 */
-	public $key = 'ftp';
 
 	/**
 	 * FTP password.
@@ -145,63 +202,6 @@ class Boldgrid_Backup_Admin_Ftp {
 	private $pass = null;
 
 	/**
-	 * Retention count.
-	 *
-	 * @since 1.6.0
-	 * @access public
-	 * @var    int $retention_count
-	 */
-	public $retention_count = 5;
-
-	/**
-	 * Settings class.
-	 *
-	 * @since 1.7.2
-	 * @access public
-	 * @var Boldgrid_Backup_Admin_Remote_Settings
-	 */
-	public $settings;
-
-	/**
-	 * Default timeout.
-	 *
-	 * @since 1.6.0
-	 * @access public
-	 * @var    int
-	 */
-	public $timeout = 10;
-
-	/**
-	 * Our title / label for ftp.
-	 *
-	 * @since 1.6.0
-	 * @access public
-	 * @var    string
-	 */
-	public $title = 'FTP / SFTP';
-
-	/**
-	 * Title attribute.
-	 *
-	 * If you are using a nickname, hovering over the nickname should show this
-	 * more clear title.
-	 *
-	 * @since  1.6.0
-	 * @access public
-	 * @var    string
-	 */
-	public $title_attr;
-
-	/**
-	 * Our FTP type, ftp or sftp.
-	 *
-	 * @since 1.6.0
-	 * @access public
-	 * @var    string
-	 */
-	public $type = null;
-
-	/**
 	 * FTP username.
 	 *
 	 * @since 1.6.0
@@ -211,13 +211,13 @@ class Boldgrid_Backup_Admin_Ftp {
 	private $user = null;
 
 	/**
-	 * Valid types.
+	 * Whether or not we have logged in.
 	 *
-	 * @since 1.6.0
-	 * @access public
-	 * @var    array
+	 * @since 1.9.3
+	 * @access private
+	 * @var    bool
 	 */
-	public $valid_types = array( 'ftp', 'sftp' );
+	private $reconnected = false;
 
 	/**
 	 * Constructor.
@@ -257,8 +257,13 @@ class Boldgrid_Backup_Admin_Ftp {
 			case 'ftp':
 				$this->connection = ftp_connect( $this->host, $this->port, $this->timeout );
 				break;
+			case 'ftpes':
+				$this->connection = ftp_ssl_connect( $this->host, $this->port, $this->timeout );
+				break;
 			case 'sftp':
 				$this->connection = new phpseclib\Net\SFTP( $this->host, $this->port );
+				break;
+			default:
 				break;
 		}
 	}
@@ -287,10 +292,13 @@ class Boldgrid_Backup_Admin_Ftp {
 
 		switch ( $this->type ) {
 			case 'ftp':
+			case 'ftpes':
 				$created = ftp_mkdir( $this->connection, $this->get_folder_name() );
 				break;
 			case 'sftp':
 				$created = $this->connection->mkdir( $this->get_folder_name() );
+				break;
+			default:
 				break;
 		}
 
@@ -314,7 +322,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	 * @since 1.6.0
 	 */
 	public function disconnect() {
-		if ( 'ftp' === $this->type && is_resource( $this->connection ) ) {
+		if ( ( 'ftp' === $this->type || 'ftpes' === $this->type ) && is_resource( $this->connection ) ) {
 			ftp_close( $this->connection );
 			$this->connection = null;
 			$this->logged_in  = false;
@@ -340,10 +348,13 @@ class Boldgrid_Backup_Admin_Ftp {
 
 		switch ( $this->type ) {
 			case 'ftp':
+			case 'ftpes':
 				$success = ftp_get( $this->connection, $local_filepath, $server_filepath, FTP_BINARY );
 				break;
 			case 'sftp':
 				$success = $this->connection->get( $server_filepath, $local_filepath );
+				break;
+			default:
 				break;
 		}
 
@@ -385,10 +396,13 @@ class Boldgrid_Backup_Admin_Ftp {
 
 			switch ( $this->type ) {
 				case 'ftp':
+				case 'ftpes':
 					ftp_delete( $this->connection, $path );
 					break;
 				case 'sftp':
 					$this->connection->delete( $path, false );
+					break;
+				default:
 					break;
 			}
 
@@ -437,6 +451,8 @@ class Boldgrid_Backup_Admin_Ftp {
 			case 2:
 				$this->folder_name = $has_folder_set ? $settings['remote'][ $this->key ]['folder_name'] : $this->default_folder_name;
 				break;
+			default:
+				break;
 		}
 
 		return $this->folder_name;
@@ -454,47 +470,47 @@ class Boldgrid_Backup_Admin_Ftp {
 	public function get_from_post() {
 		$settings = $this->core->settings->get_settings();
 
-		$values = array(
-			array(
+		$values = [
+			[
 				'key'      => 'host',
 				'default'  => null,
 				'callback' => 'sanitize_file_name',
-			),
-			array(
+			],
+			[
 				'key'      => 'user',
 				'default'  => null,
 				'callback' => 'sanitize_text_field',
-			),
-			array(
+			],
+			[
 				'key'     => 'pass',
 				'default' => null,
-			),
-			array(
+			],
+			[
 				'key'      => 'folder_name',
 				'default'  => $this->get_folder_name(),
 				'callback' => 'sanitize_file_name',
-			),
-			array(
+			],
+			[
 				'key'      => 'type',
 				'default'  => $this->default_type,
 				'callback' => 'sanitize_key',
-			),
-			array(
+			],
+			[
 				'key'      => 'port',
 				'default'  => $this->default_port[ $this->default_type ],
 				'callback' => 'intval',
-			),
-			array(
+			],
+			[
 				'key'      => 'retention_count',
 				'default'  => $this->retention_count,
 				'callback' => 'intval',
-			),
-			array(
+			],
+			[
 				'key'      => 'nickname',
 				'default'  => '',
 				'callback' => 'stripslashes',
-			),
-		);
+			],
+		];
 
 		// phpcs:disable WordPress.CSRF.NonceVerification.NoNonceVerification, WordPress.Security.NonceVerification.NoNonceVerification
 
@@ -543,8 +559,11 @@ class Boldgrid_Backup_Admin_Ftp {
 	 * }
 	 */
 	public function format_raw_contents( $contents ) {
-		$skips   = array( '.', '..' );
-		$backups = array();
+		$skips   = [
+			'.',
+			'..',
+		];
+		$backups = [];
 
 		if ( ! is_array( $contents ) ) {
 			return $backups;
@@ -558,11 +577,11 @@ class Boldgrid_Backup_Admin_Ftp {
 					continue;
 				}
 
-				$backups[] = array(
+				$backups[] = [
 					'time'     => $item['mtime'],
 					'filename' => $filename,
 					'size'     => $item['size'],
-				);
+				];
 			} else {
 				// Before exploding by space, replace multiple spaces with one space.
 				$item = preg_replace( '!\s+!', ' ', $item );
@@ -600,11 +619,11 @@ class Boldgrid_Backup_Admin_Ftp {
 					$size = $exploded_item[ $count - 5 ];
 				}
 
-				$backups[] = array(
+				$backups[] = [
 					'time'     => $time,
 					'filename' => $filename,
 					'size'     => $size,
-				);
+				];
 			}
 		}
 
@@ -636,11 +655,12 @@ class Boldgrid_Backup_Admin_Ftp {
 		$this->log_in();
 		if ( ! $this->logged_in ) {
 			$this->errors[] = __( 'Unable to log in to FTP server.', 'boldgrid-backup' );
-			return array();
+			return [];
 		}
 
 		switch ( $this->type ) {
 			case 'ftp':
+			case 'ftpes':
 				if ( $raw ) {
 					$contents = ftp_rawlist( $this->connection, $dir );
 				} else {
@@ -653,6 +673,8 @@ class Boldgrid_Backup_Admin_Ftp {
 				} else {
 					$contents = $this->connection->nlist( $dir );
 				}
+				break;
+			default:
 				break;
 		}
 
@@ -667,7 +689,8 @@ class Boldgrid_Backup_Admin_Ftp {
 			}
 			return $item;
 		};
-		if ( 'ftp' === $this->type && is_array( $contents ) ) {
+
+		if ( ( 'ftp' === $this->type || 'ftpes' === $this->type ) && is_array( $contents ) ) {
 			$contents = array_map( $fix_windows, $contents );
 		}
 
@@ -687,13 +710,13 @@ class Boldgrid_Backup_Admin_Ftp {
 
 		$settings = $this->core->settings->get_settings();
 
-		return array(
+		return [
 			'title'     => $this->title,
 			'key'       => $this->key,
 			'configure' => 'admin.php?page=boldgrid-backup-ftp',
 			'is_setup'  => $is_setup,
 			'enabled'   => ! empty( $settings['remote'][ $this->key ]['enabled'] ) && $settings['remote'][ $this->key ]['enabled'] && $is_setup,
-		);
+		];
 	}
 
 	/**
@@ -708,38 +731,46 @@ class Boldgrid_Backup_Admin_Ftp {
 
 		$settings = $this->core->settings->get_settings();
 
-		$labels = array( 'user', 'pass', 'host', 'port', 'type', 'retention_count', 'nickname' );
+		$labels = [
+			'user',
+			'pass',
+			'host',
+			'port',
+			'type',
+			'retention_count',
+			'nickname',
+		];
 
-		$configs = array(
-			array(
+		$configs = [
+			[
 				'property' => 'user',
 				'default'  => null,
-			),
-			array(
+			],
+			[
 				'property' => 'pass',
 				'default'  => null,
-			),
-			array(
+			],
+			[
 				'property' => 'host',
 				'default'  => null,
-			),
-			array(
+			],
+			[
 				'property' => 'port',
 				'default'  => $this->default_port,
-			),
-			array(
+			],
+			[
 				'property' => 'type',
 				'default'  => $this->default_type,
-			),
-			array(
+			],
+			[
 				'property' => 'retention_count',
 				'default'  => $this->retention_count,
-			),
-			array(
+			],
+			[
 				'property' => 'nickname',
 				'default'  => $this->title,
-			),
-		);
+			],
+		];
 
 		foreach ( $configs as $config ) {
 			$property = $config['property'];
@@ -817,8 +848,13 @@ class Boldgrid_Backup_Admin_Ftp {
 			case 'ftp':
 				$connection = @ftp_connect( $host, $port, $this->timeout ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
 				break;
+			case 'ftpes':
+				$connection = @ftp_ssl_connect( $host, $port, $this->timeout ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
+				break;
 			case 'sftp':
 				$connection = @new phpseclib\Net\SFTP( $host, $port, $this->timeout ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
+				break;
+			default:
 				break;
 		}
 		if ( ! $connection ) {
@@ -849,16 +885,24 @@ class Boldgrid_Backup_Admin_Ftp {
 		 */
 		$error_caught = false;
 
-		set_error_handler( array( 'Boldgrid_Backup_Admin_Utility', 'handle_error' ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler
+		set_error_handler( // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler
+			[
+				'Boldgrid_Backup_Admin_Utility',
+				'handle_error',
+			]
+		);
 
 		try {
 			switch ( $type ) {
 				case 'ftp':
+				case 'ftpes':
 					$logged_in = ftp_login( $connection, $user, $pass );
 					ftp_close( $connection );
 					break;
 				case 'sftp':
 					$logged_in = $connection->login( $user, $pass );
+					break;
+				default:
 					break;
 			}
 		} catch ( Exception $e ) {
@@ -894,14 +938,17 @@ class Boldgrid_Backup_Admin_Ftp {
 
 		switch ( $this->type ) {
 			case 'ftp':
+			case 'ftpes':
 				$this->logged_in = @ftp_login( $this->connection, $this->user, $this->pass ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
 				break;
 			case 'sftp':
 				$this->logged_in = $this->connection->login( $this->user, $this->pass );
 				break;
+			default:
+				break;
 		}
 
-		if ( $this->logged_in ) {
+		if ( $this->logged_in && ! $this->reconnected ) {
 			$this->maybe_passive();
 
 			$this->settings->set_last_login();
@@ -917,10 +964,14 @@ class Boldgrid_Backup_Admin_Ftp {
 	 * @since 1.7.0
 	 */
 	public function maybe_passive() {
-		if ( 'ftp' === $this->type ) {
+		if ( 'ftp' === $this->type || 'ftpes' === $this->type ) {
 			$contents = $this->get_contents();
 
 			if ( ! is_array( $contents ) ) {
+				$this->reconnected = true;
+				$this->disconnect();
+				$this->connect();
+				$this->log_in();
 				ftp_pasv( $this->connection, true );
 			}
 		}
@@ -991,6 +1042,16 @@ class Boldgrid_Backup_Admin_Ftp {
 	 * @return bool
 	 */
 	public function upload( $filepath ) {
+		// Make sure our backup file exists.
+		if ( ! $this->core->wp_filesystem->exists( $filepath ) ) {
+			$this->last_error = sprintf(
+				// translators: 1 The filepath to a backup file.
+				__( 'Archive does not exist: $1$s', 'boldgrid-backup' ),
+				$filepath
+			);
+			return false;
+		}
+
 		$remote_file = $this->get_folder_name() . '/' . basename( $filepath );
 
 		$timestamp = filemtime( $filepath );
@@ -1009,6 +1070,7 @@ class Boldgrid_Backup_Admin_Ftp {
 
 		switch ( $this->type ) {
 			case 'ftp':
+			case 'ftpes':
 				$uploaded = ftp_put( $this->connection, $remote_file, $filepath, FTP_BINARY );
 
 				/*
@@ -1025,6 +1087,8 @@ class Boldgrid_Backup_Admin_Ftp {
 
 				// Adjust timestamp.
 				$this->connection->touch( $remote_file, $timestamp );
+				break;
+			default:
 				break;
 		}
 

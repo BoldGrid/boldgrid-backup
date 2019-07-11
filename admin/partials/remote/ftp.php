@@ -17,9 +17,10 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-$selected      = 'selected="selected"';
-$ftp_selected  = 'ftp' === $data['type'] ? $selected : '';
-$sftp_selected = 'sftp' === $data['type'] ? $selected : '';
+$selected       = 'selected="selected"';
+$ftp_selected   = 'ftp' === $data['type'] ? $selected : '';
+$ftpes_selected = 'ftpes' === $data['type'] ? $selected : '';
+$sftp_selected  = 'sftp' === $data['type'] ? $selected : '';
 ?>
 <form method="post">
 	<?php wp_nonce_field( 'bgb-settings-ftp', 'ftp_auth' ); ?>
@@ -47,6 +48,7 @@ $sftp_selected = 'sftp' === $data['type'] ? $selected : '';
 				<?php esc_html_e( 'FTP / SFTP', 'boldgrid-backup' ); ?><br />
 				<select name="type">
 					<option value='ftp' <?php echo esc_attr( $ftp_selected ); ?> >FTP</option>
+					<option value='ftpes' <?php echo esc_attr( $ftpes_selected ); ?> >FTPES</option>
 					<option value='sftp' <?php echo esc_attr( $sftp_selected ); ?> >SFTP</option>
 				</select>
 			</td>

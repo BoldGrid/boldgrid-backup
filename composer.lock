@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "69de0c4f4777ac42430fd5eb7a649542",
+    "content-hash": "bf4347cd90025fba0e73f75f54471bf2",
     "packages": [
         {
             "name": "boldgrid/library",
-            "version": "2.7.7",
+            "version": "2.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BoldGrid/library.git",
-                "reference": "e6b781f06c8b221c5139b05c980a8a84471fe7d7"
+                "reference": "e6bf6c16f36e483400eea4da0cf1dcd7135372d9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BoldGrid/library/zipball/e6b781f06c8b221c5139b05c980a8a84471fe7d7",
-                "reference": "e6b781f06c8b221c5139b05c980a8a84471fe7d7",
+                "url": "https://api.github.com/repos/BoldGrid/library/zipball/e6bf6c16f36e483400eea4da0cf1dcd7135372d9",
+                "reference": "e6bf6c16f36e483400eea4da0cf1dcd7135372d9",
                 "shasum": ""
             },
             "type": "library",
@@ -47,36 +47,35 @@
                     "role": "Developer"
                 },
                 {
-                    "name": "Joe C",
+                    "name": "Joe Cartonia",
                     "email": "joec@boldgrid.com",
+                    "homepage": "https://twitter.com/joemotocss",
                     "role": "Developer"
                 }
             ],
             "description": "The BoldGrid Library for shared code used in official BoldGrid plugins and themes.",
-            "time": "2019-01-15T17:43:46+00:00"
+            "time": "2019-07-02T14:13:42+00:00"
         },
         {
             "name": "cbschuld/browser.php",
-            "version": "dev-master",
+            "version": "1.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cbschuld/Browser.php.git",
-                "reference": "f8655aedba32168ed34a6b89c7cceeb502fee3e4"
+                "reference": "bdc8dce950e5014a669f310c7ed2968a9ca0673c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cbschuld/Browser.php/zipball/f8655aedba32168ed34a6b89c7cceeb502fee3e4",
-                "reference": "f8655aedba32168ed34a6b89c7cceeb502fee3e4",
+                "url": "https://api.github.com/repos/cbschuld/Browser.php/zipball/bdc8dce950e5014a669f310c7ed2968a9ca0673c",
+                "reference": "bdc8dce950e5014a669f310c7ed2968a9ca0673c",
                 "shasum": ""
             },
             "type": "library",
             "extra": {
-                "branch-alias": {
-                    "dev-master": "1.95-dev"
-                }
+                "branch-alias": []
             },
             "autoload": {
-                "files": [
+                "classmap": [
                     "lib/Browser.php"
                 ]
             },
@@ -98,7 +97,7 @@
                 "detection",
                 "user agent"
             ],
-            "time": "2018-11-05T16:46:30+00:00"
+            "time": "2019-06-19T17:24:22+00:00"
         },
         {
             "name": "chland/tdcron",
@@ -113,22 +112,23 @@
         },
         {
             "name": "ifsnop/mysqldump-php",
-            "version": "v2.6",
+            "version": "v2.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ifsnop/mysqldump-php.git",
-                "reference": "d830857e93c3f309fd63768c0fe6d13d9240fc70"
+                "reference": "30f07f4f0b0fdfcd74e6e57de933248d47f2dd61"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ifsnop/mysqldump-php/zipball/d830857e93c3f309fd63768c0fe6d13d9240fc70",
-                "reference": "d830857e93c3f309fd63768c0fe6d13d9240fc70",
+                "url": "https://api.github.com/repos/ifsnop/mysqldump-php/zipball/30f07f4f0b0fdfcd74e6e57de933248d47f2dd61",
+                "reference": "30f07f4f0b0fdfcd74e6e57de933248d47f2dd61",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0"
             },
             "require-dev": {
+                "phpunit/phpunit": "4.8.36",
                 "squizlabs/php_codesniffer": "1.*"
             },
             "type": "library",
@@ -163,20 +163,20 @@
                 "php5",
                 "sql"
             ],
-            "time": "2018-12-27T00:33:19+00:00"
+            "time": "2019-02-18T23:38:33+00:00"
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "2.0.15",
+            "version": "2.0.20",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "11cf67cf78dc4acb18dc9149a57be4aee5036ce0"
+                "reference": "d6819a55b05e123db1e881d8b230d57f912126be"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/11cf67cf78dc4acb18dc9149a57be4aee5036ce0",
-                "reference": "11cf67cf78dc4acb18dc9149a57be4aee5036ce0",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/d6819a55b05e123db1e881d8b230d57f912126be",
+                "reference": "d6819a55b05e123db1e881d8b230d57f912126be",
                 "shasum": ""
             },
             "require": {
@@ -255,7 +255,7 @@
                 "x.509",
                 "x509"
             ],
-            "time": "2019-03-10T16:53:45+00:00"
+            "time": "2019-06-23T16:33:11+00:00"
         }
     ],
     "packages-dev": [

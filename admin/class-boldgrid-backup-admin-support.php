@@ -28,6 +28,26 @@ class Boldgrid_Backup_Admin_Support {
 	const PHP_MIN_VER = '5.4.0';
 
 	/**
+	 * The core class object.
+	 *
+	 * @since 1.10.1
+	 * @access private
+	 * @var    Boldgrid_Backup_Admin_Core
+	 */
+	private $core;
+
+	/**
+	 * Constructor.
+	 *
+	 * @since 1.10.1
+	 *
+	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
+	 */
+	public function __construct( $core = null ) {
+		$this->core = $core;
+	}
+
+	/**
 	 * Deactivate and show an error.
 	 *
 	 * @since 1.7.0
@@ -69,17 +89,6 @@ class Boldgrid_Backup_Admin_Support {
 	}
 
 	/**
-	 * Determine whether or not we have our build directory.
-	 *
-	 * @since 1.7.0
-	 *
-	 * @return bool
-	 */
-	public function has_been_built() {
-		return file_exists( BOLDGRID_BACKUP_PATH . '/build/clipboard.min.js' );
-	}
-
-	/**
 	 * Determine whether or not composer has been setup.
 	 *
 	 * @since 1.7.0
@@ -111,7 +120,6 @@ class Boldgrid_Backup_Admin_Support {
 	 *
 	 * @see has_compatible_php()
 	 * @see Boldgrid_Backup_Admin_Support::has_composer_installed()
-	 * @see Boldgrid_Backup_Admin_Support::has_been_built()
 	 * @see Boldgrid_Backup_Admin_Support::deactivate()
 	 *
 	 * @return bool
@@ -144,17 +152,17 @@ class Boldgrid_Backup_Admin_Support {
 			return false;
 		}
 
-		if ( ! $this->has_been_built() ) {
-			$this->deactivate(
-				__(
-					'The "build" folder is missing. Please run "yarn install" and "gulp", or contact your host for further assistance.',
-					'boldgrid-backup'
-				)
-			);
-
-			return false;
-		}
-
 		return true;
+	}
+
+	/**
+	 * Render the support page.
+	 *
+	 * @since 1.10.1
+	 */
+	public function page() {
+		wp_enqueue_style( 'bglib-ui-css' );
+
+		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-support.php';
 	}
 }

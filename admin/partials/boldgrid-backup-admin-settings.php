@@ -22,11 +22,10 @@ $scheduler       = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/sche
 $folders_include = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/folders.php';
 $db              = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/db.php';
 $auto_backup     = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/auto-backup.php';
-$auto_rollback   = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/auto-rollback.php';
 $auto_updates    = include $library_dir . 'src/Library/Views/Connect/AutoUpdates.php';
-$update_channels = include $library_dir . 'src/Library/Views/Connect/UpdateChannels.php';
 $notifications   = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/notifications.php';
 $connect_key     = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/connect-key.php';
+$site_check      = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/site-check.php';
 $days_of_week    = '';
 $time_of_day     = '';
 $storage         = '';
@@ -60,14 +59,9 @@ $sections = array(
 			'content' => $auto_backup . $auto_updates,
 		),
 		array(
-			'id'      => 'section_auto_rollback',
-			'title'   => __( 'Manual Updates', 'boldgrid-backup' ),
-			'content' => $auto_rollback,
-		),
-		array(
-			'id'      => 'section_update_channels',
-			'title'   => __( 'Update Channels', 'boldgrid-backup' ),
-			'content' => $update_channels,
+			'id'      => 'section_site_check',
+			'title'   => __( 'Site Check', 'boldgrid-backup' ),
+			'content' => $site_check,
 		),
 		array(
 			'id'      => 'section_notifications',

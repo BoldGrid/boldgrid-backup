@@ -64,6 +64,7 @@ $files = array(
 	'/admin/class-boldgrid-backup-admin-core-files.php',
 	'/admin/class-boldgrid-backup-admin-in-progress.php',
 	'/admin/class-boldgrid-backup-admin-go-pro.php',
+	'/admin/class-boldgrid-backup-admin-support.php',
 	'/admin/class-boldgrid-backup-admin-tools.php',
 	'/admin/class-boldgrid-backup-admin-time.php',
 	'/admin/class-boldgrid-backup-admin-crypt.php',
@@ -77,8 +78,9 @@ $files = array(
 	'/admin/remote/class-boldgrid-backup-admin-ftp-page.php',
 	'/admin/remote/class-boldgrid-backup-admin-remote-settings.php',
 	'/vendor/phpseclib/phpseclib/phpseclib/Net/SSH2.php',
-	// cron
-	'/cron/class-info.php',
+	'/cli/class-info.php',
+	'/cli/class-log.php',
+	'/cli/class-email.php',
 );
 
 foreach ( $files as $file ) {

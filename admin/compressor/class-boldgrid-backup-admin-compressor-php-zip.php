@@ -139,11 +139,23 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 		foreach ( $filelist as $fileinfo ) {
 			$is_dir = ! empty( $fileinfo[3] ) && 'd' === $fileinfo[3];
 
-			if ( $is_dir ) {
-				$this->zip->addEmptyDir( $fileinfo[1] );
-			} else {
-				$this->zip->addFile( $fileinfo[0], $fileinfo[1] );
-				$this->add_dir( $fileinfo[1] );
+			switch ( $is_dir ) {
+				case true:
+					$this->zip->addEmptyDir( $fileinfo[1] );
+					break;
+				case false:
+					if ( ! is_readable( $fileinfo[0] ) ) {
+						$info['backup_errors'][] = sprintf(
+							// translators: 1 The path to a file that was unable to be added to the backup.
+							__( 'Permission defined. Unable to add the following file to your backup: %1$s', 'boldgrid-backup' ),
+							$fileinfo[0]
+						);
+						continue 2;
+					} else {
+						$this->zip->addFile( $fileinfo[0], $fileinfo[1] );
+						$this->add_dir( $fileinfo[1] );
+					}
+					break;
 			}
 
 			/*

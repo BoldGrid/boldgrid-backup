@@ -238,10 +238,14 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/cron/entry/class-crontab.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/cron/entry/class-wpcron.php';
 
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-plugins.php';
+
 		// WP-CLI support.
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-wpcli.php';
 		}
+
+		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-activator.php';
 
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
@@ -280,6 +284,10 @@ class Boldgrid_Backup {
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			Boldgrid_Backup_Admin_Wpcli::$core = $plugin_admin_core;
 		}
+
+		$activator = new Boldgrid_Backup_Activator();
+		$this->loader->add_action( 'admin_notices', $activator, 'post_activate_notice' );
+		$this->loader->add_action( 'shutdown', $activator, 'shutdown' );
 
 		// Add nav menu items.
 		$this->loader->add_action(
@@ -458,6 +466,9 @@ class Boldgrid_Backup {
 		$this->loader->add_filter( 'boldgrid_backup_get_core', $plugin_admin_core, 'get_core' );
 
 		$this->loader->add_filter( 'Boldgrid\Library\Notifications\DashboardWidget\displayWidget\plugin-boldgrid-backup', $plugin_admin_core->dashboard_widget, 'filter_item' );
+
+		$plugins = new Boldgrid_Backup_Admin_Plugins();
+		$this->loader->add_filter( 'plugin_action_links_boldgrid-backup/boldgrid-backup.php', $plugins, 'plugin_action_links', 10, 4 );
 	}
 
 	/**
