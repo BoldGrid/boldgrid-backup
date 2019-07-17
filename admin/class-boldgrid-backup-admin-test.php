@@ -677,7 +677,7 @@ class Boldgrid_Backup_Admin_Test {
 			// Our command may have resulted in unexpected output. Look for a json string.
 			preg_match( '/{.*}/', $this->core->wp_filesystem->get_contents( $filepath ), $matches );
 
-			$result = is_array( $matches ) ? json_decode( $matches[0], true ) : null;
+			$result = is_array( $matches ) && isset( $matches[0] ) ? json_decode( $matches[0], true ) : null;
 
 			$this->core->wp_filesystem->delete( $filepath );
 

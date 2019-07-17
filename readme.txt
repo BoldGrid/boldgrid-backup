@@ -4,7 +4,7 @@ Tags: backup, cloud backup, database backup, restore, wordpress backup
 Requires at least: 4.4
 Tested up to: 5.2
 Requires PHP: 5.4
-Stable tag: 1.10.3
+Stable tag: 1.10.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -132,11 +132,17 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
+= 1.10.4 =
+
+Release date: July 17th, 2019
+
+* Bug fix:     Fixed get_execution_functions method so that disable_functions are properly removed.
+
 = 1.10.3 =
 
 Release date: July 2nd, 2019
 
-* Update: Moved BoldGrid RSS feed to the library.
+* Update:      Moved BoldGrid RSS feed to the library.
 
 = 1.10.2 =
 
