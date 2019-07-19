@@ -15,7 +15,7 @@
  *          @wordpress-plugin
  *          Plugin Name: BoldGrid Backup
  *          Plugin URI: https://www.boldgrid.com/boldgrid-backup/
- *          Description: BoldGrid Backup provides WordPress backup and restoration with update protection.
+ *          Description: Automated backups, remote backup to Amazon S3 and Google Drive, stop website crashes before they happen and more. BoldGrid Backup is the backup solution you need.
  *          Version: 1.10.4
  *          Author: BoldGrid
  *          Author URI: https://www.boldgrid.com/
