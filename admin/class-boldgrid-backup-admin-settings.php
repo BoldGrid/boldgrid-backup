@@ -323,10 +323,18 @@ class Boldgrid_Backup_Admin_Settings {
 	 *
 	 * @since 1.10.1
 	 *
+	 * @param  string $section If passed, $section will be appended to the url so it loads that
+	 *                         specific section first.
 	 * @return string
 	 */
-	public function get_settings_url() {
-		return admin_url( 'admin.php?page=boldgrid-backup-settings' );
+	public function get_settings_url( $section = '' ) {
+		$url = admin_url( 'admin.php?page=boldgrid-backup-settings' );
+
+		if ( ! empty( $section ) ) {
+			$url .= '&section=' . $section;
+		}
+
+		return $url;
 	}
 
 	/**

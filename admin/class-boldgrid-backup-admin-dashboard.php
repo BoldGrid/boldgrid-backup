@@ -39,12 +39,30 @@ class Boldgrid_Backup_Admin_Dashboard {
 	}
 
 	/**
+	 * Enqueue scripts.
 	 *
+	 * @since xxx
+	 *
+	 * @param string $hook Hook name.
+	 */
+	public function admin_enqueue_scripts( $hook ) {
+		if ( 'boldgrid-backup_page_boldgrid-backup-dashboard' === $hook ) {
+			wp_enqueue_style(
+				'boldgrid-backup-admin-dashboard',
+				plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-dashboard.css',
+				array(),
+				BOLDGRID_BACKUP_VERSION
+			);
+		}
+	}
+
+	/**
+	 * Render the dashboard page.
+	 *
+	 * @since xxx
 	 */
 	public function page() {
 		wp_enqueue_style( 'bglib-ui-css' );
-		// wp_enqueue_script( 'bglib-ui-js' );
-		// wp_enqueue_script( 'bglib-sticky' );
 
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-dashboard.php';
 	}

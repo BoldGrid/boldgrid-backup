@@ -240,6 +240,17 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-plugins.php';
 
+		// Cards.
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-backups.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-updates.php';
+
+		// Features.
+		require_once BOLDGRID_BACKUP_PATH . '/admin/feature/class-scheduled-backups.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/feature/class-remote-storage.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/feature/class-versions.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/feature/class-auto-rollback.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/feature/class-auto-update-backup.php';
+
 		// WP-CLI support.
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-wpcli.php';
@@ -469,6 +480,9 @@ class Boldgrid_Backup {
 
 		$plugins = new Boldgrid_Backup_Admin_Plugins();
 		$this->loader->add_filter( 'plugin_action_links_boldgrid-backup/boldgrid-backup.php', $plugins, 'plugin_action_links', 10, 4 );
+
+		// BoldGrid Backup Dashboard.
+		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core->dashboard, 'admin_enqueue_scripts' );
 	}
 
 	/**

@@ -25,25 +25,22 @@ $nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav
 	<?php
 	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
-	/*
-	 * Get our next runtime and display it.
-	 *
-	 * This code is temporary. It is not translatable, it's not being displayed properly, etc...
-	 */
-	$cron = new Boldgrid\Backup\Admin\Cron();
+	include BOLDGRID_BACKUP_PATH . '/admin/partials/banners/dashboard.php';
 
-	$backup_entry = $cron->get_entry( 'backup' );
+	$cards = [
+		new \Boldgrid\Backup\Admin\Card\Backups(),
+		new \Boldgrid\Backup\Admin\Card\Updates(),
+	];
 
-	$next_runtime = 'No backup is scheduled';
-	if ( ! empty( $backup_entry ) && $backup_entry->is_set() ) {
-		$this->core->time->init( $backup_entry->get_next_runtime(), 'utc' );
-		$next_runtime = $this->core->time->get_span( 'D, M jS, g:ia' );
+	echo '<div class="bglib-card-container">';
+
+	foreach ( $cards as $card ) {
+		$card->init();
+		$card->print();
 	}
 
-	echo '
-		<p>
-			<strong>Next backup scheduled to run</strong>:
-			<em>' . esc_html( $next_runtime ) . '</em>
-		</p>';
+	echo '</div>';
+
+	include BOLDGRID_BACKUP_PATH . '/admin/partials/banners/support.php';
 	?>
 </div>

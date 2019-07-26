@@ -86,7 +86,9 @@ class Boldgrid_Backup_Admin_Archive {
 	/**
 	 * The unix timestamp of the backup file.
 	 *
-	 * Not the date the backup was created (though it should be), just the date created timestamp.
+	 * The timestamp of when the backup was created. This value is set in the self::init() method by
+	 * reading the 'lastmodunix' value from the logs. The 'lastmodunix' value was saved to the archive's
+	 * log when the archive was made in Boldgrid_Backup_Admin_Core::archive_files().
 	 *
 	 * @since 1.7.3
 	 * @var string
@@ -205,6 +207,17 @@ class Boldgrid_Backup_Admin_Archive {
 	}
 
 	/**
+	 * Get the filesize of the backup file itself.
+	 *
+	 * IE the size of the zip file, not the size of everything before compression.
+	 *
+	 * @since x.x.x
+	 */
+	public function get_filesize() {
+		return $this->core->wp_filesystem->size( $this->filepath );
+	}
+
+	/**
 	 * Init.
 	 *
 	 * @since 1.6.0
@@ -263,6 +276,20 @@ class Boldgrid_Backup_Admin_Archive {
 		$filepath = $this->core->backup_dir->get_path_to( $filename );
 
 		$this->init( $filepath );
+	}
+
+	/**
+	 * Init this class using the last backup created.
+	 *
+	 * The last backup created is that defined by the boldgrid_backup_latest_backup option. This option
+	 * is set at the end of Boldgrid_Backup_Admin_Core::archive_files.
+	 */
+	public function init_by_latest() {
+		$option = get_option( 'boldgrid_backup_latest_backup' );
+
+		if ( ! empty( $option['filepath'] ) ) {
+			$this->init( $option['filepath'] );
+		}
 	}
 
 	/**

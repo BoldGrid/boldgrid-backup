@@ -62,6 +62,45 @@ class Boldgrid_Backup_Admin_Remote {
 	}
 
 	/**
+	 * Get enabled remote storage providers.
+	 *
+	 * @since xxx
+	 *
+	 * @param  string $key If a key is passed in, only that key from the array of providers will be
+	 *                     returned. For example, if we only need the title of the providers, set
+	 *                     $key = 'title' and you'll only get an array of titles.
+	 * @return array
+	 */
+	public function get_enabled( $key = '' ) {
+		$enabled = [];
+
+		// Example: https://pastebin.com/w09Kea9B
+		$storage_locations = apply_filters( 'boldgrid_backup_register_storage_location', [] );
+
+		foreach ( $storage_locations as $location ) {
+			if ( ! empty( $location['enabled'] ) ) {
+				$enabled[] = $location;
+			}
+		}
+
+		// Filter the remote storage providers if a $key was passed in.
+		if ( ! empty( $key ) ) {
+			$keys = [];
+
+			foreach ( $enabled as $storage_location ) {
+				if ( ! empty( $storage_location[ $key ] ) ) {
+					$keys[] = $storage_location[ $key ];
+				}
+			}
+
+			$enabled = $keys;
+		}
+
+		return $enabled;
+	}
+
+
+	/**
 	 * Return whether or not a remote storage provider is enabled.
 	 *
 	 * @since 1.5.2

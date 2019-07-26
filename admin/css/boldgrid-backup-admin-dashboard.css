@@ -1,0 +1,46 @@
+.bglib-card {
+	height: fit-content;
+}
+
+.bglib-card-container {
+	display: grid;
+	grid-gap: 2em;
+	grid-template-columns: 1fr 1fr 1fr;
+}
+
+/**
+ * Style for specific cards.
+ */
+
+#bgbkup_backups .bglib-card-icon {
+	border-top-color: #0073aa;
+}
+
+#bgbkup_backups .bglib-card-icon .dashicons {
+	color: #0073aa;
+}
+
+#bgbkup_updates .bglib-card-icon {
+	border-top-color: #aa0073;
+}
+#bgbkup_updates .bglib-card-icon .dashicons {
+	color: #aa0073;
+}
+
+
+/**
+ * Media queries.
+ */
+
+/* Left nav hides, admin bar gets big. */
+@media screen and (max-width: 782px) {
+	.bglib-card-container {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media screen and (min-width: 700px) and (max-width: 1199px) {
+	.bglib-card-container {
+		grid-template-columns: 1fr 1fr;
+	}
+}
