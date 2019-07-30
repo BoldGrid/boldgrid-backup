@@ -134,6 +134,7 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 = 1.10.5 In progress =
 
+* Bug fix:     Replaced cbschuld/browser.php with a custom solution to avoid class conflicts.
 * Update:      Updated dependencies.
 
 = 1.10.4 =
