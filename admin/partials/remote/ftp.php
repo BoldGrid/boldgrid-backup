@@ -46,28 +46,27 @@ $auto_selected    = empty( $active_selected ) && empty( $passive_selected ) ? $s
 					);
 					?>
 			</td>
-			<td></td>
+			<td>
+				<?php esc_html_e( 'FTP Port', 'boldgrid-backup' ); ?><br />
+				<input type="number" name="port" value="<?php echo esc_attr( $data['port'] ); ?>" min="1" required />
+			</td>
 		</tr>
 		<tr>
 			<td>
-				<?php esc_html_e( 'FTP / SFTP', 'boldgrid-backup' ); ?><br />
+				<?php esc_html_e( 'FTP Type', 'boldgrid-backup' ); ?><br />
 				<select name="type">
-					<option value='ftp' <?php echo esc_attr( $ftp_selected ); ?> >FTP</option>
-					<option value='ftpes' <?php echo esc_attr( $ftpes_selected ); ?> >FTPES</option>
-					<option value='sftp' <?php echo esc_attr( $sftp_selected ); ?> >SFTP</option>
+					<option value='ftp' <?php echo esc_attr( $ftp_selected ); ?>>FTP</option>
+					<option value='ftpes' <?php echo esc_attr( $ftpes_selected ); ?>>FTPES</option>
+					<option value='sftp' <?php echo esc_attr( $sftp_selected ); ?>>SFTP</option>
 				</select>
 			</td>
 			<td>
 				<?php esc_html_e( 'FTP Mode', 'boldgrid-backup' ); ?><br />
 				<select name="ftp_mode">
-					<option value='auto' <?php echo esc_attr( $auto_selected ); ?> >Auto</option>
-					<option value='active' <?php echo esc_attr( $active_selected ); ?> >Active</option>
-					<option value='passive' <?php echo esc_attr( $passive_selected ); ?> >Passive</option>
+					<option value='auto' <?php echo esc_attr( $auto_selected ); ?>><?php esc_html_e( 'Auto', 'boldgrid-backup' ); ?></option>
+					<option value='active' <?php echo esc_attr( $active_selected ); ?>><?php esc_html_e( 'Active', 'boldgrid-backup' ); ?></option>
+					<option value='passive' <?php echo esc_attr( $passive_selected ); ?>><?php esc_html_e( 'Passive', 'boldgrid-backup' ); ?></option>
 				</select>
-			</td>
-			<td>
-				<?php esc_html_e( 'FTP Port', 'boldgrid-backup' ); ?><br />
-				<input type="number" name="port" value="<?php echo esc_attr( $data['port'] ); ?>" min="1" required />
 			</td>
 		</tr>
 		<tr>
