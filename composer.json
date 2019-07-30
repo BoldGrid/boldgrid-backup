@@ -2,8 +2,7 @@
     "require": {
         "boldgrid/library": "2.*",
         "ifsnop/mysqldump-php" : "2.*",
-        "phpseclib/phpseclib" : "~2.0",
-        "cbschuld/browser.php" : "~1.0-dev"
+        "phpseclib/phpseclib" : "~2.0"
     },
     "require-dev": {
         "lox/xhprof": "dev-master"

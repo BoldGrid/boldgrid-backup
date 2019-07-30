@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bf4347cd90025fba0e73f75f54471bf2",
+    "content-hash": "04ed8193c7289a89265a5f333b66d74a",
     "packages": [
         {
             "name": "boldgrid/library",
@@ -55,49 +55,6 @@
             ],
             "description": "The BoldGrid Library for shared code used in official BoldGrid plugins and themes.",
             "time": "2019-07-25T18:36:58+00:00"
-        },
-        {
-            "name": "cbschuld/browser.php",
-            "version": "1.9.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/cbschuld/Browser.php.git",
-                "reference": "f5c5600237cb88b983b8c26811022e4b96523c14"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/cbschuld/Browser.php/zipball/f5c5600237cb88b983b8c26811022e4b96523c14",
-                "reference": "f5c5600237cb88b983b8c26811022e4b96523c14",
-                "shasum": ""
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": []
-            },
-            "autoload": {
-                "classmap": [
-                    "lib/Browser.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Chris Schuld",
-                    "email": "chris@chrisschuld.com",
-                    "homepage": "http://chrisschuld.com"
-                }
-            ],
-            "description": "A PHP Class to detect a user's Browser",
-            "homepage": "http://chrisschuld.com/projects/browser-php-detecting-a-users-browser-from-php.html",
-            "keywords": [
-                "browser",
-                "detection",
-                "user agent"
-            ],
-            "time": "2019-06-19T17:24:22+00:00"
         },
         {
             "name": "ifsnop/mysqldump-php",
@@ -291,7 +248,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "cbschuld/browser.php": 20,
         "lox/xhprof": 20
     },
     "prefer-stable": false,
