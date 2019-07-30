@@ -132,6 +132,10 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
+= 1.10.5 In progress =
+
+* Update:      Updated dependencies.
+
 = 1.10.4 =
 
 Release date: July 17th, 2019
