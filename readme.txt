@@ -134,6 +134,7 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 = 1.10.5 In progress =
 
+* Update:      FTP mode detection taking too long; now saving mode.
 * Update:      Updated dependencies.
 
 = 1.10.4 =
