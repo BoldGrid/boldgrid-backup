@@ -51,6 +51,14 @@ class Boldgrid_Backup_Admin_Ftp {
 	public $default_type = 'sftp';
 
 	/**
+	 * Default FTP mode.
+	 *
+	 * @since 1.10.5
+	 * @var    string
+	 */
+	public $default_ftp_mode = 'auto';
+
+	/**
 	 * Errors.
 	 *
 	 * @since 1.6.0
@@ -164,6 +172,16 @@ class Boldgrid_Backup_Admin_Ftp {
 		'ftpes',
 		'sftp',
 	];
+
+	/**
+	 * FTP mode.
+	 *
+	 * Valid values: auto, active, passive.
+	 *
+	 * @since 1.10.5
+	 * @var    string
+	 */
+	public $ftp_mode;
 
 	/**
 	 * An FTP connection.
@@ -496,6 +514,11 @@ class Boldgrid_Backup_Admin_Ftp {
 				'callback' => 'sanitize_key',
 			],
 			[
+				'key'      => 'ftp_mode',
+				'default'  => $this->default_ftp_mode,
+				'callback' => 'sanitize_key',
+			],
+			[
 				'key'      => 'port',
 				'default'  => $this->default_port[ $this->default_type ],
 				'callback' => 'intval',
@@ -737,6 +760,7 @@ class Boldgrid_Backup_Admin_Ftp {
 			'host',
 			'port',
 			'type',
+			'ftp_mode',
 			'retention_count',
 			'nickname',
 		];
@@ -761,6 +785,10 @@ class Boldgrid_Backup_Admin_Ftp {
 			[
 				'property' => 'type',
 				'default'  => $this->default_type,
+			],
+			[
+				'property' => 'ftp_mode',
+				'default'  => $this->default_ftp_mode,
 			],
 			[
 				'property' => 'retention_count',
@@ -818,14 +846,15 @@ class Boldgrid_Backup_Admin_Ftp {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param  string $host Hostname.
-	 * @param  string $user Username.
-	 * @param  string $pass Password.
-	 * @param  int    $port Port number.
-	 * @param  string $type Type.
+	 * @param  string $host     Hostname.
+	 * @param  string $user     Username.
+	 * @param  string $pass     Password.
+	 * @param  int    $port     Port number.
+	 * @param  string $type     Type.
+	 * @param  string $ftp_mode FTP mode: active, passive.
 	 * @return bool
 	 */
-	public function is_valid_credentials( $host, $user, $pass, $port, $type ) {
+	public function is_valid_credentials( $host, $user, $pass, $port, $type, $ftp_mode ) {
 		$connection = false;
 		$logged_in  = false;
 		$port       = intval( $port );
@@ -883,7 +912,8 @@ class Boldgrid_Backup_Admin_Ftp {
 		 * If we have any trouble connecting, we'll use a custom error handler
 		 * and throw an Exception.
 		 */
-		$error_caught = false;
+		$error_caught        = false;
+		$ftp_listing_success = true;
 
 		set_error_handler( // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler
 			[
@@ -897,6 +927,12 @@ class Boldgrid_Backup_Admin_Ftp {
 				case 'ftp':
 				case 'ftpes':
 					$logged_in = ftp_login( $connection, $user, $pass );
+					if ( 'auto' !== $ftp_mode ) {
+						if ( 'passive' === $ftp_mode ) {
+							ftp_pasv( $connection, true );
+						}
+						$ftp_listing_success = is_array( ftp_nlist( $connection, '.' ) );
+					}
 					ftp_close( $connection );
 					break;
 				case 'sftp':
@@ -913,6 +949,11 @@ class Boldgrid_Backup_Admin_Ftp {
 
 		if ( ! $error_caught && ! $logged_in ) {
 			$this->errors[] = __( 'Invalid username / password.', 'boldgrid-backup' );
+		}
+
+		if ( ! $ftp_listing_success ) {
+			$this->errors[] = __( 'Could not retrieve FTP directory listing.', 'boldgrid-backup' );
+			$logged_in      = false;
 		}
 
 		return false !== $logged_in;
@@ -964,10 +1005,20 @@ class Boldgrid_Backup_Admin_Ftp {
 	 * @since 1.7.0
 	 */
 	public function maybe_passive() {
-		if ( 'ftp' === $this->type || 'ftpes' === $this->type ) {
-			$contents = $this->get_contents();
+		if ( 'active' !== $this->ftp_mode && ( 'ftp' === $this->type || 'ftpes' === $this->type ) ) {
+			$this->ftp_mode = 'auto' === $this->ftp_mode && is_array( $this->get_contents() ) ?
+				'active' : 'passive';
 
-			if ( ! is_array( $contents ) ) {
+			// If the ftp_mode has changed, then save it.
+			$settings       = $this->core->settings->get_settings();
+			$saved_ftp_mode = ! empty( $settings['remote'][ $this->key ]['ftp_mode'] ) ?
+				$settings['remote'][ $this->key ]['ftp_mode'] : null;
+			if ( $saved_ftp_mode !== $this->ftp_mode ) {
+				$settings['remote'][ $this->key ]['ftp_mode'] = $this->ftp_mode;
+				update_site_option( 'boldgrid_backup_settings', $settings );
+			}
+
+			if ( 'passive' === $this->ftp_mode ) {
 				$this->reconnected = true;
 				$this->disconnect();
 				$this->connect();
@@ -992,6 +1043,7 @@ class Boldgrid_Backup_Admin_Ftp {
 		$this->port            = $this->default_port['ftp'];
 		$this->retention_count = null;
 		$this->type            = $this->default_type;
+		$this->ftp_mode        = $this->default_ftp_mode;
 	}
 
 	/**
