@@ -10,7 +10,6 @@
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin/partials/tools
  * @copyright  BoldGrid
- * @version    $Id$
  * @author     BoldGrid <support@boldgrid.com>
  */
 
@@ -18,24 +17,29 @@
 
 defined( 'WPINC' ) || die;
 
-// @link https://github.com/cbschuld/Browser.php
-require_once BOLDGRID_BACKUP_PATH . '/vendor/cbschuld/browser.php/lib/Browser.php';
-$browser = new Browser();
-
 ob_start();
 
-$local_info = array(
-	array(
-		'title' => __( 'Browser', 'boldgrid-backup' ),
-		'value' => $browser->getBrowser() . ' ' . $browser->getVersion(),
-	),
-	array(
-		'title' => __( 'Operating System', 'boldgrid-backup' ),
-		'value' => $browser->getPlatform(),
-	),
+preg_match(
+	'/\(([^\)]+)\).+?(MSIE|(?!Gecko.+)Firefox|(?!AppleWebKit.+Chrome.+)Safari|(?!AppleWebKit.+)Chrome|AppleWebKit(?!.+Chrome|.+Safari)|Gecko(?!.+Firefox))(?: |\/)([\d\.apre]+)/',
+	$_SERVER['HTTP_USER_AGENT'],
+	$browser_info
 );
 
+$local_info = [
+	[
+		'title' => __( 'Browser', 'boldgrid-backup' ),
+		'value' => ( ! empty( $browser_info[2] ) ? $browser_info[2] : __( 'Unknown browser', 'boldgrid-backup' ) ) .
+			' ' .
+			( ! empty( $browser_info[3] ) ? $browser_info[3] : __( 'Unknown version', 'boldgrid-backup' ) ),
+	],
+	[
+		'title' => __( 'Operating System', 'boldgrid-backup' ),
+		'value' => ! empty( $browser_info[1] ) ? $browser_info[1] : __( 'Unknown', 'boldgrid-backup' ),
+	],
+];
+
 $local_info_markup = '';
+
 foreach ( $local_info as $info ) {
 	if ( empty( $info['value'] ) ) {
 		continue;
@@ -48,20 +52,20 @@ foreach ( $local_info as $info ) {
 	);
 }
 
-$server_info = array(
-	array(
+$server_info = [
+	[
 		'title' => __( 'Server Name', 'boldgrid-backup' ),
 		'key'   => 'SERVER_NAME',
-	),
-	array(
+	],
+	[
 		'title' => __( 'Server IP Address', 'boldgrid-backup' ),
 		'key'   => 'SERVER_ADDR',
-	),
-	array(
-		'title' => __( 'Server Type / OS', 'boldgrid-backup' ),
+	],
+	[
+		'title' => __( 'Server Type', 'boldgrid-backup' ),
 		'key'   => 'SERVER_SOFTWARE',
-	),
-);
+	],
+];
 
 $server_info_markup = '';
 foreach ( $server_info as $info ) {
@@ -69,8 +73,29 @@ foreach ( $server_info as $info ) {
 		continue;
 	}
 
-	$server_info_markup .= sprintf( '<li><strong>%1$s</strong>: %2$s</li>', $info['title'], $_SERVER[ $info['key'] ] );
+	$server_info_markup .= sprintf(
+		'<li><strong>%1$s</strong>: %2$s</li>',
+		$info['title'],
+		$_SERVER[ $info['key'] ]
+	);
 }
+
+if ( function_exists( 'php_uname' ) ) {
+	$server_architecture = sprintf(
+		'%1$s %2$s %3$s',
+		php_uname( 's' ),
+		php_uname( 'r' ),
+		php_uname( 'm' )
+	);
+} else {
+	$server_architecture = __( 'Unknown', 'boldgrid-backup' );
+}
+
+$server_info_markup .= sprintf(
+	'<li><strong>%1$s</strong>: %2$s</li>',
+	__( 'Server OS', 'boldgrid-backup' ),
+	$server_architecture
+);
 
 printf(
 	'
@@ -127,9 +152,7 @@ if ( ! empty( $local_info_markup ) ) {
 }
 
 echo '<hr />';
-
 printf( '<h3>%1$s</h3>', esc_html__( 'Web Server', 'boldgrid-backup' ) );
-
 echo '<p>';
 printf(
 	// translators: 1: HTML strong open tag. 2: HTML strong close tag.
