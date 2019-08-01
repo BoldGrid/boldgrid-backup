@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "boldgrid/library",
-            "version": "2.9.1",
+            "version": "2.9.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BoldGrid/library.git",
-                "reference": "b7642abf0154fd49c374b67bf7a18854f06ac81e"
+                "reference": "1f703de85afb9e218af0781c5973510894325631"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BoldGrid/library/zipball/b7642abf0154fd49c374b67bf7a18854f06ac81e",
-                "reference": "b7642abf0154fd49c374b67bf7a18854f06ac81e",
+                "url": "https://api.github.com/repos/BoldGrid/library/zipball/1f703de85afb9e218af0781c5973510894325631",
+                "reference": "1f703de85afb9e218af0781c5973510894325631",
                 "shasum": ""
             },
             "type": "library",
@@ -54,7 +54,7 @@
                 }
             ],
             "description": "The BoldGrid Library for shared code used in official BoldGrid plugins and themes.",
-            "time": "2019-07-25T18:36:58+00:00"
+            "time": "2019-08-01T18:27:41+00:00"
         },
         {
             "name": "ifsnop/mysqldump-php",
