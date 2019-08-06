@@ -278,12 +278,13 @@ class Boldgrid_Backup_Admin_Cron {
 			$deadline = $time_5_minutes_later;
 		}
 
+		$settings         = $this->core->settings->get_settings();
+		$backup_directory = $this->core->backup_dir->get();
+
 		// Build cron job line in crontab format.
 		$entry = date( $minute . ' ' . $hour, $deadline ) . ' * * ' . date( 'w' ) . ' ' . $this->cron_command . ' "' .
-			dirname( dirname( __FILE__ ) ) . '/boldgrid-backup-cron.php" mode=restore siteurl=' .
-			get_site_url() . ' id=' . $this->core->get_backup_identifier() . ' secret=' .
-			$this->get_cron_secret() . ' archive_key=' . $archive_key .
-			' archive_filename=' . $archive_filename;
+			dirname( dirname( __FILE__ ) ) . '/cli/bgbkup-cli.php" mode=restore restore notify email=' . $settings['notification_email'] .
+			' zip=' . $backup_directory . '/' . $archive_filename;
 
 		// If not Windows, then also silence the cron job.
 		if ( ! $this->core->test->is_windows() ) {
@@ -553,7 +554,7 @@ class Boldgrid_Backup_Admin_Cron {
 		if ( '' === $mode ) {
 			$pattern .= 'boldgrid-backup-cron.php" mode=';
 		} elseif ( 'restore' === $mode ) {
-			$pattern .= 'boldgrid-backup-cron.php" mode=restore';
+			$pattern .= 'cli/bgbkup-cli.php" mode=restore';
 		} elseif ( true !== $mode ) {
 			$pattern .= $mode;
 		}

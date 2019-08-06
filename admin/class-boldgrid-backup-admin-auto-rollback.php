@@ -1095,4 +1095,17 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 
 		return $value;
 	}
+
+	/**
+	 * Callback function for canceling a pending rollback from the cli process.
+	 *
+	 * This admin-ajax call is unprovileged, so that the CLI script can make the call.
+	 * Nobody will be trying to cancel rollbacks (with a 15-minute window) anyways.
+	 *
+	 * @since 1.10.7
+	 */
+	public function wp_ajax_cli_cancel() {
+		$this->cancel();
+		wp_die();
+	}
 }
