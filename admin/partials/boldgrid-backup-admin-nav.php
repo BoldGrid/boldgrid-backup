@@ -43,6 +43,11 @@ $navs = [
 		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup-tools' === $_GET['page'] ? $active : '',
 	],
 	[
+		'title' => __( 'Transfers', 'boldgrid-backup' ),
+		'href'  => 'admin.php?page=boldgrid-backup-transfers',
+		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup-transfers' === $_GET['page'] ? $active : '',
+	],
+	[
 		'title' => __( 'Support', 'boldgrid-backup' ),
 		'href'  => 'admin.php?page=boldgrid-backup-support',
 		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup-support' === $_GET['page'] ? $active : '',
