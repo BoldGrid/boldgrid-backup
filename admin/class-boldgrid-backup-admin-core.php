@@ -2292,7 +2292,7 @@ class Boldgrid_Backup_Admin_Core {
 		 */
 		$this->archives_all->init();
 		if ( ! empty( $this->archives_all->all ) ) {
-			$table = $this->archives->get_mine_count();
+			$table  = $this->archives->get_mine_count();
 			$table .= $this->archives->get_table();
 		} else {
 			$table = $this->archives->get_empty_markup();

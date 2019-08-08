@@ -1,6 +1,6 @@
 <?php
 /**
- * SignUp class.
+ * Sign_Up class.
  *
  * @link       https://www.boldgrid.com
  * @since      xxx
@@ -14,11 +14,11 @@
 namespace Boldgrid\Backup\Admin\Card\Feature;
 
 /**
- * Class: SignUp
+ * Class: Sign_Up
  *
  * @since xxx
  */
-class SignUp extends \Boldgrid\Library\Library\Ui\Feature {
+class Sign_Up extends \Boldgrid\Library\Library\Ui\Feature {
 	/**
 	 * Init.
 	 *

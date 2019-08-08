@@ -1,6 +1,6 @@
 <?php
 /**
- * MoreBoldgrid class.
+ * More_Boldgrid class.
  *
  * @link       https://www.boldgrid.com
  * @since      xxx
@@ -14,11 +14,11 @@
 namespace Boldgrid\Backup\Admin\Card\Feature;
 
 /**
- * Class: MoreBackup
+ * Class: More_Boldgrid
  *
  * @since xxx
  */
-class MoreBoldgrid extends \Boldgrid\Library\Library\Ui\Feature {
+class More_Boldgrid extends \Boldgrid\Library\Library\Ui\Feature {
 	/**
 	 * Init.
 	 *

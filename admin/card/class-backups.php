@@ -31,13 +31,13 @@ class Backups extends \Boldgrid\Library\Library\Ui\Card {
 
 		$this->title = esc_html__( 'Backups', 'boldgrid-backup' );
 
-		$this->subTitle = esc_html__( 'It\'s website insurance. Make sure you have a backup.', 'boldgrid-backup' );
+		$this->subTitle = esc_html__( 'It\'s website insurance. Make sure you have a backup.', 'boldgrid-backup' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
 
 		$this->icon = '<span class="dashicons dashicons-vault"></span>';
 
 		$features = [
-			new \Boldgrid\Backup\Admin\Card\Feature\ScheduledBackups(),
-			new \Boldgrid\Backup\Admin\Card\Feature\RemoteStorage(),
+			new \Boldgrid\Backup\Admin\Card\Feature\Scheduled_Backups(),
+			new \Boldgrid\Backup\Admin\Card\Feature\Remote_Storage(),
 		];
 
 		foreach ( $features as $feature ) {

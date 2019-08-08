@@ -32,14 +32,14 @@ class Updates extends \Boldgrid\Library\Library\Ui\Card {
 
 		$this->title = esc_html__( 'Update Management', 'boldgrid-backup' );
 
-		$this->subTitle = esc_html__( 'Keep everything tidy and up to date.', 'boldgrid-backup' );
+		$this->subTitle = esc_html__( 'Keep everything tidy and up to date.', 'boldgrid-backup' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
 
 		$this->icon = '<span class="dashicons dashicons-plugins-checked"></span>';
 
 		$features = [
 			new \Boldgrid\Backup\Admin\Card\Feature\Versions(),
-			new \Boldgrid\Backup\Admin\Card\Feature\AutoRollback(),
-			new \Boldgrid\Backup\Admin\Card\Feature\AutoUpdateBackup(),
+			new \Boldgrid\Backup\Admin\Card\Feature\Auto_Rollback(),
+			new \Boldgrid\Backup\Admin\Card\Feature\Auto_Update_Backup(),
 		];
 
 		foreach ( $features as $feature ) {

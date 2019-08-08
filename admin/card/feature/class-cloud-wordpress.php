@@ -1,6 +1,6 @@
 <?php
 /**
- * CloudWordpress class.
+ * Cloud_WordPress class.
  *
  * @link       https://www.boldgrid.com
  * @since      xxx
@@ -14,11 +14,11 @@
 namespace Boldgrid\Backup\Admin\Card\Feature;
 
 /**
- * Class: CloudWordpress
+ * Class: Cloud_WordPress
  *
  * @since xxx
  */
-class CloudWordpress extends \Boldgrid\Library\Library\Ui\Feature {
+class Cloud_WordPress extends \Boldgrid\Library\Library\Ui\Feature {
 	/**
 	 * Init.
 	 *

@@ -19,6 +19,7 @@ defined( 'WPINC' ) || die;
 $nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
 
 $dashboard = new \Boldgrid\Library\Library\Ui\Dashboard();
+
 $dashboard->cards = $this->get_cards();
 ?>
 

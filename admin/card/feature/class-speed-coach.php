@@ -1,6 +1,6 @@
 <?php
 /**
- * SpeedCoach class.
+ * Speed_Coach class.
  *
  * @link       https://www.boldgrid.com
  * @since      xxx
@@ -14,11 +14,11 @@
 namespace Boldgrid\Backup\Admin\Card\Feature;
 
 /**
- * Class: SpeedCoach
+ * Class: Speed_Coach
  *
  * @since xxx
  */
-class SpeedCoach extends \Boldgrid\Library\Library\Ui\Feature {
+class Speed_Coach extends \Boldgrid\Library\Library\Ui\Feature {
 	/**
 	 * Init.
 	 *

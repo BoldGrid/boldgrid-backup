@@ -57,9 +57,9 @@ class Boldgrid_Backup_Admin_Archives {
 				__( 'Create a backup of your site right now by clicking the %1$sBackup Site Now%2$s button at the top of the page.', 'boldgrid-backup' ),
 				'<strong>',
 				'</strong>'
-				),
+			),
 			array( 'strong' => array() )
-			);
+		);
 		$markup .= '</li><li>';
 		$markup .= wp_kses(
 			sprintf(
@@ -67,9 +67,9 @@ class Boldgrid_Backup_Admin_Archives {
 				__( 'After the backup is created, go to your %1$ssettings%2$s page and setup backups so they\'re create automatically on a set schedule.', 'boldgrid-backup' ),
 				'<a href="' . $this->core->settings->get_settings_url() . '">',
 				'</a>'
-				),
+			),
 			array( 'a' => array( 'href' => array() ) )
-			);
+		);
 		$markup .= '</li>
 				</ol>
 			</div>';

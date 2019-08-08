@@ -243,7 +243,7 @@ class Boldgrid_Backup {
 		// Cards.
 		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-backups.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-updates.php';
-		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-get-premium.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-premium.php';
 
 		// Features.
 		require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-scheduled-backups.php';

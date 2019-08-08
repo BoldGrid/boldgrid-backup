@@ -35,6 +35,6 @@ class Central extends \Boldgrid\Library\Library\Ui\Feature {
 
 		$this->content = '<p>' . esc_html__( 'Manage your account, Run Automated Website Speed Tests, and more within BoldGrid Central.', 'boldgrid-backup' ) . '</p>';
 
-		$this->content .= '<p style="text-align:right;"><a href="' . esc_url( $reseller->centralUrl ) . '">' . esc_html__( 'BoldGrid Central Login', 'boldgrid-backup' ) . '</a></p>';
+		$this->content .= '<p style="text-align:right;"><a href="' . esc_url( $reseller->centralUrl ) . '">' . esc_html__( 'BoldGrid Central Login', 'boldgrid-backup' ) . '</a></p>'; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
 	}
 }
