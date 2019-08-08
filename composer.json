@@ -16,9 +16,13 @@
     "require": {
         "boldgrid/library": "2.*",
         "ifsnop/mysqldump-php" : "2.*",
+<<<<<<< HEAD
         "phpseclib/phpseclib" : "~2.0",
         "cbschuld/browser.php" : "~1.0-dev",
         "chland/tdcron" : "dev-master"
+=======
+        "phpseclib/phpseclib" : "~2.0"
+>>>>>>> 8d087a3c9ff2fd01e37283a36195d105dfb97980
     },
     "require-dev": {
         "lox/xhprof": "dev-master"

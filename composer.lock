@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bf4347cd90025fba0e73f75f54471bf2",
+    "content-hash": "04ed8193c7289a89265a5f333b66d74a",
     "packages": [
         {
             "name": "boldgrid/library",
-            "version": "2.9.0",
+            "version": "2.9.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BoldGrid/library.git",
-                "reference": "e6bf6c16f36e483400eea4da0cf1dcd7135372d9"
+                "reference": "1f703de85afb9e218af0781c5973510894325631"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BoldGrid/library/zipball/e6bf6c16f36e483400eea4da0cf1dcd7135372d9",
-                "reference": "e6bf6c16f36e483400eea4da0cf1dcd7135372d9",
+                "url": "https://api.github.com/repos/BoldGrid/library/zipball/1f703de85afb9e218af0781c5973510894325631",
+                "reference": "1f703de85afb9e218af0781c5973510894325631",
                 "shasum": ""
             },
             "type": "library",
@@ -33,71 +33,28 @@
             "authors": [
                 {
                     "name": "Tim Elsass",
+                    "role": "Developer",
                     "email": "dev@tim.ph",
-                    "homepage": "http://tim.ph",
-                    "role": "Developer"
+                    "homepage": "http://tim.ph"
                 },
                 {
                     "name": "Rafael Ramos",
-                    "homepage": "http://rafael-ramos.com",
-                    "role": "Developer"
+                    "role": "Developer",
+                    "homepage": "http://rafael-ramos.com"
+                },
+                {
+                    "name": "Joe Cartonia",
+                    "role": "Developer",
+                    "email": "joec@boldgrid.com",
+                    "homepage": "https://twitter.com/joemotocss"
                 },
                 {
                     "name": "bwmarkle",
                     "role": "Developer"
-                },
-                {
-                    "name": "Joe Cartonia",
-                    "email": "joec@boldgrid.com",
-                    "homepage": "https://twitter.com/joemotocss",
-                    "role": "Developer"
                 }
             ],
             "description": "The BoldGrid Library for shared code used in official BoldGrid plugins and themes.",
-            "time": "2019-07-02T14:13:42+00:00"
-        },
-        {
-            "name": "cbschuld/browser.php",
-            "version": "1.9.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/cbschuld/Browser.php.git",
-                "reference": "bdc8dce950e5014a669f310c7ed2968a9ca0673c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/cbschuld/Browser.php/zipball/bdc8dce950e5014a669f310c7ed2968a9ca0673c",
-                "reference": "bdc8dce950e5014a669f310c7ed2968a9ca0673c",
-                "shasum": ""
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": []
-            },
-            "autoload": {
-                "classmap": [
-                    "lib/Browser.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Chris Schuld",
-                    "email": "chris@chrisschuld.com",
-                    "homepage": "http://chrisschuld.com"
-                }
-            ],
-            "description": "A PHP Class to detect a user's Browser",
-            "homepage": "http://chrisschuld.com/projects/browser-php-detecting-a-users-browser-from-php.html",
-            "keywords": [
-                "browser",
-                "detection",
-                "user agent"
-            ],
-            "time": "2019-06-19T17:24:22+00:00"
+            "time": "2019-08-01T18:27:41+00:00"
         },
         {
             "name": "chland/tdcron",
@@ -167,16 +124,16 @@
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "2.0.20",
+            "version": "2.0.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "d6819a55b05e123db1e881d8b230d57f912126be"
+                "reference": "9f1287e68b3f283339a9f98f67515dd619e5bf9d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/d6819a55b05e123db1e881d8b230d57f912126be",
-                "reference": "d6819a55b05e123db1e881d8b230d57f912126be",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/9f1287e68b3f283339a9f98f67515dd619e5bf9d",
+                "reference": "9f1287e68b3f283339a9f98f67515dd619e5bf9d",
                 "shasum": ""
             },
             "require": {
@@ -255,7 +212,7 @@
                 "x.509",
                 "x509"
             ],
-            "time": "2019-06-23T16:33:11+00:00"
+            "time": "2019-07-12T12:53:49+00:00"
         }
     ],
     "packages-dev": [
@@ -302,7 +259,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "cbschuld/browser.php": 20,
         "chland/tdcron": 20,
         "lox/xhprof": 20
     },

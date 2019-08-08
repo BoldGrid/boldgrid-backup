@@ -63,9 +63,9 @@ class Boldgrid_Backup_Admin_Cli {
 		);
 
 		// Iterate through the array and remove disabled functions.
-		foreach ( $exec_functions as $exec_function ) {
+		foreach ( $exec_functions as $key => $exec_function ) {
 			if ( in_array( $exec_function, $disabled, true ) ) {
-				unset( $exec_functions[ $exec_function ] );
+				unset( $exec_functions[ $key ] );
 			}
 		}
 

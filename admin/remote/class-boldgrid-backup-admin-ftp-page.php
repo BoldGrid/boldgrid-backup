@@ -100,6 +100,7 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 		$type       = $this->core->ftp->default_type;
 		$blank_data = array(
 			'type'            => $type,
+			'ftp_mode'        => $this->core->ftp->default_ftp_mode,
 			'host'            => null,
 			'port'            => $this->core->ftp->default_port[ $type ],
 			'user'            => null,
@@ -201,14 +202,22 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 		// This method has default values for each setting and also handles sanitization.
 		$data = $ftp->get_from_post();
 
-		$valid_credentials = $ftp->is_valid_credentials( $data['host'], $data['user'], $data['pass'], $data['port'], $data['type'] );
+		$valid_credentials = $ftp->is_valid_credentials(
+			$data['host'],
+			$data['user'],
+			$data['pass'],
+			$data['port'],
+			$data['type'],
+			$data['ftp_mode']
+		);
 
 		if ( $valid_credentials ) {
-			$settings['remote'][ $ftp->key ]['host'] = $data['host'];
-			$settings['remote'][ $ftp->key ]['user'] = $data['user'];
-			$settings['remote'][ $ftp->key ]['pass'] = $data['pass'];
-			$settings['remote'][ $ftp->key ]['port'] = $data['port'];
-			$settings['remote'][ $ftp->key ]['type'] = $data['type'];
+			$settings['remote'][ $ftp->key ]['host']     = $data['host'];
+			$settings['remote'][ $ftp->key ]['user']     = $data['user'];
+			$settings['remote'][ $ftp->key ]['pass']     = $data['pass'];
+			$settings['remote'][ $ftp->key ]['port']     = $data['port'];
+			$settings['remote'][ $ftp->key ]['type']     = $data['type'];
+			$settings['remote'][ $ftp->key ]['ftp_mode'] = $data['ftp_mode'];
 		}
 
 		$settings['remote'][ $ftp->key ]['retention_count'] = $data['retention_count'];
