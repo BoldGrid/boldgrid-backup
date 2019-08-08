@@ -795,19 +795,20 @@ class Boldgrid_Backup_Admin_Core {
 		];
 
 		// The main slug all sub menu items are children of.
-		$main_slug = 'boldgrid-backup';
+		$main_slug = 'boldgrid-backup-dashboard';
 
 		// The capability required for these menu items to be displayed to the user.
 		$capability = 'administrator';
 
+		// Add the main menu item.
 		add_menu_page(
 			$lang['boldgrid_backup'],
 			$lang['boldgrid_backup'],
 			$capability,
 			$main_slug,
 			[
-				$this,
-				'page_archives',
+				$this->dashboard,
+				'page',
 			],
 			'none'
 		);
@@ -819,10 +820,10 @@ class Boldgrid_Backup_Admin_Core {
 			__( 'Dashboard', 'boldgrid-backup' ),
 			$capability,
 			'boldgrid-backup-dashboard',
-			array(
+			[
 				$this->dashboard,
 				'page',
-			)
+			]
 		);
 
 		// Add "Backup Archive", formally known as "BoldGrid Backup".
