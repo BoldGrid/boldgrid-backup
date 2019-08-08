@@ -11,7 +11,7 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-namespace Boldgrid\Backup\Admin\Feature;
+namespace Boldgrid\Backup\Admin\Card\Feature;
 
 /**
  * Class: AutoRollback

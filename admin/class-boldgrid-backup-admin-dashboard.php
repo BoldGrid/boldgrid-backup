@@ -57,13 +57,31 @@ class Boldgrid_Backup_Admin_Dashboard {
 	}
 
 	/**
+	 * Get cards needed for the dashboard.
+	 *
+	 * @since xxx
+	 *
+	 * @return array
+	 */
+	public function get_cards() {
+		$cards = [];
+
+		if ( ! $this->core->config->is_premium_done ) {
+			$cards[] = new \Boldgrid\Backup\Admin\Card\GetPremium();
+		}
+
+		$cards[] = new \Boldgrid\Backup\Admin\Card\Backups();
+		$cards[] = new \Boldgrid\Backup\Admin\Card\Updates();
+
+		return $cards;
+	}
+
+	/**
 	 * Render the dashboard page.
 	 *
 	 * @since xxx
 	 */
 	public function page() {
-		wp_enqueue_style( 'bglib-ui-css' );
-
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-dashboard.php';
 	}
 }

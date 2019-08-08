@@ -37,9 +37,9 @@ class Updates extends \Boldgrid\Library\Library\Ui\Card {
 		$this->icon = '<span class="dashicons dashicons-plugins-checked"></span>';
 
 		$features = [
-			new \Boldgrid\Backup\Admin\Feature\Versions(),
-			new \Boldgrid\Backup\Admin\Feature\AutoRollback(),
-			new \Boldgrid\Backup\Admin\Feature\AutoUpdateBackup(),
+			new \Boldgrid\Backup\Admin\Card\Feature\Versions(),
+			new \Boldgrid\Backup\Admin\Card\Feature\AutoRollback(),
+			new \Boldgrid\Backup\Admin\Card\Feature\AutoUpdateBackup(),
 		];
 
 		foreach ( $features as $feature ) {

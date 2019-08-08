@@ -36,8 +36,8 @@ class Backups extends \Boldgrid\Library\Library\Ui\Card {
 		$this->icon = '<span class="dashicons dashicons-vault"></span>';
 
 		$features = [
-			new \Boldgrid\Backup\Admin\Feature\ScheduledBackups(),
-			new \Boldgrid\Backup\Admin\Feature\RemoteStorage(),
+			new \Boldgrid\Backup\Admin\Card\Feature\ScheduledBackups(),
+			new \Boldgrid\Backup\Admin\Card\Feature\RemoteStorage(),
 		];
 
 		foreach ( $features as $feature ) {

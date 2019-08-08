@@ -17,6 +17,9 @@
 defined( 'WPINC' ) || die;
 
 $nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
+
+$dashboard = new \Boldgrid\Library\Library\Ui\Dashboard();
+$dashboard->cards = $this->get_cards();
 ?>
 
 <div class='wrap'>
@@ -25,22 +28,6 @@ $nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav
 	<?php
 	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
-	include BOLDGRID_BACKUP_PATH . '/admin/partials/banners/dashboard.php';
-
-	$cards = [
-		new \Boldgrid\Backup\Admin\Card\Backups(),
-		new \Boldgrid\Backup\Admin\Card\Updates(),
-	];
-
-	echo '<div class="bglib-card-container">';
-
-	foreach ( $cards as $card ) {
-		$card->init();
-		$card->print();
-	}
-
-	echo '</div>';
-
-	include BOLDGRID_BACKUP_PATH . '/admin/partials/banners/support.php';
+	$dashboard->printCards();
 	?>
 </div>

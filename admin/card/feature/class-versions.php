@@ -11,7 +11,7 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-namespace Boldgrid\Backup\Admin\Feature;
+namespace Boldgrid\Backup\Admin\Card\Feature;
 
 /**
  * Class: Versions
@@ -23,15 +23,13 @@ class Versions extends \Boldgrid\Library\Library\Ui\Feature {
 	 *
 	 */
 	public function init() {
-		global $wp_version;
-
 		$data = wp_get_update_data();
 
 		$has_updates = ! empty( $data['counts']['plugins'] ) || ! empty( $data['counts']['themes'] ) || ! empty( $data['counts']['wordpress'] );
 
 		$this->icon = '<span class="dashicons dashicons-wordpress"></span>';
 
-		$this->title = __( 'WordPress, Plugins, & Theme Version', 'boldgrid-backup' );
+		$this->title = esc_html__( 'WordPress, Plugins, & Theme Version', 'boldgrid-backup' );
 
 		if ( $has_updates ) {
 			$this->content = '<p>' . wp_kses(
@@ -51,7 +49,7 @@ class Versions extends \Boldgrid\Library\Library\Ui\Feature {
 				[ 'a' => [ 'href' => [] ] ]
 			) . '</p></div>';
 		} else {
-			$this->content = '<p>' . esc_html( 'Everything is up to date!', 'boldgrid-backup' ) . '</p>';
+			$this->content = '<p>' . esc_html__( 'Everything is up to date!', 'boldgrid-backup' ) . '</p>';
 		}
 	}
 }

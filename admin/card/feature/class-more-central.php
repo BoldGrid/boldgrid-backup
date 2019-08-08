@@ -1,0 +1,40 @@
+<?php
+/**
+ * MoreBackup class.
+ *
+ * @link       https://www.boldgrid.com
+ * @since      xxx
+ *
+ * @package    Boldgrid\Backup
+ * @subpackage Boldgrid\Backup\Card
+ * @copyright  BoldGrid
+ * @author     BoldGrid <support@boldgrid.com>
+ */
+
+namespace Boldgrid\Backup\Admin\Card\Feature;
+
+/**
+ * Class: MoreBackup
+ *
+ * @since xxx
+ */
+class MoreCentral extends \Boldgrid\Library\Library\Ui\Feature {
+	/**
+	 * Init.
+	 *
+	 * @since xxx
+	 */
+	public function init() {
+		$core = apply_filters( 'boldgrid_backup_get_core', null );
+
+		$get_premium_url = $core->go_pro->get_premium_url( 'bgbkup-dashboard' );
+
+		$this->icon = '<span class="dashicons boldgrid-icon"></span>';
+
+		$this->title = esc_html__( 'More BoldGrid Central Features', 'boldgrid-backup' );
+
+		$this->content = '<p>' . esc_html__( 'Unlock more features within BoldGrid Central, including Cloud WordPress Advanced Controls and more Automated Website Speed Tests.', 'boldgrid-backup' ) . '</p>';
+
+		$this->content .= '<p style="text-align:right;"><a href="' . esc_url( $get_premium_url ) . '" class="button button-primary boldgrid-orange">' . __( 'Get Premium', 'boldgrid-backup' ) . '</a></p>';
+	}
+}

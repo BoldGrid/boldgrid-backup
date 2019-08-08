@@ -1,6 +1,6 @@
 <?php
 /**
- * My Backups class.
+ * Remote Storage class.
  *
  * @link       https://www.boldgrid.com
  * @since      xxx
@@ -11,7 +11,7 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-namespace Boldgrid\Backup\Admin\Feature;
+namespace Boldgrid\Backup\Admin\Card\Feature;
 
 /**
  * Class: RemoteStorage
@@ -20,14 +20,16 @@ namespace Boldgrid\Backup\Admin\Feature;
  */
 class RemoteStorage extends \Boldgrid\Library\Library\Ui\Feature {
 	/**
+	 * Init.
 	 *
+	 * @since xxx
 	 */
 	public function init() {
 		$core = apply_filters( 'boldgrid_backup_get_core', null );
 
 		$this->icon = '<span class="dashicons dashicons-networking"></span>';
 
-		$this->title = __( 'Remote Storage', 'boldgrid-backup' );
+		$this->title = esc_html__( 'Remote Storage', 'boldgrid-backup' );
 
 		if ( $core->settings->has_remote_configured() ) {
 			$storage_locations = $core->remote->get_enabled( 'title' );
