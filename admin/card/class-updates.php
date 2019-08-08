@@ -36,15 +36,10 @@ class Updates extends \Boldgrid\Library\Library\Ui\Card {
 
 		$this->icon = '<span class="dashicons dashicons-plugins-checked"></span>';
 
-		$features = [
+		$this->features = [
 			new \Boldgrid\Backup\Admin\Card\Feature\Versions(),
 			new \Boldgrid\Backup\Admin\Card\Feature\Auto_Rollback(),
 			new \Boldgrid\Backup\Admin\Card\Feature\Auto_Update_Backup(),
 		];
-
-		foreach ( $features as $feature ) {
-			$feature->init();
-			$this->footer .= $feature->print( false );
-		}
 	}
 }

@@ -42,7 +42,7 @@ class Premium extends \Boldgrid\Library\Library\Ui\Card {
 
 			$this->subTitle = __( 'We can help your website thrive in more ways than one.', 'boldgrid-backup' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
 
-			$features = [
+			$this->features = [
 				new \Boldgrid\Backup\Admin\Card\Feature\Cloud_WordPress(),
 				new \Boldgrid\Backup\Admin\Card\Feature\Speed_Coach(),
 				new \Boldgrid\Backup\Admin\Card\Feature\Sign_Up(),
@@ -52,7 +52,7 @@ class Premium extends \Boldgrid\Library\Library\Ui\Card {
 
 			$this->subTitle = esc_html__( 'We hope so. There\'s more available by upgrading now!', 'boldgrid-backup' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
 
-			$features = [
+			$this->features = [
 				new \Boldgrid\Backup\Admin\Card\Feature\More_Backup(),
 				new \Boldgrid\Backup\Admin\Card\Feature\More_Boldgrid(),
 				new \Boldgrid\Backup\Admin\Card\Feature\More_Central(),
@@ -62,14 +62,9 @@ class Premium extends \Boldgrid\Library\Library\Ui\Card {
 
 			$this->subTitle = esc_html__( 'Thank you for running BoldGrid Premium!', 'boldgrid-backup' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
 
-			$features = [
+			$this->features = [
 				new \Boldgrid\Backup\Admin\Card\Feature\Central(),
 			];
-		}
-
-		foreach ( $features as $feature ) {
-			$feature->init();
-			$this->footer .= $feature->print( false );
 		}
 	}
 }

@@ -67,7 +67,7 @@ class Boldgrid_Backup_Admin_Dashboard {
 		$cards = [];
 
 		if ( ! $this->core->config->is_premium_done ) {
-			$cards[] = new \Boldgrid\Backup\Admin\Card\GetPremium();
+			$cards[] = new \Boldgrid\Backup\Admin\Card\Premium();
 		}
 
 		$cards[] = new \Boldgrid\Backup\Admin\Card\Backups();
