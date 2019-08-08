@@ -55,7 +55,7 @@ class Boldgrid_Backup_Admin_Dashboard_Widget {
 						sprintf(
 							// translators: 1 The opening anchor tag to the Inspirations page, 2 its closing tag.
 							__( 'Not fully protected. %1$sClick here to learn more%2$s.', 'boldgrid-backup' ),
-							'<a href="' . esc_url( admin_url( 'admin.php?page=boldgrid-backup-tools&section=section_full_protection' ) ) . '">',
+							'<a href="' . esc_url( admin_url( 'admin.php?page=boldgrid-backup-dashboard' ) ) . '">',
 							'</a>'
 						),
 						array( 'a' => array( 'href' => array() ) )
