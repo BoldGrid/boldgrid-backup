@@ -46,7 +46,7 @@ class Boldgrid_Backup_Admin_Dashboard {
 	 * @param string $hook Hook name.
 	 */
 	public function admin_enqueue_scripts( $hook ) {
-		if ( 'boldgrid-backup_page_boldgrid-backup-dashboard' === $hook ) {
+		if ( 'toplevel_page_boldgrid-backup-dashboard' === $hook ) {
 			wp_enqueue_style(
 				'boldgrid-backup-admin-dashboard',
 				plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-dashboard.css',
