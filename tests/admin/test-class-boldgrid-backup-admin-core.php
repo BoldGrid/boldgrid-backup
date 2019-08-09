@@ -52,14 +52,14 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 		}
 
 		// Debug. This is how you can see the actual counts / sizes in question.
-		/*
+
 		phpunit_error_log( array(
 			'$dir'        => $dir,
 			'$file_count' => $file_count,
 			'$file_size'  => $file_size,
 			'$dir_count'  => $dir_count,
 		) );
-		*/
+
 
 		$this->assertTrue( $file_count >= $min_file_count && $file_size >= $min_file_size && $dir_count >= $min_dir_count );
 	}
