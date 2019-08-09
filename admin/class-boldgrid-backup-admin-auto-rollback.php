@@ -1079,8 +1079,8 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 *
 	 * @since 1.7.0
 	 *
-	 * @param  array|false WordPress option value for "boldgrid_backup_pending_rollback".
-	 * @param  string      Option name.
+	 * @param  array|false $value  WordPress option value for "boldgrid_backup_pending_rollback".
+	 * @param  string      $option Option name.
 	 * @return array|false
 	 */
 	public function validate_rollback_option( $value, $option ) {
