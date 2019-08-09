@@ -16,4 +16,9 @@
 			<directory>./</directory>
 		</whitelist>
 	</filter>
+	<groups>
+		<exclude>
+			<group>ajax</group>
+		</exclude>
+	</groups>
 </phpunit>
