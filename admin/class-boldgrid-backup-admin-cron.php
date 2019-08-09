@@ -280,11 +280,12 @@ class Boldgrid_Backup_Admin_Cron {
 
 		$settings         = $this->core->settings->get_settings();
 		$backup_directory = $this->core->backup_dir->get();
+		$backup_id        = $this->core->get_backup_identifier();
 
 		// Build cron job line in crontab format.
 		$entry = date( $minute . ' ' . $hour, $deadline ) . ' * * ' . date( 'w' ) . ' ' . $this->cron_command . ' "' .
 			dirname( dirname( __FILE__ ) ) . '/cli/bgbkup-cli.php" mode=restore restore notify email=' . $settings['notification_email'] .
-			' zip=' . $backup_directory . '/' . $archive_filename;
+			' backup_id=' . $backup_id . ' zip=' . $backup_directory . '/' . $archive_filename;
 
 		// If not Windows, then also silence the cron job.
 		if ( ! $this->core->test->is_windows() ) {
