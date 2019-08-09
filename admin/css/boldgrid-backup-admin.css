@@ -297,7 +297,8 @@ p > .bgbkup-remote-logo {
 /**
  * Support tab.
  */
-.bgbkup-support-page {
+.bgbkup-support-page,
+.bgbkup-transfers-page {
 	display: flex;
 	margin-top: 1em;
 }
@@ -308,7 +309,8 @@ p > .bgbkup-remote-logo {
 }
 
 /* @todo For reusability, these styles handling the bg-box display can be moved to library/src/assets/css/ui.css */
-.bgbkup-support-page .bg-box {
+.bgbkup-support-page .bg-box,
+.bgbkup-transfers-page .bg-box {
 	margin: 1em;
 	width: 50%;
 }
@@ -321,6 +323,14 @@ p > .bgbkup-remote-logo {
 	margin-top: 0;
 }
 
-.bgbkup-support-page .bg-box-bottom p, .bgbkup-support-page .bg-box-bottom li {
+.bgbkup-support-page .bg-box-bottom p,
+.bgbkup-support-page .bg-box-bottom li,
+.bgbkup-transfers-page .bg-box-bottom p,
+.bgbkup-transfers-page .bg-box-bottom li {
 	font-size: 1.2em;
+}
+
+.bgbkup-transfers-source .bg-box-bottom {
+	height: 350px;
+	overflow-y: scroll;
 }

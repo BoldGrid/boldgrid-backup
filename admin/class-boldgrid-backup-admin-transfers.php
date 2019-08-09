@@ -43,6 +43,15 @@ class Boldgrid_Backup_Admin_Transfers {
 	 * @since 1.11.0
 	 */
 	public function page() {
+		wp_enqueue_style( 'bglib-ui-css' );
+
+		wp_enqueue_style(
+			'boldgrid-backup-admin-transfers',
+			plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-home.css',
+			[],
+			BOLDGRID_BACKUP_VERSION
+		);
+
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-transfers.php';
 	}
 }
