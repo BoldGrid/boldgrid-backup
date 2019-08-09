@@ -58,6 +58,7 @@ $files = array(
 	'/admin/class-boldgrid-backup-admin-email.php',
 	'/admin/class-boldgrid-backup-admin-db-omit.php',
 	'/admin/class-boldgrid-backup-admin-db-dump.php',
+	'/admin/class-boldgrid-backup-admin-db-import.php',
 	'/admin/class-boldgrid-backup-admin-db-get.php',
 	'/admin/class-boldgrid-backup-admin-utility.php',
 	'/admin/class-boldgrid-backup-admin-folder-exclusion.php',
