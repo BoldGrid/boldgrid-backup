@@ -104,6 +104,79 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Create a wp-config file.
+	 *
+	 * This file doesn't actually exist within the testing environment, and needs to exist for the
+	 * restore via cli script.
+	 *
+	 * @since xxx
+	 */
+	public function createWpconfig() {
+		$wpconfig = '
+			define( \'DB_NAME\', \'' . DB_NAME . '\' );
+			define( \'DB_USER\', \'' . DB_USER . '\' );
+			define( \'DB_PASSWORD\', \'' . DB_PASSWORD . '\' );
+			define( \'DB_HOST\', \'' . DB_HOST . '\' );
+			define( \'DB_CHARSET\', \'' . DB_CHARSET . '\' );
+			define( \'DB_COLLATE\', \'\' );
+		';
+
+		file_put_contents( trailingslashit( ABSPATH ) . 'wp-config.php', $wpconfig ); // phpcs:ignore
+	}
+
+	/**
+	 * Delete a few files, drop a few tables, and make sure the delete / drop worked as expected.
+	 *
+	 * This method is intended to be ran before / after a restore method is executed. It is used to
+	 * delete files / drop tables, and after a restore, it makes sure those files and tables are
+	 * back.
+	 *
+	 * @since xxx.
+	 */
+	public function deleteBasic( $action = 'delete' ) {
+		$files_to_delete = [
+			trailingslashit( ABSPATH ) . 'wp-load.php',
+			trailingslashit( ABSPATH ) . 'wp-includes/theme.php',
+			trailingslashit( ABSPATH ) . 'wp-includes/rest-api/class-wp-rest-request.php',
+		];
+
+		$tables_to_drop = [
+			'wptests_commentmeta',
+			'wptests_comments',
+		];
+
+		switch ( $action ) {
+			case 'delete':
+				foreach ( $files_to_delete as $file ) {
+					$this->assertTrue( file_exists( $file ) );
+					unlink( $file );
+					$this->assertFalse( file_exists( $file ) );
+				}
+
+				foreach ( $tables_to_drop as $table ) {
+					$tables = $this->getTables();
+					$this->assertTrue( in_array( $table, $tables, true ) );
+
+					$this->dropTable( $table );
+
+					$tables = $this->getTables();
+					$this->assertFalse( in_array( $table, $tables, true ) );
+				}
+				break;
+			case 'restore':
+				foreach ( $files_to_delete as $file ) {
+					$this->assertTrue( file_exists( $file ) );
+				}
+
+				$tables = $this->getTables();
+				foreach ( $tables_to_drop as $table ) {
+					$this->assertTrue( in_array( $table, $tables, true ) );
+				}
+				break;
+		}
+	}
+
+	/**
 	 * Get an array of our db tables.
 	 *
 	 * @since xxx
@@ -176,74 +249,53 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 	 */
 	public function test_restore_archive_file() {
 		/*
-		 * Test 1: Basic test.
+		 * Test: Basic test.
 		 *
 		 * Create a basic backup. Delete some stuff. Restore the backup. Make sure everything worked.
 		 */
 
-		/*
-		 * Test 1.1: Create a backup if don't already have one.
-		 *
-		 * The backup should exist because of self::test_archive_files().
-		 */
+		// Create a backup if don't already have one.
 		if ( empty( $this->info ) ) {
 			$this->info = $this->core->archive_files( true );
 		}
 
-		$files_to_delete = [
-			trailingslashit( ABSPATH ) . 'wp-load.php',
-			trailingslashit( ABSPATH ) . 'wp-includes/theme.php',
-			trailingslashit( ABSPATH ) . 'wp-includes/rest-api/class-wp-rest-request.php',
-		];
+		$this->deleteBasic( 'delete' );
 
-		/*
-		 * Test 1.2: Delete a few files, drop a few tables, and make sure the delete / drop worked
-		 * as expected.
-		 */
-		$tables_to_drop = [
-			'wptests_commentmeta',
-			'wptests_comments',
-		];
-
-		foreach ( $files_to_delete as $file ) {
-			$this->assertTrue( file_exists( $file ) );
-			unlink( $file );
-			$this->assertFalse( file_exists( $file ) );
-		}
-
-		foreach ( $tables_to_drop as $table ) {
-			$tables = $this->getTables();
-			$this->assertTrue( in_array( $table, $tables, true ) );
-
-			$this->dropTable( $table );
-
-			$tables = $this->getTables();
-			$this->assertFalse( in_array( $table, $tables, true ) );
-		}
-
-		/*
-		 * Test 1.3: Restore our backup file.
-		 *
-		 * Requires padding some $_POST variables.
-		 */
+		// Pad necessary $_POST vars.
 		$_POST['restore_now']      = 1;
 		$_POST['archive_key']      = 0;
 		$_POST['archive_filename'] = basename( $this->info['filepath'] );
 
-		$restore_info = $this->core->restore_archive_file();
+		$this->core->restore_archive_file();
 
-		/*
-		 * Test 1.4: Test the restoration.
-		 *
-		 * Ensure all of our files and database tables are back.
-		 */
-		foreach ( $files_to_delete as $file ) {
-			$this->assertTrue( file_exists( $file ) );
+		$this->deleteBasic( 'restore' );
+	}
+
+	/**
+	 * Test restore_cli.
+	 *
+	 * There is not restore_cli method. This method tests the cron command generated to restore a
+	 * backup file.
+	 *
+	 * @since xxx
+	 */
+	public function test_restore_cli() {
+		$this->createWpconfig();
+
+		if ( empty( $this->info ) ) {
+			$this->info = $this->core->archive_files( true );
 		}
 
-		$tables = $this->getTables();
-		foreach ( $tables_to_drop as $table ) {
-			$this->assertTrue( in_array( $table, $tables, true ) );
-		}
+		$this->deleteBasic( 'delete' );
+
+		// Get our restore command.
+		$cron = $this->core->cron->get_restore_command();
+		$cron = strstr( $cron, 'php' );
+		$cron = strstr( $cron, ' > /dev/null', true );
+
+		// Restore.
+		exec( $cron, $output ); // phpcs:ignore
+
+		$this->deleteBasic( 'restore' );
 	}
 }
