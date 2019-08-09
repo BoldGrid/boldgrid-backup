@@ -100,7 +100,7 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 	public function dropTable( $table ) {
 		global $wpdb;
 
-		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %s', $table ) );
+		$wpdb->query( 'DROP TABLE IF EXISTS ' . $table ); // phpcs:ignore
 	}
 
 	/**
