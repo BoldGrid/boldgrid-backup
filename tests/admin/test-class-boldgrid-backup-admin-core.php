@@ -100,7 +100,7 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 	public function dropTable( $table ) {
 		global $wpdb;
 
-		$wpdb->query( 'DROP TABLE IF EXISTS ' . $table );
+		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %s', $table ) );
 	}
 
 	/**
@@ -117,8 +117,8 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 
 		$sql_tables = $wpdb->get_results( 'SHOW TABLES' );
 
-		foreach( $sql_tables as $table ) {
-			$tables[] = $table->Tables_in_bradm_wp_test;
+		foreach ( $sql_tables as $table ) {
+			$tables[] = $table->Tables_in_bradm_wp_test; // phpcs:ignore
 		}
 
 		return $tables;
@@ -213,12 +213,12 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 
 		foreach ( $tables_to_drop as $table ) {
 			$tables = $this->getTables();
-			$this->assertTrue( in_array( $table, $tables ) );
+			$this->assertTrue( in_array( $table, $tables, true ) );
 
 			$this->dropTable( $table );
 
 			$tables = $this->getTables();
-			$this->assertFalse( in_array( $table, $tables ) );
+			$this->assertFalse( in_array( $table, $tables, true ) );
 		}
 
 		/*
@@ -243,7 +243,7 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 
 		$tables = $this->getTables();
 		foreach ( $tables_to_drop as $table ) {
-			$this->assertTrue( in_array( $table, $tables ) );
+			$this->assertTrue( in_array( $table, $tables, true ) );
 		}
 	}
 }
