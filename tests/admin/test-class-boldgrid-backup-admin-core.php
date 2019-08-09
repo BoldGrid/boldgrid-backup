@@ -112,7 +112,7 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 		$this->assertTrue( ! empty( $info['filepath'] ) );
 
 		// Ensure the $info returned matches the data stored in the boldgrid_backup_latest_backup option.
-		$this->assertTrue( $info === get_option( 'boldgrid_backup_latest_backup' ) );
+		$this->assertTrue( get_option( 'boldgrid_backup_latest_backup' ) === $info );
 
 		// Ensure we have files and folders (IE they're not empty and the backup process recursed).
 		$this->assertDirNotEmpty( $info['filepath'], '.', 10, 10000, 3 );
