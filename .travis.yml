@@ -25,7 +25,7 @@ before_script:
 
 script:
   - find . -name composer -prune -o -name node_modules -prune -o -name '*.php' -exec php -lf {} \; > /dev/null
-  - phpunit --debug --coverage-clover=coverage.xml
+  - phpunit --debug --coverage-clover=coverage.xml --group ajax
   - yarn run php-codesniffer
   - yarn run js-lint
 
