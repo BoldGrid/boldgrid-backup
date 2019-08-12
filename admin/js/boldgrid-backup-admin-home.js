@@ -254,10 +254,19 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 					.html(
 						lang.savedTo +
 							response.data.filepath +
-							' <a href="' + response.data.detailsUrl + '">' + lang.viewDetails + '</a>' +
+							' <a href="' +
+							response.data.detailsUrl +
+							'">' +
+							lang.viewDetails +
+							'</a>' +
 							' <a class="button restore-now" href="#"' +
-							'" data-archive-filename="' + response.data.archiveFilename +
-							'" data-nonce="' + data._wpnonce + '">' + lang.restore + '</a><span class="spinner"></span>'
+							'" data-archive-filename="' +
+							response.data.archiveFilename +
+							'" data-nonce="' +
+							data._wpnonce +
+							'">' +
+							lang.restore +
+							'</a><span class="spinner"></span>'
 					);
 			} else if ( response.data !== undefined && response.data.error !== undefined ) {
 				$notice
