@@ -34,7 +34,7 @@ class Boldgrid_Backup_Admin_Dashboard {
 	 *
 	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
 	 */
-	public function __construct( $core ) {
+	public function __construct( Boldgrid_Backup_Admin_Core $core ) {
 		$this->core = $core;
 	}
 

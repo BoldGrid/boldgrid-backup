@@ -303,7 +303,7 @@ class Boldgrid_Backup_Admin_Settings {
 	public function has_scheduled_backups() {
 		$settings = $this->get_settings();
 
-		$schedule = empty( $settings['schedule'] ) ? array() : $settings['schedule'];
+		$schedule = empty( $settings['schedule'] ) ? [] : $settings['schedule'];
 
 		$days_scheduled = 0;
 

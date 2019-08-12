@@ -15,5 +15,6 @@ cli/bgbkup-cli.log
 cron/cron-test.config
 cron/cron-test.result
 cron/restore-info.json
+cron/bgbkup-cli.log
 boldgrid-backup-cron.log
 .ea-php-cli.cache
