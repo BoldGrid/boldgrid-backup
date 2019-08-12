@@ -184,9 +184,14 @@ class Boldgrid_Backup_Admin_Archives {
 	 *
 	 * @since 1.6.0
 	 *
+	 * @param  array $options {
+	 *     Display options.
+	 *
+	 *     @type bool $show_link_button Display the "Get Download Link" button.
+	 * }
 	 * @return string
 	 */
-	public function get_table() {
+	public function get_table( array $options = [] ) {
 		$this->core->archives_all->init();
 		$backup       = __( 'Backup', 'boldgrid-backup' );
 		$view_details = __( 'View details', 'boldgrid-backup' );
@@ -232,8 +237,15 @@ class Boldgrid_Backup_Admin_Archives {
 							href="admin.php?page=boldgrid-backup-archive-details&filename=%4$s"
 						>%5$s</a>
 					</td>
+					' . (
+						! empty( $options['show_link_button'] ) ?
+						'<td>' . $this->core->archive_actions->get_download_link_button( $archive['filename'] ) . '</td>' : ''
+						) . '
 				</tr>
-				',
+				' . (
+					! empty( $options['show_link_button'] ) ?
+					'<tr><td colspan="4"><div id="download-link-copy" class="notice notice-info inline"></div></td></tr>' : ''
+				),
 				/* 1 */ $backup,
 				/* 2 */ empty( $title ) ? '' : '<strong>' . esc_html( $title ) . '</strong><br />',
 				/* 3 */ Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive['size'] ),

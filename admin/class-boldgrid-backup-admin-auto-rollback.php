@@ -295,6 +295,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 			'unknownError' => __( 'Unknown error.', 'boldgrid-backup' ),
 			'ajaxError'    => __( 'Could not reach the URL address. HTTP error: ', 'boldgrid-backup' ),
 			'urlRegex'     => $this->core->configs['url_regex'],
+			'restore'      => __( 'Restore', 'boldgrid-backup' ),
 		);
 
 		wp_localize_script( $handle, 'BoldGridBackupAdminHome', $translation );

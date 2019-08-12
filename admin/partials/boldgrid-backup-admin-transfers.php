@@ -13,48 +13,58 @@
 
 defined( 'WPINC' ) || die;
 
-$nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
+$nav         = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
+$overview    = include BOLDGRID_BACKUP_PATH . '/admin/partials/transfers/overview.php';
+$source      = include BOLDGRID_BACKUP_PATH . '/admin/partials/transfers/source.php';
+$destination = include BOLDGRID_BACKUP_PATH . '/admin/partials/transfers/destination.php';
+
+$this->core->archive_actions->enqueue_scripts();
+$this->core->auto_rollback->enqueue_home_scripts();
+
+$sections = [
+	'sections' => [
+		[
+			'id'      => 'section_transfers',
+			'title'   => __( 'Overview', 'boldgrid-backup' ),
+			'content' => $overview,
+		],
+		[
+			'id'      => 'section_source',
+			'title'   => __( 'Source', 'boldgrid-backup' ),
+			'content' => $source,
+		],
+		[
+			'id'      => 'section_destination',
+			'title'   => __( 'Destination', 'boldgrid-backup' ),
+			'content' => $destination,
+		],
+	],
+];
+
+/**
+ * Allow other plugins to modify the sections of the tools page.
+ *
+ * @since 1.6.0
+ *
+ * @param array $sections Sections.
+ */
+$sections = apply_filters( 'boldgrid_backup_transfers_sections', $sections );
+
+/**
+ * Render the $sections into displayable markup.
+ *
+ * @since 1.6.0
+ *
+ * @param array $sections Sections.
+ *
+ * phpcs:disable WordPress.NamingConventions.ValidHookName
+ */
+$col_container = apply_filters( 'Boldgrid\Library\Ui\render_col_container', $sections );
 ?>
 
 <div class='wrap'>
 	<h1><?php esc_html_e( 'BoldGrid Backup Transfers', 'boldgrid-backup' ); ?></h1>
-	<?php
-	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
-	?>
 	<div class="bgbkup-transfers-page">
-	<?php
-	printf(
-		'<div class="bgbkup-transfers-source bg-box">
-		<div class="bg-box-top">
-		%1$s
-		</div>
-		<div class="bg-box-bottom">
-		%2$s
-		</div>
-		</div>',
-		esc_html__( 'Source', 'boldgrid-backup' ),
-		$this->core->archives->get_table() // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
-	);
-
-	printf(
-		'<div class="bgbkup-transfers-destination bg-box">
-		<div class="bg-box-top">
-		%1$s
-		</div>
-		<div class="bg-box-bottom">
-			<div id="url-import-section" class="wp-upload-form">
-				%2$s <input type="text" name="url" placeholder="%3$s" size="30" />
-				<input class="button" type="submit" value="%4$s" />
-				<span class="spinner"></span>
-				<div id="url-import-notice" class="notice notice-success inline"></div>
-			</div>
-		</div>
-		</div>',
-		esc_html__( 'Destination', 'boldgrid-backup' ),
-		esc_html__( 'From a URL address:', 'boldgrid-backup' ),
-		esc_attr__( 'Download URL address', 'boldgrid-backup' ),
-		esc_attr__( 'Upload', 'boldgrid-backup' )
-	);
-	?>
+		<?php echo $nav . $col_container; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped ?>
 	</div>
 </div>

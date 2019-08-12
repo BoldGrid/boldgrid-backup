@@ -474,25 +474,26 @@ class Boldgrid_Backup_Admin_Upload {
 			$this->core->remote->post_download( $filepath );
 
 			wp_send_json_success(
-				array(
-					'filepath'   => $filepath,
-					'detailsUrl' => admin_url(
+				[
+					'filepath'        => $filepath,
+					'detailsUrl'      => admin_url(
 						'admin.php?page=boldgrid-backup-archive-details&filename=' .
 						basename( $filepath )
 					),
-				)
+					'archiveFilename' => basename( $filepath ),
+				]
 			);
 		} else {
 			$this->core->wp_filesystem->delete( $filepath );
 		}
 
 		wp_send_json_error(
-			array(
+			[
 				'error' => __(
 					'Could not retrieve the remote file.  It may not be a ZIP file, or the link is no longer valid.',
 					'boldgrid-backup'
 				),
-			)
+			]
 		);
 	}
 }

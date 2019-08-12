@@ -816,6 +816,32 @@ class Boldgrid_Backup_Admin_Core {
 			]
 		);
 
+		// Add "Transfers" page.
+		add_submenu_page(
+			$main_slug,
+			$lang['boldgrid_backup'] . ' ' . $lang['transfers'],
+			$lang['transfers'],
+			$capability,
+			'boldgrid-backup-transfers',
+			[
+				$this->transfers,
+				'page',
+			]
+		);
+
+		// Add "Tools" page.
+		add_submenu_page(
+			$main_slug,
+			$lang['boldgrid_backup'] . ' ' . $lang['tools'],
+			$lang['tools'],
+			$capability,
+			'boldgrid-backup-tools',
+			[
+				$this->tools,
+				'page',
+			]
+		);
+
 		/*
 		 * Add "Settings", formally known as "Backup Settings".
 		 *
@@ -856,32 +882,6 @@ class Boldgrid_Backup_Admin_Core {
 			[
 				$this->archive_details,
 				'render_archive',
-			]
-		);
-
-		// Add "Tools" page.
-		add_submenu_page(
-			$main_slug,
-			$lang['boldgrid_backup'] . ' ' . $lang['tools'],
-			$lang['tools'],
-			$capability,
-			'boldgrid-backup-tools',
-			[
-				$this->tools,
-				'page',
-			]
-		);
-
-		// Add "Transfers" page.
-		add_submenu_page(
-			$main_slug,
-			$lang['boldgrid_backup'] . ' ' . $lang['transfers'],
-			$lang['transfers'],
-			$capability,
-			'boldgrid-backup-transfers',
-			[
-				$this->transfers,
-				'page',
 			]
 		);
 

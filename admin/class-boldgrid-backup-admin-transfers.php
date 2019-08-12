@@ -44,6 +44,8 @@ class Boldgrid_Backup_Admin_Transfers {
 	 */
 	public function page() {
 		wp_enqueue_style( 'bglib-ui-css' );
+		wp_enqueue_script( 'bglib-ui-js' );
+		wp_enqueue_script( 'bglib-sticky' );
 
 		wp_enqueue_style(
 			'boldgrid-backup-admin-transfers',
