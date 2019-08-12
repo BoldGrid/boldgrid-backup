@@ -39,45 +39,6 @@ class Boldgrid_Backup_Admin_Archives {
 	}
 
 	/**
-	 *
-	 */
-	public function get_empty_markup() {
-		$markup  = '
-			<div class="notice notice-warning inline" style="margin:15px 0">
-				<p>
-					<strong>
-					' . esc_html__( 'It looks like you don\'t have any backups! That\'s ok, let\'s fix that now. Here\'s what we recommend you do:', 'boldgrid-backup' ) . '
-					</strong>
-				</p>
-				<ol>
-					<li>';
-		$markup .= wp_kses(
-			sprintf(
-				// translators: 1 an opening strong tag, 2 its closing strong tag.
-				__( 'Create a backup of your site right now by clicking the %1$sBackup Site Now%2$s button at the top of the page.', 'boldgrid-backup' ),
-				'<strong>',
-				'</strong>'
-			),
-			array( 'strong' => array() )
-		);
-		$markup .= '</li><li>';
-		$markup .= wp_kses(
-			sprintf(
-				// translators: 1 the opening anchor tag linking to the settings page, 2 its closing anchor tag.
-				__( 'After the backup is created, go to your %1$ssettings%2$s page and setup backups so they\'re create automatically on a set schedule.', 'boldgrid-backup' ),
-				'<a href="' . $this->core->settings->get_settings_url() . '">',
-				'</a>'
-			),
-			array( 'a' => array( 'href' => array() ) )
-		);
-		$markup .= '</li>
-				</ol>
-			</div>';
-
-		return $markup;
-	}
-
-	/**
 	 * Get the location type from a location.
 	 *
 	 * @since 1.6.0
@@ -227,8 +188,12 @@ class Boldgrid_Backup_Admin_Archives {
 	 */
 	public function get_table() {
 		$this->core->archives_all->init();
+		$backup       = __( 'Backup', 'boldgrid-backup' );
+		$view_details = __( 'View details', 'boldgrid-backup' );
 
-		$table = sprintf(
+		$table = $this->get_mine_count();
+
+		$table .= sprintf(
 			'
 			<table class="wp-list-table widefat fixed striped pages">
 				<thead>
@@ -269,11 +234,11 @@ class Boldgrid_Backup_Admin_Archives {
 					</td>
 				</tr>
 				',
-				/* 1 */ __( 'Backup', 'boldgrid-backup' ),
+				/* 1 */ $backup,
 				/* 2 */ empty( $title ) ? '' : '<strong>' . esc_html( $title ) . '</strong><br />',
 				/* 3 */ Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive['size'] ),
 				/* 4 */ $archive['filename'],
-				/* 5 */ __( 'View details', 'boldgrid-backup' ),
+				/* 5 */ $view_details,
 				/* 6 */ $locations,
 				/* 7 */ $this->core->time->get_span()
 			);
@@ -281,6 +246,46 @@ class Boldgrid_Backup_Admin_Archives {
 		$table .= '</tbody>
 			</table>
 		';
+
+		/*
+		 * Create message for users who have no backups.
+		 *
+		 * If a user has no backups, instead of saying, "Hey, you have no backups", we should inform
+		 * the user (1) how they can create their first backup and (2) how they can schedule backups.
+		 */
+		if ( empty( $this->core->archives_all->all ) ) {
+			$table  = '
+			<div class="notice notice-warning inline" style="margin:15px 0">
+				<p>
+					<strong>
+					' . esc_html( 'It looks like you don\'t have any backups! That\'s ok, let\'s fix that now. Here\'s what we recommend you do:', 'boldgrid-backup' ) . '
+					</strong>
+				</p>
+				<ol>
+					<li>';
+			$table .= wp_kses(
+				sprintf(
+					// translators: 1 an opening strong tag, 2 its closing strong tag.
+					__( 'Create a backup of your site right now by clicking the %1$sBackup Site Now%2$s button at the top of the page.', 'boldgrid-backup' ),
+					'<strong>',
+					'</strong>'
+				),
+				array( 'strong' => array() )
+			);
+			$table .= '</li><li>';
+			$table .= wp_kses(
+				sprintf(
+					// translators: 1 the opening anchor tag linking to the settings page, 2 its closing anchor tag.
+					__( 'After the backup is created, go to your %1$ssettings%2$s page and setup backups so they\'re create automatically on a set schedule.', 'boldgrid-backup' ),
+					'<a href="' . $this->core->settings->get_settings_url() . '">',
+					'</a>'
+				),
+				array( 'a' => array( 'href' => array() ) )
+			);
+			$table .= '</li>
+				</ol>
+			</div>';
+		}
 
 		return $table;
 	}

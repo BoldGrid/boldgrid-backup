@@ -2284,19 +2284,7 @@ class Boldgrid_Backup_Admin_Core {
 			$settings['backup_directory'] = $this->backup_dir->get();
 		}
 
-		/*
-		 * Get the markup of a table showing all the backups.
-		 *
-		 * If a user has no backups, instead of saying, "Hey, you have no backups", we should inform
-		 * the user (1) how they can create their first backup and (2) how they can schedule backups.
-		 */
-		$this->archives_all->init();
-		if ( ! empty( $this->archives_all->all ) ) {
-			$table  = $this->archives->get_mine_count();
-			$table .= $this->archives->get_table();
-		} else {
-			$table = $this->archives->get_empty_markup();
-		}
+		$table = $this->archives->get_table();
 
 		// Include the home page template.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-home.php';
