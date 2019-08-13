@@ -132,6 +132,10 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
+= 1.10.7 In progress =
+
+* Bug fix:     Fixed database table exclusion when none are selected.
+
 = 1.10.6 =
 
 Release date: August 1st, 2019
