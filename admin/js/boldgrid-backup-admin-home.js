@@ -263,7 +263,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 							'" data-archive-filename="' +
 							response.data.archiveFilename +
 							'" data-nonce="' +
-							data._wpnonce +
+							$( '[name="_wpnonce_restore"]' ).val() +
 							'">' +
 							lang.restore +
 							'</a><span class="spinner"></span>'

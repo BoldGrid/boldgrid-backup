@@ -26,6 +26,7 @@ return sprintf(
 			<span class="spinner"></span>
 			<div id="url-import-notice" class="notice notice-success inline"></div>
 			%7$s
+			%8$s
 		</div>
 	</div>',
 	esc_html__( 'Use this section if you want to select this WordPress installation as the destination.', 'boldgrid_backup' ),
@@ -34,5 +35,6 @@ return sprintf(
 	esc_html__( 'Import from a download link:', 'boldgrid-backup' ),
 	esc_attr__( 'Download URL address', 'boldgrid-backup' ),
 	esc_attr__( 'Upload', 'boldgrid-backup' ),
-	wp_nonce_field( 'upload_archive_file' ) // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+	wp_nonce_field( 'upload_archive_file' ), // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+	wp_nonce_field( 'boldgrid_backup_restore_archive', '_wpnonce_restore' ) // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 );
