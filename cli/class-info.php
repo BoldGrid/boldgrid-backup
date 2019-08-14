@@ -125,6 +125,10 @@ class Info {
 	 */
 	public static function print_errors() {
 		if ( self::has_errors() ) {
+			if ( ! defined( 'STDERR' ) ) {
+				define( 'STDERR', fopen( 'php://stderr', 'w' ) );
+			}
+
 			fwrite( STDERR, implode( PHP_EOL, self::$info['errors'] ) . PHP_EOL );
 		}
 	}
