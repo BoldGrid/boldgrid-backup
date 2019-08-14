@@ -38,9 +38,9 @@ class Premium extends \Boldgrid\Library\Library\Ui\Card {
 		$features = [];
 
 		if ( empty( $api_key ) ) {
-			$this->title = __( 'Sign up for BoldGrid Central!', 'boldgrid-backup' );
+			$this->title = esc_html__( 'Sign up for BoldGrid Central!', 'boldgrid-backup' );
 
-			$this->subTitle = __( 'We can help your website thrive in more ways than one.', 'boldgrid-backup' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
+			$this->subTitle = esc_html__( 'We can help your website thrive in more ways than one.', 'boldgrid-backup' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
 
 			$this->features = [
 				new \Boldgrid\Backup\Admin\Card\Feature\Cloud_WordPress(),
