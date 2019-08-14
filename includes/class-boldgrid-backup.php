@@ -487,7 +487,7 @@ class Boldgrid_Backup {
 
 		$this->loader->add_filter( 'boldgrid_backup_get_core', $plugin_admin_core, 'get_core' );
 
-		$this->loader->add_filter( 'Boldgrid\Library\Notifications\DashboardWidget\displayWidget\plugin-boldgrid-backup', $plugin_admin_core->dashboard_widget, 'filter_item' );
+		$this->loader->add_filter( 'Boldgrid\Library\Notifications\DashboardWidget\getFeaturePlugin\boldgrid-backup', $plugin_admin_core->dashboard_widget, 'filter_feature', 10, 2 );
 
 		$plugins = new Boldgrid_Backup_Admin_Plugins();
 		$this->loader->add_filter( 'plugin_action_links_boldgrid-backup/boldgrid-backup.php', $plugins, 'plugin_action_links', 10, 4 );
