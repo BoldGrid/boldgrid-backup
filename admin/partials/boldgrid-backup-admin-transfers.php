@@ -42,7 +42,7 @@ $sections = [
 ];
 
 /**
- * Allow other plugins to modify the sections of the tools page.
+ * Allow other plugins to modify the sections of the transfers page.
  *
  * @since 1.6.0
  *
