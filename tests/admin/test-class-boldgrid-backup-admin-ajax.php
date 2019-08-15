@@ -69,11 +69,19 @@ class Test_Boldgrid_Backup_Admin_Ajax extends WP_Ajax_UnitTestCase {
 		global $_GET; // phpcs:ignore
 		unset( $_GET['backup_id'] );
 
+		update_option( 'boldgrid_backup_pending_rollback', 'test' );
+
 		try {
 			@$this->_handleAjax( 'nopriv_boldgrid_cli_cancel_rollback' );
 		} catch ( WPAjaxDieStopException $e ) {
 			echo null; // Do nothing.
 		}
+
+		/*
+		 * This option was given a value above, and because the cancel rollback method failed, the
+		 * value should still be the same.
+		 */
+		$this->assertEquals( 'test', get_option( 'boldgrid_backup_pending_rollback' ) );
 
 		$response = json_decode( $this->_last_response );
 
