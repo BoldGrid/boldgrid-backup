@@ -138,6 +138,11 @@ Release date: August ??, 2019
 
 * New feature: Added a transfers page.
 
+= 1.10.7 In progress =
+
+* Update:      Updated auto-rollback to use the CLI restoration process.
+* Bug fix:     Fixed database table exclusion when none are selected.
+
 = 1.10.6 =
 
 Release date: August 1st, 2019
