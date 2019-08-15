@@ -32,7 +32,7 @@ class More_Backup extends \Boldgrid\Library\Library\Ui\Feature {
 		$this->content = '<p>' . wp_kses(
 			sprintf(
 				// translators: 1 A span displaying the Google Drive logo, 2 a span displaying the Amazon S3 logo.
-				__( 'With BoldGrid Backup Premium, you can store backups on %1$s and %2$s, restore individual files with just a click, and more!', 'boldgrid-backup' ),
+				__( 'BoldGrid Backup Premium can store backups on %1$s and %2$s, restore individual files with just a click, and more!', 'boldgrid-backup' ),
 				'<span class="bgbkup-remote-logo bgbkup-gdrive-logo" title="Google Drive"></span>',
 				'<span class="bgbkup-remote-logo amazon-s3-logo" title="Amazon S3"></span>'
 			),
