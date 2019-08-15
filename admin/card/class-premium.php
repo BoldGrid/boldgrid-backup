@@ -43,9 +43,9 @@ class Premium extends \Boldgrid\Library\Library\Ui\Card {
 			$this->subTitle = esc_html__( 'We can help your website thrive in more ways than one.', 'boldgrid-backup' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
 
 			$this->features = [
-				new \Boldgrid\Backup\Admin\Card\Feature\Cloud_WordPress(),
-				new \Boldgrid\Backup\Admin\Card\Feature\Speed_Coach(),
-				new \Boldgrid\Backup\Admin\Card\Feature\Sign_Up(),
+				new Feature\Cloud_WordPress(),
+				new Feature\Speed_Coach(),
+				new Feature\Sign_Up(),
 			];
 		} elseif ( ! $core->config->get_is_premium() ) {
 			$this->title = esc_html__( 'Enjoying your free account?', 'boldgrid-backup' );
@@ -53,9 +53,9 @@ class Premium extends \Boldgrid\Library\Library\Ui\Card {
 			$this->subTitle = esc_html__( 'We hope so. There\'s more available by upgrading now!', 'boldgrid-backup' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
 
 			$this->features = [
-				new \Boldgrid\Backup\Admin\Card\Feature\More_Backup(),
-				new \Boldgrid\Backup\Admin\Card\Feature\More_Boldgrid(),
-				new \Boldgrid\Backup\Admin\Card\Feature\More_Central(),
+				new Feature\More_Backup(),
+				new Feature\More_Boldgrid(),
+				new Feature\More_Central(),
 			];
 		} else {
 			$this->title = esc_html__( 'BoldGrid Premium', 'boldgrid-backup' );
@@ -63,7 +63,7 @@ class Premium extends \Boldgrid\Library\Library\Ui\Card {
 			$this->subTitle = esc_html__( 'Thank you for running BoldGrid Premium!', 'boldgrid-backup' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
 
 			$this->features = [
-				new \Boldgrid\Backup\Admin\Card\Feature\Central(),
+				new Feature\Central(),
 			];
 		}
 	}
