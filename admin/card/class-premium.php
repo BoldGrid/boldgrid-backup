@@ -43,7 +43,7 @@ class Premium extends \Boldgrid\Library\Library\Ui\Card {
 			$this->subTitle = esc_html__( 'We can help your website thrive in more ways than one.', 'boldgrid-backup' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
 
 			$this->features = [
-				new Feature\Cloud_WordPress(),
+				new Feature\Cloud_Wordpress(),
 				new Feature\Speed_Coach(),
 				new Feature\Sign_Up(),
 			];

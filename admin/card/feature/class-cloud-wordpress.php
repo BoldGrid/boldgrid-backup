@@ -18,7 +18,7 @@ namespace Boldgrid\Backup\Admin\Card\Feature;
  *
  * @since xxx
  */
-class Cloud_WordPress extends \Boldgrid\Library\Library\Ui\Feature {
+class Cloud_Wordpress extends \Boldgrid\Library\Library\Ui\Feature {
 	/**
 	 * Init.
 	 *
