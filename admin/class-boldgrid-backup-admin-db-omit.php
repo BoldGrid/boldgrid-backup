@@ -131,14 +131,9 @@ class Boldgrid_Backup_Admin_Db_Omit {
 		 */
 		$backup_now_full = $this->core->is_backup_now && 'full' === $this->get_post_type();
 
-		// When backing-up now with no database tables, we have to put something in the include list.
-		if ( 'full' !== $this->get_post_type() && empty( $_POST['include_tables'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
-			$_POST['include_tables'] = [ 'BGB-DB-Null-Placeholder' ];
-		}
-
 		if ( $this->core->is_archiving_update_protection || $backup_now_full || $this->core->pre_auto_update ) {
 			$excluded_tables = array();
-		} elseif ( $this->core->is_backup_now && isset( $_POST['include_tables'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		} elseif ( $this->core->is_backup_now ) {
 			$excluded_tables = $this->get_from_post();
 		} else {
 			$settings = $this->core->settings->get_settings();
