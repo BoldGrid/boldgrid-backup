@@ -56,7 +56,7 @@ class Boldgrid_Backup_Admin_Dashboard_Widget {
 					'<a href="' . esc_url( admin_url( 'admin.php?page=boldgrid-backup-dashboard' ) ) . '">',
 					'</a>'
 				),
-					array( 'a' => array( 'href' => array() ) )
+				array( 'a' => array( 'href' => array() ) )
 			) . '</p></div>';
 		}
 
