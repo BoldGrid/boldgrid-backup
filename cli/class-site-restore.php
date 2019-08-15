@@ -133,6 +133,7 @@ class Site_Restore {
 	 * @see self::restore_database()
 	 * @see self::increment_restore_attempts()
 	 * @see \Boldgrid\Backup\Cli\Log::write()
+	 * @see self::cancel_rollback()
 	 *
 	 * @return bool;
 	 */
@@ -154,6 +155,8 @@ class Site_Restore {
 			ignore_user_abort( true );
 			$this->set_time_limit();
 			$success = $this->restore_files() && $this->restore_database();
+
+			$this->cancel_rollback();
 		}
 
 		$this->increment_restore_attempts();
@@ -340,5 +343,20 @@ class Site_Restore {
 		file_put_contents( Info::get_results_filepath(), json_encode( $results ) );
 
 		Info::set_info_item( 'restore_attempts', $results['restore_attempts'] );
+	}
+
+	/**
+	 * Cancel any rollback scheduled.
+	 *
+	 * @since 1.10.7
+	 * @access private
+	 *
+	 * @see \Boldgrid\Backup\Cli\Info::get_arg_value()
+	 */
+	private function cancel_rollback() {
+		require_once dirname( dirname( __FILE__ ) ) . '/cron/class-boldgrid-backup-url-helper.php';
+		$url     = Info::get_info()['siteurl'] . '/wp-admin/admin-ajax.php?action=boldgrid_cli_cancel_rollback&backup_id=' .
+			Info::get_arg_value( 'backup_id' );
+		$success = ( new \Boldgrid_Backup_Url_Helper() )->call_url( $url, $status, $errorno, $error );
 	}
 }

@@ -325,6 +325,12 @@ class Boldgrid_Backup {
 			'wp_ajax_cancel'
 		);
 
+		// Add a custom action to handle AJAX callback for canceling a pending rollback from the CLI restoration script.
+		$this->loader->add_action(
+			'wp_ajax_nopriv_boldgrid_cli_cancel_rollback', $plugin_admin_core->auto_rollback,
+			'wp_ajax_cli_cancel'
+		);
+
 		if ( $plugin_admin_core->test->run_functionality_tests() ) {
 			$this->loader->add_action( 'admin_notices', $plugin_admin_core->auto_rollback, 'notice_backup_show' );
 		}
