@@ -28,6 +28,11 @@ class Test_Boldgrid_Backup_Admin_Ajax extends WP_Ajax_UnitTestCase {
 	 * @since 1.10.7
 	 */
 	public function setUp() {
+		parent::setup();
+
+		require_once dirname( dirname( __DIR__ ) ) . '/includes/class-boldgrid-backup.php';
+		( new Boldgrid_Backup() )->run();
+
 		$this->core = new Boldgrid_Backup_Admin_Core();
 	}
 
@@ -42,11 +47,8 @@ class Test_Boldgrid_Backup_Admin_Ajax extends WP_Ajax_UnitTestCase {
 
 		update_option( 'boldgrid_backup_pending_rollback', 'test' );
 
-		try {
-			@$this->_handleAjax( 'nopriv_boldgrid_cli_cancel_rollback' );
-		} catch ( WPAjaxDieStopException $e ) {
-			echo null; // Do nothing.
-		}
+		$this->setExpectedException( 'WPAjaxDieContinueException' );
+		$this->_handleAjax( 'nopriv_boldgrid_cli_cancel_rollback' );
 
 		// This option was given a value above, and the cancel rollback method should have deleted it.
 		$this->assertEmpty( get_option( 'boldgrid_backup_pending_rollback' ) );
@@ -56,7 +58,7 @@ class Test_Boldgrid_Backup_Admin_Ajax extends WP_Ajax_UnitTestCase {
 		$this->assertInternalType( 'object', $response ); // Should be an object.
 		$this->assertObjectHasAttribute( 'success', $response ); // Should have "success".
 		$this->assertTrue( $response->success ); // "success" should be TRUE.
-		$this->assertObjectHasAttribute( data, $response ); // Should have "data".
+		$this->assertObjectHasAttribute( 'data', $response ); // Should have "data".
 		$this->assertEquals( 'Rollback canceled', $response->data ); // "data" is a string; must match expected string.
 	}
 
@@ -71,11 +73,8 @@ class Test_Boldgrid_Backup_Admin_Ajax extends WP_Ajax_UnitTestCase {
 
 		update_option( 'boldgrid_backup_pending_rollback', 'test' );
 
-		try {
-			@$this->_handleAjax( 'nopriv_boldgrid_cli_cancel_rollback' );
-		} catch ( WPAjaxDieStopException $e ) {
-			echo null; // Do nothing.
-		}
+		$this->setExpectedException( 'WPAjaxDieContinueException' );
+		$this->_handleAjax( 'nopriv_boldgrid_cli_cancel_rollback' );
 
 		/*
 		 * This option was given a value above, and because the cancel rollback method failed, the
