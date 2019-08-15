@@ -26,6 +26,6 @@ return sprintf(
 	</div>',
 	esc_html__( 'Use this section if you want to select this WordPress installation as the source.', 'boldgrid_backup' ),
 	esc_html__( 'Choose a full backup in the list, click the "Get Download Link" button, and then click the "Copy Link" button.  The download link is valid for a limited time and can be used to import the backed-up website into another WordPress installation using BoldGrid Backup.', 'boldgrid_backup' ),
-	esc_html__( 'Note: Backup archives only existing in remote storage must first be downloaded to this web server in order to get a download link.  Click the "View Details" for an archive and use the details page to download from reomte storage.', 'boldgrid_backup' ),
+	esc_html__( 'Note: Backup archives only existing in remote storage must first be downloaded to this web server in order to get a download link.  Click the "View Details" for an archive and use the details page to download from remote storage.', 'boldgrid_backup' ),
 	$archive_list // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 );
