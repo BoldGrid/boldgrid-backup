@@ -1079,8 +1079,8 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 *
 	 * @since 1.7.0
 	 *
-	 * @param  array|false WordPress option value for "boldgrid_backup_pending_rollback".
-	 * @param  string      Option name.
+	 * @param  array|false $value  WordPress option value for "boldgrid_backup_pending_rollback".
+	 * @param  string      $option Option name.
 	 * @return array|false
 	 */
 	public function validate_rollback_option( $value, $option ) {
@@ -1094,5 +1094,25 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		}
 
 		return $value;
+	}
+
+	/**
+	 * Callback function for canceling a pending rollback from the cli process.
+	 *
+	 * This admin-ajax call is unprovileged, so that the CLI script can make the call.
+	 * The only validation that we use is the backup identifier.
+	 * Nobody will be trying to cancel rollbacks (with a 15-minute window) anyways.
+	 *
+	 * @since 1.10.7
+	 */
+	public function wp_ajax_cli_cancel() {
+		$backup_id_match = ! empty( $_GET['backup_id'] ) && $this->core->get_backup_identifier() === sanitize_key( $_GET['backup_id'] ); // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+
+		if ( $backup_id_match ) {
+			$this->cancel();
+			wp_send_json_success( __( 'Rollback canceled', 'boldgrid-backup' ) );
+		} else {
+			wp_send_json_error( __( 'Invalid arguments', 'boldgrid-backup' ), 400 );
+		}
 	}
 }
