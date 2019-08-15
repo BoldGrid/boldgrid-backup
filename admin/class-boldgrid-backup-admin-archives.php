@@ -238,11 +238,13 @@ class Boldgrid_Backup_Admin_Archives {
 						>%5$s</a>
 					</td>
 					' . (
+						// Show a "Get Download Link" button.
 						! empty( $options['show_link_button'] ) ?
 						'<td>' . $this->core->archive_actions->get_download_link_button( $archive['filename'] ) . '</td>' : ''
 						) . '
 				</tr>
 				' . (
+					// If showing a "Get Download Link" button, we need a container to show the results.
 					! empty( $options['show_link_button'] ) ?
 					'<tr><td colspan="4"><div id="download-link-copy" class="notice notice-info inline"></div></td></tr>' : ''
 				),

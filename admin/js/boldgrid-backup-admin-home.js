@@ -259,6 +259,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 							'">' +
 							lang.viewDetails +
 							'</a>' +
+							// Add a "Restore" button.
 							' <a class="button restore-now" href="#"' +
 							' data-restore-now=1' +
 							'" data-archive-filename="' +
