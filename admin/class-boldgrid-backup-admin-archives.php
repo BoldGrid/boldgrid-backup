@@ -197,7 +197,13 @@ class Boldgrid_Backup_Admin_Archives {
 		$backup       = __( 'Backup', 'boldgrid-backup' );
 		$view_details = __( 'View details', 'boldgrid-backup' );
 
-		$table = $this->get_mine_count();
+		// If showing a "Get Download Link" button, we need a container to show the results.
+		$table = (
+			! empty( $options['show_link_button'] ) ?
+			'<div id="download-link-copy" class="notice notice-info inline"></div>' : ''
+		);
+
+		$table .= $this->get_mine_count();
 
 		$table .= sprintf(
 			'
@@ -243,12 +249,7 @@ class Boldgrid_Backup_Admin_Archives {
 						// Show a "Get Download Link" button.
 						! empty( $options['show_link_button'] ) ?
 						'<td>' . $this->core->archive_actions->get_download_link_button( $archive['filename'] ) . '</td>' : ''
-				) . '</tr>' .
-				(
-					// If showing a "Get Download Link" button, we need a container to show the results.
-					! empty( $options['show_link_button'] ) ?
-					'<tr><td colspan="4"><div id="download-link-copy" class="notice notice-info inline"></div></td></tr>' : ''
-				),
+				) . '</tr>',
 				/* 1 */ $backup,
 				/* 2 */ empty( $title ) ? '' : '<strong>' . esc_html( $title ) . '</strong><br />',
 				/* 3 */ Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive['size'] ),
