@@ -3,7 +3,7 @@
  * More_Backup class.
  *
  * @link       https://www.boldgrid.com
- * @since      xxx
+ * @since      1.11.0
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Card
@@ -16,13 +16,13 @@ namespace Boldgrid\Backup\Admin\Card\Feature;
 /**
  * Class: More_Backup
  *
- * @since xxx
+ * @since 1.11.0
  */
 class More_Backup extends \Boldgrid\Library\Library\Ui\Feature {
 	/**
 	 * Init.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 */
 	public function init() {
 		$this->icon = '<span class="dashicons dashicons-vault"></span>';

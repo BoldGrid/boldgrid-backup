@@ -5,7 +5,7 @@
  * This is an object class, representing crontab.
  *
  * @link       https://www.boldgrid.com
- * @since      xxx
+ * @since      1.11.0
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Cron
@@ -18,7 +18,7 @@ namespace Boldgrid\Backup\Admin\Cron;
 /**
  * Class: Crontab
  *
- * @since xxx
+ * @since 1.11.0
  */
 class Crontab {
 	/**
@@ -27,7 +27,7 @@ class Crontab {
 	 * This method is similar to the Boldgrid_Backup_Admin_Cron::entry_search() method, except it
 	 * accepts an array of patterns to search for, rather than just one.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 *
 	 * @param  array $patterns An array of patterns to search for. All patterns must be found in
 	 *                         order to return a cron entry as a match.

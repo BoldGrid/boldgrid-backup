@@ -3,7 +3,7 @@
  * Cloud_WordPress class.
  *
  * @link       https://www.boldgrid.com
- * @since      xxx
+ * @since      1.11.0
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Card
@@ -16,13 +16,13 @@ namespace Boldgrid\Backup\Admin\Card\Feature;
 /**
  * Class: Cloud_WordPress
  *
- * @since xxx
+ * @since 1.11.0
  */
 class Cloud_Wordpress extends \Boldgrid\Library\Library\Ui\Feature { //phpcs:ignore
 	/**
 	 * Init.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 */
 	public function init() {
 		$this->icon = '<span class="dashicons dashicons-cloud"></span>';

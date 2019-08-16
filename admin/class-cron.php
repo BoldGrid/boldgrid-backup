@@ -5,7 +5,7 @@
  * This is a controller class, working with classes within the admin/cron folder.
  *
  * @link       https://www.boldgrid.com
- * @since      xxx
+ * @since      1.11.0
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Cron
@@ -18,13 +18,13 @@ namespace Boldgrid\Backup\Admin;
 /**
  * Class: Cron
  *
- * @since xxx
+ * @since 1.11.0
  */
 class Cron {
 	/**
 	 * Get our cron configs.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 *
 	 * @return array
 	 */
@@ -35,7 +35,7 @@ class Cron {
 	/**
 	 * Get our cron engine (either "cron" or "wp-cron").
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 *
 	 * @return string
 	 */
@@ -48,7 +48,7 @@ class Cron {
 	/**
 	 * Get a cron entry.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 *
 	 * @param string $name The cron entry to get.
 	 * @return mixed
@@ -84,7 +84,7 @@ class Cron {
 	 *
 	 * Determine our cron engine and return the appropriate entry class object.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 *
 	 * @return mixed
 	 */

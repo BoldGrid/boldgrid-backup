@@ -5,7 +5,7 @@
  * This is our entry interface.
  *
  * @link       https://www.boldgrid.com
- * @since      xxx
+ * @since      1.11.0
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Cron
@@ -18,7 +18,7 @@ namespace Boldgrid\Backup\Admin\Cron\Entry;
 /**
  * Class: Entry
  *
- * @since xxx
+ * @since 1.11.0
  */
 interface Entry {
 	public function get_next_runtime();

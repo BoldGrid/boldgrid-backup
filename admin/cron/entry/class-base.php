@@ -5,7 +5,7 @@
  * This is our base class for an entry.
  *
  * @link       https://www.boldgrid.com
- * @since      xxx
+ * @since      1.11.0
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Cron
@@ -20,13 +20,13 @@ use Boldgrid\Backup\Admin\Cron\Entry\Entry;
 /**
  * Class: Entry
  *
- * @since xxx
+ * @since 1.11.0
  */
 class Base implements Entry {
 	/**
 	 * Get our cron entry's next runtime.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 *
 	 * @return bool
 	 */
@@ -37,7 +37,7 @@ class Base implements Entry {
 	/**
 	 * Initialize our cron entry.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 *
 	 * @return bool
 	 */
@@ -48,7 +48,7 @@ class Base implements Entry {
 	/**
 	 * Get whether or not our cron entry exists in the cron engine.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 *
 	 * @return boolean
 	 */

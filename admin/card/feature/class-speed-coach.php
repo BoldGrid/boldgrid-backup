@@ -3,7 +3,7 @@
  * Speed_Coach class.
  *
  * @link       https://www.boldgrid.com
- * @since      xxx
+ * @since      1.11.0
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Card
@@ -16,13 +16,13 @@ namespace Boldgrid\Backup\Admin\Card\Feature;
 /**
  * Class: Speed_Coach
  *
- * @since xxx
+ * @since 1.11.0
  */
 class Speed_Coach extends \Boldgrid\Library\Library\Ui\Feature {
 	/**
 	 * Init.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 */
 	public function init() {
 		$this->icon = '<span class="dashicons dashicons-chart-line"></span>';

@@ -3,7 +3,7 @@
  * Updates class.
  *
  * @link       https://www.boldgrid.com
- * @since      xxx
+ * @since      1.11.0
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Card
@@ -19,13 +19,13 @@ namespace Boldgrid\Backup\Admin\Card;
  * This class is responsible for rendering the "Update Management" card on the BoldGrid Backup
  * dashboard.
  *
- * @since xxx
+ * @since 1.11.0
  */
 class Updates extends \Boldgrid\Library\Library\Ui\Card {
 	/**
 	 * Init.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 */
 	public function init() {
 		$this->id = 'bgbkup_updates';

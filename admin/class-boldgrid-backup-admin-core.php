@@ -39,7 +39,7 @@ class Boldgrid_Backup_Admin_Core {
 	/**
 	 * An instance of Boldgrid_Backup_Admin_Dashboard
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 * @var   Boldgrid_Backup_Admin_Dashboard
 	 */
 	public $dashboard;

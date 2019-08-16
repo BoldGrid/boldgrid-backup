@@ -211,7 +211,7 @@ class Boldgrid_Backup_Admin_Archive {
 	 *
 	 * IE the size of the zip file, not the size of everything before compression.
 	 *
-	 * @since x.x.x
+	 * @since 1.11.0
 	 */
 	public function get_filesize() {
 		return $this->core->wp_filesystem->size( $this->filepath );

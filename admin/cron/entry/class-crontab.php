@@ -5,7 +5,7 @@
  * This class represents a single entry in the crontab.
  *
  * @link       https://www.boldgrid.com
- * @since      xxx
+ * @since      1.11.0
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Cron
@@ -21,7 +21,7 @@ use Boldgrid\Backup\Admin\Cron\Entry\Base;
 /**
  * Class: Crontab Entry.
  *
- * @since xxx
+ * @since 1.11.0
  */
 class Crontab extends Base implements Entry {
 	/**
@@ -32,7 +32,7 @@ class Crontab extends Base implements Entry {
 	 *
 	 * This property is the "COMMAND" part.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 * @access private
 	 * @var string
 	 */
@@ -41,7 +41,7 @@ class Crontab extends Base implements Entry {
 	/**
 	 * Whether or not this cron exists in the crontab.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 * @access private
 	 * @var bool
 	 */
@@ -55,7 +55,7 @@ class Crontab extends Base implements Entry {
 	 *
 	 * The raw command is the entire string, "* * * * * COMMAND".
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 * @access private
 	 * @var string
 	 */
@@ -69,7 +69,7 @@ class Crontab extends Base implements Entry {
 	 *
 	 * The time is the "* * * * *" part.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 * @access private
 	 * @var string
 	 */
@@ -78,7 +78,7 @@ class Crontab extends Base implements Entry {
 	/**
 	 * An instance of Boldgrid\Backup\Admin\Cron\Crontab.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 * @access private
 	 * @var Boldgrid\Backup\Admin\Cron\Crontab
 	 */
@@ -94,7 +94,7 @@ class Crontab extends Base implements Entry {
 	/**
 	 * Get our cron's next runtime.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 *
 	 * @return string The unix timestamp (UTC) of when this cron will run next.
 	 */
@@ -124,7 +124,7 @@ class Crontab extends Base implements Entry {
 	/**
 	 * Init this cron entry.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 *
 	 * @return mixed
 	 */
@@ -151,7 +151,7 @@ class Crontab extends Base implements Entry {
 	/**
 	 * Whether or not this cron entry exists in the crontab.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 *
 	 * @return bool
 	 */

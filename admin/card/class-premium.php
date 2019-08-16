@@ -3,7 +3,7 @@
  * Premium class.
  *
  * @link       https://www.boldgrid.com
- * @since      xxx
+ * @since      1.11.0
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Card
@@ -18,13 +18,13 @@ namespace Boldgrid\Backup\Admin\Card;
  *
  * This class is responsible for rendering the "Premium" card on the BoldGrid Backup dashboard.
  *
- * @since xxx
+ * @since 1.11.0
  */
 class Premium extends \Boldgrid\Library\Library\Ui\Card {
 	/**
 	 * Init.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 */
 	public function init() {
 		$core = apply_filters( 'boldgrid_backup_get_core', null );

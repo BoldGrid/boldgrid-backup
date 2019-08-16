@@ -3,7 +3,7 @@
  * My Backups class.
  *
  * @link       https://www.boldgrid.com
- * @since      xxx
+ * @since      1.11.0
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Card
@@ -16,7 +16,7 @@ namespace Boldgrid\Backup\Admin\Card\Feature;
 /**
  * Class: Versions
  *
- * @since xxx
+ * @since 1.11.0
  */
 class Versions extends \Boldgrid\Library\Library\Ui\Feature {
 	/**

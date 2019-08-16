@@ -3,7 +3,7 @@
  * Sign_Up class.
  *
  * @link       https://www.boldgrid.com
- * @since      xxx
+ * @since      1.11.0
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Card
@@ -16,13 +16,13 @@ namespace Boldgrid\Backup\Admin\Card\Feature;
 /**
  * Class: Sign_Up
  *
- * @since xxx
+ * @since 1.11.0
  */
 class Sign_Up extends \Boldgrid\Library\Library\Ui\Feature {
 	/**
 	 * Init.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 */
 	public function init() {
 		$new_key_url = \Boldgrid\Library\Library\Key\PostNewKey::getCentralUrl( admin_url( 'admin.php?page=boldgrid-backup-dashboard' ) );

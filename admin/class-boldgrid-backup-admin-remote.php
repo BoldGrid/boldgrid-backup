@@ -64,7 +64,7 @@ class Boldgrid_Backup_Admin_Remote {
 	/**
 	 * Get enabled remote storage providers.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 *
 	 * @param  string $key If a key is passed in, only that key from the array of providers will be
 	 *                     returned. For example, if we only need the title of the providers, set

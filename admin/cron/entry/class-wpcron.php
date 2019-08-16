@@ -5,7 +5,7 @@
  * This class represents a single entry within WPCron.
  *
  * @link       https://www.boldgrid.com
- * @since      xxx
+ * @since      1.11.0
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Cron
@@ -21,13 +21,13 @@ use Boldgrid\Backup\Admin\Cron\Entry\Base;
 /**
  * Class: Entry
  *
- * @since xxx
+ * @since 1.11.0
  */
 class Wpcron extends Base implements Entry {
 	/**
 	 * The hook this wpcron uses.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 * @access private
 	 * @var string
 	 */
@@ -36,7 +36,7 @@ class Wpcron extends Base implements Entry {
 	/**
 	 * Whether or not this wpcron is set / configured within the wpcron system.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 * @access private
 	 * @var bool
 	 */
@@ -45,7 +45,7 @@ class Wpcron extends Base implements Entry {
 	/**
 	 * Get the next runtime of this wpcron.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 *
 	 * @return string Timestamp, the time the scheduled event will next occur (unix timestamp).
 	 *                False, if the event isn't scheduled.
@@ -57,7 +57,7 @@ class Wpcron extends Base implements Entry {
 	/**
 	 * Initialize this wpcron entry.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 *
 	 * @param string $hook
 	 */
@@ -76,7 +76,7 @@ class Wpcron extends Base implements Entry {
 	/**
 	 * Get whether or not this wpcron entry exists.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 *
 	 * @return bool
 	 */

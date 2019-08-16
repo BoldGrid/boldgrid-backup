@@ -3,7 +3,7 @@
  * Auto_Update_Backup class.
  *
  * @link       https://www.boldgrid.com
- * @since      xxx
+ * @since      1.11.0
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Feature
@@ -19,13 +19,13 @@ namespace Boldgrid\Backup\Admin\Card\Feature;
  * This class is responsible for rendering the, "Auto Backup Before Updates" feature on the BoldGrid
  * Backup Dashboard.
  *
- * @since xxx
+ * @since 1.11.0
  */
 class Auto_Update_Backup extends \Boldgrid\Library\Library\Ui\Feature {
 	/**
 	 * Init.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 */
 	public function init() {
 		$core = apply_filters( 'boldgrid_backup_get_core', null );

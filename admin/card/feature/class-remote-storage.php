@@ -3,7 +3,7 @@
  * Remote_Storage class.
  *
  * @link       https://www.boldgrid.com
- * @since      xxx
+ * @since      1.11.0
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Card
@@ -16,13 +16,13 @@ namespace Boldgrid\Backup\Admin\Card\Feature;
 /**
  * Class: Remote_Storage
  *
- * @since xxx
+ * @since 1.11.0
  */
 class Remote_Storage extends \Boldgrid\Library\Library\Ui\Feature {
 	/**
 	 * Init.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 */
 	public function init() {
 		$core = apply_filters( 'boldgrid_backup_get_core', null );

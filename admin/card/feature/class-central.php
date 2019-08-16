@@ -3,7 +3,7 @@
  * Central class.
  *
  * @link       https://www.boldgrid.com
- * @since      xxx
+ * @since      1.11.0
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Card
@@ -18,13 +18,13 @@ namespace Boldgrid\Backup\Admin\Card\Feature;
  *
  * This class is responsible for initializing a BoldGrid Central "feature" for use within a card.
  *
- * @since xxx
+ * @since 1.11.0
  */
 class Central extends \Boldgrid\Library\Library\Ui\Feature {
 	/**
 	 * Init.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 */
 	public function init() {
 		$reseller = new \Boldgrid\Library\Library\Reseller();

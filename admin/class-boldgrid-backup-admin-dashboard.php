@@ -3,7 +3,7 @@
  * File: class-boldgrid-backup-admin-dashboard.php
  *
  * @link       https://www.boldgrid.com
- * @since      xxx
+ * @since      1.11.0
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
@@ -15,13 +15,13 @@
 /**
  * Class: Boldgrid_Backup_Admin_Dashboard
  *
- * @since xxx
+ * @since 1.11.0
  */
 class Boldgrid_Backup_Admin_Dashboard {
 	/**
 	 * The core class object.
 	 *
-	 * @since  xxx
+	 * @since  1.11.0
 	 * @access private
 	 * @var    Boldgrid_Backup_Admin_Core
 	 */
@@ -30,7 +30,7 @@ class Boldgrid_Backup_Admin_Dashboard {
 	/**
 	 * Constructor.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 *
 	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
 	 */
@@ -41,7 +41,7 @@ class Boldgrid_Backup_Admin_Dashboard {
 	/**
 	 * Enqueue scripts.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 *
 	 * @param string $hook Hook name.
 	 */
@@ -59,7 +59,7 @@ class Boldgrid_Backup_Admin_Dashboard {
 	/**
 	 * Get cards needed for the dashboard.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 *
 	 * @return array
 	 */
@@ -76,7 +76,7 @@ class Boldgrid_Backup_Admin_Dashboard {
 	/**
 	 * Render the dashboard page.
 	 *
-	 * @since xxx
+	 * @since 1.11.0
 	 */
 	public function page() {
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-dashboard.php';

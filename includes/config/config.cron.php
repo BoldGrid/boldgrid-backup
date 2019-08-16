@@ -5,7 +5,7 @@
  * Plugin configuration file.
  *
  * @link https://www.boldgrid.com
- * @since xxx
+ * @since 1.11.0
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/includes
