@@ -254,7 +254,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 					.html(
 						lang.savedTo +
 							response.data.filepath +
-							' <a href="' +
+							' <a class="button" href="' +
 							response.data.detailsUrl +
 							'">' +
 							lang.viewDetails +
