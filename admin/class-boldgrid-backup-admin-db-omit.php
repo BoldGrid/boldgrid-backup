@@ -133,7 +133,7 @@ class Boldgrid_Backup_Admin_Db_Omit {
 
 		if ( $this->core->is_archiving_update_protection || $backup_now_full || $this->core->pre_auto_update ) {
 			$excluded_tables = array();
-		} elseif ( $this->core->is_backup_now && isset( $_POST['include_tables'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		} elseif ( $this->core->is_backup_now ) {
 			$excluded_tables = $this->get_from_post();
 		} else {
 			$settings = $this->core->settings->get_settings();

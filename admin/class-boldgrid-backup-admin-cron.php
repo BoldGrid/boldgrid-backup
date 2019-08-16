@@ -235,7 +235,6 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @see BoldGrid_Backup_Admin_Cron::get_cron_secret()
 	 */
 	public function add_restore_cron() {
-		// Update cron.
 		$entry  = $this->get_restore_command();
 		$status = $this->update_cron( $entry );
 

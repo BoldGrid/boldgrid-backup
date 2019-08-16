@@ -7,8 +7,8 @@
 	convertWarningsToExceptions="true"
 	>
 	<testsuites>
-		<testsuite>
-			<directory prefix="test-" suffix=".php">./tests/</directory>
+		<testsuite name="tests">
+			<directory suffix=".php">./tests/</directory>
 		</testsuite>
 	</testsuites>
 	<filter>
@@ -16,4 +16,9 @@
 			<directory>./</directory>
 		</whitelist>
 	</filter>
+	<groups>
+		<exclude>
+			<group>ajax</group>
+		</exclude>
+	</groups>
 </phpunit>
