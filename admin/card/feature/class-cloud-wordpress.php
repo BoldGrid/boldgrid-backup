@@ -29,6 +29,6 @@ class Cloud_Wordpress extends \Boldgrid\Library\Library\Ui\Feature { //phpcs:ign
 
 		$this->title = __( 'Cloud WordPress', 'boldgrid-backup' );
 
-		$this->content = '<p>' . __( 'Create a fully functional free WordPress instance in the cloud with just a few clicks.', 'boldgrid-backup' ) . '</p>';
+		$this->content = '<p>' . __( 'Create a fully functional free WordPress demo in just a few clicks. Easily design, build, test and share your WordPress website with clients or teams.', 'boldgrid-backup' ) . '</p>';
 	}
 }

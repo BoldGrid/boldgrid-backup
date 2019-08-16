@@ -29,6 +29,6 @@ class Speed_Coach extends \Boldgrid\Library\Library\Ui\Feature {
 
 		$this->title = esc_html__( 'Speed Coach', 'boldgrid-backup' );
 
-		$this->content = '<p>' . esc_html__( 'Speed Coach, our automated website speed and usability tool, provides a customized report of actionable steps that will increase both your website\'s speed and usability.', 'boldgrid-backup' ) . '</p>';
+		$this->content = '<p>' . esc_html__( 'A faster website means happier visitors and higher rankings on the search engines. Simply type in your website’s URL and receive detailed advice on making your site lightning fast.', 'boldgrid-backup' ) . '</p>';
 	}
 }

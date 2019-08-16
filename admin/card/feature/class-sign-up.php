@@ -29,8 +29,8 @@ class Sign_Up extends \Boldgrid\Library\Library\Ui\Feature {
 
 		$this->icon = '<span class="dashicons dashicons-clipboard"></span>';
 
-		$this->content = '<p>' . esc_html__( 'Enhance your site even more by signing up for BoldGrid Central and get access to additional tools!', 'boldgrid-backup' ) . '</p>';
+		$this->content = '<p>' . esc_html__( 'There’s more waiting for you in BoldGrid Central. Download the full-featured community versions of ALL our plugins for FREE. It’s just a click away.', 'boldgrid-backup' ) . '</p>';
 
-		$this->content .= '<p style="text-align:right;"><a href="' . esc_url( $new_key_url ) . '" class="button button-primary boldgrid-orange">' . __( 'Sign Up!', 'boldgrid-backup' ) . '</a></p>';
+		$this->content .= '<p style="text-align:right;"><a href="' . esc_url( $new_key_url ) . '" class="button button-primary boldgrid-orange">' . __( 'Sign Up for Free!', 'boldgrid-backup' ) . '</a></p>';
 	}
 }
