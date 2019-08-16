@@ -191,7 +191,11 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 		$sql_tables = $wpdb->get_results( 'SHOW TABLES' );
 
 		foreach ( $sql_tables as $table ) {
-			$tables[] = $table->Tables_in_bradm_wp_test; // phpcs:ignore
+			// Get the name of the table.
+			$vars       = get_object_vars( $table );
+			$table_name = reset( $vars );
+
+			$tables[] = $table_name;
 		}
 
 		return $tables;

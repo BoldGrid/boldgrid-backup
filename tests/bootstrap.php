@@ -101,7 +101,12 @@ foreach ( $files as $file ) {
  * @param mixed $var Message to write to STDERR.
  */
 function phpunit_error_log( $var ) {
-	fwrite( STDERR, "\n" . print_r( $var, 1 ) . "\n" ); // phpcs:ignore WordPress
+	fwrite( // phpcs:ignore
+		STDERR,
+		"\n\n## --------------------\n" .
+			print_r( $var, 1 ) . // phpcs:ignore
+		"\n## ------------------\n\n"
+	);
 }
 
 require $_tests_dir . '/includes/bootstrap.php';
