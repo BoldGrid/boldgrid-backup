@@ -44,7 +44,7 @@ $ad          = $this->config->is_premium_done ? '' : sprintf(
 		%1$s
 		<p style="margin:0;">%2$s</p>
 	</div>',
-	$this->go_pro->get_premium_button( $premium_url ),
+	$this->go_pro->get_premium_button( $premium_url, esc_html__( 'Unlock Feature', 'boldgrid-backup' ) ),
 	$this->lang['want_to']
 );
 

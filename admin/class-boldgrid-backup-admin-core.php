@@ -2544,7 +2544,7 @@ class Boldgrid_Backup_Admin_Core {
 			 */
 			'want_to'                   => sprintf(
 				// translators: 1 Markup showing a "Google Drive" logo, 2 Markup showing an "Amazon S3" logo.
-				__( 'Want to store your backups on %1$s and %2$s, restore individual files with just a click, and have access to more tools? Get <strong>BoldGrid Backup Premium</strong>!', 'boldgrid-backup' ),
+				__( 'Catastrophic data loss can happen at any time. Storing your archives in multiple secure locations will keep your website data safe and put your mind at ease. Upgrade to BoldGrid Premium to enable automated remote backups to %1$s and %2$s', 'boldgrid-backup' ),
 				'<span class="bgbkup-remote-logo bgbkup-gdrive-logo" title="Google Drive"></span>',
 				'<span class="bgbkup-remote-logo amazon-s3-logo" title="Amazon S3"></span>'
 			),
