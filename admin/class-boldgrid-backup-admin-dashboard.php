@@ -64,14 +64,11 @@ class Boldgrid_Backup_Admin_Dashboard {
 	 * @return array
 	 */
 	public function get_cards() {
-		$cards = [];
-
-		if ( ! $this->core->config->is_premium_done ) {
-			$cards[] = new \Boldgrid\Backup\Admin\Card\Premium();
-		}
-
-		$cards[] = new \Boldgrid\Backup\Admin\Card\Backups();
-		$cards[] = new \Boldgrid\Backup\Admin\Card\Updates();
+		$cards = [
+			new \Boldgrid\Backup\Admin\Card\Premium(),
+			new \Boldgrid\Backup\Admin\Card\Backups(),
+			new \Boldgrid\Backup\Admin\Card\Updates(),
+		];
 
 		return $cards;
 	}
