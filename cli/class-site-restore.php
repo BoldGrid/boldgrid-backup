@@ -101,18 +101,10 @@ class Site_Restore {
 	 *
 	 * @see \Boldgrid\Backup\Cli\Info::get_info()
 	 *
-	 * @link https://docs.travis-ci.com/user/environment-variables/#default-environment-variables
-	 *
 	 * @return bool
 	 */
 	private function get_db_config() {
-		if ( getenv( 'TRAVIS' ) ) {
-			$wpconfig_filename = 'wp-tests-config.php';
-		} else {
-			$wpconfig_filename = 'wp-config.php';
-		}
-
-		$wpconfig = file_get_contents( Info::get_info()['ABSPATH'] . $wpconfig_filename );
+		$wpconfig = file_get_contents( Info::get_info()['ABSPATH'] . 'wp-config.php' );
 
 		if ( $wpconfig ) {
 			preg_match_all( '/define\(.+DB_(NAME|USER|PASSWORD|HOST).+\);/', $wpconfig, $matches1 );
