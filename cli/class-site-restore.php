@@ -101,10 +101,18 @@ class Site_Restore {
 	 *
 	 * @see \Boldgrid\Backup\Cli\Info::get_info()
 	 *
+	 * @link https://docs.travis-ci.com/user/environment-variables/#default-environment-variables
+	 *
 	 * @return bool
 	 */
 	private function get_db_config() {
-		$wpconfig = file_get_contents( Info::get_info()['ABSPATH'] . 'wp-config.php' );
+		if ( getenv( 'TRAVIS' ) ) {
+			$wpconfig_filename = 'wp-tests-config.php';
+		} else {
+			$wpconfig_filename = 'wp-config.php';
+		}
+
+		$wpconfig = file_get_contents( Info::get_info()['ABSPATH'] . $wpconfig_filename );
 
 		if ( $wpconfig ) {
 			preg_match_all( '/define\(.+DB_(NAME|USER|PASSWORD|HOST).+\);/', $wpconfig, $matches1 );
@@ -335,14 +343,18 @@ class Site_Restore {
 	 * @see \Boldgrid\Backup\Cli\Info::set_info_item()
 	 */
 	private function increment_restore_attempts() {
-		$results = json_decode( file_get_contents( Info::get_results_filepath() ), true );
+		$results_filepath = Info::get_results_filepath();
 
-		$results['restore_attempts'] = isset( $results['restore_attempts'] ) ?
-			++$results['restore_attempts'] : 1;
+		if ( file_exists( $results_filepath ) && is_readable( $results_filepath ) ) {
+			$results = json_decode( file_get_contents( $results_filepath ), true );
 
-		file_put_contents( Info::get_results_filepath(), json_encode( $results ) );
+			$results['restore_attempts'] = isset( $results['restore_attempts'] ) ?
+				++$results['restore_attempts'] : 1;
 
-		Info::set_info_item( 'restore_attempts', $results['restore_attempts'] );
+			file_put_contents( $results_filepath, json_encode( $results ) );
+
+			Info::set_info_item( 'restore_attempts', $results['restore_attempts'] );
+		}
 	}
 
 	/**
