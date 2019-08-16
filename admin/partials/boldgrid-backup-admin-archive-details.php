@@ -210,9 +210,9 @@ $intro       = $this->core->config->is_premium_done ? '' : sprintf(
 			%3$s
 		</p>
 	</div>',
-	/* 1 */ __( 'One click file restorations', 'boldgrid-backup' ),
-	/* 2 */ $this->core->go_pro->get_premium_button( $premium_url ),
-	/* 3 */ __( 'Please note that most functionality for the Archive Browser, such as one click file restorations, is contained within the Premium version. For help with restoring a single file without this one click feature, please <a href="https://www.boldgrid.com/support" target="_blank">click here</a>.', 'boldgrid-backup' )
+	/* 1 */ __( 'Restore Individual Files With One Click', 'boldgrid-backup' ),
+	/* 2 */ $this->core->go_pro->get_premium_button( $premium_url, esc_html__( 'Unlock Feature', 'boldgrid-backup' ) ),
+	/* 3 */ __( 'Changed a file and now your site isn’t working properly? With BoldGrid Backup Premium, you can browse through past backup archives and restore individual files with a single click.', 'boldgrid-backup' )
 );
 
 $main_content = '
