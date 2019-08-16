@@ -15,7 +15,12 @@
 
 defined( 'WPINC' ) || die;
 
-$archive_list = $this->core->archives->get_table( [ 'show_link_button' => true ] );
+$archive_list = $this->core->archives->get_table(
+	[
+		'show_link_button' => true,
+		'transfers_mode'   => true,
+	]
+);
 
 return sprintf(
 	'<div class="bgbkup-transfers-source">
