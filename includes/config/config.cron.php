@@ -33,7 +33,7 @@ $core = apply_filters( 'boldgrid_backup_get_core', null );
 $site_url = site_url();
 
 // Only defined cron entries can be found.
-return [
+$config = [
 	'entries' => [
 		'backup' => [
 			'search' => [
@@ -48,3 +48,7 @@ return [
 		],
 	],
 ];
+
+unset( $core, $site_url );
+
+return $config;
