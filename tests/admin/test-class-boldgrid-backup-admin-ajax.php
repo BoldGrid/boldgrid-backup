@@ -47,8 +47,11 @@ class Test_Boldgrid_Backup_Admin_Ajax extends WP_Ajax_UnitTestCase {
 
 		update_option( 'boldgrid_backup_pending_rollback', 'test' );
 
-		$this->setExpectedException( 'WPAjaxDieContinueException' );
-		$this->_handleAjax( 'nopriv_boldgrid_cli_cancel_rollback' );
+		try {
+			$this->_handleAjax( 'nopriv_boldgrid_cli_cancel_rollback' );
+		} catch( WPAjaxDieContinueException $e ) {
+			// Do nothing, this is expected.
+		}
 
 		// This option was given a value above, and the cancel rollback method should have deleted it.
 		$this->assertEmpty( get_option( 'boldgrid_backup_pending_rollback' ) );
@@ -73,8 +76,11 @@ class Test_Boldgrid_Backup_Admin_Ajax extends WP_Ajax_UnitTestCase {
 
 		update_option( 'boldgrid_backup_pending_rollback', 'test' );
 
-		$this->setExpectedException( 'WPAjaxDieContinueException' );
-		$this->_handleAjax( 'nopriv_boldgrid_cli_cancel_rollback' );
+		try {
+			$this->_handleAjax( 'nopriv_boldgrid_cli_cancel_rollback' );
+		} catch ( WPAjaxDieContinueException $e ) {
+			// Do nothing, this is expected.
+		}
 
 		/*
 		 * This option was given a value above, and because the cancel rollback method failed, the
@@ -87,7 +93,7 @@ class Test_Boldgrid_Backup_Admin_Ajax extends WP_Ajax_UnitTestCase {
 		$this->assertInternalType( 'object', $response ); // Should be an object.
 		$this->assertObjectHasAttribute( 'success', $response ); // Should have "success".
 		$this->assertFalse( $response->success ); // "success" should be FALSE.
-		$this->assertObjectHasAttribute( data, $response ); // Should have "data".
+		$this->assertObjectHasAttribute( 'data', $response ); // Should have "data".
 		$this->assertEquals( 'Invalid arguments', $response->data ); // "data" is a string; must match expected string.
 	}
 }
