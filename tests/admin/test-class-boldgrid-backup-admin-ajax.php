@@ -49,8 +49,9 @@ class Test_Boldgrid_Backup_Admin_Ajax extends WP_Ajax_UnitTestCase {
 
 		try {
 			$this->_handleAjax( 'nopriv_boldgrid_cli_cancel_rollback' );
-		} catch( WPAjaxDieContinueException $e ) {
+		} catch ( WPAjaxDieContinueException $e ) {
 			// Do nothing, this is expected.
+			echo null;
 		}
 
 		// This option was given a value above, and the cancel rollback method should have deleted it.
@@ -80,6 +81,7 @@ class Test_Boldgrid_Backup_Admin_Ajax extends WP_Ajax_UnitTestCase {
 			$this->_handleAjax( 'nopriv_boldgrid_cli_cancel_rollback' );
 		} catch ( WPAjaxDieContinueException $e ) {
 			// Do nothing, this is expected.
+			echo null;
 		}
 
 		/*
