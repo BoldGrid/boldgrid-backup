@@ -58,6 +58,7 @@ $files = array(
 	'/admin/class-boldgrid-backup-admin-email.php',
 	'/admin/class-boldgrid-backup-admin-db-omit.php',
 	'/admin/class-boldgrid-backup-admin-db-dump.php',
+	'/admin/class-boldgrid-backup-admin-db-import.php',
 	'/admin/class-boldgrid-backup-admin-db-get.php',
 	'/admin/class-boldgrid-backup-admin-utility.php',
 	'/admin/class-boldgrid-backup-admin-folder-exclusion.php',
@@ -70,6 +71,10 @@ $files = array(
 	'/admin/class-boldgrid-backup-admin-time.php',
 	'/admin/class-boldgrid-backup-admin-crypt.php',
 	'/admin/class-boldgrid-backup-admin-cli.php',
+	'/admin/class-boldgrid-backup-admin-in-progress-data.php',
+	'/admin/class-boldgrid-backup-admin-compressor.php',
+	'/admin/compressor/class-boldgrid-backup-admin-compressor-php-zip.php',
+	'/admin/compressor/class-boldgrid-backup-admin-compressor-pcl-zip.php',
 	'/includes/class-boldgrid-backup-authentication.php',
 	'/includes/class-boldgrid-backup-download.php',
 	'/includes/class-boldgrid-backup-file.php',
@@ -79,6 +84,7 @@ $files = array(
 	'/admin/remote/class-boldgrid-backup-admin-ftp-page.php',
 	'/admin/remote/class-boldgrid-backup-admin-remote-settings.php',
 	'/vendor/phpseclib/phpseclib/phpseclib/Net/SSH2.php',
+	'/vendor/ifsnop/mysqldump-php/src/Ifsnop/Mysqldump/Mysqldump.php',
 	'/cli/class-info.php',
 	'/cli/class-log.php',
 	'/cli/class-email.php',
@@ -96,7 +102,12 @@ foreach ( $files as $file ) {
  * @param mixed $var Message to write to STDERR.
  */
 function phpunit_error_log( $var ) {
-	fwrite( STDERR, "\n" . print_r( $var, 1 ) . "\n" ); // phpcs:ignore WordPress
+	fwrite( // phpcs:ignore
+		STDERR,
+		"\n\n## --------------------\n" .
+			print_r( $var, 1 ) . // phpcs:ignore
+		"\n## ------------------\n\n"
+	);
 }
 
 require $_tests_dir . '/includes/bootstrap.php';

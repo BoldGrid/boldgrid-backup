@@ -335,14 +335,18 @@ class Site_Restore {
 	 * @see \Boldgrid\Backup\Cli\Info::set_info_item()
 	 */
 	private function increment_restore_attempts() {
-		$results = json_decode( file_get_contents( Info::get_results_filepath() ), true );
+		$results_filepath = Info::get_results_filepath();
 
-		$results['restore_attempts'] = isset( $results['restore_attempts'] ) ?
-			++$results['restore_attempts'] : 1;
+		if ( file_exists( $results_filepath ) && is_readable( $results_filepath ) ) {
+			$results = json_decode( file_get_contents( $results_filepath ), true );
 
-		file_put_contents( Info::get_results_filepath(), json_encode( $results ) );
+			$results['restore_attempts'] = isset( $results['restore_attempts'] ) ?
+				++$results['restore_attempts'] : 1;
 
-		Info::set_info_item( 'restore_attempts', $results['restore_attempts'] );
+			file_put_contents( $results_filepath, json_encode( $results ) );
+
+			Info::set_info_item( 'restore_attempts', $results['restore_attempts'] );
+		}
 	}
 
 	/**
