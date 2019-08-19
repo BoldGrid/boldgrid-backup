@@ -388,8 +388,6 @@ class Boldgrid_Backup_Admin_Upload {
 	 * @see Boldgrid_Backup_Admin_Remote::post_download()
 	 *
 	 * @uses $_POST['url'] URL address.
-	 *
-	 * @return string
 	 */
 	public function ajax_url_import() {
 		// Check user permissions.
@@ -466,6 +464,7 @@ class Boldgrid_Backup_Admin_Upload {
 			}
 
 			$log_filepath = $this->core->archive_log->path_from_zip( $log_filepath );
+			$filename     = basename( $filepath );
 
 			// Restore the log file from the archive.
 			$this->core->archive_log->restore_by_zip( $filepath, basename( $log_filepath ) );
@@ -473,26 +472,31 @@ class Boldgrid_Backup_Admin_Upload {
 			// Update the archive file modification time, based on the log file contents.
 			$this->core->remote->post_download( $filepath );
 
+			// Get the archive details.
+			$archive = $this->core->archive->get_by_name( $filename );
+
 			wp_send_json_success(
-				array(
-					'filepath'   => $filepath,
-					'detailsUrl' => admin_url(
+				[
+					'filepath'        => $filepath,
+					'detailsUrl'      => admin_url(
 						'admin.php?page=boldgrid-backup-archive-details&filename=' .
 						basename( $filepath )
 					),
-				)
+					'archiveFilename' => $filename,
+					'archiveKey'      => $archive['key'],
+				]
 			);
 		} else {
 			$this->core->wp_filesystem->delete( $filepath );
 		}
 
 		wp_send_json_error(
-			array(
+			[
 				'error' => __(
 					'Could not retrieve the remote file.  It may not be a ZIP file, or the link is no longer valid.',
 					'boldgrid-backup'
 				),
-			)
+			]
 		);
 	}
 }

@@ -184,10 +184,10 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 	 * @param  array  $args     Arguments for the link/button.
 	 * @return string
 	 */
-	public function get_restore_button( $filename, $args = array() ) {
-		$defaults = array(
-			'button_text' => __( 'Restore' ),
-		);
+	public function get_restore_button( $filename, $args = [] ) {
+		$defaults = [
+			'button_text' => __( 'Restore', 'boldgrid-backup' ),
+		];
 
 		$args = wp_parse_args( $args, $defaults );
 
@@ -200,20 +200,19 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 				'
 				<a
 					data-restore-now="1"
-					data-archive-key="%2$s"
-					data-archive-filename="%3$s"
-					data-nonce="%4$s"
+					data-archive-key="%1$s"
+					data-archive-filename="%2$s"
+					data-nonce="%3$s"
 					class="button restore-now"
 					href="">
-					%5$s
+					%4$s
 				</a>
-				%6$s',
-				/* 1 */ get_admin_url( null, 'admin.php?page=boldgrid-backup' ),
-				/* 2 */ $archive['key'],
-				/* 3 */ $filename,
-				/* 4 */ wp_create_nonce( 'boldgrid_backup_restore_archive' ),
-				/* 5 */ $args['button_text'],
-				/* 6 */ $this->core->lang['spinner']
+				%5$s',
+				/* 1 */ $archive['key'],
+				/* 2 */ $filename,
+				/* 3 */ wp_create_nonce( 'boldgrid_backup_restore_archive' ),
+				/* 4 */ esc_html( $args['button_text'] ),
+				/* 5 */ $this->core->lang['spinner']
 			);
 		}
 

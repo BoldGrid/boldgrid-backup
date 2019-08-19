@@ -184,14 +184,26 @@ class Boldgrid_Backup_Admin_Archives {
 	 *
 	 * @since 1.6.0
 	 *
+	 * @param  array $options {
+	 *     Display options.
+	 *
+	 *     @type bool $show_link_button Display the "Get Download Link" button. Optional.
+	 *     @type bool $transfers_mode   Alters messages for the transfers pages. Optional.
+	 * }
 	 * @return string
 	 */
-	public function get_table() {
+	public function get_table( array $options = [] ) {
 		$this->core->archives_all->init();
 		$backup       = __( 'Backup', 'boldgrid-backup' );
 		$view_details = __( 'View details', 'boldgrid-backup' );
 
-		$table = $this->get_mine_count();
+		// If showing a "Get Download Link" button, we need a container to show the results.
+		$table = (
+			! empty( $options['show_link_button'] ) ?
+			'<div id="download-link-copy" class="notice notice-info inline"></div>' : ''
+		);
+
+		$table .= $this->get_mine_count();
 
 		$table .= sprintf(
 			'
@@ -199,7 +211,8 @@ class Boldgrid_Backup_Admin_Archives {
 				<thead>
 					<td>%1$s</td>
 					<td>%2$s</td>
-					<td></td>
+					<td></td>' .
+					( ! empty( $options['show_link_button'] ) ? '<td></td>' : '' ) . '
 				<tbody id="backup-archive-list-body">',
 			__( 'Date', 'boldgrid-backup' ),
 			__( 'Size', 'boldgrid-backup' )
@@ -232,8 +245,11 @@ class Boldgrid_Backup_Admin_Archives {
 							href="admin.php?page=boldgrid-backup-archive-details&filename=%4$s"
 						>%5$s</a>
 					</td>
-				</tr>
-				',
+					' . (
+						// Show a "Get Download Link" button.
+						! empty( $options['show_link_button'] ) ?
+						'<td>' . $this->core->archive_actions->get_download_link_button( $archive['filename'] ) . '</td>' : ''
+				) . '</tr>',
 				/* 1 */ $backup,
 				/* 2 */ empty( $title ) ? '' : '<strong>' . esc_html( $title ) . '</strong><br />',
 				/* 3 */ Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive['size'] ),
@@ -243,6 +259,7 @@ class Boldgrid_Backup_Admin_Archives {
 				/* 7 */ $this->core->time->get_span()
 			);
 		}
+
 		$table .= '</tbody>
 			</table>
 		';
@@ -254,7 +271,7 @@ class Boldgrid_Backup_Admin_Archives {
 		 * the user (1) how they can create their first backup and (2) how they can schedule backups.
 		 */
 		if ( empty( $this->core->archives_all->all ) ) {
-			$table  = '
+			$table = '
 			<div class="notice notice-warning inline" style="margin:15px 0">
 				<p>
 					<strong>
@@ -263,26 +280,46 @@ class Boldgrid_Backup_Admin_Archives {
 				</p>
 				<ol>
 					<li>';
-			$table .= wp_kses(
-				sprintf(
-					// translators: 1 an opening strong tag, 2 its closing strong tag.
-					__( 'Create a backup of your site right now by clicking the %1$sBackup Site Now%2$s button at the top of the page.', 'boldgrid-backup' ),
-					'<strong>',
-					'</strong>'
-				),
-				array( 'strong' => array() )
-			);
-			$table .= '</li><li>';
-			$table .= wp_kses(
-				sprintf(
-					// translators: 1 the opening anchor tag linking to the settings page, 2 its closing anchor tag.
-					__( 'After the backup is created, go to your %1$ssettings%2$s page and setup backups so they\'re create automatically on a set schedule.', 'boldgrid-backup' ),
-					'<a href="' . $this->core->settings->get_settings_url() . '">',
-					'</a>'
-				),
-				array( 'a' => array( 'href' => array() ) )
-			);
-			$table .= '</li>
+
+			if ( ! empty( $options['transfers_mode'] ) ) {
+				$table .= wp_kses(
+					sprintf(
+						// translators: 1 an opening strong tag, 2 its closing strong tag.
+						__( 'Go to the %1$sBackups%2$s page to create a backup of your site, and then come back here for further instruction.', 'boldgrid-backup' ),
+						'<em>',
+						'</em>'
+					),
+					[ 'em' => [] ]
+				);
+			} else {
+				$table .= wp_kses(
+					sprintf(
+						// translators: 1 an opening strong tag, 2 its closing strong tag.
+						__( 'Create a backup of your site right now by clicking the %1$sBackup Site Now%2$s button at the top of the page.', 'boldgrid-backup' ),
+						'<strong>',
+						'</strong>'
+					),
+					array( 'strong' => array() )
+				);
+			}
+
+			$table .= '</li>';
+
+			if ( empty( $options['transfers_mode'] ) ) {
+				$table .= '<li>';
+				$table .= wp_kses(
+					sprintf(
+						// translators: 1 the opening anchor tag linking to the settings page, 2 its closing anchor tag.
+						__( 'After the backup is created, go to your %1$ssettings%2$s page and setup backups so they\'re create automatically on a set schedule.', 'boldgrid-backup' ),
+						'<a href="' . $this->core->settings->get_settings_url() . '">',
+						'</a>'
+					),
+					array( 'a' => array( 'href' => array() ) )
+				);
+				$table .= '</li>';
+			}
+
+			$table .= '
 				</ol>
 			</div>';
 		}

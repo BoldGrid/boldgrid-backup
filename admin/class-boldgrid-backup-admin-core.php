@@ -149,6 +149,14 @@ class Boldgrid_Backup_Admin_Core {
 	public $tools;
 
 	/**
+	 * An instance of Boldgrid_Backup_Admin_Transfers.
+	 *
+	 * @since 1.11.0
+	 * @var    Boldgrid_Backup_Admin_Transfers
+	 */
+	public $transfers;
+
+	/**
 	 * An instance of Boldgrid_Backup_Admin_Support.
 	 *
 	 * @since 1.10.1
@@ -606,6 +614,8 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->tools = new Boldgrid_Backup_Admin_Tools( $this );
 
+		$this->transfers = new Boldgrid_Backup_Admin_Transfers( $this );
+
 		$this->support = new Boldgrid_Backup_Admin_Support( $this );
 
 		$this->time = new Boldgrid_Backup_Admin_Time( $this );
@@ -771,6 +781,7 @@ class Boldgrid_Backup_Admin_Core {
 			'preflight_check' => __( 'Preflight Check', 'boldgrid-backup' ),
 			'settings'        => __( 'Settings', 'boldgrid-backup' ),
 			'tools'           => __( 'Tools', 'boldgrid-backup' ),
+			'transfers'       => __( 'Transfers', 'boldgrid-backup' ),
 			'support'         => __( 'Support', 'boldgrid-backup' ),
 		];
 
@@ -802,6 +813,32 @@ class Boldgrid_Backup_Admin_Core {
 			[
 				$this,
 				'page_archives',
+			]
+		);
+
+		// Add "Transfers" page.
+		add_submenu_page(
+			$main_slug,
+			$lang['boldgrid_backup'] . ' ' . $lang['transfers'],
+			$lang['transfers'],
+			$capability,
+			'boldgrid-backup-transfers',
+			[
+				$this->transfers,
+				'page',
+			]
+		);
+
+		// Add "Tools" page.
+		add_submenu_page(
+			$main_slug,
+			$lang['boldgrid_backup'] . ' ' . $lang['tools'],
+			$lang['tools'],
+			$capability,
+			'boldgrid-backup-tools',
+			[
+				$this->tools,
+				'page',
 			]
 		);
 
@@ -845,19 +882,6 @@ class Boldgrid_Backup_Admin_Core {
 			[
 				$this->archive_details,
 				'render_archive',
-			]
-		);
-
-		// Add "Tools" page.
-		add_submenu_page(
-			$main_slug,
-			$lang['boldgrid_backup'] . ' ' . $lang['tools'],
-			$lang['tools'],
-			$capability,
-			'boldgrid-backup-tools',
-			[
-				$this->tools,
-				'page',
 			]
 		);
 

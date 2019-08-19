@@ -132,6 +132,12 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
+= 1.11.0 In progress =
+
+Release date: August ??, 2019
+
+* New feature: Added a transfers page.
+
 = 1.10.7 In progress =
 
 * Bug fix:     Fixed "Use of undefined constant STDERR" warning for bgbkup-cli.

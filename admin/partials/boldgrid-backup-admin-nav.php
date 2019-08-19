@@ -28,6 +28,16 @@ $navs = [
 		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup' === $_GET['page'] ? $active : '',
 	],
 	[
+		'title' => __( 'Transfers', 'boldgrid-backup' ),
+		'href'  => 'admin.php?page=boldgrid-backup-transfers',
+		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup-transfers' === $_GET['page'] ? $active : '',
+	],
+	[
+		'title' => __( 'Tools', 'boldgrid-backup' ),
+		'href'  => 'admin.php?page=boldgrid-backup-tools',
+		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup-tools' === $_GET['page'] ? $active : '',
+	],
+	[
 		'title' => __( 'Settings', 'boldgrid-backup' ),
 		'href'  => 'admin.php?page=boldgrid-backup-settings',
 		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup-settings' === $_GET['page'] ? $active : '',
@@ -36,11 +46,6 @@ $navs = [
 		'title' => __( 'Preflight Check', 'boldgrid-backup' ),
 		'href'  => 'admin.php?page=boldgrid-backup-test',
 		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup-test' === $_GET['page'] ? $active : '',
-	],
-	[
-		'title' => __( 'Tools', 'boldgrid-backup' ),
-		'href'  => 'admin.php?page=boldgrid-backup-tools',
-		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup-tools' === $_GET['page'] ? $active : '',
 	],
 	[
 		'title' => __( 'Support', 'boldgrid-backup' ),
