@@ -23,6 +23,11 @@ $active = 'nav-tab-active';
 // phpcs:disable WordPress.CSRF.NonceVerification.NoNonceVerification
 $navs = [
 	[
+		'title' => __( 'Dashboard', 'boldgrid-backup' ),
+		'href'  => 'admin.php?page=boldgrid-backup-dashboard',
+		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup-dashboard' === $_GET['page'] ? $active : '',
+	],
+	[
 		'title' => __( 'Backups', 'boldgrid-backup' ),
 		'href'  => 'admin.php?page=boldgrid-backup',
 		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup' === $_GET['page'] ? $active : '',

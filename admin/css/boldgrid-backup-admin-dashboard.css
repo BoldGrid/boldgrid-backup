@@ -1,0 +1,27 @@
+/**
+ * Style for specific cards.
+ */
+
+#bgbkup_backups .bglib-card-icon {
+	border-top-color: #0073aa;
+}
+
+#bgbkup_backups .bglib-card-icon .dashicons {
+	color: #0073aa;
+}
+
+#bgbkup_updates .bglib-card-icon {
+	border-top-color: #aa0073;
+}
+
+#bgbkup_updates .bglib-card-icon .dashicons {
+	color: #aa0073;
+}
+
+#bgbkup_get_premium .bglib-card-icon {
+	border-top-color: #f95b26;
+}
+
+#bgbkup_get_premium .bglib-card-icon .dashicons {
+	color: #f95b26;
+}

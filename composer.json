@@ -1,8 +1,23 @@
 {
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "chland/tdcron",
+                "version": "dev-master",
+                "source": {
+                    "url": "https://github.com/chland/tdcron",
+                    "type": "git",
+                    "reference": "origin/master"
+                }
+            }
+        }
+    ],
     "require": {
         "boldgrid/library": "2.*",
         "ifsnop/mysqldump-php" : "2.*",
-        "phpseclib/phpseclib" : "~2.0"
+        "phpseclib/phpseclib" : "~2.0",
+        "chland/tdcron" : "dev-master"
     },
     "require-dev": {
         "lox/xhprof": "dev-master"

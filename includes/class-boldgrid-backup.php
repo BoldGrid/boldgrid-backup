@@ -227,7 +227,41 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-cli.php';
 
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-dashboard-widget.php';
+
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-dashboard.php';
+
+		// Cron Module.
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-cron.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/cron/class-crontab.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/cron/entry/class-entry.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/cron/entry/class-base.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/cron/entry/class-crontab.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/cron/entry/class-wpcron.php';
+
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-plugins.php';
+
+		// Cards.
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-backups.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-updates.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-premium.php';
+
+		// Features.
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-scheduled-backups.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-remote-storage.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-versions.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-auto-rollback.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-auto-update-backup.php';
+		// Features - Sign up for BoldGrid Central.
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-cloud-wordpress.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-speed-coach.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-sign-up.php';
+		// Features - Upgrade to Pro.
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-more-backup.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-more-boldgrid.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-more-central.php';
+		// Feature - Pro.
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-central.php';
 
 		// WP-CLI support.
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
@@ -460,8 +494,13 @@ class Boldgrid_Backup {
 
 		$this->loader->add_filter( 'boldgrid_backup_get_core', $plugin_admin_core, 'get_core' );
 
+		$this->loader->add_filter( 'Boldgrid\Library\Notifications\DashboardWidget\getFeaturePlugin\boldgrid-backup', $plugin_admin_core->dashboard_widget, 'filter_feature', 10, 2 );
+
 		$plugins = new Boldgrid_Backup_Admin_Plugins();
 		$this->loader->add_filter( 'plugin_action_links_boldgrid-backup/boldgrid-backup.php', $plugins, 'plugin_action_links', 10, 4 );
+
+		// BoldGrid Backup Dashboard.
+		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core->dashboard, 'admin_enqueue_scripts' );
 	}
 
 	/**

@@ -105,16 +105,33 @@ foreach ( $this->remote_storage_li as $provider ) {
  */
 if ( ! $this->core->config->get_is_premium() ) {
 	foreach ( $this->core->configs['premium_remote'] as $provider ) {
-		// Determine if we should show the title or the logo of the remote storage provider.
-		$provider_title = esc_html( $provider['title'] );
+		// Some providers will have a logo ($provider_span) shown instead of a title.
+		$provider_span = '';
 		if ( ! empty( $provider['logo_class'] ) ) {
-			$provider_title = '<span class="' . esc_attr( $provider['logo_class'] ) . ' ' . esc_attr( $provider['logo_class'] ) . '-smaller" title="' . esc_attr( $provider['title'] ) . '"></span>';
+			$provider_span = '<span class="' . esc_attr( $provider['logo_class'] ) . ' ' . esc_attr( $provider['logo_class'] ) . '-smaller" title="' . esc_attr( $provider['title'] ) . '"></span>';
 		}
 
 		$data['postbox'] .= sprintf(
 			$entry_template,
-			/* 1 */ $provider_title,
-			/* 2 */ esc_html__( 'Premium Feature', 'boldgrid-backup' ),
+			/* 1 */ empty( $provider_span ) ? esc_html( $provider['title'] ) : $provider_span,
+			/* 2 */ wp_kses(
+				sprintf(
+					// translators: 1 an opening anchor tag linking to BoldGrid Backup, 2 its closing anchor tag, 3 the name of a remote storage provider.
+					__( 'Please upgrade to %1$sBackup Premium%2$s to enable %3$s.', 'boldgrid-backup' ),
+					'<a href="' . esc_url( $this->core->go_pro->get_premium_url( 'bgbkup-details-' . $provider['key'] ) ) . '">',
+					'</a>',
+					$provider['title']
+				),
+				[
+					'span' => [
+						'class' => [],
+						'title' => [],
+					],
+					'a'    => [
+						'href' => [],
+					],
+				]
+			),
 			/* 3 */ '',
 			/* 4 */ '',
 			/* 5 */ '<hr class="separator-small" />',

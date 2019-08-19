@@ -50,6 +50,8 @@ $files = array(
 	'/admin/class-boldgrid-backup-admin-archive-details.php',
 	'/admin/class-boldgrid-backup-admin-archive-fail.php',
 	'/admin/class-boldgrid-backup-admin-archiver-utility.php',
+	'/admin/class-boldgrid-backup-admin-dashboard.php',
+	'/admin/class-boldgrid-backup-admin-dashboard-widget.php',
 	'/admin/class-boldgrid-backup-admin-wp-cron.php',
 	'/admin/class-boldgrid-backup-admin-scheduler.php',
 	'/admin/class-boldgrid-backup-admin-auto-rollback.php',

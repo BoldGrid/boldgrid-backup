@@ -253,14 +253,88 @@ class Boldgrid_Backup_Admin_Settings {
 	}
 
 	/**
+	 * Determine whether or not the user has full site protection.
+	 *
+	 * Generally, this means they have scheduled backups that upload backups to a remote server.
+	 *
+	 * @since 1.10.0
+	 *
+	 * @return bool
+	 */
+	public function has_full_protection() {
+		return $this->has_scheduled_backups() && $this->has_remote_configured();
+	}
+
+	/**
+	 * Determine whether or not the user has any remote storage options enabled.
+	 *
+	 * @since 1.10.0
+	 *
+	 * @return bool
+	 */
+	public function has_remote_configured() {
+		$remotes = $this->get_setting( 'remote', array() );
+
+		$has_remote = false;
+
+		foreach ( $remotes as $id => $config ) {
+			if ( 'local' === $id ) {
+				continue;
+			}
+
+			if ( ! empty( $config['enabled'] ) ) {
+				$has_remote = true;
+			}
+		}
+
+		return $has_remote;
+	}
+
+	/**
+	 * Whether or not the user has backups scheduled.
+	 *
+	 * This method is not exhaustive, and insteads returns true if the user has any days of the week
+	 * selected.
+	 *
+	 * @since 1.10.0
+	 *
+	 * @return bool
+	 */
+	public function has_scheduled_backups() {
+		$settings = $this->get_settings();
+
+		$schedule = empty( $settings['schedule'] ) ? [] : $settings['schedule'];
+
+		$days_scheduled = 0;
+
+		foreach ( $schedule as $key => $value ) {
+			if ( 'dow_' !== substr( $key, 0, 4 ) ) {
+				continue;
+			}
+
+			$days_scheduled += empty( $value ) ? 0 : 1;
+		}
+
+		return ! empty( $days_scheduled );
+	}
+
+	/**
 	 * Get the url to the settings pages.
 	 *
 	 * @since 1.10.1
 	 *
+	 * @param  string $section If passed, $section will be appended to the url so it loads that
+	 *                         specific section first.
 	 * @return string
 	 */
-	public function get_settings_url() {
-		return admin_url( 'admin.php?page=boldgrid-backup-settings' );
+	public function get_settings_url( $section = '' ) {
+		$url = admin_url( 'admin.php?page=boldgrid-backup-settings' );
+
+		if ( ! empty( $section ) ) {
+			$url .= '&section=' . $section;
+		}
+
+		return $url;
 	}
 
 	/**

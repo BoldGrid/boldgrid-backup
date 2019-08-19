@@ -37,6 +37,22 @@ class Boldgrid_Backup_Admin_Core {
 	public $auto_rollback;
 
 	/**
+	 * An instance of Boldgrid_Backup_Admin_Dashboard
+	 *
+	 * @since 1.11.0
+	 * @var   Boldgrid_Backup_Admin_Dashboard
+	 */
+	public $dashboard;
+
+	/**
+	 * Dashboard widget.
+	 *
+	 * @since 1.10.0
+	 * @var Boldgrid_Backup_Admin_Dashboard_Widget
+	 */
+	public $dashboard_widget;
+
+	/**
 	 * The settings class object.
 	 *
 	 * @since 1.0
@@ -626,6 +642,10 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->download = new Boldgrid_Backup_Download( $this );
 
+		$this->dashboard_widget = new Boldgrid_Backup_Admin_Dashboard_Widget( $this );
+
+		$this->dashboard = new Boldgrid_Backup_Admin_Dashboard( $this );
+
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
 
@@ -786,21 +806,35 @@ class Boldgrid_Backup_Admin_Core {
 		];
 
 		// The main slug all sub menu items are children of.
-		$main_slug = 'boldgrid-backup';
+		$main_slug = 'boldgrid-backup-dashboard';
 
 		// The capability required for these menu items to be displayed to the user.
 		$capability = 'administrator';
 
+		// Add the main menu item.
 		add_menu_page(
 			$lang['boldgrid_backup'],
 			$lang['boldgrid_backup'],
 			$capability,
 			$main_slug,
 			[
-				$this,
-				'page_archives',
+				$this->dashboard,
+				'page',
 			],
 			'none'
+		);
+
+		// Add our "Dashboard" page.
+		add_submenu_page(
+			$main_slug,
+			__( 'Dashboard', 'boldgrid-backup' ),
+			__( 'Dashboard', 'boldgrid-backup' ),
+			$capability,
+			'boldgrid-backup-dashboard',
+			[
+				$this->dashboard,
+				'page',
+			]
 		);
 
 		// Add "Backup Archive", formally known as "BoldGrid Backup".
@@ -1440,7 +1474,7 @@ class Boldgrid_Backup_Admin_Core {
 			'ABSPATH'           => ABSPATH,
 			'backup_id'         => $this->get_backup_identifier(),
 			'siteurl'           => site_url(),
-			'timestamp'         => time(),
+			'timestamp'         => time(), // @todo Is this a duplicate value? $info['lastmodunix'] is added below.
 			// Environment information.
 			'gateway_interface' => getenv( 'GATEWAY_INTERFACE' ),
 			'http_host'         => getenv( 'HTTP_HOST' ),
@@ -2534,7 +2568,7 @@ class Boldgrid_Backup_Admin_Core {
 			 */
 			'want_to'                   => sprintf(
 				// translators: 1 Markup showing a "Google Drive" logo, 2 Markup showing an "Amazon S3" logo.
-				__( 'Want to store your backups on %1$s and %2$s, restore individual files with just a click, and have access to more tools? Get <strong>BoldGrid Backup Premium</strong>!', 'boldgrid-backup' ),
+				__( 'Catastrophic data loss can happen at any time. Storing your archives in multiple secure locations will keep your website data safe and put your mind at ease. Upgrade to BoldGrid Premium to enable automated remote backups to %1$s and %2$s', 'boldgrid-backup' ),
 				'<span class="bgbkup-remote-logo bgbkup-gdrive-logo" title="Google Drive"></span>',
 				'<span class="bgbkup-remote-logo amazon-s3-logo" title="Amazon S3"></span>'
 			),

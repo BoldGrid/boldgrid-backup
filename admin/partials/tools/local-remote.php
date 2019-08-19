@@ -211,18 +211,8 @@ if ( ! $this->core->config->is_premium_done ) {
 			%1$s
 			%2$s
 		</div>',
-		$this->core->go_pro->get_premium_button( $premium_url ), // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
-		sprintf(
-			// translators: 1: HTML strong open tag, 2: HTML strong close tag, 3: HTML em open tag, 4: HTML em close tag.
-			esc_html__(
-				'Upgrade to %1$sBoldGrid Backup Premium%2$s to gain access to more %3$sRemote Storage Providers%4$s.',
-				'boldgrid-backup'
-			),
-			'<strong>',
-			'</strong>',
-			'<em>',
-			'</em>'
-		)
+		$this->core->go_pro->get_premium_button( $premium_url, esc_html__( 'Unlock Feature', 'boldgrid-backup' ) ), // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+		esc_html__( 'Changed a file and now your site isn’t working properly? With BoldGrid Backup Premium, you can browse through past backup archives and restore individual files with a single click.', 'boldgrid-backup' )
 	);
 }
 

@@ -57,6 +57,17 @@
             "time": "2019-08-01T18:27:41+00:00"
         },
         {
+            "name": "chland/tdcron",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/chland/tdcron",
+                "reference": "origin/master"
+            },
+            "type": "library",
+            "time": "2018-01-23T14:06:12+00:00"
+        },
+        {
             "name": "ifsnop/mysqldump-php",
             "version": "v2.7",
             "source": {
@@ -248,6 +259,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "chland/tdcron": 20,
         "lox/xhprof": 20
     },
     "prefer-stable": false,

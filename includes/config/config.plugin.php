@@ -68,10 +68,12 @@ return array(
 		'google_drive' => [
 			'title'      => __( 'Google Drive', 'boldgrid-backup' ),
 			'logo_class' => 'bgbkup-gdrive-logo',
+			'key'        => 'google_drive',
 		],
 		'amazon_s3'    => [
 			'title'      => __( 'Amazon S3', 'boldgrid-backup' ),
 			'logo_class' => 'amazon-s3-logo',
+			'key'        => 'amazon_s3',
 		],
 	],
 );
