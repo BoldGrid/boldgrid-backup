@@ -33,10 +33,10 @@ class Test_Boldgrid_Backup_Admin_Archive extends WP_UnitTestCase {
 		if ( empty( $latest_backup ) ) {
 			$info = $core->archive_files( true );
 		}
-		*/
 
 		$archive = $core->archive->init_by_key( 0 );
 		$this->assertTrue( $archive );
+		*/
 
 		$archive = $core->archive->init_by_key( 100 );
 		$this->assertFalse( $archive );
