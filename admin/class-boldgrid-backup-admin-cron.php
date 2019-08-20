@@ -765,19 +765,35 @@ class Boldgrid_Backup_Admin_Cron {
 			return $entry;
 		}
 
-		$time             = $this->core->auto_rollback->get_time_data();
-		$settings         = $this->core->settings->get_settings();
-		$backup_directory = $this->core->backup_dir->get();
+		$time      = $this->core->auto_rollback->get_time_data();
+		$settings  = $this->core->settings->get_settings();
+		$backup_id = $this->core->get_backup_identifier();
 
-		// Build cron job line in crontab format.
-		$entry = date( $time['minute'] . ' ' . $time['hour'], $time['deadline'] ) . ' * * ' . date( 'w' ) . ' ' . $this->cron_command . ' "' .
-			dirname( dirname( __FILE__ ) ) . '/cli/bgbkup-cli.php" mode=restore restore notify email=' . $settings['notification_email'] .
-			' zip=' . $backup_directory . '/' . $this->core->archive->filename;
+		$entry_parts = [
+			date( $time['minute'] . ' ' . $time['hour'], $time['deadline'] ) . ' * * ' . date( 'w' ),
+			$this->cron_command,
+			'"' . dirname( dirname( __FILE__ ) ) . '/cli/bgbkup-cli.php"',
+			/*
+			 * Info on mode=restore and restore:
+			 *
+			 * The "mode=restore" property is for the cron remove function (it's a pattern searched for),
+			 * and "plain" is used by CLI. If you take out "mode=restore", it will still do the
+			 * restoration but it won't be able to find and delete the cron.
+			 *
+			 * @todo simplify this.
+			 */
+			'mode=restore restore',
+			'notify email=' . $settings['notification_email'],
+			'backup_id=' . $backup_id,
+			'zip=' . $this->core->archive->filepath,
+		];
 
 		// If not Windows, then also silence the cron job.
 		if ( ! $this->core->test->is_windows() ) {
-			$entry .= ' > /dev/null 2>&1';
+			$entry_parts[] = '> /dev/null 2>&1';
 		}
+
+		$entry = implode( ' ', $entry_parts );
 
 		return $entry;
 	}
