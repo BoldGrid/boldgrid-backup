@@ -290,7 +290,12 @@ class Boldgrid_Backup_Admin_Archive {
 		$this->reset();
 
 		$archives = $this->core->get_archive_list();
-		$archive  = $archives[0];
+
+		if ( empty( $archives[ $key ] ) ) {
+			return false;
+		}
+
+		$archive = $archives[ $key ];
 
 		if ( ! empty( $archive['filename'] ) ) {
 			$this->init_by_filename( $archive['filename'] );
