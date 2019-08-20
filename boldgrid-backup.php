@@ -16,7 +16,7 @@
  *          Plugin Name: BoldGrid Backup
  *          Plugin URI: https://www.boldgrid.com/boldgrid-backup/
  *          Description: Automated backups, remote backup to Amazon S3 and Google Drive, stop website crashes before they happen and more. BoldGrid Backup is the backup solution you need.
- *          Version: 1.11.0-rc.1
+ *          Version: 1.11.0-rc.3
  *          Author: BoldGrid
  *          Author URI: https://www.boldgrid.com/
  *          License: GPL-2.0+
