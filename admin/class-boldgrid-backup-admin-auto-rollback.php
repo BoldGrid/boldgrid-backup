@@ -59,6 +59,23 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	private $core;
 
 	/**
+	 * Time data.
+	 *
+	 * An array of time about when our auto rollback needs to occur.
+	 *
+	 * When we are setting our auto rollback cron, we need to get the time for 15 minutes from now
+	 * (or whatever time limit is set in the config). When we parse that time, we split out the minute,
+	 * hour, etc, to help build the cron command.
+	 *
+	 * After parsing the time, we save it in this class property.
+	 *
+	 * @since 1.11.0
+	 * @access private
+	 * @var array
+	 */
+	private $time_data = [];
+
+	/**
 	 * Whether or not we are on an update page.
 	 *
 	 * An update page is a page that allows the user to update either WP, a plugin,
@@ -598,6 +615,63 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		} else {
 			return $pending_rollback['deadline'];
 		}
+	}
+
+	/**
+	 * Get our auto rollback time data.
+	 *
+	 * This code was originally contained within Boldgrid_Backup_Admin_Cron::add_restore_cron, but
+	 * has since been separated out for reusability.
+	 *
+	 * @since 1.11.0
+	 *
+	 * @return array
+	 */
+	public function get_time_data() {
+		if ( ! empty( $this->time_data ) ) {
+			return $this->time_data;
+		}
+
+		$time = [];
+
+		// Get the unix time for 5 minutes from now.
+		$time_5_minutes_later = strtotime( $this->testing_time );
+
+		// Get the system's localized current time (HH:MM:SS), 5 minutes in the future.
+		$system_time = $this->core->execute_command(
+			'date "+%H|%M|%S|%a %d %b %Y %I:%M:00 %p %Z" -d "' . $this->testing_time . '"'
+		);
+
+		// Split the time into hour, minute, and second.
+		if ( ! empty( $system_time ) ) {
+			list(
+				$time['hour'],
+				$time['minute'],
+				$time['second'],
+				$time['system_time_iso']
+			) = explode( '|', $system_time );
+		}
+
+		// Validate hour; use system hour, or the date code for hour ("G").
+		if ( ! isset( $time['hour'] ) ) {
+			$time['hour'] = 'G';
+		}
+
+		// Validate hour; use system hour, or the date code for minute ("i").
+		if ( ! isset( $time['minute'] ) ) {
+			$time['minute'] = 'i';
+		}
+
+		// Mark the deadline.
+		if ( ! empty( $time['system_time_iso'] ) ) {
+			$time['deadline'] = strtotime( $time['system_time_iso'] );
+		} else {
+			$time['deadline'] = $time_5_minutes_later;
+		}
+
+		$this->time_data = $time;
+
+		return $this->time_data;
 	}
 
 	/**

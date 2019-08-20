@@ -279,6 +279,31 @@ class Boldgrid_Backup_Admin_Archive {
 	}
 
 	/**
+	 * Init this class based upon an archive key.
+	 *
+	 * @since 1.11.0
+	 *
+	 * @param  int $key The archive key.
+	 * @return bool     Whether or not this archive was initialized successfully.
+	 */
+	public function init_by_key( $key ) {
+		$this->reset();
+
+		$archives = $this->core->get_archive_list();
+		$archive  = $archives[0];
+
+		if ( ! empty( $archive['filename'] ) ) {
+			$this->init_by_filename( $archive['filename'] );
+		}
+
+		/*
+		 * Return whether or not this init method was successful. If we don't have a filename, then
+		 * it was not succesful.
+		 */
+		return ! empty( $this->filename );
+	}
+
+	/**
 	 * Init this class using the last backup created.
 	 *
 	 * The last backup created is that defined by the boldgrid_backup_latest_backup option. This option

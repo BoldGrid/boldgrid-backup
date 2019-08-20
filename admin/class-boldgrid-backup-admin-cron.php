@@ -235,14 +235,18 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @see BoldGrid_Backup_Admin_Cron::get_cron_secret()
 	 */
 	public function add_restore_cron() {
+		// Remove existing restore cron jobs.
+		$this->delete_cron_entries( 'restore' );
+
 		$entry  = $this->get_restore_command();
 		$status = $this->update_cron( $entry );
+		$time   = $this->core->auto_rollback->get_time_data();
 
 		// If cron job was added, then update the boldgrid_backup_pending_rollback option with time.
 		if ( $status ) {
 			$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
 
-			$pending_rollback['deadline'] = $deadline;
+			$pending_rollback['deadline'] = $time['deadline'];
 
 			update_site_option( 'boldgrid_backup_pending_rollback', $pending_rollback );
 		}
@@ -754,55 +758,21 @@ class Boldgrid_Backup_Admin_Cron {
 	 * return string
 	 */
 	public function get_restore_command() {
-		$archives = $this->core->get_archive_list();
+		$entry = '';
 
 		// Use the first key to get info on the most recent archive.
-		$archive_key = 0;
-
-		$archive = $archives[ $archive_key ];
-
-		$archive_filename = $archive['filename'];
-
-		// Remove existing restore cron jobs.
-		$this->delete_cron_entries( 'restore' );
-
-		// Get the unix time for 5 minutes from now.
-		$time_5_minutes_later = strtotime( $this->core->auto_rollback->testing_time );
-
-		// Get the system's localized current time (HH:MM:SS), 5 minutes in the future.
-		$system_time = $this->core->execute_command(
-			'date "+%H|%M|%S|%a %d %b %Y %I:%M:00 %p %Z" -d "' . $this->core->auto_rollback->testing_time . '"'
-		);
-
-		// Split the time into hour, minute, and second.
-		if ( ! empty( $system_time ) ) {
-			list( $hour, $minute, $second, $system_time_iso ) = explode( '|', $system_time );
+		if ( ! $this->core->archive->init_by_key( 0 ) ) {
+			return $entry;
 		}
 
-		// Validate hour; use system hour, or the date code for hour ("G").
-		if ( ! isset( $hour ) ) {
-			$hour = 'G';
-		}
-
-		// Validate hour; use system hour, or the date code for minute ("i").
-		if ( ! isset( $minute ) ) {
-			$minute = 'i';
-		}
-
-		// Mark the deadline.
-		if ( ! empty( $system_time_iso ) ) {
-			$deadline = strtotime( $system_time_iso );
-		} else {
-			$deadline = $time_5_minutes_later;
-		}
-
+		$time             = $this->core->auto_rollback->get_time_data();
 		$settings         = $this->core->settings->get_settings();
 		$backup_directory = $this->core->backup_dir->get();
 
 		// Build cron job line in crontab format.
-		$entry = date( $minute . ' ' . $hour, $deadline ) . ' * * ' . date( 'w' ) . ' ' . $this->cron_command . ' "' .
+		$entry = date( $time['minute'] . ' ' . $time['hour'], $time['deadline'] ) . ' * * ' . date( 'w' ) . ' ' . $this->cron_command . ' "' .
 			dirname( dirname( __FILE__ ) ) . '/cli/bgbkup-cli.php" mode=restore restore notify email=' . $settings['notification_email'] .
-			' zip=' . $backup_directory . '/' . $archive_filename;
+			' zip=' . $backup_directory . '/' . $this->core->archive->filename;
 
 		// If not Windows, then also silence the cron job.
 		if ( ! $this->core->test->is_windows() ) {
