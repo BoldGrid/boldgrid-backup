@@ -33,7 +33,7 @@ class More_Central extends \Boldgrid\Library\Library\Ui\Feature {
 
 		$this->title = esc_html__( 'More BoldGrid Central Features', 'boldgrid-backup' );
 
-		$this->content = '<p>' . esc_html__( 'Unlock more features within BoldGrid Central, including Cloud WordPress Advanced Controls and more Automated Website Speed Tests.', 'boldgrid-backup' ) . '</p>';
+		$this->content = '<p>' . esc_html__( 'Unlock more features within BoldGrid Central, including Cloud WordPress Advanced Controls and Automated Website Speed Tests.', 'boldgrid-backup' ) . '</p>';
 
 		$this->content .= '<p style="text-align:right;"><a href="' . esc_url( $get_premium_url ) . '" class="button button-primary boldgrid-orange">' . __( 'Get Premium', 'boldgrid-backup' ) . '</a></p>';
 	}

@@ -29,6 +29,6 @@ class More_Boldgrid extends \Boldgrid\Library\Library\Ui\Feature {
 
 		$this->title = esc_html__( 'More Premium BoldGrid Plugins', 'boldgrid-backup' );
 
-		$this->content = '<p>' . esc_html__( 'Gain access to all BoldGrid premium plugins. This includes Post and Page Builder Premium, which offers premium Blocks and native sliders.', 'boldgrid-backup' ) . '</p>';
+		$this->content = '<p>' . esc_html__( 'Gain access to all BoldGrid premium plugins and services. This includes Post and Page Builder Premium, which offers premium Blocks and native sliders.', 'boldgrid-backup' ) . '</p>';
 	}
 }
