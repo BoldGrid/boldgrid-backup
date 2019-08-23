@@ -48,41 +48,52 @@ class Boldgrid_Backup_Admin_Go_Pro {
 	}
 
 	/**
-	 * Display "setup" admin notices.
+	 * Get "setup" admin notices.
 	 *
-	 * This method is currently used to display admin notices to help guide the
-	 * user to getting a premium key and getting / activating the premium extension.
+	 * This method is currently used to create the admin notices to help guide the user to getting a
+	 * premium key and getting / activating the premium extension.
 	 *
-	 * @since 1.6.0
+	 * @since 1.11.0
+	 *
+	 * @return array
 	 */
-	public function admin_notice_setup() {
+	public function get_admin_notices() {
+		$notices = [];
+
 		// If the premium plugin is installed and all is good, abort!
 		if ( $this->core->config->is_premium_done ) {
-			return;
+			return $notices;
 		}
 
 		// Check user role.
 		if ( ! current_user_can( 'update_plugins' ) ) {
-			return;
+			return $notices;
 		}
 
 		if ( ! class_exists( '\Boldgrid\Library\Library\Notice' ) ) {
-			return;
+			return $notices;
 		}
 
 		// Avoid a fatal error.
 		if ( ! class_exists( '\Boldgrid\Library\Library\Plugin\Plugin' ) ) {
-			$message = __( 'Class "Boldgrid\Library\Library\Plugin\Plugin" not found. Please ensure you are running the lastest version of the BoldGrid Library.', 'boldgrid-backup' );
-			$this->core->notice->boldgrid_backup_notice( $message );
-			return;
+			$notices = [
+				[
+					'id'      => 'boldgrid_backup_missing_library',
+					'show'    => true,
+					'message' => '<p>' . __( 'Class "Boldgrid\Library\Library\Plugin\Plugin" not found. Please ensure you are running the lastest version of the BoldGrid Library.', 'boldgrid-backup' ) . '</p>',
+					'class'   => 'notice notice-error',
+				],
+			];
+
+			return $notices;
 		}
 
 		$is_premium = $this->core->config->get_is_premium();
 
 		$premium_plugin = new \Boldgrid\Library\Library\Plugin\Plugin( 'boldgrid-backup-premium' );
 
-		$notices = array(
-			array(
+		$notices = [
+			[
 				'id'      => 'boldgrid_backup_activate_premium',
 				'show'    => $is_premium && $this->core->config->is_premium_installed,
 				'message' => '<p>' . sprintf(
@@ -93,8 +104,9 @@ class Boldgrid_Backup_Admin_Go_Pro {
 					),
 					admin_url( 'plugins.php' )
 				) . '</p>',
-			),
-			array(
+				'class'   => 'notice notice-warning',
+			],
+			[
 				'id'      => 'boldgrid_backup_upgrade_premium',
 				'show'    => ! $is_premium && $this->core->config->is_premium_active,
 				'message' => '<p>' . sprintf(
@@ -103,8 +115,9 @@ class Boldgrid_Backup_Admin_Go_Pro {
 					$this->get_premium_url( 'bgbkup-premium-activate' ),
 					admin_url( 'admin.php?page=boldgrid-backup-settings&section=connect_key' )
 				) . '</p>',
-			),
-			array(
+				'class'   => 'notice notice-warning',
+			],
+			[
 				'id'      => 'boldgrid_backup_download_premium',
 				'show'    => $is_premium && ! $this->core->config->is_premium_installed,
 				'message' => '<p>' . sprintf(
@@ -116,12 +129,36 @@ class Boldgrid_Backup_Admin_Go_Pro {
 					$premium_plugin->getDownloadUrl(),
 					admin_url( 'plugin-install.php' )
 				) . '</p>',
-			),
-		);
+				'class'   => 'notice notice-warning',
+			],
+		];
+
+		return $notices;
+	}
+
+	/**
+	 * Display "setup" admin notices.
+	 *
+	 * This method is currently used to display admin notices to help guide the
+	 * user to getting a premium key and getting / activating the premium extension.
+	 *
+	 * @since 1.6.0
+	 */
+	public function admin_notice_setup() {
+		/*
+		 * Don't bombard the user with admin notices. Only show these notices if the user is on a
+		 * BoldGrid Backup page.
+		 */
+		$page = ! empty( $_GET['page'] ) ? $_GET['page'] : ''; // phpcs:ignore
+		if ( substr( $page, 0, strlen( 'boldgrid-backup' ) ) !== 'boldgrid-backup' ) {
+			return;
+		}
+
+		$notices = $this->get_admin_notices();
 
 		foreach ( $notices as $notice ) {
 			if ( $notice['show'] ) {
-				\Boldgrid\Library\Library\Notice::show( $notice['message'], $notice['id'] );
+				\Boldgrid\Library\Library\Notice::show( $notice['message'], $notice['id'], $notice['class'] );
 				break;
 			}
 		}
