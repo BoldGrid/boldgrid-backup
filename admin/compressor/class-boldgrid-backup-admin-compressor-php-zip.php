@@ -97,6 +97,7 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 	 *     @type string 0 Path.  Example: ""/home/user/public_html/readme.html".
 	 *     @type string 1 basename.  Example: "readme.html".
 	 *     @type int    2 File size (in bytes). Example: "7413".
+	 *     @type string 3 File type. Examples: "d", "f".
 	 * }
 	 * @param array $info {
 	 *     Data about the backup archive we are generating.
@@ -215,6 +216,13 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 		 */
 		Boldgrid_Backup_Admin_In_Progress_Data::delete_arg( 'last_files' );
 		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'step', 3 );
+
+		// Verify files before write/close.  Delete any invalid files.
+		for ( $i = 0; $i < $this->zip->numFiles; $i++ ) {
+			if ( ! $this->core->wp_filesystem->is_readable( ABSPATH . $this->zip->getNameIndex( $i ) ) ) {
+				$this->zip->deleteIndex( $i );
+			}
+		}
 
 		$close = $this->zip->close();
 

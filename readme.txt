@@ -143,6 +143,7 @@ Release date: August ??, 2019
 * Bug fix:     Fixed "Use of undefined constant STDERR" warning for bgbkup-cli.
 * Update:      Updated auto-rollback to use the CLI restoration process.
 * Bug fix:     Fixed database table exclusion when none are selected.
+* Bug fix:     Avoid zip close error by checking files before write/close.
 
 = 1.10.6 =
 
