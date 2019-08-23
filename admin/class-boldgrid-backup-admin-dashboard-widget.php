@@ -48,6 +48,7 @@ class Boldgrid_Backup_Admin_Dashboard_Widget {
 	 * @return \Boldgrid\Library\Library\Ui\Feature
 	 */
 	public function filter_feature( Boldgrid\Library\Library\Ui\Feature $feature, \Boldgrid\Library\Library\Plugin\Plugin $plugin ) {
+		// Full site protection.
 		if ( ! $this->core->settings->has_full_protection() ) {
 			$feature->content .= '<div class="notice notice-error inline"><p>' . wp_kses(
 				sprintf(
@@ -58,6 +59,14 @@ class Boldgrid_Backup_Admin_Dashboard_Widget {
 				),
 				array( 'a' => array( 'href' => array() ) )
 			) . '</p></div>';
+		}
+
+		// Show notices if the user has the premium plugin but needs to enable it, or a similar situation.
+		$notices = $this->core->go_pro->get_admin_notices();
+		foreach ( $notices as $notice ) {
+			if ( $notice['show'] ) {
+				$feature->content .= '<div class="' . $notice['class'] . ' inline">' . $notice['message'] . '</div>';
+			}
 		}
 
 		return $feature;
