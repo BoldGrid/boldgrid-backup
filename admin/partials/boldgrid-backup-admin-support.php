@@ -87,7 +87,11 @@ if ( ! empty( $reseller ) ) {
 	) . '</li>';
 } else {
 	$premium_button = $this->core->go_pro->get_premium_button(
-		$this->core->go_pro->get_premium_url( 'bgbkup-support' )
+		$this->core->go_pro->get_premium_url( [
+			'utm_source'   => 'Backup Plugin - Support',
+			'utm_medium'   => 'Button',
+			'utm_campaign' => 'BoldGrid Backup FTP',
+		] )
 	);
 	$premium_markup = '<div class="bgbkup-upgrade-message"><p>' .
 		esc_html__( 'Upgrade to receive premium support from BoldGrid', 'boldgrid-backup' ) .

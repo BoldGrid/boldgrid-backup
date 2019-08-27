@@ -204,7 +204,11 @@ printf(
 echo '</p>';
 
 if ( ! $this->core->config->is_premium_done ) {
-	$premium_url = $this->core->go_pro->get_premium_url( 'bgbkup-tools-faq-storage' );
+	$premium_url = $this->core->go_pro->get_premium_url( [
+		'utm_source'   => 'Backup Plugin - Tools',
+		'utm_medium'   => 'Button',
+		'utm_campaign' => 'BoldGrid Backup FTP',
+	] );
 	printf(
 		'
 		<div class="bg-box-bottom premium wp-clearfix">

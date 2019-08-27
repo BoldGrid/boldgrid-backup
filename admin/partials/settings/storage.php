@@ -60,7 +60,11 @@ if ( ! $this->core->config->is_premium_done ) {
 	}
 }
 
-$premium_url = $this->core->go_pro->get_premium_url( 'bgbkup-settings-storage' );
+$premium_url = $this->core->go_pro->get_premium_url( [
+	'utm_source'   => 'Backup Plugin - Storage Settings',
+	'utm_medium'   => 'Button',
+	'utm_campaign' => 'BoldGrid Backup FTP',
+] );
 $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 	'
 	<div class="bg-box-bottom premium">

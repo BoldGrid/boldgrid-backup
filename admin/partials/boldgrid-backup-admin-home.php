@@ -37,7 +37,11 @@ defined( 'WPINC' ) || die;
 $nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
 
 // Premium advertisement on the bottom of the archives page.
-$premium_url = $this->go_pro->get_premium_url( 'bgbkup-archives-bottom' );
+$premium_url = $this->go_pro->get_premium_url( [
+	'utm_source'   => 'Backup Plugin - Archives Bottom',
+	'utm_medium'   => 'Button',
+	'utm_campaign' => 'BoldGrid Backup FTP',
+] );
 $ad          = $this->config->is_premium_done ? '' : sprintf(
 	'
 	<div class="bg-box-bottom premium wp-clearfix">

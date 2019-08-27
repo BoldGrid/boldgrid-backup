@@ -189,12 +189,26 @@ class Boldgrid_Backup_Admin_Go_Pro {
 	 *
 	 * @since 1.7.0
 	 *
-	 * @param  string $source Source to append to url.
-	 * @param  string $url    URL address for the upgrade page.
+	 * @param  string $args An array of key / value args to add.
+	 * @param  string $url  URL address for the upgrade page.
 	 * @return string
 	 */
-	public function get_premium_url( $source = 'bgbkup', $url = 'https://www.boldgrid.com/update-backup' ) {
-		$url = add_query_arg( 'source', $source, $url );
+	public function get_premium_url( $args = [], $url = 'https://www.boldgrid.com/update-backup' ) {
+		/*
+		 * Backwards compat fix.
+		 *
+		 * Prior to 1.11.0, the $args param was a string, which was added to the url like
+		 * ?source=STRING. As of 1.11.0, the $args param allows for an array of utm_ info to be added
+		 * to the url.
+		 *
+		 * For callls to this method still passing a string / IE missing utm campaign info, convert
+		 * it to an array.
+		 */
+		if ( is_string( $args ) ) {
+			$args = [ 'source' => $args ];
+		}
+
+		$url = add_query_arg( $args, $url );
 
 		return $url;
 	}

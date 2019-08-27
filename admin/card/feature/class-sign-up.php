@@ -26,6 +26,11 @@ class Sign_Up extends \Boldgrid\Library\Library\Ui\Feature {
 	 */
 	public function init() {
 		$new_key_url = \Boldgrid\Library\Library\Key\PostNewKey::getCentralUrl( admin_url( 'admin.php?page=boldgrid-backup-dashboard' ) );
+		$new_key_url = add_query_arg( [
+			'utm_source'   => 'Backup Plugin - Dashboard',
+			'utm_medium'   => 'Button',
+			'utm_campaign' => 'BoldGrid Backup FTP',
+		], $new_key_url );
 
 		$this->icon = '<span class="dashicons dashicons-clipboard"></span>';
 
