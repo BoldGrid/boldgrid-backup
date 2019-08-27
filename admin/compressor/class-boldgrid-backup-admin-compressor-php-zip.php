@@ -122,6 +122,10 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 			return true;
 		}
 
+		// Prevent this process from ending; allow the archive to be completed.
+		ignore_user_abort( true );
+		set_time_limit( 0 );
+
 		$this->zip = new ZipArchive();
 
 		$status = $this->zip->open( $info['filepath'], ZipArchive::CREATE );
