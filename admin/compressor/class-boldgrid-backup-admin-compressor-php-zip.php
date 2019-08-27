@@ -217,7 +217,16 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 		Boldgrid_Backup_Admin_In_Progress_Data::delete_arg( 'last_files' );
 		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'step', 3 );
 
-		// Verify files before write/close.  Delete any invalid files.
+		/*
+		 * Verify files before write/close.  Delete any invalid files.
+		 *
+		 * In some scenarios, a file will be added above, but then deleted before the zip->close()
+		 * call below. For example, while a backup is in progress, users may be editing pages and
+		 * on save, cache files may get deleted. If the cache file was added to the zip above, and then
+		 * deleted before the zip->close() below, we're going to have a problem.
+		 *
+		 * @todo The user is not notified if a file is removed below.
+		 */
 		for ( $i = 0; $i < $this->zip->numFiles; $i++ ) {
 			if ( ! $this->core->wp_filesystem->is_readable( ABSPATH . $this->zip->getNameIndex( $i ) ) ) {
 				$this->zip->deleteIndex( $i );
