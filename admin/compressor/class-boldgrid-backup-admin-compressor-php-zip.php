@@ -228,7 +228,11 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 		 * @todo The user is not notified if a file is removed below.
 		 */
 		for ( $i = 0; $i < $this->zip->numFiles; $i++ ) {
-			if ( ! $this->core->wp_filesystem->is_readable( ABSPATH . $this->zip->getNameIndex( $i ) ) ) {
+			$filename = $this->zip->getNameIndex( $i );
+			$filepath = false !== strpos( $this->core->db_dump_filepath, $filename ) ?
+				$this->core->db_dump_filepath : ABSPATH . $filename;
+
+			if ( ! $this->core->wp_filesystem->is_readable( $filepath ) ) {
 				$this->zip->deleteIndex( $i );
 			}
 		}
