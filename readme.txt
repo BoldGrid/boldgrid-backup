@@ -4,7 +4,7 @@ Tags: backup, cloud backup, database backup, restore, wordpress backup
 Requires at least: 4.4
 Tested up to: 5.2
 Requires PHP: 5.4
-Stable tag: 1.10.6
+Stable tag: 1.11.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -132,17 +132,15 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
-= 1.11.0 In progress =
+= 1.11.0 =
 
-Release date: August ??, 2019
+Release date: August 29th, 2019
 
 * New feature: Added a transfers page.
-
-= 1.10.7 In progress =
-
 * Bug fix:     Fixed "Use of undefined constant STDERR" warning for bgbkup-cli.
 * Update:      Updated auto-rollback to use the CLI restoration process.
 * Bug fix:     Fixed database table exclusion when none are selected.
+* Bug fix:     Avoid zip close error by checking files before write/close.
 * Bug fix:     Prevent the web server from killing the archive process.
 
 = 1.10.6 =

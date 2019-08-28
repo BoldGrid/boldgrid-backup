@@ -97,6 +97,7 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 	 *     @type string 0 Path.  Example: ""/home/user/public_html/readme.html".
 	 *     @type string 1 basename.  Example: "readme.html".
 	 *     @type int    2 File size (in bytes). Example: "7413".
+	 *     @type string 3 File type. Examples: "d", "f".
 	 * }
 	 * @param array $info {
 	 *     Data about the backup archive we are generating.
@@ -219,6 +220,29 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 		 */
 		Boldgrid_Backup_Admin_In_Progress_Data::delete_arg( 'last_files' );
 		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'step', 3 );
+
+		/*
+		 * Verify files before write/close.  Delete any invalid file indicies in the ZIP index.
+		 *
+		 * In some scenarios, a file will be added above, but then deleted before the zip->close()
+		 * call below. For example, while a backup is in progress, users may be editing pages and
+		 * on save, cache files may get deleted. If the cache file was added to the zip above, and then
+		 * deleted before the zip->close() below, we're going to have a problem.
+		 *
+		 * There is one file path outside of ABSPATH; the database dump file.
+		 * The full path of each file is determined by checking if it is the dump file or not.
+		 *
+		 * @todo The user is not notified if a file is removed below.
+		 */
+		for ( $i = 0; $i < $this->zip->numFiles; $i++ ) {
+			$filename = $this->zip->getNameIndex( $i );
+			$filepath = false !== strpos( $this->core->db_dump_filepath, $filename ) ?
+				$this->core->db_dump_filepath : ABSPATH . $filename;
+
+			if ( ! $this->core->wp_filesystem->is_readable( $filepath ) ) {
+				$this->zip->deleteIndex( $i );
+			}
+		}
 
 		$close = $this->zip->close();
 
