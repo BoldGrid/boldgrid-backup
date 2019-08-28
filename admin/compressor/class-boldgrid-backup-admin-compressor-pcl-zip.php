@@ -174,6 +174,10 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 			);
 		}
 
+		// Prevent this process from ending; allow the archive to be completed.
+		ignore_user_abort( true );
+		set_time_limit( 0 );
+
 		/*
 		 * Create our $new_filelist.
 		 *
