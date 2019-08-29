@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fb10eab8eb693ba32c952ba64dabf704",
+    "content-hash": "8da5aa0a07f9f218e2835512338238b8",
     "packages": [
         {
             "name": "boldgrid/library",
-            "version": "dev-dev",
+            "version": "2.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BoldGrid/library.git",
-                "reference": "69c4924252d10a860623015e01c02b1196d34b28"
+                "reference": "4a0a16cf9620bc2076e8a247d0d39df8dd6afc57"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BoldGrid/library/zipball/69c4924252d10a860623015e01c02b1196d34b28",
-                "reference": "69c4924252d10a860623015e01c02b1196d34b28",
+                "url": "https://api.github.com/repos/BoldGrid/library/zipball/4a0a16cf9620bc2076e8a247d0d39df8dd6afc57",
+                "reference": "4a0a16cf9620bc2076e8a247d0d39df8dd6afc57",
                 "shasum": ""
             },
             "type": "library",
@@ -54,7 +54,7 @@
                 }
             ],
             "description": "The BoldGrid Library for shared code used in official BoldGrid plugins and themes.",
-            "time": "2019-08-19T19:59:25+00:00"
+            "time": "2019-08-29T11:41:49+00:00"
         },
         {
             "name": "chland/tdcron",
@@ -101,8 +101,8 @@
             "authors": [
                 {
                     "name": "Diego Torres",
-                    "homepage": "https://github.com/ifsnop",
-                    "role": "Developer"
+                    "role": "Developer",
+                    "homepage": "https://github.com/ifsnop"
                 }
             ],
             "description": "PHP version of mysqldump cli that comes with MySQL",
@@ -167,28 +167,28 @@
             "authors": [
                 {
                     "name": "Jim Wigginton",
-                    "email": "terrafrost@php.net",
-                    "role": "Lead Developer"
+                    "role": "Lead Developer",
+                    "email": "terrafrost@php.net"
                 },
                 {
                     "name": "Patrick Monnerat",
-                    "email": "pm@datasphere.ch",
-                    "role": "Developer"
+                    "role": "Developer",
+                    "email": "pm@datasphere.ch"
                 },
                 {
                     "name": "Andreas Fischer",
-                    "email": "bantu@phpbb.com",
-                    "role": "Developer"
+                    "role": "Developer",
+                    "email": "bantu@phpbb.com"
                 },
                 {
                     "name": "Hans-Jürgen Petrich",
-                    "email": "petrich@tronic-media.com",
-                    "role": "Developer"
+                    "role": "Developer",
+                    "email": "petrich@tronic-media.com"
                 },
                 {
                     "name": "Graham Campbell",
-                    "email": "graham@alt-three.com",
-                    "role": "Developer"
+                    "role": "Developer",
+                    "email": "graham@alt-three.com"
                 }
             ],
             "description": "PHP Secure Communications Library - Pure-PHP implementations of RSA, AES, SSH2, SFTP, X.509 etc.",
@@ -256,17 +256,9 @@
             "time": "2015-08-31T22:07:48+00:00"
         }
     ],
-    "aliases": [
-        {
-            "alias": "2.10.0",
-            "alias_normalized": "2.10.0.0",
-            "version": "dev-dev",
-            "package": "boldgrid/library"
-        }
-    ],
+    "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "boldgrid/library": 20,
         "chland/tdcron": 20,
         "lox/xhprof": 20
     },

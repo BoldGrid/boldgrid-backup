@@ -139,6 +139,7 @@ Release date: August 29th, 2019
 * New feature: Added a transfers page.
 * Bug fix:     Fixed "Use of undefined constant STDERR" warning for bgbkup-cli.
 * Update:      Updated auto-rollback to use the CLI restoration process.
+* Update:      Updated dependencies.
 * Bug fix:     Fixed database table exclusion when none are selected.
 * Bug fix:     Avoid zip close error by checking files before write/close.
 * Bug fix:     Prevent the web server from killing the archive process.
