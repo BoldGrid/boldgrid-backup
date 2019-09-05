@@ -380,6 +380,8 @@ class Boldgrid_Backup_Admin_Cron {
 	 *
 	 * @since 1.2
 	 *
+	 * @see \Boldgrid\Backup\Admin\Cron\Crontab::write_crontab()
+	 *
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
 	 * @param string $entry A cron entry.
@@ -405,86 +407,20 @@ class Boldgrid_Backup_Admin_Cron {
 
 		$crontab .= "\n" . $entry . "\n";
 
-		$crontab_written = $this->write_crontab( $crontab );
+		$crontab_written = ( new \Boldgrid\Backup\Admin\Cron\Crontab() )->write_crontab( $crontab );
 
 		return $crontab_written && $this->entry_exists( $entry );
 	}
 
 	/**
-	 * Write the crontab.
+	 * Get the pattern determined by mode passed.
 	 *
-	 * @since 1.6.0
-	 *
-	 * @see Boldgrid_Backup_Admin_Core::execute_command()
-	 *
-	 * @param  string $crontab A string of crons, similar to raw output of crontab -l.
-	 * @return bool
-	 */
-	public function write_crontab( $crontab ) {
-		// Strip extra line breaks.
-		$crontab = str_replace( "\n\n", "\n", $crontab );
-
-		// Trim the crontab.
-		$crontab = trim( $crontab );
-
-		// Add a line break at the end of the file.
-		$crontab .= "\n";
-
-		// Get the backup directory path.
-		$backup_directory = $this->core->backup_dir->get();
-
-		// Check if the backup directory is writable.
-		if ( ! $this->core->wp_filesystem->is_writable( $backup_directory ) ) {
-			return false;
-		}
-
-		// Save the temp crontab to file.
-		$temp_crontab_path = $backup_directory . '/crontab.' . microtime( true ) . '.tmp';
-
-		$this->core->wp_filesystem->put_contents( $temp_crontab_path, $crontab, 0600 );
-
-		// Check if the defaults file was written.
-		if ( ! $this->core->wp_filesystem->exists( $temp_crontab_path ) ) {
-			return false;
-		}
-
-		// Write crontab.
-		$command = 'crontab ' . $temp_crontab_path;
-
-		$crontab = $this->core->execute_command( $command, $success );
-
-		// Remove temp crontab file.
-		$deleted = $this->core->wp_filesystem->delete( $temp_crontab_path, false, 'f' );
-
-		return $success && $deleted;
-	}
-
-	/**
-	 * Delete boldgrid-backup cron entries from the system user crontab.
-	 *
-	 * @since 1.2
-	 *
-	 * @see Boldgrid_Backup_Admin_Core::execute_command()
-	 *
-	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
+	 * @since 1.11.1
 	 *
 	 * @param  string|bool $mode Please see in-method comments below when $pattern is configured.
-	 * @return bool
+	 * @return string
 	 */
-	public function delete_cron_entries( $mode = '' ) {
-		// Check if crontab is available.
-		$is_crontab_available = $this->core->test->is_crontab_available();
-
-		// If crontab is not available, then abort.
-		if ( ! $is_crontab_available ) {
-			return false;
-		}
-
-		// Check if the backup directory is configured.
-		if ( ! $this->core->backup_dir->get() ) {
-			return false;
-		}
-
+	public function get_mode_pattern( $mode = '' ) {
 		/*
 		 * Configure our regex pattern.
 		 *
@@ -515,74 +451,81 @@ class Boldgrid_Backup_Admin_Cron {
 		// Escape the regex delimited that we will use.
 		$pattern = str_replace( '~', '\~', $pattern );
 
-		// Use either crontab or wp-cron.
-		if ( $is_crontab_available ) {
-			// Use crontab.
-			// Read crontab.
-			$command = 'crontab -l';
+		return $pattern;
+	}
 
-			$crontab = $this->core->execute_command( $command, $success );
+	/**
+	 * Remove lines matching the pattern.
+	 *
+	 * @since 1.11.1
+	 *
+	 * @param  string $pattern Regex pattern, without delimiter "~".
+	 * @param  string $crontab The crontab contents.
+	 * @return string
+	 */
+	public function filter_crontab( $pattern, $crontab ) {
+		$crontab_exploded = explode( "\n", $crontab );
+		$crontab          = '';
 
-			// If the command to retrieve crontab failed, then abort.
-			if ( ! $success ) {
-				return false;
+		foreach ( $crontab_exploded as $line ) {
+			if ( ! preg_match( '~' . $pattern . '~', $line ) ) {
+				$line     = trim( $line );
+				$crontab .= $line . "\n";
 			}
-
-			// If no entries exist, then return success.
-			if ( ! preg_match( '~' . $pattern . '~', $crontab ) ) {
-				return true;
-			}
-
-			// Remove lines matching the pattern.
-			$crontab_exploded = explode( "\n", $crontab );
-
-			$crontab = '';
-
-			foreach ( $crontab_exploded as $line ) {
-				if ( ! preg_match( '~' . $pattern . '~', $line ) ) {
-					$line     = trim( $line );
-					$crontab .= $line . "\n";
-				}
-			}
-
-			// Get the backup directory path.
-			$backup_directory = $this->core->backup_dir->get();
-
-			// Connect to the WordPress Filesystem API.
-			global $wp_filesystem;
-
-			// Check if the backup directory is writable.
-			if ( ! $wp_filesystem->is_writable( $backup_directory ) ) {
-				return false;
-			}
-
-			// Save the temp crontab to file.
-			$temp_crontab_path = $backup_directory . '/crontab.' . microtime( true ) . '.tmp';
-
-			// Save a temporary file for crontab.
-			$wp_filesystem->put_contents( $temp_crontab_path, $crontab, 0600 );
-
-			// Check if the defaults file was written.
-			if ( ! $wp_filesystem->exists( $temp_crontab_path ) ) {
-				return false;
-			}
-
-			// Write crontab.
-			$command = 'crontab ' . $temp_crontab_path;
-
-			$crontab = $this->core->execute_command( $command, $success );
-
-			// Remove temp crontab file.
-			$wp_filesystem->delete( $temp_crontab_path, false, 'f' );
 		}
 
-		return true;
+		return $crontab;
+	}
+
+	/**
+	 * Delete boldgrid-backup cron entries from the system user crontab.
+	 *
+	 * @since 1.2
+	 *
+	 * @see \Boldgrid\Backup\Admin\Cron\Crontab::read_crontab()
+	 * @see \Boldgrid_Backup_Admin_Cron::get_mode_pattern()
+	 * @see \Boldgrid_Backup_Admin_Cron::filter_crontab()
+	 * @see \Boldgrid\Backup\Admin\Cron\Crontab::write_crontab()
+	 *
+	 * @param  string|bool $mode Please see in-method comments below when $pattern is configured.
+	 * @return bool
+	 */
+	public function delete_cron_entries( $mode = '' ) {
+		if ( ! $this->core->test->is_crontab_available() ) {
+			return false;
+		}
+
+		if ( ! $this->core->backup_dir->get() ) {
+			return false;
+		}
+
+		$crontab_helper = new \Boldgrid\Backup\Admin\Cron\Crontab();
+
+		$crontab = $crontab_helper->read_crontab();
+
+		if ( false === $crontab ) {
+			return false;
+		}
+
+		$pattern = $this->get_mode_pattern( $mode );
+
+		// If no entries exist, then return success.
+		if ( ! preg_match( '~' . $pattern . '~', $crontab ) ) {
+			return true;
+		}
+
+		$crontab = $this->filter_crontab( $pattern, $crontab );
+
+		return $crontab_helper->write_crontab( $crontab );
 	}
 
 	/**
 	 * Delete one entry from the crontab.
 	 *
 	 * @since 1.6.0
+	 *
+	 * @see \Boldgrid\Backup\Admin\Cron\Crontab::write_crontab()
+	 * @see \Boldgrid_Backup_Admin_Cron::entry_exists()
 	 *
 	 * @param  string $entry Crontab entry.
 	 * @return bool True if the entry does not exist or was deleted successfully.
@@ -600,9 +543,10 @@ class Boldgrid_Backup_Admin_Cron {
 			unset( $all_entries[ $key ] );
 		}
 
-		$all_entries = implode( "\n", $all_entries );
+		$all_entries     = implode( "\n", $all_entries );
+		$crontab_written = ( new \Boldgrid\Backup\Admin\Cron\Crontab() )->write_crontab( $all_entries );
 
-		return $this->write_crontab( $all_entries ) && ! $this->entry_exists( $entry );
+		return $crontab_written && ! $this->entry_exists( $entry );
 	}
 
 	/**
