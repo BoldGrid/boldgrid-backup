@@ -468,9 +468,8 @@ class Boldgrid_Backup_Admin_Cron {
 	 *
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 *
-	 * @param  string $mode Please see in-method comments when the $pattern is
-	 *                      configured.
-	 * @return bool         Success.
+	 * @param  string|bool $mode Please see in-method comments below when $pattern is configured.
+	 * @return bool
 	 */
 	public function delete_cron_entries( $mode = '' ) {
 		// Check if crontab is available.
@@ -487,7 +486,7 @@ class Boldgrid_Backup_Admin_Cron {
 		}
 
 		/*
-		 * Configure our pattern.
+		 * Configure our regex pattern.
 		 *
 		 * When this method was initially written, $mode was either
 		 * empty (defaulting to "backup") or "restore", hence the first two
@@ -504,10 +503,17 @@ class Boldgrid_Backup_Admin_Cron {
 		if ( '' === $mode ) {
 			$pattern .= 'boldgrid-backup-cron.php" mode=';
 		} elseif ( 'restore' === $mode ) {
-			$pattern .= 'cli/bgbkup-cli.php" mode=restore';
+			$pattern .= '(boldgrid-backup-cron|cli/bgbkup-cli).php" mode=restore';
 		} elseif ( true !== $mode ) {
 			$pattern .= $mode;
 		}
+
+		// Format the periods in the pattern for regex; ensure a backslash before periods.
+		$pattern = str_replace( '\.', '.', $pattern );
+		$pattern = str_replace( '.', '\.', $pattern );
+
+		// Escape the regex delimited that we will use.
+		$pattern = str_replace( '~', '\~', $pattern );
 
 		// Use either crontab or wp-cron.
 		if ( $is_crontab_available ) {
@@ -523,7 +529,7 @@ class Boldgrid_Backup_Admin_Cron {
 			}
 
 			// If no entries exist, then return success.
-			if ( false === strpos( $crontab, $pattern ) ) {
+			if ( ! preg_match( '~' . $pattern . '~', $crontab ) ) {
 				return true;
 			}
 
@@ -533,7 +539,7 @@ class Boldgrid_Backup_Admin_Cron {
 			$crontab = '';
 
 			foreach ( $crontab_exploded as $line ) {
-				if ( false === strpos( $line, $pattern ) ) {
+				if ( ! preg_match( '~' . $pattern . '~', $line ) ) {
 					$line     = trim( $line );
 					$crontab .= $line . "\n";
 				}
