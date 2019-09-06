@@ -436,7 +436,8 @@ class Boldgrid_Backup_Admin_Cron {
 		 * added to the pattern and ALL crons for this site will be removed.
 		 */
 		$pattern = BOLDGRID_BACKUP_PATH . '/';
-		if ( '' === $mode ) {
+
+		if ( '' === $mode || 'backup' === $mode ) {
 			$pattern .= 'boldgrid-backup-cron.php" mode=';
 		} elseif ( 'restore' === $mode ) {
 			$pattern .= '(boldgrid-backup-cron|cli/bgbkup-cli).php" mode=restore';
@@ -468,7 +469,7 @@ class Boldgrid_Backup_Admin_Cron {
 		$crontab          = '';
 
 		foreach ( $crontab_exploded as $line ) {
-			if ( ! preg_match( '~' . $pattern . '~', $line ) ) {
+			if ( ! empty( $line ) && ! preg_match( '~' . $pattern . '~', $line ) ) {
 				$line     = trim( $line );
 				$crontab .= $line . "\n";
 			}
