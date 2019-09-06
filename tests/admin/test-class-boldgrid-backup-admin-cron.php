@@ -75,10 +75,10 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 		$pattern_expected = $this->base_path . 'boldgrid-backup-cron\.php" mode=';
 
 		$pattern_from_mode = $this->core->cron->get_mode_pattern( 'backup' );
-		$this->assertEqual( $pattern_from_mode, $pattern_expected );
+		$this->assertEquals( $pattern_from_mode, $pattern_expected );
 
 		$pattern_from_mode = $this->core->cron->get_mode_pattern();
-		$this->assertEqual( $pattern_from_mode, $pattern_expected );
+		$this->assertEquals( $pattern_from_mode, $pattern_expected );
 
 		$crontab_filtered = $this->core->cron->filter_crontab( $pattern, $this->crontab );
 		$crontab_expected = 'MAILTO=""
@@ -86,7 +86,7 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 */5 * * * * php -d register_argc_argv="1" -qf "' . $this->base_path . 'cron/run-jobs.php" siteurl=https://example.com id=12345678 secret=notasecret > /dev/null 2>&1
 08 12 * * 4 php -d register_argc_argv="1" -qf "' . $this->base_path . 'cli/bgbkup-cli.php" mode=restore restore notify email=user@example.com backup_id=12345678 zip=/home/user/boldgrid_backup/boldgrid-backup-example.com-12345678-20190905-150000.zip > /dev/null 2>&1
 	';
-		$this->assertEqual( $crontab_filtered, $crontab_expected );
+		$this->assertEquals( $crontab_filtered, $crontab_expected );
 	}
 
 	/**
@@ -97,7 +97,7 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 	public function test_filter_crontab_restore() {
 		$pattern_expected  = $this->base_path . '(boldgrid-backup-cron|cli/bgbkup-cli)\.php" mode=restore';
 		$pattern_from_mode = $this->core->cron->get_mode_pattern( 'restore' );
-		$this->assertEqual( $pattern_from_mode, $pattern_expected );
+		$this->assertEquals( $pattern_from_mode, $pattern_expected );
 
 		$crontab_filtered = $this->core->cron->filter_crontab( $pattern, $this->crontab );
 		$crontab_expected = 'MAILTO=""
@@ -105,7 +105,7 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 20 4 * * 1 php -d register_argc_argv="1" -qf "' . $this->base_path . 'boldgrid-backup-cron.php" mode=backup siteurl=https://example.com id=12345678 secret=notasecret > /dev/null 2>&1
 */5 * * * * php -d register_argc_argv="1" -qf "' . $this->base_path . 'cron/run-jobs.php" siteurl=https://example.com id=12345678 secret=notasecret > /dev/null 2>&1
 ';
-		$this->assertEqual( $crontab_filtered, $crontab_expected );
+		$this->assertEquals( $crontab_filtered, $crontab_expected );
 	}
 
 	/**
@@ -116,7 +116,7 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 	public function test_filter_crontab_run_jobs() {
 		$pattern_from_mode = $this->core->cron->get_mode_pattern( 'cron/run-jobs.php' );
 		$pattern_expected  = $this->base_path . 'cron/run-jobs\.php';
-		$this->assertEqual( $pattern_from_mode, $pattern_expected );
+		$this->assertEquals( $pattern_from_mode, $pattern_expected );
 
 		$crontab_filtered = $this->core->cron->filter_crontab( $pattern, $this->crontab );
 		$crontab_expected = 'MAILTO=""
@@ -125,7 +125,7 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 03 12 * * 4 php -d register_argc_argv="1" -qf "' . $this->base_path . 'boldgrid-backup-cron.php" mode=restore siteurl=https://example.com id=12345678 secret=notasecret archive_key=0 archive_filename=boldgrid-backup-example.com-12345678-20190905-150000.zip > /dev/null 2>&1
 08 12 * * 4 php -d register_argc_argv="1" -qf "' . $this->base_path . 'cli/bgbkup-cli.php" mode=restore restore notify email=user@example.com backup_id=12345678 zip=/home/user/boldgrid_backup/boldgrid-backup-example.com-12345678-20190905-150000.zip > /dev/null 2>&1
 ';
-		$this->assertEqual( $crontab_filtered, $crontab_expected );
+		$this->assertEquals( $crontab_filtered, $crontab_expected );
 	}
 
 	/**
@@ -136,12 +136,12 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 	public function test_filter_crontab_all() {
 		$pattern_from_mode = $this->core->cron->get_mode_pattern( true );
 		$pattern_expected  = $this->base_path;
-		$this->assertEqual( $pattern_from_mode, $pattern_expected );
+		$this->assertEquals( $pattern_from_mode, $pattern_expected );
 
 		$crontab_filtered = $this->core->cron->filter_crontab( $pattern, $this->crontab );
 		$crontab_expected = 'MAILTO=""
 58 23 * * * echo "2 minutes to midnight"
 ';
-		$this->assertEqual( $crontab_filtered, $crontab_expected );
+		$this->assertEquals( $crontab_filtered, $crontab_expected );
 	}
 }
