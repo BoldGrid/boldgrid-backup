@@ -80,7 +80,7 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 		$pattern_from_mode = $this->core->cron->get_mode_pattern();
 		$this->assertEquals( $pattern_from_mode, $pattern_expected );
 
-		$crontab_filtered = $this->core->cron->filter_crontab( $pattern, $this->crontab );
+		$crontab_filtered = $this->core->cron->filter_crontab( $pattern_from_mode, $this->crontab );
 		$crontab_expected = 'MAILTO=""
 58 23 * * * echo "2 minutes to midnight"
 */5 * * * * php -d register_argc_argv="1" -qf "' . $this->base_path . 'cron/run-jobs.php" siteurl=https://example.com id=12345678 secret=notasecret > /dev/null 2>&1
@@ -99,7 +99,7 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 		$pattern_from_mode = $this->core->cron->get_mode_pattern( 'restore' );
 		$this->assertEquals( $pattern_from_mode, $pattern_expected );
 
-		$crontab_filtered = $this->core->cron->filter_crontab( $pattern, $this->crontab );
+		$crontab_filtered = $this->core->cron->filter_crontab( $pattern_from_mode, $this->crontab );
 		$crontab_expected = 'MAILTO=""
 58 23 * * * echo "2 minutes to midnight"
 20 4 * * 1 php -d register_argc_argv="1" -qf "' . $this->base_path . 'boldgrid-backup-cron.php" mode=backup siteurl=https://example.com id=12345678 secret=notasecret > /dev/null 2>&1
@@ -118,7 +118,7 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 		$pattern_expected  = $this->base_path . 'cron/run-jobs\.php';
 		$this->assertEquals( $pattern_from_mode, $pattern_expected );
 
-		$crontab_filtered = $this->core->cron->filter_crontab( $pattern, $this->crontab );
+		$crontab_filtered = $this->core->cron->filter_crontab( $pattern_from_mode, $this->crontab );
 		$crontab_expected = 'MAILTO=""
 58 23 * * * echo "2 minutes to midnight"
 20 4 * * 1 php -d register_argc_argv="1" -qf "' . $this->base_path . 'boldgrid-backup-cron.php" mode=backup siteurl=https://example.com id=12345678 secret=notasecret > /dev/null 2>&1
@@ -138,7 +138,7 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 		$pattern_expected  = $this->base_path;
 		$this->assertEquals( $pattern_from_mode, $pattern_expected );
 
-		$crontab_filtered = $this->core->cron->filter_crontab( $pattern, $this->crontab );
+		$crontab_filtered = $this->core->cron->filter_crontab( $pattern_from_mode, $this->crontab );
 		$crontab_expected = 'MAILTO=""
 58 23 * * * echo "2 minutes to midnight"
 ';
