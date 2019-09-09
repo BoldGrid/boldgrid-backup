@@ -161,7 +161,7 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 	 */
 	public function test_filter_crontab_site_check() {
 		$pattern_from_mode = $this->core->cron->get_mode_pattern( 'site_check' );
-		$pattern_expected  = $this->base_path . 'cli/bgbkup-cli\.php';
+		$pattern_expected  = $this->base_path . 'cli/bgbkup-cli\.php" check';
 		$this->assertEquals( $pattern_from_mode, $pattern_expected );
 
 		$crontab_filtered = $this->core->cron->filter_crontab( $pattern_from_mode, $this->crontab );

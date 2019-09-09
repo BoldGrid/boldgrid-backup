@@ -437,24 +437,24 @@ class Boldgrid_Backup_Admin_Cron {
 		 */
 		$pattern = BOLDGRID_BACKUP_PATH . '/';
 
-		switch ( $mode ) {
-			case '':
-			case 'backup':
+		switch ( true ) {
+			case '' === $mode:
+			case 'backup' === $mode:
 				$pattern .= 'boldgrid-backup-cron.php" mode=backup';
 				break;
-			case 'restore':
+			case 'restore' === $mode:
 				// Match "boldgrid-backup-cron.php" (old) and "cli/bgbkup-cli.php" (new) in the pattern.
 				$pattern .= '(boldgrid-backup-cron|cli/bgbkup-cli).php" mode=restore';
 				break;
-			case 'jobs':
+			case 'jobs' === $mode:
 				// Match "run_jobs" (old) and "run-jobs" (new) filenames in the pattern.
 				$pattern .= '(cron/run_jobs.php|' . $this->run_jobs . ')';
 				break;
-			case 'site_check':
+			case 'site_check' === $mode:
 				$pattern .= $this->site_check . '" check';
 				break;
-			case 'all':
-			case true:
+			case 'all' === $mode:
+			case true === $mode:
 				break;
 			default:
 				$pattern .= $mode;
