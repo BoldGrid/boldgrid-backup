@@ -58,6 +58,17 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 	public function setUp() {
 		$this->core      = new Boldgrid_Backup_Admin_Core();
 		$this->base_path = BOLDGRID_BACKUP_PATH . '/';
+
+		/*
+		 * Example crontab.
+		 *
+		 * After the MAILTO, this crontab has 5 different entries:
+		 * 1. A simple echo command.
+		 * 2. The command to create a backup.
+		 * 3. The command for run jobs.
+		 * 4. The command to restore a backup. Versions prior to 1.11.0
+		 * 5. The command to restore a backup. Version 1.11.0 and later.
+		 */
 		$this->crontab   = 'MAILTO=""
 58 23 * * * echo "2 minutes to midnight"
 20 4 * * 1 php -d register_argc_argv="1" -qf "' . $this->base_path . 'boldgrid-backup-cron.php" mode=backup siteurl=https://example.com id=12345678 secret=notasecret > /dev/null 2>&1
@@ -77,9 +88,11 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 	public function test_filter_crontab_backup() {
 		$pattern_expected = $this->base_path . 'boldgrid-backup-cron\.php" mode=';
 
+		// Make sure correct pattern is returned.
 		$pattern_from_mode = $this->core->cron->get_mode_pattern( 'backup' );
 		$this->assertEquals( $pattern_from_mode, $pattern_expected );
 
+		// Make sure correct pattern is returned.
 		$pattern_from_mode = $this->core->cron->get_mode_pattern();
 		$this->assertEquals( $pattern_from_mode, $pattern_expected );
 
