@@ -50,6 +50,9 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 	/**
 	 * Setup.
 	 *
+	 * This setup method stages the information needed for the tests.
+	 * The mock crontab contains old and new (cli) formats of the restore cron job entry.
+	 *
 	 * @since 1.11.1
 	 */
 	public function setUp() {
