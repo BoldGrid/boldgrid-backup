@@ -117,7 +117,7 @@ class Boldgrid_Backup_Admin_Cron {
 		}
 
 		// Delete existing backup cron jobs.
-		$cron_status = $this->delete_cron_entries();
+		$cron_status = $this->delete_cron_entries( 'backup' );
 
 		// Initialize $days_scheduled_list.
 		$days_scheduled_list = '';
@@ -334,7 +334,7 @@ class Boldgrid_Backup_Admin_Cron {
 	 *
 	 * This method is usually ran after saving the BoldGrid Backup settings. If
 	 * (after save) cron is our scheduler, then we need to make sure we have
-	 * the "run_jobs" wp-cron scheduled.
+	 * the "site_check" wp-cron scheduled.
 	 *
 	 * @since 1.10.0
 	 *
@@ -437,12 +437,28 @@ class Boldgrid_Backup_Admin_Cron {
 		 */
 		$pattern = BOLDGRID_BACKUP_PATH . '/';
 
-		if ( '' === $mode || 'backup' === $mode ) {
-			$pattern .= 'boldgrid-backup-cron.php" mode=';
-		} elseif ( 'restore' === $mode ) {
-			$pattern .= '(boldgrid-backup-cron|cli/bgbkup-cli).php" mode=restore';
-		} elseif ( true !== $mode ) {
-			$pattern .= $mode;
+		switch ( $mode ) {
+			case '':
+			case 'backup':
+				$pattern .= 'boldgrid-backup-cron.php" mode=backup';
+				break;
+			case 'restore':
+				// Match "boldgrid-backup-cron.php" (old) and "cli/bgbkup-cli.php" (new) in the pattern.
+				$pattern .= '(boldgrid-backup-cron|cli/bgbkup-cli).php" mode=restore';
+				break;
+			case 'jobs':
+				// Match "run_jobs" (old) and "run-jobs" (new) filenames in the pattern.
+				$pattern .= '(cron/run_jobs.php|' . $this->run_jobs . ')';
+				break;
+			case 'site_check':
+				$pattern .= $this->site_check . '" check';
+				break;
+			case 'all':
+			case true:
+				break;
+			default:
+				$pattern .= $mode;
+				break;
 		}
 
 		// Format the periods in the pattern for regex; ensure a backslash before periods.
@@ -724,6 +740,7 @@ class Boldgrid_Backup_Admin_Cron {
 			date( $time['minute'] . ' ' . $time['hour'], $time['deadline'] ) . ' * * ' . date( 'w' ),
 			$this->cron_command,
 			'"' . dirname( dirname( __FILE__ ) ) . '/cli/bgbkup-cli.php"',
+
 			/*
 			 * Info on mode=restore and restore:
 			 *
