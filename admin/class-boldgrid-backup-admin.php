@@ -92,6 +92,8 @@ class Boldgrid_Backup_Admin {
 	 * @since 1.0
 	 */
 	public function enqueue_styles() {
+		$core = apply_filters( 'boldgrid_backup_get_core', null );
+
 		/*
 		 * An instance of this class should be passed to the run() function
 		 * defined in Boldgrid_Backup_Loader as all of the hooks are defined
@@ -118,11 +120,11 @@ class Boldgrid_Backup_Admin {
 		$spinner     = '<span class="spinner inline"></span> ';
 		$dots        = ' ...';
 		$translation = array(
-			'is_premium'      => ( true === $this->config->get_is_premium() ? 'true' : 'false' ),
-			'lang'            => $this->config->lang,
-			'spinner_loading' => $spinner . __( 'Loading', 'boldgrid-backup' ) . $dots,
-			'spinner'         => $spinner,
-			'get_premium_url' => Boldgrid_Backup_Admin_Go_Pro::$url,
+			'is_premium'                  => ( true === $this->config->get_is_premium() ? 'true' : 'false' ),
+			'lang'                        => $this->config->lang,
+			'spinner_loading'             => $spinner . __( 'Loading', 'boldgrid-backup' ) . $dots,
+			'spinner'                     => $spinner,
+			'get_premium_url'             => Boldgrid_Backup_Admin_Go_Pro::$url,
 		);
 
 		wp_localize_script( 'boldgrid-backup-admin', 'BoldGridBackupAdmin', $translation );
@@ -139,10 +141,12 @@ class Boldgrid_Backup_Admin {
 			false
 		);
 		$translation = array(
-			'archive_file_size'       => __( 'Archive file size: ', 'boldgrid_backup' ),
-			'size_before_compression' => __( 'File size before compression: ', 'boldgrid-backup' ),
-			'adding_tables'           => __( 'Adding tables.', 'boldgrid-backup' ),
-			'completing_database'     => __( 'Completing database backup...', 'boldgrid-backup' ),
+			'archive_file_size'           => __( 'Archive file size: ', 'boldgrid_backup' ),
+			'size_before_compression'     => __( 'File size before compression: ', 'boldgrid-backup' ),
+			'adding_tables'               => __( 'Adding tables.', 'boldgrid-backup' ),
+			'completing_database'         => __( 'Completing database backup...', 'boldgrid-backup' ),
+			'update_protection_activated' => $core->elements['update_protection_activated'],
+			'backup_created'              => $core->lang['backup_created'],
 		);
 		wp_localize_script( $handle, 'BoldGridBackupAdminInProgress', $translation );
 		wp_enqueue_script( $handle );

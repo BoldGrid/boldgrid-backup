@@ -225,25 +225,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 			false
 		);
 
-		$access_type          = get_filesystem_method();
-		$archive_nonce        = wp_create_nonce( 'archive_auth' );
-		$localize_script_data = array(
-			'archiveNonce'              => $archive_nonce,
-			'accessType'                => $access_type,
-			'updateProtectionActivated' => $this->core->elements['update_protection_activated'],
-			'backupCreated'             => $this->core->lang['backup_created'],
-			'errorText'                 => esc_html__(
-				'There was an error processing your request.  Please reload the page and try again.',
-				'boldgrid-backup'
-			),
-		);
-		wp_localize_script( $handle, 'localizeScriptData', $localize_script_data );
-
 		wp_enqueue_script( $handle );
-
-		// Scripts required for showing backup in progress bar.
-		wp_enqueue_script( 'heartbeat' );
-		wp_enqueue_script( 'jquery-ui-progressbar' );
 	}
 
 	/**
@@ -280,6 +262,9 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		);
 		wp_localize_script( $handle, 'boldgridBackupCustomizer', $translations );
 		wp_enqueue_script( $handle );
+
+		// Needed to show the "in progress" bar in the customizer.
+		wp_enqueue_script( 'jquery-ui-progressbar' );
 
 		$this->enqueue_backup_scripts();
 
@@ -875,8 +860,9 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		 * 1.6.0 so that we can uniquely identify this notice on the page.
 		 */
 		$backup_button = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-button.php';
+		$in_progress   = Boldgrid_Backup_Admin_In_Progress_Data::get_markup();
 		$notice        = $this->notice_backup_get();
-		do_action( 'boldgrid_backup_notice', $notice . $backup_button, 'notice notice-warning is-dismissible boldgrid-backup-protect-now' );
+		do_action( 'boldgrid_backup_notice', $notice . $backup_button . $in_progress, 'notice notice-warning is-dismissible boldgrid-backup-protect-now' );
 	}
 
 	/**
@@ -1143,7 +1129,8 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 			// You're not protected, make a backup first.
 			$notice        = $this->notice_backup_get();
 			$backup_button = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-button.php';
-			$notice        = '<div class="notice notice-warning is-dismissible boldgrid-backup-protect-now">' . $notice . $backup_button . '</div>';
+			$in_progress   = Boldgrid_Backup_Admin_In_Progress_Data::get_markup();
+			$notice        = '<div class="notice notice-warning is-dismissible boldgrid-backup-protect-now">' . $notice . $backup_button . $in_progress . '</div>';
 		}
 
 		wp_send_json_success( $notice );

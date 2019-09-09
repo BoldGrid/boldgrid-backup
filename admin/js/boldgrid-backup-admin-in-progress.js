@@ -85,6 +85,11 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 					 */
 					$( document ).on( 'boldgrid_backup_progress_notice_added', 'body', self.onInProgress );
 
+					/*
+					 * Take action when a backup is started.
+					 *
+					 * The only script triggering this event is backup-now.js.
+					 */
 					$( document ).on( 'boldgrid_backup_initiated', 'body', self.onBackupInitiated );
 
 					$( document ).on( 'boldgrid_backup_complete', 'body', self.onComplete );
@@ -142,6 +147,31 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			// Bail out of the heartbeat.
 			$( document ).off( 'heartbeat-tick', self.onHeartbeatTick );
 			$( document ).off( 'heartbeat-send', self.heartbeatModify );
+
+			/*
+			 * Show a notice that upgrade protection is now enabled. This updates the current notice
+			 * rather than generate a new one.
+			 *
+			 * This logic was originally introduced in 1.5.3 within backup-now.js. As of 1.12.0 it
+			 * has been moved here so that backup-now.js can focus soley on triggering the ajax call
+			 * to generate the backup and nothing else.
+			 */
+			$( '#backup-site-now-results' ).closest( '.notice' )
+				// Change it from warning to success.
+				.removeClass( 'notice-warning' ).addClass( 'notice-success' )
+				// Find the protection enabled and change the html.
+				.find( '#protection_enabled' ).html( self.i18n.update_protection_activated );
+
+			/*
+			 * When a backup is completed, replace the "Backup Site Now" button with a "Backup Created
+			 * Successfully" message.
+			 *
+			 * The .backup-site-now-section is the container for the "Backup Site Now" <form>.
+			 *
+			 * We're targeting the "visible" section so that the non-visible section, the one in the
+			 * modal, does not get overwritten.
+			 */
+			$( '#backup-site-now-section:visible' ).html( '<p>' + self.i18n.backup_created + '</p>' );
 		},
 
 		/**

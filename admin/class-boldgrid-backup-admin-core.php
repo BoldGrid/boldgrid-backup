@@ -2352,22 +2352,18 @@ class Boldgrid_Backup_Admin_Core {
 
 		$archive_info = $this->archive_files( true );
 
-		if ( ! $this->is_archiving_update_protection ) {
-			$message = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup.php';
-			$this->notice->add_user_notice( $message['message'], $message['class'] );
-			wp_send_json_success(
-				array(
-					'callback' => 'reload',
-				)
-			);
-		} else {
+		if ( $this->is_archiving_update_protection ) {
 			update_site_option( 'boldgrid_backup_pending_rollback', $archive_info );
-			wp_send_json_success(
-				array(
-					'callback' => 'updateProtectionEnabled',
-				)
-			);
 		}
+
+		/*
+		 * Finish.
+		 *
+		 * Normally we'd give the user a notice that the backup has been completed. However, since
+		 * 1.12.0, we are no longer waiting for this ajax call to complete. The "in progress" bar
+		 * will give the user any updates they need.
+		 */
+		wp_send_json_success();
 	}
 
 	/**
