@@ -142,9 +142,9 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 		/*
 		 * Take action now that the ajax call to create a backup has been triggered.
 		 *
-		 * If we're on the Backup Archive's page page, reload the page. Within the "Backup Site Now"
-		 * modal, the user will be given a notice that their backup has started, and that the page will
-		 * refresh and display a progress bar.
+		 * If we're on the Backup Archive's page page, wait 3 seconds and reload the page. Within the
+		 * "Backup Site Now" modal, the user will be given a notice that their backup has started, and
+		 * that the page will refresh and display a progress bar.
 		 *
 		 * Else, trigger 'boldgrid_backup_initiated'. The only listener is in-progress.js. When a
 		 * backup has been initiated, it starts the WordPress Heartbeat and shows the in progress container.
