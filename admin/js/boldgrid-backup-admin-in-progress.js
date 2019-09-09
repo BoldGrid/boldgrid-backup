@@ -93,6 +93,9 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 					$( document ).on( 'boldgrid_backup_initiated', 'body', self.onBackupInitiated );
 
 					$( document ).on( 'boldgrid_backup_complete', 'body', self.onComplete );
+				} else {
+					// Something's gone wrong.
+					console.log( 'BoldGrid Backup: Error, progress bar needs heartbeat enqueued.' );
 				}
 			} );
 		},
@@ -130,23 +133,56 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		/**
 		 * Action to take when a backup is completed.
 		 *
-		 * This function is called on the body's "boldgrid_backup_complete" event, which is trigger
-		 * in the following scenarios:
-		 * # We make an ajax call to backup now, and that call is successful.
-		 * # We are using the wp.heartbeat to check on the status of a in progress backup and we're
-		 *   notified the backup is complete.
+		 * This function is called within this file's onHeartbeatTick listener.
 		 *
 		 * @since 1.7.0
+		 *
+		 * @param object data The data object received from the WordPress Heartbeat.
 		 */
-		onComplete: function() {
-
-			// Hide "in progress" notices.
-			self.$inProgressNotice.slideUp();
-			$( '#boldgrid_backup_in_progress_container' ).slideUp();
+		onComplete: function( data ) {
+			var $notice;
 
 			// Bail out of the heartbeat.
 			$( document ).off( 'heartbeat-tick', self.onHeartbeatTick );
 			$( document ).off( 'heartbeat-send', self.heartbeatModify );
+
+			/*
+			 * Enable buttons again.
+			 *
+			 * We disabled certain buttons during the backup, like "Update now" and "Backup site now".
+			 * Enable those buttons now.
+			 */
+			if ( undefined !== BOLDGRID.BACKUP.UpdateSelectors ) {
+				BOLDGRID.BACKUP.UpdateSelectors.enable();
+			} else {
+				console.log( 'BoldGrid Backup: Error, BOLDGRID.BACKUP.UpdateSelectors class not available.' );
+			}
+
+			$( 'body' ).trigger( 'make_notices_dismissible' );
+
+			/*
+			 * Create our success notice and show it.
+			 *
+			 * Our success notices is passed to us via the heartbeat call, within data.boldgrid_backup_complete.
+			 */
+			$notice = $( data.boldgrid_backup_complete );
+			$notice
+				// Hide the notice before inserting it so that we can display it using slide down.
+				.css( 'display', 'none' )
+				.insertBefore( self.$inProgressNotice )
+				.slideDown();
+
+			/*
+			 * Hide "in progress" notices.
+			 *
+			 * The notice is either:
+			 * 1: Inside of its own .notice container, represented by self.$inProgressNotice. This
+			 *    is the admin notice added on page load when a backup is in progress.
+			 * 2: Inside the "Update protection" notice, represented by #boldgrid_backup_in_progress_container.
+			 *    This is hidden on page load, and shown dynamically when a backup is initiated.
+			 */
+			self.$inProgressNotice.slideUp();
+			$( '#boldgrid_backup_in_progress_container' ).slideUp();
 
 			/*
 			 * Show a notice that upgrade protection is now enabled. This updates the current notice
@@ -180,8 +216,6 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		 * @since 1.7.0
 		 */
 		onHeartbeatTick: function( e, data ) {
-			var $notice;
-
 			/*
 			 * This class deals with backups in progress. If our in progress class didn't give us
 			 * any information, abort.
@@ -219,18 +253,13 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 				self.setSubText();
 			}
 
-			// Steps to take when we no longer have a backup in progress.
+			/*
+			 * Steps to take when we no longer have a backup in progress.
+			 *
+			 * @todo This logic to determine when a backup has been completed needs to be improved.
+			 */
 			if ( null === data.boldgrid_backup_in_progress ) {
-
-				// Create our success notice and show it.
-				$notice = $( data.boldgrid_backup_complete );
-				$notice
-					.css( 'display', 'none' )
-					.insertBefore( self.$inProgressNotice )
-					.slideDown();
-
-				$( 'body' ).trigger( 'make_notices_dismissible' );
-				$( 'body' ).trigger( 'boldgrid_backup_complete' );
+				self.onComplete( data );
 			}
 		},
 

@@ -151,6 +151,12 @@ class Boldgrid_Backup_Admin {
 		wp_localize_script( $handle, 'BoldGridBackupAdminInProgress', $translation );
 		wp_enqueue_script( $handle );
 
+		// The "In Progress" script relies on the heartbeat.
+		wp_enqueue_script( 'heartbeat' );
+
+		// The "In Progress" script needs this progressbar script.
+		wp_enqueue_script( 'jquery-ui-progressbar' );
+
 		// Used by admin.js to highlight / bounce elements.
 		wp_enqueue_script( 'jquery-effects-core' );
 		wp_enqueue_script( 'jquery-effects-bounce' );

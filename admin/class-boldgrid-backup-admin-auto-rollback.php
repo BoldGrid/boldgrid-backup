@@ -263,9 +263,6 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		wp_localize_script( $handle, 'boldgridBackupCustomizer', $translations );
 		wp_enqueue_script( $handle );
 
-		// Needed to show the "in progress" bar in the customizer.
-		wp_enqueue_script( 'jquery-ui-progressbar' );
-
 		$this->enqueue_backup_scripts();
 
 		$this->enqueue_rollback_scripts();
