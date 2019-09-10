@@ -224,18 +224,33 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 
 			if ( self.hasProtectionNotice ) {
 				self.$protectionNotice
+
 					// Change the notice from a warning to an error.
-					.removeClass( 'notice-warning' ).addClass( 'notice-error' )
+					.removeClass( 'notice-warning' )
+					.addClass( 'notice-error' )
+
 					// Clean up the existing markup of the notice.
-					.find( '#protection_enabled' ).nextAll().remove().end()
-					.remove().end()
+					.find( '#protection_enabled' )
+					.nextAll()
+					.remove()
+					.end()
+					.remove()
+					.end()
+
 					// Break the news and tell the user an error occurred.
 					.append( '<p>' + self.i18n.backup_error + '</p>' )
-					.append( '<div class="notice"><p><strong>' + self.i18n.error + '</strong><br /><em>' + data.in_progress_data.error + '</em></p></div>' )
+					.append(
+						'<div class="notice"><p><strong>' +
+							self.i18n.error +
+							'</strong><br /><em>' +
+							data.in_progress_data.error +
+							'</em></p></div>'
+					)
 					.append( '<p>' + self.i18n.get_support + '</p>' );
 			} else {
 				$notice = $( data.boldgrid_backup_error );
 				$notice
+
 					// Hide the notice before inserting it so that we can display it using slide down.
 					.css( 'display', 'none' )
 					.insertBefore( self.$inProgressNotice )
@@ -254,6 +269,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			var $notice;
 
 			if ( self.hasProgressNotice ) {
+
 				/*
 				 * Display our notice.
 				 *
@@ -264,6 +280,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 				 */
 				$notice = $( data.boldgrid_backup_complete );
 				$notice
+
 					// Hide the notice before inserting it so that we can display it using slide down.
 					.css( 'display', 'none' )
 					.insertBefore( self.$inProgressNotice )
