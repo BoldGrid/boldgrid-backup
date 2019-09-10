@@ -134,7 +134,7 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 = 1.11.1 =
 
-Release date: September 5th, 2019
+Release date: September 10th, 2019
 
 * Bug fix:     Fixed crontab entry removal on cancel of rollback from updating from version <=1.10.6 to >=1.11.0.
 * Update:      Updated dependencies.
