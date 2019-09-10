@@ -79,10 +79,10 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 		$this->core      = new Boldgrid_Backup_Admin_Core();
 		$this->base_path = BOLDGRID_BACKUP_PATH . '/';
 
-		$site_b_abspath = dirname( dirname( dirname( $this->base_path ) ) ) . '/site-b/';
+		$site_b_abspath         = dirname( dirname( dirname( $this->base_path ) ) ) . '/site-b/';
 		$this->site_b_base_path = $site_b_abspath . 'wp-content/plugins/boldgrid-backup/';
 
-		$site_c_abspath = dirname( dirname( dirname( dirname( $this->base_path ) ) ) ) . '/';
+		$site_c_abspath         = dirname( dirname( dirname( dirname( $this->base_path ) ) ) ) . '/';
 		$this->site_c_base_path = $site_c_abspath . 'wp-content/plugins/boldgrid-backup/';
 
 		/*
@@ -198,7 +198,7 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 	 * @since 1.11.1
 	 */
 	public function test_filter_crontab_restore() {
-		$pattern_expected  = $this->base_path . '(boldgrid-backup-cron|cli/bgbkup-cli)\.php" mode=restore';
+		$pattern_expected = $this->base_path . '(boldgrid-backup-cron|cli/bgbkup-cli)\.php" mode=restore';
 
 		// Make sure correct pattern is returned.
 		$pattern_from_mode = $this->core->cron->get_mode_pattern( 'restore' );
@@ -234,7 +234,7 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 		$pattern_from_mode = $this->core->cron->get_mode_pattern( 'jobs' );
 
 		// Make sure correct pattern is returned.
-		$pattern_expected  = $this->base_path . '(cron/run_jobs\.php|cron/run-jobs\.php)';
+		$pattern_expected = $this->base_path . '(cron/run_jobs\.php|cron/run-jobs\.php)';
 		$this->assertEquals( $pattern_from_mode, $pattern_expected );
 
 		// Make sure both old and new style "run jobs" commands are removed.
@@ -267,7 +267,7 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 		$pattern_from_mode = $this->core->cron->get_mode_pattern( 'site_check' );
 
 		// Make sure correct pattern is returned.
-		$pattern_expected  = $this->base_path . 'cli/bgbkup-cli\.php" check';
+		$pattern_expected = $this->base_path . 'cli/bgbkup-cli\.php" check';
 		$this->assertEquals( $pattern_from_mode, $pattern_expected );
 
 		// Make sure "site check" commands are removed.
