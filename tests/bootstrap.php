@@ -77,6 +77,7 @@ $files = array(
 	'/admin/class-boldgrid-backup-admin-compressor.php',
 	'/admin/compressor/class-boldgrid-backup-admin-compressor-php-zip.php',
 	'/admin/compressor/class-boldgrid-backup-admin-compressor-pcl-zip.php',
+	'/admin/cron/class-crontab.php',
 	'/includes/class-boldgrid-backup-authentication.php',
 	'/includes/class-boldgrid-backup-download.php',
 	'/includes/class-boldgrid-backup-file.php',

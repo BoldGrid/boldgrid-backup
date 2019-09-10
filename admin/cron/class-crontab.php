@@ -22,6 +22,25 @@ namespace Boldgrid\Backup\Admin\Cron;
  */
 class Crontab {
 	/**
+	 * Boldgrid_Backup_Admin_Core object.
+	 *
+	 * @since 1.11.1
+	 * @access private
+	 *
+	 * @var Boldgrid_Backup_Admin_Core
+	 */
+	private $core;
+
+	/**
+	 * Constructor.
+	 *
+	 * @since 1.11.1
+	 */
+	public function __construct() {
+		$this->core = apply_filters( 'boldgrid_backup_get_core', null );
+	}
+
+	/**
 	 * Search for cron entries.
 	 *
 	 * This method is similar to the Boldgrid_Backup_Admin_Cron::entry_search() method, except it
@@ -34,9 +53,7 @@ class Crontab {
 	 * @return array           An array of crons.
 	 */
 	public function find_crons( array $patterns = [] ) {
-		$core = apply_filters( 'boldgrid_backup_get_core', null );
-
-		$all_crons = $core->cron->get_all( false );
+		$all_crons = $this->core->cron->get_all( false );
 
 		$matched_crons = [];
 
@@ -55,5 +72,71 @@ class Crontab {
 		}
 
 		return $matched_crons;
+	}
+
+	/**
+	 * Retrieve the system crontab entries.
+	 *
+	 * @since 1.11.1
+	 *
+	 * @return string|false
+	 */
+	public function read_crontab() {
+		if ( ! $this->core->test->is_crontab_available() ) {
+			return false;
+		}
+
+		$command = 'crontab -l';
+		$crontab = $this->core->execute_command( $command, $success );
+
+		return $success ? $crontab : false;
+	}
+
+	/**
+	 * Write to the system crontab.
+	 *
+	 * The crontab contents will be replaced with the string passed to this method.
+	 *
+	 * @since 1.11.1
+	 *
+	 * @param  string $crontab The crontab contents to be written.
+	 * @return bool
+	 */
+	public function write_crontab( $crontab ) {
+		$backup_directory = $this->core->backup_dir->get();
+
+		if ( ! $this->core->wp_filesystem->is_writable( $backup_directory ) ) {
+			return false;
+		}
+
+		// Strip extra line breaks.
+		$crontab = str_replace( "\n\n", "\n", $crontab );
+
+		// Trim the crontab.
+		$crontab = trim( $crontab );
+
+		// Add a line break at the end of the file.
+		$crontab .= "\n";
+
+		// Save the temp crontab to file.
+		$temp_crontab_path = $backup_directory . '/crontab.' . microtime( true ) . '.tmp';
+
+		// Save a temporary file for crontab.
+		$this->core->wp_filesystem->put_contents( $temp_crontab_path, $crontab, 0600 );
+
+		// Check if the defaults file was written.
+		if ( ! $this->core->wp_filesystem->exists( $temp_crontab_path ) ) {
+			return false;
+		}
+
+		// Write crontab.
+		$command = 'crontab ' . $temp_crontab_path;
+
+		$this->core->execute_command( $command, $success );
+
+		// Remove temp crontab file.
+		$this->core->wp_filesystem->delete( $temp_crontab_path, false, 'f' );
+
+		return (bool) $success;
 	}
 }
