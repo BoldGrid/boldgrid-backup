@@ -147,6 +147,9 @@ class Boldgrid_Backup_Admin {
 			'completing_database'         => __( 'Completing database backup...', 'boldgrid-backup' ),
 			'update_protection_activated' => $core->elements['update_protection_activated'],
 			'backup_created'              => $core->lang['backup_created'],
+			'backup_error'                => '<span class="dashicons dashicons-no red"></span>' . esc_html__( 'Unfortunately there was an error creating your backup. Update protection is not available.', 'boldgrid-backup' ),
+			'error'                       => esc_html__( 'Error:', 'boldgrid-backup' ),
+			'get_support'                 => $core->lang['get_support'],
 		);
 		wp_localize_script( $handle, 'BoldGridBackupAdminInProgress', $translation );
 		wp_enqueue_script( $handle );

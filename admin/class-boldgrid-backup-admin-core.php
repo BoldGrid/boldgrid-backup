@@ -2352,6 +2352,11 @@ class Boldgrid_Backup_Admin_Core {
 
 		$archive_info = $this->archive_files( true );
 
+		// If there were any errors encountered during the backup, save them to the In Progress data.
+		if ( ! empty( $archive_info['error'] ) ) {
+			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'error', $archive_info['error'] );
+		}
+
 		if ( $this->is_archiving_update_protection ) {
 			update_site_option( 'boldgrid_backup_pending_rollback', $archive_info );
 		}
@@ -2551,6 +2556,15 @@ class Boldgrid_Backup_Admin_Core {
 			'backup_created'            => __( 'Backup created successfully!', 'boldgrid-backup' ),
 			'Checking_credentials'      => __( 'Checking credentials', 'boldgrid-backup' ),
 			'checkmark'                 => '&#10003;',
+			'get_support'               => wp_kses(
+				sprintf(
+					// translators: 1 The opening anchor tag to the support tab, 2 its closing anchor tag.
+					__( 'Please try again. If you continue to experience problems, please %1$scontact us for additional support%2$s.', 'boldgrid-backup' ),
+					'<a href="' . esc_url( admin_url( 'admin.php?page=boldgrid-backup-support' ) ) . '">',
+					'</a>'
+				),
+				[ 'a' => [ 'href' => [] ] ]
+			),
 			'icon_success'              => '<span class="dashicons dashicons-yes green"></span> ',
 			'icon_warning'              => '<span class="dashicons dashicons-warning yellow"></span> ',
 			'heading_update_protection' => __( 'BoldGrid Backup - Update Protection', 'boldgrid-backup' ),

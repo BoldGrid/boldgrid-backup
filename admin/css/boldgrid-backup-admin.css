@@ -48,7 +48,7 @@ a[disabled] {
 	cursor: wait !important;
 }
 
-.dashicons-warning.red {
+.dashicons.red {
 	color: #dc3232;
 }
 
