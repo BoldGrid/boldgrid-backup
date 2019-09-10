@@ -94,6 +94,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 
 					$( document ).on( 'boldgrid_backup_complete', 'body', self.onComplete );
 				} else {
+
 					// Something's gone wrong.
 					console.log( 'BoldGrid Backup: Error, progress bar needs heartbeat enqueued.' );
 				}
@@ -167,6 +168,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			 */
 			$notice = $( data.boldgrid_backup_complete );
 			$notice
+
 				// Hide the notice before inserting it so that we can display it using slide down.
 				.css( 'display', 'none' )
 				.insertBefore( self.$inProgressNotice )
@@ -192,11 +194,16 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			 * has been moved here so that backup-now.js can focus soley on triggering the ajax call
 			 * to generate the backup and nothing else.
 			 */
-			$( '#backup-site-now-results' ).closest( '.notice' )
+			$( '#backup-site-now-results' )
+				.closest( '.notice' )
+
 				// Change it from warning to success.
-				.removeClass( 'notice-warning' ).addClass( 'notice-success' )
+				.removeClass( 'notice-warning' )
+				.addClass( 'notice-success' )
+
 				// Find the protection enabled and change the html.
-				.find( '#protection_enabled' ).html( self.i18n.update_protection_activated );
+				.find( '#protection_enabled' )
+				.html( self.i18n.update_protection_activated );
 
 			/*
 			 * When a backup is completed, replace the "Backup Site Now" button with a "Backup Created
@@ -216,6 +223,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		 * @since 1.7.0
 		 */
 		onHeartbeatTick: function( e, data ) {
+
 			/*
 			 * This class deals with backups in progress. If our in progress class didn't give us
 			 * any information, abort.
