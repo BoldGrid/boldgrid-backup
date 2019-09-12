@@ -18,34 +18,55 @@
 
 defined( 'WPINC' ) || die;
 
-$core = isset( $this->core ) ? $this->core : $this;
+$page = empty( $_GET['page'] ) ? '' : $_GET['page'];
 
-// Are we loading the "protect now" form via ajax?
-$update_protection_ajax = ! empty( $_POST['action'] ) &&
-	'boldgrid_backup_get_protect_notice' === $_POST['action'] &&
-	! empty( $_POST['update_protection'] );
+$backup_button = '
+	<div id="backup-site-now-section">
+		<form action="#" id="backup-site-now-form" method="POST">' .
+			wp_nonce_field( 'boldgrid_backup_now', 'backup_auth', true, false );
 
-return sprintf(
-	'<div id="backup-site-now-section">
-		<form action="#" id="backup-site-now-form" method="POST">
-			%1$s
-			<p id="you_may_leave" class="hidden">
-				%4$s
-			</p>
+/*
+ * Create the "beef" of the backup button.
+ *
+ * The backup button is displayed in two ways:
+ * 1. Within the "Backup Site Now" modal
+ * 2. In an admin notice for Update protection.
+ *
+ * If the page is 'boldgrid-backup', then you're in the modal. The buttons will generally be the same,
+ * but the formatting will be slightly different, hence the conditional below.
+ */
+if ( 'boldgrid-backup' === $page ) {
+	// The first div in the grid is needed so the grid fills out properly.
+	$backup_button .= '
+			<div style="display:grid; grid-gap:2em; grid-template-columns: 5fr 2fr;">
+				<div>
+					<p id="you_may_leave" class="hidden">' .
+					esc_html__( 'Your backup is starting. This page will refresh and display the progress of the backup.', 'boldgrid-backup' ) .
+					'</p>
+				</div>
+				<p style="text-align:right;">
+					<a id="backup-site-now" class="button button-primary">' .
+						esc_html__( 'Backup Site Now', 'boldgrid-backup' ) .
+					'</a>
+					<span class="spinner"></span>
+				</p>
+			</div>';
+} else {
+	$backup_button .= '
+			<p id="you_may_leave" class="hidden">' .
+				__( 'You may leave this page, doing so will not stop your backup.', 'boldgrid-backup' ) .
+			'</p>
 			<p>
-				<a id="backup-site-now" class="button button-primary" %3$s >
-					%2$s
-				</a>
+				<a id="backup-site-now" class="button button-primary" data-updating="true" >' .
+					esc_html__( 'Backup Site Now', 'boldgrid-backup' ) .
+				'</a>
 				<span class="spinner"></span>
-			</p>
+			</p>';
+}
+
+$backup_button .= '
 		</form>
 	</div>
-	<div id="backup-site-now-results"></div>
-	%5$s
-	',
-	wp_nonce_field( 'boldgrid_backup_now', 'backup_auth', true, false ),
-	esc_html( 'Backup Site Now', 'boldgrid-backup' ),
-	$update_protection_ajax || $core->auto_rollback->on_update_page ? 'data-updating="true"' : '',
-	/* 4 */ __( 'You may leave this page, doing so will not stop your backup.', 'boldgrid-backup' ),
-	Boldgrid_Backup_Admin_In_Progress_Data::get_markup()
-);
+	<div id="backup-site-now-results"></div>';
+
+return $backup_button;

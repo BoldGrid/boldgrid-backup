@@ -9,7 +9,7 @@
  * @param $ The jQuery object.
  */
 
-/* global ajaxurl,jQuery,localizeScriptData */
+/* global ajaxurl,jQuery,localizeScriptData,pagenow */
 
 var BOLDGRID = BOLDGRID || {};
 BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
@@ -18,14 +18,11 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 	'use strict';
 
 	var self = this,
-		lang = localizeScriptData,
 		$backupNowType = $( '[name="folder_exclusion_type"]' ),
 		$tablesType = $( '[name="table_inclusion_type"]' );
 
 	$( function() {
 		$( 'body' ).on( 'click', '#backup-site-now', self.backupNow );
-
-		$( 'body' ).on( 'boldgrid_backup_complete', self.updateProtectionEnabled );
 	} );
 
 	/**
@@ -38,14 +35,10 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 		// Declare variables.
 		var $this,
 			$backupSiteSection,
-			$backupSiteResults,
 			backupNonce,
 			wpHttpReferer,
 			isUpdating,
-			errorCallback,
-			successCallback,
 			data,
-			markup,
 			$folderExclude = $( '[name="folder_exclusion_exclude"]' ),
 			$folderInclude = $( '[name="folder_exclusion_include"]' ),
 			$tableInclude = $( '[name="include_tables[]"]' ),
@@ -74,9 +67,6 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 		// Create a context selector for the Backup Site Now section.
 		$backupSiteSection = $( '#backup-site-now-section' );
 
-		// Create a context selector for the Backup Site Now results.
-		$backupSiteResults = $( '#backup-site-now-results' );
-
 		$( '#TB_ajaxContent' )
 			.find( 'input' )
 			.attr( 'disabled', true )
@@ -96,66 +86,6 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 		isUpdating = $this.data( 'updating' );
 
 		$backupSiteSection.find( '.spinner' ).addClass( 'inline' );
-
-		/**
-		 * @summary backupNow error callback.
-		 *
-		 * @since 1.0
-		 *
-		 * @param object jqXHR
-		 * @param string textStatus
-		 * @param string errorThrown
-		 */
-		errorCallback = function( jqXHR, textStatus, errorThrown ) {
-			var data,
-				errorText = lang.errorText;
-
-			/*
-			 * As of 1.5.2, we are hooking into the shutdown and checking for
-			 * errors. If a fatal error is found, we will return that, rather
-			 * than the generic errorText defined above.
-			 */
-			if ( jqXHR.responseText !== undefined && '{' === jqXHR.responseText.charAt( 0 ) ) {
-				data = JSON.parse( jqXHR.responseText );
-
-				if ( data !== undefined && data.data !== undefined && data.data.errorText !== undefined ) {
-					errorText = data.data.errorText;
-				}
-			}
-
-			// Show error message.
-			markup = '<div class="notice notice-error"><p>' + errorText + '</p></div>';
-
-			$backupSiteResults.html( markup );
-		};
-
-		/**
-		 * @summary backupNow success callback.
-		 *
-		 * This is the success callback function for the boldgrid_backup_now ajax call, which is
-		 * handled by $Boldgrid_Backup_Admin_Core->boldgrid_backup_now_callback().
-		 *
-		 * @since 1.5.3
-		 */
-		successCallback = function( response ) {
-			var data = JSON.parse( response ),
-				success = data.success !== undefined && true === data.success,
-				callback =
-					success && data.data !== undefined && data.data.callback !== undefined ?
-						data.data.callback :
-						null;
-
-			$( 'body' ).trigger( 'boldgrid_backup_complete' );
-
-			switch ( callback ) {
-				case 'updateProtectionEnabled':
-					self.updateProtectionEnabled();
-					break;
-				case 'reload':
-					location.reload();
-					break;
-			}
-		};
 
 		// Generate the data array.
 		data = {
@@ -197,48 +127,38 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 			BOLDGRID.BACKUP.UpdateSelectors.disable();
 		}
 
-		// Make the call.
+		/*
+		 * Make the ajax call to "Backup Site Now".
+		 *
+		 * No success, error, or complete callback is passed to the ajax call. Successes will be
+		 * handled by "in progress".
+		 */
 		$.ajax( {
 			url: ajaxurl,
 			data: data,
-			type: 'post',
-			dataType: 'text',
-			success: successCallback,
-			error: errorCallback,
-			complete: function() {
-
-				// Hide the spinner.
-				$backupSiteSection.find( '.spinner' ).removeClass( 'is-active' );
-
-				if ( undefined !== BOLDGRID.BACKUP.UpdateSelectors ) {
-					BOLDGRID.BACKUP.UpdateSelectors.enable();
-				}
-			}
+			type: 'post'
 		} );
 
-		$( 'body' ).trigger( 'boldgrid_backup_initiated' );
+		/*
+		 * Take action now that the ajax call to create a backup has been triggered.
+		 *
+		 * If we're on the Backup Archive's page page, wait 3 seconds and reload the page. Within the
+		 * "Backup Site Now" modal, the user will be given a notice that their backup has started, and
+		 * that the page will refresh and display a progress bar.
+		 *
+		 * Else, trigger 'boldgrid_backup_initiated'. The only listener is in-progress.js. When a
+		 * backup has been initiated, it starts the WordPress Heartbeat and shows the in progress container.
+		 */
+		if ( 'boldgrid-backup_page_boldgrid-backup' === pagenow ) {
+			setTimeout( function() {
+				location.reload();
+			}, 3000 );
+		} else {
+			$( 'body' ).trigger( 'boldgrid_backup_initiated' );
+		}
 
 		// Prevent default browser action.
 		e.preventDefault();
-	};
-
-	/**
-	 * @summary Show notice after backup and upgrade protection now enabled.
-	 *
-	 * This updates the current notice rather than generates a new one.
-	 *
-	 * @since 1.5.3
-	 */
-	self.updateProtectionEnabled = function() {
-		var $notice = $( '#backup-site-now-results' ).closest( '.notice' ),
-			$status = $notice.find( '#protection_enabled' ),
-			$backupNow = $( '#backup-site-now-section' );
-
-		$notice.removeClass( 'notice-warning' ).addClass( 'notice-success' );
-
-		$status.html( lang.updateProtectionActivated );
-
-		$backupNow.html( '<p>' + lang.backupCreated + '</p>' );
 	};
 };
 

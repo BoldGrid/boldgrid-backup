@@ -92,6 +92,8 @@ class Boldgrid_Backup_Admin {
 	 * @since 1.0
 	 */
 	public function enqueue_styles() {
+		$core = apply_filters( 'boldgrid_backup_get_core', null );
+
 		/*
 		 * An instance of this class should be passed to the run() function
 		 * defined in Boldgrid_Backup_Loader as all of the hooks are defined
@@ -139,13 +141,24 @@ class Boldgrid_Backup_Admin {
 			false
 		);
 		$translation = array(
-			'archive_file_size'       => __( 'Archive file size: ', 'boldgrid_backup' ),
-			'size_before_compression' => __( 'File size before compression: ', 'boldgrid-backup' ),
-			'adding_tables'           => __( 'Adding tables.', 'boldgrid-backup' ),
-			'completing_database'     => __( 'Completing database backup...', 'boldgrid-backup' ),
+			'archive_file_size'           => __( 'Archive file size: ', 'boldgrid_backup' ),
+			'size_before_compression'     => __( 'File size before compression: ', 'boldgrid-backup' ),
+			'adding_tables'               => __( 'Adding tables.', 'boldgrid-backup' ),
+			'completing_database'         => __( 'Completing database backup...', 'boldgrid-backup' ),
+			'update_protection_activated' => $core->elements['update_protection_activated'],
+			'backup_created'              => $core->lang['backup_created'],
+			'backup_error'                => '<span class="dashicons dashicons-no red"></span>' . esc_html__( 'Unfortunately there was an error creating your backup. Update protection is not available.', 'boldgrid-backup' ),
+			'error'                       => esc_html__( 'Error:', 'boldgrid-backup' ),
+			'get_support'                 => $core->lang['get_support'],
 		);
 		wp_localize_script( $handle, 'BoldGridBackupAdminInProgress', $translation );
 		wp_enqueue_script( $handle );
+
+		// The "In Progress" script relies on the heartbeat.
+		wp_enqueue_script( 'heartbeat' );
+
+		// The "In Progress" script needs this progressbar script.
+		wp_enqueue_script( 'jquery-ui-progressbar' );
 
 		// Used by admin.js to highlight / bounce elements.
 		wp_enqueue_script( 'jquery-effects-core' );

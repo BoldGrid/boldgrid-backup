@@ -134,6 +134,32 @@ class Boldgrid_Backup_Admin_In_Progress {
 	}
 
 	/**
+	 * Get the markup of an error message.
+	 *
+	 * This method is similar to self::get_notice() and self::get_notice_markup(), except those methods
+	 * are for success and this one for errors.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @return string
+	 */
+	public function get_error_markup() {
+		$error = Boldgrid_Backup_Admin_In_Progress_Data::get_arg( 'error' );
+
+		$notice = array(
+			'class'   => 'notice notice-error boldgrid-backup-in-progress',
+			'message' => '<div class="notice"><p><strong>' . __( 'Error:', 'boldgrid-backup' ) . '</strong><br />' .
+				'<em>' . esc_html( $error ) . '</em></p></div>' .
+				'<p>' . $this->core->lang['get_support'] . '</p>',
+			'heading' => __( 'BoldGrid Backup - Error creating backup', 'boldgrid-backup' ),
+		);
+
+		$markup = $this->core->notice->get_notice_markup( $notice['class'], $notice['message'], $notice['heading'] );
+
+		return $markup;
+	}
+
+	/**
 	 * Get our in progress notice.
 	 *
 	 * @since 1.6.0
@@ -251,6 +277,12 @@ class Boldgrid_Backup_Admin_In_Progress {
 		$response['boldgrid_backup_complete'] = $this->core->notice->get_backup_complete();
 
 		$response['in_progress_data'] = Boldgrid_Backup_Admin_In_Progress_Data::get_args();
+
+		// If we have an error message, add an "error message notice".
+		$response['boldgrid_backup_error'] = '';
+		if ( ! empty( $response['in_progress_data']['error'] ) ) {
+			$response['boldgrid_backup_error'] = $this->get_error_markup();
+		}
 
 		// Steps to take if we're on the last step, step 3, closing the archive.
 		if ( 3 === Boldgrid_Backup_Admin_In_Progress_Data::get_arg( 'step' ) ) {
