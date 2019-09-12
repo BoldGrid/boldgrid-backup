@@ -100,23 +100,54 @@ class Boldgrid_Backup_Activator {
 	 */
 	public function post_activate_notice() {
 		if ( $this->on_post_activate() ) {
-			$core = apply_filters( 'boldgrid_backup_get_core', null );
-
-			echo '<div class="notice notice-success">
+			$notice = '<div class="notice notice-success">
 				<h2>' . esc_html__( 'Thank you for installing BoldGrid Backup!', 'boldgrid-backup' ) . '</h2>
 				<p>';
-			echo wp_kses(
+
+			$notice .= wp_kses(
 				sprintf(
 					// translators: 1 An opening strong tag, 2 its closing strong tag.
 					__( 'Creating your first backup is easy! Simply go to your %1$sBackup Archives%2$s page and click %1$sBackup Site Now%2$s.', 'boldgrid-backup' ),
 					'<strong>',
 					'</strong>'
 				),
-				array( 'strong' => array() )
+				[ 'strong' => [] ]
 			);
-			echo '</p>
+
+			$notice .= '</p>
 				<p><a href="' . esc_url( admin_url( 'admin.php?page=boldgrid-backup' ) ) . '" class="button button-primary">' . esc_html__( 'Create your first Backup now!', 'boldgrid-backup' ) . '</a></p>
 			</div>';
+
+			/**
+			 * Allow our activation notice to be filtered.
+			 *
+			 * It could be changed, or, if it's not wanted to be shown at all, set to ''.
+			 *
+			 * @since 1.12.0
+			 *
+			 * @param string $notice HTML markup of the notice.
+			 */
+			$notice = apply_filters( 'boldgrid_backup_post_activate_notice', $notice );
+
+			echo wp_kses(
+				$notice,
+				[
+					'div'    => [
+						'class' => [],
+					],
+					'h2'     => [
+						'class' => [],
+					],
+					'p'      => [
+						'class' => [],
+					],
+					'a'      => [
+						'href'  => [],
+						'class' => [],
+					],
+					'strong' => [],
+				]
+			);
 		}
 	}
 
