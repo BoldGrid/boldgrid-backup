@@ -132,6 +132,10 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
+= 1.12.0 In progress =
+
+* Update:      Allow activation notice to be filtered.
+
 = 1.11.1 =
 
 Release date: September 10th, 2019
