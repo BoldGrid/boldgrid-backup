@@ -2365,7 +2365,7 @@ class Boldgrid_Backup_Admin_Core {
 		 * Finish.
 		 *
 		 * Normally we'd give the user a notice that the backup has been completed. However, since
-		 * 1.12.0, we are no longer waiting for this ajax call to complete. The "in progress" bar
+		 * 1.11.2, we are no longer waiting for this ajax call to complete. The "in progress" bar
 		 * will give the user any updates they need.
 		 */
 		wp_send_json_success();
