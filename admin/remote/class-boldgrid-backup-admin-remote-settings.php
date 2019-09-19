@@ -79,6 +79,15 @@ class Boldgrid_Backup_Admin_Remote_Settings {
 	}
 
 	/**
+	 * Delete all settings for this provider.
+	 *
+	 * @since 1.11.3
+	 */
+	public function delete_settings() {
+		$this->save_settings( [] );
+	}
+
+	/**
 	 * Get the time we last logged in successfully.
 	 *
 	 * @since 1.7.2
@@ -130,6 +139,19 @@ class Boldgrid_Backup_Admin_Remote_Settings {
 		$settings = ! empty( $option[ $this->remote_key ][ $this->remote_id ] ) ? $option[ $this->remote_key ][ $this->remote_id ] : array();
 
 		return $settings;
+	}
+
+	/**
+	 * Whether or not this remove provider has settings saved.
+	 *
+	 * @since 1.11.3
+	 *
+	 * @return bool
+	 */
+	public function has_settings() {
+		$settings = $this->get_settings();
+
+		return is_array( $settings ) && ! empty( $settings );
 	}
 
 	/**
