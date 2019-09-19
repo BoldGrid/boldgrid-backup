@@ -27,7 +27,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		/**
 		 * Whether or not there's an "In progress" notice on the page.
 		 *
-		 * @since 1.12.0
+		 * @since 1.11.2
 		 *
 		 * @type bool
 		 */
@@ -36,7 +36,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		/**
 		 * Whether or not there's an "Update Protection" notice on the page.
 		 *
-		 * @since 1.12.0
+		 * @since 1.11.2
 		 *
 		 * @type bool
 		 */
@@ -75,7 +75,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		 *
 		 * This is the notice that says, "BoldGrid Backup - Update Protection".
 		 *
-		 * @since 1.12.0
+		 * @since 1.11.2
 		 */
 		$protectionNotice: null,
 
@@ -215,7 +215,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		/**
 		 * Steps to take when an error has occurred.
 		 *
-		 * @since 1.12.0
+		 * @since 1.11.2
 		 *
 		 * @param object Heartbeat data.
 		 */
@@ -261,7 +261,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		/**
 		 * Steps to take when our backup was successful.
 		 *
-		 * @since 1.12.0
+		 * @since 1.11.2
 		 *
 		 * @param object Heartbeat data.
 		 */
@@ -291,7 +291,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			 * Show a notice that upgrade protection is now enabled. This updates the current notice
 			 * rather than generate a new one.
 			 *
-			 * This logic was originally introduced in 1.5.3 within backup-now.js. As of 1.12.0 it
+			 * This logic was originally introduced in 1.5.3 within backup-now.js. As of 1.11.2 it
 			 * has been moved here so that backup-now.js can focus soley on triggering the ajax call
 			 * to generate the backup and nothing else.
 			 */

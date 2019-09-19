@@ -139,7 +139,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 	 * This method is similar to self::get_notice() and self::get_notice_markup(), except those methods
 	 * are for success and this one for errors.
 	 *
-	 * @since 1.12.0
+	 * @since 1.11.2
 	 *
 	 * @return string
 	 */
