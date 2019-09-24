@@ -734,8 +734,12 @@ class Boldgrid_Backup_Admin_Core {
 	 * Initialize the premium version of the plugin.
 	 *
 	 * @since 1.5.2
+	 *
+	 * @global string $pagenow
 	 */
 	public function init_premium() {
+		global $pagenow;
+
 		$premium_class = 'Boldgrid_Backup_Premium';
 
 		/*
@@ -743,6 +747,45 @@ class Boldgrid_Backup_Admin_Core {
 		 * we have a premium key.
 		 */
 		if ( ! class_exists( $premium_class ) || ! $this->config->get_is_premium() ) {
+			return;
+		}
+
+		/*
+		 * If this version of the backup plugin is not compatible with the premium version:
+		 * 1. Don't init the premium extension.
+		 * 2. Display an admin notice telling the user to upgrade.
+		 */
+		if ( ! $this->support->is_premium_compatible() ) {
+			if ( 'update-core.php' !== $pagenow ) {
+				add_action( 'admin_notices', function() {
+					$message = wp_kses(
+						sprintf(
+							// Translators: 1 The minimum version required, 2 an opening strong tag, 3 its closing strong tag, 4 an opening anchor to the updates page, 5 its closing anchor.
+							__( 'The version of the %2$sBoldGrid Backup Premium%3$s plugin you have installed requires %2$sBoldGrid Backup%3$s version %1$s or higher. Don\'t worry, the fix is simple. Please go to your %4$sUpdates page%5$s and update the %2$sBoldGrid Backup%3$s plugin.', 'boldgrid-backup' ),
+							BOLDGRID_BACKUP_MIN_VERSION_FOR_PREMIUM,
+							'<strong>',
+							'</strong>',
+							'<a href="' . esc_url( admin_url( 'update-core.php' ) ) . '">',
+							'</a>'
+						),
+						[
+							'strong' => [],
+							'a'      => [
+								'href' => [],
+							],
+						]
+					);
+
+					$notice_markup = $this->notice->get_notice_markup(
+						'notice notice-error is-dismissible',
+						$message,
+						esc_html__( 'BoldGrid Backup - Update required', 'boldgrid-backup' )
+					);
+
+					echo $notice_markup; // phpcs:ignore
+				});
+			}
+
 			return;
 		}
 

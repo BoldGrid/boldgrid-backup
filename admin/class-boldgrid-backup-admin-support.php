@@ -114,6 +114,18 @@ class Boldgrid_Backup_Admin_Support {
 	}
 
 	/**
+	 * Whether or not this version of the Backup Plugin is compatible with the premium extension.
+	 *
+	 * @since 1.11.3
+	 *
+	 * @return bool
+	 */
+	public function is_premium_compatible() {
+		return ! defined( 'BOLDGRID_BACKUP_MIN_VERSION_FOR_PREMIUM' ) ||
+			version_compare( BOLDGRID_BACKUP_VERSION, BOLDGRID_BACKUP_MIN_VERSION_FOR_PREMIUM, '>=' );
+	}
+
+	/**
 	 * Run tests.
 	 *
 	 * @since 1.7.1

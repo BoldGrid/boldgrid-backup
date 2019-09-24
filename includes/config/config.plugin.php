@@ -75,5 +75,9 @@ return array(
 			'logo_class' => 'amazon-s3-logo',
 			'key'        => 'amazon_s3',
 		],
+		'dreamobjects' => [
+			'title' => __( 'DreamObjects', 'boldgrid-backup' ),
+			'key'   => 'dreamobjects',
+		],
 	],
 );

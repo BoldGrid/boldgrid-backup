@@ -79,6 +79,15 @@ class Boldgrid_Backup_Admin_Remote_Settings {
 	}
 
 	/**
+	 * Delete all settings for this provider.
+	 *
+	 * @since 1.11.3
+	 */
+	public function delete_settings() {
+		$this->save_settings( [] );
+	}
+
+	/**
 	 * Get the time we last logged in successfully.
 	 *
 	 * @since 1.7.2
@@ -130,6 +139,43 @@ class Boldgrid_Backup_Admin_Remote_Settings {
 		$settings = ! empty( $option[ $this->remote_key ][ $this->remote_id ] ) ? $option[ $this->remote_key ][ $this->remote_id ] : array();
 
 		return $settings;
+	}
+
+	/**
+	 * Deterine whether or not this provider has a set of settings.
+	 *
+	 * For example, if working with an s3 client, we'll want to know if it has a key, host, etc.
+	 *
+	 * @since 1.11.3
+	 *
+	 * @param  array $keys An array of keys to check for.
+	 * @return bool
+	 */
+	public function has_setting_keys( array $keys ) {
+		$has_setting_keys = true;
+
+		$settings = $this->get_settings();
+
+		foreach ( $keys as $key ) {
+			if ( empty( $settings[ $key ] ) ) {
+				$has_setting_keys = false;
+			}
+		}
+
+		return $has_setting_keys;
+	}
+
+	/**
+	 * Whether or not this remove provider has settings saved.
+	 *
+	 * @since 1.11.3
+	 *
+	 * @return bool
+	 */
+	public function has_settings() {
+		$settings = $this->get_settings();
+
+		return is_array( $settings ) && ! empty( $settings );
 	}
 
 	/**
