@@ -121,7 +121,7 @@ class Boldgrid_Backup_Admin_Support {
 	 * @return bool
 	 */
 	public function is_premium_compatible() {
-		return defined( 'BOLDGRID_BACKUP_MIN_VERSION_FOR_PREMIUM' ) &&
+		return ! defined( 'BOLDGRID_BACKUP_MIN_VERSION_FOR_PREMIUM' ) ||
 			version_compare( BOLDGRID_BACKUP_VERSION, BOLDGRID_BACKUP_MIN_VERSION_FOR_PREMIUM, '>=' );
 	}
 
