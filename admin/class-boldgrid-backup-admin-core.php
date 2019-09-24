@@ -762,7 +762,7 @@ class Boldgrid_Backup_Admin_Core {
 						sprintf(
 							// Translators: 1 The minimum version required, 2 an opening strong tag, 3 its closing strong tag, 4 an opening anchor to the updates page, 5 its closing anchor.
 							__( 'The version of the %2$sBoldGrid Backup Premium%3$s plugin you have installed requires %2$sBoldGrid Backup%3$s version %1$s or higher. Don\'t worry, the fix is simple. Please go to your %4$sUpdates page%5$s and update the %2$sBoldGrid Backup%3$s plugin.', 'boldgrid-backup' ),
-							BOLDGRID_BACKUP_PREMIUM_MIN_VERSION,
+							BOLDGRID_BACKUP_MIN_VERSION_FOR_PREMIUM,
 							'<strong>',
 							'</strong>',
 							'<a href="' . esc_url( admin_url( 'update-core.php' ) ) . '">',
