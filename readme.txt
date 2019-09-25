@@ -132,6 +132,11 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
+= 1.11.3 =
+
+* Update:      Allow BoldGrid Backup Premium to define minimum free version.
+* Update:      Updates to inform users DreamObjects is now available.
+
 = 1.11.2 =
 
 Release date: September 17th, 2019
