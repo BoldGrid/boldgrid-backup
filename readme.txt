@@ -132,6 +132,12 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
+= 1.11.3 =
+
+Release date: September 26th, 2019
+
+* Bug fix:     Prevent warnings when user is logged in as a non admin.
+
 = 1.11.2 =
 
 Release date: September 17th, 2019
