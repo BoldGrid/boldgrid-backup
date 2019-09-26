@@ -991,10 +991,17 @@ class Boldgrid_Backup_Admin_Core {
 				$menu_slug
 			);
 
-			// Change the url (2 is key of the menu item's slug / url).
-			foreach ( $submenu[ $main_slug ] as &$item ) {
-				if ( $menu_slug === $item[2] ) {
-					$item[2] = $this->go_pro->get_premium_url( 'bgbkup-nav' );
+			/*
+			 * Change the url (2 is key of the menu item's slug / url).
+			 *
+			 * The ! empty check is to ensure the submenu exists. In some cases, such as when a user
+			 * is logged in as an editor, it will not exist.
+			 */
+			if ( ! empty( $submenu[ $main_slug ] ) ) {
+				foreach ( $submenu[ $main_slug ] as &$item ) {
+					if ( $menu_slug === $item[2] ) {
+						$item[2] = $this->go_pro->get_premium_url( 'bgbkup-nav' );
+					}
 				}
 			}
 		}
