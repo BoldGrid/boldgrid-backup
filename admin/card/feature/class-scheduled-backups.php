@@ -34,9 +34,22 @@ class Scheduled_Backups extends \Boldgrid\Library\Library\Ui\Feature {
 
 		$this->title = esc_html__( 'Scheduled Backups', 'boldgrid-backup' );
 
-		if ( $core->settings->has_scheduled_backups() ) {
-			$cron         = new \Boldgrid\Backup\Admin\Cron();
-			$backup_entry = $cron->get_entry( 'backup' );
+		$cron         = new \Boldgrid\Backup\Admin\Cron();
+		$backup_entry = $cron->get_entry( 'backup' );
+
+		/*
+		 * If a user does not have backups scheduled, suggest they schedule them.
+		 *
+		 * As of 1.11.4, in addition to checking if a schedule is saved in the settings, we also ensure
+		 * that the backup cron can be found. We need to check for the scenario in which the user has
+		 * manually deleted the cron entry yet the settings say backups are scheduled.
+		 *
+		 * In some cases where the settings say backups are scheduled but the cron doesn't actually
+		 * exist, false positives may be given or errors triggered. We may want to explore the idea
+		 * of showing an admin notice. For now, if this scenario exists, the dashboard will tell the
+		 * user to schedule backups, and resaving the settings will resave the cron entry.
+		 */
+		if ( $core->settings->has_scheduled_backups() && $backup_entry->is_set() ) {
 			$next_runtime = $backup_entry->get_next_runtime();
 
 			$this->content = '<p>' . wp_kses(

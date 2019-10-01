@@ -4,7 +4,7 @@ Tags: backup, cloud backup, database backup, restore, wordpress backup
 Requires at least: 4.4
 Tested up to: 5.2
 Requires PHP: 5.4
-Stable tag: 1.11.3
+Stable tag: 1.11.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -132,10 +132,18 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
-= 1.11.4 =
+= 1.11.5 =
+
+Release date: October 1st, 2019
 
 * Update:      Allow BoldGrid Backup Premium to define minimum free version.
 * Update:      Updates to inform users DreamObjects is now available.
+
+= 1.11.4 =
+
+Release date: September 26th, 2019
+
+* Bug fix:     Improve logic that checks if scheduled backups are enabled.
 
 = 1.11.3 =
 
