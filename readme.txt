@@ -121,7 +121,7 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 = Minimum Requirements =
 
-* PHP 5.4 or higher
+* PHP 5.4 or higher.  PHP 7.3 or higher is recommended.
 * At least one of the following PHP execution functions enabled: "popen", "proc_open", "exec", "shell_exec", "passthru", or "system".
 * A Cron system with the "crontab" utility, or WP Cron.
 * A WP_Filesystem FS_METHOD being "direct".
