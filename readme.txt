@@ -132,6 +132,10 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
+= ?? =
+
+* Bug fix:     Prevent fatals during activation when library classes are missing.
+
 = 1.11.5 =
 
 Release date: October 1st, 2019
