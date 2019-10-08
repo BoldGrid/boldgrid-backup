@@ -29,12 +29,20 @@ return sprintf(
 	__( 'This backup file is not on your <strong>web server</strong>, but it is saved to one or more of your <strong>remote storage providers</strong>. If you would like to restore this backup or review the contents of this backup, you will first need to download it to your web server.', 'boldgrid-backup' ),
 	'<a class="button button-primary" id="download_first">Download to web server</a>',
 	$this->core->lang['spinner'],
-	sprintf(
-		// translators: 1: Link.
-		esc_html__(
-			'After your backup has been downloaded to the web server, this page will refresh and you will see more options available. To learn more about your web server vs. remote storage providers, <a href="%1$s">click here</a>.',
-			'boldgrid-backup'
+	wp_kses(
+		sprintf(
+			// translators: 1 An opening anchor tag to the tools page, 2 its closing tag.
+			__(
+				'After your backup has been downloaded to the web server, this page will refresh and you will see more options available. To learn more about your web server vs. remote storage providers, %1$sclick here%2$s.',
+				'boldgrid-backup'
+			),
+			'<a href="' . admin_url( 'admin.php?page=boldgrid-backup-tools&section=section_locations' ) . '">',
+			'</a>'
 		),
-		'admin.php?page=boldgrid-backup-tools&section=section_locations'
+		[
+			'a' => [
+				'href' => [],
+			],
+		]
 	)
 );
