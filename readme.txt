@@ -138,6 +138,7 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 * Bug fix:     Fixed escaping of html on archives page when backup only exists remotely.
 * Bug fix:     Don't show "Make your first backup" message while a backup is in progress.
 * Bug fix:     Make notices on the Settings page dismissible.
+* Bug fix:     Don't show "Update Protection" notice if we just updated something.
 * Update:      Be default, have local storage enabled in remote settings.
 
 = 1.11.5 =

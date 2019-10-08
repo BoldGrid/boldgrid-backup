@@ -770,6 +770,22 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 * @global string $pagenow
 	 */
 	public function notice_backup_show() {
+		$action = ! empty( $_GET['action'] ) ? $_GET['action'] : null; // phpcs:ignore
+
+		/*
+		 * The $_GET action that specifies an update has just occurred. These generally happen from
+		 * Dashboard > Updates > Update.
+		 */
+		$update_actions = [
+			'do-theme-upgrade',
+			'do-plugin-upgrade',
+			'do-core-reinstall',
+			'do-core-upgrade',
+		];
+
+		// Whether or not we just updated something.
+		$just_updated = 'update-core.php' === $this->core->pagenow && in_array( $action, $update_actions, true );
+
 		/*
 		 * This method is hooked into admin_notices. If we don't have auto_rollback
 		 * enabled, then we can abort right now.
@@ -783,6 +799,11 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		 * don't want to bombard the user with notices, so don't show this notice too.
 		 */
 		if ( Boldgrid_Backup_Activator::on_post_activate() ) {
+			return;
+		}
+
+		// Don't show notice if we just updated.
+		if ( $just_updated ) {
 			return;
 		}
 
