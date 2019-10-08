@@ -12,6 +12,8 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
+use \Boldgrid\Library\Library\Notice;
+
 // phpcs:disable WordPress.VIP
 
 /**
@@ -793,29 +795,37 @@ class Boldgrid_Backup_Admin_Settings {
 			);
 		}
 
-		// Display warning on resource usage and backups.
-		do_action(
-			'boldgrid_backup_notice',
-			esc_html__(
+		/*
+		 * Display warning on resource usage and backups.
+		 *
+		 * As of 1.11.6, this notice is dismissable (and won't return).
+		 */
+		$notice_id = 'bgbkup_uses_resources';
+		if ( ! Notice::isDismissed( $notice_id ) ) {
+			$message = '<p>' . esc_html__(
 				'Warning: Making backups uses resources. When the system is backing up, it will slow down your site for visitors. Furthermore, when the database itself is being copied, your site must “pause” temporarily to preserve data integrity. For most sites, the pause is typically a few seconds and is not noticed by visitors. Large sites take longer though. Please keep the number of backups you have stored and how often you make those backups to a minimum.',
 				'boldgrid-backup'
-			),
-			'notice notice-warning is-dismissible'
-		);
+			) . '</p>';
+
+			Notice::show( $message, $notice_id );
+		}
 
 		// Get BoldGrid reseller settings.
 		$boldgrid_reseller = get_option( 'boldgrid_reseller' );
 
-		// If not part of a reseller, then show the unofficial host notice.
-		if ( empty( $boldgrid_reseller ) ) {
-			do_action(
-				'boldgrid_backup_notice',
-				esc_html__(
-					'Please note that your web hosting provider may have a policy against these types of backups. Please verify with your provider or choose a BoldGrid Official Host.',
-					'boldgrid-backup'
-				),
-				'notice notice-warning is-dismissible'
-			);
+		/*
+		 * If not part of a reseller, then show the unofficial host notice.
+		 *
+		 * As of 1.11.6, this notice is dismissable (and won't return).
+		 */
+		$notice_id = 'bgbkup_host_policy';
+		if ( ! Notice::isDismissed( $notice_id ) && empty( $boldgrid_reseller ) ) {
+			$message = '<p>' . esc_html__(
+				'Please note that your web hosting provider may have a policy against these types of backups. Please verify with your provider or choose a BoldGrid Official Host.',
+				'boldgrid-backup'
+			) . '</p>';
+
+			Notice::show( $message, $notice_id );
 		}
 
 		// Check for settings update.
