@@ -132,7 +132,9 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
-= ?? =
+= 1.11.6 =
+
+Release date: October 8th, 2019
 
 * Bug fix:     Prevent fatals during activation when library classes are missing.
 * Bug fix:     Fixed escaping of html on archives page when backup only exists remotely.
