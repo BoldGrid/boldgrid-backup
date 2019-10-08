@@ -213,6 +213,8 @@ class Boldgrid_Backup_Admin_Settings {
 			$settings['notifications']['restore'] = 1;
 			$settings['auto_backup']              = 1;
 			$settings['auto_rollback']            = 1;
+
+			$settings['remote']['local']['enabled'] = true;
 		}
 
 		if ( empty( $settings['remote'] ) ) {
