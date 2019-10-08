@@ -197,72 +197,80 @@ class Boldgrid_Backup_Admin_Archives {
 		$backup       = __( 'Backup', 'boldgrid-backup' );
 		$view_details = __( 'View details', 'boldgrid-backup' );
 
-		// If showing a "Get Download Link" button, we need a container to show the results.
-		$table = (
-			! empty( $options['show_link_button'] ) ?
-			'<div id="download-link-copy" class="notice notice-info inline"></div>' : ''
-		);
+		$table = '';
 
-		$table .= $this->get_mine_count();
+		/*
+		 * If a user has backups, either locally or remote, create a $table showing a list of all their
+		 * backups.
+		 */
+		if ( ! empty( $this->core->archives_all->all ) ) {
+			// If showing a "Get Download Link" button, we need a container to show the results.
+			$table = (
+				! empty( $options['show_link_button'] ) ?
+				'<div id="download-link-copy" class="notice notice-info inline"></div>' : ''
+			);
 
-		$table .= sprintf(
-			'
-			<table class="wp-list-table widefat fixed striped pages">
-				<thead>
-					<td>%1$s</td>
-					<td>%2$s</td>
-					<td></td>' .
-					( ! empty( $options['show_link_button'] ) ? '<td></td>' : '' ) . '
-				<tbody id="backup-archive-list-body">',
-			__( 'Date', 'boldgrid-backup' ),
-			__( 'Size', 'boldgrid-backup' )
-		);
-
-		foreach ( $this->core->archives_all->all as $archive ) {
-			$this->core->time->init( $archive['last_modified'], 'utc' );
-
-			// Get the title of the backup.
-			$filepath = $this->core->backup_dir->get_path_to( $archive['filename'] );
-			$this->core->archive->init( $filepath );
-			$title = $this->core->archive->get_attribute( 'title' );
-
-			$locations = $this->get_locations( $archive );
+			$table .= $this->get_mine_count();
 
 			$table .= sprintf(
 				'
-				<tr>
-					<td>
-						%2$s
-						%7$s<br />
-						<p class="description">%6$s</p>
-					</td>
-					<td>
-						%3$s
-					</td>
-					<td>
-						<a
-							class="button"
-							href="admin.php?page=boldgrid-backup-archive-details&filename=%4$s"
-						>%5$s</a>
-					</td>
-					' . (
-						// Show a "Get Download Link" button.
-						! empty( $options['show_link_button'] ) ?
-						'<td>' . $this->core->archive_actions->get_download_link_button( $archive['filename'] ) . '</td>' : ''
-				) . '</tr>',
-				/* 1 */ $backup,
-				/* 2 */ empty( $title ) ? '' : '<strong>' . esc_html( $title ) . '</strong><br />',
-				/* 3 */ Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive['size'] ),
-				/* 4 */ $archive['filename'],
-				/* 5 */ $view_details,
-				/* 6 */ $locations,
-				/* 7 */ $this->core->time->get_span()
+				<table class="wp-list-table widefat fixed striped pages">
+					<thead>
+						<td>%1$s</td>
+						<td>%2$s</td>
+						<td></td>' .
+						( ! empty( $options['show_link_button'] ) ? '<td></td>' : '' ) . '
+					<tbody id="backup-archive-list-body">',
+				__( 'Date', 'boldgrid-backup' ),
+				__( 'Size', 'boldgrid-backup' )
 			);
-		}
 
-		$table .= '</tbody>
-			</table>
-		';
+			foreach ( $this->core->archives_all->all as $archive ) {
+				$this->core->time->init( $archive['last_modified'], 'utc' );
+
+				// Get the title of the backup.
+				$filepath = $this->core->backup_dir->get_path_to( $archive['filename'] );
+				$this->core->archive->init( $filepath );
+				$title = $this->core->archive->get_attribute( 'title' );
+
+				$locations = $this->get_locations( $archive );
+
+				$table .= sprintf(
+					'
+					<tr>
+						<td>
+							%2$s
+							%7$s<br />
+							<p class="description">%6$s</p>
+						</td>
+						<td>
+							%3$s
+						</td>
+						<td>
+							<a
+								class="button"
+								href="admin.php?page=boldgrid-backup-archive-details&filename=%4$s"
+							>%5$s</a>
+						</td>
+						' . (
+							// Show a "Get Download Link" button.
+							! empty( $options['show_link_button'] ) ?
+							'<td>' . $this->core->archive_actions->get_download_link_button( $archive['filename'] ) . '</td>' : ''
+					) . '</tr>',
+					/* 1 */ $backup,
+					/* 2 */ empty( $title ) ? '' : '<strong>' . esc_html( $title ) . '</strong><br />',
+					/* 3 */ Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive['size'] ),
+					/* 4 */ $archive['filename'],
+					/* 5 */ $view_details,
+					/* 6 */ $locations,
+					/* 7 */ $this->core->time->get_span()
+				);
+			}
+
+			$table .= '</tbody>
+				</table>
+			';
+		}
 
 		/*
 		 * Create message for users who have no backups.
