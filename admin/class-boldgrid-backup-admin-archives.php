@@ -269,8 +269,12 @@ class Boldgrid_Backup_Admin_Archives {
 		 *
 		 * If a user has no backups, instead of saying, "Hey, you have no backups", we should inform
 		 * the user (1) how they can create their first backup and (2) how they can schedule backups.
+		 *
+		 * In edition to checking whether or not the user has any backups, make sure they're not currently
+		 * backing up their site. We don't want to tell the user to create their first backup if there
+		 * is a backup currently in progress.
 		 */
-		if ( empty( $this->core->archives_all->all ) ) {
+		if ( ! $this->core->in_progress->get() && empty( $this->core->archives_all->all ) ) {
 			$table = '
 			<div class="notice notice-warning inline" style="margin:15px 0">
 				<p>
