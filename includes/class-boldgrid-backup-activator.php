@@ -99,7 +99,19 @@ class Boldgrid_Backup_Activator {
 	 * @since 1.10.1
 	 */
 	public function post_activate_notice() {
-		if ( $this->on_post_activate() ) {
+		$page = ! empty( $_GET['page'] ) ? $_GET['page'] : null; // phpcs:ignore
+
+		$on_archives_page = 'boldgrid-backup' === $page;
+
+		/*
+		 * Show the activation notice if just activated.
+		 *
+		 * Some serivces, such as CloudWP, may redirect users to the backups page immediately after
+		 * activation. If you have no backups, that page will show a message similar to the message
+		 * we're going to show. In that case, if $on_archives_page, don't show this message, otherwise
+		 * the user will see the same info in two different notices.
+		 */
+		if ( $this->on_post_activate() && ! $on_archives_page ) {
 			$notice = '<div class="notice notice-success">
 				<h2>' . esc_html__( 'Thank you for installing BoldGrid Backup!', 'boldgrid-backup' ) . '</h2>
 				<p>';

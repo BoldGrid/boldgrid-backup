@@ -140,6 +140,7 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 * Bug fix:     Make notices on the Settings page dismissible.
 * Bug fix:     Don't show "Update Protection" notice if we just updated something.
 * Update:      Be default, have local storage enabled in remote settings.
+* Update:      Avoid showing activation notice if users is redirected to the archives page.
 
 = 1.11.5 =
 
