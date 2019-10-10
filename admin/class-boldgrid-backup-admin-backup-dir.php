@@ -8,11 +8,10 @@
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
  * @copyright  BoldGrid.com
- * @version    $Id$
  * @author     BoldGrid.com <wpb@boldgrid.com>
+ *
+ * phpcs:disable WordPress.VIP
  */
-
-// phpcs:disable WordPress.VIP
 
 /**
  * Class: Boldgrid_Backup_Admin_Backup_Dir
@@ -289,12 +288,32 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	}
 
 	/**
+	 * Generate a random string of characters for a directory suffix.
+	 *
+	 * @since 1.11.7
+	 *
+	 * @return string
+	 */
+	public function generate_suffix() {
+		$suffix = '';
+		$chars  = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+		for ( $i = 0; $i < 12; $i++ ) {
+			$suffix .= $chars[ mt_rand( 0, strlen( $chars ) - 1 ) ];
+		}
+
+		return $suffix;
+	}
+
+	/**
 	 * Set our backup directory.
 	 *
 	 * Based on the environment, determine where best backup dir should be and
 	 * then create it.
 	 *
 	 * @since 1.5.2
+	 *
+	 * @see self::generate_suffix()
 	 *
 	 * @return mixed Backup directory on success, false on failure.
 	 */
@@ -317,9 +336,10 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 			 * If directory is the wp-content directory, add additional random characters so that
 			 * the backup directory is not simply wp-content/boldgrid_backup.
 			 */
-			$append           = WP_CONTENT_DIR !== $possible_dir ? '' : '_' . wp_generate_password( 12, false );
+			$append           = WP_CONTENT_DIR !== $possible_dir ? '' : '_' . $this->generate_suffix();
 			$possible_dir    .= DIRECTORY_SEPARATOR . 'boldgrid_backup' . $append;
 			$backup_directory = $this->create( $possible_dir );
+
 			if ( ! $backup_directory ) {
 				continue;
 			}

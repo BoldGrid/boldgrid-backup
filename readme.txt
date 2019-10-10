@@ -132,6 +132,12 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
+= 1.11.7 In-progress =
+
+Release date: ?
+
+* Update:      Updated backup directory suffix creation.
+
 = 1.11.6 =
 
 Release date: October 8th, 2019
