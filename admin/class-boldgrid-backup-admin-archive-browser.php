@@ -70,6 +70,8 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 	 *
 	 * @since 1.6.0
 	 *
+	 * @see Boldgrid_Backup_Admin_Archive_Log::get_by_zip()
+	 *
 	 * @param  string $filepath Zip file.
 	 * @param  string $file     Sql file name.
 	 * @return string
@@ -99,17 +101,53 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 			/* 2 */ $in_current
 		);
 
-		foreach ( $prefixed_tables as $table => $record_count ) {
-			$return .= sprintf(
-				'<tr>
-					<td>%1$s</td>
-					<td>%2$s</td>
-					<td>%3$s</td>
-				</tr>',
-				esc_html( $table ),
-				isset( $tables_with_records[ $table ] ) ? $tables_with_records[ $table ] : '0',
-				esc_html( $record_count )
-			);
+		// If the database dump file is encrypted and the premium plugin or license is missing, then show a notice.
+		$archive_info      = ( new Boldgrid_Backup_Admin_Archive_Log( $this->core ) )->get_by_zip( $filepath );
+		$is_premium        = $this->core->config->get_is_premium();
+		$is_premium_active = $this->core->config->is_premium_active;
+
+		if ( ! empty( $archive_info['encrypt_db'] ) && ( ! $is_premium || ! $is_premium_active ) ) {
+			$return .= '<tr><td colspan="3">' . __( 'The database dump file in this archive has been encrypted with BoldGrid Backup Premium.', 'boldgrid-backup' ) . '</td></tr>';
+
+			if ( ! $is_premium ) {
+				$return .= '<tr><td colspan="3">' .
+				sprintf(
+					// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag.
+					__( 'A BoldGrid Backup Premium license is required for decryption.  %1$sGet Premium%2$s', 'boldgrid-backup' ),
+					'<a class="button button-success" href="' .
+						esc_url( 'https://www.boldgrid.com/update-backup?source=bgbkup-archive-browser' ) .
+						'" target="_blank">',
+					'</a>'
+				) .
+				'</td></tr>';
+			}
+
+			if ( ! $is_premium_active ) {
+				$return .= '<tr><td colspan="3">' .
+					sprintf(
+						// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag.
+						__( 'BoldGrid Backup Premium is not active.  Please go to the %1$sPlugins%2$s page to activate it.', 'boldgrid-backup' ),
+						'<a href="' .
+							esc_url( admin_url( 'plugins.php?s=Boldgrid%20Backup%20Premium&plugin_status=inactive' ) ) .
+							'">',
+						'</a>'
+					) .
+					'</td></tr>';
+			}
+		} else {
+			// Show database table record counts.
+			foreach ( $prefixed_tables as $table => $record_count ) {
+				$return .= sprintf(
+					'<tr>
+						<td>%1$s</td>
+						<td>%2$s</td>
+						<td>%3$s</td>
+					</tr>',
+					esc_html( $table ),
+					isset( $tables_with_records[ $table ] ) ? $tables_with_records[ $table ] : '0',
+					esc_html( $record_count )
+				);
+			}
 		}
 
 		$return .= '</tbody></table>';

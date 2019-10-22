@@ -1537,6 +1537,7 @@ class Boldgrid_Backup_Admin_Core {
 			'server_software'   => getenv( 'SERVER_SOFTWARE' ),
 			'uid'               => getmyuid(),
 			'username'          => get_current_user(),
+			'encrypt_db'        => false,
 		);
 
 		// Determine how this backup was triggered.
@@ -1627,7 +1628,10 @@ class Boldgrid_Backup_Admin_Core {
 		 *
 		 * @since 1.5.1
 		 *
-		 * @param array $info See Boldgrid_Backup_Admin_Compressor_Php_Zip::archive_files.
+		 * @see Boldgrid_Backup_Admin_Compressor_Php_Zip::archive_files
+		 * @see \Boldgrid\Backup\Premium\Admin\Crypt::post_dump()
+		 *
+		 * @param array $info Archive information.
 		 */
 		$info = apply_filters( 'boldgrid_backup_pre_archive_info', $info );
 

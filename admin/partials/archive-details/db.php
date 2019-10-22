@@ -10,16 +10,15 @@
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin/partials/archive-details
  * @copyright  BoldGrid
- * @version    $Id$
  * @author     BoldGrid <support@boldgrid.com>
  */
 
 defined( 'WPINC' ) || die;
 
-$db = array(
+$db = [
 	'browser' => '',
 	'buttons' => '',
-);
+];
 
 if ( empty( $dump_file ) ) {
 	$db['browser'] = sprintf(
@@ -41,7 +40,7 @@ $contains = esc_html__(
 
 $basename = basename( $dump_file );
 
-$db = array(
+$db = [
 	'browser' => sprintf(
 		'
 		<div class="hidden" data-view-type="db">
@@ -50,12 +49,16 @@ $db = array(
 		</div>',
 		$basename
 	),
-	'buttons' => sprintf(
+	'buttons' => null,
+];
+
+if ( empty( $archive['encrypt_db'] ) || ( $is_premium && $is_premium_active ) ) {
+	$db['buttons'] = sprintf(
 		'<a class="restore-db button button-primary" data-file="%2$s" data-view-type="db" style="display:none;">%1$s</a>%3$s',
 		__( 'Restore this database', 'boldgrid-backup' ),
 		esc_attr( $basename ),
 		$this->core->lang['spinner']
-	),
-);
+	);
+}
 
 return $db;

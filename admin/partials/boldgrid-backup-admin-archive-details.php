@@ -32,6 +32,9 @@ $allowed_html = array(
 	),
 );
 
+$is_premium        = $this->core->config->get_is_premium();
+$is_premium_active = $this->core->config->is_premium_active;
+
 $details        = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/details.php';
 $remote_storage = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/remote-storage.php';
 $browser        = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/browser.php';
