@@ -107,7 +107,7 @@ class Boldgrid_Backup_Admin_Settings {
 	 */
 	public function get_settings( $raw = false ) {
 		// Get settings.
-		$settings = get_site_option( 'boldgrid_backup_settings', array() );
+		$settings = get_site_option( 'boldgrid_backup_settings', [] );
 
 		if ( $raw ) {
 			return $settings;
@@ -251,6 +251,9 @@ class Boldgrid_Backup_Admin_Settings {
 		$settings['site_check']['interval'] = ( isset( $settings['site_check']['interval'] ) &&
 			4 < $settings['site_check']['interval'] && 60 > $settings['site_check']['interval'] ) ?
 			$settings['site_check']['interval'] : 15;
+
+		// Encryption.
+		$settings['encrypt_db'] = isset( $settings['encrypt_db'] ) ? (bool) $settings['encrypt_db'] : false;
 
 		// Return the settings array.
 		return $settings;
@@ -587,6 +590,9 @@ class Boldgrid_Backup_Admin_Settings {
 					$settings['notification_email'] = sanitize_email( $_POST['notification_email'] );
 			}
 
+			// Database encryption.
+			$settings['encrypt_db'] = isset( $_POST['encrypt_db'] ) && '1' === $_POST['encrypt_db'];
+
 			/*
 			 * Save compressor settings.
 			 *
@@ -747,7 +753,7 @@ class Boldgrid_Backup_Admin_Settings {
 			 *
 			 * @since 1.5.3
 			 */
-			do_action( 'boldgrid_backup_settings_updated' );
+			do_action( 'boldgrid_backup_settings_updated', $settings );
 		}
 
 		// Return success.

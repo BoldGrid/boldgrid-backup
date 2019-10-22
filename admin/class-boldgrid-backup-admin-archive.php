@@ -270,7 +270,7 @@ class Boldgrid_Backup_Admin_Archive {
 	 *
 	 * @since 1.7.3
 	 *
-	 * @param string $filename
+	 * @param string $filename Filename.
 	 */
 	public function init_by_filename( $filename ) {
 		$filepath = $this->core->backup_dir->get_path_to( $filename );
@@ -468,7 +468,7 @@ class Boldgrid_Backup_Admin_Archive {
 	 *
 	 * @see Boldgrid_Backup_Admin_Archive::get_by_name()
 	 *
-	 * @param  string $filename
+	 * @param  string $filename Filename.
 	 * @return array
 	 */
 	public function validate_link_request( $filename ) {
@@ -526,7 +526,7 @@ class Boldgrid_Backup_Admin_Archive {
 	 * @see Boldgrid_Backup_Admin_Archive::validate_link_request()
 	 * @see Boldgrid_Backup_Authentication::create_token()
 	 *
-	 * @param  string $filename
+	 * @param  string $filename Filename.
 	 * @return string
 	 */
 	public function generate_download_link( $filename ) {

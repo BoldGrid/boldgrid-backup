@@ -67,7 +67,7 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		 *
 		 * @since 1.6.0
 		 */
-		do_action( 'boldgrid_backup_pre_dump' );
+		do_action( 'boldgrid_backup_pre_dump', $file );
 
 		// Some hosts may configure the DB_HOST as localhost:3306. Strip out the port.
 		$db_host = explode( ':', DB_HOST );
@@ -93,7 +93,7 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		 *
 		 * @since 1.6.0
 		 */
-		do_action( 'boldgrid_backup_post_dump' );
+		do_action( 'boldgrid_backup_post_dump', $file );
 
 		return true;
 	}
@@ -108,11 +108,18 @@ class Boldgrid_Backup_Admin_Db_Dump {
 	 * @return array
 	 */
 	public function get_insert_count( $filepath, $file ) {
-		$return = array();
+		$return = [];
 
 		$tables = $this->get_insert_tables( $filepath, $file );
 
 		$file_contents = $this->core->archive->get_file( $file );
+
+		/**
+		 * Handle encryption.
+		 *
+		 * @since 1.x.0
+		 */
+		$file_contents = apply_filters( 'boldgrid_backup_post_get_dump_file', $file_contents );
 
 		foreach ( $tables as $table ) {
 			/*
@@ -177,6 +184,13 @@ class Boldgrid_Backup_Admin_Db_Dump {
 	public function get_insert_tables( $filepath, $file ) {
 		$this->core->archive->init( $filepath );
 		$file_contents = $this->core->archive->get_file( $file );
+
+		/**
+		 * Handle encryption.
+		 *
+		 * @since 1.x.0
+		 */
+		$file_contents = apply_filters( 'boldgrid_backup_post_get_dump_file', $file_contents );
 
 		/*
 		 * Get a list of all tables within the dump that we are inserting

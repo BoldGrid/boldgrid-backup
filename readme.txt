@@ -132,6 +132,10 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
+= 1.x.0 In progress =
+
+* New feature: Added an option to encrypt the database dump file in a backup archive.
+
 = 1.11.8 =
 
 Release date: October 11th, 2019

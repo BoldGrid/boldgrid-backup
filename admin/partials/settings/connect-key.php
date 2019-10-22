@@ -22,11 +22,12 @@ return '
 		' . __( 'BoldGrid Connect Key', 'boldgrid-backup' ) . '
 	</div>
 	<div class="bg-box-bottom">
-' . sprintf(
-	'%1$s <a href="' . admin_url( 'options-general.php?page=boldgrid-connect.php' ) . '">%2$s</a>.',
-	__( 'Connect Key management has been moved to', 'boldgrid-backup' ),
-	__( 'Settings >> BoldGrid Connect', 'boldgrid-backup' )
-) . '
+' .
+	sprintf(
+		'%1$s <a href="' . admin_url( 'options-general.php?page=boldgrid-connect.php' ) . '">%2$s</a>.',
+		__( 'Connect Key management has been moved to', 'boldgrid-backup' ),
+		__( 'Settings >> BoldGrid Connect', 'boldgrid-backup' )
+	) . '
 	</div>
 </div>
 ';

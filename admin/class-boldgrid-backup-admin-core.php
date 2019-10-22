@@ -2584,7 +2584,8 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * When we're generating a backup, both via cron and wpcron, doing_cron is true.
 	 *
-	 * $_GET['doing_wp_cron'] is the timestamp the cron has been triggered. Please see:
+	 * $_GET['doing_wp_cron'] is the timestamp the cron has been triggered.
+	 *
 	 * @link https://github.com/WordPress/WordPress/blob/5.1.1/wp-cron.php#L84-L96
 	 * @link https://github.com/WordPress/WordPress/blob/5.1.1/wp-includes/cron.php#L635-L639
 	 *
@@ -2600,6 +2601,10 @@ class Boldgrid_Backup_Admin_Core {
 	 * @since 1.5.3
 	 */
 	public function set_lang() {
+		/*
+		 * The "want_to" string is a generic "why you should upgrade" string used for general
+		 * purposes. For example, it's currently used at the bottom of the backups page.
+		 */
 		$this->lang = array(
 			// Mine count, total number of backups.
 			'All'                       => __( 'All', 'boldgrid-backup' ),
@@ -2622,10 +2627,6 @@ class Boldgrid_Backup_Admin_Core {
 			'Remote'                    => __( 'Remote', 'boldgrid-backup' ),
 			'spinner'                   => '<span class="spinner"></span>',
 			'spinner_inline'            => '<span class="spinner inline"></span>',
-			/*
-			 * The "want_to" string is a generic "why you should upgrade" string used for general
-			 * purposes. For example, it's currently used at the bottom of the backups page.
-			 */
 			'want_to'                   => sprintf(
 				// translators: 1 Markup showing a "Google Drive" logo, 2 Markup showing an "Amazon S3" logo.
 				__( 'Catastrophic data loss can happen at any time. Storing your archives in multiple secure locations will keep your website data safe and put your mind at ease. Upgrade to BoldGrid Premium to enable automated remote backups to %1$s and %2$s', 'boldgrid-backup' ),
