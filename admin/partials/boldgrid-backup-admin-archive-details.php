@@ -194,13 +194,14 @@ $editor_tools = sprintf(
 		</div>
 		<div class="wp-editor-tabs">
 			<button type="button" id="content-tmce" class="wp-switch-editor switch-tmce" data-wp-editor-id="content">%2$s</button>
-			<button type="button" id="content-html" class="wp-switch-editor switch-html" data-wp-editor-id="content">%3$s</button>
+			<button type="button" id="content-html" class="wp-switch-editor switch-html" data-wp-editor-id="content">%3$s%4$s</button>
 		</div>
 	</div>
 	',
 	/* 1 */ $db['buttons'],
 	/* 2 */ __( 'Files & Folders', 'boldgrid-backup' ),
-	/* 3 */ __( 'Database', 'boldgrid-backup' )
+	/* 3 */ __( 'Database', 'boldgrid-backup' ),
+	/* 4 */ empty( $archive['encrypt_db'] ) ? '' : '<span class="dashicons dashicons-admin-network"></span>'
 );
 
 $premium_url = $this->core->go_pro->get_premium_url( 'bgbkup-archive-browser' );
