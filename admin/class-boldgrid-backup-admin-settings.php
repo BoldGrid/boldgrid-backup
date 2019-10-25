@@ -721,9 +721,10 @@ class Boldgrid_Backup_Admin_Settings {
 				$boldgrid_settings['theme_autoupdate']
 			);
 
+			$settings['updated'] = time();
+
 			// If no errors, then save the settings.
 			if ( ! $update_error ) {
-				$settings['updated'] = time();
 				update_site_option( 'boldgrid_backup_settings', $settings );
 				update_option( 'boldgrid_settings', $boldgrid_settings );
 			}
@@ -773,8 +774,14 @@ class Boldgrid_Backup_Admin_Settings {
 	 * Menu callback to display the Backup schedule page.
 	 *
 	 * @since 1.0
+	 *
+	 * @see Boldgrid_Backup_Admin_Config::get_is_premium
+	 * @see Boldgrid_Backup_Admin_Config::is_premium_active
 	 */
 	public function page_backup_settings() {
+		$is_premium        = $this->core->config->get_is_premium();
+		$is_premium_active = $this->core->config->is_premium_active;
+
 		add_thickbox();
 		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
 		wp_enqueue_style( 'bglib-ui-css' );

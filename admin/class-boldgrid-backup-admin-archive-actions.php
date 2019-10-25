@@ -94,15 +94,7 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 		wp_localize_script( $handle, 'BoldGridBackupAdminArchiveActions', $translation );
 		wp_enqueue_script( $handle );
 
-		// Enqueue the external clipboard script.
-		wp_enqueue_script(
-			'clipboard',
-			plugin_dir_url( BOLDGRID_BACKUP_PATH . '/boldgrid-backup.php' ) .
-				'/build/clipboard.min.js',
-			array( 'jquery' ),
-			'2.0.1',
-			true
-		);
+		wp_enqueue_script( 'clipboard' );
 	}
 
 	/**
