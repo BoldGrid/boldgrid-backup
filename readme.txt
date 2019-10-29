@@ -1,4 +1,4 @@
-=== BoldGrid Backup ===
+=== BoldGrid Backup - WordPress Backup Plugin plus Restore & Migrate ===
 Contributors: boldgrid, joemoto, imh_brad, rramo012, timph, bgnicolepaschen
 Tags: backup, cloud backup, database backup, restore, wordpress backup
 Requires at least: 4.4
