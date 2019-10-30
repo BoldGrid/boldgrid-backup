@@ -101,4 +101,9 @@ foreach ( $datas as $data ) {
 	$details .= sprintf( $attribute, $data['title'], $value );
 }
 
-return $details;
+/**
+ * Filter the archive details.
+ *
+ * @since 1.x.0
+ */
+return apply_filters( 'boldgrid_backup_filter_archive_details', $details, $archive );

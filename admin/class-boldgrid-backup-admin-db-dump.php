@@ -109,8 +109,9 @@ class Boldgrid_Backup_Admin_Db_Dump {
 	 */
 	public function get_insert_count( $filepath, $file ) {
 		$return = [];
+		$tables = [];
 
-		$tables = $this->get_insert_tables( $filepath, $file );
+		$this->core->archive->init( $filepath );
 
 		$file_contents = $this->core->archive->get_file( $file );
 
@@ -120,6 +121,14 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		 * @since 1.x.0
 		 */
 		$file_contents = apply_filters( 'boldgrid_backup_post_get_dump_file', $file_contents );
+
+		// Check for the dump file header.
+		if ( false !== strpos( $file_contents[0]['content'], '-- mysqldump-php' ) ) {
+			$tables = $this->get_insert_tables( $filepath, $file );
+		} else {
+			// The file header is missing; the file may have been encrypted with other settings.
+			$return = [ 'encrypted_other' => true ];
+		}
 
 		foreach ( $tables as $table ) {
 			/*

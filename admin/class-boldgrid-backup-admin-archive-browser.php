@@ -78,12 +78,10 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 	 */
 	public function get_sql_details( $filepath, $file ) {
 		$tables_with_records = $this->core->db_dump->get_insert_count( $filepath, $file );
-		$prefixed_tables     = $this->core->db_get->prefixed_count();
-
-		$in_backup  = __( '# Records in this backup', 'boldgrid-backup' );
-		$in_current = __( '# Records in current database', 'boldgrid-backup' );
-
-		$return = sprintf(
+		$is_encrypted_other  = isset( $tables_with_records['encrypted_other'] );
+		$in_backup           = __( '# Records in this backup', 'boldgrid-backup' );
+		$in_current          = __( '# Records in current database', 'boldgrid-backup' );
+		$return              = sprintf(
 			'
 			<table class="wp-list-table fixed striped widefat">
 			<thead>
@@ -134,8 +132,22 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 					) .
 					'</td></tr>';
 			}
+		} elseif ( $is_encrypted_other ) {
+			// The database dump file was encrypted with other settings.
+			$return .= '<tr><td colspan="3">' .
+			sprintf(
+				// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag.
+				__( 'The database was encrypted with other settings.  If you saved the encryption token, then please go to the %1$sBackup Security%2$s settings page to save it.', 'boldgrid-backup' ),
+				'<a href="' .
+					esc_url( admin_url( 'admin.php?page=boldgrid-backup-settings&section=section_security' ) ) .
+					'">',
+				'</a>'
+			) .
+			'</td></tr>';
 		} else {
 			// Show database table record counts.
+			$prefixed_tables = $this->core->db_get->prefixed_count();
+
 			foreach ( $prefixed_tables as $table => $record_count ) {
 				$return .= sprintf(
 					'<tr>
