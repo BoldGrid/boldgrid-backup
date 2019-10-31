@@ -123,9 +123,16 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 				archive_filename: filename,
 				archive_auth: $this.attr( 'data-nonce' )
 			},
-			$spinner = $this.next( '.spinner' );
+			$spinner = $this.next( '.spinner' ),
+			encryptDb = $wpbody.find( '#bgb-details-encrypt_db' ).data( 'value' );
+		tokenMatch = $wpbody.find( '#bgbp-token-match' ).data( 'value' );
 
 		restoreConfirmText = lang.restoreConfirmText.replace( '%s', filename );
+
+		if ( 'Y' === encryptDb && 'Y' !== tokenMatch ) {
+			restoreConfirmText = restoreConfirmText + '\n\n' + lang.tokenMismatchTest;
+		}
+
 		confirmResponse = confirm( restoreConfirmText );
 
 		if ( true === confirmResponse ) {

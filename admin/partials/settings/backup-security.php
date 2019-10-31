@@ -22,33 +22,89 @@ ob_start();
 	</div>
 	<div class="bg-box-bottom">
 		<p class="help" data-id="backup_security">
-			<?php
-			esc_html_e(
-				'Manage security features to help protect backup archives.',
-				'boldgrid-backup'
-			);
-			?>
+<?php
+esc_html_e(
+	'Manage security features to help protect backup archives.',
+	'boldgrid-backup'
+);
+?>
 		</p>
 		<table class="form-table">
 			<tr>
 				<th><?php esc_html_e( 'Encrypt Database', 'boldgrid-backup' ); ?></th>
 				<td>
 					<input id="encrypt-db-enabled" type="radio" name="encrypt_db" value="1"
-					<?php
-					if ( $settings['encrypt_db'] ) {
-							echo ' checked'; // Default.
-					}
-					?>
+<?php
+if ( $settings['encrypt_db'] ) {
+	echo ' checked'; // Default.
+}
+
+if ( ! $is_premium || ! $is_premium_installed || ! $is_premium_active ) {
+	echo ' disabled="disabled"';
+}
+?>
 					/> <label for="encrypt-db-enabled"><?php esc_html_e( 'Enabled', 'boldgrid-backup' ); ?></label>
 					&nbsp; <input id="encrypt-db-disabled" type="radio" name="encrypt_db" value="0"
-					<?php
-					if ( ! $settings['encrypt_db'] ) {
-							echo ' checked';
-					}
-					?>
+<?php
+if ( ! $settings['encrypt_db'] ) {
+	echo ' checked';
+}
+
+if ( ! $is_premium || ! $is_premium_installed || ! $is_premium_active ) {
+	echo ' disabled="disabled"';
+}
+?>
 					/> <label for="encrypt-db-disabled"><?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?></label>
 				</td>
 			</tr>
+<?php
+if ( ! $is_premium ) {
+	?>
+			<tr><td colspan="2">
+	<?php
+	printf(
+		// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag.
+		esc_html__( 'A BoldGrid Backup Premium license is required for encryption features.  %1$sGet Premium%2$s', 'boldgrid-backup' ),
+		'<a class="button button-success" href="' .
+			esc_url( 'https://www.boldgrid.com/update-backup?source=bgbkup-settings-security' ) .
+			'" target="_blank">',
+		'</a>'
+	);
+	?>
+			</td></tr>
+	<?php
+} elseif ( ! $is_premium_installed ) {
+	?>
+			<tr><td colspan="2">
+	<?php
+	printf(
+		// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag.
+		esc_html__( 'The BoldGrid Backup Premium plugin is required for encryption features.  %1$sGet Premium Plugins%2$s', 'boldgrid-backup' ),
+		'<a class="button button-success" href="' .
+			esc_url( 'https://www.boldgrid.com/central/plugins?source=bgbkup-settings-security' ) .
+			'" target="_blank">',
+		'</a>'
+	);
+	?>
+			</td></tr>
+	<?php
+} elseif ( ! $is_premium_active ) {
+	?>
+			<tr><td colspan="2">
+	<?php
+	printf(
+		// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag.
+		esc_html__( 'The BoldGrid Backup Premium plugin is not active.  Encryption features are not available.  Please go to the %1$sPlugins%2$s page to activate it.', 'boldgrid-backup' ),
+		'<a href="' .
+			esc_url( admin_url( 'plugins.php?s=Boldgrid%20Backup%20Premium&plugin_status=inactive' ) ) .
+			'">',
+		'</a>'
+	);
+	?>
+		</td></tr>
+	<?php
+}
+?>
 		</table>
 	</div>
 </div>

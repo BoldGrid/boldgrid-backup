@@ -779,8 +779,9 @@ class Boldgrid_Backup_Admin_Settings {
 	 * @see Boldgrid_Backup_Admin_Config::is_premium_active
 	 */
 	public function page_backup_settings() {
-		$is_premium        = $this->core->config->get_is_premium();
-		$is_premium_active = $this->core->config->is_premium_active;
+		$is_premium           = $this->core->config->get_is_premium();
+		$is_premium_installed = $this->core->config->is_premium_installed;
+		$is_premium_active    = $this->core->config->is_premium_active;
 
 		add_thickbox();
 		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
@@ -910,6 +911,10 @@ class Boldgrid_Backup_Admin_Settings {
 		}
 
 		$available_compressors = $this->core->compressors->get_available();
+
+		if ( ! $is_premium || ! $is_premium_installed || ! $is_premium_active ) {
+			$settings['encrypt_db'] = false;
+		}
 
 		// Include the page template.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-settings.php';

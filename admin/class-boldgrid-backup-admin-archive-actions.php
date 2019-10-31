@@ -67,6 +67,10 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 			'Please keep this link private, as the download file contains sensitive data.',
 			'boldgrid-backup'
 		);
+		$token_mismatch_text  = __(
+			'The database was encrypted with other settings and cannot be imported. If you saved the encryption token, then please go to the Backup Security settings page to save it.',
+			'boldgrid-backup'
+		);
 
 		$handle = 'boldgrid-backup-admin-archive-actions';
 
@@ -89,6 +93,7 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 			'copiedText'         => $copied_text,
 			'expiresText'        => $expires_text,
 			'linkDisclaimerText' => $link_disclaimer_text,
+			'tokenMismatchTest'  => $token_mismatch_text,
 		);
 
 		wp_localize_script( $handle, 'BoldGridBackupAdminArchiveActions', $translation );
