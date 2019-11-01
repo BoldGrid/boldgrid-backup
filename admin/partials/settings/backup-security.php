@@ -23,9 +23,15 @@ ob_start();
 	<div class="bg-box-bottom">
 		<p class="help" data-id="backup_security">
 <?php
-esc_html_e(
-	'Manage security features to help protect backup archives.',
-	'boldgrid-backup'
+printf(
+	// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag.
+	esc_html__(
+		'Manage security features to help protect backup archives.%1$sThe %2$sEncrypt Database%3$s premium feature will encrypt the database dump file in backup archives in order to protect sensitive information.%1$sThe %2$sEncryption Token%3$s setting provides a way to copy or update the encryption settings.',
+		'boldgrid-backup'
+	),
+	'<br /><br />',
+	'<strong>',
+	'</strong>'
 );
 ?>
 		</p>
