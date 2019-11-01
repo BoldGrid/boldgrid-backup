@@ -109,6 +109,6 @@ foreach ( $datas as $data ) {
 /**
  * Filter the archive details.
  *
- * @since 1.x.0
+ * @since 1.12.0
  */
 return apply_filters( 'boldgrid_backup_filter_archive_details', $details, $archive );

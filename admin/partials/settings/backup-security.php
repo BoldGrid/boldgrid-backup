@@ -4,7 +4,7 @@
  *
  * Show "Backup Security" on settings page.
  *
- * @since      1.x.0
+ * @since      1.12.0
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin/partials/settings
  * @copyright  BoldGrid

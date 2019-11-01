@@ -118,7 +118,7 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		/**
 		 * Handle encryption.
 		 *
-		 * @since 1.x.0
+		 * @since 1.12.0
 		 */
 		$file_contents = apply_filters( 'boldgrid_backup_post_get_dump_file', $file_contents );
 
@@ -197,7 +197,7 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		/**
 		 * Handle encryption.
 		 *
-		 * @since 1.x.0
+		 * @since 1.12.0
 		 */
 		$file_contents = apply_filters( 'boldgrid_backup_post_get_dump_file', $file_contents );
 
