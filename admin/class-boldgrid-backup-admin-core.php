@@ -1053,7 +1053,7 @@ class Boldgrid_Backup_Admin_Core {
 		if ( ! $this->test->run_functionality_tests() ) {
 			// Display an error notice.
 			$this->notice->functionality_fail_notice();
-			return array( 'error' => __( 'Unable to create backup, functionality test failed.', 'boldgrid_backup' ) );
+			return array( 'error' => __( 'Unable to create backup, functionality test failed.', 'boldgrid-backup' ) );
 		}
 
 		// Get the backup directory path.

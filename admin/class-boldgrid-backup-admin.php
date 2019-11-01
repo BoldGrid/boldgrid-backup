@@ -141,7 +141,7 @@ class Boldgrid_Backup_Admin {
 			false
 		);
 		$translation = array(
-			'archive_file_size'           => __( 'Archive file size: ', 'boldgrid_backup' ),
+			'archive_file_size'           => __( 'Archive file size: ', 'boldgrid-backup' ),
 			'size_before_compression'     => __( 'File size before compression: ', 'boldgrid-backup' ),
 			'adding_tables'               => __( 'Adding tables.', 'boldgrid-backup' ),
 			'completing_database'         => __( 'Completing database backup...', 'boldgrid-backup' ),
