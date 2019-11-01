@@ -1128,11 +1128,12 @@ class Boldgrid_Backup_Admin_Core {
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 * @global wpdb $wpdb The WordPress database class object.
 	 *
-	 * @param string $db_dump_filepath File path to the mysql dump file.
-	 * @param string $db_prefix The database prefix to use, if restoring and it changed.
+	 * @param  string $db_dump_filepath File path to the mysql dump file.
+	 * @param  string $db_prefix        The database prefix to use, if restoring and it changed.
+	 * @param  bool   $db_encrypted     Is the database dump file encrypted.
 	 * @return bool Status of the operation.
 	 */
-	private function restore_database( $db_dump_filepath, $db_prefix = null ) {
+	private function restore_database( $db_dump_filepath, $db_prefix = null, $db_encrypted = false ) {
 		// Check input.
 		if ( empty( $db_dump_filepath ) ) {
 			// Display an error notice.
@@ -1165,6 +1166,17 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->set_time_limit();
 
+		// If BGBP is activated, then check for encryption.
+		if ( class_exists( 'Boldgrid_Backup_Premium_Admin_Core' ) ) {
+			$premium_core = new Boldgrid_Backup_Premium_Admin_Core();
+
+			// If the dump file is encrypted, then try to decrpyt it.
+			if ( $db_encrypted && $premium_core->is_file_encrypted( $db_dump_filepath ) ) {
+				$premium_core->crypt_file( $db_dump_filepath, 'd' );
+			}
+		}
+
+		// Import the dump file.
 		$importer = new Boldgrid_Backup_Admin_Db_Import();
 		$status   = $importer->import( $db_dump_filepath );
 
@@ -2261,8 +2273,12 @@ class Boldgrid_Backup_Admin_Core {
 				}
 			}
 
+			// Determine if the dump file is encrypted.
+			$this->archive->init( $filepath );
+			$db_encrypted = $this->archive->get_attribute( 'encrypt_db' );
+
 			// Restore the database and then delete the dump.
-			$restore_ok = $this->restore_database( $db_dump_filepath, $db_prefix );
+			$restore_ok = $this->restore_database( $db_dump_filepath, $db_prefix, $db_encrypted );
 			$this->wp_filesystem->delete( $db_dump_filepath, false, 'f' );
 
 			// Display notice of deletion status.

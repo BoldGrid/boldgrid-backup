@@ -235,7 +235,7 @@ class Boldgrid_Backup_Admin_Archives {
 
 				$locations = $this->get_locations( $archive );
 
-				$db_encryped = $this->core->archive->get_attribute( 'encrypt_db' ) ?
+				$db_encrypted = $this->core->archive->get_attribute( 'encrypt_db' ) ?
 					' <span class="dashicons dashicons-admin-network" title="' .
 						__( 'Encrypted database', 'boldgrid-backup' ) . '"></span>' : '';
 
@@ -268,7 +268,7 @@ class Boldgrid_Backup_Admin_Archives {
 					/* 5 */ $view_details,
 					/* 6 */ $locations,
 					/* 7 */ $this->core->time->get_span(),
-					/* 8 */ $db_encryped
+					/* 8 */ $db_encrypted
 				);
 			}
 
