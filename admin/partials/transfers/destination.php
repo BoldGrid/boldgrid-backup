@@ -30,25 +30,21 @@ switch ( true ) {
 
 	case ! $is_premium:
 		// Does not have a premium license.
+		$get_premium_url = 'https://www.boldgrid.com/update-backup?source=bgbkup-settings-transfer-destination';
 		$encrypt_message = sprintf(
-			// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag.
-			__( 'If you are going to import and restore a backup containing encrypted files, then a BoldGrid Backup Premium license is required for decryption.  %1$sGet Premium%2$s', 'boldgrid-backup' ),
-			'<a class="button button-success" href="' .
-				esc_url( 'https://www.boldgrid.com/update-backup?source=bgbkup-settings-transfer-destination' ) .
-				'" target="_blank">',
-			'</a>'
+			// translators: 1: Get premium button/link.
+			__( 'If you are going to import and restore a backup containing encrypted files, then a BoldGrid Backup Premium license is required for decryption.  %1$s', 'boldgrid-backup' ),
+			$this->core->go_pro->get_premium_button( $get_premium_url, __( 'Get Premium', 'boldgrid-backup' ) ) // phpcs:ignore
 		);
 		break;
 
 	case ! $is_premium_installed:
 		// Has a premium license, but no premium plugin is installed.
+		$get_plugins_url = 'https://www.boldgrid.com/central/plugins?source=bgbkup-settings-transfer-destination';
 		$encrypt_message = sprintf(
-			// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag.
-			esc_html__( 'The BoldGrid Backup Premium plugin is required for encryption features.  %1$sGet Premium Plugins%2$s', 'boldgrid-backup' ),
-			'<a class="button button-success" href="' .
-				esc_url( 'https://www.boldgrid.com/central/plugins?source=bgbkup-settings-transfer-destination' ) .
-				'" target="_blank">',
-			'</a>'
+			// translators: 1: Get premium plugins button/link.
+			esc_html__( 'The BoldGrid Backup Premium plugin is required for encryption features.  %1$s', 'boldgrid-backup' ),
+			$this->core->go_pro->get_premium_button( $get_plugins_url, __( 'Get Premium Plugins', 'boldgrid-backup' ) ) // phpcs:ignore
 		);
 		break;
 

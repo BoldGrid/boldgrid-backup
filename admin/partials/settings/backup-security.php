@@ -67,31 +67,31 @@ if ( ! $is_premium || ! $is_premium_installed || ! $is_premium_active ) {
 if ( ! $is_premium ) {
 	?>
 			<tr><td colspan="2">
+				<div class="bg-box-bottom premium">
 	<?php
+	$get_premium_url = 'https://www.boldgrid.com/update-backup?source=bgbkup-settings-security';
 	printf(
-		// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag.
-		esc_html__( 'A BoldGrid Backup Premium license is required for encryption features.  %1$sGet Premium%2$s', 'boldgrid-backup' ),
-		'<a class="button button-success" href="' .
-			esc_url( 'https://www.boldgrid.com/update-backup?source=bgbkup-settings-security' ) .
-			'" target="_blank">',
-		'</a>'
+		// translators: 1: Get premium button/link.
+		esc_html__( 'A BoldGrid Backup Premium license is required for encryption features.  %1$s', 'boldgrid-backup' ),
+		$this->core->go_pro->get_premium_button( $get_premium_url, __( 'Get Premium', 'boldgrid-backup' ) ) // phpcs:ignore
 	);
 	?>
+				</div>
 			</td></tr>
 	<?php
 } elseif ( ! $is_premium_installed ) {
 	?>
 			<tr><td colspan="2">
+				<div class="bg-box-bottom premium">
 	<?php
+	$get_plugins_url = 'https://www.boldgrid.com/central/plugins?source=bgbkup-settings-security';
 	printf(
-		// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag.
-		esc_html__( 'The BoldGrid Backup Premium plugin is required for encryption features.  %1$sGet Premium Plugins%2$s', 'boldgrid-backup' ),
-		'<a class="button button-success" href="' .
-			esc_url( 'https://www.boldgrid.com/central/plugins?source=bgbkup-settings-security' ) .
-			'" target="_blank">',
-		'</a>'
+		// translators: 1: Get premium plugins button/link.
+		esc_html__( 'The BoldGrid Backup Premium plugin is required for encryption features.  %1$s', 'boldgrid-backup' ),
+		$this->core->go_pro->get_premium_button( $get_plugins_url, __( 'Get Premium Plugins', 'boldgrid-backup' ) ) // phpcs:ignore
 	);
 	?>
+				</div>
 			</td></tr>
 	<?php
 } elseif ( ! $is_premium_active ) {
