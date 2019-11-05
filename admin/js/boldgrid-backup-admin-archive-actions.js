@@ -130,7 +130,7 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 		restoreConfirmText = lang.restoreConfirmText.replace( '%s', filename );
 
 		if ( 'Y' === encryptDb && 'Y' !== tokenMatch ) {
-			restoreConfirmText = restoreConfirmText + '\n\n' + lang.tokenMismatchTest;
+			restoreConfirmText = restoreConfirmText + '\n\n' + lang.tokenMismatchText;
 		}
 
 		confirmResponse = confirm( restoreConfirmText );

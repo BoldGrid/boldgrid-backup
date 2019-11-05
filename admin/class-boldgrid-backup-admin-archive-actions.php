@@ -68,7 +68,7 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 			'boldgrid-backup'
 		);
 		$token_mismatch_text  = __(
-			'The database was encrypted with other settings and cannot be imported. If you saved the encryption token, then please go to the Backup Security settings page to save it.',
+			'The database was encrypted with a token that does not match the one saved in your settings and cannot be imported.  In order to restore the encrypted database, the matching encryption token is required.  If you have the matching token, then go to the Backup Security settings page to save it.',
 			'boldgrid-backup'
 		);
 
@@ -93,7 +93,7 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 			'copiedText'         => $copied_text,
 			'expiresText'        => $expires_text,
 			'linkDisclaimerText' => $link_disclaimer_text,
-			'tokenMismatchTest'  => $token_mismatch_text,
+			'tokenMismatchText'  => $token_mismatch_text,
 		);
 
 		wp_localize_script( $handle, 'BoldGridBackupAdminArchiveActions', $translation );

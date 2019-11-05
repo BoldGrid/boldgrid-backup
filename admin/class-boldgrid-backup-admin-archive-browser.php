@@ -137,7 +137,7 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 			$return .= '<tr><td colspan="3">' .
 			sprintf(
 				// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag.
-				__( 'The database was encrypted with other settings.  If you saved the encryption token, then please go to the %1$sBackup Security%2$s settings page to save it.', 'boldgrid-backup' ),
+				__( 'The database in this backup archive was encrypted with a token that does not match the one saved in your settings.  In order to access the encrypted database, the matching encryption token is required.  If you have the matching token, then go to the %1$sBackup Security%2$s settings page to save it.', 'boldgrid-backup' ),
 				'<a href="' .
 					esc_url( admin_url( 'admin.php?page=boldgrid-backup-settings&section=section_security' ) ) .
 					'">',

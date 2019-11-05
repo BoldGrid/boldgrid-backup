@@ -201,7 +201,8 @@ $editor_tools = sprintf(
 	/* 1 */ $db['buttons'],
 	/* 2 */ __( 'Files & Folders', 'boldgrid-backup' ),
 	/* 3 */ __( 'Database', 'boldgrid-backup' ),
-	/* 4 */ empty( $archive['encrypt_db'] ) ? '' : '<span class="dashicons dashicons-admin-network"></span>'
+	/* 4 */ empty( $archive['encrypt_db'] ) ? '' : '<span class="dashicons dashicons-admin-network" title="' .
+		__( 'Encrypted database', 'boldgrid-backup' ) . '"></span>'
 );
 
 $premium_url = $this->core->go_pro->get_premium_url( 'bgbkup-archive-browser' );
