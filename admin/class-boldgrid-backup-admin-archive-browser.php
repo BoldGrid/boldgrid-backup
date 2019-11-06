@@ -105,10 +105,11 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 		$is_premium_active = $this->core->config->is_premium_active;
 
 		if ( ! empty( $archive_info['encrypt_db'] ) && ( ! $is_premium || ! $is_premium_active ) ) {
-			$return .= '<tr><td colspan="3">' . __( 'The database dump file in this archive has been encrypted with BoldGrid Backup Premium.', 'boldgrid-backup' ) . '</td></tr>';
+			$return .= '<tr><td colspan="3">
+				<p>' . __( 'The database dump file in this archive has been encrypted with BoldGrid Backup Premium.', 'boldgrid-backup' ) . '</p>';
 
 			if ( ! $is_premium ) {
-				$return .= '<tr><td colspan="3">' .
+				$return .= '<p>' .
 				sprintf(
 					// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag.
 					__( 'A BoldGrid Backup Premium license is required for decryption.  %1$sGet Premium%2$s', 'boldgrid-backup' ),
@@ -117,11 +118,11 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 						'" target="_blank">',
 					'</a>'
 				) .
-				'</td></tr>';
+				'</p>';
 			}
 
 			if ( ! $is_premium_active ) {
-				$return .= '<tr><td colspan="3">' .
+				$return .= '<p>' .
 					sprintf(
 						// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag.
 						__( 'BoldGrid Backup Premium is not active.  Please go to the %1$sPlugins%2$s page to activate it.', 'boldgrid-backup' ),
@@ -130,8 +131,10 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 							'">',
 						'</a>'
 					) .
-					'</td></tr>';
+					'</p>';
 			}
+
+			$return .= '</td></tr>';
 		} elseif ( $is_encrypted_other ) {
 			// The database dump file was encrypted with other settings.
 			$return .= '<tr><td colspan="3">' .
