@@ -438,6 +438,23 @@ class Boldgrid_Backup_Admin_Archive {
 	 * @return bool
 	 */
 	public function set_attribute( $key, $value ) {
+		$old_value = isset( $this->log[ $key ] ) ? $this->log[ $key ] : null;
+
+		/**
+		 * Filter archive attribute value.
+		 *
+		 * Allows operations to be performed on attribute changes and alter the value depending on results.
+		 *
+		 * @since 1.12.0
+		 *
+		 * @param  string $filepath  Archive filepath.
+		 * @param  string $key       Key name.
+		 * @param  string $value     New value.
+		 * @param  string $old_value Old value.
+		 * @return string
+		 */
+		$value = apply_filters( 'boldgrid_backup_archive_set_attribute', $this->filepath, $key, $value, $old_value );
+
 		$this->log[ $key ] = $value;
 
 		return $this->core->archive_log->write( $this->log );
@@ -595,6 +612,8 @@ class Boldgrid_Backup_Admin_Archive {
 			$archive_filename = basename( $archive_filepath );
 			$archive_info     = $this->core->archive->get_by_name( $archive_filename );
 			$archive_key      = isset( $archive_info['key'] ) ? $archive_info['key'] : null;
+			$encrypt_db       = ! empty( $archive_info['encrypt_db'] );
+			$encrypt_sig      = isset( $archive_info['encrypt_sig'] ) ? $archive_info['encrypt_sig'] : null;
 			$cron_secret      = $this->core->cron->get_cron_secret();
 			$siteurl          = site_url();
 			$site_title       = get_bloginfo( 'name' );
