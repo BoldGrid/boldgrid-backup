@@ -59,11 +59,6 @@ $datas = array(
 		'title'        => __( 'Database tables excluded', 'boldgrid-backup' ),
 		'presentation' => 'comma_implode',
 	),
-	array(
-		'key'          => 'encrypt_db',
-		'title'        => __( 'Database dump encrypted', 'boldgrid-backup' ),
-		'presentation' => 'bool',
-	),
 );
 
 foreach ( $datas as $data ) {
