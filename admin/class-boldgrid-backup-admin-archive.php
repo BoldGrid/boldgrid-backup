@@ -440,6 +440,11 @@ class Boldgrid_Backup_Admin_Archive {
 	public function set_attribute( $key, $value ) {
 		$old_value = isset( $this->log[ $key ] ) ? $this->log[ $key ] : null;
 
+		// If the value is not changing, then return success.
+		if ( $value === $old_value ) {
+			return true;
+		}
+
 		/**
 		 * Filter archive attribute value.
 		 *
@@ -651,5 +656,32 @@ class Boldgrid_Backup_Admin_Archive {
 		}
 
 		return $success;
+	}
+
+	/**
+	 * Delete a file from an archive.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param \PclZip $archive  PCLZip achive object.
+	 * @param string  $filename Filename to delete.
+	 * @param array   $list     Content list from the archive object.
+	 */
+	public function delete_from_archive( &$archive, $filename, $list = null ) {
+		if ( is_a( $archive, '\PclZip' ) && empty( $list ) ) {
+			$list = $archive->listContent();
+		}
+
+		if ( is_a( $archive, '\PclZip' ) && ! empty( $filename ) && ! empty( $list ) ) {
+			foreach ( $list as $index => $filedata ) {
+				if ( $filename === $filedata['filename'] ) {
+					$remaining = $archive->deleteByIndex( $index );
+
+					if ( ! empty( $remaining[1] ) ) {
+						$this->delete_from_archive( $archive, $filename, $remaining );
+					}
+				}
+			}
+		}
 	}
 }

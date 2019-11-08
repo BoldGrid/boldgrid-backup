@@ -55,6 +55,7 @@ if ( ! $archive_found ) {
 	$more_info     = '';
 	$major_actions = '';
 	$protect       = '';
+	$encrypt_db    = '';
 } else {
 	$file_size = sprintf(
 		'<div class="misc-pub-section">%1$s: <strong>%2$s</strong></div>',

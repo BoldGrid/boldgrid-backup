@@ -161,6 +161,8 @@ class Boldgrid_Backup_Admin_Archive_Log {
 	 *
 	 * @since 1.5.1
 	 *
+	 * @see Boldgrid_Backup_Admin_Archive::delete_from_archive()
+	 *
 	 * @param  array $info Archive information.
 	 * @return bool
 	 */
@@ -187,20 +189,13 @@ class Boldgrid_Backup_Admin_Archive_Log {
 		}
 
 		// Open the archive.
-		$archive = new PclZip( $info['filepath'] );
+		$archive = new \PclZip( $info['filepath'] );
 		if ( 0 === $archive ) {
 			return false;
 		}
 
-		// Delete old log files.
-		$list = $archive->listContent();
-		if ( ! empty( $list ) ) {
-			foreach ( $list as $index => $filedata ) {
-				if ( basename( $log_filepath ) === $filedata['filename'] ) {
-					$archive->deleteByIndex( $index );
-				}
-			}
-		}
+		// Delete the old log file(s).
+		$this->core->archive->delete_from_archive( $archive, basename( $log_filepath ) );
 
 		/*
 		 * The log file is being added to the root of the archive. If the user
