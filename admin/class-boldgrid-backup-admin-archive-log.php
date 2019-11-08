@@ -185,9 +185,21 @@ class Boldgrid_Backup_Admin_Archive_Log {
 		if ( ! class_exists( 'PclZip' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/class-pclzip.php';
 		}
+
+		// Open the archive.
 		$archive = new PclZip( $info['filepath'] );
 		if ( 0 === $archive ) {
 			return false;
+		}
+
+		// Delete old log files.
+		$list = $archive->listContent();
+		if ( ! empty( $list ) ) {
+			foreach ( $list as $index => $filedata ) {
+				if ( basename( $log_filepath ) === $filedata['filename'] ) {
+					$archive->deleteByIndex( $index );
+				}
+			}
 		}
 
 		/*
