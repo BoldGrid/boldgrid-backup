@@ -86,9 +86,9 @@ if ( ! $is_premium ) {
 	<?php
 	$get_plugins_url = 'https://www.boldgrid.com/central/plugins?source=bgbkup-settings-security';
 	printf(
-		// translators: 1: Get premium plugins button/link.
+		// translators: 1: Unlock Feature button/link.
 		esc_html__( 'The BoldGrid Backup Premium plugin is required for encryption features.  %1$s', 'boldgrid-backup' ),
-		$this->core->go_pro->get_premium_button( $get_plugins_url, __( 'Get Premium Plugins', 'boldgrid-backup' ) ) // phpcs:ignore
+		$this->core->go_pro->get_premium_button( $get_plugins_url, __( 'Unlock Feature', 'boldgrid-backup' ) ) // phpcs:ignore
 	);
 	?>
 				</div>

@@ -235,6 +235,9 @@ class Boldgrid_Backup_Admin_Archives {
 
 				$locations = $this->get_locations( $archive );
 
+				$db_encrypted = $this->core->archive->get_attribute( 'encrypt_db' ) ?
+					'<span class="bgbkup-db-encrypted"></span>' : '';
+
 				$table .= sprintf(
 					'
 					<tr>
@@ -244,7 +247,7 @@ class Boldgrid_Backup_Admin_Archives {
 							<p class="description">%6$s</p>
 						</td>
 						<td>
-							%3$s
+							%3$s%8$s
 						</td>
 						<td>
 							<a
@@ -263,7 +266,8 @@ class Boldgrid_Backup_Admin_Archives {
 					/* 4 */ $archive['filename'],
 					/* 5 */ $view_details,
 					/* 6 */ $locations,
-					/* 7 */ $this->core->time->get_span()
+					/* 7 */ $this->core->time->get_span(),
+					/* 8 */ $db_encrypted
 				);
 			}
 

@@ -42,9 +42,9 @@ switch ( true ) {
 		// Has a premium license, but no premium plugin is installed.
 		$get_plugins_url = 'https://www.boldgrid.com/central/plugins?source=bgbkup-settings-transfer-destination';
 		$encrypt_message = sprintf(
-			// translators: 1: Get premium plugins button/link.
-			esc_html__( 'The BoldGrid Backup Premium plugin is required for encryption features.  %1$s', 'boldgrid-backup' ),
-			$this->core->go_pro->get_premium_button( $get_plugins_url, __( 'Get Premium Plugins', 'boldgrid-backup' ) ) // phpcs:ignore
+			// translators: 1: Unlock Feature button/link.
+			esc_html__( 'The BoldGrid Backup Premium plugin is required for encryption.  %1$s', 'boldgrid-backup' ),
+			$this->core->go_pro->get_premium_button( $get_plugins_url, __( 'Unlock Feature', 'boldgrid-backup' ) ) // phpcs:ignore
 		);
 		break;
 
