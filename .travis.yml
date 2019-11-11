@@ -1,46 +1,37 @@
-language: php
-
+language: node_js
 dist: trusty
-
 notifications:
   email:
     on_success: never
     on_failure: change
-
 php:
-  - 5.6
-
-language: node_js
+- 5.6
 node_js:
-  - "8.12.0"
-
+- 8.12.0
 env:
-  - WP_VERSION=latest WP_MULTISITE=0
-
+- WP_VERSION=latest WP_MULTISITE=0
 before_script:
-  - npm install -g gulp-cli
-  - yarn install
-  - composer install -o --no-dev
-  - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
-
+- npm install -g gulp-cli
+- yarn install
+- composer install -o --no-dev
+- bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
 script:
-  - find . -name composer -prune -o -name node_modules -prune -o -name '*.php' -exec php -lf {} \; > /dev/null
-  - phpunit --debug --coverage-clover=coverage.xml
-  - yarn run php-codesniffer
-  - yarn run js-lint
-
+- find . -name composer -prune -o -name node_modules -prune -o -name '*.php' -exec
+  php -lf {} \; > /dev/null
+- phpunit --debug --coverage-clover=coverage.xml
+- yarn run php-codesniffer
+- yarn run js-lint
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
-
+- bash <(curl -s https://codecov.io/bash)
 deploy:
   - provider: script
     script: chmod +x ./node_modules/@boldgrid/wordpress-tag-sync/release.sh && ./node_modules/@boldgrid/wordpress-tag-sync/release.sh
     skip_cleanup: true
     on:
       tags: true
-  - provider: releases
-    api_key: "${GITHUB_TOKEN}"
-    file: "boldgrid-backup.zip"
-    skip_cleanup: true
-    on:
-      tags: true
+  provider: releases
+  api_key:
+    secure: YwLpq7iINmXKEvDWYTl2S6MQCemTqBrRAeZATnRaOAiDab4M+Qkfdjul+28gPrBSKmiwsMNKShdl4OjdAHDGQh6rSGYwmJ+OjSvSQdKtyN+Tn7gEFIJooG0SD4EkJbPBJKslH2rjZqvEG4hYEzVyt7bMNIGCkRzJTdoUZL2Z4/i9rDfkrAhYQpXgqTnbWruQMkDJnccMBMtX9e1SkD3CRomRI1Xaub7EJwl1SbJ51vX1el84Vos1r055Tr4eIBI/J2t0OlfOtpG5sdt3rQEciFmLuU4ynx36WM+ceWen49L7ZM6VJOoqfg9ttBT5MsOvn7hovHFDkaC/eQNhMicFmtCg+i05fTANqCoBTLyxsayGFJlhfl1/R7HXjgj8IdAyLipa8CAlN9SyXe4bqXPMoecRUFf1KIHQfjQ64Jov3wsGOzsaMmQYDjB30FyILRcFgZNuktrXROs2yQys+611GOCVUvW5A0GImW7OZcoYBygjtVV22haPHF0MF2btKHuUr1agb9icAL/dnI5i92+dlSFrXzaE7rzpfukgjVhdIupSnHpCI9EiWh+JJVvX9PkMAwJ4srapbo+iOHoHbiwxGaQGkB+rlH+0VV8Xwh2I+XsduYw30pO0pGrUK/DHEWMzXU1px53f8hS7kYl6ZAhcBDvOhISAlt5HpXogKz21WEs=
+  file: boldgrid-backup.zip
+  on:
+    tags: true
