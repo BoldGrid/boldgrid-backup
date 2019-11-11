@@ -132,6 +132,12 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
+= 1.12.0-alpha.2 =
+
+Release date: November 8th, 2019
+
+* Update: Added encryption toggle action.
+
 = 1.12.0-alpha.1 =
 
 Release date: November 1st, 2019

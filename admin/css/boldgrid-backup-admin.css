@@ -320,3 +320,13 @@ p > .bgbkup-remote-logo {
 .bgbkup-premium-support .bgbkup-upgrade-message p:first-of-type {
 	margin-top: 0;
 }
+
+.bgbkup-db-lock {
+	background-image: url('../image/db-lock-64.png');
+	background-position-y: center;
+	background-repeat: no-repeat;
+	background-size: 20px 20px;
+	display: block;
+	margin-left: 10px;
+	padding-left: 23px;
+}

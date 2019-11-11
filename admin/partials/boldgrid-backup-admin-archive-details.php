@@ -102,7 +102,7 @@ if ( ! $archive_found ) {
 	$is_protected = (bool) $this->core->archive->get_attribute( 'protect' );
 	$protect      = '
 	<div class="misc-pub-section bglib-misc-pub-section dashicons-lock">
-		' . esc_html__( 'Protect backup', 'boldgrid-backup' ) . ': <span class="value-displayed"></span>
+		' . esc_html__( 'Ignore retention', 'boldgrid-backup' ) . ': <span class="value-displayed"></span>
 		<a class="edit" href="#" style="display: inline;">
 			<span aria-hidden="true">' . esc_html__( 'Edit', 'boldgrid-backup' ) . '</span>
 		</a>
@@ -136,7 +136,7 @@ if ( ! $archive_found ) {
 
 	$is_db_encrypted = (bool) $this->core->archive->get_attribute( 'encrypt_db' );
 	$encrypt_db      = '
-	<div class="misc-pub-section bglib-misc-pub-section dashicons-admin-network">
+	<div class="misc-pub-section bglib-misc-pub-section bgbkup-db-lock">
 		' . esc_html__( 'Encrypt database', 'boldgrid-backup' ) . ': <span class="value-displayed"></span>
 		<a class="edit" href="#" style="display: ' .
 		( $is_premium && $is_premium_active ? 'inline' : 'none' ) .
@@ -193,8 +193,8 @@ $main_meta_box = sprintf(
 	/* 5 */ $backup_date,
 	/* 6 */ $more_info,
 	/* 7 */ $major_actions,
-	/* 8 */ $protect,
-	/* 9 */ $encrypt_db
+	/* 8 */ $encrypt_db,
+	/* 9 */ $protect
 );
 
 $premium_url     = $this->core->go_pro->get_premium_url( 'bgbkup-archive-storage' );
