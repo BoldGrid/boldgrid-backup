@@ -32,8 +32,10 @@ $allowed_html = array(
 	),
 );
 
-$is_premium        = $this->core->config->get_is_premium();
-$is_premium_active = $this->core->config->is_premium_active;
+$is_premium           = $this->core->config->get_is_premium();
+$is_premium_installed = $this->core->config->is_premium_installed;
+$is_premium_active    = $this->core->config->is_premium_active;
+$is_premium_all       = $is_premium && $is_premium_active;
 
 $details        = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/details.php';
 $remote_storage = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/remote-storage.php';
@@ -134,13 +136,60 @@ if ( ! $archive_found ) {
 	</div>
 	';
 
+	// Determine premium message.
+	if ( ! $is_premium_all ) {
+		switch ( true ) {
+			case ! $is_premium:
+				$premium_url     = $this->core->go_pro->get_premium_url( 'bgbkup-archive-encrypt' );
+				$premium_message = sprintf(
+					'<div class="premium">%1$s</div>
+					<div><p>%2$s</p></div>',
+					__(
+						'Upgrade to Premium to protect your sensitive data!',
+						'boldgrid-backup'
+					),
+					$this->core->go_pro->get_premium_button( $premium_url )
+				);
+				break;
+			case ! $is_premium_installed:
+				$premium_url     = $this->core->go_pro->get_premium_url(
+					'bgbkup-archive-encrypt',
+					'https://www.boldgrid.com/central/plugins'
+				);
+				$premium_message = sprintf(
+					'<div class="premium">%1$s</div>
+					<div><p>%2$s</p></div>',
+					__(
+						'Secure your sesitive data with the Premium plugin!',
+						'boldgrid-backup'
+					),
+					$this->core->go_pro->get_premium_button( $premium_url, __( 'Unlock Feature', 'boldgrid-backup' ) )
+				);
+				break;
+			case ! $is_premium_active:
+				$premium_url     = $this->core->go_pro->get_premium_url( 'bgbkup-archive-encrypt' );
+				$premium_message = '<div class="premium">' . sprintf(
+					// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag.
+					__( 'BoldGrid Backup Premium is not active.  Please go to the %1$sPlugins%2$s page to activate it.', 'boldgrid-backup' ),
+					'<a href="' .
+						esc_url( admin_url( 'plugins.php?s=Boldgrid%20Backup%20Premium&plugin_status=inactive' ) ) .
+						'">',
+					'</a>'
+				) . '</div>';
+				break;
+			default:
+				$premium_message = '';
+				break;
+		}
+	} else {
+		$premium_message = '';
+	}
+
 	$is_db_encrypted = (bool) $this->core->archive->get_attribute( 'encrypt_db' );
 	$encrypt_db      = '
 	<div class="misc-pub-section bglib-misc-pub-section bgbkup-db-lock">
 		' . esc_html__( 'Encrypt database', 'boldgrid-backup' ) . ': <span class="value-displayed"></span>
-		<a class="edit" href="#" style="display: ' .
-		( $is_premium && $is_premium_active ? 'inline' : 'none' ) .
-		';">
+		<a class="edit" href="#" style="display: inline;">
 			<span aria-hidden="true">' . esc_html__( 'Edit', 'boldgrid-backup' ) . '</span>
 		</a>
 		<div class="options" style="display: none;">
@@ -160,9 +209,12 @@ if ( ! $archive_found ) {
 				</em>
 			</p>
 			<select name="encrypt_db" id="encrypt-db">
-				<option value="0" ' . selected( $is_db_encrypted, false, false ) . '>' . esc_html__( 'No', 'boldgrid-backup' ) . '</option>
-				<option value="1" ' . selected( $is_db_encrypted, true, false ) . '>' . esc_html__( 'Yes', 'boldgrid-backup' ) . '</option>
+				<option value="0" ' . selected( $is_db_encrypted, false, false ) . ' ' .
+		disabled( $is_premium_all, false, false ) . '>' . esc_html__( 'No', 'boldgrid-backup' ) . '</option>
+				<option value="1" ' . selected( $is_db_encrypted, true, false ) . ' ' .
+		disabled( $is_premium_all, false, false ) . '>' . esc_html__( 'Yes', 'boldgrid-backup' ) . '</option>
 			</select>
+			<p>' . $premium_message . '</p>
 			<p>
 				<a href="" class="button">' . esc_html__( 'OK', 'boldgrid-backup' ) . '</a>
 				<a href="" class="button-cancel">' . esc_html__( 'Cancel', 'boldgrid-backup' ) . '</a>

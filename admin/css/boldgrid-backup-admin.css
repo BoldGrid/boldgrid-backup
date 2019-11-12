@@ -323,7 +323,7 @@ p > .bgbkup-remote-logo {
 
 .bgbkup-db-lock {
 	background-image: url('../image/db-lock-64.png');
-	background-position-y: center;
+	background-position-y: 7px;
 	background-repeat: no-repeat;
 	background-size: 20px 20px;
 	display: block;
