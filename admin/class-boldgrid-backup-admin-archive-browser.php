@@ -167,6 +167,14 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 
 		$return .= '</tbody></table>';
 
+		if ( ! $this->core->config->is_premium_done ) {
+			$get_plugins_url = 'https://www.boldgrid.com/central/plugins?source=bgbkup-settings-security';
+			$return         .= '<tr><td colspan="2"><div class="bg-box-bottom premium">' .
+			esc_html__( 'Secure your sesitive data with the BoldGrid Backup Premium plugin.', 'boldgrid-backup' ) .
+			$this->core->go_pro->get_premium_button( $get_plugins_url, __( 'Unlock Feature', 'boldgrid-backup' ) ) .
+			'<div style="clear: both;"></div></div></td></tr>';
+		}
+
 		return $return;
 	}
 
