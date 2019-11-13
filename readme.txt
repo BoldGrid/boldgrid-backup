@@ -132,16 +132,11 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
-= 1.12.0-alpha.2 =
+= 1.12.0 =
 
-Release date: November 8th, 2019
+Release date: November ??, 2019
 
 * Update: Added encryption toggle action.
-
-= 1.12.0-alpha.1 =
-
-Release date: November 1st, 2019
-
 * New feature: Added support for database dump file encryption.
 
 = 1.11.8 =

@@ -11,7 +11,7 @@ notifications:
       secure: "${SLACK_TOKEN_SECURE}"
 
 php:
-  - 7.1
+  - 7.3
   - 5.6
 
 before_script:
