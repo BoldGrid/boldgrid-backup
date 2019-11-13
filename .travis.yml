@@ -6,7 +6,8 @@ notifications:
   email:
     on_success: never
     on_failure: change
-  slack: "${SLACK_AUTH}"
+  slack:
+    secure: "GYRxUZH53f/OdEhgn4w908Ivuyl4h/p05kR1Buv0ovDEiSbuesWvqa3LMlXy8J67dLZpkFxToM4tlNCFdykNNHnKLHb1EqgjShIpRcgKppOA0L/87UrtjS+5OhAJAghnQr8KOuj+Ivn7zFVHS8+WBvLWKEeP7zrW/K1IqNrvUjzVcg9xSzLL/q6l/yLaAxqtCX4jXudg5HmtK7QTTQEjFSnnNW4J4hWbrKGHH43C5+9msUT7Mqo3mNjJf1tKGm+HJ5NN2wk3x/SzVEFdUJIUoFVAoG1CjOZKPqfKi7I9VStaC6sGhhiq53Sn7rbmbPJqH3ZD+Q3GaE/sqc5RxuC/34Bn1rGPs3H7RGi5DAAz7f5fHpaZWsux4b+QvLwVx7FHky44uGzPPgzN7+jJxwXh1RBd6yZq6551mHDvOdF77RPJlTJ1UukqQFjqMLNUISX9Pv6cQPealEXjFM7fOMofGyIAkJQusDczIekIZqB5W44i4XwBjKMky+47CZK9Ac41HSpJdpLs+jVa1G7N8Kb/mNSzGx4ABGbXLt+V0YphAL2+WPJ1DEYRZZVCcEzwJl/M5CFOBiUAcd9B3ZpFXoYBxyfjReJFUY7xMVozRXB7hu6RatmLhh+mYbL48572eq01wMxtfr/Klr82PwzoSX5qujWZv2ksxJTiRbPJcBk22YQ="
 
 php:
   - 7.1
