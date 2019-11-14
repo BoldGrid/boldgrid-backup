@@ -1,7 +1,7 @@
 /**
- * BoldGrid Backup Folder Exclude.
+ * Folder Exclude
  *
- * @summary JavaScript for handling Folder Exclude settings..
+ * @summary JavaScript for handling Folder Exclude settings.
  *
  * @since 1.6.0
  *

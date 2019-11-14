@@ -8,7 +8,6 @@
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/includes
  * @copyright  BoldGrid
- * @version    $Id$
  * @author     BoldGrid <support@boldgrid.com>
  *
  * @link https://github.com/BoldGrid/library/wiki/Library-RatingPrompt
@@ -21,23 +20,31 @@ if ( ! defined( 'WPINC' ) ) {
 	exit();
 }
 
-$allowed_tags = array(
-	'a' => array(
-		'href'   => array(),
-		'target' => array(),
+$allowed_tags = [
+	'a' => [
+		'href'   => [],
+		'target' => [],
+	],
+];
+
+$lang = [
+	'feel_good_value' => sprintf(
+		// translators: 1: Plugin title.
+		__(
+			'If you feel you\'re getting really good value from the %1$s plugin, could you do us a favor and rate us 5 stars on WordPress?',
+			'boldgrid-backup'
+		),
+		BOLDGRID_BACKUP_TITLE
 	),
-);
+];
 
-$lang = array(
-	'feel_good_value' => __( 'If you feel you\'re getting really good value from the BoldGrid Backup plugin, could you do us a favor and rate us 5 stars on WordPress?', 'boldgrid-backup' ),
-);
-
-$default_prompt = array(
+$default_prompt = [
 	'plugin' => BOLDGRID_BACKUP_KEY,
 	'name'   => 'REPLACE_THIS_NAME',
-	'slides' => array(
-		'start'       => array(
+	'slides' => [
+		'start'       => [
 			'text'      => $lang['feel_good_value'],
+
 			/*
 			 * Decisions
 			 *
@@ -49,57 +56,68 @@ $default_prompt = array(
 			 *                      is selected. If no snooze is set, the decision will dismiss the
 			 *                      prompt.
 			 */
-			'decisions' => array(
-				'sure_will'           => array(
+			'decisions' => [
+				'sure_will'           => [
 					'text'  => __( 'Yes, I sure will!', 'boldgrid-backup' ),
 					'link'  => 'https://wordpress.org/support/plugin/boldgrid-backup/reviews/',
 					'slide' => 'thanks',
-				),
-				'maybe_still_testing' => array(
+				],
+				'maybe_still_testing' => [
 					'text'   => __( 'Maybe later, I\'m still testing the plugin.', 'boldgrid-backup' ),
 					'snooze' => WEEK_IN_SECONDS,
 					'slide'  => 'maybe_later',
-				),
-				'already_did'         => array(
+				],
+				'already_did'         => [
 					'text'  => __( 'I already did', 'boldgrid-backup' ),
 					'slide' => 'already_did',
-				),
-			),
-		),
-		'thanks'      => array(
+				],
+			],
+		],
+		'thanks'      => [
 			'text' => sprintf(
 				wp_kses(
-					/* translators: The URL to the boldgrid-backup plugin in the plugin repo. */
-					__( 'Thanks! A new page should have opened to the BoldGrid Backup ratings page on WordPress.org. You will need to log in to your WordPress.org account before you can post a review. If the page didn\'t open, please click the following link: <a href="%1$s" target="_blank">%1$s</a>', 'boldgrid-backup' ),
+					// translators: 1: Plugin title, 2: The URL to the boldgrid-backup plugin in the plugin repo.
+					__(
+						'Thanks! A new page should have opened to the %1$s ratings page on WordPress.org. You will need to log in to your WordPress.org account before you can post a review. If the page didn\'t open, please click the following link: <a href="%2$s" target="_blank">%2$s</a>',
+						'boldgrid-backup'
+					),
 					$allowed_tags
 				),
+				BOLDGRID_BACKUP_TITLE,
 				'https://wordpress.org/support/plugin/boldgrid-backup/reviews/'
 			),
-		),
-		'maybe_later' => array(
+		],
+		'maybe_later' => [
 			'text' => sprintf(
 				wp_kses(
-					/* translators: The URL to submit boldgrid-backup bug reports and feature requests. */
-					__( 'No problem, maybe now is not a good time. We want to be your WordPress backup plugin of choice. If you\'re experiencing a problem or want to make a suggestion, please %1$sclick here%2$s.', 'boldgrid-backup' ),
+					// translators: 1: The URL to submit boldgrid-backup bug reports and feature requests.
+					__(
+						'No problem, maybe now is not a good time. We want to be your WordPress backup plugin of choice. If you\'re experiencing a problem or want to make a suggestion, please %1$sclick here%2$s.',
+						'boldgrid-backup'
+					),
 					$allowed_tags
 				),
 				'<a href="https://www.boldgrid.com/feedback" target="_blank">',
 				'</a>'
 			),
-		),
-		'already_did' => array(
+		],
+		'already_did' => [
 			'text' => sprintf(
 				wp_kses(
-					/* translators: The URL to submit boldgrid-backup bug reports and feature requests. */
-					__( 'Thank you for the previous rating! You can help us to continue improving the BoldGrid Backup plugin by reporting any bugs or submitting feature requests %1$shere%2$s. Thank you for using the BoldGrid Backup plugin!', 'boldgrid-backup' ),
+					// translators: 1: HTML opening anchor tag linking to submit boldgrid-backup bug reports and feature requests, 2: HTML closing anchor tag, 3: Plugin title.
+					__(
+						'Thank you for the previous rating! You can help us to continue improving the %3$s plugin by reporting any bugs or submitting feature requests %1$shere%2$s. Thank you for using the %3$s plugin!',
+						'boldgrid-backup'
+					),
 					$allowed_tags
 				),
 				'<a href="https://www.boldgrid.com/feedback" target="_blank">',
-				'</a>'
+				'</a>',
+				BOLDGRID_BACKUP_TITLE
 			),
-		),
-	),
-);
+		],
+	],
+];
 
 // Set a title or description for your backup.
 $title_description_prompt                            = $default_prompt;
@@ -114,20 +132,22 @@ $download_prompt['slides']['start']['text'] = __( 'We\'re glad to see you\'re ke
 // Create any type of backup.
 $any_backup_prompt                            = $default_prompt;
 $any_backup_prompt['name']                    = 'any_backup_created';
-$any_backup_prompt['slides']['start']['text'] = __( 'It looks like you\'ve created 10 backups with the BoldGrid Backup Plugin!', 'boldgrid-backup' ) . ' ' . $lang['feel_good_value'];
+$any_backup_prompt['slides']['start']['text'] = sprintf(
+	// translators: 1: Plugin title.
+	__( 'It looks like you\'ve created 10 backups with the %1$s plugin!', 'boldgrid-backup' )
+) . ' ' . $lang['feel_good_value'];
 
-return array(
-	'update_title_description'  => array(
+return [
+	'update_title_description'  => [
 		'threshold' => 10,
 		'prompt'    => $title_description_prompt,
-	),
-	'download_to_local_machine' => array(
+	],
+	'download_to_local_machine' => [
 		'threshold' => 2,
 		'prompt'    => $download_prompt,
-	),
-
-	'any_backup_created'        => array(
+	],
+	'any_backup_created'        => [
 		'threshold' => 10,
 		'prompt'    => $any_backup_prompt,
-	),
-);
+	],
+];

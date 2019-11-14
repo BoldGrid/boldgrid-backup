@@ -1,5 +1,5 @@
 /**
- * BoldGrid Backup settings.
+ * Settings page
  *
  * @summary JavaScript for the settings page.
  *

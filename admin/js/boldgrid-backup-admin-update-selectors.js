@@ -1,5 +1,5 @@
 /**
- * BoldGrid Backup Admin Update Selectors.
+ * Update Selectors
  *
  * JavaScript for handling WordPress' native "update" buttons and links. Primary
  * function is to disable "update" buttons when we're in the middle of making a
@@ -49,10 +49,10 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			// Customizer > Installed themes > click a theme > "update now" link.
 			'#update-theme',
 
-			// BoldGrid Backup - Update Protection > "Backup Site Now" button.
+			// Update Protection > "Backup Site Now" button.
 			'.notice #backup-site-now',
 
-			// Dashboard > BoldGrid Backup > Backup Archive > "Backup Site Now" button.
+			// Backup Archive > "Backup Site Now" button.
 			'.page-title-actions .page-title-action'
 		],
 

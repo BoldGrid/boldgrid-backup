@@ -14,14 +14,14 @@
 /**
  * Class: Boldgrid_Backup_Admin_Plugins
  *
- * This is a generic class designed to help manage how BoldGrid Backup behaves within the scope of
+ * This is a generic class designed to help manage how this plugin behaves within the scope of
  * "WordPress Dashboard > Plugins > *".
  *
  * @since 1.10.1
  */
 class Boldgrid_Backup_Admin_Plugins {
 	/**
-	 * Filter the links under "BoldGrid Backup" within WP Dashboard > Plugins > Installed Plugins.
+	 * Filter this plugin's links within Plugins > Installed Plugins.
 	 *
 	 * @since 1.10.1
 	 *
@@ -37,13 +37,13 @@ class Boldgrid_Backup_Admin_Plugins {
 		$core = apply_filters( 'boldgrid_backup_get_core', null );
 
 		$row_actions = [
-			// @todo "Start here" is a good idea, but where does it link?
-			// 'start_here' => '<a href="">Start Here</a>',
-			'settings' => '<a href="' . esc_url( $core->settings->get_settings_url() ) . '">' . esc_html__( 'Settings', 'boldgrid-backup' ) . '</a>',
+			'settings' => '<a href="' . esc_url( $core->settings->get_settings_url() ) . '">' .
+				__( 'Settings', 'boldgrid-backup' ) . '</a>',
 		];
 
 		if ( ! $core->config->get_is_premium() ) {
-			$row_actions[] = '<a href="' . esc_url( $core->go_pro->get_premium_url( 'bgbkup-plugin-actions' ) ) . '" target="_blank">' . esc_html__( 'Get Premium', 'boldgrid-backup' ) . '</a>';
+			$row_actions[] = '<a href="' . esc_url( $core->go_pro->get_premium_url( 'bgbkup-plugin-actions' ) ) .
+				'" target="_blank">' . __( 'Get Premium', 'boldgrid-backup' ) . '</a>';
 		}
 
 		$actions = array_merge( $row_actions, $actions );

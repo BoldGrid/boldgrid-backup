@@ -97,7 +97,7 @@ class Boldgrid_Backup_Admin_Archives_All {
 	public function __construct( $core ) {
 		$this->core = $core;
 
-		$this->local_title = __( 'Web Server', 'BoldGrid Backup' );
+		$this->local_title = __( 'Web Server', 'boldgrid-backup' );
 	}
 
 	/**

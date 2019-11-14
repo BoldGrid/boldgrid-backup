@@ -2,7 +2,7 @@
 /**
  * File: boldgrid-backup-admin-nav.php
  *
- * This file contains the navbar for all BoldGrid Backup pages.
+ * This file contains the navbar for all plugin pages.
  *
  * @link https://www.boldgrid.com
  * @since 1.5.1

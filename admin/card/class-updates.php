@@ -16,8 +16,7 @@ namespace Boldgrid\Backup\Admin\Card;
 /**
  * Class: Updates
  *
- * This class is responsible for rendering the "Update Management" card on the BoldGrid Backup
- * dashboard.
+ * This class is responsible for rendering the "Update Management" card on this plugin's dashboard.
  *
  * @since 1.11.0
  */

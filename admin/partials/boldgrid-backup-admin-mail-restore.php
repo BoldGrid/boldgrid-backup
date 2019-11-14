@@ -75,11 +75,19 @@ if ( defined( 'DOING_CRON' ) ) {
 	) . ".\n\n";
 }
 
-$body .= esc_html__(
-	'You can manage notifications in your WordPress admin panel, under BoldGrid Backup Settings',
-	'boldgrid-backup'
+$body .= sprintf(
+	// translators: 1: Plugin title.
+	esc_html__(
+		'You can manage notifications in your WordPress admin panel, under %1$s Settings',
+		'boldgrid-backup'
+	),
+	BOLDGRID_BACKUP_TITLE
 ) . ".\n\n";
 
 $body .= esc_html__( 'Best regards', 'boldgrid-backup' ) . ",\n\n";
 
-$body .= esc_html__( 'The BoldGrid Backup plugin', 'boldgrid-backup' ) . "\n\n";
+$body .= sprintf(
+	// translators: 1: Plugin title.
+	esc_html__( 'The %1$s plugin', 'boldgrid-backup' ),
+	BOLDGRID_BACKUP_TITLE
+) . "\n\n";

@@ -113,7 +113,14 @@ class Boldgrid_Backup_Activator {
 		 */
 		if ( $this->on_post_activate() && ! $on_archives_page ) {
 			$notice = '<div class="notice notice-success">
-				<h2>' . esc_html__( 'Thank you for installing BoldGrid Backup!', 'boldgrid-backup' ) . '</h2>
+				<h2>' .
+			esc_html(
+				sprintf(
+					// translators: 1: Plugin title.
+					__( 'Thank you for installing %1$s!', 'boldgrid-backup' ),
+					BOLDGRID_BACKUP_TITLE
+				)
+			) . '</h2>
 				<p>';
 
 			$notice .= wp_kses(
@@ -169,7 +176,7 @@ class Boldgrid_Backup_Activator {
 	 * @since 1.10.1
 	 */
 	public function shutdown() {
-		// Delete the option that signifies we just activated BoldGrid Backup.
+		// Delete the option that signifies we just activated.
 		if ( ! self::$just_activated ) {
 			delete_option( self::$option );
 		}

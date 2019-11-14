@@ -56,7 +56,7 @@ $in_modal = false;
 ?>
 <div class='wrap'>
 
-	<h1 class="wp-heading-inline"><?php esc_html_e( 'Backup Archives', 'boldgrid-backup' ); ?></h1>
+	<h1 class="wp-heading-inline"><?php echo esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'Backup Archives', 'boldgrid-backup' ) ); ?></h1>
 
 	<div class="page-title-actions">
 
@@ -75,8 +75,10 @@ $in_modal = false;
 
 	echo $modal; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
-	// @todo Revisit the usefulness of this notice in this location. Commented out @since 1.10.1
-	// require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/note-pre-backup.php';
+	/*
+	 * @todo Revisit the usefulness of this notice in this location. Commented out @since 1.10.1
+	 * require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/note-pre-backup.php';
+	 */
 
 	// Bombard the user with an ad before they've even made their first backup. I mean, don't.
 	if ( ! empty( $this->archives_all->all ) ) {

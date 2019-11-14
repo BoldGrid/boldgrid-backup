@@ -153,7 +153,7 @@ class Boldgrid_Backup_Admin_Storage_Local {
 	 * @see Boldgrid_Backup_Admin_Backup_Dir::create()
 	 * @see Boldgrid_Backup_Admin_Backup_Dir::is_valid()
 	 *
-	 * @uses $_POST[] BoldGrid Backup settings.
+	 * @uses $_POST[] Settings.
 	 *
 	 * @return bool
 	 */

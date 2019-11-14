@@ -2,7 +2,7 @@
 /**
  * File: run-jobs.php
  *
- * BoldGrid Backup Run Jobs.
+ * Run jobs.
  *
  * @link       https://www.boldgrid.com
  * @since      1.5.2

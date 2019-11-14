@@ -25,7 +25,7 @@ if ( ! defined( 'WP_CLI' ) ) {
 WP_CLI::add_command( 'bgbkup', 'Boldgrid_Backup_Admin_Wpcli' );
 
 /**
- * Perform actions for BoldGrid Backup.
+ * Support WP-CLI actions.
  *
  * ## EXAMPLES
  *

@@ -39,12 +39,12 @@ class Boldgrid_Backup_Admin_Dashboard_Widget {
 	}
 
 	/**
-	 * Filter the BoldGrid Backup item in the dashboard widget.
+	 * Filter the item in the dashboard widget.
 	 *
 	 * @since 1.10.0
 	 *
-	 * @param  \Boldgrid\Library\Library\Ui\Feature    The feature object.
-	 * @param  \Boldgrid\Library\Library\Plugin\Plugin The plugin object.
+	 * @param  \Boldgrid\Library\Library\Ui\Feature    $feature The feature object.
+	 * @param  \Boldgrid\Library\Library\Plugin\Plugin $plugin  The plugin object.
 	 * @return \Boldgrid\Library\Library\Ui\Feature
 	 */
 	public function filter_feature( Boldgrid\Library\Library\Ui\Feature $feature, \Boldgrid\Library\Library\Plugin\Plugin $plugin ) {

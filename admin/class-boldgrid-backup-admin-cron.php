@@ -108,7 +108,7 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @see BoldGrid_Backup_Admin_Core::get_backup_identifier()
 	 * @see BoldGrid_Backup_Admin_Cron::get_cron_secret()
 	 *
-	 * @param  array $settings BoldGrid Backup settings.
+	 * @param  array $settings Settings.
 	 * @return bool  Success.
 	 */
 	public function add_cron_entry( array $settings = [] ) {
@@ -190,7 +190,7 @@ class Boldgrid_Backup_Admin_Cron {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param  array $settings BoldGrid Backup settings.
+	 * @param  array $settings Settings.
 	 * @return bool
 	 */
 	public function add_all_crons( array $settings ) {
@@ -304,9 +304,8 @@ class Boldgrid_Backup_Admin_Cron {
 	 * This hook will run every 5 minutes and run one job at a time, such as
 	 * upload to a remote storage provider.
 	 *
-	 * This method is usually ran after saving the BoldGrid Backup settings. If
-	 * after save cron is our scheduler, then we need to make sure we have
-	 * the "run_jobs" wp-cron scheduled.
+	 * This method is usually ran after saving the settings. If after save cron is our scheduler,
+	 * then we need to make sure we have the "run_jobs" wp-cron scheduled.
 	 *
 	 * @since 1.5.2
 	 *
@@ -332,9 +331,8 @@ class Boldgrid_Backup_Admin_Cron {
 	/**
 	 * Schedule Site Check.
 	 *
-	 * This method is usually ran after saving the BoldGrid Backup settings. If
-	 * (after save) cron is our scheduler, then we need to make sure we have
-	 * the "site_check" wp-cron scheduled.
+	 * This method is usually ran after saving the settings. If (after save) cron is our scheduler,
+	 * then we need to make sure we have the "site_check" wp-cron scheduled.
 	 *
 	 * @since 1.10.0
 	 *

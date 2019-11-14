@@ -1,5 +1,5 @@
 /**
- * BoldGrid Backup Admin Backup Now.
+ * Backup Now
  *
  * JavaScript for handling "backup" buttons. This code was initially contained
  * within the home.js, but separated out as of 1.6.0 for reusability.

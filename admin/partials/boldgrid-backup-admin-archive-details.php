@@ -178,7 +178,11 @@ $remote_meta_box = sprintf(
 			%2$s
 		</div>',
 		/* 1 */ $this->core->go_pro->get_premium_button( $premium_url ),
-		/* 2 */ __( 'Upgrade to <strong>BoldGrid Backup Premium</strong> for more Storage Locations!', 'boldgrid-backup' )
+		/* 2 */ sprintf(
+			// translators: 1: Plugin title.
+			__( 'Upgrade to <strong>%1$s</strong> for more Storage Locations!', 'boldgrid-backup' ),
+			BOLDGRID_BACKUP_TITLE . ' Premium'
+		)
 	),
 	/* 4 */ __( 'Secure your backups by keeping copies of them on <a href="admin.php?page=boldgrid-backup-tools&section=section_locations">remote storage</a>.', 'boldgrid-backup' )
 );
@@ -212,7 +216,14 @@ $intro       = $this->core->config->is_premium_done ? '' : sprintf(
 	</div>',
 	/* 1 */ __( 'Restore Individual Files With One Click', 'boldgrid-backup' ),
 	/* 2 */ $this->core->go_pro->get_premium_button( $premium_url, esc_html__( 'Unlock Feature', 'boldgrid-backup' ) ),
-	/* 3 */ __( 'Changed a file and now your site isn’t working properly? With BoldGrid Backup Premium, you can browse through past backup archives and restore individual files with a single click.', 'boldgrid-backup' )
+	/* 3 */ sprintf(
+		// translators: 1: Plugin title.
+		__(
+			'Changed a file and now your site isn’t working properly? With %1$s, you can browse through past backup archives and restore individual files with a single click.',
+			'boldgrid-backup'
+		),
+		BOLDGRID_BACKUP_TITLE . ' Premium'
+	)
 );
 
 $main_content = '

@@ -1,7 +1,7 @@
 /**
- * This file handles the "In progress" bar for when a backup is in progress.
+ * Backup In Progress Bar
  *
- * @summary Backup In Progress Bar.
+ * @summary This file handles the "In progress" bar for when a backup is in progress.
  *
  * @since 1.7.0
  */
@@ -54,10 +54,9 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		/**
 		 * In progress notice.
 		 *
-		 * BoldGrid Backup - Backup in progress
-		 * BoldGrid Backup began archiving your website 1 min ago.
-		 *
 		 * @since 1.7.0
+		 *
+		 * @type string
 		 */
 		$inProgressNotice: null,
 
@@ -73,9 +72,9 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		/**
 		 * The Update Protection notice.
 		 *
-		 * This is the notice that says, "BoldGrid Backup - Update Protection".
-		 *
 		 * @since 1.11.2
+		 *
+		 * @type string
 		 */
 		$protectionNotice: null,
 
@@ -127,7 +126,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 				} else {
 
 					// Something's gone wrong.
-					console.log( 'BoldGrid Backup: Error, progress bar needs heartbeat enqueued.' );
+					console.log( 'Error: Progress bar needs heartbeat enqueued.' );
 				}
 			} );
 		},
@@ -190,7 +189,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			if ( undefined !== BOLDGRID.BACKUP.UpdateSelectors ) {
 				BOLDGRID.BACKUP.UpdateSelectors.enable();
 			} else {
-				console.log( 'BoldGrid Backup: Error, BOLDGRID.BACKUP.UpdateSelectors class not available.' );
+				console.log( 'Error: BOLDGRID.BACKUP.UpdateSelectors class not available.' );
 			}
 
 			$( 'body' ).trigger( 'make_notices_dismissible' );

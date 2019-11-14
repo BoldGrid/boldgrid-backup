@@ -24,7 +24,7 @@ $dashboard->cards = $this->get_cards();
 ?>
 
 <div class='wrap'>
-	<h1><?php esc_html_e( 'BoldGrid Backup Dashboard', 'boldgrid-backup' ); ?></h1>
+	<h1><?php echo esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'Dashboard', 'boldgrid-backup' ) ); ?></h1>
 
 	<?php
 	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped

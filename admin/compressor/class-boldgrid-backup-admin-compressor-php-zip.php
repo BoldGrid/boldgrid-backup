@@ -280,9 +280,10 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 
 		$backup_dir = $this->core->backup_dir->get();
 
-		$test_file_contents = __(
-			'This is a test file from BoldGrid Backup. You can delete this file.',
-			'boldgrid-backup'
+		$test_file_contents = sprintf(
+			// translators: 1: Plugin title.
+			__( 'This is a test file from %1$s. You can delete this file.', 'boldgrid-backup' ),
+			BOLDGRID_BACKUP_TITLE
 		);
 
 		// translators: 1: A filename.

@@ -48,7 +48,7 @@ class Boldgrid_Backup_Admin_Remote_Settings {
 	private $last_login_key = 'last_login';
 
 	/**
-	 * The WordPress option that stores boldgrid backup settings.
+	 * The WordPress option that stores settings.
 	 *
 	 * @since 1.7.2
 	 * @access private
@@ -198,8 +198,8 @@ class Boldgrid_Backup_Admin_Remote_Settings {
 	 *
 	 * @since 1.7.2
 	 *
-	 * @param string $key
-	 * @param mixed  $value
+	 * @param string $key   Key/index.
+	 * @param mixed  $value Value.
 	 */
 	public function save_setting( $key, $value ) {
 		$settings = $this->get_settings();

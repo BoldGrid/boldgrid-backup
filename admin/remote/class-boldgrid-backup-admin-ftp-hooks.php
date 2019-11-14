@@ -268,14 +268,15 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 			$this->core->notice->add_user_notice(
 				wp_kses(
 					sprintf(
-						// translators: 1: Filename.
+						// translators: 1: Plugin title,2: Filename.
 						__(
-							'<h2>BoldGrid Backup Premium - FTP Download</h2><p>Backup file <strong>%1$s</strong> successfully downloaded from FTP.</p>',
+							'<h2>%1$s - FTP Download</h2><p>Backup file <strong>%2$s</strong> successfully downloaded from FTP.</p>',
 							'boldgrid-backup'
 						),
 						$filename
 					), $allowed_html
 				),
+				BOLDGRID_BACKUP_TITLE . ' Premium',
 				'notice notice-success'
 			);
 			wp_send_json_success();

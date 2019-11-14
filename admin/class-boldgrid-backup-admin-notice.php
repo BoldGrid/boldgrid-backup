@@ -235,13 +235,14 @@ class Boldgrid_Backup_Admin_Notice {
 	 */
 	public function display_autoupdate_notice() {
 		$message = sprintf(
-			// translators: 1: HTML anchor opening tag, 2: HTML anchor closing tag.
-			esc_html__(
-				'Auto-Updates can be configured in the %1$sBoldGrid Backup Settings%2$s.',
+			// translators: 1: HTML anchor opening tag, 2: HTML anchor closing tag, 3: Plugin title.
+			__(
+				'Auto Updates can be configured in the %1$s%3$s Settings%2$s.',
 				'boldgrid-backup'
 			),
 			'<a href="' . admin_url( 'admin.php?page=boldgrid-backup-settings&section=section_auto_updates' ) . '">',
-			'</a>'
+			'</a>',
+			BOLDGRID_BACKUP_TITLE
 		);
 
 		do_action( 'boldgrid_backup_notice', $message, 'notice notice-info is-dismissible' );

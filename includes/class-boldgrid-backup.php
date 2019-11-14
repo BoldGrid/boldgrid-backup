@@ -10,11 +10,10 @@
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/includes
  * @copyright  BoldGrid
- * @version    $Id$
  * @author     BoldGrid <support@boldgrid.com>
+ *
+ * phpcs:disable WordPress.VIP
  */
-
-// phpcs:disable WordPress.VIP
 
 /**
  * Class: Boldgrid_Backup
@@ -503,7 +502,7 @@ class Boldgrid_Backup {
 		$plugins = new Boldgrid_Backup_Admin_Plugins();
 		$this->loader->add_filter( 'plugin_action_links_boldgrid-backup/boldgrid-backup.php', $plugins, 'plugin_action_links', 10, 4 );
 
-		// BoldGrid Backup Dashboard.
+		// This plugin's Dashboard.
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core->dashboard, 'admin_enqueue_scripts' );
 	}
 

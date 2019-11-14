@@ -1,8 +1,7 @@
 /**
- * BoldGrid Backup Admin Customizer.
+ * Admin Customizer
  *
- * Javascript for the Custoimzer. Used for backup protection before updating
- * themes.
+ * Javascript for the Custoimzer. Used for backup protection before updating themes.
  *
  * @since 1.6.0
  */
