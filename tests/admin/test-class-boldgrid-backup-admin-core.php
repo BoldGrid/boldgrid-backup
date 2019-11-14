@@ -10,6 +10,8 @@
  * @copyright  BoldGrid
  * @version    $Id$
  * @author     BoldGrid <support@boldgrid.com>
+ *
+ * phpcs:disable WordPress.VIP
  */
 
 /**
@@ -33,7 +35,7 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 	 * @param string $filepath Path to the zip file.
 	 * @param string $dir      The dir within the zip to check.
 	 * @param int    $min_file_count The minimum number of files that need to be in the directory.
-	 * @param int    $file_file_size The minimum file size of all files in the directory.
+	 * @param int    $min_file_size The minimum file size of all files in the directory.
 	 * @param int    $min_dir_count  The minimum number of folders that need to be in the directory.
 	 */
 	public function assertDirNotEmpty( $filepath, $dir = '.', $min_file_count, $min_file_size, $min_dir_count ) {
@@ -51,8 +53,8 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 			}
 		}
 
-		// Debug. This is how you can see the actual counts / sizes in question.
 		/*
+		 * Debug. This is how you can see the actual counts / sizes in question.
 		phpunit_error_log( array(
 			'$dir'        => $dir,
 			'$file_count' => $file_count,
@@ -132,6 +134,8 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 	 * back.
 	 *
 	 * @since xxx.
+	 *
+	 * @param string $action Action.
 	 */
 	public function deleteBasic( $action = 'delete' ) {
 		$files_to_delete = [
