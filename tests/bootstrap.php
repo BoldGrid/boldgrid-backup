@@ -22,6 +22,10 @@ if ( ! defined( 'BOLDGRID_BACKUP_PATH' ) ) {
 	define( 'BOLDGRID_BACKUP_PATH', dirname( dirname( __FILE__ ) ) );
 }
 
+if ( ! defined( 'BOLDGRID_BACKUP_TITLE' ) ) {
+	define( 'BOLDGRID_BACKUP_TITLE', 'Total Upkeep' );
+}
+
 // Require necessary files.
 $files = array(
 	'/admin/class-boldgrid-backup-admin.php',
