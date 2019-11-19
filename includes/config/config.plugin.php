@@ -10,7 +10,6 @@
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/includes
  * @copyright  BoldGrid
- * @version    $Id$
  * @author     BoldGrid <support@boldgrid.com>
  */
 
@@ -21,8 +20,8 @@ if ( ! defined( 'WPINC' ) ) {
 	exit();
 }
 
-return array(
-	'urls'                 => array(
+return [
+	'urls'                 => [
 		'compatibility'       => 'https://www.boldgrid.com/support/advanced-tutorials/backup-compatibility-guide',
 		'possible_issues'     => 'https://www.boldgrid.com/support/advanced-tutorials/backup-userguide#possible-issues',
 		'reduce_size_warning' => 'https://www.boldgrid.com/support/advanced-tutorials/backup-userguide#reduce-size-warning',
@@ -31,13 +30,15 @@ return array(
 		'user_guide'          => 'https://www.boldgrid.com/support/advanced-tutorials/backup-userguide',
 		'restore'             => 'https://www.boldgrid.com/support/advanced-tutorials/restoring-boldgrid-backup/',
 		'setting_directory'   => 'https://www.boldgrid.com/support/advanced-tutorials/backup-userguide#setting-backup-directory',
-	),
-	'lang'                 => array(
+		'plugin_renamed'      => 'https://www.boldgrid.com/support/total-upkeep-plugin-product-guide/what-is-total-upkeep/',
+	],
+	'lang'                 => [
 		// translators: 1: Number of seconds.
 		'est_pause' => esc_html__( 'Estimated Pause: %s seconds', 'boldgrid-backup' ),
-	),
+	],
 	'public_link_lifetime' => '1 HOUR',
 	'url_regex'            => '^https?:\/\/[a-z0-9\-\.]+(\.[a-z]{2,5})?(:[0-9]{1,5})?(\/.*)?$',
+
 	/*
 	 * When we login to a remote storage provider, we log the utc timestamp of that login. Sometimes
 	 * we want to know if a remote storage provider is setup, and usually we check by trying to log
@@ -80,4 +81,4 @@ return array(
 			'key'   => 'dreamobjects',
 		],
 	],
-);
+];

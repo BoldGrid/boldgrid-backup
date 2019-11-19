@@ -2,9 +2,9 @@
 Contributors: boldgrid, joemoto, imh_brad, rramo012, bgnicolepaschen
 Tags: backup, cloud backup, database backup, restore, wordpress backup
 Requires at least: 4.4
-Tested up to: 5.2
+Tested up to: 5.3
 Requires PHP: 5.4
-Stable tag: 1.11.8
+Stable tag: 1.12.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -132,7 +132,9 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
-= 1.x.0 =
+= 1.12.0-rc.1 =
+
+Release date: November 19th, 2019
 
 * Update:      Renamed plugin from "BoldGrid Backup" to "Total Upkeep".
 
@@ -579,3 +581,7 @@ Release Date: July 6th, 2016
 Release Date: June 21st, 2016
 
 * Initial public release.
+
+== Upgrade Notice ==
+= 1.12.0 =
+BoldGrid Backup has become Total Upkeep.  Different name with the same great features.

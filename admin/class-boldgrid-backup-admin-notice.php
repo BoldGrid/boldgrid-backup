@@ -12,6 +12,8 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
+use \Boldgrid\Library\Library\Notice;
+
 /**
  * Class: Boldgrid_Backup_Admin_Notice
  *
@@ -33,10 +35,18 @@ class Boldgrid_Backup_Admin_Notice {
 	 * @since 1.6.0
 	 * @var   array
 	 */
-	public $lang = array(
+	public $lang = [
 		'dis_error'   => 'notice notice-error is-dismissible',
 		'dis_success' => 'notice notice-success is-dismissible',
-	);
+	];
+
+	/**
+	 * An array of messages we've already printed to the current page.
+	 *
+	 * @since 1.5.1
+	 * @var   array
+	 */
+	public $displayed_messages = [];
 
 	/**
 	 * Constructor.
@@ -61,26 +71,18 @@ class Boldgrid_Backup_Admin_Notice {
 	public function add_user_notice( $message, $class, $heading = null ) {
 		$option = $this->get_user_option();
 
-		$notices = get_option( $option, array() );
+		$notices = get_option( $option, [] );
 
 		$message = $this->add_container( $message );
 
-		$notices[] = array(
+		$notices[] = [
 			'message' => $message,
 			'class'   => $class,
 			'heading' => $heading,
-		);
+		];
 
 		update_option( $option, $notices );
 	}
-
-	/**
-	 * An array of messages we've already printed to the current page.
-	 *
-	 * @since 1.5.1
-	 * @var   array
-	 */
-	public $displayed_messages = array();
 
 	/**
 	 * Display notices for user.
@@ -90,7 +92,7 @@ class Boldgrid_Backup_Admin_Notice {
 	public function display_user_notice() {
 		$option = $this->get_user_option();
 
-		$notices = get_option( $option, array() );
+		$notices = get_option( $option, [] );
 
 		$notices = $this->core->in_progress->add_notice( $notices );
 
@@ -246,5 +248,37 @@ class Boldgrid_Backup_Admin_Notice {
 		);
 
 		do_action( 'boldgrid_backup_notice', $message, 'notice notice-info is-dismissible' );
+	}
+
+	/**
+	 * Display a notice for this plugin being renamed.
+	 *
+	 * The notice is displayed to all admin users, dismissible per user.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @see \Boldgrid\Library\Library\Notice::isDismissed()
+	 * @see \Boldgrid\Library\Library\Notice::show()
+	 */
+	public function plugin_renamed_notice() {
+		$notice_id = 'boldgrid_backup_renamed';
+
+		if ( ! Notice::isDismissed( $notice_id ) ) {
+			$message = sprintf(
+				// translators: 1: HTML anchor opening tag, 2: HTML anchor closing tag.
+				esc_html__(
+					'%3$sBoldGrid Backup has become Total Upkeep!%4$s%5$sDifferent name with the same great features.  For more information on the change, please go to %1$sour website%2$s.%6$s',
+					'boldgrid-backup'
+				),
+				'<a target="_blank" href="' . esc_url( $this->core->configs['urls']['plugin_renamed'] ) . '">',
+				'</a>',
+				'<h3>',
+				'</h3>',
+				'<p>',
+				'</p>'
+			);
+
+			Notice::show( $message, $notice_id, 'notice notice-info' );
+		}
 	}
 }

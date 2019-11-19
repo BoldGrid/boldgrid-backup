@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "boldgrid/library",
-            "version": "2.10.4",
+            "version": "2.10.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BoldGrid/library.git",
-                "reference": "b0e3a29abfa45d12d06db8b5b45736c647a0809a"
+                "reference": "c6e390ebc8cb1c93cd53a026eb2c157601bc3d48"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BoldGrid/library/zipball/b0e3a29abfa45d12d06db8b5b45736c647a0809a",
-                "reference": "b0e3a29abfa45d12d06db8b5b45736c647a0809a",
+                "url": "https://api.github.com/repos/BoldGrid/library/zipball/c6e390ebc8cb1c93cd53a026eb2c157601bc3d48",
+                "reference": "c6e390ebc8cb1c93cd53a026eb2c157601bc3d48",
                 "shasum": ""
             },
             "type": "library",
@@ -54,7 +54,7 @@
                 }
             ],
             "description": "The BoldGrid Library for shared code used in official BoldGrid plugins and themes.",
-            "time": "2019-10-11T14:57:41+00:00"
+            "time": "2019-11-19T17:57:49+00:00"
         },
         {
             "name": "chland/tdcron",
@@ -69,16 +69,16 @@
         },
         {
             "name": "ifsnop/mysqldump-php",
-            "version": "v2.7",
+            "version": "v2.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ifsnop/mysqldump-php.git",
-                "reference": "30f07f4f0b0fdfcd74e6e57de933248d47f2dd61"
+                "reference": "b6919eff87c36b18fe0d4b3a53635df03c8a3b38"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ifsnop/mysqldump-php/zipball/30f07f4f0b0fdfcd74e6e57de933248d47f2dd61",
-                "reference": "30f07f4f0b0fdfcd74e6e57de933248d47f2dd61",
+                "url": "https://api.github.com/repos/ifsnop/mysqldump-php/zipball/b6919eff87c36b18fe0d4b3a53635df03c8a3b38",
+                "reference": "b6919eff87c36b18fe0d4b3a53635df03c8a3b38",
                 "shasum": ""
             },
             "require": {
@@ -120,7 +120,7 @@
                 "php5",
                 "sql"
             ],
-            "time": "2019-02-18T23:38:33+00:00"
+            "time": "2019-10-29T23:13:43+00:00"
         },
         {
             "name": "phpseclib/phpseclib",
