@@ -113,14 +113,7 @@ class Boldgrid_Backup_Admin_Db_Dump {
 
 		$this->core->archive->init( $filepath );
 
-		$file_contents = $this->core->archive->get_file( $file );
-
-		/**
-		 * Handle encryption.
-		 *
-		 * @since 1.12.0
-		 */
-		$file_contents = apply_filters( 'boldgrid_backup_post_get_dump_file', $file_contents );
+		$file_contents = $this->core->archive->get_dump_file( $file );
 
 		// Check for the dump file header.
 		if ( false !== strpos( $file_contents[0]['content'], '-- mysqldump-php' ) ) {
@@ -192,14 +185,7 @@ class Boldgrid_Backup_Admin_Db_Dump {
 	 */
 	public function get_insert_tables( $filepath, $file ) {
 		$this->core->archive->init( $filepath );
-		$file_contents = $this->core->archive->get_file( $file );
-
-		/**
-		 * Handle encryption.
-		 *
-		 * @since 1.12.0
-		 */
-		$file_contents = apply_filters( 'boldgrid_backup_post_get_dump_file', $file_contents );
+		$file_contents = $this->core->archive->get_dump_file( $file );
 
 		/*
 		 * Get a list of all tables within the dump that we are inserting

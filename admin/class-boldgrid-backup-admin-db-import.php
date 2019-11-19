@@ -89,14 +89,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 */
 	public function import_from_archive( $archive_filepath, $file ) {
 		$this->core->archive->init( $archive_filepath );
-		$file_contents = $this->core->archive->get_file( $file );
-
-		/**
-		 * Handle encryption.
-		 *
-		 * @since 1.12.0
-		 */
-		$file_contents = apply_filters( 'boldgrid_backup_post_get_dump_file', $file_contents );
+		$file_contents = $this->core->archive->get_dump_file( $file );
 
 		$sql = ! empty( $file_contents[0]['content'] ) ? $file_contents[0]['content'] : null;
 		if ( empty( $sql ) ) {

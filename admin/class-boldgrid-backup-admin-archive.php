@@ -207,6 +207,23 @@ class Boldgrid_Backup_Admin_Archive {
 	}
 
 	/**
+	 * Get the database dump file from an archive.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param  string $file      The file to get.
+	 * @return array
+	 */
+	public function get_dump_file( $file ) {
+		/**
+		 * Handle encryption.
+		 *
+		 * @since 1.12.0
+		 */
+		return apply_filters( 'boldgrid_backup_post_get_dump_file', $this->get_file( $file ) );
+	}
+
+	/**
 	 * Get the filesize of the backup file itself.
 	 *
 	 * IE the size of the zip file, not the size of everything before compression.
