@@ -30,7 +30,7 @@ return [
 		'user_guide'          => 'https://www.boldgrid.com/support/advanced-tutorials/backup-userguide',
 		'restore'             => 'https://www.boldgrid.com/support/advanced-tutorials/restoring-boldgrid-backup/',
 		'setting_directory'   => 'https://www.boldgrid.com/support/advanced-tutorials/backup-userguide#setting-backup-directory',
-		'plugin_renamed'      => 'https://www.boldgrid.com/support/total-upkeep-plugin-product-guide/what-is-total-upkeep/',
+		'plugin_renamed'      => 'https://www.boldgrid.com/support/total-upkeep-backup-plugin-product-guide/what-is-total-upkeep/',
 	],
 	'lang'                 => [
 		// translators: 1: Number of seconds.
