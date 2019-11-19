@@ -164,7 +164,7 @@ class Boldgrid_Backup_Admin_Time {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param  array $settings BoldGrid Backup settings.
+	 * @param  array $settings Settings.
 	 * @param  array $tz_info  Timezone information.
 	 * @return DateTime
 	 */

@@ -105,13 +105,14 @@ printf(
 	<hr />',
 	esc_html__( 'Where should I store my backups?', 'boldgrid-backup' ),
 	sprintf(
-		// translators: 1: HTML strong open tag. 2: HTML strong close tag.
+		// translators: 1: HTML strong open tag. 2: HTML strong close tag, 3: Plugin title.
 		esc_html__(
-			'Throughout the BoldGrid Backup plugin, you will see references to %1$sLocal Machine%2$s, %1$sWeb Server%2$s, and %1$sRemote Storage%2$s. These are all locations you can save your backup archives to.',
+			'Throughout the %3$s plugin, you will see references to %1$sLocal Machine%2$s, %1$sWeb Server%2$s, and %1$sRemote Storage%2$s. These are all locations you can save your backup archives to.',
 			'boldgrid-backup'
 		),
 		'<strong>',
-		'</strong>'
+		'</strong>',
+		esc_html( BOLDGRID_BACKUP_TITLE )
 	),
 	esc_html__(
 		'Continue reading below to find out more about each. It is recommended to store backup archives in at least 2 different storage locations.',
@@ -212,7 +213,16 @@ if ( ! $this->core->config->is_premium_done ) {
 			%2$s
 		</div>',
 		$this->core->go_pro->get_premium_button( $premium_url, esc_html__( 'Unlock Feature', 'boldgrid-backup' ) ), // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
-		esc_html__( 'Changed a file and now your site isn’t working properly? With BoldGrid Backup Premium, you can browse through past backup archives and restore individual files with a single click.', 'boldgrid-backup' )
+		esc_html(
+			sprintf(
+				// translators: 1: Plugin title.
+				__(
+					'Changed a file and now your site isn’t working properly? With %1$s, you can browse through past backup archives and restore individual files with a single click.',
+					'boldgrid-backup'
+				),
+				BOLDGRID_BACKUP_TITLE . ' Premium'
+			)
+		)
 	);
 }
 

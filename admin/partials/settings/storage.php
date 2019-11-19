@@ -2,8 +2,7 @@
 /**
  * File: storage.php
  *
- * This file is included on the BoldGrid Backup Settings page and helps render the "Backup Storage"
- * section.
+ * This file is included on the settings page and helps render the "Backup Storage" section.
  *
  * @link https://www.boldgrid.com
  * @since 1.5.2
@@ -20,9 +19,7 @@ defined( 'WPINC' ) || die;
 ob_start();
 
 // Add the web server storage details.
-$storage_locations = array(
-	$this->core->local->get_webserver_details(),
-);
+$storage_locations = [ $this->core->local->get_webserver_details() ];
 
 /**
  * Allow other storage providers to register themselves.
@@ -93,13 +90,9 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 						'The following is a list of storage locations available to store your backup archives on. It is recommended to store your backups on at least 2 different storage locations. You can find more information <a href="%1$s">here</a>.',
 						'boldgrid-backup'
 					),
-					array( 'a' => array( 'href' => array() ) )
+					[ 'a' => [ 'href' => [] ] ]
 				),
-				esc_url(
-					admin_url(
-						'admin.php?page=boldgrid-backup-tools&section=section_locations'
-					)
-				)
+				esc_url( admin_url( 'admin.php?page=boldgrid-backup-tools&section=section_locations' ) )
 			);
 			?>
 		</p>

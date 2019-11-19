@@ -2,7 +2,7 @@
 /**
  * File: boldgrid-backup-cron.php
  *
- * BoldGrid Backup cron control script.
+ * Total Upkeep cron control script.
  *
  * @link https://www.boldgrid.com
  * @since 1.0

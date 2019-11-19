@@ -54,7 +54,7 @@ class Boldgrid_Backup_Url_Helper {
 						CURLOPT_SSL_VERIFYPEER => false,
 						CURLOPT_SSL_VERIFYHOST => 0,
 						CURLOPT_TIMEOUT        => 0,
-						CURLOPT_USERAGENT      => 'BoldGrid Backup cron task',
+						CURLOPT_USERAGENT      => 'BoldGrid task',
 					]
 				);
 

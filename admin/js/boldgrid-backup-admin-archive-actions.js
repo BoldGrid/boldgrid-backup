@@ -1,5 +1,5 @@
 /**
- * BoldGrid Backup Admin Archive Actions.
+ * Archive Actions
  *
  * @summary JavaScript to handle archive actions.
  *

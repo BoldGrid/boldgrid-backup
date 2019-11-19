@@ -1,7 +1,7 @@
 /**
- * BoldGrid Backup Table Include.
+ * Table include
  *
- * @summary JavaScript for handling Table include settings.
+ * @summary JavaScript for handling table include settings.
  *
  * @since 1.6.0
  *

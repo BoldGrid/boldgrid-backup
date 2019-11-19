@@ -60,7 +60,7 @@ class Email {
 		$headers = 'From: ' . $this->recipient . "\r\nX-Mailer: PHP/" . phpversion() . "\r\n";
 
 		$message = "Hello,\r\n\r\n" . trim( $message ) . "\r\n\r\n" .
-			"Best regards,\r\n\r\nThe BoldGrid Backup plugin\r\n";
+			"Best regards,\r\n\r\nThe Total Upkeep plugin\r\n";
 
 		return mail( $this->recipient, $subject, $message, $headers );
 	}

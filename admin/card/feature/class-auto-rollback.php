@@ -16,8 +16,7 @@ namespace Boldgrid\Backup\Admin\Card\Feature;
 /**
  * Class: Auto_Rollback
  *
- * This class is responsible for rendering the "Auto Rollback" feature on the BoldGrid Backup
- * dashboard.
+ * This class is responsible for rendering the "Auto Rollback" feature on this plugin's dashboard.
  *
  * @since 1.11.0
  */

@@ -230,10 +230,10 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param  array $settings BoldGrid Backup settings.
+	 * @param  array $settings Settings.
 	 * @return bool
 	 */
-	public function get_settings_excluded( $settings = array() ) {
+	public function get_settings_excluded( $settings = [] ) {
 		if ( empty( $settings ) ) {
 			$settings = $this->core->settings->get_settings();
 		}
@@ -242,7 +242,7 @@ class Boldgrid_Backup_Admin_Db_Omit {
 		$key = 'exclude_tables';
 
 		return ! isset( $settings[ $key ] ) || ! is_array( $settings[ $key ] ) ?
-			array() : array_map( 'sanitize_text_field', $settings[ $key ] );
+			[] : array_map( 'sanitize_text_field', $settings[ $key ] );
 	}
 
 	/**
@@ -255,7 +255,7 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param  array $settings BoldGrid Backup settings.
+	 * @param  array $settings Settings.
 	 * @return bool
 	 */
 	public function get_settings_type( $settings = array() ) {

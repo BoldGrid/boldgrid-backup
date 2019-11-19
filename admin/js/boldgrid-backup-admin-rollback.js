@@ -1,7 +1,7 @@
 /**
- * BoldGrid Backup admin rollback notice.
+ * Rollback notice
  *
- * @summary JavaScript for the BoldGrid Backup admin rollback notice.
+ * @summary JavaScript for the rollback notice.
  *
  * @since 1.0
  */
@@ -15,9 +15,9 @@ var BOLDGRID = BOLDGRID || {};
 BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 
 /**
- * BoldGrid Backup admin rollback.
+ * Rollback notice.
  *
- * @summary JavaScript for the BoldGrid Backup admin rollback notice.
+ * @summary JavaScript for the rollback notice.
  *
  * @since 1.0
  *

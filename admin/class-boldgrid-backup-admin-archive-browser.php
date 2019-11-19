@@ -211,7 +211,11 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 		}
 
 		// Here's the default message.
-		$upgrade_message = __( 'With BoldGrid Backup Premium, you can view and restore files from here.', 'boldgrid-backup' );
+		$upgrade_message = sprintf(
+			// translators: 1: Plugin title.
+			__( 'With %1$s, you can view and restore files from here.', 'boldgrid-backup' ),
+			BOLDGRID_BACKUP_TITLE . ' Premium'
+		);
 
 		/**
 		 * Allow other plugins to add functionality.

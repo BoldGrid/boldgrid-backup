@@ -146,13 +146,13 @@ class Boldgrid_Backup_Admin_In_Progress {
 	public function get_error_markup() {
 		$error = Boldgrid_Backup_Admin_In_Progress_Data::get_arg( 'error' );
 
-		$notice = array(
+		$notice = [
 			'class'   => 'notice notice-error boldgrid-backup-in-progress',
 			'message' => '<div class="notice"><p><strong>' . __( 'Error:', 'boldgrid-backup' ) . '</strong><br />' .
 				'<em>' . esc_html( $error ) . '</em></p></div>' .
 				'<p>' . $this->core->lang['get_support'] . '</p>',
-			'heading' => __( 'BoldGrid Backup - Error creating backup', 'boldgrid-backup' ),
-		);
+			'heading' => BOLDGRID_BACKUP_TITLE . ' - ' . __( 'Error creating backup', 'boldgrid-backup' ),
+		];
 
 		$markup = $this->core->notice->get_notice_markup( $notice['class'], $notice['message'], $notice['heading'] );
 
@@ -179,14 +179,19 @@ class Boldgrid_Backup_Admin_In_Progress {
 		 * Initially started out as "backup in progress". Has expanded to include a progress bar.
 		 */
 		$loading = __( 'Loading...', 'bgtfw' );
-		// translators: 1: The time since the last backup was initiated.
-		$message  = '<p>' . sprintf( __( 'BoldGrid Backup began archiving your website %1$s ago.', 'boldgrid-backup' ), human_time_diff( $in_progress, time() ) ) . '</p>';
+		$message = '<p>' . sprintf(
+			// translators: 1: Plugin title, 2: Time since the last backup was initiated.
+			__( '%1$s began archiving your website %2$s ago.', 'boldgrid-backup' ),
+			BOLDGRID_BACKUP_TITLE,
+			human_time_diff( $in_progress, time() )
+		) . '</p>';
+
 		$message .= Boldgrid_Backup_Admin_In_Progress_Data::get_markup( $loading );
-		$notice   = array(
+		$notice   = [
 			'class'   => 'notice notice-warning boldgrid-backup-in-progress',
 			'message' => $message,
-			'heading' => __( 'BoldGrid Backup - Backup in progress', 'boldgrid-backup' ),
-		);
+			'heading' => BOLDGRID_BACKUP_TITLE . ' - ' . __( 'Backup in progress', 'boldgrid-backup' ),
+		];
 
 		return $notice;
 	}

@@ -1,5 +1,5 @@
 /**
- * Summary
+ * Archive Details
  *
  * @summary JS for all admin backup pages.
  *

@@ -734,7 +734,10 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 * @return string
 	 */
 	public function notice_backup_get() {
-		$notice_text = sprintf( '<h2 class="header-notice">%1$s</h2>', __( 'BoldGrid Backup - Update Protection', 'boldgrid-backup' ) );
+		$notice_text = sprintf(
+			'<h2 class="header-notice">%1$s</h2>',
+			BOLDGRID_BACKUP_TITLE . ' - ' . __( 'Update Protection', 'boldgrid-backup' )
+		);
 
 		$notice_text .= '<p>';
 

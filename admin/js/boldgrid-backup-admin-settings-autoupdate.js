@@ -1,3 +1,9 @@
+/**
+ * Auto update settings
+ *
+ * @summary JavaScript for the auto update settings.
+ */
+
 /* global ajaxurl,jQuery */
 
 var BOLDGRID = BOLDGRID || {};

@@ -907,7 +907,7 @@ class Boldgrid_Backup_Admin_Settings {
 	 *
 	 * @since 1.5.2
 	 *
-	 * @param  array $settings BoldGrid Backup settings.
+	 * @param  array $settings Settings.
 	 * @return bool True on success.
 	 */
 	public function save( $settings ) {
@@ -919,7 +919,7 @@ class Boldgrid_Backup_Admin_Settings {
 	 *
 	 * @since 1.8.0
 	 *
-	 * @param  array $settings BoldGrid Backup settings.
+	 * @param  array $settings Settings.
 	 * @return array
 	 */
 	public function update_cron( array $settings ) {
