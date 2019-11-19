@@ -784,7 +784,7 @@ class Boldgrid_Backup_Admin_Core {
 					$notice_markup = $this->notice->get_notice_markup(
 						'notice notice-error is-dismissible',
 						$message,
-						BOLDGRID_BACKUP_TITLE . ' - ' . __( 'Update required', 'boldgrid-backup' )
+						BOLDGRID_BACKUP_TITLE . ' - ' . esc_html__( 'Update required', 'boldgrid-backup' )
 					);
 
 					echo $notice_markup; // phpcs:ignore
@@ -1143,7 +1143,7 @@ class Boldgrid_Backup_Admin_Core {
 			// Display an error notice.
 			do_action(
 				'boldgrid_backup_notice',
-				__( 'The database dump file was not found.', 'boldgrid-backup' ),
+				esc_html__( 'The database dump file was not found.', 'boldgrid-backup' ),
 				'notice notice-error is-dismissible'
 			);
 
@@ -1203,7 +1203,7 @@ class Boldgrid_Backup_Admin_Core {
 				// Display an error notice.
 				do_action(
 					'boldgrid_backup_notice',
-					__(
+					esc_html__(
 						'The WordPress siteurl has changed.  There was an issue changing it back.  You will have to fix the siteurl manually in the database, or use an override in your wp-config.php file.',
 						'boldgrid-backup'
 					),
@@ -1898,7 +1898,7 @@ class Boldgrid_Backup_Admin_Core {
 
 			do_action(
 				'boldgrid_backup_notice',
-				__( 'Invalid key for the selected archive file.', 'boldgrid-backup' ),
+				esc_html__( 'Invalid key for the selected archive file.', 'boldgrid-backup' ),
 				'notice notice-error is-dismissible'
 			);
 
@@ -1912,7 +1912,7 @@ class Boldgrid_Backup_Admin_Core {
 			// Fail with a notice.
 			do_action(
 				'boldgrid_backup_notice',
-				__( 'Invalid filename for the selected archive file.', 'boldgrid-backup' ),
+				esc_html__( 'Invalid filename for the selected archive file.', 'boldgrid-backup' ),
 				'notice notice-error is-dismissible'
 			);
 
@@ -1932,7 +1932,7 @@ class Boldgrid_Backup_Admin_Core {
 			// Fail with a notice.
 			do_action(
 				'boldgrid_backup_notice',
-				__( 'No archive files were found.', 'boldgrid-backup' ),
+				esc_html__( 'No archive files were found.', 'boldgrid-backup' ),
 				'notice notice-error is-dismissible'
 			);
 
@@ -1950,7 +1950,7 @@ class Boldgrid_Backup_Admin_Core {
 			// Fail with a notice.
 			do_action(
 				'boldgrid_backup_notice',
-				__( 'The selected archive file was not found.', 'boldgrid-backup' ),
+				esc_html__( 'The selected archive file was not found.', 'boldgrid-backup' ),
 				'notice notice-error is-dismissible'
 			);
 
@@ -1969,7 +1969,7 @@ class Boldgrid_Backup_Admin_Core {
 		if ( ! $delete_ok ) {
 			do_action(
 				'boldgrid_backup_notice',
-				__( 'Error deleting the selected archive file.', 'boldgrid-backup' ),
+				esc_html__( 'Error deleting the selected archive file.', 'boldgrid-backup' ),
 				'notice notice-error is-dismissible'
 			);
 		}
@@ -2085,12 +2085,12 @@ class Boldgrid_Backup_Admin_Core {
 
 		// If a restoration was not requested, then abort.
 		if ( empty( $_POST['restore_now'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
-			return [ 'error' => __( 'Invalid restore_now value.', 'boldgrid-backup' ) ];
+			return [ 'error' => esc_html__( 'Invalid restore_now value.', 'boldgrid-backup' ) ];
 		}
 
 		// Check if functional.
 		if ( ! $this->test->run_functionality_tests() ) {
-			return [ 'error' => __( 'Functionality tests fail.', 'boldgrid-backup' ) ];
+			return [ 'error' => esc_html__( 'Functionality tests fail.', 'boldgrid-backup' ) ];
 		}
 
 		// Initialize variables.
@@ -2101,14 +2101,14 @@ class Boldgrid_Backup_Admin_Core {
 		if ( isset( $_POST['archive_key'] ) && is_numeric( $_POST['archive_key'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			$archive_key = (int) $_POST['archive_key'];
 		} else {
-			return [ 'error' => __( 'Invalid key for the selected archive file.', 'boldgrid-backup' ) ];
+			return [ 'error' => esc_html__( 'Invalid key for the selected archive file.', 'boldgrid-backup' ) ];
 		}
 
 		// Validate archive_filename.
 		if ( ! empty( $_POST['archive_filename'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			$archive_filename = sanitize_file_name( $_POST['archive_filename'] );
 		} else {
-			return [ 'error' => __( 'Invalid filename for the selected archive file.', 'boldgrid-backup' ) ];
+			return [ 'error' => esc_html__( 'Invalid filename for the selected archive file.', 'boldgrid-backup' ) ];
 		}
 
 		// Close any PHP session, so that another session can open during this restore operation.
@@ -2116,13 +2116,13 @@ class Boldgrid_Backup_Admin_Core {
 
 		$archives = $this->get_archive_list( $archive_filename );
 		if ( empty( $archives ) ) {
-			return [ 'error' => __( 'No archive files were found.', 'boldgrid-backup' ) ];
+			return [ 'error' => esc_html__( 'No archive files were found.', 'boldgrid-backup' ) ];
 		}
 
 		$filename = ! empty( $archives[ $archive_key ]['filename'] ) ? $archives[ $archive_key ]['filename'] : null;
 
 		if ( $archive_filename !== $filename ) {
-			return [ 'error' => __( 'The selected archive file was not found.', 'boldgrid-backup' ) ];
+			return [ 'error' => esc_html__( 'The selected archive file was not found.', 'boldgrid-backup' ) ];
 		}
 
 		$filepath = ! empty( $archives[ $archive_key ]['filepath'] ) ? $archives[ $archive_key ]['filepath'] : null;
@@ -2130,7 +2130,7 @@ class Boldgrid_Backup_Admin_Core {
 		if ( ! empty( $filepath ) && $this->wp_filesystem->exists( $filepath ) ) {
 			$filesize = $this->wp_filesystem->size( $filepath );
 		} else {
-			return [ 'error' => __( 'The selected archive file is empty.', 'boldgrid-backup' ) ];
+			return [ 'error' => esc_html__( 'The selected archive file is empty.', 'boldgrid-backup' ) ];
 		}
 
 		// Populate $info.
@@ -2230,7 +2230,7 @@ class Boldgrid_Backup_Admin_Core {
 			// Display notice of deletion status.
 			if ( ! $restore_ok ) {
 				return [
-					'error' => __( 'Could not restore database.', 'boldgrid-backup' ),
+					'error' => esc_html__( 'Could not restore database.', 'boldgrid-backup' ),
 				];
 			}
 		}
@@ -2342,7 +2342,7 @@ class Boldgrid_Backup_Admin_Core {
 		// Verify nonce.
 		if ( ! isset( $_POST['backup_auth'] ) || 1 !== check_ajax_referer( 'boldgrid_backup_now', 'backup_auth', false ) ) {
 			$this->notice->add_user_notice(
-				'<p>' . __( 'Security violation (invalid nonce).', 'boldgrid-backup' ) . '</p>',
+				'<p>' . esc_html__( 'Security violation (invalid nonce).', 'boldgrid-backup' ) . '</p>',
 				'error'
 			);
 			wp_die();
@@ -2351,7 +2351,7 @@ class Boldgrid_Backup_Admin_Core {
 		// Check user capabilities.
 		if ( ! current_user_can( 'update_plugins' ) ) {
 			$this->notice->add_user_notice(
-				'<p>' . __( 'Security violation (not authorized).', 'boldgrid-backup' ) . '</p>',
+				'<p>' . esc_html__( 'Security violation (not authorized).', 'boldgrid-backup' ) . '</p>',
 				'error'
 			);
 			wp_die();
@@ -2633,13 +2633,13 @@ class Boldgrid_Backup_Admin_Core {
 	 * @since 1.6.0
 	 */
 	public function wp_ajax_restore() {
-		$error        = __( 'Unable to restore backup: ', 'boldgrid-backup' );
-		$redirect_url = admin_url( 'admin.php?page=boldgrid-backup' );
+		$error        = esc_html__( 'Unable to restore backup: ', 'boldgrid-backup' );
+		$redirect_url = esc_url( admin_url( 'admin.php?page=boldgrid-backup' ) );
 
 		// Validate user role.
 		if ( ! current_user_can( 'update_plugins' ) ) {
 			$this->notice->add_user_notice(
-				'<p>' . $error . __( 'Security violation (not authorized).', 'boldgrid-backup' ) . '</p>',
+				'<p>' . $error . esc_html__( 'Security violation (not authorized).', 'boldgrid-backup' ) . '</p>',
 				'error'
 			);
 			wp_send_json_error();
@@ -2648,7 +2648,7 @@ class Boldgrid_Backup_Admin_Core {
 		// Validate nonce.
 		if ( ! check_ajax_referer( 'boldgrid_backup_restore_archive', 'archive_auth', false ) ) {
 				$this->notice->add_user_notice(
-					'<p>' . $error . __( 'Security violation (invalid nonce).', 'boldgrid-backup' ) . '</p>',
+					'<p>' . $error . esc_html__( 'Security violation (invalid nonce).', 'boldgrid-backup' ) . '</p>',
 					'error'
 				);
 			wp_send_json_error();
@@ -2670,13 +2670,13 @@ class Boldgrid_Backup_Admin_Core {
 		$is_success = ! empty( $archive_info ) && empty( $archive_info['error'] );
 		if ( $is_success ) {
 			$message = [
-				'message' => __( 'The selected archive file has been successfully restored.', 'boldgrid-backup' ),
+				'message' => esc_html__( 'The selected archive file has been successfully restored.', 'boldgrid-backup' ),
 				'class'   => 'notice notice-success is-dismissible',
 				'header'  => BOLDGRID_BACKUP_TITLE . ' - ' . __( 'Restoration complete' ),
 			];
 		} else {
 			$message = [
-				'message' => ! empty( $archive_info['error'] ) ? $archive_info['error'] : __( 'Unknown error when attempting to restore archive.', 'bolcgrid-backup' ),
+				'message' => ! empty( $archive_info['error'] ) ? $archive_info['error'] : esc_html__( 'Unknown error when attempting to restore archive.', 'bolcgrid-backup' ),
 				'class'   => 'notice notice-error is-dismissible',
 				'header'  => BOLDGRID_BACKUP_TITLE . ' - ' . __( 'Restoration failed' ),
 			];

@@ -118,38 +118,38 @@ class Boldgrid_Backup_Admin_Email {
 		// translators: 1: Site identifier.
 		$parts['subject'] = sprintf( __( 'Backup completed for %1$s', 'boldgrid-backup' ), $site_id );
 
-		$parts['body']['main'] = __( 'Hello', 'boldgrid-backup' ) . ",\n\n";
+		$parts['body']['main'] = esc_html__( 'Hello', 'boldgrid-backup' ) . ",\n\n";
 
 		if ( $info['dryrun'] ) {
-			$body['main'] .= __( 'THIS OPERATION WAS A DRY-RUN TEST', 'boldgrid-backup' ) . ".\n\n";
+			$body['main'] .= esc_html__( 'THIS OPERATION WAS A DRY-RUN TEST', 'boldgrid-backup' ) . ".\n\n";
 		}
 
 		$parts['body']['main'] .= sprintf(
 			// translators: 1: Site identifier/name.
-			__( 'A backup archive has been created for %1$s', 'boldgrid-backup' ),
+			esc_html__( 'A backup archive has been created for %1$s', 'boldgrid-backup' ),
 			$site_id
 		) . ".\n\n";
-		$parts['body']['main'] .= __( 'Backup details', 'boldgrid-backup' ) . ":\n";
+		$parts['body']['main'] .= esc_html__( 'Backup details', 'boldgrid-backup' ) . ":\n";
 		$parts['body']['main'] .= sprintf( $this->core->configs['lang']['est_pause'], $info['db_duration'] ) . "\n";
 
 		// translators: 1: Backup duration.
-		$parts['body']['main'] .= sprintf( __( 'Duration: %1$s seconds', 'boldgrid-backup' ), $info['duration'] ) . "\n";
+		$parts['body']['main'] .= sprintf( esc_html__( 'Duration: %1$s seconds', 'boldgrid-backup' ), $info['duration'] ) . "\n";
 
 		// translators: 1: Total backup size.
-		$parts['body']['main'] .= sprintf( __( 'Total size: %1$s', 'boldgrid-backup' ), Boldgrid_Backup_Admin_Utility::bytes_to_human( $info['total_size'] ) ) . "\n";
+		$parts['body']['main'] .= sprintf( esc_html__( 'Total size: %1$s', 'boldgrid-backup' ), Boldgrid_Backup_Admin_Utility::bytes_to_human( $info['total_size'] ) ) . "\n";
 
 		// translators: 1: Archive file path.
-		$parts['body']['main'] .= sprintf( __( 'Archive file path: %1$s', 'boldgrid-backup' ), $info['filepath'] ) . "\n";
+		$parts['body']['main'] .= sprintf( esc_html__( 'Archive file path: %1$s', 'boldgrid-backup' ), $info['filepath'] ) . "\n";
 
 		// translators: 1: Archive file size.
-		$parts['body']['main'] .= sprintf( __( 'Archive file size: %1$s', 'boldgrid-backup' ), Boldgrid_Backup_Admin_Utility::bytes_to_human( $info['filesize'] ) ) . "\n";
+		$parts['body']['main'] .= sprintf( esc_html__( 'Archive file size: %1$s', 'boldgrid-backup' ), Boldgrid_Backup_Admin_Utility::bytes_to_human( $info['filesize'] ) ) . "\n";
 
 		// translators: 1: Archive compressor name.
-		$parts['body']['main'] .= sprintf( __( 'Compressor used: %1$s', 'boldgrid-backup' ), $info['compressor'] ) . "\n";
+		$parts['body']['main'] .= sprintf( esc_html__( 'Compressor used: %1$s', 'boldgrid-backup' ), $info['compressor'] ) . "\n";
 
 		if ( ! empty( $info['trigger'] ) ) {
 			// translators: 1: What triggered the backup process.
-			$parts['body']['main'] .= sprintf( __( 'Backup triggered by: %1$s', 'boldgrid-backup' ), $info['trigger'] ) . "\n";
+			$parts['body']['main'] .= sprintf( esc_html__( 'Backup triggered by: %1$s', 'boldgrid-backup' ), $info['trigger'] ) . "\n";
 		}
 
 		$parts['body']['main'] .= $this->core->folder_exclusion->email_part( $info );
@@ -169,17 +169,17 @@ class Boldgrid_Backup_Admin_Email {
 
 		$parts['body']['signature'] .= sprintf(
 			// translators: 1: Plugin title, 2: URL address for help restoring a backup archive file.
-			__( 'For help with restoring a %1$s archive file, please visit: %2$s', 'boldgrid-backup' ),
+			esc_html__( 'For help with restoring a %1$s archive file, please visit: %2$s', 'boldgrid-backup' ),
 			BOLDGRID_BACKUP_TITLE,
 			esc_url( $this->core->configs['urls']['restore'] )
 		) . "\n\n";
 
 		$parts['body']['signature'] .= $this->ads['generic'];
 
-		$parts['body']['signature'] .= __( 'Best regards', 'boldgrid-backup' ) . ",\n\n";
+		$parts['body']['signature'] .= esc_html__( 'Best regards', 'boldgrid-backup' ) . ",\n\n";
 		$parts['body']['signature'] .= sprintf(
 			// translators: 1: Plugin title.
-			__( 'The %1$s plugin', 'boldgrid-backup' ),
+			esc_html__( 'The %1$s plugin', 'boldgrid-backup' ),
 			BOLDGRID_BACKUP_TITLE
 		) . "\n\n";
 

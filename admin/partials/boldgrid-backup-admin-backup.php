@@ -125,10 +125,10 @@ if ( ! empty( $archive_info ) ) {
 					<p>%3$s <a href="%4$s">%5$s</a></p>
 				',
 				/* 1 */ BOLDGRID_BACKUP_TITLE,
-				/* 2 */ __( 'Backup complete', 'boldgrid-backup' ),
+				/* 2 */ esc_html__( 'Backup complete', 'boldgrid-backup' ),
 				/* 3 */ esc_html__( 'A backup archive file has been created successfully!', 'boldgrid-backup' ),
 				/* 4 */ $core->archive->view_details_url,
-				/* 5 */ __( 'View details', 'boldgrid-backup' )
+				/* 5 */ esc_html__( 'View details', 'boldgrid-backup' )
 			),
 		];
 	} else {
@@ -139,8 +139,8 @@ if ( ! empty( $archive_info ) ) {
 				'%1$s - %2$s',
 				BOLDGRID_BACKUP_TITLE,
 				empty( $_POST['restore_now'] ) ? // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
-					__( 'Error creating archive', 'boldgrid-backup' ) :
-					__( 'Error restoring archive', 'boldgrid-backup' )
+				esc_html__( 'Error creating archive', 'boldgrid-backup' ) :
+				esc_html__( 'Error restoring archive', 'boldgrid-backup' )
 			),
 		];
 	}
@@ -160,7 +160,7 @@ if ( ! empty( $archive_info ) ) {
 			empty( $archive_info['filepath'] ) ? '' : '<p>' . sprintf( esc_html__( 'File Path: %1$s', 'boldgrid-backup' ), $archive_info['filepath'] ) . '</p>',
 			empty( $archive_info['error'] ) ? '' : '<p>' . $archive_info['error'] . '</p>',
 			// translators: 1: Error message.
-			! isset( $archive_info['error_message'] ) ? '' : '<p>' . sprintf( __( 'Error Details: %1$s', 'boldgrid-backup' ), $archive_info['error_message'] ),
+			! isset( $archive_info['error_message'] ) ? '' : '<p>' . sprintf( esc_html__( 'Error Details: %1$s', 'boldgrid-backup' ), $archive_info['error_message'] ),
 			isset( $archive_info['error_message'] ) && isset( $archive_info['error_code'] ) ?
 				' (' . $archive_info['error_code'] . ')' : ''
 		),
@@ -170,7 +170,7 @@ if ( ! empty( $archive_info ) ) {
 if ( ! isset( $message ) ) {
 	$message = [
 		'class'   => 'notice notice-error is-dismissible',
-		'message' => __( 'Unknown error.', 'boldgrid-backup' ),
+		'message' => esc_html__( 'Unknown error.', 'boldgrid-backup' ),
 		'header'  => BOLDGRID_BACKUP_TITLE,
 	];
 }

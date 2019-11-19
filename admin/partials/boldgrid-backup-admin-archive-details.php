@@ -55,7 +55,7 @@ if ( ! $archive_found ) {
 } else {
 	$file_size = sprintf(
 		'<div class="misc-pub-section">%1$s: <strong>%2$s</strong></div>',
-		__( 'File size', 'boldgrid-backup' ),
+		esc_html__( 'File size', 'boldgrid-backup' ),
 		Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive['filesize'] )
 	);
 
@@ -63,7 +63,7 @@ if ( ! $archive_found ) {
 	$this->core->time->init( $archive['lastmodunix'], 'utc' );
 	$backup_date = sprintf(
 		'<div class="misc-pub-section">%1$s: <strong>%2$s</strong></div>',
-		__( 'Backup date', 'boldgrid-backup' ),
+		esc_html__( 'Backup date', 'boldgrid-backup' ),
 		$this->core->time->get_span()
 	);
 
@@ -145,8 +145,8 @@ $main_meta_box = sprintf(
 			%7$s
 		</div>
 	</div>',
-	/* 1 */ __( 'Backup Archive', 'boldgrid-backup' ),
-	/* 2 */ __( 'File name', 'boldgrid-backup' ),
+	/* 1 */ esc_html__( 'Backup Archive', 'boldgrid-backup' ),
+	/* 2 */ esc_html__( 'File name', 'boldgrid-backup' ),
 	/* 3 */ $archive['filename'],
 	/* 4 */ $file_size,
 	/* 5 */ $backup_date,
@@ -169,7 +169,7 @@ $remote_meta_box = sprintf(
 		</div>
 		%3$s
 	</div>',
-	/* 1 */ __( 'Remote Storage', 'boldgrid-backup' ),
+	/* 1 */ esc_html__( 'Remote Storage', 'boldgrid-backup' ),
 	/* 2 */ $remote_storage['postbox'],
 	/* 3 */ $this->core->config->is_premium_done ? '' : sprintf(
 		'
@@ -180,11 +180,11 @@ $remote_meta_box = sprintf(
 		/* 1 */ $this->core->go_pro->get_premium_button( $premium_url ),
 		/* 2 */ sprintf(
 			// translators: 1: Plugin title.
-			__( 'Upgrade to <strong>%1$s</strong> for more Storage Locations!', 'boldgrid-backup' ),
+			esc_html__( 'Upgrade to <strong>%1$s</strong> for more Storage Locations!', 'boldgrid-backup' ),
 			BOLDGRID_BACKUP_TITLE . ' Premium'
 		)
 	),
-	/* 4 */ __( 'Secure your backups by keeping copies of them on <a href="admin.php?page=boldgrid-backup-tools&section=section_locations">remote storage</a>.', 'boldgrid-backup' )
+	/* 4 */ esc_html__( 'Secure your backups by keeping copies of them on <a href="admin.php?page=boldgrid-backup-tools&section=section_locations">remote storage</a>.', 'boldgrid-backup' )
 );
 
 $editor_tools = sprintf(
@@ -200,8 +200,8 @@ $editor_tools = sprintf(
 	</div>
 	',
 	/* 1 */ $db['buttons'],
-	/* 2 */ __( 'Files & Folders', 'boldgrid-backup' ),
-	/* 3 */ __( 'Database', 'boldgrid-backup' )
+	/* 2 */ esc_html__( 'Files & Folders', 'boldgrid-backup' ),
+	/* 3 */ esc_html__( 'Database', 'boldgrid-backup' )
 );
 
 $premium_url = $this->core->go_pro->get_premium_url( 'bgbkup-archive-browser' );
@@ -214,11 +214,11 @@ $intro       = $this->core->config->is_premium_done ? '' : sprintf(
 			%3$s
 		</p>
 	</div>',
-	/* 1 */ __( 'Restore Individual Files With One Click', 'boldgrid-backup' ),
+	/* 1 */ esc_html__( 'Restore Individual Files With One Click', 'boldgrid-backup' ),
 	/* 2 */ $this->core->go_pro->get_premium_button( $premium_url, esc_html__( 'Unlock Feature', 'boldgrid-backup' ) ),
 	/* 3 */ sprintf(
 		// translators: 1: Plugin title.
-		__(
+		esc_html__(
 			'Changed a file and now your site isn’t working properly? With %1$s, you can browse through past backup archives and restore individual files with a single click.',
 			'boldgrid-backup'
 		),
@@ -230,25 +230,25 @@ $main_content = '
 	<div id="postdivrich" class="postarea wp-editor-expand">
 		<div id="wp-content-wrap" class="wp-core-ui wp-editor-wrap tmce-active has-dfw">
 			<h2 style="font-size:initial; padding:0px;">
-				' . __( 'Download & Restore', 'boldgrid-backup' ) . '
+				' . esc_html__( 'Download & Restore', 'boldgrid-backup' ) . '
 				<span class="dashicons dashicons-editor-help" data-id="download_and_restore"></span>
 			</h2>
 			<p class="help" data-id="download_and_restore">
-				<strong>' . __( 'Download to Local Machine', 'boldgrid-backup' ) . '</strong><br />
-				' . __( 'Backup archives generally should be stored in more locations than just your <strong>web server</strong>. Be sure to keep copies on your <strong>local machine</strong> and / or a <strong>remote storage</strong> provider. Learn more about these different locations <a href="admin.php?page=boldgrid-backup-tools&section=section_locations">here</a>.', 'boldgrid-backup' ) . '<br /><br />
-				<strong>' . __( 'Restore', 'boldgrid-backup' ) . '</strong><br />
-				' . __( 'Restore this backup. This will restore all the files and the database in this backup. Use the <strong>Backup Browser</strong> below to look at the backup archive and see what will be restored.', 'boldgrid-backup' ) . '<br /><br />
-				<strong>' . __( 'Download Link', 'boldgrid-backup' ) . '</strong><br />
-				' . __( 'A public link that is used to download a backup archive file.  You can use it to migrate your website to another WordPress installation.  Please keep download links private, as the download files contains sensitive data.', 'boldgrid-backup' ) . '
+				<strong>' . esc_html__( 'Download to Local Machine', 'boldgrid-backup' ) . '</strong><br />
+				' . esc_html__( 'Backup archives generally should be stored in more locations than just your <strong>web server</strong>. Be sure to keep copies on your <strong>local machine</strong> and / or a <strong>remote storage</strong> provider. Learn more about these different locations <a href="admin.php?page=boldgrid-backup-tools&section=section_locations">here</a>.', 'boldgrid-backup' ) . '<br /><br />
+				<strong>' . esc_html__( 'Restore', 'boldgrid-backup' ) . '</strong><br />
+				' . esc_html__( 'Restore this backup. This will restore all the files and the database in this backup. Use the <strong>Backup Browser</strong> below to look at the backup archive and see what will be restored.', 'boldgrid-backup' ) . '<br /><br />
+				<strong>' . esc_html__( 'Download Link', 'boldgrid-backup' ) . '</strong><br />
+				' . esc_html__( 'A public link that is used to download a backup archive file.  You can use it to migrate your website to another WordPress installation.  Please keep download links private, as the download files contains sensitive data.', 'boldgrid-backup' ) . '
 			</p>
 			<p>
 				' . $download_button . ' ' . $restore_button . ' ' . $download_link . '
 			</p>
 			<div id="download-link-copy" class="notice notice-info inline"></div>
 			<hr class="separator" />
-			<h2 style="font-size:initial; padding:0px;">' . __( 'Backup Browser', 'boldgrid-backup' ) . '</h2>
+			<h2 style="font-size:initial; padding:0px;">' . esc_html__( 'Backup Browser', 'boldgrid-backup' ) . '</h2>
 			<p>
-				' . __( 'Use the File & Folders and Database tools below to browse the contents of this backup file.', 'boldgrid-backup' ) . '
+				' . esc_html__( 'Use the File & Folders and Database tools below to browse the contents of this backup file.', 'boldgrid-backup' ) . '
 			</p>
 			' . $intro . $editor_tools . $browser . $db['browser'] . '
 		</div>
@@ -307,7 +307,7 @@ $page = sprintf(
 	</div>
 	',
 	/* 1 */ $archive['filename'],
-	/* 2 */ __( 'Backup Archive Details', 'boldgrid-backup' ),
+	/* 2 */ esc_html__( 'Backup Archive Details', 'boldgrid-backup' ),
 	/* 3 */ require BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php',
 	/* 4 */ $main_content,
 	/* 5 */ $main_meta_box,

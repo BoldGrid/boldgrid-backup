@@ -38,12 +38,12 @@ class Boldgrid_Backup_Admin_Plugins {
 
 		$row_actions = [
 			'settings' => '<a href="' . esc_url( $core->settings->get_settings_url() ) . '">' .
-				__( 'Settings', 'boldgrid-backup' ) . '</a>',
+			esc_html__( 'Settings', 'boldgrid-backup' ) . '</a>',
 		];
 
 		if ( ! $core->config->get_is_premium() ) {
 			$row_actions[] = '<a href="' . esc_url( $core->go_pro->get_premium_url( 'bgbkup-plugin-actions' ) ) .
-				'" target="_blank">' . __( 'Get Premium', 'boldgrid-backup' ) . '</a>';
+				'" target="_blank">' . esc_html__( 'Get Premium', 'boldgrid-backup' ) . '</a>';
 		}
 
 		$actions = array_merge( $row_actions, $actions );

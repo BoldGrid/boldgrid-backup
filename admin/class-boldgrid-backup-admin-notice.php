@@ -238,7 +238,7 @@ class Boldgrid_Backup_Admin_Notice {
 	public function display_autoupdate_notice() {
 		$message = sprintf(
 			// translators: 1: HTML anchor opening tag, 2: HTML anchor closing tag, 3: Plugin title.
-			__(
+			esc_html__(
 				'Auto Updates can be configured in the %1$s%3$s Settings%2$s.',
 				'boldgrid-backup'
 			),
