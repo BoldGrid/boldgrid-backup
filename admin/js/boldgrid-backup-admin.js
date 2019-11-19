@@ -1,5 +1,5 @@
 /**
- * This file contains javascript to load on all admin pages of the BoldGrid Backup plugin.
+ * This file contains javascript to load on all admin pages of the plugin
  *
  * @summary JS for all admin backup pages.
  *

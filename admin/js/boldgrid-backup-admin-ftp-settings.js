@@ -1,5 +1,5 @@
 /**
- * BoldGrid Backup FTP Settings
+ * FTP Settings
  *
  * @summary JavaScript for handling FTP Settings page.
  *

@@ -67,7 +67,7 @@ $col_container = apply_filters( 'Boldgrid\Library\Ui\render_col_container', $sec
 ?>
 
 <div class='wrap'>
-	<h1><?php esc_html_e( 'BoldGrid Backup Transfers', 'boldgrid-backup' ); ?></h1>
+	<h1><?php echo esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'Transfers', 'boldgrid-backup' ) ); ?></h1>
 	<div class="bgbkup-transfers-page">
 		<?php echo $nav . $col_container; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped ?>
 	</div>

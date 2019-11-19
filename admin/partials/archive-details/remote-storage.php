@@ -116,11 +116,12 @@ if ( ! $this->core->config->get_is_premium() ) {
 			/* 1 */ empty( $provider_span ) ? esc_html( $provider['title'] ) : $provider_span,
 			/* 2 */ wp_kses(
 				sprintf(
-					// translators: 1 an opening anchor tag linking to BoldGrid Backup, 2 its closing anchor tag, 3 the name of a remote storage provider.
-					__( 'Please upgrade to %1$sBackup Premium%2$s to enable %3$s.', 'boldgrid-backup' ),
+					// translators: 1: HTML opening anchor tag linking to the plugin, 2: HTML closing anchor tag, 3: Name of a remote storage provider, 4: Premium plugin title.
+					__( 'Please upgrade to %1$s%4$s%2$s to enable %3$s.', 'boldgrid-backup' ),
 					'<a href="' . esc_url( $this->core->go_pro->get_premium_url( 'bgbkup-details-' . $provider['key'] ) ) . '">',
 					'</a>',
-					$provider['title']
+					$provider['title'],
+					BOLDGRID_BACKUP_TITLE . ' Premium'
 				),
 				[
 					'span' => [

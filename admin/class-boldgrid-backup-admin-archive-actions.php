@@ -13,7 +13,7 @@
  */
 
 /**
- * BoldGrid Backup Admin Archive Actions Class.
+ * Class: Boldgrid_Backup_Admin_Archive_Actions
  *
  * @since 1.6.0
  */

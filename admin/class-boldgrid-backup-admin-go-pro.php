@@ -97,12 +97,13 @@ class Boldgrid_Backup_Admin_Go_Pro {
 				'id'      => 'boldgrid_backup_activate_premium',
 				'show'    => $is_premium && $this->core->config->is_premium_installed,
 				'message' => '<p>' . sprintf(
-					// translators: 1: URL address for the wp-admin plugins page.
+					// translators: 1: URL address for the wp-admin plugins page, 2: Plugin/extension title.
 					__(
-						'You have a <strong>Premium BoldGrid Connect Key</strong> and you have the <strong>BoldGrid Backup Premium Extension installed</strong>. Please go to your <a href="%1$s">plugins page</a> and activate your premium extension!',
+						'You have a <strong>Premium BoldGrid Connect Key</strong> and you have the <strong>%2$s Extension installed</strong>. Please go to your <a href="%1$s">plugins page</a> and activate your premium extension!',
 						'boldgrid-backup'
 					),
-					admin_url( 'plugins.php' )
+					admin_url( 'plugins.php' ),
+					BOLDGRID_BACKUP_TITLE . ' Premium'
 				) . '</p>',
 				'class'   => 'notice notice-warning',
 			],
@@ -111,9 +112,10 @@ class Boldgrid_Backup_Admin_Go_Pro {
 				'show'    => ! $is_premium && $this->core->config->is_premium_active,
 				'message' => '<p>' . sprintf(
 					// translators: 1: URL address for the upgrade page.
-					__( 'Thank you for activating the <strong>BoldGrid Backup Premium Extension</strong>! Before you can begin using all of the premium features, you must <a href="%2$s">add your premium key</a>. If you are using an Official BoldGrid Host, contact them or login to their management system to retrieve your Premium key. Otherwise, please visit <a href="%1$s" target="_blank">BoldGrid Central</a> to upgrade.', 'boldgrid-backup' ),
+					__( 'Thank you for activating the <strong>%3$s</strong> plugin! Before you can begin using all of the premium features, you must <a href="%2$s">add your premium key</a>. If you are using an Official BoldGrid Host, contact them or login to their management system to retrieve your Premium key. Otherwise, please visit <a href="%1$s" target="_blank">BoldGrid Central</a> to upgrade.', 'boldgrid-backup' ),
 					$this->get_premium_url( 'bgbkup-premium-activate' ),
-					admin_url( 'admin.php?page=boldgrid-backup-settings&section=connect_key' )
+					admin_url( 'admin.php?page=boldgrid-backup-settings&section=connect_key' ),
+					BOLDGRID_BACKUP_TITLE . ' Premium'
 				) . '</p>',
 				'class'   => 'notice notice-warning',
 			],
@@ -121,13 +123,14 @@ class Boldgrid_Backup_Admin_Go_Pro {
 				'id'      => 'boldgrid_backup_download_premium',
 				'show'    => $is_premium && ! $this->core->config->is_premium_installed,
 				'message' => '<p>' . sprintf(
-					// translators: 1: URL address to download the BoldGrid Backup Premium plugin 2: URL to plugin-installer.php
+					// translators: 1: URL address to download plugin 2: URL to plugin-installer.php
 					__(
-						'Hello there! We see that you have a <strong>Premium BoldGrid Connect Key</strong> and you have the <strong>BoldGrid Backup Plugin</strong> activated! <a href="%1$s">Click here</a> to download the <strong>BoldGrid Backup Premium Extension</strong> and gain access to more features! After the download completes, go to <a href="%2$s">Plugins &raquo; Add New</a> and click the <em>Upload Plugin</em> button at the top of the page to upload your new plugin.',
+						'Hello there! We see that you have a <strong>Premium BoldGrid Connect Key</strong> and you have the <strong>%3$s</strong> plugin activated! <a href="%1$s">Click here</a> to download the <strong>%3$s</strong> plugin and gain access to more features! After the download completes, go to <a href="%2$s">Plugins &raquo; Add New</a> and click the <em>Upload Plugin</em> button at the top of the page to upload your new plugin.',
 						'boldgrid-backup'
 					),
 					$premium_plugin->getDownloadUrl(),
-					admin_url( 'plugin-install.php' )
+					admin_url( 'plugin-install.php' ),
+					BOLDGRID_BACKUP_TITLE . ' Premium'
 				) . '</p>',
 				'class'   => 'notice notice-warning',
 			],
@@ -145,10 +148,7 @@ class Boldgrid_Backup_Admin_Go_Pro {
 	 * @since 1.6.0
 	 */
 	public function admin_notice_setup() {
-		/*
-		 * Don't bombard the user with admin notices. Only show these notices if the user is on a
-		 * BoldGrid Backup page.
-		 */
+		// Don't bombard the user with admin notices. Only show these notices if the user is on a page for this plugin.
 		$page = ! empty( $_GET['page'] ) ? $_GET['page'] : ''; // phpcs:ignore
 		if ( substr( $page, 0, strlen( 'boldgrid-backup' ) ) !== 'boldgrid-backup' ) {
 			return;

@@ -16,7 +16,7 @@ namespace Boldgrid\Backup\Admin\Card;
 /**
  * Class: Backups
  *
- * This class is responsible for rendering the "Backups" card on the BoldGrid Backup dashboard.
+ * This class is responsible for rendering the "Backups" card on this plugin's dashboard.
  *
  * @since 1.11.0
  */

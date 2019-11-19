@@ -57,18 +57,19 @@ class Boldgrid_Backup_Admin_Support {
 	public function deactivate( $error ) {
 		add_action(
 			'admin_notices', function () use ( $error ) {
-				$allowed_html = array(
-					'p'      => array(),
-					'strong' => array(),
-					'br'     => array(),
-					'em'     => array(),
-				);
+				$allowed_html = [
+					'p'      => [],
+					'strong' => [],
+					'br'     => [],
+					'em'     => [],
+				];
 
 				$error = '<p>' . sprintf(
-					/* translators: 1 and 2 are opening and closing string tags. */
-					__( '%1$sBoldGrid Backup%2$s has been deactivated due to the following error:', 'boldgrid-backup' ),
+					// translators: 1: HTML opening strong tags, 2: HTML closing strong tag, 3: Plugin title.
+					__( '%1$s%3$s%2$s has been deactivated due to the following error:', 'boldgrid-backup' ),
 					'<strong>',
-					'</strong>'
+					'</strong>',
+					BOLDGRID_BACKUP_TITLE
 				) . '<br /><br />' . $error . '</p>';
 
 				// Echo our admin notice. Hide the "plugin activated" notice.

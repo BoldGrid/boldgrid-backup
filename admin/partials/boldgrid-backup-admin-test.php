@@ -406,8 +406,8 @@ if ( $is_functional ) {
 			%1$s<br />
 			<a href="%3$s" target="_blank" />%2$s</a>
 		</p>',
-		esc_html__( 'BoldGrid Backup is not compatible with your hosting account. For further help please see:', 'boldgrid-backup' ),
-		esc_html__( 'Making your web hosting account compatible with BoldGrid Backup', 'boldgrid-backup' ),
+		esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'is not compatible with your hosting account. For further help please see:', 'boldgrid-backup' ) ),
+		esc_html( __( 'Making your web hosting account compatible with', 'boldgrid-backup' ) . ' ' . BOLDGRID_BACKUP_TITLE ),
 		esc_url( $this->configs['urls']['compatibility'] )
 	);
 }
@@ -442,7 +442,7 @@ $table .= '</table>';
 <div class="functionality-test-section wrap">
 
 	<?php
-	printf( '<h1>%1$s</h1>', esc_html__( 'BoldGrid Backup Preflight Check', 'boldgrid-backup' ) );
+	printf( '<h1>%1$s</h1>', esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'Preflight Check', 'boldgrid-backup' ) ) );
 
 	$nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
 	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped

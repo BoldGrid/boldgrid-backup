@@ -107,7 +107,7 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param  array $settings BoldGrid Backup settings.
+	 * @param  array $settings Settings.
 	 * @return bool
 	 */
 	public function add_all_crons( $settings = array() ) {
@@ -268,7 +268,7 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param  array  $settings BoldGrid Backup settings.
+	 * @param  array  $settings Settings.
 	 * @param  string $hook     Hook name.
 	 * @return bool
 	 */
@@ -325,9 +325,8 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	 * This hook will run every 5 minutes and run one job at a time, such as
 	 * upload to a remote storage provider.
 	 *
-	 * This method is usually ran after saving the BoldGrid Backup settings. If
-	 * after save wp-cron is our scheduler, then we need to make sure we have
-	 * the "run_jobs" wp-cron scheduled.
+	 * This method is usually ran after saving the settings. If after save wp-cron is our scheduler,
+	 * then we need tomake sure we have the "run_jobs" wp-cron scheduled.
 	 *
 	 * @since 1.5.2
 	 *

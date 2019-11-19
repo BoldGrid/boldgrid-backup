@@ -29,18 +29,22 @@ $size_info = __(
 	'boldgrid-backup'
 );
 
-$upload_info = __(
-	'You can upload a backup file that was created with BoldGrid Backup.
+$upload_info = sprintf(
+	// translators: 1: Plugin title.
+	__(
+		'You can upload a backup file that was created with %1$s.
 			If you choose to restore an uploaded file from a different web location (URL), then we will try to ensure that references to URL address are updated.
 			There may be times when some items may need to be updated manually.',
-	'boldgrid-backup'
+		'boldgrid-backup'
+	),
+	BOLDGRID_BACKUP_TITLE
 );
 
 $backup_id_notice = sprintf(
-	// translators: 1: HTML tag, 2: Filename part, 3: Backup identifier, 4: File extension, 5: Archive filename, 6: Backup directory path.
+	// translators: 1: HTML tag, 2: Filename part, 3: Backup identifier, 4: File extension, 5: Archive filename, 6: Backup directory path, 7: Plugin title.
 	__(
-		'Your BoldGrid Backup id is %3$s. This backup id is used to determine if a backup archive file is associated with this WordPress installation.
-		Manually uploaded archive files must have filenames starting with "%2$s", contain the BoldGrid Backup id "%3$s", and end with "%4$s", to be recognized.%1$s%1$s
+		'Your %7$s id is %3$s. This backup id is used to determine if a backup archive file is associated with this WordPress installation.
+		Manually uploaded archive files must have filenames starting with "%2$s", contain the %7$s id "%3$s", and end with "%4$s", to be recognized.%1$s%1$s
 		For example: %5$s%1$s%1$s
 		Manually uploaded archive files should be uploaded to: %6$s',
 		'boldgrid-backup'
@@ -50,7 +54,8 @@ $backup_id_notice = sprintf(
 	$backup_identifier,
 	'.zip',
 	'boldgrid-backup-' . $backup_identifier . '-my_backup_file.zip',
-	$settings['backup_directory']
+	$settings['backup_directory'],
+	BOLDGRID_BACKUP_TITLE
 );
 
 ?>

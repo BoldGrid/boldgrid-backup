@@ -1,9 +1,9 @@
-# BoldGrid Backup #
+# Total Upkeep #
 
 [![Build Status](https://travis-ci.org/BoldGrid/boldgrid-backup.svg?branch=master)](https://travis-ci.org/BoldGrid/boldgrid-backup)
 [![Greenkeeper badge](https://badges.greenkeeper.io/BoldGrid/boldgrid-backup.svg)](https://greenkeeper.io/)
 
-BoldGrid Backup provides WordPress backup and restoration with update protection.
+Total Upkeep provides WordPress backup and restoration with update protection.
 
 ## Description ##
 
@@ -27,6 +27,6 @@ WordPress backup and restoration with update protection.
 Before you can use the development version of this plugin you must install the dependencies.
 
 ```
-yarn install
+yarn
 composer install -o
 ```

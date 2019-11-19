@@ -29,7 +29,7 @@ $auto_selected    = empty( $active_selected ) && empty( $passive_selected ) ? $s
 ?>
 <form method="post">
 	<?php wp_nonce_field( 'bgb-settings-ftp', 'ftp_auth' ); ?>
-	<h1><?php esc_html_e( 'BoldGrid Backup - FTP Settings', 'boldgrid-backup' ); ?></h1>
+	<h1><?php echo esc_html( BOLDGRID_BACKUP_TITLE . ' - ' . __( 'FTP Settings', 'boldgrid-backup' ) ); ?></h1>
 	<hr />
 	<table class="widefat fixed striped">
 		<tr>

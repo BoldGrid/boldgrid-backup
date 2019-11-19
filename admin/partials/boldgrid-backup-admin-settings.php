@@ -124,7 +124,7 @@ wp_nonce_field( 'boldgrid_backup_settings' );
 
 ?>
 <div class='wrap'>
-	<h1><?php esc_html_e( 'BoldGrid Backup and Restore Settings', 'boldgrid-backup' ); ?></h1>
+	<h1><?php echo esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'Backup and Restore Settings', 'boldgrid-backup' ) ); ?></h1>
 
 	<?php
 	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
@@ -132,7 +132,7 @@ wp_nonce_field( 'boldgrid_backup_settings' );
 	/*
 	 * Print this text:
 	 *
-	 * The BoldGrid Backup and Restore system allows you to upgrade your themes and plugins without
+	 * The BOLDGRID_BACKUP_TITLE and Restore system allows you to upgrade your themes and plugins without
 	 * being afraid it will do something you cannot easily undo. We perform a Preflight Check to see
 	 * if the needed support is available on your web hosting account.
 	 */
@@ -141,13 +141,14 @@ wp_nonce_field( 'boldgrid_backup_settings' );
 	<?php
 	printf(
 		wp_kses(
-			// translators: 1: URL address.
+			// translators: 1: Plugin title, 2:URL address.
 			__(
-				'The BoldGrid Backup and Restore system allows you to upgrade your themes and plugins without being afraid it will do something you cannot easily undo. We perform a <a href="%s">Preflight Check</a> to see if the needed support is available on your web hosting account.',
+				'The %1$s Backup and Restore system allows you to upgrade your themes and plugins without being afraid it will do something you cannot easily undo. We perform a <a href="%2$s">Preflight Check</a> to see if the needed support is available on your web hosting account.',
 				'boldgrid-backup'
 			),
 			[ 'a' => [ 'href' => [] ] ]
 		),
+		esc_html( BOLDGRID_BACKUP_TITLE ),
 		esc_url( admin_url( 'admin.php?page=boldgrid-backup-test' ) )
 	);
 

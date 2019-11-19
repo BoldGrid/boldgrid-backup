@@ -104,7 +104,7 @@ class Boldgrid_Backup_Admin_Cron_Log {
 		$message = sprintf(
 			wp_kses(
 				/* translators: %1$s is the URL to view the cron log. */
-				__( 'Your latest <strong>BoldGrid Backup</strong> <em>scheduled backup</em> may not have finished successfully. For more info, please <a href="%1$s">click here</a> to see your latest <em>cron notices</em>.', 'boldgrid-backup' ),
+				__( 'Your latest <em>scheduled backup</em> may not have finished successfully. For more info, please <a href="%1$s">click here</a> to see your latest <em>cron notices</em>.', 'boldgrid-backup' ),
 				array(
 					'a'      => array(
 						'href' => array(),

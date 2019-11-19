@@ -1,5 +1,5 @@
 /**
- * Browser.
+ * Browser
  *
  * @summary JS for all admin backup pages.
  *

@@ -2,7 +2,7 @@
 /**
  * File: retention.php
  *
- * Show the retention settings section of the BoldGrid Backup settings page.
+ * Show the retention settings section of the settings page.
  *
  * @link https://www.boldgrid.com
  * @since 1.3.1

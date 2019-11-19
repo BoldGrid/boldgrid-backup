@@ -193,7 +193,11 @@ class Boldgrid_Backup_Admin_Test {
 		$random_filename = $dir . $this->test_prefix . mt_rand();
 		$txt_filename    = $random_filename . '.txt';
 		$info_filename   = $random_filename . '.rtf';
-		$str             = __( 'This is a test file from BoldGrid Backup. You can delete this file.', 'boldgrid-backup' );
+		$str             = sprintf(
+			// translators: 1: Plugin title.
+			__( 'This is a test file from %1$s. You can delete this file.', 'boldgrid-backup' ),
+			BOLDGRID_BACKUP_TITLE
+		);
 
 		$data['exists'] = $this->core->wp_filesystem->exists( $dir );
 		$data['read']   = $this->core->wp_filesystem->is_readable( $dir );
@@ -412,7 +416,7 @@ class Boldgrid_Backup_Admin_Test {
 			return $this->is_crontab_available;
 		}
 
-		$test_entry = '# BoldGrid Backup Test Entry ' . time() . ' (You can delete this line).';
+		$test_entry = '# ' . BOLDGRID_BACKUP_TITLE . ' Test Entry ' . time() . ' (You can delete this line).';
 
 		/*
 		 * To determine if crontab is available, we will BOTH write and remove

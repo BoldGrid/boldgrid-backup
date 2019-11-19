@@ -16,8 +16,7 @@ namespace Boldgrid\Backup\Admin\Card\Feature;
 /**
  * Class: Scheduled_Backups
  *
- * This class is responsible for displaying the scheduled backups feature on the BoldGrid Backup
- * dashboard.
+ * This class is responsible for displaying the scheduled backups feature on this plugin's dashboard.
  *
  * @since 1.11.0
  */

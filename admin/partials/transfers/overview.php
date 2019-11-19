@@ -21,7 +21,7 @@ return sprintf(
 	<p>%2$s</p>
 	<p>%3$s</p>
 </div>',
-	esc_html__( 'Easily transfer websites!', 'boldgrid-backup' ),
-	esc_html__( 'BoldGrid Backup provides an easy way to transfer a website from one installation to another.', 'boldgrid-backup' ),
-	esc_html__( 'Use the section selection on the left to choose if this WordPress installation is either the source or destination.', 'boldgrid-backup' )
+	esc_html__( 'Easily transfer websites!', 'boldgrid_backup' ),
+	esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'provides an easy way to transfer a website from one installation to another.', 'boldgrid_backup' ) ),
+	esc_html__( 'Use the section selection on the left to choose if this WordPress installation is either the source or destination.', 'boldgrid_backup' )
 );

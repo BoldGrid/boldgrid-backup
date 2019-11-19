@@ -80,9 +80,18 @@ return sprintf(
 			%8$s
 		</div>
 	</div>',
-	esc_html__( 'Use this section if you want to select this WordPress installation as the destination.', 'boldgrid-backup' ),
-	esc_html__( 'Retrieve a download link from BoldGrid Backup on another WordPress installation, paste the link in form below, and click "Upload".  Once the download completes, you can either inspect the backup files and database or click "Restore".', 'boldgrid-backup' ),
-	esc_html__( 'Note: Performing a restoration in this installation will replace files and the database contents.', 'boldgrid-backup' ),
+	esc_html__( 'Use this section if you want to select this WordPress installation as the destination.', 'boldgrid_backup' ),
+	esc_html(
+		sprintf(
+			// translators: 1: Plugin title.
+			__(
+				'Retrieve a download link from %1$s on another WordPress installation, paste the link in form below, and click "Upload".  Once the download completes, you can either inspect the backup files and database or click "Restore".',
+				'boldgrid_backup'
+			),
+			BOLDGRID_BACKUP_TITLE
+		)
+	),
+	esc_html__( 'Note: Performing a restoration in this installation will replace files and the database contents.', 'boldgrid_backup' ),
 	esc_html__( 'Import from a download link:', 'boldgrid-backup' ),
 	esc_attr__( 'Download URL address', 'boldgrid-backup' ),
 	esc_attr__( 'Upload', 'boldgrid-backup' ),

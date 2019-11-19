@@ -10,7 +10,6 @@
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/includes
  * @copyright  BoldGrid
- * @version    $Id$
  * @author     BoldGrid <support@boldgrid.com>
  */
 
@@ -25,7 +24,7 @@ $core = apply_filters( 'boldgrid_backup_get_core', null );
 
 /*
  * The site_url is mainly needed for crontab, as one linux account may be running more than
- * once instance of BoldGrid Backup.
+ * once instance of this plugin.
  *
  * For example, we could find the backup cron entry by searching for, "mode=backup", but we
  * would get multiple results if more than one site was adding cron entries.

@@ -1,7 +1,7 @@
 /**
- * BoldGrid Backup admin home page.
+ * Plugin home page
  *
- * @summary JavaScript for the BoldGrid Backup admin home page.
+ * @summary JavaScript for the plugin home page.
  *
  * @since 1.0
  *
