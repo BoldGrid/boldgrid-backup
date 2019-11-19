@@ -1171,14 +1171,13 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->set_time_limit();
 
-		// If BGBP is activated, then check for encryption.
-		if ( class_exists( 'Boldgrid_Backup_Premium_Admin_Core' ) ) {
-			$premium_core = new Boldgrid_Backup_Premium_Admin_Core( $this );
-
-			// If the dump file is encrypted, then try to decrpyt it.
-			if ( $db_encrypted && $premium_core->crypt->is_file_encrypted( $db_dump_filepath ) ) {
-				$premium_core->crypt->crypt_file( $db_dump_filepath, 'd' );
-			}
+		if ( $db_encrypted ) {
+			/**
+			 * If BGBP is activated, then check for encryption and decrypt the file.
+			 *
+			 * @since 1.12.0
+			 */
+			do_Action( 'boldgrid_backup_crypt_file', $db_dump_filepath, 'd' );
 		}
 
 		// Import the dump file.
