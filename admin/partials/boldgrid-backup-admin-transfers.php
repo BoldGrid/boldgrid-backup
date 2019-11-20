@@ -13,6 +13,10 @@
 
 defined( 'WPINC' ) || die;
 
+$is_premium           = $this->core->config->get_is_premium();
+$is_premium_installed = $this->core->config->is_premium_installed;
+$is_premium_active    = $this->core->config->is_premium_active;
+
 $nav         = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
 $overview    = include BOLDGRID_BACKUP_PATH . '/admin/partials/transfers/overview.php';
 $source      = include BOLDGRID_BACKUP_PATH . '/admin/partials/transfers/source.php';

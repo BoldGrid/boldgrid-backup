@@ -30,7 +30,7 @@ $allowed_tags = [
 $lang = [
 	'feel_good_value' => sprintf(
 		// translators: 1: Plugin title.
-		__(
+		esc_html__(
 			'If you feel you\'re getting really good value from the %1$s plugin, could you do us a favor and rate us 5 stars on WordPress?',
 			'boldgrid-backup'
 		),
@@ -58,17 +58,17 @@ $default_prompt = [
 			 */
 			'decisions' => [
 				'sure_will'           => [
-					'text'  => __( 'Yes, I sure will!', 'boldgrid-backup' ),
+					'text'  => esc_html__( 'Yes, I sure will!', 'boldgrid-backup' ),
 					'link'  => 'https://wordpress.org/support/plugin/boldgrid-backup/reviews/',
 					'slide' => 'thanks',
 				],
 				'maybe_still_testing' => [
-					'text'   => __( 'Maybe later, I\'m still testing the plugin.', 'boldgrid-backup' ),
+					'text'   => esc_html__( 'Maybe later, I\'m still testing the plugin.', 'boldgrid-backup' ),
 					'snooze' => WEEK_IN_SECONDS,
 					'slide'  => 'maybe_later',
 				],
 				'already_did'         => [
-					'text'  => __( 'I already did', 'boldgrid-backup' ),
+					'text'  => esc_html__( 'I already did', 'boldgrid-backup' ),
 					'slide' => 'already_did',
 				],
 			],
@@ -77,7 +77,7 @@ $default_prompt = [
 			'text' => sprintf(
 				wp_kses(
 					// translators: 1: Plugin title, 2: The URL to the boldgrid-backup plugin in the plugin repo.
-					__(
+					esc_html__(
 						'Thanks! A new page should have opened to the %1$s ratings page on WordPress.org. You will need to log in to your WordPress.org account before you can post a review. If the page didn\'t open, please click the following link: <a href="%2$s" target="_blank">%2$s</a>',
 						'boldgrid-backup'
 					),
@@ -91,7 +91,7 @@ $default_prompt = [
 			'text' => sprintf(
 				wp_kses(
 					// translators: 1: The URL to submit boldgrid-backup bug reports and feature requests.
-					__(
+					esc_html__(
 						'No problem, maybe now is not a good time. We want to be your WordPress backup plugin of choice. If you\'re experiencing a problem or want to make a suggestion, please %1$sclick here%2$s.',
 						'boldgrid-backup'
 					),
@@ -105,7 +105,7 @@ $default_prompt = [
 			'text' => sprintf(
 				wp_kses(
 					// translators: 1: HTML opening anchor tag linking to submit boldgrid-backup bug reports and feature requests, 2: HTML closing anchor tag, 3: Plugin title.
-					__(
+					esc_html__(
 						'Thank you for the previous rating! You can help us to continue improving the %3$s plugin by reporting any bugs or submitting feature requests %1$shere%2$s. Thank you for using the %3$s plugin!',
 						'boldgrid-backup'
 					),
@@ -122,19 +122,20 @@ $default_prompt = [
 // Set a title or description for your backup.
 $title_description_prompt                            = $default_prompt;
 $title_description_prompt['name']                    = 'update_title_description';
-$title_description_prompt['slides']['start']['text'] = __( 'We hope that you\'re finding adding titles and descriptions to your backups helpful in keeping things organized.', 'boldgrid-backup' ) . ' ' . $lang['feel_good_value'];
+$title_description_prompt['slides']['start']['text'] = esc_html__( 'We hope that you\'re finding adding titles and descriptions to your backups helpful in keeping things organized.', 'boldgrid-backup' ) . ' ' . $lang['feel_good_value'];
 
 // Download a backup to your local machine.
 $download_prompt                            = $default_prompt;
 $download_prompt['name']                    = 'download_to_local_machine';
-$download_prompt['slides']['start']['text'] = __( 'We\'re glad to see you\'re keeping your backups safe and downloading them to your local machine!', 'boldgrid-backup' ) . ' ' . $lang['feel_good_value'];
+$download_prompt['slides']['start']['text'] = esc_html__( 'We\'re glad to see you\'re keeping your backups safe and downloading them to your local machine!', 'boldgrid-backup' ) . ' ' . $lang['feel_good_value'];
 
 // Create any type of backup.
 $any_backup_prompt                            = $default_prompt;
 $any_backup_prompt['name']                    = 'any_backup_created';
 $any_backup_prompt['slides']['start']['text'] = sprintf(
 	// translators: 1: Plugin title.
-	__( 'It looks like you\'ve created 10 backups with the %1$s plugin!', 'boldgrid-backup' )
+	esc_html__( 'It looks like you\'ve created 10 backups with the %1$s plugin!', 'boldgrid-backup' ),
+	BOLDGRID_BACKUP_TITLE
 ) . ' ' . $lang['feel_good_value'];
 
 return [

@@ -26,6 +26,7 @@ $auto_updates    = include $library_dir . 'src/Library/Views/Connect/AutoUpdates
 $notifications   = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/notifications.php';
 $connect_key     = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/connect-key.php';
 $site_check      = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/site-check.php';
+$backup_security = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/backup-security.php';
 $days_of_week    = '';
 $time_of_day     = '';
 $storage         = '';
@@ -36,39 +37,44 @@ if ( $this->core->scheduler->is_available( 'cron' ) || $this->core->scheduler->i
 	$storage      = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/storage.php';
 }
 
-$sections = array(
-	'sections'       => array(
-		array(
+$sections = [
+	'sections'       => [
+		[
 			'id'      => 'section_schedule',
 			'title'   => __( 'Backup Schedule', 'boldgrid-backup' ),
 			'content' => $days_of_week . $time_of_day . $scheduler,
-		),
-		array(
+		],
+		[
 			'id'      => 'section_storage',
 			'title'   => __( 'Backup Storage', 'boldgrid-backup' ),
 			'content' => $storage . $folders_include . $db,
-		),
-		array(
+		],
+		[
+			'id'      => 'section_security',
+			'title'   => __( 'Backup Security', 'boldgrid-backup' ),
+			'content' => $backup_security,
+		],
+		[
 			'id'      => 'connect_key',
 			'title'   => __( 'BoldGrid Connect Key', 'boldgrid-backup' ),
 			'content' => $connect_key,
-		),
-		array(
+		],
+		[
 			'id'      => 'section_auto_updates',
 			'title'   => __( 'Auto Updates', 'boldgrid-backup' ),
 			'content' => $auto_backup . $auto_updates,
-		),
-		array(
+		],
+		[
 			'id'      => 'section_site_check',
 			'title'   => __( 'Site Check', 'boldgrid-backup' ),
 			'content' => $site_check,
-		),
-		array(
+		],
+		[
 			'id'      => 'section_notifications',
 			'title'   => __( 'Notifications', 'boldgrid-backup' ),
 			'content' => $notifications,
-		),
-	),
+		],
+	],
 	'post_col_right' => sprintf(
 		'
 		<div id="boldgrid-settings-submit-div">
@@ -78,7 +84,7 @@ $sections = array(
 		</div>',
 		__( 'Save Changes', 'boldgrid-backup' )
 	),
-);
+];
 
 /**
  * Allow other plugins to modify the sections of the settings page.
@@ -107,10 +113,10 @@ if ( is_array( $col_container ) ) {
 if ( empty( $settings ) ) {
 	add_action(
 		'admin_footer',
-		array(
+		[
 			$this,
 			'notice_settings_retrieval',
-		)
+		]
 	);
 }
 
@@ -140,7 +146,7 @@ wp_nonce_field( 'boldgrid_backup_settings' );
 				'The %1$s Backup and Restore system allows you to upgrade your themes and plugins without being afraid it will do something you cannot easily undo. We perform a <a href="%2$s">Preflight Check</a> to see if the needed support is available on your web hosting account.',
 				'boldgrid-backup'
 			),
-			array( 'a' => array( 'href' => array() ) )
+			[ 'a' => [ 'href' => [] ] ]
 		),
 		esc_html( BOLDGRID_BACKUP_TITLE ),
 		esc_url( admin_url( 'admin.php?page=boldgrid-backup-test' ) )

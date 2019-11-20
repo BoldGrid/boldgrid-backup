@@ -67,7 +67,7 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		 *
 		 * @since 1.6.0
 		 */
-		do_action( 'boldgrid_backup_pre_dump' );
+		do_action( 'boldgrid_backup_pre_dump', $file );
 
 		// Some hosts may configure the DB_HOST as localhost:3306. Strip out the port.
 		$db_host = explode( ':', DB_HOST );
@@ -93,7 +93,7 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		 *
 		 * @since 1.6.0
 		 */
-		do_action( 'boldgrid_backup_post_dump' );
+		do_action( 'boldgrid_backup_post_dump', $file );
 
 		return true;
 	}
@@ -108,11 +108,20 @@ class Boldgrid_Backup_Admin_Db_Dump {
 	 * @return array
 	 */
 	public function get_insert_count( $filepath, $file ) {
-		$return = array();
+		$return = [];
+		$tables = [];
 
-		$tables = $this->get_insert_tables( $filepath, $file );
+		$this->core->archive->init( $filepath );
 
-		$file_contents = $this->core->archive->get_file( $file );
+		$file_contents = $this->core->archive->get_dump_file( $file );
+
+		// Check for the dump file header.
+		if ( false !== strpos( $file_contents[0]['content'], '-- mysqldump-php' ) ) {
+			$tables = $this->get_insert_tables( $filepath, $file );
+		} else {
+			// The file header is missing; the file may have been encrypted with other settings.
+			$return = [ 'encrypted_other' => true ];
+		}
 
 		foreach ( $tables as $table ) {
 			/*
@@ -176,7 +185,7 @@ class Boldgrid_Backup_Admin_Db_Dump {
 	 */
 	public function get_insert_tables( $filepath, $file ) {
 		$this->core->archive->init( $filepath );
-		$file_contents = $this->core->archive->get_file( $file );
+		$file_contents = $this->core->archive->get_dump_file( $file );
 
 		/*
 		 * Get a list of all tables within the dump that we are inserting

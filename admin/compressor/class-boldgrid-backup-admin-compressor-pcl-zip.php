@@ -342,7 +342,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 	 * @param  string $filepath    Archive path, such as "/home/user/boldgrid_backup/archive.zip".
 	 * @param  string $file        A file path in the archive file, such as "wp-content/index.php".
 	 * @return mixed False on failure, array on success {
-	 *     Accessed via $file_contentws[0].
+	 *     Accessed via $file_contents[0].
 	 *
 	 *     @type string $filename        wp-content/index.php
 	 *     @type string $stored_filename wp-content/index.php

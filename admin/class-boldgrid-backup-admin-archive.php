@@ -207,6 +207,23 @@ class Boldgrid_Backup_Admin_Archive {
 	}
 
 	/**
+	 * Get the database dump file from an archive.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param  string $file      The file to get.
+	 * @return array
+	 */
+	public function get_dump_file( $file ) {
+		/**
+		 * Handle encryption.
+		 *
+		 * @since 1.12.0
+		 */
+		return apply_filters( 'boldgrid_backup_post_get_dump_file', $this->get_file( $file ) );
+	}
+
+	/**
 	 * Get the filesize of the backup file itself.
 	 *
 	 * IE the size of the zip file, not the size of everything before compression.
@@ -270,7 +287,7 @@ class Boldgrid_Backup_Admin_Archive {
 	 *
 	 * @since 1.7.3
 	 *
-	 * @param string $filename
+	 * @param string $filename Filename.
 	 */
 	public function init_by_filename( $filename ) {
 		$filepath = $this->core->backup_dir->get_path_to( $filename );
@@ -438,6 +455,28 @@ class Boldgrid_Backup_Admin_Archive {
 	 * @return bool
 	 */
 	public function set_attribute( $key, $value ) {
+		$old_value = isset( $this->log[ $key ] ) ? $this->log[ $key ] : null;
+
+		// If the value is not changing, then return success.
+		if ( $value === $old_value ) {
+			return true;
+		}
+
+		/**
+		 * Filter archive attribute value.
+		 *
+		 * Allows operations to be performed on attribute changes and alter the value depending on results.
+		 *
+		 * @since 1.12.0
+		 *
+		 * @param  string $filepath  Archive filepath.
+		 * @param  string $key       Key name.
+		 * @param  string $value     New value.
+		 * @param  string $old_value Old value.
+		 * @return string
+		 */
+		$value = apply_filters( 'boldgrid_backup_archive_set_attribute', $this->filepath, $key, $value, $old_value );
+
 		$this->log[ $key ] = $value;
 
 		return $this->core->archive_log->write( $this->log );
@@ -468,7 +507,7 @@ class Boldgrid_Backup_Admin_Archive {
 	 *
 	 * @see Boldgrid_Backup_Admin_Archive::get_by_name()
 	 *
-	 * @param  string $filename
+	 * @param  string $filename Filename.
 	 * @return array
 	 */
 	public function validate_link_request( $filename ) {
@@ -526,7 +565,7 @@ class Boldgrid_Backup_Admin_Archive {
 	 * @see Boldgrid_Backup_Admin_Archive::validate_link_request()
 	 * @see Boldgrid_Backup_Authentication::create_token()
 	 *
-	 * @param  string $filename
+	 * @param  string $filename Filename.
 	 * @return string
 	 */
 	public function generate_download_link( $filename ) {
@@ -595,6 +634,8 @@ class Boldgrid_Backup_Admin_Archive {
 			$archive_filename = basename( $archive_filepath );
 			$archive_info     = $this->core->archive->get_by_name( $archive_filename );
 			$archive_key      = isset( $archive_info['key'] ) ? $archive_info['key'] : null;
+			$encrypt_db       = ! empty( $archive_info['encrypt_db'] );
+			$encrypt_sig      = isset( $archive_info['encrypt_sig'] ) ? $archive_info['encrypt_sig'] : null;
 			$cron_secret      = $this->core->cron->get_cron_secret();
 			$siteurl          = site_url();
 			$site_title       = get_bloginfo( 'name' );
@@ -632,5 +673,32 @@ class Boldgrid_Backup_Admin_Archive {
 		}
 
 		return $success;
+	}
+
+	/**
+	 * Delete a file from an archive.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param \PclZip $archive  PCLZip achive object.
+	 * @param string  $filename Filename to delete.
+	 * @param array   $list     Content list from the archive object.
+	 */
+	public function delete_from_archive( &$archive, $filename, $list = null ) {
+		if ( is_a( $archive, '\PclZip' ) && empty( $list ) ) {
+			$list = $archive->listContent();
+		}
+
+		if ( is_a( $archive, '\PclZip' ) && ! empty( $filename ) && ! empty( $list ) ) {
+			foreach ( $list as $index => $filedata ) {
+				if ( $filename === $filedata['filename'] ) {
+					$remaining = $archive->deleteByIndex( $index );
+
+					if ( ! empty( $remaining[1] ) ) {
+						$this->delete_from_archive( $archive, $filename, $remaining );
+					}
+				}
+			}
+		}
 	}
 }

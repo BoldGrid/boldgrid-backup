@@ -20,7 +20,7 @@ defined( 'WPINC' ) || die;
 
 $details = '';
 
-$attribute = '<p><strong>%1$s</strong>: %2$s</p>';
+$attribute = '<p><strong>%1$s</strong>: <span id="bgb-details-%3$s" data-value="%4$s">%2$s</span></p>';
 
 $datas = array(
 	array(
@@ -70,17 +70,22 @@ foreach ( $datas as $data ) {
 		$details .= sprintf( '<h2>%1$s:</h2>', $data['heading'] );
 	}
 
-	$value = $archive[ $data['key'] ];
+	$value      = $archive[ $data['key'] ];
+	$value_data = '';
+
 	if ( ! empty( $data['presentation'] ) ) {
 		switch ( $data['presentation'] ) {
 			case 'bytes_to_human':
-				$value = Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive[ $data['key'] ] );
+				$value      = Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive[ $data['key'] ] );
+				$value_data = $archive[ $data['key'] ];
 				break;
 			case 'bool':
-				$value = $archive[ $data['key'] ] ? __( 'yes', 'boldgrid-backup' ) : __( 'no', 'boldgrid-backup' );
+				$value      = $archive[ $data['key'] ] ? __( 'yes', 'boldgrid-backup' ) : __( 'no', 'boldgrid-backup' );
+				$value_data = $archive[ $data['key'] ] ? 'Y' : 'N';
 				break;
 			case 'comma_implode':
-				$value = empty( $value ) ? __( 'n/a', 'boldgrid-backup' ) : implode( ', ', $value );
+				$value      = empty( $value ) ? __( 'n/a', 'boldgrid-backup' ) : implode( ', ', $value );
+				$value_data = $value;
 				break;
 		}
 	}
@@ -93,7 +98,12 @@ foreach ( $datas as $data ) {
 		$value .= sprintf( '<input type="hidden" id="%1$s" value="%2$s" />', $data['key'], $archive[ $data['key'] ] );
 	}
 
-	$details .= sprintf( $attribute, $data['title'], $value );
+	$details .= sprintf( $attribute, $data['title'], $value, $data['key'], $value_data );
 }
 
-return $details;
+/**
+ * Filter the archive details.
+ *
+ * @since 1.12.0
+ */
+return apply_filters( 'boldgrid_backup_filter_archive_details', $details, $archive );

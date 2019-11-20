@@ -107,7 +107,7 @@ class Boldgrid_Backup_Admin_Settings {
 	 */
 	public function get_settings( $raw = false ) {
 		// Get settings.
-		$settings = get_site_option( 'boldgrid_backup_settings', array() );
+		$settings = get_site_option( 'boldgrid_backup_settings', [] );
 
 		if ( $raw ) {
 			return $settings;
@@ -251,6 +251,9 @@ class Boldgrid_Backup_Admin_Settings {
 		$settings['site_check']['interval'] = ( isset( $settings['site_check']['interval'] ) &&
 			4 < $settings['site_check']['interval'] && 60 > $settings['site_check']['interval'] ) ?
 			$settings['site_check']['interval'] : 15;
+
+		// Encryption.
+		$settings['encrypt_db'] = isset( $settings['encrypt_db'] ) ? (bool) $settings['encrypt_db'] : false;
 
 		// Return the settings array.
 		return $settings;
@@ -587,6 +590,9 @@ class Boldgrid_Backup_Admin_Settings {
 					$settings['notification_email'] = sanitize_email( $_POST['notification_email'] );
 			}
 
+			// Database encryption.
+			$settings['encrypt_db'] = isset( $_POST['encrypt_db'] ) && '1' === $_POST['encrypt_db'];
+
 			/*
 			 * Save compressor settings.
 			 *
@@ -715,9 +721,10 @@ class Boldgrid_Backup_Admin_Settings {
 				$boldgrid_settings['theme_autoupdate']
 			);
 
+			$settings['updated'] = time();
+
 			// If no errors, then save the settings.
 			if ( ! $update_error ) {
-				$settings['updated'] = time();
 				update_site_option( 'boldgrid_backup_settings', $settings );
 				update_option( 'boldgrid_settings', $boldgrid_settings );
 			}
@@ -747,7 +754,7 @@ class Boldgrid_Backup_Admin_Settings {
 			 *
 			 * @since 1.5.3
 			 */
-			do_action( 'boldgrid_backup_settings_updated' );
+			do_action( 'boldgrid_backup_settings_updated', $settings );
 		}
 
 		// Return success.
@@ -767,8 +774,15 @@ class Boldgrid_Backup_Admin_Settings {
 	 * Menu callback to display the Backup schedule page.
 	 *
 	 * @since 1.0
+	 *
+	 * @see Boldgrid_Backup_Admin_Config::get_is_premium
+	 * @see Boldgrid_Backup_Admin_Config::is_premium_active
 	 */
 	public function page_backup_settings() {
+		$is_premium           = $this->core->config->get_is_premium();
+		$is_premium_installed = $this->core->config->is_premium_installed;
+		$is_premium_active    = $this->core->config->is_premium_active;
+
 		add_thickbox();
 		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
 		wp_enqueue_style( 'bglib-ui-css' );
@@ -897,6 +911,10 @@ class Boldgrid_Backup_Admin_Settings {
 		}
 
 		$available_compressors = $this->core->compressors->get_available();
+
+		if ( ! $is_premium || ! $is_premium_installed || ! $is_premium_active ) {
+			$settings['encrypt_db'] = false;
+		}
 
 		// Include the page template.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-settings.php';

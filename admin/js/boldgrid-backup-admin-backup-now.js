@@ -149,7 +149,7 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 		 * Else, trigger 'boldgrid_backup_initiated'. The only listener is in-progress.js. When a
 		 * backup has been initiated, it starts the WordPress Heartbeat and shows the in progress container.
 		 */
-		if ( 'boldgrid-backup_page_boldgrid-backup' === pagenow ) {
+		if ( 'total-upkeep_page_boldgrid-backup' === pagenow ) {
 			setTimeout( function() {
 				location.reload();
 			}, 3000 );
