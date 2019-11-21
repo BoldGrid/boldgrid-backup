@@ -2311,6 +2311,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->auto_rollback->enqueue_home_scripts();
 		$this->auto_rollback->enqueue_backup_scripts();
+		$this->archive_actions->enqueue_scripts();
 
 		$this->folder_exclusion->enqueue_scripts();
 		$this->db_omit->enqueue_scripts();

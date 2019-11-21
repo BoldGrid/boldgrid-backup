@@ -12,8 +12,7 @@ var BOLDGRID = BOLDGRID || {};
 BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 
 BOLDGRID.BACKUP.ACTIONS = function( $ ) {
-	var $body,
-		$wpbbody,
+	var $wpbody,
 		self = this,
 		lang = BoldGridBackupAdminArchiveActions;
 
@@ -112,22 +111,20 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 	 * @since 1.6.0
 	 */
 	self.restoreArchiveConfirm = function() {
-		var confirmResponse,
-			restoreConfirmText,
-			$this = $( this ),
-			filename = $this.attr( 'data-archive-filename' ),
+		var $this = $( this ),
+			confirmResponse,
+			filename = $this.data( 'archive-filename' ),
+			restoreConfirmText = lang.restoreConfirmText.replace( '%s', filename ),
 			data = {
 				action: 'boldgrid_backup_restore_archive',
-				restore_now: $this.attr( 'data-restore-now' ),
-				archive_key: $this.attr( 'data-archive-key' ),
+				restore_now: $this.data( 'restore-now' ),
+				archive_key: $this.data( 'archive-key' ),
 				archive_filename: filename,
-				archive_auth: $this.attr( 'data-nonce' )
+				archive_auth: $this.data( 'nonce' )
 			},
 			$spinner = $this.next( '.spinner' ),
-			encryptDb = $wpbody.find( '#bgb-details-encrypt_db' ).data( 'value' );
-		tokenMatch = $wpbody.find( '#bgbp-token-match' ).data( 'value' );
-
-		restoreConfirmText = lang.restoreConfirmText.replace( '%s', filename );
+			encryptDb = $wpbody.find( '#bgb-details-encrypt_db' ).data( 'value' ),
+			tokenMatch = $wpbody.find( '#bgbp-token-match' ).data( 'value' );
 
 		if ( 'Y' === encryptDb && 'Y' !== tokenMatch ) {
 			restoreConfirmText = restoreConfirmText + '\n\n' + lang.tokenMismatchText;
@@ -254,14 +251,13 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 	};
 
 	$( function() {
-		$body = $( 'body' );
-		$wpbody = $body.find( '#wpbody' );
+		$wpbody = $( 'body #wpbody' );
 
-		$body.on( 'click', '.action-download', self.downloadArchive );
-		$body.on( 'click', '.restore-now', self.restoreArchiveConfirm );
-		$body.on( 'click', '#delete-action a', self.onClickDelete );
-		$body.on( 'click', '#download-link-button', self.getDownloadLink );
-		$body.on( 'click', '#download-copy-button', self.updateCopyText );
+		$wpbody.on( 'click', '.action-download', self.downloadArchive );
+		$wpbody.on( 'click', '.restore-now', self.restoreArchiveConfirm );
+		$wpbody.on( 'click', '#delete-action a', self.onClickDelete );
+		$wpbody.on( 'click', '#download-link-button', self.getDownloadLink );
+		$wpbody.on( 'click', '#download-copy-button', self.updateCopyText );
 	} );
 };
 

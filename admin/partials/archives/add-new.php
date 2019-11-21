@@ -82,6 +82,7 @@ printf(
 		<p><?php esc_html_e( 'Import from a download link:', 'boldgrid-backup' ); ?></p>
 		<input type="text" name="url"
 			placeholder="<?php esc_attr_e( 'Download URL address', 'boldgrid-backup' ); ?>" size="30" />
+		<?php wp_nonce_field( 'boldgrid_backup_restore_archive', '_wpnonce_restore' ); ?>
 		<input class="button" type="submit" value="<?php esc_attr_e( 'Upload', 'boldgrid-backup' ); ?>" />
 		<span class='spinner'></span>
 		<div id="url-import-notice" class="notice notice-success inline"></div>

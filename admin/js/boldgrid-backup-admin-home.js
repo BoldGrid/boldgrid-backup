@@ -215,12 +215,13 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 			$this = $( this ),
 			$spinner = $this.next(),
 			$notice = $( '#url-import-notice' ),
+			wpnonce = $( '#_wpnonce' ).val(),
 			urlRegex = new RegExp( lang.urlRegex, 'i' ),
 			data = {
 				action: 'boldgrid_backup_url_upload',
-				_wpnonce: $( '[name="_wpnonce"]' ).val(),
-				_wp_http_referer: $( '[name="_wp_http_referer"]' ).val(),
-				url: $( '[name="url"]' ).val()
+				_wpnonce: wpnonce,
+				_wp_http_referer: $( 'input[name="_wp_http_referer"]' ).val(),
+				url: $( 'input[name="url"]' ).val()
 			};
 
 		e.preventDefault();
