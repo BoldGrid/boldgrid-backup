@@ -144,11 +144,12 @@ if ( ! $archive_found ) {
 				$premium_message = sprintf(
 					'<div class="premium">%1$s</div>
 					<div><p>%2$s</p></div>',
-					__(
+					esc_html__(
 						'Upgrade to Premium to protect your sensitive data!',
 						'boldgrid-backup'
 					),
-					$this->core->go_pro->get_premium_button( $premium_url )
+					'<form action="' . $premium_url . '" target="_blank"><button class="button button-success" type="submit">' .
+						esc_html__( 'Get Premium', 'boldgrid-backup' ) . '</button></form>'
 				);
 				break;
 			case ! $is_premium_installed:
@@ -159,11 +160,12 @@ if ( ! $archive_found ) {
 				$premium_message = sprintf(
 					'<div class="premium">%1$s</div>
 					<div><p>%2$s</p></div>',
-					__(
+					esc_html__(
 						'Secure your sesitive data with the Premium plugin!',
 						'boldgrid-backup'
 					),
-					$this->core->go_pro->get_premium_button( $premium_url, __( 'Unlock Feature', 'boldgrid-backup' ) )
+					'<form action="' . $premium_url . '" target="_blank"><button class="button button-success" type="submit">' .
+						esc_html__( 'Unlock Feature', 'boldgrid-backup' ) . '</button></form>'
 				);
 				break;
 			case ! $is_premium_active:
