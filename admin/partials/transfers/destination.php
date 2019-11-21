@@ -32,9 +32,10 @@ switch ( true ) {
 		// Does not have a premium license.
 		$get_premium_url = 'https://www.boldgrid.com/update-backup?source=bgbkup-settings-transfer-destination';
 		$encrypt_message = sprintf(
-			// translators: 1: Get premium button/link.
-			__( 'If you are going to import and restore a backup containing encrypted files, then a BoldGrid Backup Premium license is required for decryption.  %1$s', 'boldgrid-backup' ),
-			$this->core->go_pro->get_premium_button( $get_premium_url, __( 'Get Premium', 'boldgrid-backup' ) ) // phpcs:ignore
+			// translators: 1: Get premium button/link, 2: Premium plugin title.
+			__( 'If you are going to import and restore a backup containing encrypted files, then a %2$s license is required for decryption.  %1$s', 'boldgrid-backup' ),
+			$this->core->go_pro->get_premium_button( $get_premium_url, __( 'Get Premium', 'boldgrid-backup' ) ), // phpcs:ignore
+			BOLDGRID_BACKUP_TITLE . ' Premium'
 		);
 		break;
 
@@ -42,21 +43,23 @@ switch ( true ) {
 		// Has a premium license, but no premium plugin is installed.
 		$get_plugins_url = 'https://www.boldgrid.com/central/plugins?source=bgbkup-settings-transfer-destination';
 		$encrypt_message = sprintf(
-			// translators: 1: Unlock Feature button/link.
-			esc_html__( 'The BoldGrid Backup Premium plugin is required for encryption.  %1$s', 'boldgrid-backup' ),
-			$this->core->go_pro->get_premium_button( $get_plugins_url, __( 'Unlock Feature', 'boldgrid-backup' ) ) // phpcs:ignore
+			// translators: 1: Unlock Feature button/link, 2: Premium plugin title.
+			esc_html__( 'The %2$s plugin is required for encryption.  %1$s', 'boldgrid-backup' ),
+			$this->core->go_pro->get_premium_button( $get_plugins_url, __( 'Unlock Feature', 'boldgrid-backup' ) ), // phpcs:ignore
+			BOLDGRID_BACKUP_TITLE . ' Premium'
 		);
 		break;
 
 	case $is_premium_installed && ! $is_premium_active:
 		// Has a premium license and the premium plugin installed, but not activated.
 		$encrypt_message = sprintf(
-			// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag.
-			__( 'BoldGrid Backup Premium is not active and required for encryption features.  Please go to the %1$sPlugins%2$s page to activate it.', 'boldgrid-backup' ),
+			// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag, 3: Premium plugin title.
+			__( '%3$s is not active and required for encryption features.  Please go to the %1$sPlugins%2$s page to activate it.', 'boldgrid-backup' ),
 			'<a href="' .
 				esc_url( admin_url( 'plugins.php?s=Boldgrid%20Backup%20Premium&plugin_status=inactive' ) ) .
 				'">',
-			'</a>'
+			'</a>',
+			BOLDGRID_BACKUP_TITLE . ' Premium'
 		);
 		break;
 
