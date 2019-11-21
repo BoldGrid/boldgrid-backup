@@ -132,9 +132,9 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
-= 1.12.0-rc.1 =
+= 1.12.0 =
 
-Release date: November 20th, 2019
+Release date: November 21th, 2019
 
 * Update:      Renamed plugin from "BoldGrid Backup" to "Total Upkeep".
 * New feature: Added support for database dump file encryption.
