@@ -265,9 +265,9 @@ class Boldgrid_Backup_Admin_Notice {
 
 		if ( ! Notice::isDismissed( $notice_id ) ) {
 			$message = sprintf(
-				// translators: 1: HTML anchor opening tag, 2: HTML anchor closing tag.
+				// translators: 1: HTML anchor open tag, 2: HTML anchor close tag, 3: HTML H3 open tag, 4: HTML H3 close tag, 5: HTML p open tag, 6: HTML p close tag, 7: Plugin title.
 				esc_html__(
-					'%3$sBoldGrid Backup has become Total Upkeep!%4$s%5$sDifferent name with the same great features.  For more information on the change, please go to %1$sour website%2$s.%6$s',
+					'%3$s%7$s has become Total Upkeep!%4$s%5$sDifferent name with the same great features.  For more information on the change, please go to %1$sour website%2$s.%6$s',
 					'boldgrid-backup'
 				),
 				'<a target="_blank" href="' . esc_url( $this->core->configs['urls']['plugin_renamed'] ) . '">',
@@ -275,7 +275,8 @@ class Boldgrid_Backup_Admin_Notice {
 				'<h3>',
 				'</h3>',
 				'<p>',
-				'</p>'
+				'</p>',
+				BOLDGRID_BACKUP_TITLE
 			);
 
 			Notice::show( $message, $notice_id, 'notice notice-info' );

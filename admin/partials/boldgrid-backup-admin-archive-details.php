@@ -169,12 +169,13 @@ if ( ! $archive_found ) {
 			case ! $is_premium_active:
 				$premium_url     = $this->core->go_pro->get_premium_url( 'bgbkup-archive-encrypt' );
 				$premium_message = '<div class="premium">' . sprintf(
-					// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag.
-					__( 'BoldGrid Backup Premium is not active.  Please go to the %1$sPlugins%2$s page to activate it.', 'boldgrid-backup' ),
+					// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag, 3: Premium plugin title.
+					__( '%3$s is not active.  Please go to the %1$sPlugins%2$s page to activate it.', 'boldgrid-backup' ),
 					'<a href="' .
 						esc_url( admin_url( 'plugins.php?s=Boldgrid%20Backup%20Premium&plugin_status=inactive' ) ) .
 						'">',
-					'</a>'
+					'</a>',
+					BOLDGRID_BACKUP_TITLE . ' Premium'
 				) . '</div>';
 				break;
 			default:
@@ -273,8 +274,10 @@ $remote_meta_box = sprintf(
 		</div>',
 		/* 1 */ $this->core->go_pro->get_premium_button( $premium_url ),
 		/* 2 */ sprintf(
-			// translators: 1: Plugin title.
-			esc_html__( 'Upgrade to <strong>%1$s</strong> for more Storage Locations!', 'boldgrid-backup' ),
+			// translators: 1: HTML strong open tag, 2: HTML strong close tag, 3: Plugin title.
+			esc_html__( 'Upgrade to %1$s%3$s%2$s for more Storage Locations!', 'boldgrid-backup' ),
+			'<strong>',
+			'</strong>',
 			BOLDGRID_BACKUP_TITLE . ' Premium'
 		)
 	),

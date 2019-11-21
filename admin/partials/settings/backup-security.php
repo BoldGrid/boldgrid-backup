@@ -71,9 +71,10 @@ if ( ! $is_premium ) {
 	<?php
 	$get_premium_url = 'https://www.boldgrid.com/update-backup?source=bgbkup-settings-security';
 	printf(
-		// translators: 1: Get premium button/link.
-		esc_html__( '%1$sA BoldGrid Backup Premium license is required for encryption features.', 'boldgrid-backup' ),
-		$this->core->go_pro->get_premium_button( $get_premium_url, __( 'Get Premium', 'boldgrid-backup' ) ) // phpcs:ignore
+		// translators: 1: Get premium button/link, 2: Premium plugin title.
+		esc_html__( '%1$sA %2$s license is required for encryption features.', 'boldgrid-backup' ),
+		$this->core->go_pro->get_premium_button( $get_premium_url, __( 'Get Premium', 'boldgrid-backup' ) ), // phpcs:ignore
+		esc_html( BOLDGRID_BACKUP_TITLE . ' Premium' )
 	);
 	?>
 				</div>
@@ -86,9 +87,10 @@ if ( ! $is_premium ) {
 	<?php
 	$get_plugins_url = 'https://www.boldgrid.com/central/plugins?source=bgbkup-settings-security';
 	printf(
-		// translators: 1: Unlock Feature button/link.
-		esc_html__( '%1$sThe BoldGrid Backup Premium plugin is required for encryption features.', 'boldgrid-backup' ),
-		$this->core->go_pro->get_premium_button( $get_plugins_url, __( 'Unlock Feature', 'boldgrid-backup' ) ) // phpcs:ignore
+		// translators: 1: Unlock Feature button/link, 2: Premium plugin title.
+		esc_html__( '%1$sThe %2$s plugin is required for encryption features.', 'boldgrid-backup' ),
+		$this->core->go_pro->get_premium_button( $get_plugins_url, __( 'Unlock Feature', 'boldgrid-backup' ) ), // phpcs:ignore
+		esc_html( BOLDGRID_BACKUP_TITLE . ' Premium' )
 	);
 	?>
 				</div>
@@ -99,12 +101,13 @@ if ( ! $is_premium ) {
 			<tr><td colspan="2">
 	<?php
 	printf(
-		// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag.
-		esc_html__( 'The BoldGrid Backup Premium plugin is not active.  Encryption features are not available.  Please go to the %1$sPlugins%2$s page to activate it.', 'boldgrid-backup' ),
+		// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag, 3: Premium plugin title.
+		esc_html__( 'The %3$s plugin is not active.  Encryption features are not available.  Please go to the %1$sPlugins%2$s page to activate it.', 'boldgrid-backup' ),
 		'<a href="' .
 			esc_url( admin_url( 'plugins.php?s=Boldgrid%20Backup%20Premium&plugin_status=inactive' ) ) .
 			'">',
-		'</a>'
+		'</a>',
+		esc_html( BOLDGRID_BACKUP_TITLE . ' Premium' )
 	);
 	?>
 		</td></tr>

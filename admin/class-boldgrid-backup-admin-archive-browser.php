@@ -106,17 +106,23 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 
 		if ( ! empty( $archive_info['encrypt_db'] ) && ( ! $is_premium || ! $is_premium_active ) ) {
 			$return .= '<tr><td colspan="3">
-				<p>' . __( 'The database dump file in this archive has been encrypted with BoldGrid Backup Premium.', 'boldgrid-backup' ) . '</p>';
+				<p>' .
+				sprintf(
+					// translators: 1: Premium plugin title.
+					__( 'The database dump file in this archive has been encrypted with %1$s.', 'boldgrid-backup' ) . '</p>',
+					BOLDGRID_BACKUP_TITLE . ' Premium'
+				);
 
 			if ( ! $is_premium ) {
 				$return .= '<p>' .
 				sprintf(
-					// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag.
-					__( 'A BoldGrid Backup Premium license is required for decryption.  %1$sGet Premium%2$s', 'boldgrid-backup' ),
+					// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag, 3: Premium plugin title.
+					__( 'A %3$s license is required for decryption.  %1$sGet Premium%2$s', 'boldgrid-backup' ),
 					'<a class="button button-success" href="' .
 						esc_url( 'https://www.boldgrid.com/update-backup?source=bgbkup-archive-browser' ) .
 						'" target="_blank">',
-					'</a>'
+					'</a>',
+					BOLDGRID_BACKUP_TITLE . ' Premium'
 				) .
 				'</p>';
 			}
@@ -124,12 +130,13 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 			if ( ! $is_premium_active ) {
 				$return .= '<p>' .
 					sprintf(
-						// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag.
-						__( 'BoldGrid Backup Premium is not active.  Please go to the %1$sPlugins%2$s page to activate it.', 'boldgrid-backup' ),
+						// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag, 3: Premium plugin title.
+						__( '%3$s is not active.  Please go to the %1$sPlugins%2$s page to activate it.', 'boldgrid-backup' ),
 						'<a href="' .
 							esc_url( admin_url( 'plugins.php?s=Boldgrid%20Backup%20Premium&plugin_status=inactive' ) ) .
 							'">',
-						'</a>'
+						'</a>',
+						BOLDGRID_BACKUP_TITLE . ' Premium'
 					) .
 					'</p>';
 			}
@@ -171,8 +178,11 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 			$get_plugins_url = 'https://www.boldgrid.com/central/plugins?source=bgbkup-archive-browser';
 			$return         .= '<tr><td colspan="2"><div class="bg-box-bottom premium wp-clearfix">' .
 			$this->core->go_pro->get_premium_button( $get_plugins_url, __( 'Unlock Feature', 'boldgrid-backup' ) ) .
-			esc_html__( 'Secure your sesitive data with the BoldGrid Backup Premium plugin.', 'boldgrid-backup' ) .
-			'</div></div></td></tr>';
+			sprintf(
+				// translators: 1: Premium plugin title.
+				esc_html__( 'Secure your sesitive data with the %1$s plugin.', 'boldgrid-backup' ),
+				BOLDGRID_BACKUP_TITLE . ' Premium'
+			) . '</div></div></td></tr>';
 		}
 
 		return $return;
