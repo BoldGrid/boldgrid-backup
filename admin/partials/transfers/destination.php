@@ -30,7 +30,7 @@ switch ( true ) {
 
 	case ! $is_premium:
 		// Does not have a premium license.
-		$get_premium_url = 'https://www.boldgrid.com/update-backup?source=bgbkup-settings-transfer-destination';
+		$get_premium_url = $this->core->go_pro->get_premium_url( 'bgbkup-transfer-destination' );
 		$encrypt_message = sprintf(
 			// translators: 1: Get premium button/link, 2: Premium plugin title.
 			__( 'If you are going to import and restore a backup containing encrypted files, then a %2$s license is required for decryption.  %1$s', 'boldgrid-backup' ),
@@ -41,7 +41,7 @@ switch ( true ) {
 
 	case ! $is_premium_installed:
 		// Has a premium license, but no premium plugin is installed.
-		$get_plugins_url = 'https://www.boldgrid.com/central/plugins?source=bgbkup-settings-transfer-destination';
+		$get_plugins_url = $this->core->go_pro->get_premium_url( 'bgbkup-transfer-destination' );
 		$encrypt_message = sprintf(
 			// translators: 1: Unlock Feature button/link, 2: Premium plugin title.
 			esc_html__( 'The %2$s plugin is required for encryption.  %1$s', 'boldgrid-backup' ),
