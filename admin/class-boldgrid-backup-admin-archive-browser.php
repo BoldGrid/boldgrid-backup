@@ -175,7 +175,7 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 		$return .= '</tbody></table>';
 
 		if ( ! $this->core->config->is_premium_done ) {
-			$get_plugins_url = 'https://www.boldgrid.com/central/plugins?source=bgbkup-archive-browser';
+			$get_plugins_url = $this->core->go_pro->get_premium_url( 'bgbkup-db-browser-encrypt' );
 			$return         .= '<tr><td colspan="2"><div class="bg-box-bottom premium wp-clearfix">' .
 			$this->core->go_pro->get_premium_button( $get_plugins_url, __( 'Unlock Feature', 'boldgrid-backup' ) ) .
 			sprintf(
