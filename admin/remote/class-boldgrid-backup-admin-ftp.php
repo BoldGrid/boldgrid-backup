@@ -492,7 +492,11 @@ class Boldgrid_Backup_Admin_Ftp {
 			[
 				'key'      => 'host',
 				'default'  => null,
-				'callback' => 'sanitize_file_name',
+				/*
+				 * Sanitize ftp hostname. Initially sanitize_file_name was used, but it converted
+				 * sub.domain.org to sub.domain_.org (because "org" was not a valid mime type).
+				 */
+				'callback' => 'sanitize_text_field',
 			],
 			[
 				'key'      => 'user',
