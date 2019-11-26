@@ -132,6 +132,12 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
+= 1.12.1 =
+
+Release date: November 26th, 2019
+
+* Bug fix:     Fixed sanitizing of ftp hostnames.
+
 = 1.12.0 =
 
 Release date: November 21th, 2019
