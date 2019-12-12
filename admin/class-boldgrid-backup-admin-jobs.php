@@ -183,7 +183,7 @@ class Boldgrid_Backup_Admin_Jobs {
 
 		$job_summary = array();
 
-		$job_summary[] = __( 'The following tasks were ran after creating the backup:', 'boldgrid-backup' );
+		$job_summary[] = __( 'The following tasks were run after creating the backup:', 'boldgrid-backup' );
 
 		$email_parts = $this->core->email->post_archive_parts( $info );
 

@@ -1752,7 +1752,7 @@ class Boldgrid_Backup_Admin_Core {
 		 * was created during a scheduled backup, the user will get an email from the jobs queue.
 		 * Scheduled backups receive email notifications from the jobs queue because that email will
 		 * not only include the standard info about the backup (which we're sending now), it will
-		 * also include info about other jobs that were ran (such as uploading the backup remotely).
+		 * also include info about other jobs that were run (such as uploading the backup remotely).
 		 */
 		if ( $this->email->user_wants_notification( 'backup' ) && ! $this->is_scheduled_backup ) {
 			$email_parts          = $this->email->post_archive_parts( $info );
