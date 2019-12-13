@@ -232,16 +232,9 @@ class Boldgrid_Backup_Admin_Jobs {
 	 * call this method, which will handle the rest.
 	 *
 	 * @since 1.5.2
-	 *
-	 * @see Boldgrid_Backup_Admin_Cron::is_valid_call()
 	 */
 	public function run() {
 		$this->set_jobs();
-
-		// If not logged-in, then require a matching "id".
-		if ( ! $this->core->cron->is_valid_call() ) {
-			wp_die( esc_html__( 'Error: Invalid request.', 'boldgrid-backup' ) );
-		}
 
 		// If there are no jobs or already running, then abort.
 		if ( empty( $this->jobs ) || $this->is_running() ) {
