@@ -467,15 +467,15 @@ class Boldgrid_Backup_Admin_Archive {
 		 *
 		 * Allows operations to be performed on attribute changes and alter the value depending on results.
 		 *
-		 * @since 1.12.0
+		 * @since 1.12.2
 		 *
-		 * @param  string $filepath  Archive filepath.
-		 * @param  string $key       Key name.
 		 * @param  string $value     New value.
 		 * @param  string $old_value Old value.
+		 * @param  string $key       Key name.
+		 * @param  string $filepath  Archive filepath.
 		 * @return string
 		 */
-		$value = apply_filters( 'boldgrid_backup_archive_set_attribute', $this->filepath, $key, $value, $old_value );
+		$value = apply_filters( 'boldgrid_backup_archive_update_attribute', $value, $old_value, $key, $this->filepath );
 
 		$this->log[ $key ] = $value;
 

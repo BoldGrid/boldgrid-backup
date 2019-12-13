@@ -132,6 +132,10 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
+= 1.12.2 In progress =
+
+* Bug fix:     Fixed filtering of archive attributes.
+
 = 1.12.1 =
 
 Release date: November 26th, 2019
