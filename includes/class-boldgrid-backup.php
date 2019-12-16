@@ -272,6 +272,7 @@ class Boldgrid_Backup {
 		}
 
 		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-activator.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-rest.php';
 
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
@@ -508,6 +509,10 @@ class Boldgrid_Backup {
 		// Disply a notice regarding the plugin rename.
 		$this->loader->add_action( 'admin_notices', $plugin_admin_core->notice, 'plugin_renamed_notice' );
 		$this->loader->add_action( 'wp_ajax_dismissBoldgridNotice', 'Boldgrid\Library\Library\Notice', 'dismiss' );
+
+		// Register REST endpoints.
+		$rest = new Boldgrid_Backup_Rest( $plugin_admin_core );
+		$rest->register();
 	}
 
 	/**
