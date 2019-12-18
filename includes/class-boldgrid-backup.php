@@ -272,7 +272,13 @@ class Boldgrid_Backup {
 		}
 
 		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-activator.php';
-		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-rest.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-job.php';
+
+		// REST API support.
+		require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-controller.php';
+		require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-job.php';
+		require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-setting.php';
+		require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-archive.php';
 
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
@@ -511,8 +517,16 @@ class Boldgrid_Backup {
 		$this->loader->add_action( 'wp_ajax_dismissBoldgridNotice', 'Boldgrid\Library\Library\Notice', 'dismiss' );
 
 		// Register REST endpoints.
-		$rest = new Boldgrid_Backup_Rest( $plugin_admin_core );
-		$rest->register();
+		add_action( 'rest_api_init', function() use ( $plugin_admin_core ) {
+			$rest_job = new Boldgrid_Backup_Rest_Job( $plugin_admin_core );
+			$rest_job->register_routes();
+
+			$rest_archive = new Boldgrid_Backup_Rest_Archive( $plugin_admin_core );
+			$rest_archive->register_routes();
+
+			$rest_setting = new Boldgrid_Backup_Rest_Setting( $plugin_admin_core );
+			$rest_setting->register_routes();
+		} );
 	}
 
 	/**

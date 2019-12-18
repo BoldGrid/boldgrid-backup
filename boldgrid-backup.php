@@ -124,6 +124,11 @@ function load_boldgrid_backup() {
 	return true;
 }
 
+/** Need to implment a way to check if this is a rest request.
+ * This may help: https://wordpress.stackexchange.com/questions/221202/does-something-like-is-rest-exist
+ * */
+$brad_here = 1;
+
 /*
  * Load the plugin.
  *
@@ -135,7 +140,7 @@ function load_boldgrid_backup() {
  *
  * Run the plugin only if on a wp-admin page or when DOING_CRON.
  */
-if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) || defined( 'WP_CLI' ) && WP_CLI ) {
+if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) || defined( 'WP_CLI' ) && WP_CLI || $brad_here ) {
 	// If we could not load boldgrid_backup (missing system requirements), abort.
 	if ( load_boldgrid_backup() ) {
 		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup.php';
