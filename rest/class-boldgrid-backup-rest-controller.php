@@ -57,7 +57,7 @@ class Boldgrid_Backup_Rest_Controller extends WP_REST_Controller {
 	 */
 	public function permission_check() {
 		return true;
-		return current_user_can( 'activate_plugins' );
+		// return current_user_can( 'activate_plugins' );
 	}
 
 	/**
@@ -70,8 +70,8 @@ class Boldgrid_Backup_Rest_Controller extends WP_REST_Controller {
 	 */
 	protected function filter_schema_properties( $item ) {
 		$resource = [];
-		$schema = $this->get_schema();
-		foreach( $schema['properties'] as $name => $property ) {
+		$schema   = $this->get_schema();
+		foreach ( $schema['properties'] as $name => $property ) {
 			if ( isset( $item[ $name ] ) ) {
 				$resource[ $name ] = $item[ $name ];
 			} else {

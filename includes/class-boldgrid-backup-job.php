@@ -42,9 +42,9 @@ class Boldgrid_Backup_Job {
 	 */
 	public static function start( $type, $data = [] ) {
 		$new_job = [
-			'id' => self::generate_id(),
-			'status' => 'running',
-			'type' => $type,
+			'id'         => self::generate_id(),
+			'status'     => 'running',
+			'type'       => $type,
 			'data_start' => $data,
 		];
 
@@ -83,7 +83,7 @@ class Boldgrid_Backup_Job {
 	 */
 	public static function complete( $job_id, $status, $data ) {
 		$job = self::update_db( $job_id, function ( $job ) use ( $status, $data ) {
-			$job['status'] = $status;
+			$job['status']        = $status;
 			$job['data_complete'] = $data;
 			return $job;
 		} );
@@ -134,7 +134,7 @@ class Boldgrid_Backup_Job {
 	 */
 	protected static function update_db( $job_id, $callback ) {
 		$jobs = self::fetch_all();
-		$job = array_filter( $jobs, function ( $val ) use ( $job_id, $callback ) {
+		$job  = array_filter( $jobs, function ( $val ) use ( $job_id, $callback ) {
 			if ( ! empty( $val['id'] ) && $val['id'] === $job_id ) {
 				$val = $callback( $val );
 			}
@@ -152,7 +152,7 @@ class Boldgrid_Backup_Job {
 	 * @return void
 	 */
 	protected static function insert_db( $job ) {
-		$jobs = self::fetch_all();
+		$jobs   = self::fetch_all();
 		$jobs[] = $job;
 		update_option( self::$option_name, $jobs );
 	}

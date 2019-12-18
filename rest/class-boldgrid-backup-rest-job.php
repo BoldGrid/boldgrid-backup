@@ -35,17 +35,17 @@ class Boldgrid_Backup_Rest_Job extends Boldgrid_Backup_Rest_Controller {
 	 * @since X.X.X
 	 */
 	public function register_routes() {
-		register_rest_route( $this->namespace, '/' . $this->resource . '/(?P<id>[\w-]+)' , [
+		register_rest_route( $this->namespace, '/' . $this->resource . '/(?P<id>[\w-]+)', [
 			[
-				'methods' => WP_REST_Server::READABLE,
-				'callback'=> [ $this, 'get_item' ],
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'get_item' ],
 				'permission_callback' => [ $this, 'permission_check' ],
-				'args' => [
+				'args'                => [
 					'id' => [
-						'required' => true,
-						'context' => [ 'view' ],
+						'required'    => true,
+						'context'     => [ 'view' ],
 						'description' => esc_html__( 'Unique identifier for the object.', 'boldgrid-backup' ),
-						'type' => 'string',
+						'type'        => 'string',
 					],
 				],
 			],
@@ -62,38 +62,38 @@ class Boldgrid_Backup_Rest_Job extends Boldgrid_Backup_Rest_Controller {
 	 */
 	public function get_schema() {
 		$schema = [
-			'$schema' => 'http://json-schema.org/draft-04/schema#',
-			'title' => 'job',
-			'type' => 'object',
+			'$schema'    => 'http://json-schema.org/draft-04/schema#',
+			'title'      => 'job',
+			'type'       => 'object',
 			'properties' => [
-				'id' => [
-					'context' => [ 'view' ],
+				'id'            => [
+					'context'     => [ 'view' ],
 					'description' => esc_html__( 'Unique identifier for the object.', 'boldgrid-backup' ),
-					'type' => 'string',
+					'type'        => 'string',
 				],
-				'type' => [
-					'context' => [ 'view' ],
+				'type'          => [
+					'context'     => [ 'view' ],
 					'description' => esc_html__( 'Type of job.', 'boldgrid-backup' ),
-					'type' => 'string',
-					'enum' => [
+					'type'        => 'string',
+					'enum'        => [
 						'backup',
 						'restoration',
-					]
+					],
 				],
-				'status' => [
-					'context' => [ 'view' ],
+				'status'        => [
+					'context'     => [ 'view' ],
 					'description' => esc_html__( 'Currently status of the job.', 'boldgrid-backup' ),
-					'type' => 'string',
+					'type'        => 'string',
 				],
-				'data_start' => [
-					'context' => [ 'view' ],
+				'data_start'    => [
+					'context'     => [ 'view' ],
 					'description' => esc_html__( 'Information attached to the start of the prcoess.', 'boldgrid-backup' ),
-					'type' => 'array',
+					'type'        => 'array',
 				],
 				'data_complete' => [
-					'context' => [ 'view' ],
+					'context'     => [ 'view' ],
 					'description' => esc_html__( 'Results of the process.', 'boldgrid-backup' ),
-					'type' => 'array',
+					'type'        => 'array',
 				],
 			],
 		];

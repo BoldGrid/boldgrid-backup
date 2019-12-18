@@ -48,8 +48,8 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 	public function register_creation() {
 		register_rest_route( $this->namespace, '/' . $this->resource, [
 			[
-				'methods' => WP_REST_Server::CREATABLE,
-				'callback'=> [ $this, 'create_item' ],
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'create_item' ],
 				'permission_callback' => [ $this, 'permission_check' ],
 			],
 			'schema' => [ $this, 'get_schema' ],
@@ -64,14 +64,14 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 	public function register_restore() {
 		register_rest_route( $this->namespace, '/' . $this->resource, [
 			[
-				'methods' => 'PUT',
-				'callback'=> [ $this, 'restore' ],
+				'methods'             => 'PUT',
+				'callback'            => [ $this, 'restore' ],
 				'permission_callback' => [ $this, 'permission_check' ],
-				'args' => [
+				'args'                => [
 					'url' => [
-						'required' => true,
-						'description' => esc_html__( 'Route URL to restore.', 'boldgrid-backup' ),
-						'type' => 'string',
+						'required'            => true,
+						'description'         => esc_html__( 'Route URL to restore.', 'boldgrid-backup' ),
+						'type'                => 'string',
 						'sanitation_callback' => function ( $field ) {
 							return esc_url_raw( $field );
 						},
@@ -90,8 +90,8 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 	public function register_list() {
 		register_rest_route( $this->namespace, '/' . $this->resource, [
 			[
-				'methods' => WP_REST_Server::READABLE,
-				'callback'=> [ $this, 'get_items' ],
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'get_items' ],
 				'permission_callback' => [ $this, 'permission_check' ],
 			],
 			'schema' => [ $this, 'get_schema' ],
@@ -107,29 +107,29 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 	 */
 	public function get_schema() {
 		$schema = [
-			'$schema' => 'http://json-schema.org/draft-04/schema#',
-			'title' => $this->resource,
-			'type' => 'object',
+			'$schema'    => 'http://json-schema.org/draft-04/schema#',
+			'title'      => $this->resource,
+			'type'       => 'object',
 			'properties' => [
-				'id' => [
-					'context' => [ 'view' ],
+				'id'            => [
+					'context'     => [ 'view' ],
 					'description' => esc_html__( 'Unique identifier for the object.', 'boldgrid-backup' ),
-					'type' => 'string',
+					'type'        => 'string',
 				],
-				'title' => [
-					'context' => [ 'view' ],
+				'title'         => [
+					'context'     => [ 'view' ],
 					'description' => esc_html__( 'Name of the archive.', 'boldgrid-backup' ),
-					'type' => 'string',
+					'type'        => 'string',
 				],
-				'description' => [
-					'context' => [ 'view' ],
+				'description'   => [
+					'context'     => [ 'view' ],
 					'description' => esc_html__( 'Description of the archive.', 'boldgrid-backup' ),
-					'type' => 'array',
+					'type'        => 'array',
 				],
 				'creation_date' => [
-					'context' => [ 'view' ],
+					'context'     => [ 'view' ],
 					'description' => esc_html__( 'Date the archive was created.', 'boldgrid-backup' ),
-					'type' => 'string',
+					'type'        => 'string',
 				],
 			],
 		];
@@ -175,7 +175,7 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 	public function get_items( $request ) {
 		$backups = []; // Brad: get a collection of backups here.
 
-		foreach( $backups as &$backup ) {
+		foreach ( $backups as &$backup ) {
 			$backup = $this->prepare_item_for_response( $backup, $request );
 		}
 
@@ -195,5 +195,4 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 		$job = [];
 		return new WP_REST_Response( $job, 200 );
 	}
-
 }

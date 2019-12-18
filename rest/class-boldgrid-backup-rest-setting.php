@@ -46,8 +46,8 @@ class Boldgrid_Backup_Rest_Setting extends Boldgrid_Backup_Rest_Controller {
 	public function register_get() {
 		register_rest_route( $this->namespace, '/' . $this->resource, [
 			[
-				'methods' => WP_REST_Server::READABLE,
-				'callback'=> [ $this, 'get_item' ],
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'get_item' ],
 				'permission_callback' => [ $this, 'permission_check' ],
 			],
 			'schema' => [ $this, 'get_schema' ],
@@ -76,39 +76,39 @@ class Boldgrid_Backup_Rest_Setting extends Boldgrid_Backup_Rest_Controller {
 	 */
 	public function get_schema() {
 		$schema = [
-			'$schema' => 'http://json-schema.org/draft-04/schema#',
-			'title' => $this->resource,
-			'type' => 'object',
+			'$schema'    => 'http://json-schema.org/draft-04/schema#',
+			'title'      => $this->resource,
+			'type'       => 'object',
 			'properties' => [
-				'schedule' => [
-					'context' => [ 'view' ],
+				'schedule'                 => [
+					'context'     => [ 'view' ],
 					'description' => esc_html__( 'Date the backup was created.', 'boldgrid-backup' ),
-					'type' => 'array',
+					'type'        => 'array',
 				],
-				'notification_email' => [
-					'context' => [ 'view' ],
+				'notification_email'       => [
+					'context'     => [ 'view' ],
 					'description' => esc_html__( 'Email to notify got backups.', 'boldgrid-backup' ),
-					'type' => 'string',
+					'type'        => 'string',
 				],
-				'auto_backup' => [
-					'context' => [ 'view' ],
+				'auto_backup'              => [
+					'context'     => [ 'view' ],
 					'description' => esc_html__( 'Does a site have auto backups enabled?', 'boldgrid-backup' ),
-					'type' => 'integer',
+					'type'        => 'integer',
 				],
-				'auto_backup' => [
-					'context' => [ 'view' ],
+				'auto_backup'              => [
+					'context'     => [ 'view' ],
 					'description' => esc_html__( 'Does a site have auto rollback enabled?', 'boldgrid-backup' ),
-					'type' => 'integer',
+					'type'        => 'integer',
 				],
-				'folder_exclusion_include'  => [
-					'context' => [ 'view' ],
+				'folder_exclusion_include' => [
+					'context'     => [ 'view' ],
 					'description' => esc_html__( 'Directories and files to include.', 'boldgrid-backup' ),
-					'type' => 'string',
+					'type'        => 'string',
 				],
-				'folder_exclusion_exclude'  => [
-					'context' => [ 'view' ],
+				'folder_exclusion_exclude' => [
+					'context'     => [ 'view' ],
 					'description' => esc_html__( 'Directories and files to exclude.', 'boldgrid-backup' ),
-					'type' => 'string',
+					'type'        => 'string',
 				],
 			],
 		];
