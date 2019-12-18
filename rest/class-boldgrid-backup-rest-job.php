@@ -27,7 +27,7 @@ class Boldgrid_Backup_Rest_Job extends Boldgrid_Backup_Rest_Controller {
 	 * @access private
 	 * @var    string
 	 */
-	protected $resource = 'job';
+	protected $resource = 'jobs';
 
 	/**
 	 * Register the routes for the objects of the controller.
