@@ -1,6 +1,6 @@
 <?php
 /**
- * File: class-boldgrid-backup-rest-setting.php
+ * File: class-boldgrid-backup-rest-controller.php
  *
  * @link       https://www.boldgrid.com
  * @since      X.X.X
@@ -12,9 +12,9 @@
  */
 
 /**
- * Class: Boldgrid_Backup_Rest_Schedule
+ * Class: Boldgrid_Backup_Rest_Controller
  *
- * REST endpoints to access the backup schedule.
+ * A base class for the wp rest controller.
  *
  * @since X.X.X
  */

@@ -30,7 +30,7 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 	protected $resource = 'archive';
 
 	/**
-	 * Register the routes for the objects of the controller.
+	 * Register all routes.
 	 *
 	 * @since X.X.X
 	 */

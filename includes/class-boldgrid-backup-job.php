@@ -36,7 +36,9 @@ class Boldgrid_Backup_Job {
 	 *
 	 * @since X.X.X
 	 *
-	 * @return array $data Data for step.
+	 * @param string $type Type of job.
+	 * @param array $data  Request data for job start.
+	 * @return array       Job resource.
 	 */
 	public static function start( $type, $data = [] ) {
 		$new_job = [
@@ -48,7 +50,7 @@ class Boldgrid_Backup_Job {
 
 		self::insert_db( $new_job );
 
-		return $new_job['id'];
+		return $new_job;
 	}
 
 	/**
