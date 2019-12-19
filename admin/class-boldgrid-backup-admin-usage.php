@@ -19,6 +19,22 @@
  */
 class Boldgrid_Backup_Admin_Usage {
 	/**
+	 * Screen prefixes.
+	 *
+	 * @since SINCEVERSION
+	 * @access private
+	 * @var array
+	 */
+	private $prefixes = [
+		// The Total Upkeep dashboard.
+		'toplevel_page_boldgrid-backup',
+		// Archive details page.
+		'admin_page_boldgrid-backup',
+		// All other Total Upkeep pages.
+		'total-upkeep_page',
+	];
+
+	/**
 	 * Admin init.
 	 *
 	 * @since SINCEVERSION
@@ -53,7 +69,7 @@ class Boldgrid_Backup_Admin_Usage {
 	 * @return bool
 	 */
 	public function maybe_show_notice( $show ) {
-		if ( $this->has_page_prefix() && ! get_option( 'boldgrid_backup_latest_backup' ) ) {
+		if ( $this->has_screen_prefix() && ! get_option( 'boldgrid_backup_latest_backup' ) ) {
 			/*
 			 * Only show the notice if the user already has created a backup. If they haven't, they'll see
 			 * admin notices telling them how to create their first backup, and we don't want this notice
@@ -74,7 +90,7 @@ class Boldgrid_Backup_Admin_Usage {
 	 * @return array
 	 */
 	public function filter_notice( $params ) {
-		if ( $this->has_page_prefix() ) {
+		if ( $this->has_screen_prefix() ) {
 			$params['message'] = '<p>' .
 				esc_html__(
 					'Thank you for using Total Upkeep by BoldGrid! Would you be ok with helping us improve our products by sending anonymous usage data? Information collected will not be personal and is not used to identify or contact you.',
@@ -96,7 +112,7 @@ class Boldgrid_Backup_Admin_Usage {
 	 * @return array
 	 */
 	public function filter_prefixes( $prefixes ) {
-		$prefixes[] = 'boldgrid-backup';
+		$prefixes = array_merge( $prefixes, $this->prefixes );
 
 		return $prefixes;
 	}
@@ -108,7 +124,7 @@ class Boldgrid_Backup_Admin_Usage {
 	 *
 	 * @return bool
 	 */
-	public function has_page_prefix() {
-		return \Boldgrid\Library\Library\Usage\Helper::hasPagePrefix( [ 'boldgrid-backup' ] );
+	public function has_screen_prefix() {
+		return \Boldgrid\Library\Library\Usage\Helper::hasScreenPrefix( $this->prefixes );
 	}
 }
