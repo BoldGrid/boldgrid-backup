@@ -261,6 +261,11 @@ class Boldgrid_Backup_Admin_Notice {
 	 * @see \Boldgrid\Library\Library\Notice::show()
 	 */
 	public function plugin_renamed_notice() {
+		// Only show to active users. Abort if the user has never created a backup.
+		if ( ! get_option( 'boldgrid_backup_latest_backup' ) ) {
+			return;
+		}
+
 		$notice_id = 'boldgrid_backup_renamed';
 
 		if ( ! Notice::isDismissed( $notice_id ) ) {

@@ -132,6 +132,12 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
+= 1.12.3 =
+
+Release date: December 19th, 2019
+
+* Bug fix:     Only show plugin rename notice to active users.
+
 = 1.12.2 =
 
 Release date: December 13th, 2019
