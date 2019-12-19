@@ -114,7 +114,7 @@ class Boldgrid_Backup_Admin_Go_Pro {
 					// translators: 1: URL address for the upgrade page, 2: Premium plugin title.
 					__( 'Thank you for activating the <strong>%3$s</strong> plugin! Before you can begin using all of the premium features, you must <a href="%2$s">add your premium key</a>. If you are using an Official BoldGrid Host, contact them or login to their management system to retrieve your Premium key. Otherwise, please visit <a href="%1$s" target="_blank">BoldGrid Central</a> to upgrade.', 'boldgrid-backup' ),
 					$this->get_premium_url( 'bgbkup-premium-activate' ),
-					admin_url( 'admin.php?page=boldgrid-backup-settings&section=connect_key' ),
+					admin_url( 'options-general.php?page=boldgrid-connect.php' ),
 					BOLDGRID_BACKUP_TITLE . ' Premium'
 				) . '</p>',
 				'class'   => 'notice notice-warning',

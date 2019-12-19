@@ -137,6 +137,7 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 Release date: December 19th, 2019
 
 * Bug fix:     Only show plugin rename notice to active users.
+* Update:      Updating link to admin page for entering BoldGrid Connect Key.
 
 = 1.12.2 =
 
