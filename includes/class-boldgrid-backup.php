@@ -273,6 +273,8 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-activator.php';
 
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-usage.php';
+
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
 
@@ -508,6 +510,12 @@ class Boldgrid_Backup {
 		// Disply a notice regarding the plugin rename.
 		$this->loader->add_action( 'admin_notices', $plugin_admin_core->notice, 'plugin_renamed_notice' );
 		$this->loader->add_action( 'wp_ajax_dismissBoldgridNotice', 'Boldgrid\Library\Library\Notice', 'dismiss' );
+
+		$usage = new Boldgrid_Backup_Admin_Usage();
+		$this->loader->add_action( 'admin_init', $usage, 'admin_init' );
+		$this->loader->add_filter( 'Boldgrid\Library\Usage\Notice\admin_notices', $usage, 'filter_notice' );
+		$this->loader->add_filter( 'Boldgrid\Library\Usage\Notice\maybeShow', $usage, 'maybe_show_notice' );
+		$this->loader->add_filter( 'Boldgrid\Library\Usage\getPrefixes', $usage, 'filter_prefixes' );
 	}
 
 	/**
