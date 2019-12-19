@@ -3,7 +3,7 @@
  * File: class-boldgrid-backup-admin-usage.php
  *
  * @link       https://www.boldgrid.com
- * @since      SINCEVERSION
+ * @since      1.12.3
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
@@ -15,13 +15,13 @@
 /**
  * Class: Boldgrid_Backup_Admin_Usage
  *
- * @since SINCEVERSION
+ * @since 1.12.3
  */
 class Boldgrid_Backup_Admin_Usage {
 	/**
 	 * Screen prefixes.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.12.3
 	 * @access private
 	 * @var array
 	 */
@@ -37,7 +37,7 @@ class Boldgrid_Backup_Admin_Usage {
 	/**
 	 * Admin init.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.12.3
 	 */
 	public function admin_init() {
 		/*
@@ -64,7 +64,7 @@ class Boldgrid_Backup_Admin_Usage {
 	/**
 	 * Determine whether or not to show the notice to the user to accept usage tracking.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.12.3
 	 *
 	 * @return bool
 	 */
@@ -84,7 +84,7 @@ class Boldgrid_Backup_Admin_Usage {
 	/**
 	 * Filter the notice that is given to users.
 	 *
-	 * @since SINCEVERSIONS
+	 * @since 1.12.3S
 	 *
 	 * @param  array $params
 	 * @return array
@@ -106,7 +106,7 @@ class Boldgrid_Backup_Admin_Usage {
 	 *
 	 * Tell the Usage class to listen to pages that begin with boldgrid-backup.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.12.3
 	 *
 	 * @param  array $prefixes An array of page prefixes.
 	 * @return array
@@ -120,7 +120,7 @@ class Boldgrid_Backup_Admin_Usage {
 	/**
 	 * Whether or not the current admin page begins with boldgrid-backup.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.12.3
 	 *
 	 * @return bool
 	 */
