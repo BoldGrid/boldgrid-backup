@@ -173,7 +173,24 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 	 * @return array                   A collection of archive resources.
 	 */
 	public function get_items( $request ) {
-		$backups = []; // Brad: get a collection of backups here.
+		// Init our list of raw backup data.
+		$core = apply_filters( 'boldgrid_backup_get_core', null );
+		$core->archives_all->init();
+
+		// Init our list of backups to return.
+		$backups = [];
+
+		foreach ( $core->archives_all->all as $backup ) {
+			$core->archive->init_by_filename( $backup['filename'] );
+
+			$backups[] = [
+				// @todo need a way to add id's to each backup.
+				'id'            => null,
+				'title'         => $core->archive->get_attribute( 'title' ),
+				'description'   => $core->archive->get_attribute( 'description' ),
+				'creation_date' => $core->archive->timestamp,
+			];
+		}
 
 		foreach ( $backups as &$backup ) {
 			$backup = $this->prepare_item_for_response( $backup, $request );
