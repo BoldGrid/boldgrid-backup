@@ -1752,7 +1752,7 @@ class Boldgrid_Backup_Admin_Core {
 		 * was created during a scheduled backup, the user will get an email from the jobs queue.
 		 * Scheduled backups receive email notifications from the jobs queue because that email will
 		 * not only include the standard info about the backup (which we're sending now), it will
-		 * also include info about other jobs that were run (such as uploading the backup remotely).
+		 * also include info about other jobs that were ran (such as uploading the backup remotely).
 		 */
 		if ( $this->email->user_wants_notification( 'backup' ) && ! $this->is_scheduled_backup ) {
 			$email_parts          = $this->email->post_archive_parts( $info );
@@ -2388,9 +2388,15 @@ class Boldgrid_Backup_Admin_Core {
 
 		$archive_info = $this->archive_files( true );
 
-		// If there were any errors encountered during the backup, save them to the In Progress data.
+		// Take action if any errors were encountered.
 		if ( ! empty( $archive_info['error'] ) ) {
+			// Save errors to the In Progress data.
 			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'error', $archive_info['error'] );
+
+			// Send an email confirming the backup failed.
+			$this->archive_fail->cron_fail_email( [
+				'message' => $this->archive_fail->get_fail_body( $archive_info['error'] )
+			] );
 		}
 
 		if ( $this->is_archiving_update_protection ) {

@@ -132,6 +132,12 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
+= 1.12.4 =
+
+Release date: January 6th, 2019
+
+* Update:      Send failure emails for ajaxy Backup Site Now failures.
+
 = 1.12.3 =
 
 Release date: December 19th, 2019

@@ -110,12 +110,7 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 	 * @param string $message Error message.
 	 */
 	public function schedule_fail_email( $message ) {
-		$message = sprintf(
-			$this->unable_to_backup . "\n\n%1\$s",
-			strip_tags( $message )
-		);
-
-		$email_body = $this->core->email->fill_generic_template( $message, false );
+		$email_body = $this->get_fail_body( $message );
 
 		$args = array(
 			'action'       => 'boldgrid_backup_cron_fail_email',
@@ -174,5 +169,25 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 			$data['errorText'] = $this->unable_to_backup . '<br />' . $error_message;
 			wp_send_json_error( $data );
 		}
+	}
+
+	/**
+	 * Generate the text for an email message describing a backup has failed.
+	 *
+	 * This code originally lived in self::schedule_fail_email, but was moved here when it needed to be
+	 * reused.
+	 *
+	 * @since 1.12.4
+	 *
+	 * @param  string $message The error message.
+	 * @return string          The entire email body.
+	 */
+	public function get_fail_body( $message ) {
+		$message = sprintf(
+			$this->unable_to_backup . "\n\n%1\$s",
+			strip_tags( $message )
+		);
+
+		return $this->core->email->fill_generic_template( $message, false );
 	}
 }
