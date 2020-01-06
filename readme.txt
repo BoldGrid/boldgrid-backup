@@ -136,6 +136,7 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 Release date: January 6th, 2019
 
+* Bug fix:     Skip views / virtual tables when backing up database.
 * Update:      Send failure emails for ajaxy Backup Site Now failures.
 
 = 1.12.3 =

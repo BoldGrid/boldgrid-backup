@@ -55,11 +55,31 @@ class Boldgrid_Backup_Admin_Db_Get {
 		$prefix_tables = array();
 
 		$results = $wpdb->get_results(
-			"SHOW TABLES LIKE '{$wpdb->prefix}%';",
+			"SHOW FULL TABLES;",
 			ARRAY_N
 		);
 
+		/*
+		 * Based upon our full list of tables, create our list of prefixed tables.
+		 *
+		 * Initially, in the get_results() call above, we used "SHOW TABLES LIKE 'prefix%'" to get a
+		 * list of all prefixed tables. This returned both tables and views. The views triggered errors
+		 * because they did not actually exist.
+		 *
+		 * @link https://stackoverflow.com/questions/2908680/how-to-get-only-tables-not-views-using-show-tables
+		 * @link https://wordpress.org/support/topic/backup-fails-because-of-some-database-error/
+		 */
 		foreach ( $results as $v ) {
+			// If this isn't a table (IE it's a view), skip it.
+			if ( 'BASE TABLE' !== $v[1] ) {
+				continue;
+			}
+
+			// If this table doesn't begin with our prefix, skip it.
+			if ( substr( $v[0], 0, strlen( $wpdb->prefix ) ) !== $wpdb->prefix ) {
+				continue;
+			}
+
 			$prefix_tables[] = $v[0];
 		}
 
