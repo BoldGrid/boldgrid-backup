@@ -55,7 +55,7 @@ class Boldgrid_Backup_Admin_Db_Get {
 		$prefix_tables = array();
 
 		$results = $wpdb->get_results(
-			"SHOW FULL TABLES;",
+			'SHOW FULL TABLES;',
 			ARRAY_N
 		);
 

@@ -2395,7 +2395,7 @@ class Boldgrid_Backup_Admin_Core {
 
 			// Send an email confirming the backup failed.
 			$this->archive_fail->cron_fail_email( [
-				'message' => $this->archive_fail->get_fail_body( $archive_info['error'] )
+				'message' => $this->archive_fail->get_fail_body( $archive_info['error'] ),
 			] );
 		}
 
