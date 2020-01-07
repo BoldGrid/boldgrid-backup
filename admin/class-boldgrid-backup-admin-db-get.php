@@ -55,7 +55,10 @@ class Boldgrid_Backup_Admin_Db_Get {
 		$prefix_tables = array();
 
 		$results = $wpdb->get_results(
-			"SHOW TABLES LIKE '{$wpdb->prefix}%';",
+			$wpdb->prepare(
+				'SHOW TABLES LIKE %s;',
+				$wpdb->esc_like( $wpdb->prefix ) . '%'
+			),
 			ARRAY_N
 		);
 
