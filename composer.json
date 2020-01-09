@@ -1,30 +1,38 @@
 {
-    "repositories": [
-        {
-            "type": "package",
-            "package": {
-                "name": "chland/tdcron",
-                "version": "dev-master",
-                "source": {
-                    "url": "https://github.com/chland/tdcron",
-                    "type": "git",
-                    "reference": "origin/master"
-                }
-            }
-        }
-    ],
-    "require": {
-        "boldgrid/library": "^2.0.0",
-        "ifsnop/mysqldump-php" : "2.*",
-        "phpseclib/phpseclib" : "~2.0",
-        "chland/tdcron" : "dev-master"
-    },
-    "require-dev": {
-        "lox/xhprof": "dev-master"
-    },
-    "scripts": {
-        "post-autoload-dump": [
-            "composer run-script post-autoload-dump -d ./vendor/boldgrid/library"
-        ]
-    }
+	"repositories" : [{
+			"type" : "package",
+			"package" : {
+				"name" : "chland/tdcron",
+				"version" : "dev-master",
+				"source" : {
+					"url" : "https://github.com/chland/tdcron",
+					"type" : "git",
+					"reference" : "origin/master"
+				}
+			}
+		},
+		{
+			"type" : "package",
+			"package" : {
+				"name" : "boldgrid/mysqldump-php",
+				"version" : "dev-include-views",
+				"source" : {
+					"url" : "https://github.com/BoldGrid/mysqldump-php",
+					"type" : "git",
+					"reference" : "origin/dev-include-views"
+				}
+			}
+		}
+	],
+	"require" : {
+		"boldgrid/library" : "^2.0.0",
+		"phpseclib/phpseclib" : "~2.0",
+		"chland/tdcron" : "dev-master"
+	},
+	"require-dev" : {
+		"lox/xhprof" : "dev-master"
+	},
+	"scripts" : {
+		"post-autoload-dump" : "composer run-script post-autoload-dump -d ./vendor/boldgrid/library"
+	}
 }
