@@ -91,7 +91,7 @@ $files = array(
 	'/admin/remote/class-boldgrid-backup-admin-ftp-page.php',
 	'/admin/remote/class-boldgrid-backup-admin-remote-settings.php',
 	'/vendor/phpseclib/phpseclib/phpseclib/Net/SSH2.php',
-	'/vendor/boldgrid/mysqldump-php/src/Ifsnop/Mysqldump/Mysqldump.php',
+	'/vendor/ifsnop/mysqldump-php/src/Ifsnop/Mysqldump/Mysqldump.php',
 	'/cli/class-info.php',
 	'/cli/class-log.php',
 	'/cli/class-email.php',
