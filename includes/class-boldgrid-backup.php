@@ -240,11 +240,17 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-plugins.php';
 
-		// Cards.
+		// Premium Cards.
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-premium.php';
+
+		// Cards. ** Changed to scan Cards directory to avoid having to edit this with each added card
 		if ( class_exists( '\Boldgrid\Library\Library\Ui\Card' ) ) {
-			require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-backups.php';
-			require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-updates.php';
-			require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-premium.php';
+		    foreach (scandir(BOLDGRID_BACKUP_PATH . '/admin/card/') as $filename) {
+                $path = BOLDGRID_BACKUP_PATH . '/admin/card/' . $filename;
+                if (is_file($path)) {
+                    require $path;
+                }
+            }
 		}
 
 		// Features.
