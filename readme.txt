@@ -137,6 +137,7 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 Release date: January 14th, 2019
 
 * Update:      Adding logging system.
+* Update:      Updated dependencies.
 
 = 1.12.4 =
 
