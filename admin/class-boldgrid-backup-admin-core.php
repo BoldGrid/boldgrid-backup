@@ -181,6 +181,14 @@ class Boldgrid_Backup_Admin_Core {
 	public $support;
 
 	/**
+	 * An instance of Boldgrid_Backup_Admin_Premium.
+	 *
+	 * @since 1.12.4
+	 * @var    Boldgrid_Backup_Admin_Premium
+	 */
+	public $premium;
+
+	/**
 	 * An instance of Boldgrid_Backup_Admin_Utility.
 	 *
 	 * @since  1.5.3
@@ -634,6 +642,8 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->support = new Boldgrid_Backup_Admin_Support( $this );
 
+		$this->premium = new Boldgrid_Backup_Admin_Premium( $this );
+
 		$this->time = new Boldgrid_Backup_Admin_Time( $this );
 
 		$this->cron_test = new Boldgrid_Backup_Admin_Cron_Test( $this );
@@ -851,6 +861,7 @@ class Boldgrid_Backup_Admin_Core {
 			'tools'           => esc_html__( 'Tools', 'boldgrid-backup' ),
 			'transfers'       => esc_html__( 'Transfers', 'boldgrid-backup' ),
 			'support'         => esc_html__( 'Support', 'boldgrid-backup' ),
+			'premium'         => esc_html__( 'Premium', 'boldgrid-backup' ),
 		];
 
 		// The main slug all sub menu items are children of.
@@ -976,6 +987,19 @@ class Boldgrid_Backup_Admin_Core {
 			'boldgrid-backup-support',
 			[
 				$this->support,
+				'page',
+			]
+		);
+		
+		// Add "Premium" page.
+		add_submenu_page(
+			$main_slug,
+			$lang['boldgrid_backup'] . ' ' . $lang['premium'],
+			$lang['premium'],
+			$capability,
+			'boldgrid-backup-premium',
+			[
+				$this->premium,
 				'page',
 			]
 		);
@@ -2607,7 +2631,7 @@ class Boldgrid_Backup_Admin_Core {
 				[ 'a' => [ 'href' => [] ] ]
 			),
 			'icon_success'              => '<span class="dashicons dashicons-yes green"></span> ',
-			'icon_warning'              => '<span class="dashicons dashicons-warning yellow"></span> ',
+			'icon_warning'               => '<span class="dashicons dashicons-warning yellow"></span> ',
 			'heading_update_protection' => BOLDGRID_BACKUP_TITLE . ' - ' . esc_html__( 'Update Protection', 'boldgrid-backup' ),
 			// Mine count, number of backups on remote storage providers.
 			'Remote'                    => esc_html__( 'Remote', 'boldgrid-backup' ),

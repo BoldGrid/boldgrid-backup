@@ -57,6 +57,11 @@ $navs = [
 		'href'  => 'admin.php?page=boldgrid-backup-support',
 		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup-support' === $_GET['page'] ? $active : '',
 	],
+	[
+		'title' => __( 'Premium Features', 'boldgrid-backup' ),
+		'href'  => 'admin.php?page=boldgrid-backup-premium',
+		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup-premium' === $_GET['page'] ? $active : '',
+	],
 ];
 // phpcs:enable WordPress.CSRF.NonceVerification.NoNonceVerification
 
