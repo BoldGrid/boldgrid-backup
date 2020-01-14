@@ -1648,13 +1648,24 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Add the database dump file to the beginning of file list.
 		if ( ! empty( $this->db_dump_filepath ) ) {
+			$db_dump_size = $this->wp_filesystem->size( $this->db_dump_filepath );
+
 			$db_file_array = [
 				$this->db_dump_filepath,
 				substr( $this->db_dump_filepath, strlen( $backup_directory ) + 1 ),
-				$this->wp_filesystem->size( $this->db_dump_filepath ),
+				$db_dump_size,
 			];
 
 			array_unshift( $filelist, $db_file_array );
+
+			$this->logger->add(
+				sprintf(
+					'Database dump file added to file list: %1$s / %2$s (%3$s)',
+					$this->db_dump_filepath,
+					$db_dump_size,
+					size_format( $db_dump_size, 2 )
+				)
+			);
 		}
 
 		$this->set_time_limit();
@@ -1714,7 +1725,22 @@ class Boldgrid_Backup_Admin_Core {
 				break;
 		}
 
+		$archive_exists = ! empty( $info['filepath'] ) && $this->wp_filesystem->exists( $info['filepath'] );
+		$archive_size   = ! $archive_exists ? 0 : $this->wp_filesystem->size( $info['filepath'] );
+
+		// Add additional info to the logs.
 		$this->logger->add( 'Archiving of files complete!' );
+		if ( true !== $status ) {
+			$this->logger->add( 'Archiving of files did not complete successfully: ' . print_r( $status, 1 ) ); // phpcs:ignore
+		}
+		$this->logger->add(
+			sprintf(
+				'Archive filepath / size: %1$s / %2$s (%3$s)',
+				( empty( $info['filepath'] ) ? 'MISSING FILEPATH' : $info['filepath'] ),
+				$archive_size,
+				size_format( $archive_size, 2 )
+			)
+		);
 		$this->logger->add_memory();
 
 		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'status', esc_html__( 'Wrapping things up...', 'boldgrid-backup' ) );
@@ -1722,7 +1748,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		$info['total_size'] += $this->filelist->get_total_size( $filelist );
 
-		if ( true === $status && ! $this->wp_filesystem->exists( $info['filepath'] ) ) {
+		if ( true === $status && ! $archive_exists ) {
 			$status = [ 'error' => 'The archive file "' . $info['filepath'] . '" was not written.' ];
 		}
 
