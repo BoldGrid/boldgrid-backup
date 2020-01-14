@@ -28,6 +28,11 @@ $sections = array(
 			'title'   => __( 'Cron Log', 'boldgrid-backup' ),
 			'content' => $this->core->cron_log->get_markup(),
 		),
+		array(
+			'id'      => 'section_logs',
+			'title'   => __( 'Logs', 'boldgrid-backup' ),
+			'content' => include BOLDGRID_BACKUP_PATH . '/admin/partials/tools/logs.php',
+		),
 	),
 );
 

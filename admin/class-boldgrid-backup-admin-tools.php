@@ -39,15 +39,28 @@ class Boldgrid_Backup_Admin_Tools {
 	}
 
 	/**
+	 *
+	 */
+	public function admin_enqueue_scripts( $hook ) {
+		if ( 'total-upkeep_page_boldgrid-backup-tools' !== $hook ) {
+			return;
+		}
+
+		// Load classes for the UI class. As of @since 1.12.5, moved from self::page to here.
+		wp_enqueue_style( 'bglib-ui-css' );
+		wp_enqueue_script( 'bglib-ui-js' );
+		wp_enqueue_script( 'bglib-sticky' );
+
+		// Add thickbox functionality. Initially added to support viewing log files.
+		add_thickbox();
+	}
+
+	/**
 	 * Render the tools page.
 	 *
 	 * @since 1.6.0
 	 */
 	public function page() {
-		wp_enqueue_style( 'bglib-ui-css' );
-		wp_enqueue_script( 'bglib-ui-js' );
-		wp_enqueue_script( 'bglib-sticky' );
-
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-tools.php';
 	}
 }
