@@ -23,14 +23,15 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 	 * @since 1.12.5
 	 */
 	BOLDGRID.BACKUP.Logs = {
+
 		/**
-		  * i18n.
-		  *
-		  * @since 1.7.0
-		  *
-		  * @type object
-		  */
-	     i18n: window.BoldGridBackupAdminLogs || {},
+		 * i18n.
+		 *
+		 * @since 1.7.0
+		 *
+		 * @type object
+		 */
+		i18n: window.BoldGridBackupAdminLogs || {},
 
 		/**
 		 * Init.
@@ -60,15 +61,20 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			 * to allow some time for the modal to open before we take action. In testing, a 1ms timeout
 			 * worked. To be on the safe side, we're using 10ms.
 			 */
-			setTimeout( function(){
-				$( '#TB_ajaxContent' ).html( '<p id="bgbu_thickbox_loading">' +
-					self.i18n.loading + ' <span class="spinner inline"></span></p>' );
+			setTimeout( function() {
+				$( '#TB_ajaxContent' ).html(
+					'<p id="bgbu_thickbox_loading">' +
+						self.i18n.loading +
+						' <span class="spinner inline"></span></p>'
+				);
 			}, 10 );
 
 			$.post( ajaxurl, data, function( response ) {
 				$( '#TB_ajaxContent' ).html( response.data );
 			} ).error( function() {
-				$( '#TB_ajaxConent' ).html( '<div class="notice notice-error"><p>' + unknownError + '<p></div>' );
+				$( '#TB_ajaxConent' ).html(
+					'<div class="notice notice-error"><p>' + unknownError + '<p></div>'
+				);
 			} );
 		},
 
@@ -81,7 +87,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			$( function() {
 				$( '#section_logs a[data-filename]' ).on( 'click', self.onClickLog );
 			} );
-		},
+		}
 	};
 
 	self = BOLDGRID.BACKUP.Logs;
