@@ -31,7 +31,7 @@ $sections = array(
 		array(
 			'id'      => 'section_logs',
 			'title'   => __( 'Logs', 'boldgrid-backup' ),
-			'content' => include BOLDGRID_BACKUP_PATH . '/admin/partials/tools/logs.php',
+			'content' => include BOLDGRID_BACKUP_PATH . '/admin/partials/tools/view-logs.php',
 		),
 	),
 );
