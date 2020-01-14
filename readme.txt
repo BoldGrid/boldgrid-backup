@@ -132,9 +132,15 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
+= 1.12.5 =
+
+Release date: January 14th, 2019
+
+* Update:      Adding logging system.
+
 = 1.12.4 =
 
-Release date: January 10th, 2019
+Release date: January 10th, 2020
 
 * Bug fix:     Escape table prefix when getting tables.
 * Bug fix:     Include views when dumping the database.
