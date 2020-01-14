@@ -81,4 +81,7 @@ return [
 			'key'   => 'dreamobjects',
 		],
 	],
+
+	// The time, in seconds, that log files are kept for.
+	'max_log_age'          => 30 * DAY_IN_SECONDS,
 ];
