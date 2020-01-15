@@ -81,4 +81,21 @@ return [
 			'key'   => 'dreamobjects',
 		],
 	],
+	/**
+	 * plugin_notices is used to add "unread" notice counts to various
+	 * UI locations within boldgrid plugin. This config is used by 
+	 * Boldgrid\Library\Library\NoticeCounts
+	 */
+	'boldgrid-plugin-notice-counts'	=> [
+		'boldgrid-backup-premium-features' => [
+			'Encryption'		  => true,
+			'Drive' 			  => true,
+			'Amazon' 			  => true,
+			'Dreamobjects' 		  => true,
+			'OneClickRestoration' => true,
+			'History' 	 		  => true,
+			'HistoricalVersions'  => true,
+			'PluginEditorTools'   => true,
+		]
+	]
 ];

@@ -656,10 +656,12 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->dashboard = new Boldgrid_Backup_Admin_Dashboard( $this );
 
-		// Ensure there is a backup identifier.
+				// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
 
 		$this->configs = Boldgrid_Backup_Admin::get_configs();
+
+		$this->notice_counts = new Boldgrid\Library\Library\NoticeCounts( $this->configs );
 
 		$this->set_lang();
 
@@ -861,7 +863,7 @@ class Boldgrid_Backup_Admin_Core {
 			'tools'           => esc_html__( 'Tools', 'boldgrid-backup' ),
 			'transfers'       => esc_html__( 'Transfers', 'boldgrid-backup' ),
 			'support'         => esc_html__( 'Support', 'boldgrid-backup' ),
-			'premium'         => esc_html__( 'Premium', 'boldgrid-backup' ),
+			'premium'         => esc_html__( 'Premium Features', 'boldgrid-backup' ),
 		];
 
 		// The main slug all sub menu items are children of.
@@ -995,9 +997,9 @@ class Boldgrid_Backup_Admin_Core {
 		add_submenu_page(
 			$main_slug,
 			$lang['boldgrid_backup'] . ' ' . $lang['premium'],
-			$lang['premium'],
+			$lang['premium'] . $this->notice_counts::get_unread_count('boldgrid-backup-premium-features'),
 			$capability,
-			'boldgrid-backup-premium',
+			'boldgrid-backup-premium-features',
 			[
 				$this->premium,
 				'page',

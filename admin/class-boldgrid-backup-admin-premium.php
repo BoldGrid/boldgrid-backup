@@ -46,9 +46,9 @@ class Boldgrid_Backup_Admin_Premium {
 	 * @param string $hook Hook name.
 	 */
 	public function admin_enqueue_scripts( $hook ) {
-		if ( isset( $_REQUEST['page'] ) && 'boldgrid-backup-premium' === $_REQUEST['page'] ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		if ( isset( $_REQUEST['page'] ) && 'boldgrid-backup-premium-features' === $_REQUEST['page'] ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			wp_enqueue_style(
-				'boldgrid-backup-admin-premium',
+				'boldgrid-backup-admin-premium-features',
 				plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-premium.css', array(),
 				BOLDGRID_BACKUP_VERSION
 			);
@@ -85,7 +85,7 @@ class Boldgrid_Backup_Admin_Premium {
 	 * @since 1.12.4
 	 */
 	public function page() {
-        $this->admin_enqueue_scripts('boldgrid-backup-admin-premium');
+		$this->admin_enqueue_scripts('boldgrid-backup-admin-premium-features');
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-premium.php';
 	}
 }
