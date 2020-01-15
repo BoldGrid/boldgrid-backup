@@ -30,7 +30,7 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 	'
 	<div class="bg-box-bottom premium">
 		<p>
-			%1$s
+			<span class="bg-box-title">%1$s</span>
 			%2$s
 		</p>
 		<p>

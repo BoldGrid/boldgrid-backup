@@ -103,3 +103,8 @@
 	background:green;
 	color: #fff;
 }
+
+.bg-box-title {
+	font-size: 1.25em;
+	font-weight: 600;
+}
