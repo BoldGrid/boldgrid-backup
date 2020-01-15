@@ -132,6 +132,13 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
+= 1.12.6 =
+
+Release date: ??
+
+* Update:      Open logs full screen.
+* Update:      Added additional info to the logs.
+
 = 1.12.5 =
 
 Release date: January 14th, 2020

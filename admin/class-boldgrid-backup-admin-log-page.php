@@ -90,7 +90,7 @@ class Boldgrid_Backup_Admin_Log_Page {
 		}
 
 		// Good to go.
-		$markup = '<div style="overflow:auto;white-space:pre;font-family:\'Courier New\';">' . esc_html( $contents ) . '</div>';
+		$markup = '<div style="overflow:auto;white-space:pre-wrap;font-family:\'Courier New\';">' . esc_html( $contents ) . '</div>';
 		wp_send_json_success( $markup );
 	}
 }

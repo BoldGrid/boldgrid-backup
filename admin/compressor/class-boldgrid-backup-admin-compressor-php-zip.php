@@ -253,7 +253,13 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 			}
 		}
 
+		$this->core->logger->add( 'Starting to close the zip file.' );
+		$this->core->logger->add_memory();
+
 		$close = $this->zip->close();
+
+		$this->core->logger->add( 'Finished closing the zip file.' );
+		$this->core->logger->add_memory();
 
 		Boldgrid_Backup_Admin_In_Progress_Data::delete_arg( 'step' );
 
