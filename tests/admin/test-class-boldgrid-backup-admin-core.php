@@ -235,6 +235,11 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 	public function setUp() {
 		global $wpdb;
 
+		if ( ! defined( 'BOLDGRID_BACKUP_VERSION' ) ) {
+			$file = dirname( dirname( dirname( __FILE__ ) ) ) . '/boldgrid-backup.php';
+			define( 'BOLDGRID_BACKUP_VERSION', implode( get_file_data( $file, array( 'Version' ), 'plugin' ) ) );
+		}
+
 		$this->core = apply_filters( 'boldgrid_backup_get_core', null );
 
 		$this->zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this->core );
