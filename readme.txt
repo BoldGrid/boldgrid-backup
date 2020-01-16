@@ -4,7 +4,7 @@ Tags: backup, cloud backup, database backup, restore, wordpress backup
 Requires at least: 4.4
 Tested up to: 5.3
 Requires PHP: 5.4
-Stable tag: 1.12.5
+Stable tag: 1.12.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -134,7 +134,7 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 = 1.12.6 =
 
-Release date: ??
+Release date: January 16th, 2020
 
 * Update:      Open logs full screen.
 * Update:      Added additional info to the logs.
