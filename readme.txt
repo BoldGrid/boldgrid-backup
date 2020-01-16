@@ -138,6 +138,7 @@ Release date: ??
 
 * Update:      Open logs full screen.
 * Update:      Added additional info to the logs.
+* Update:      Logs now listen for signals, can log when a script is killed.
 
 = 1.12.5 =
 

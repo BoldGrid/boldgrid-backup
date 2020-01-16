@@ -79,6 +79,19 @@ class Boldgrid_Backup_Admin_Log {
 	}
 
 	/**
+	 * Add generic info for all logs.
+	 *
+	 * @since 1.12.6
+	 */
+	public function add_generic() {
+		$this->add( 'PHP Version: ' . phpversion() );
+
+		$this->add( 'WordPress Version: ' . get_bloginfo( 'version' ) );
+
+		$this->add( 'Total Upkeep version: ' . BOLDGRID_BACKUP_VERSION );
+	}
+
+	/**
 	 * Add info to the log about memory usage.
 	 *
 	 * @since 1.12.5
@@ -144,7 +157,72 @@ class Boldgrid_Backup_Admin_Log {
 
 		$this->filepath = $this->core->backup_dir->get_logs_dir() . DIRECTORY_SEPARATOR . $this->filename;
 
-		// Create the file.
-		return $this->core->wp_filesystem->touch( $this->filepath );
+		$this->init_signal_handler();
+
+		$log_created = $this->core->wp_filesystem->touch( $this->filepath );
+
+		if ( $log_created ) {
+			$this->add_generic();
+		}
+
+		return $log_created;
+	}
+
+	/**
+	 * Add signal handlers.
+	 *
+	 * The one signal we can't handle is SIGFILL (kill -9).
+	 *
+	 * @since 1.12.6
+	 */
+	private function init_signal_handler() {
+		/*
+		 * Available only on php >= 7.1
+		 *
+		 * With PHP 7.1, pcntl_async_signals was added to enable asynchronous signal handling, and it
+		 * works great.
+		 *
+		 * Using ticks in php 5.6 not working as expected.
+		 */
+		if ( ! version_compare( phpversion(), '7.1', '>=' ) ) {
+			return;
+		}
+
+		// Enable asynchronous signal handling.
+		pcntl_async_signals( true );
+
+		$signals = [
+			// Ctrl+C.
+			SIGINT,
+			// Ctrl+\ (similiar to SIGINT, generates a core dump if necessary).
+			SIGQUIT,
+			// kill.
+			SIGTERM,
+			// Terminal log-out.
+			SIGHUP,
+			/*
+			 * Apache graceful stop.
+			 *
+			 * @link https://stackoverflow.com/questions/780853/what-is-in-apache-2-a-caught-sigwinch-error
+			 */
+			SIGWINCH,
+		];
+
+		foreach ( $signals as $signal ) {
+			pcntl_signal( $signal, [ $this, 'signal_handler' ] );
+		}
+	}
+
+	/**
+	 * Signal handler.
+	 *
+	 * @since 1.12.6
+	 *
+	 * @param int The signal being handled.
+	 */
+	public function signal_handler( $signo ) {
+		$this->add( 'Signal received: ' . $signo );
+
+		exit;
 	}
 }
