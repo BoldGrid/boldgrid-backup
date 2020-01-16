@@ -62,6 +62,8 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			 * worked. To be on the safe side, we're using 10ms.
 			 */
 			setTimeout( function() {
+				$( '#TB_window' ).addClass( 'bg-full-screen' );
+
 				$( '#TB_ajaxContent' ).html(
 					'<p id="bgbu_thickbox_loading">' +
 						self.i18n.loading +
