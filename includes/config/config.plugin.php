@@ -88,7 +88,7 @@ return [
 	 */
 	'boldgrid-plugin-notice-counts'	=> [
 		'boldgrid-backup-premium-features' => [
-			'Encryption'		  => true,
+			'Encryption'          => true,
 			'Drive' 			  => true,
 			'Amazon' 			  => true,
 			'Dreamobjects' 		  => true,
@@ -96,6 +96,8 @@ return [
 			'History' 	 		  => true,
 			'HistoricalVersions'  => true,
 			'PluginEditorTools'   => true,
-		]
+			'TestFeature3'        => true,
+		],
+		'boldgrid-backup-preflight-check' => []
 	]
 ];

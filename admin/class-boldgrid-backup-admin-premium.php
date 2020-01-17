@@ -53,8 +53,6 @@ class Boldgrid_Backup_Admin_Premium {
 				BOLDGRID_BACKUP_VERSION
 			);
 		}
-        
-        
 	}
 
 	/**
@@ -85,7 +83,7 @@ class Boldgrid_Backup_Admin_Premium {
 	 * @since 1.12.4
 	 */
 	public function page() {
-		$this->admin_enqueue_scripts('boldgrid-backup-admin-premium-features');
+		$this->admin_enqueue_scripts( 'boldgrid-backup-admin-premium-features' );
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-premium.php';
 	}
 }

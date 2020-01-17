@@ -16,7 +16,7 @@
 
 defined( 'WPINC' ) || die;
 
-Boldgrid\Library\Library\NoticeCounts::set_read('boldgrid-backup-premium-features');
+Boldgrid\Library\Library\NoticeCounts::set_read( 'boldgrid-backup-premium-features' );
 
 $nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
 
@@ -38,7 +38,7 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 	</div>',
 	/* 1 */ __( 'Total Upkeep Premium', 'boldgrid-backup' ),
 	/* 2 */ $this->core->go_pro->get_premium_button( $premium_url ),
-	/* 3 */ __( 'Upgrade to Total Upkeep Premium to take advantage of these additional features')
+	/* 3 */ __( 'Upgrade to Total Upkeep Premium to take advantage of these additional features' )
 );
 
 ?>
@@ -49,7 +49,7 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 	<?php
 	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
-	echo $premium_box;
+	echo $premium_box; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
 	$premium->printCards();
 	?>

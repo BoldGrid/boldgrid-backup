@@ -875,7 +875,7 @@ class Boldgrid_Backup_Admin_Core {
 		// Add the main menu item.
 		add_menu_page(
 			$lang['boldgrid_backup'],
-			$lang['boldgrid_backup'],
+			$lang['boldgrid_backup'] . $this->notice_counts->get_total_unread(),
 			$capability,
 			$main_slug,
 			[
@@ -958,7 +958,7 @@ class Boldgrid_Backup_Admin_Core {
 		add_submenu_page(
 			$main_slug,
 			$lang['boldgrid_backup'] . ' ' . $lang['preflight_check'],
-			$lang['preflight_check'],
+			$lang['preflight_check'] . $this->notice_counts::get_unread_count('boldgrid-backup-preflight-check'),
 			$capability,
 			'boldgrid-backup-test',
 			[
