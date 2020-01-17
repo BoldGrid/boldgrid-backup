@@ -33,11 +33,11 @@ class Amazon extends \Boldgrid\Library\Library\Ui\Premiums {
 
 		$this->footer = esc_html__( 'Automatically store backups on Amazon S3 Storage.', 'boldgrid-backup' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
 
-		$this->icon = '<img class="dashimages" src="' . plugin_dir_url(__FILE__) . '../image/remote/amazon-s3-logo.png"></img>';
+		$this->icon = '<img class="dashimages" src="' . plugin_dir_url( __FILE__ ) . '../image/remote/amazon-s3-logo.png"></img>';
 
 		$this->link = array(
-		    "url" => "#",
-		    "text" => "Setup Guide"
+			'url'  => 'https://www.boldgrid.com/support/total-upkeep-backup-plugin-product-guide/how-do-i-upload-my-wordpress-backup-to-amazon-s3/',
+			'text' => 'Setup Guide',
 		);
 	}
 }

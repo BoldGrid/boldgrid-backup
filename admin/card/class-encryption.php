@@ -36,8 +36,8 @@ class Encryption extends \Boldgrid\Library\Library\Ui\Premiums {
 		$this->icon = '<span class="dashicons dashicons-products"></span>';
 
 		$this->link = array(
-		    "url" => "#",
-		    "text" => "Setup Guide"
+			'url'  => '#',
+			'text' => 'Setup Guide',
 		);
 	}
 }

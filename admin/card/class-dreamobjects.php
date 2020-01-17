@@ -16,7 +16,7 @@ namespace Boldgrid\Backup\Admin\Card;
 /**
  * Class: Dreamobjects
  *
- * This class is responsible for rendering the "Dream Objects" card 
+ * This class is responsible for rendering the "Dream Objects" card
  * on this plugin's Premium Cards Page.
  *
  * @since 1.12.4
@@ -34,14 +34,13 @@ class Dreamobjects extends \Boldgrid\Library\Library\Ui\Premiums {
 
 		$this->footer = esc_html__( 'Do whatever it does that being part of DreamObjects is?', 'boldgrid-backup' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
 
-		$this->icon = '<img class="dashimages" src="' . plugin_dir_url(__FILE__) . '../image/remote/dreamhost-logo.png"></img>';
+		$this->icon = '<img class="dashimages" src="' . plugin_dir_url( __FILE__ ) . '../image/remote/dreamhost-logo.png"></img>';
 
-		$this->features = [
-			];
-			
+		$this->features = [];
+
 		$this->link = array(
-		    "url" => "#",
-		    "text" => "Setup Guide"
+			'url'  => '#',
+			'text' => 'Setup Guide',
 		);
 	}
 }

@@ -16,7 +16,7 @@ namespace Boldgrid\Backup\Admin\Card;
 /**
  * Class: Drive
  *
- * This class is responsible for rendering the "Google drive" card on this 
+ * This class is responsible for rendering the "Google drive" card on this
  * plugin's Premium Cards Page.
  *
  * @since 1.12.4
@@ -34,11 +34,11 @@ class Drive extends \Boldgrid\Library\Library\Ui\Premiums {
 
 		$this->footer = esc_html__( 'Automatically store backups on Google Drive.', 'boldgrid-backup' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
 
-		$this->icon = '<img class="dashimages" src="' . plugin_dir_url(__FILE__) . '../image/remote/google-drive.png"></img>';
+		$this->icon = '<img class="dashimages" src="' . plugin_dir_url( __FILE__ ) . '../image/remote/google-drive.png"></img>';
 
 		$this->link = array(
-		    "url" => "#",
-		    "text" => "Setup Guide"
+			'url'  => 'https://www.boldgrid.com/support/total-upkeep-backup-plugin-product-guide/using-a-wordpress-plugin-to-backup-to-google-drive/',
+			'text' => 'Setup Guide',
 		);
 	}
 }

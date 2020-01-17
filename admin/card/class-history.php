@@ -16,7 +16,7 @@ namespace Boldgrid\Backup\Admin\Card;
 /**
  * Class: History
  *
- * This class is responsible for rendering the "History" card on this plugin's 
+ * This class is responsible for rendering the "History" card on this plugin's
  * Premium Cards Page.
  *
  * @since 1.12.4
@@ -37,8 +37,8 @@ class History extends \Boldgrid\Library\Library\Ui\Premiums {
 		$this->icon = '<span class="dashicons dashicons-media-text"></span>';
 
 		$this->link = array(
-		    "url" => "#",
-		    "text" => "Setup Guide"
+			'url'  => 'https://www.boldgrid.com/support/total-upkeep-backup-plugin-product-guide/how-to-use-the-history-in-boldgrid-backup-premium/',
+			'text' => 'Setup Guide',
 		);
 	}
 }

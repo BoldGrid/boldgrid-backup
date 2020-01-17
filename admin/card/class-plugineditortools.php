@@ -16,7 +16,7 @@ namespace Boldgrid\Backup\Admin\Card;
 /**
  * Class: PluginEditorTools
  *
- * This class is responsible for rendering the "Plugin Editor Tools" 
+ * This class is responsible for rendering the "Plugin Editor Tools"
  * card on this plugin's Premium Cards Page.
  *
  * @since 1.12.4
@@ -36,9 +36,9 @@ class PluginEditorTools extends \Boldgrid\Library\Library\Ui\Premiums {
 
 		$this->icon = '<span class="dashicons dashicons-media-code"></span>';
 
-        $this->link = array(
-		    "url" => "#",
-		    "text" => "Setup Guide"
+		$this->link = array(
+			'url'  => '#',
+			'text' => 'Setup Guide',
 		);
 	}
 }

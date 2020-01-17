@@ -16,7 +16,7 @@ namespace Boldgrid\Backup\Admin\Card;
 /**
  * Class: OneClickRestoration
  *
- * This class is responsible for rendering the "One Click Restoration" card 
+ * This class is responsible for rendering the "One Click Restoration" card
  * on this plugin's Premium Cards Page.
  *
  * @since 1.12.4
@@ -36,9 +36,9 @@ class OneClickRestoration extends \Boldgrid\Library\Library\Ui\Premiums {
 
 		$this->icon = '<span class="dashicons dashicons-undo"></span>';
 
-        $this->link = array(
-		    "url" => "#",
-		    "text" => "Setup Guide"
+		$this->link = array(
+			'url'  => '#',
+			'text' => 'Setup Guide',
 		);
 	}
 }

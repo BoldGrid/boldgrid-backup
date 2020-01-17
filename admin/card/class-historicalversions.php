@@ -16,7 +16,7 @@ namespace Boldgrid\Backup\Admin\Card;
 /**
  * Class: HistoricalVersions
  *
- * This class is responsible for rendering the "Historical Versions" card on this 
+ * This class is responsible for rendering the "Historical Versions" card on this
  * plugin's Premium Cards Page.
  *
  * @since 1.12.4
@@ -37,8 +37,8 @@ class HistoricalVersions extends \Boldgrid\Library\Library\Ui\Premiums {
 		$this->icon = '<span class="dashicons dashicons-images-alt2"></span>';
 
 		$this->link = array(
-		    "url" => "#",
-		    "text" => "Setup Guide"
+			'url'  => '#',
+			'text' => 'Setup Guide',
 		);
 	}
 }
