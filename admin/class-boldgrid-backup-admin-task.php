@@ -169,7 +169,7 @@ class Boldgrid_Backup_Admin_Task {
 		$this->created_at   = ! empty( $args['created_at'] ) ? $args['created_at'] : time();
 		$this->started_at   = ! empty( $args['started_at'] ) ? $args['started_at'] : null;
 		$this->completed_at = ! empty( $args['completed_at'] ) ? $args['completed_at'] : null;
-		$this->completed_at = ! empty( $args['data'] ) ? $args['data'] : [];
+		$this->data = ! empty( $args['data'] ) ? $args['data'] : [];
 
 		// You must supply a type.
 		$type = ! empty( $args['type'] ) ? $args['type'] : null;
