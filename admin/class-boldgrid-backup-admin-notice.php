@@ -261,6 +261,18 @@ class Boldgrid_Backup_Admin_Notice {
 	 * @see \Boldgrid\Library\Library\Notice::show()
 	 */
 	public function plugin_renamed_notice() {
+		$plugin = new \Boldgrid\Library\Library\Plugin\Plugin( 'boldgrid-backup' );
+
+		/*
+		 * Only show to existing users.
+		 *
+		 * If the first version of this plugin is not less than 1.12.0 (the version when the rename
+		 * occurred), abort.
+		 */
+		if ( ! $plugin->firstVersionCompare( '1.12.0', '<' ) ) {
+			return;
+		}
+
 		$notice_id = 'boldgrid_backup_renamed';
 
 		if ( ! Notice::isDismissed( $notice_id ) ) {

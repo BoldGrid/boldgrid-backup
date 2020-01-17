@@ -280,6 +280,12 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-setting.php';
 		require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-archive.php';
 
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-usage.php';
+
+		// Logs system.
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-log.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-log-page.php';
+
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
 
@@ -527,6 +533,19 @@ class Boldgrid_Backup {
 			$rest_setting = new Boldgrid_Backup_Rest_Setting( $plugin_admin_core );
 			$rest_setting->register_routes();
 		} );
+
+		$usage = new Boldgrid_Backup_Admin_Usage();
+		$this->loader->add_action( 'admin_init', $usage, 'admin_init' );
+		$this->loader->add_filter( 'Boldgrid\Library\Usage\Notice\admin_notices', $usage, 'filter_notice' );
+		$this->loader->add_filter( 'Boldgrid\Library\Usage\Notice\maybeShow', $usage, 'maybe_show_notice' );
+		$this->loader->add_filter( 'Boldgrid\Library\Usage\getPrefixes', $usage, 'filter_prefixes' );
+
+		// Log system.
+		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core->log_page, 'admin_enqueue_scripts' );
+		$this->loader->add_action( 'wp_ajax_boldgrid_backup_view_log', $plugin_admin_core->log_page, 'wp_ajax_boldgrid_backup_view_log' );
+
+		// Tools page.
+		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core->tools, 'admin_enqueue_scripts' );
 	}
 
 	/**

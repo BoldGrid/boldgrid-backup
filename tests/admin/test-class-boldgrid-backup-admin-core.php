@@ -85,6 +85,14 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 	public $info;
 
 	/**
+	 * The name of a view that we will be testing.
+	 *
+	 * @since 1.12.4
+	 * @var string
+	 */
+	public $view_name;
+
+	/**
 	 * An instance of pcl_zip.
 	 *
 	 * @since xxx
@@ -138,6 +146,8 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 	 * @param string $action Action.
 	 */
 	public function deleteBasic( $action = 'delete' ) {
+		global $wpdb;
+
 		$files_to_delete = [
 			trailingslashit( ABSPATH ) . 'wp-load.php',
 			trailingslashit( ABSPATH ) . 'wp-includes/theme.php',
@@ -166,6 +176,13 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 					$tables = $this->getTables();
 					$this->assertFalse( in_array( $table, $tables, true ) );
 				}
+
+				// Delete the view we created. We should now have 0 views.
+				$sql = 'DROP VIEW ' . $this->view_name;
+				$wpdb->query( $sql ); // phpcs:ignore
+				$views = $this->core->db_get->get_by_type( 'VIEW' );
+				$this->assertTrue( 0 === count( $views ) );
+
 				break;
 			case 'restore':
 				foreach ( $files_to_delete as $file ) {
@@ -176,6 +193,11 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 				foreach ( $tables_to_drop as $table ) {
 					$this->assertTrue( in_array( $table, $tables, true ) );
 				}
+
+				// Ensure our view was restored.
+				$views = $this->core->db_get->get_by_type( 'VIEW' );
+				$this->assertTrue( 1 === count( $views ) );
+
 				break;
 		}
 	}
@@ -211,9 +233,18 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 	 * @since xxx
 	 */
 	public function setUp() {
+		global $wpdb;
+
+		if ( ! defined( 'BOLDGRID_BACKUP_VERSION' ) ) {
+			$file = dirname( dirname( dirname( __FILE__ ) ) ) . '/boldgrid-backup.php';
+			define( 'BOLDGRID_BACKUP_VERSION', implode( get_file_data( $file, array( 'Version' ), 'plugin' ) ) );
+		}
+
 		$this->core = apply_filters( 'boldgrid_backup_get_core', null );
 
 		$this->zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this->core );
+
+		$this->view_name = $wpdb->prefix . 'view1';
 	}
 
 	/**
@@ -222,6 +253,8 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 	 * @since xxx
 	 */
 	public function test_archive_files() {
+		global $wpdb;
+
 		// Delete our latest_backup variable.
 		delete_option( 'boldgrid_backup_latest_backup' );
 		$this->assertFalse( get_option( 'boldgrid_backup_latest_backup' ) );
@@ -231,6 +264,17 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 		 *
 		 * This is a generic backup test (IE backup all files and folders and tables).
 		 */
+
+		/*
+		 * Before backing up, create a view to ensure it's backed up / restored properly.
+		 *
+		 * @link https://wordpress.org/support/topic/backup-fails-because-of-some-database-error/
+		 */
+		$sql = 'CREATE OR REPLACE VIEW ' . $this->view_name . ' AS SELECT * FROM ' . $wpdb->prefix . 'options WHERE `option_id` = 10';
+		$wpdb->query( $sql ); //  phpcs:ignore
+		$views = $this->core->db_get->get_by_type( 'VIEW' );
+		$this->assertTrue( 1 === count( $views ) );
+
 		$this->info = $this->core->archive_files( true );
 
 		// Ensure a backup was made and we have a filepath.
