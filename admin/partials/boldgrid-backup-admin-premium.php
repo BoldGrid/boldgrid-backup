@@ -16,8 +16,6 @@
 
 defined( 'WPINC' ) || die;
 
-Boldgrid\Library\Library\NoticeCounts::set_read( 'boldgrid-backup-premium-features' );
-
 $nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
 
 $premium = new \Boldgrid\Library\Library\Ui\Premium();
@@ -52,5 +50,7 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 	echo $premium_box; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
 	$premium->printCards();
+
+	Boldgrid\Library\Library\NoticeCounts::set_read( 'boldgrid-backup-premium-features' );
 	?>
 </div>

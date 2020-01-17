@@ -451,9 +451,9 @@ $table .= '</table>';
 
 	echo $table; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
-	foreach ( $tests as $key => $value) {
+	foreach ( $tests as $key => $value ) {
 		if ( isset( $value['v'] ) ) {
-			if ( strpos( $value['v'], 'class="error"' ) !== false) {
+			if ( strpos( $value['v'], 'class="error"' ) !== false ) {
 				$this->notice_counts->set_notice_option( array( 'boldgrid-backup-preflight-check', $value['k'], true ) );
 			} else {
 				$option = get_option( 'boldgrid-plugin-notice-counts' );
@@ -462,7 +462,6 @@ $table .= '</table>';
 				}
 			}
 		}
-		
 	}
 	?>
 
