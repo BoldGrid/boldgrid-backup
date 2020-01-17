@@ -153,15 +153,25 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 	/**
 	 * Create a new archive.
 	 *
+	 * Example call to trigger this endpoint:
+	 * jQuery.post( 'https://domain.com/wp-json/bgbkup/v1/archives' );
+	 *
 	 * @since X.X.X
 	 *
 	 * @param WP_REST_Request $request Full data about the request.
 	 * @return array                   Job Resource.
 	 */
 	public function create_item( $request ) {
-		// BRAD: return a job resource.
-		$job = [];
-		return new WP_REST_Response( $job, 200 );
+		// Initialize a new task.
+		$task = new Boldgrid_Backup_Admin_Task();
+		$task->init( [ 'type' => 'backup' ] );
+		$task->update();
+
+		// Trigger our backup.
+		$nopriv = new Boldgrid_Backup_Admin_Nopriv();
+		$nopriv->do_backup( [ 'task_id' => $task->get_id() ] );
+
+		return new WP_REST_Response( $task->get(), 200 );
 	}
 
 	/**

@@ -1478,9 +1478,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return array An array of archive file information.
 	 */
 	public function archive_files( $save = false, $dryrun = false ) {
-		$this->logger->init( 'archive-' . time() . '.log' );
-		$this->logger->add( 'Backup process initialized.' );
-
 		$this->pre_auto_update = 'pre_auto_update' === current_filter();
 
 		/*
@@ -1848,9 +1845,6 @@ class Boldgrid_Backup_Admin_Core {
 		if ( isset( $this->activity ) ) {
 			$this->activity->add( 'any_backup_created', 1, $this->rating_prompt_config );
 		}
-
-		$this->logger->add( 'Backup complete!' );
-		$this->logger->add_memory();
 
 		// Return the array of archive information.
 		return $info;
@@ -2454,7 +2448,10 @@ class Boldgrid_Backup_Admin_Core {
 		$this->is_archiving_update_protection = ! empty( $_POST['is_updating'] ) &&
 			'true' === $_POST['is_updating'];
 
-		$archive_info = $this->archive_files( true );
+		$archiver = new Boldgrid_Backup_Archiver();
+		$archiver->run();
+
+		$archive_info = $archiver->get_info();
 
 		// If there were any errors encountered during the backup, save them to the In Progress data.
 		if ( ! empty( $archive_info['error'] ) ) {
@@ -2811,7 +2808,8 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Perform the backup operation.
-		$this->archive_files( true );
+		$archiver = new Boldgrid_Backup_Archiver();
+		$archiver->run();
 	}
 
 	/**

@@ -1073,7 +1073,10 @@ class Boldgrid_Backup_Admin_Cron {
 	/**
 	 * Hook into "wp_ajax_nopriv_boldgrid_backup_run_backup" and generate backup.
 	 *
-	 * @since 1.6.1-rc.1
+	 * A scheduled backup (via cron) will call a url which ultimately triggers this method to be ran
+	 * to backup the site.
+	 *
+	 * @since 1.6.1
 	 *
 	 * @see Boldgrid_Backup_Admin_Cron::is_valid_call()
 	 *
@@ -1084,9 +1087,10 @@ class Boldgrid_Backup_Admin_Cron {
 			wp_die( esc_html__( 'Error: Invalid request.', 'boldgrid-backup' ) );
 		}
 
-		$archive_info = $this->core->archive_files( true );
+		$archiver = new Boldgrid_Backup_Archiver();
+		$archiver->run();
 
-		return $archive_info;
+		return $archiver->get_info();
 	}
 
 	/**

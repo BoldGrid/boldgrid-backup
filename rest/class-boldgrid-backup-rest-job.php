@@ -66,12 +66,12 @@ class Boldgrid_Backup_Rest_Job extends Boldgrid_Backup_Rest_Controller {
 			'title'      => 'job',
 			'type'       => 'object',
 			'properties' => [
-				'id'            => [
+				'id'           => [
 					'context'     => [ 'view' ],
 					'description' => esc_html__( 'Unique identifier for the object.', 'boldgrid-backup' ),
 					'type'        => 'string',
 				],
-				'type'          => [
+				'type'         => [
 					'context'     => [ 'view' ],
 					'description' => esc_html__( 'Type of job.', 'boldgrid-backup' ),
 					'type'        => 'string',
@@ -80,20 +80,20 @@ class Boldgrid_Backup_Rest_Job extends Boldgrid_Backup_Rest_Controller {
 						'restoration',
 					],
 				],
-				'status'        => [
+				'status'       => [
 					'context'     => [ 'view' ],
 					'description' => esc_html__( 'Currently status of the job.', 'boldgrid-backup' ),
 					'type'        => 'string',
 				],
-				'data_start'    => [
+				'started_at'   => [
 					'context'     => [ 'view' ],
 					'description' => esc_html__( 'Information attached to the start of the prcoess.', 'boldgrid-backup' ),
-					'type'        => 'array',
+					'type'        => 'string',
 				],
-				'data_complete' => [
+				'completed_at' => [
 					'context'     => [ 'view' ],
 					'description' => esc_html__( 'Results of the process.', 'boldgrid-backup' ),
-					'type'        => 'array',
+					'type'        => 'string',
 				],
 			],
 		];
@@ -117,6 +117,9 @@ class Boldgrid_Backup_Rest_Job extends Boldgrid_Backup_Rest_Controller {
 	/**
 	 * Get one item from the collection.
 	 *
+	 * Example call:
+	 * jQuery.get( 'https://domain/wp-json/bgbkup/v1/jobs/<JOB-ID>' );
+	 *
 	 * @since X.X.X
 	 *
 	 * @param WP_REST_Request $request Full data about the request.
@@ -125,8 +128,11 @@ class Boldgrid_Backup_Rest_Job extends Boldgrid_Backup_Rest_Controller {
 	public function get_item( $request ) {
 		$id = $request->get_param( 'id' );
 
-		$item = \Boldgrid_Backup_Job::get( $id );
-		if ( $item ) {
+		$task = new Boldgrid_Backup_Admin_Task();
+		$task->init_by_id( $id );
+
+		$item = $task->get();
+		if ( ! empty( $item ) ) {
 			$data = $this->prepare_item_for_response( $item, $request );
 			return new WP_REST_Response( $data, 200 );
 		} else {

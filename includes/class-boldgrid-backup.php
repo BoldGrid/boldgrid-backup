@@ -286,6 +286,14 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-log.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-log-page.php';
 
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-nopriv.php';
+
+		// Task system.
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-task.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-task-helper.php';
+
+		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-archiver.php';
+
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
 
