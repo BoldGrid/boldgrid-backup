@@ -97,6 +97,8 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 
 		$backup_dir = untrailingslashit( $backup_dir );
 
+		$logs_dir = $this->get_logs_dir( $backup_dir );
+
 		$htaccess_path   = $backup_dir . DIRECTORY_SEPARATOR . '.htaccess';
 		$index_html_path = $backup_dir . DIRECTORY_SEPARATOR . 'index.html';
 		$index_php_path  = $backup_dir . DIRECTORY_SEPARATOR . 'index.php';
@@ -105,6 +107,11 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 			array(
 				'type'  => 'dir',
 				'path'  => $backup_dir,
+				'chmod' => 0700,
+			),
+			array(
+				'type'  => 'dir',
+				'path'  => $logs_dir,
 				'chmod' => 0700,
 			),
 			array(
@@ -232,6 +239,62 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 		}
 
 		return $this->guess_and_set();
+	}
+
+	/**
+	 * Get the directory to our logs folder.
+	 *
+	 * @since 1.12.5
+	 *
+	 * @param  string $backup_dir Backup directory path.
+	 * @return string             The filepath to the logs directory.
+	 */
+	public function get_logs_dir( $backup_dir = null ) {
+		$backup_dir = ! empty( $backup_dir ) ? $backup_dir : $this->get();
+
+		$logs_dir = '';
+
+		// When looking for an existing logs dir, we'll be looking for a dir beginning with this prefix.
+		$prefix = 'logs-' . $this->core->get_backup_identifier() . '-';
+
+		/*
+		 * Check to see if we already have a logs directory created.
+		 *
+		 * We'll do this by getting a dir list of the backup directory, and then looking for a folder
+		 * named in this format: logs-[BACKUP IDENTIFIER]-[16 CHARS]
+		 */
+
+		// Get directory listing of backup directory.
+		$dirlist = $this->core->wp_filesystem->dirlist( $backup_dir );
+		$dirlist = is_array( $dirlist ) ? $dirlist : array();
+
+		// Look for a logs directory.
+		foreach ( $dirlist as $file ) {
+			if ( 'd' !== $file['type'] ) {
+				continue;
+			}
+
+			preg_match( '/^' . $prefix . '[a-zA-Z0-9]{16}$/', $file['name'], $matches );
+
+			if ( ! empty( $matches ) ) {
+				$logs_dir = Boldgrid_Backup_Admin_Utility::trailingslashit( $backup_dir ) . $matches[0];
+				break;
+			}
+		}
+
+		/*
+		 * If we need to, create our log directory.
+		 *
+		 * We're using the 16 random characters at the end of the folder name to stay consistent with
+		 * Total Upkeep Premium.
+		 *
+		 * @link https://github.com/BoldGrid/boldgrid-backup-premium/blob/ea33c7fc1b9a184d17ee50b2e61e665967595e85/admin/class-boldgrid-backup-premium-admin-historical.php#L165-L175
+		 */
+		if ( empty( $logs_dir ) ) {
+			$logs_dir = $backup_dir . DIRECTORY_SEPARATOR . $prefix . substr( md5( time() ), -16 );
+		}
+
+		return $logs_dir;
 	}
 
 	/**

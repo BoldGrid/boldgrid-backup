@@ -35,7 +35,7 @@ class Test_Boldgrid_Backup_Admin_Db_Get extends WP_UnitTestCase {
 		 */
 
 		// Create a view.
-		$sql = 'CREATE VIEW ' . $view_name . ' AS SELECT * FROM ' . $wpdb->prefix . 'options WHERE `option_id` = 10';
+		$sql = 'CREATE OR REPLACE VIEW ' . $view_name . ' AS SELECT * FROM ' . $wpdb->prefix . 'options WHERE `option_id` = 10';
 		$wpdb->query( $sql ); // phpcs:ignore
 
 		// Get our prefixed tables. This will include both tables and views.
