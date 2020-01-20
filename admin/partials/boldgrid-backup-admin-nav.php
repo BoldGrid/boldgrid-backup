@@ -80,13 +80,22 @@ $navs = apply_filters( 'boldgrid_backup_navs', $navs );
 
 $markup = '<h2 class="nav-tab-wrapper">';
 foreach ( $navs as $nav ) {
-	$markup .= sprintf(
-		'<a class="nav-tab %1$s" href="%2$s">%3$s %4$s</a>',
-		$nav['class'],
-		$nav['href'],
-		$nav['title'],
-		$nav['count']
-	);
+	if ( isset( $nav['count'] ) ) {
+		$markup .= sprintf(
+			'<a class="nav-tab %1$s" href="%2$s">%3$s %4$s</a>',
+			$nav['class'],
+			$nav['href'],
+			$nav['title'],
+			$nav['count']
+		);
+	} else {
+		$markup .= sprintf(
+			'<a class="nav-tab %1$s" href="%2$s">%3$s</a>',
+			$nav['class'],
+			$nav['href'],
+			$nav['title']
+		);
+	}
 }
 $markup .= '</h2>';
 
