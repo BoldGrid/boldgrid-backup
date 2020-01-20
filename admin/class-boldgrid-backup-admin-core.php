@@ -186,7 +186,7 @@ class Boldgrid_Backup_Admin_Core {
 	 * @since 1.12.4
 	 * @var    Boldgrid_Backup_Admin_Premium
 	 */
-	public $premium;
+	public $premium_page;
 
 	/**
 	 * An instance of Boldgrid_Backup_Admin_Utility.
@@ -642,7 +642,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->support = new Boldgrid_Backup_Admin_Support( $this );
 
-		$this->premium = new Boldgrid_Backup_Admin_Premium( $this );
+		$this->premium_page = new Boldgrid_Backup_Admin_Premium( $this );
 
 		$this->time = new Boldgrid_Backup_Admin_Time( $this );
 
@@ -1001,7 +1001,7 @@ class Boldgrid_Backup_Admin_Core {
 			$capability,
 			'boldgrid-backup-premium-features',
 			[
-				$this->premium,
+				$this->premium_page,
 				'page',
 			]
 		);
