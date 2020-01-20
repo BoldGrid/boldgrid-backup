@@ -243,15 +243,18 @@ class Boldgrid_Backup {
 		// Premium Cards.
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-premium.php';
 
-		// Cards. ** Changed to scan Cards directory to avoid having to edit this with each added card
-		if ( class_exists( '\Boldgrid\Library\Library\Ui\Card' ) ) {
-		    foreach (scandir(BOLDGRID_BACKUP_PATH . '/admin/card/') as $filename) {
-                $path = BOLDGRID_BACKUP_PATH . '/admin/card/' . $filename;
-                if (is_file($path)) {
-                    require $path;
-                }
-            }
-		}
+		// Cards. ** 
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-amazon.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-backups.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-dreamobjects.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-drive.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-encryption.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-historicalversions.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-history.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-oneclickrestoration.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-plugineditortools.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-premium.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-updates.php';
 
 		// Features.
 		if ( class_exists( '\Boldgrid\Library\Library\Ui\Feature' ) ) {
