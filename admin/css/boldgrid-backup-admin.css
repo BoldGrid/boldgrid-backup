@@ -331,6 +331,30 @@ p > .bgbkup-remote-logo {
 	padding-left: 23px;
 }
 
+/**
+ * Misc.
+ */
+
+/* Allow the standard Thickbox to be shown full screen. */
+#TB_window.bg-full-screen {
+	margin: 0 !important;
+	top: 30px;
+	left: 30px;
+	width: calc( 100% - 60px ) !important;
+	height: calc( 100% - 60px );
+}
+
+#TB_window.bg-full-screen #TB_ajaxContent {
+	width: calc( 100% - 40px ) !important;
+	height: calc( 100% - 60px ) !important;
+}
+
+/**
+ * Notice Counts
+ */
+
+/* Style Notice Counts. */
+
 .unread-notice-count {
 	display: inline-block;
 	vertical-align: top;
