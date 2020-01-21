@@ -491,6 +491,22 @@ class Boldgrid_Backup_Admin_Core {
 	public $local;
 
 	/**
+	 * Log page.
+	 *
+	 * @since 1.12.5
+	 * @var Boldgrid_Backup_Admin_Log_Page
+	 */
+	public $log_page;
+
+	/**
+	 * Logger.
+	 *
+	 * @since 1.12.5
+	 * @var Boldgrid_Backup_Admin_Log
+	 */
+	public $logger;
+
+	/**
 	 * Path to our config.rating-prompt.php file.
 	 *
 	 * @since  1.7.2
@@ -665,6 +681,10 @@ class Boldgrid_Backup_Admin_Core {
 		$this->notice_counts::setNoticeConfig();
 
 		$this->set_lang();
+
+		// Log system.
+		$this->logger   = new Boldgrid_Backup_Admin_Log( $this );
+		$this->log_page = new Boldgrid_Backup_Admin_Log_Page( $this );
 
 		// Need to construct class so necessary filters are added.
 		if ( class_exists( '\Boldgrid\Library\Library\Ui' ) ) {
@@ -1485,6 +1505,9 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return array An array of archive file information.
 	 */
 	public function archive_files( $save = false, $dryrun = false ) {
+		$this->logger->init( 'archive-' . time() . '.log' );
+		$this->logger->add( 'Backup process initialized.' );
+
 		$this->pre_auto_update = 'pre_auto_update' === current_filter();
 
 		/*
@@ -1607,7 +1630,13 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Backup the database, if saving an archive file and not a dry run.
 		if ( $save && ! $dryrun ) {
+			$this->logger->add( 'Starting dump of database...' );
+			$this->logger->add_memory();
+
 			$status = $this->backup_database();
+
+			$this->logger->add( 'Dump of database complete! $status = ' . print_r( $status, 1 ) ); // phpcs:ignore
+			$this->logger->add_memory();
 
 			if ( false === $status || ! empty( $status['error'] ) ) {
 				return [
@@ -1646,13 +1675,24 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Add the database dump file to the beginning of file list.
 		if ( ! empty( $this->db_dump_filepath ) ) {
+			$db_dump_size = $this->wp_filesystem->size( $this->db_dump_filepath );
+
 			$db_file_array = [
 				$this->db_dump_filepath,
 				substr( $this->db_dump_filepath, strlen( $backup_directory ) + 1 ),
-				$this->wp_filesystem->size( $this->db_dump_filepath ),
+				$db_dump_size,
 			];
 
 			array_unshift( $filelist, $db_file_array );
+
+			$this->logger->add(
+				sprintf(
+					'Database dump file added to file list: %1$s / %2$s (%3$s)',
+					$this->db_dump_filepath,
+					$db_dump_size,
+					size_format( $db_dump_size, 2 )
+				)
+			);
 		}
 
 		$this->set_time_limit();
@@ -1670,6 +1710,9 @@ class Boldgrid_Backup_Admin_Core {
 		$info = apply_filters( 'boldgrid_backup_pre_archive_info', $info );
 
 		Boldgrid_Backup_Admin_In_Progress_Data::set_args( [ 'total_files_todo' => count( $filelist ) ] );
+
+		$this->logger->add( 'Starting archiving of files. Chosen compressor: ' . $info['compressor'] );
+		$this->logger->add_memory();
 
 		/*
 		 * Use the chosen compressor to build an archive.
@@ -1709,12 +1752,30 @@ class Boldgrid_Backup_Admin_Core {
 				break;
 		}
 
+		$archive_exists = ! empty( $info['filepath'] ) && $this->wp_filesystem->exists( $info['filepath'] );
+		$archive_size   = ! $archive_exists ? 0 : $this->wp_filesystem->size( $info['filepath'] );
+
+		// Add additional info to the logs.
+		$this->logger->add( 'Archiving of files complete!' );
+		if ( true !== $status ) {
+			$this->logger->add( 'Archiving of files did not complete successfully: ' . print_r( $status, 1 ) ); // phpcs:ignore
+		}
+		$this->logger->add(
+			sprintf(
+				'Archive filepath / size: %1$s / %2$s (%3$s)',
+				( empty( $info['filepath'] ) ? 'MISSING FILEPATH' : $info['filepath'] ),
+				$archive_size,
+				size_format( $archive_size, 2 )
+			)
+		);
+		$this->logger->add_memory();
+
 		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'status', esc_html__( 'Wrapping things up...', 'boldgrid-backup' ) );
 		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'percentage', 100 );
 
 		$info['total_size'] += $this->filelist->get_total_size( $filelist );
 
-		if ( true === $status && ! $this->wp_filesystem->exists( $info['filepath'] ) ) {
+		if ( true === $status && ! $archive_exists ) {
 			$status = [ 'error' => 'The archive file "' . $info['filepath'] . '" was not written.' ];
 		}
 
@@ -1782,9 +1843,13 @@ class Boldgrid_Backup_Admin_Core {
 		 * also include info about other jobs that were run (such as uploading the backup remotely).
 		 */
 		if ( $this->email->user_wants_notification( 'backup' ) && ! $this->is_scheduled_backup ) {
+			$this->logger->add( 'Starting sending of email...' );
+
 			$email_parts          = $this->email->post_archive_parts( $info );
 			$email_body           = $email_parts['body']['main'] . $email_parts['body']['signature'];
 			$info['mail_success'] = $this->email->send( $email_parts['subject'], $email_body );
+
+			$this->logger->add( 'Sending of email complete! Status: ' . $info['mail_success'] );
 		}
 
 		// If not a dry-run test, update the last backup option and enforce retention.
@@ -1810,6 +1875,9 @@ class Boldgrid_Backup_Admin_Core {
 		if ( isset( $this->activity ) ) {
 			$this->activity->add( 'any_backup_created', 1, $this->rating_prompt_config );
 		}
+
+		$this->logger->add( 'Backup complete!' );
+		$this->logger->add_memory();
 
 		// Return the array of archive information.
 		return $info;

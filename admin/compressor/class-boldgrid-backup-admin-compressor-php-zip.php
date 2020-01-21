@@ -213,6 +213,15 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 			}
 		}
 
+		$this->core->logger->add(
+			sprintf(
+				'Total files / size archived: %1$s / %2$s (%3$s)',
+				$number_files_archived,
+				$total_size_archived,
+				size_format( $total_size_archived, 2 )
+			)
+		);
+
 		/*
 		 * We're done archiving all files.
 		 *
@@ -244,7 +253,13 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 			}
 		}
 
+		$this->core->logger->add( 'Starting to close the zip file.' );
+		$this->core->logger->add_memory();
+
 		$close = $this->zip->close();
+
+		$this->core->logger->add( 'Finished closing the zip file.' );
+		$this->core->logger->add_memory();
 
 		Boldgrid_Backup_Admin_In_Progress_Data::delete_arg( 'step' );
 
