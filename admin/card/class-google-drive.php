@@ -1,9 +1,9 @@
 <?php
 /**
- * Drive class.
+ * Google Drive class.
  *
  * @link       https://www.boldgrid.com
- * @since      1.12.4
+ * @since      SINCEVERSION
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Card
@@ -14,21 +14,21 @@
 namespace Boldgrid\Backup\Admin\Card;
 
 /**
- * Class: Drive
+ * Class: Google Drive
  *
  * This class is responsible for rendering the "Google drive" card on this
  * plugin's Premium Cards Page.
  *
- * @since 1.12.4
+ * @since SINCEVERSION
  */
-class Drive extends \Boldgrid\Library\Library\Ui\Premiums {
+class Google_Drive extends \Boldgrid\Library\Library\Ui\PremiumFeatures\Card {
 	/**
 	 * Init.
 	 *
-	 * @since 1.12.4
+	 * @since SINCEVERSION
 	 */
 	public function init() {
-		$this->id = 'bgbkup_drive';
+		$this->id = 'bgbkup_google_drive';
 
 		$this->title = esc_html__( 'Google Drive', 'boldgrid-backup' );
 

@@ -1,9 +1,9 @@
 <?php
 /**
- * Dreamobjects class.
+ * Dream_Objects class.
  *
  * @link       https://www.boldgrid.com
- * @since      1.12.4
+ * @since      SINCEVERSION
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Card
@@ -14,21 +14,21 @@
 namespace Boldgrid\Backup\Admin\Card;
 
 /**
- * Class: Dreamobjects
+ * Class: Dream_Objects
  *
  * This class is responsible for rendering the "Dream Objects" card
  * on this plugin's Premium Cards Page.
  *
- * @since 1.12.4
+ * @since SINCEVERSION
  */
-class Dreamobjects extends \Boldgrid\Library\Library\Ui\Premiums {
+class Dream_Objects extends \Boldgrid\Library\Library\Ui\PremiumFeatures\Card {
 	/**
 	 * Init.
 	 *
-	 * @since 1.12.4
+	 * @since SINCEVERSION
 	 */
 	public function init() {
-		$this->id = 'bgbkup_dreamobjects';
+		$this->id = 'bgbkup_dream_objects';
 
 		$this->title = esc_html__( 'DreamObjects', 'boldgrid-backup' );
 

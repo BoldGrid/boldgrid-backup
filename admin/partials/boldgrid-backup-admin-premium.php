@@ -5,7 +5,7 @@
  * This file is used to markup premium cards page.
  *
  * @link https://www.boldgrid.com
- * @since 1.12.4
+ * @since SINCEVERSION
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin/partials
@@ -18,11 +18,11 @@ defined( 'WPINC' ) || die;
 
 $nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
 
-$premium = new \Boldgrid\Library\Library\Ui\Premium();
+$premium_listing = new \Boldgrid\Library\Library\Ui\PremiumFeatures\Listing();
 
-$premium->enqueueScripts();
+$premium_listing->enqueueScripts();
 
-$premium->cards = $this->get_cards();
+$premium_listing->cards = $this->get_cards();
 
 $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 	'
@@ -35,7 +35,7 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 			%3$s
 	</div>',
 	/* 1 */ __( 'Total Upkeep Premium', 'boldgrid-backup' ),
-	/* 2 */ $this->core->go_pro->get_premium_button(),
+	/* 2 */ $this->core->go_pro->get_premium_button( $this->core->go_pro->get_premium_url( 'bgbkup-premium-features' ) ),
 	/* 3 */ __( 'Upgrade to Total Upkeep Premium to take advantage of these additional features' )
 );
 
@@ -49,8 +49,8 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 
 	echo $premium_box; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
-	$premium->printCards();
+	$premium_listing->printCards();
 
-	Boldgrid\Library\Library\NoticeCounts::set_read( 'boldgrid-backup-premium-features' );
+	Boldgrid\Library\Library\NoticeCounts::setRead( 'boldgrid-backup-premium-features' );
 	?>
 </div>

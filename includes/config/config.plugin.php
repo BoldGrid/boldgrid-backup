@@ -21,7 +21,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 return [
-	'urls'                 => [
+	'urls'                          => [
 		'compatibility'       => 'https://www.boldgrid.com/support/advanced-tutorials/backup-compatibility-guide',
 		'possible_issues'     => 'https://www.boldgrid.com/support/advanced-tutorials/backup-userguide#possible-issues',
 		'reduce_size_warning' => 'https://www.boldgrid.com/support/advanced-tutorials/backup-userguide#reduce-size-warning',
@@ -32,12 +32,12 @@ return [
 		'setting_directory'   => 'https://www.boldgrid.com/support/advanced-tutorials/backup-userguide#setting-backup-directory',
 		'plugin_renamed'      => 'https://www.boldgrid.com/support/total-upkeep-backup-plugin-product-guide/what-is-total-upkeep/',
 	],
-	'lang'                 => [
+	'lang'                          => [
 		// translators: 1: Number of seconds.
 		'est_pause' => esc_html__( 'Estimated Pause: %s seconds', 'boldgrid-backup' ),
 	],
-	'public_link_lifetime' => '1 HOUR',
-	'url_regex'            => '^https?:\/\/[a-z0-9\-\.]+(\.[a-z]{2,5})?(:[0-9]{1,5})?(\/.*)?$',
+	'public_link_lifetime'          => '1 HOUR',
+	'url_regex'                     => '^https?:\/\/[a-z0-9\-\.]+(\.[a-z]{2,5})?(:[0-9]{1,5})?(\/.*)?$',
 
 	/*
 	 * When we login to a remote storage provider, we log the utc timestamp of that login. Sometimes
@@ -49,7 +49,7 @@ return [
 	 * is still setup successfully. This is not across the board though, each storage provider must
 	 * setup this last login cache and check against it.
 	 */
-	'last_login_lifetime'  => DAY_IN_SECONDS,
+	'last_login_lifetime'           => DAY_IN_SECONDS,
 
 	/*
 	 * An array of premium remote storage providers.
@@ -65,7 +65,7 @@ return [
 	 *                              <span class="bgbkup-gdrive-logo" title="Google Drive"></span>
 	 * }
 	 */
-	'premium_remote'       => [
+	'premium_remote'                => [
 		'google_drive' => [
 			'title'      => __( 'Google Drive', 'boldgrid-backup' ),
 			'logo_class' => 'bgbkup-gdrive-logo',
@@ -83,17 +83,18 @@ return [
 	],
 
 	// The time, in seconds, that log files are kept for.
-	'max_log_age'          => 30 * DAY_IN_SECONDS,
+	'max_log_age'                   => 30 * DAY_IN_SECONDS,
 
 	/**
-	 * plugin_notices is used to add "unread" notice counts to various
-	 * UI locations within boldgrid plugin. This config is used by 
+	 * Plugin_notices is used to add "unread" notice counts to various
+	 * UI locations within boldgrid plugin. This config is used by
 	 * Boldgrid\Library\Library\NoticeCounts
 	 */
-	'boldgrid-plugin-notice-counts'	=> [
-		'boldgrid-backup-premium-features' => [
-			'bgbkup_encryption' => true,
+	'boldgrid-plugin-notice-counts' => [
+		'bgbkup_database_encryption' => [
+			'isUnread'     => true,
+			'noticeType'   => 'boldgrid-backup-premium-features',
+			'noticePlugin' => 'Total Upkeep',
 		],
-		'boldgrid-backup-preflight-check'  => [],
 	],
 ];

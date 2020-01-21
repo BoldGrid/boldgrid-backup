@@ -240,19 +240,19 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-plugins.php';
 
-		// Premium Cards.
-		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-premium.php';
+		// Premium Features Page.
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-premium-features.php';
 
-		// Cards. ** 
-		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-amazon.php';
+		// Cards.
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-amazon-s3.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-backups.php';
-		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-dreamobjects.php';
-		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-drive.php';
-		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-encryption.php';
-		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-historicalversions.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-dream-objects.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-google-drive.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-database-encryption.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-historical-versions.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-history.php';
-		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-oneclickrestoration.php';
-		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-plugineditortools.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-one-click-restoration.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-plugin-editor-tools.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-premium.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-updates.php';
 
@@ -271,6 +271,7 @@ class Boldgrid_Backup {
 			require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-more-backup.php';
 			require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-more-boldgrid.php';
 			require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-more-central.php';
+			require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-database-encryption.php';
 			// Feature - Pro.
 			require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-central.php';
 		}

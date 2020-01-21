@@ -371,6 +371,9 @@ p > .bgbkup-remote-logo {
 	text-align: center;
 	z-index: 26;
 }
+a.wp-menu-open .unread-notice-count {
+	display: none;
+}
 .unread-notice-count.hidden {
 	display: none;
 }

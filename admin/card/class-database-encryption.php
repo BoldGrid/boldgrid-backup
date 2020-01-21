@@ -1,9 +1,9 @@
 <?php
 /**
- * Encryption class.
+ * Database Encryption class.
  *
  * @link       https://www.boldgrid.com
- * @since      1.12.4
+ * @since      SINCEVERSION
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Card
@@ -18,22 +18,22 @@ namespace Boldgrid\Backup\Admin\Card;
  *
  * This class is responsible for rendering the "Encryption" card on this plugin's dashboard.
  *
- * @since 1.12.4
+ * @since SINCEVERSION
  */
-class Encryption extends \Boldgrid\Library\Library\Ui\Premiums {
+class Database_Encryption extends \Boldgrid\Library\Library\Ui\PremiumFeatures\Card {
 	/**
 	 * Init.
 	 *
-	 * @since 1.12.4
+	 * @since SINCEVERSION
 	 */
 	public function init() {
-		$this->id = 'bgbkup_encryption';
+		$this->id = 'bgbkup_database_encryption';
 
 		$this->title = esc_html__( 'Database Encryption', 'boldgrid-backup' );
 
 		$this->footer = esc_html__( 'Provide higher security for confidential database.', 'boldgrid-backup' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
 
-		$this->icon = '<span class="dashicons dashicons-products"></span>';
+		$this->icon = '<img class="dashimages" src="' . plugin_dir_url( __FILE__ ) . '../image/db-lock-64.png" />';
 
 		$this->link = array(
 			'url'  => '#',

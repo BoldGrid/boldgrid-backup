@@ -1,6 +1,6 @@
 <?php
 /**
- * File: class-boldgrid-backup-admin-premium.php
+ * File: class-boldgrid-backup-admin-premium-features.php
  *
  * @link       https://www.boldgrid.com
  * @since      1.12.4
@@ -13,11 +13,11 @@
  */
 
 /**
- * Class: Boldgrid_Backup_Admin_Premium
+ * Class: Boldgrid_Backup_Admin_Premium_Features
  *
  * @since 1.12.4
  */
-class Boldgrid_Backup_Admin_Premium {
+class Boldgrid_Backup_Admin_Premium_Features {
 	/**
 	 * The core class object.
 	 *
@@ -64,14 +64,14 @@ class Boldgrid_Backup_Admin_Premium {
 	 */
 	public function get_cards() {
 		$cards = [
-			new \Boldgrid\Backup\Admin\Card\Encryption(),
-			new \Boldgrid\Backup\Admin\Card\Drive(),
-			new \Boldgrid\Backup\Admin\Card\Amazon(),
-			new \Boldgrid\Backup\Admin\Card\Dreamobjects(),
-			new \Boldgrid\Backup\Admin\Card\OneClickRestoration(),
+			new \Boldgrid\Backup\Admin\Card\Database_Encryption(),
+			new \Boldgrid\Backup\Admin\Card\Google_Drive(),
+			new \Boldgrid\Backup\Admin\Card\Amazon_S3(),
+			new \Boldgrid\Backup\Admin\Card\Dream_Objects(),
+			new \Boldgrid\Backup\Admin\Card\One_Click_Restoration(),
 			new \Boldgrid\Backup\Admin\Card\History(),
-			new \Boldgrid\Backup\Admin\Card\HistoricalVersions(),
-			new \Boldgrid\Backup\Admin\Card\PluginEditorTools(),
+			new \Boldgrid\Backup\Admin\Card\Historical_Versions(),
+			new \Boldgrid\Backup\Admin\Card\Plugin_Editor_Tools(),
 		];
 
 		return $cards;

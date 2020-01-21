@@ -184,7 +184,7 @@ class Boldgrid_Backup_Admin_Core {
 	 * An instance of Boldgrid_Backup_Admin_Premium.
 	 *
 	 * @since 1.12.4
-	 * @var    Boldgrid_Backup_Admin_Premium
+	 * @var    Boldgrid_Backup_Admin_Premium_Features
 	 */
 	public $premium_page;
 
@@ -642,7 +642,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->support = new Boldgrid_Backup_Admin_Support( $this );
 
-		$this->premium_page = new Boldgrid_Backup_Admin_Premium( $this );
+		$this->premium_page = new Boldgrid_Backup_Admin_Premium_Features( $this );
 
 		$this->time = new Boldgrid_Backup_Admin_Time( $this );
 
@@ -662,6 +662,7 @@ class Boldgrid_Backup_Admin_Core {
 		$this->configs = Boldgrid_Backup_Admin::get_configs();
 
 		$this->notice_counts = new Boldgrid\Library\Library\NoticeCounts( $this->configs );
+		$this->notice_counts::setNoticeConfig();
 
 		$this->set_lang();
 
@@ -875,7 +876,7 @@ class Boldgrid_Backup_Admin_Core {
 		// Add the main menu item.
 		add_menu_page(
 			$lang['boldgrid_backup'],
-			$lang['boldgrid_backup'] . $this->notice_counts->get_total_unread(),
+			$lang['boldgrid_backup'] . $this->notice_counts::getUnreadCount( BOLDGRID_BACKUP_TITLE, 'noticePlugin' ),
 			$capability,
 			$main_slug,
 			[
@@ -958,7 +959,7 @@ class Boldgrid_Backup_Admin_Core {
 		add_submenu_page(
 			$main_slug,
 			$lang['boldgrid_backup'] . ' ' . $lang['preflight_check'],
-			$lang['preflight_check'] . $this->notice_counts::get_unread_count('boldgrid-backup-preflight-check'),
+			$lang['preflight_check'] . $this->notice_counts::getUnreadCount( 'boldgrid-backup-preflight-check', 'noticeType' ),
 			$capability,
 			'boldgrid-backup-test',
 			[
@@ -992,12 +993,12 @@ class Boldgrid_Backup_Admin_Core {
 				'page',
 			]
 		);
-		
+
 		// Add "Premium" page.
 		add_submenu_page(
 			$main_slug,
 			$lang['boldgrid_backup'] . ' ' . $lang['premium'],
-			$lang['premium'] . $this->notice_counts::get_unread_count('boldgrid-backup-premium-features'),
+			$lang['premium'] . $this->notice_counts::getUnreadCount( 'boldgrid-backup-premium-features', 'noticeType' ),
 			$capability,
 			'boldgrid-backup-premium-features',
 			[
@@ -2633,7 +2634,7 @@ class Boldgrid_Backup_Admin_Core {
 				[ 'a' => [ 'href' => [] ] ]
 			),
 			'icon_success'              => '<span class="dashicons dashicons-yes green"></span> ',
-			'icon_warning'               => '<span class="dashicons dashicons-warning yellow"></span> ',
+			'icon_warning'              => '<span class="dashicons dashicons-warning yellow"></span> ',
 			'heading_update_protection' => BOLDGRID_BACKUP_TITLE . ' - ' . esc_html__( 'Update Protection', 'boldgrid-backup' ),
 			// Mine count, number of backups on remote storage providers.
 			'Remote'                    => esc_html__( 'Remote', 'boldgrid-backup' ),

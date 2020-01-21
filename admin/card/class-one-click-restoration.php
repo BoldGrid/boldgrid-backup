@@ -1,9 +1,9 @@
 <?php
 /**
- * OneClickRestoration class.
+ * One_Click_Restoration class.
  *
  * @link       https://www.boldgrid.com
- * @since      1.12.4
+ * @since      SINCEVERSION
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Card
@@ -14,18 +14,18 @@
 namespace Boldgrid\Backup\Admin\Card;
 
 /**
- * Class: OneClickRestoration
+ * Class: One_Click_Restoration
  *
  * This class is responsible for rendering the "One Click Restoration" card
  * on this plugin's Premium Cards Page.
  *
- * @since 1.12.4
+ * @since SINCEVERSION
  */
-class OneClickRestoration extends \Boldgrid\Library\Library\Ui\Premiums {
+class One_Click_Restoration extends \Boldgrid\Library\Library\Ui\PremiumFeatures\Card {
 	/**
 	 * Init.
 	 *
-	 * @since 1.12.4
+	 * @since SINCEVERSION
 	 */
 	public function init() {
 		$this->id = 'bgbkup_one_click_restoration';

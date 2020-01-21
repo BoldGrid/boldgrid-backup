@@ -1,9 +1,9 @@
 <?php
 /**
- * Amazon class.
+ * Amazon_S3 class.
  *
  * @link       https://www.boldgrid.com
- * @since      1.12.4
+ * @since      SINCEVERSION
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Card
@@ -14,20 +14,20 @@
 namespace Boldgrid\Backup\Admin\Card;
 
 /**
- * Class: Amazon
+ * Class: Amazon_S3
  *
  * This class is responsible for rendering the "Amazon S3" card on this plugin's Premium Cards page.
  *
- * @since 1.12.4
+ * @since SINCEVERSION
  */
-class Amazon extends \Boldgrid\Library\Library\Ui\Premiums {
+class Amazon_S3 extends \Boldgrid\Library\Library\Ui\PremiumFeatures\Card {
 	/**
 	 * Init.
 	 *
-	 * @since 1.12.4
+	 * @since SINCEVERSION
 	 */
 	public function init() {
-		$this->id = 'bgbkup_amazon';
+		$this->id = 'bgbkup_amazon_s3';
 
 		$this->title = esc_html__( 'Amazon S3', 'boldgrid-backup' );
 

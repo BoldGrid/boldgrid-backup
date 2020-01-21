@@ -53,7 +53,7 @@ $navs = [
 		'title' => __( 'Preflight Check', 'boldgrid-backup' ),
 		'href'  => 'admin.php?page=boldgrid-backup-test',
 		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup-test' === $_GET['page'] ? $active : '',
-		'count' => $core->notice_counts->get_unread_count( 'boldgrid-backup-preflight-check' ),
+		'count' => $core->notice_counts::getUnreadCount( 'boldgrid-backup-preflight-check', 'noticeType' ),
 	],
 	[
 		'title' => __( 'Support', 'boldgrid-backup' ),
@@ -64,7 +64,7 @@ $navs = [
 		'title' => __( 'Premium Features', 'boldgrid-backup' ),
 		'href'  => 'admin.php?page=boldgrid-backup-premium-features',
 		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup-premium-features' === $_GET['page'] ? $active : '',
-		'count' => $core->notice_counts->get_unread_count( 'boldgrid-backup-premium-features' ),
+		'count' => $core->notice_counts::getUnreadCount( 'boldgrid-backup-premium-features', 'noticeType' ),
 	],
 ];
 // phpcs:enable WordPress.CSRF.NonceVerification.NoNonceVerification
