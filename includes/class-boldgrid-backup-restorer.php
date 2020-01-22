@@ -176,7 +176,7 @@ class Boldgrid_Backup_Restorer {
 	public function run() {
 		$this->init();
 
-		$this->core->restore_archive_file();
+		$this->info = $this->core->restore_archive_file();
 
 		$this->complete();
 	}
