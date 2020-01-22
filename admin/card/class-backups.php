@@ -20,7 +20,7 @@ namespace Boldgrid\Backup\Admin\Card;
  *
  * @since 1.11.0
  */
-class Backups extends \Boldgrid\Library\Library\Ui\PremiumFeatures\Card {
+class Backups extends \Boldgrid\Library\Library\Ui\Card {
 	/**
 	 * Init.
 	 *

@@ -51,6 +51,5 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 
 	$premium_listing->printCards();
 
-	Boldgrid\Library\Library\NoticeCounts::setRead( 'boldgrid-backup-premium-features' );
 	?>
 </div>

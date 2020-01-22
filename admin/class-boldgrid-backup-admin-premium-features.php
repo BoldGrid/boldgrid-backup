@@ -12,12 +12,16 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
+use Boldgrid\Backup\Admin\Card;
+
 /**
  * Class: Boldgrid_Backup_Admin_Premium_Features
  *
  * @since 1.12.4
  */
 class Boldgrid_Backup_Admin_Premium_Features {
+
+
 	/**
 	 * The core class object.
 	 *
@@ -28,6 +32,15 @@ class Boldgrid_Backup_Admin_Premium_Features {
 	private $core;
 
 	/**
+	 * The page's Boldgrid\Library\Library\Plugin\Page Object.
+	 *
+	 * @since  1.12.4
+	 * @access private
+	 * @var    Boldgrid\Library\Library\Plugin\Page
+	 */
+	private $page;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.12.4
@@ -36,6 +49,7 @@ class Boldgrid_Backup_Admin_Premium_Features {
 	 */
 	public function __construct( Boldgrid_Backup_Admin_Core $core ) {
 		$this->core = $core;
+		$this->page = $core->plugin->getPageBySlug( 'boldgrid-backup-premium-features' );
 	}
 
 	/**
@@ -64,14 +78,14 @@ class Boldgrid_Backup_Admin_Premium_Features {
 	 */
 	public function get_cards() {
 		$cards = [
-			new \Boldgrid\Backup\Admin\Card\Database_Encryption(),
-			new \Boldgrid\Backup\Admin\Card\Google_Drive(),
-			new \Boldgrid\Backup\Admin\Card\Amazon_S3(),
-			new \Boldgrid\Backup\Admin\Card\Dream_Objects(),
-			new \Boldgrid\Backup\Admin\Card\One_Click_Restoration(),
-			new \Boldgrid\Backup\Admin\Card\History(),
-			new \Boldgrid\Backup\Admin\Card\Historical_Versions(),
-			new \Boldgrid\Backup\Admin\Card\Plugin_Editor_Tools(),
+			new Card\Database_Encryption( $this->page ),
+			new Card\Google_Drive( $this->page ),
+			new Card\Amazon_S3( $this->page ),
+			new Card\Dream_Objects( $this->page ),
+			new Card\One_Click_Restoration( $this->page ),
+			new Card\History( $this->page ),
+			new Card\Historical_Versions( $this->page ),
+			new Card\Plugin_Editor_Tools( $this->page ),
 		];
 
 		return $cards;
@@ -85,5 +99,7 @@ class Boldgrid_Backup_Admin_Premium_Features {
 	public function page() {
 		$this->admin_enqueue_scripts( 'boldgrid-backup-admin-premium-features' );
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-premium.php';
+		$this->page->setAllNoticesRead();
 	}
+
 }

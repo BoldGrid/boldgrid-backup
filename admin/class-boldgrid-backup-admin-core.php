@@ -568,6 +568,12 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->pagenow = $pagenow;
 
+		// Instantiate Configs Array
+		$this->configs = Boldgrid_Backup_Admin::get_configs();
+
+		// Instantiate Boldgrid\Library\Library\Plugin\Plugin.
+		$this->plugin = new Boldgrid\Library\Library\Plugin\Plugin( 'boldgrid-backup', $this->configs );
+
 		// Instantiate Boldgrid_Backup_Admin_Settings.
 		$this->settings = new Boldgrid_Backup_Admin_Settings( $this );
 
@@ -674,11 +680,6 @@ class Boldgrid_Backup_Admin_Core {
 
 				// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
-
-		$this->configs = Boldgrid_Backup_Admin::get_configs();
-
-		$this->notice_counts = new Boldgrid\Library\Library\NoticeCounts( $this->configs );
-		$this->notice_counts::setNoticeConfig();
 
 		$this->set_lang();
 
@@ -896,7 +897,7 @@ class Boldgrid_Backup_Admin_Core {
 		// Add the main menu item.
 		add_menu_page(
 			$lang['boldgrid_backup'],
-			$lang['boldgrid_backup'] . $this->notice_counts::getUnreadCount( BOLDGRID_BACKUP_TITLE, 'noticePlugin' ),
+			$lang['boldgrid_backup'] . $this->plugin->getUnreadMarkup(),
 			$capability,
 			$main_slug,
 			[
@@ -979,7 +980,7 @@ class Boldgrid_Backup_Admin_Core {
 		add_submenu_page(
 			$main_slug,
 			$lang['boldgrid_backup'] . ' ' . $lang['preflight_check'],
-			$lang['preflight_check'] . $this->notice_counts::getUnreadCount( 'boldgrid-backup-preflight-check', 'noticeType' ),
+			$lang['preflight_check'],
 			$capability,
 			'boldgrid-backup-test',
 			[
@@ -1013,12 +1014,12 @@ class Boldgrid_Backup_Admin_Core {
 				'page',
 			]
 		);
-
+		
 		// Add "Premium" page.
 		add_submenu_page(
 			$main_slug,
 			$lang['boldgrid_backup'] . ' ' . $lang['premium'],
-			$lang['premium'] . $this->notice_counts::getUnreadCount( 'boldgrid-backup-premium-features', 'noticeType' ),
+			$lang['premium'] . $this->plugin->getPageBySlug('boldgrid-backup-premium-features')->getUnreadMarkup(),
 			$capability,
 			'boldgrid-backup-premium-features',
 			[
