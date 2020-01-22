@@ -109,6 +109,7 @@ class Boldgrid_Backup_Restorer {
 		// Init our logger.
 		$this->core->logger->init( 'restore-' . time() . '.log' );
 		$this->core->logger->add( 'Restore process initialized.' );
+		$this->core->logger->add_memory();
 
 		/*
 		 * Setup our task.

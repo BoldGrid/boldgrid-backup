@@ -1134,7 +1134,7 @@ class Boldgrid_Backup_Admin_Cron {
 				];
 			} else {
 				$restorer = new Boldgrid_Backup_Restorer();
-				$restorer->restore_by_url( $task->get_data( 'url' ) );
+				$restorer->run_by_url( $task->get_data( 'url' ) );
 
 				$archive_info = $restorer->get_info();
 			}
