@@ -2176,17 +2176,13 @@ class Boldgrid_Backup_Admin_Core {
 			return [ 'error' => esc_html__( 'Functionality tests fail.', 'boldgrid-backup' ) ];
 		}
 
-		// Initialize variables.
-		$archive_key      = null;
-		$archive_filename = null;
-
 		/*
 		 * Get our archive key.
 		 *
 		 * It can be passed in via $args or $_POST.
 		 */
 		$archive_key = false;
-		if ( ! empty( $args['archive_key'] ) ) {
+		if ( isset( $args['archive_key'] ) ) {
 			$archive_key = (int) $args['archive_key'];
 		} elseif ( isset( $_POST['archive_key'] ) && is_numeric( $_POST['archive_key'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			$archive_key = (int) $_POST['archive_key'];

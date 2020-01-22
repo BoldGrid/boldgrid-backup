@@ -233,13 +233,18 @@ class Boldgrid_Backup_Admin_Task {
 	 * @return bool         True if the type was set.
 	 */
 	private function set_type( $type ) {
-		$valid_types = [ 'backup' ];
+		$valid_types = [
+			'backup',
+			'restore',
+		];
 
 		if ( ! in_array( $type, $valid_types, true ) ) {
 			return false;
 		}
 
 		$this->type = $type;
+
+		return true;
 	}
 
 	/**
