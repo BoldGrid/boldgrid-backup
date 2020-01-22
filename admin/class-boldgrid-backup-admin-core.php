@@ -2766,7 +2766,11 @@ class Boldgrid_Backup_Admin_Core {
 			wp_send_json_error();
 		}
 
-		$archive_info = $this->restore_archive_file();
+		// Do the actual restoration.
+		$restorer = new Boldgrid_Backup_Restorer();
+		$restorer->run();
+
+		$archive_info = $restorer->get_info();
 
 		/*
 		 * Generate success message and add as a user notice.

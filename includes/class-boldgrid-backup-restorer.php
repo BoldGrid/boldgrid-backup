@@ -166,6 +166,22 @@ class Boldgrid_Backup_Restorer {
 	}
 
 	/**
+	 * Run a basic restore.
+	 *
+	 * This mimics a standard call to core->restore_archive_file, except it adds additional things
+	 * like tasks and logs.
+	 *
+	 * @since SINCEVERSION
+	 */
+	public function run() {
+		$this->init();
+
+		$this->core->restore_archive_file();
+
+		$this->complete();
+	}
+
+	/**
 	 * Run a restoration by a url.
 	 *
 	 * Method run_by_url:     This method, does more than just restoration. Handles logging, etc.
