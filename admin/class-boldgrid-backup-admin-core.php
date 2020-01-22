@@ -1014,12 +1014,12 @@ class Boldgrid_Backup_Admin_Core {
 				'page',
 			]
 		);
-		
+
 		// Add "Premium" page.
 		add_submenu_page(
 			$main_slug,
 			$lang['boldgrid_backup'] . ' ' . $lang['premium'],
-			$lang['premium'] . $this->plugin->getPageBySlug('boldgrid-backup-premium-features')->getUnreadMarkup(),
+			$lang['premium'] . $this->plugin->getPageBySlug( 'boldgrid-backup-premium-features' )->getUnreadMarkup(),
 			$capability,
 			'boldgrid-backup-premium-features',
 			[

@@ -101,5 +101,4 @@ class Boldgrid_Backup_Admin_Premium_Features {
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-premium.php';
 		$this->page->setAllNoticesRead();
 	}
-
 }
