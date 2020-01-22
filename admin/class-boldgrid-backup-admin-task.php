@@ -127,6 +127,19 @@ class Boldgrid_Backup_Admin_Task {
 	}
 
 	/**
+	 * Get a specific value from the data.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param  string $key     The key to get.
+	 * @param  mixed  $default The default value to return.
+	 * @return mixed
+	 */
+	public function get_data( $key, $default = false ) {
+		return isset( $this->data[ $key ] ) ? $this->data[ $key ] : $default;
+	}
+
+	/**
 	 * Get our task id.
 	 *
 	 * @since SINCEVERSION
@@ -169,7 +182,7 @@ class Boldgrid_Backup_Admin_Task {
 		$this->created_at   = ! empty( $args['created_at'] ) ? $args['created_at'] : time();
 		$this->started_at   = ! empty( $args['started_at'] ) ? $args['started_at'] : null;
 		$this->completed_at = ! empty( $args['completed_at'] ) ? $args['completed_at'] : null;
-		$this->data = ! empty( $args['data'] ) ? $args['data'] : [];
+		$this->data         = ! empty( $args['data'] ) ? $args['data'] : [];
 
 		// You must supply a type.
 		$type = ! empty( $args['type'] ) ? $args['type'] : null;

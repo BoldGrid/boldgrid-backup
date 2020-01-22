@@ -2154,10 +2154,16 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @see https://codex.wordpress.org/Function_Reference/flush_rewrite_rules
 	 *
-	 * @param bool $dryrun An optional switch to perform a dry run test.
+	 * @param  bool  $dryrun An optional switch to perform a dry run test.
+	 * @param  array $args {
+	 *     An optional array of args.
+	 *
+	 *     @type int    $archive_key      An archive key.
+	 *     @type string $archive_filename An archive filename.
+	 * }
 	 * @return array An array of archive file information.
 	 */
-	public function restore_archive_file( $dryrun = false ) {
+	public function restore_archive_file( $dryrun = false, $args = [] ) {
 		$restore_ok = true;
 
 		// If a restoration was not requested, then abort.
@@ -2174,17 +2180,37 @@ class Boldgrid_Backup_Admin_Core {
 		$archive_key      = null;
 		$archive_filename = null;
 
-		// Validate archive_key.
-		if ( isset( $_POST['archive_key'] ) && is_numeric( $_POST['archive_key'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		/*
+		 * Get our archive key.
+		 *
+		 * It can be passed in via $args or $_POST.
+		 */
+		$archive_key = false;
+		if ( ! empty( $args['archive_key'] ) ) {
+			$archive_key = (int) $args['archive_key'];
+		} elseif ( isset( $_POST['archive_key'] ) && is_numeric( $_POST['archive_key'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			$archive_key = (int) $_POST['archive_key'];
-		} else {
+		}
+
+		// Validate our archive key.
+		if ( false === $archive_key ) {
 			return [ 'error' => esc_html__( 'Invalid key for the selected archive file.', 'boldgrid-backup' ) ];
 		}
 
-		// Validate archive_filename.
-		if ( ! empty( $_POST['archive_filename'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		/*
+		 * Get our archive filename.
+		 *
+		 * It can be passed in via $args or $_POST.
+		 */
+		$archive_filename = false;
+		if ( ! empty( $args['archive_filename'] ) ) {
+			$archive_filename = sanitize_file_name( $args['archive_filename'] );
+		} elseif ( ! empty( $_POST['archive_filename'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			$archive_filename = sanitize_file_name( $_POST['archive_filename'] );
-		} else {
+		}
+
+		// Validate archive_filename.
+		if ( false === $archive_filename ) {
 			return [ 'error' => esc_html__( 'Invalid filename for the selected archive file.', 'boldgrid-backup' ) ];
 		}
 

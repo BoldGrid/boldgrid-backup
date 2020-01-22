@@ -408,95 +408,15 @@ class Boldgrid_Backup_Admin_Upload {
 			);
 		}
 
-		$url       = ! empty( $_POST['url'] ) ? esc_url_raw( $_POST['url'] ) : null;
-		$url_regex = '/' . $this->core->configs['url_regex'] . '/i';
+		$url = ! empty( $_POST['url'] ) ? esc_url_raw( $_POST['url'] ) : null;
 
-		if ( ! preg_match( $url_regex, $url ) ) {
-			wp_send_json_error(
-				array(
-					'error' => __( 'Invalid URL address.', 'boldgrid-backup' ),
-				)
-			);
-		}
+		$archive_fetcher = new Boldgrid_Backup_Archive_Fetcher( $url );
+		$archive_fetcher->download();
 
-		$backup_directory = $this->core->backup_dir->get();
-
-		if ( ! $this->core->backup_dir->is_valid( $backup_directory ) &&
-			! empty( $this->core->backup_dir->errors ) ) {
-			wp_send_json_error(
-				array(
-					'error' => implode( '<br />', $this->core->backup_dir->errors ),
-				)
-			);
-		}
-
-		$filepath = $this->get_save_path( basename( $url ) );
-
-		$allowed_content_types = array(
-			'application/octet-stream',
-			'binary/octet-stream',
-			'application/zip',
-		);
-
-		$response = wp_remote_get(
-			$url, array(
-				'filename'  => $filepath,
-				'headers'   => 'Accept: ' . implode( ', ', $allowed_content_types ),
-				'sslverify' => false,
-				'stream'    => true,
-				'timeout'   => MINUTE_IN_SECONDS * 20,
-			)
-		);
-
-		if ( is_array( $response ) && ! is_wp_error( $response ) &&
-			in_array( $response['headers']['content-type'], $allowed_content_types, true ) ) {
-				// Determine the archive log file path.
-				$log_filepath = $filepath;
-
-			if ( ! empty( $response['headers']['content-disposition'] ) ) {
-				$log_filepath = trim(
-					str_replace(
-						'attachment; filename=', '', $response['headers']['content-disposition']
-					), '"'
-				);
-
-				$log_filepath = $this->core->backup_dir->get_path_to( $log_filepath );
-			}
-
-			$log_filepath = $this->core->archive_log->path_from_zip( $log_filepath );
-			$filename     = basename( $filepath );
-
-			// Restore the log file from the archive.
-			$this->core->archive_log->restore_by_zip( $filepath, basename( $log_filepath ) );
-
-			// Update the archive file modification time, based on the log file contents.
-			$this->core->remote->post_download( $filepath );
-
-			// Get the archive details.
-			$archive = $this->core->archive->get_by_name( $filename );
-
-			wp_send_json_success(
-				[
-					'filepath'        => $filepath,
-					'detailsUrl'      => admin_url(
-						'admin.php?page=boldgrid-backup-archive-details&filename=' .
-						basename( $filepath )
-					),
-					'archiveFilename' => $filename,
-					'archiveKey'      => $archive['key'],
-				]
-			);
+		if ( $archive_fetcher->has_error() ) {
+			wp_send_json_error( [ 'error' => $archive_fetcher->get_error() ] );
 		} else {
-			$this->core->wp_filesystem->delete( $filepath );
+			wp_send_json_success( $archive_fetcher->get_info() );
 		}
-
-		wp_send_json_error(
-			[
-				'error' => __(
-					'Could not retrieve the remote file.  It may not be a ZIP file, or the link is no longer valid.',
-					'boldgrid-backup'
-				),
-			]
-		);
 	}
 }
