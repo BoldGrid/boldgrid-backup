@@ -16,7 +16,7 @@ namespace Boldgrid\Backup\Admin\Card;
 /**
  * Class: Amazon_S3
  *
- * This class is responsible for rendering the "Amazon S3" card on this plugin's Premium Cards page.
+ * This class is responsible for rendering the "Amazon S3" card on this plugin's Premium Features page.
  *
  * @since SINCEVERSION
  */
@@ -31,7 +31,7 @@ class Amazon_S3 extends \Boldgrid\Library\Library\Ui\PremiumFeatures\Card {
 
 		$this->title = esc_html__( 'Amazon S3', 'boldgrid-backup' );
 
-		$this->footer = esc_html__( 'Automatically store backups on Amazon S3 Storage.', 'boldgrid-backup' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
+		$this->footer = esc_html__( 'Automatically store backups on Amazon S3 Storage.', 'boldgrid-backup' );
 
 		$this->icon = '<img class="dashimages" src="' . plugin_dir_url( __FILE__ ) . '../image/remote/amazon-s3-logo.png"></img>';
 

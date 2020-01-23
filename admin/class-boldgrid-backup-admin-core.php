@@ -77,6 +77,14 @@ class Boldgrid_Backup_Admin_Core {
 	public $configs;
 
 	/**
+	 * Plugin class.
+	 *
+	 * @since  SINCEVERSION
+	 * @var    Boldgrid\Library\Library\Plugin\Plugin
+	 */
+	public $plugin;
+
+	/**
 	 * Core Files class.
 	 *
 	 * @since 1.6.0
@@ -897,6 +905,7 @@ class Boldgrid_Backup_Admin_Core {
 		// Add the main menu item.
 		add_menu_page(
 			$lang['boldgrid_backup'],
+			// This value is escaped already by Library\Plugin\Page::getUnreadMarkup
 			$lang['boldgrid_backup'] . $this->plugin->getUnreadMarkup(),
 			$capability,
 			$main_slug,
@@ -1019,6 +1028,7 @@ class Boldgrid_Backup_Admin_Core {
 		add_submenu_page(
 			$main_slug,
 			$lang['boldgrid_backup'] . ' ' . $lang['premium'],
+			// Count value is escaped already by Library\Plugin\Page::getUnreadMarkup
 			$lang['premium'] . $this->plugin->getPageBySlug( 'boldgrid-backup-premium-features' )->getUnreadMarkup(),
 			$capability,
 			'boldgrid-backup-premium-features',

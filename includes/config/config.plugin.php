@@ -97,7 +97,7 @@ return [
 		[
 			'id'      => 'bgbkup_database_encryption',
 			'page'    => 'boldgrid-backup-premium-features',
-			'version' => '1.16.16',
+			'version' => '1.26.16',
 		],
 	],
 ];

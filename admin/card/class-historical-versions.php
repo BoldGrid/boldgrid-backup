@@ -17,7 +17,7 @@ namespace Boldgrid\Backup\Admin\Card;
  * Class: Historical_Versions
  *
  * This class is responsible for rendering the "Historical Versions" card on this
- * plugin's Premium Cards Page.
+ * plugin's Premium Features Page.
  *
  * @since SINCEVERSION
  */
@@ -32,7 +32,7 @@ class Historical_Versions extends \Boldgrid\Library\Library\Ui\PremiumFeatures\C
 
 		$this->title = esc_html__( 'Historical Versions', 'boldgrid-backup' );
 
-		$this->footer = esc_html__( 'Somehow this is different than update history?', 'boldgrid-backup' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
+		$this->footer = esc_html__( 'Somehow this is different than update history?', 'boldgrid-backup' );
 
 		$this->icon = '<span class="dashicons dashicons-images-alt2"></span>';
 

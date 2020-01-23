@@ -17,7 +17,7 @@ namespace Boldgrid\Backup\Admin\Card;
  * Class: History
  *
  * This class is responsible for rendering the "History" card on this plugin's
- * Premium Cards Page.
+ * Premium Features Page.
  *
  * @since SINCEVERSION
  */
@@ -32,7 +32,7 @@ class History extends \Boldgrid\Library\Library\Ui\PremiumFeatures\Card {
 
 		$this->title = esc_html__( 'Update History', 'boldgrid-backup' );
 
-		$this->footer = esc_html__( 'See detailed history of all updates.', 'boldgrid-backup' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
+		$this->footer = esc_html__( 'See detailed history of all updates.', 'boldgrid-backup' );
 
 		$this->icon = '<span class="dashicons dashicons-media-text"></span>';
 

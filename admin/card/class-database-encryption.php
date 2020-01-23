@@ -16,7 +16,7 @@ namespace Boldgrid\Backup\Admin\Card;
 /**
  * Class: Encryption
  *
- * This class is responsible for rendering the "Encryption" card on this plugin's dashboard.
+ * This class is responsible for rendering the "Encryption" card on this plugin's Premium Features page.
  *
  * @since SINCEVERSION
  */
@@ -31,7 +31,7 @@ class Database_Encryption extends \Boldgrid\Library\Library\Ui\PremiumFeatures\C
 
 		$this->title = esc_html__( 'Database Encryption', 'boldgrid-backup' );
 
-		$this->footer = esc_html__( 'Provide higher security for confidential database.', 'boldgrid-backup' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
+		$this->footer = esc_html__( 'Provide higher security for confidential database.', 'boldgrid-backup' );
 
 		$this->icon = '<img class="dashimages" src="' . plugin_dir_url( __FILE__ ) . '../image/db-lock-64.png" />';
 

@@ -348,32 +348,3 @@ p > .bgbkup-remote-logo {
 	width: calc( 100% - 40px ) !important;
 	height: calc( 100% - 60px ) !important;
 }
-
-/**
- * Notice Counts
- */
-
-/* Style Notice Counts. */
-
-.unread-notice-count {
-	display: inline-block;
-	vertical-align: top;
-	box-sizing: border-box;
-	margin: 1px 0 -1px 5px;
-	padding: 0 5px;
-	min-width: 18px;
-	height: 18px;
-	border-radius: 9px;
-	background-color: #ca4a1f;
-	color: #fff;
-	font-size: 11px;
-	line-height: 1.6;
-	text-align: center;
-	z-index: 26;
-}
-a.wp-menu-open .unread-notice-count {
-	display: none;
-}
-.unread-notice-count.hidden {
-	display: none;
-}
