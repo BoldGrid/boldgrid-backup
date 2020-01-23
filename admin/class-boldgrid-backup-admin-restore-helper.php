@@ -239,30 +239,32 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 	public function set_writable_permissions( $archive_filepath ) {
 		global $wp_filesystem;
 
-		$zip = new ZipArchive();
+		if ( class_exists( 'ZipArchive' ) ) {
+			$zip = new ZipArchive();
 
-		if ( $zip->open( $archive_filepath ) ) {
-			for ( $i = 0; $i < $zip->numFiles; $i++ ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName
-				$data = $zip->statIndex( $i );
+			if ( $zip->open( $archive_filepath ) ) {
+				for ( $i = 0; $i < $zip->numFiles; $i++ ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName
+					$data = $zip->statIndex( $i );
 
-				if ( empty( $data['name'] ) ) {
-					continue;
-				}
+					if ( empty( $data['name'] ) ) {
+						continue;
+					}
 
-				$full_path = ABSPATH . $data['name'];
+					$full_path = ABSPATH . $data['name'];
 
-				// If the file does not exists, no need to check its permissions.
-				if ( ! $wp_filesystem->exists( $full_path ) ) {
-					continue;
-				}
+					// If the file does not exists, no need to check its permissions.
+					if ( ! $wp_filesystem->exists( $full_path ) ) {
+						continue;
+					}
 
-				if ( ! $wp_filesystem->chmod( $full_path ) ) {
-					$this->errors[] = sprintf(
-						// translators: 1 The path to a file that cannot be restored due to file permissions.
-						__( 'Permission denied. Unable to restore the following file: %1$s', 'boldgrid-backup' ),
-						$full_path
-					);
-					return false;
+					if ( ! $wp_filesystem->chmod( $full_path ) ) {
+						$this->errors[] = sprintf(
+							// translators: 1 The path to a file that cannot be restored due to file permissions.
+							__( 'Permission denied. Unable to restore the following file: %1$s', 'boldgrid-backup' ),
+							$full_path
+						);
+						return false;
+					}
 				}
 			}
 		}
