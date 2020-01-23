@@ -194,14 +194,13 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 		$backups = [];
 
 		foreach ( $core->archives_all->all as $backup ) {
-			$core->archive->init_by_filename( $backup['filename'] );
+			$archive = Boldgrid\Backup\Archive\Factory::get_by_filename( $backup['filename'] );
 
 			$backups[] = [
-				// @todo need a way to add id's to each backup.
-				'id'            => null,
-				'title'         => $core->archive->get_attribute( 'title' ),
-				'description'   => $core->archive->get_attribute( 'description' ),
-				'creation_date' => $core->archive->timestamp,
+				'id'            => $archive->get_id(),
+				'title'         => $archive->get_attribute( 'title' ),
+				'description'   => $archive->get_attribute( 'description' ),
+				'creation_date' => $archive->timestamp,
 			];
 		}
 

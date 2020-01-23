@@ -107,13 +107,26 @@ class Boldgrid_Backup_Admin_Archive {
 	public $view_details_url = '';
 
 	/**
+	 * Archive id.
+	 *
+	 * @since SINCEVERSION
+	 * @access private
+	 * @var int
+	 */
+	private $id;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.5.3
 	 *
 	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
 	 */
-	public function __construct( $core ) {
+	public function __construct( $core = null ) {
+		if ( empty( $core ) ) {
+			$core = apply_filters( 'boldgrid_backup_get_core', null );
+		}
+
 		$this->core = $core;
 	}
 
@@ -232,6 +245,17 @@ class Boldgrid_Backup_Admin_Archive {
 	 */
 	public function get_filesize() {
 		return $this->core->wp_filesystem->size( $this->filepath );
+	}
+
+	/**
+	 * Get the archive id.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @return int
+	 */
+	public function get_id() {
+		return $this->id;
 	}
 
 	/**
@@ -480,6 +504,17 @@ class Boldgrid_Backup_Admin_Archive {
 		$this->log[ $key ] = $value;
 
 		return $this->core->archive_log->write( $this->log );
+	}
+
+	/**
+	 * Set the archive id.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param int $id The archive id.
+	 */
+	public function set_id( $id ) {
+		$this->id = (int) $id;
 	}
 
 	/**

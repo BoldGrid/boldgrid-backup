@@ -298,6 +298,10 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-archive-fetcher.php';
 
+		// Archive namespace.
+		require_once BOLDGRID_BACKUP_PATH . '/includes/archive/class-factory.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/archive/class-option.php';
+
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
 
