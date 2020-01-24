@@ -237,11 +237,8 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 	 * @return bool True if permissions were able to be updated successfully.
 	 */
 	public function set_writable_permissions( $archive_filepath ) {
-		global $wp_filesystem;
-
 		if ( class_exists( 'ZipArchive' ) ) {
 			$zip = new ZipArchive();
-
 			if ( $zip->open( $archive_filepath ) ) {
 				for ( $i = 0; $i < $zip->numFiles; $i++ ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName
 					$data = $zip->statIndex( $i );
@@ -250,26 +247,59 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 						continue;
 					}
 
-					$full_path = ABSPATH . $data['name'];
+					if ( $this->change_file_permissions( $data['name'] ) ) {
+						continue;
+					} else {
+						return false;
+					}
+				}
+			}
+		} elseif ( class_exists( 'PclZip' ) ) {
+			$zip = new PclZip( $archive_filepath );
+			if ( $zip->listContent() ) {
+				foreach ( $zip->listContent() as $file ) {
 
-					// If the file does not exists, no need to check its permissions.
-					if ( ! $wp_filesystem->exists( $full_path ) ) {
+					if ( empty( $file['filename'] ) ) {
 						continue;
 					}
 
-					if ( ! $wp_filesystem->chmod( $full_path ) ) {
-						$this->errors[] = sprintf(
-							// translators: 1 The path to a file that cannot be restored due to file permissions.
-							__( 'Permission denied. Unable to restore the following file: %1$s', 'boldgrid-backup' ),
-							$full_path
-						);
+					if ( $this->change_file_permissions( $file['filename'] ) ) {
+						continue;
+					} else {
 						return false;
 					}
 				}
 			}
 		}
-
 		return true;
+	}
+
+	/**
+	 * Updates file permission per file
+	 *
+	 * This takes an individual filepath derived from the lists of files
+	 * in an archive, and uses wp_filesystem to set the correct permissions
+	 *
+	 * @since SINCEVERSION
+	 * @param string $file_name name of file to be changed.
+	 * @return bool True if permissions were able to be updated successfully.
+	 */
+	public function change_file_permissions( $file_name ) {
+		global $wp_filesystem;
+		$full_path = ABSPATH . $file_name;
+
+		// If the file does not exists, no need to check its permissions.
+		if ( ! $wp_filesystem->exists( $full_path ) ) {
+			return true;
+		}
+		if ( ! $wp_filesystem->chmod( $full_path ) ) {
+			$this->errors[] = sprintf(
+				// translators: 1 The path to a file that cannot be restored due to file permissions.
+				__( 'Permission denied. Unable to restore the following file: %1$s', 'boldgrid-backup' ),
+				$full_path
+			);
+			return false;
+		}
 	}
 
 	/**
