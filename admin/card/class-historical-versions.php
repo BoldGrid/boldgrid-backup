@@ -21,7 +21,7 @@ namespace Boldgrid\Backup\Admin\Card;
  *
  * @since SINCEVERSION
  */
-class Historical_Versions extends \Boldgrid\Library\Library\Ui\PremiumFeatures\Card {
+class Historical_Versions extends \Boldgrid\Library\Library\Ui\Card {
 	/**
 	 * Init.
 	 *
@@ -32,13 +32,16 @@ class Historical_Versions extends \Boldgrid\Library\Library\Ui\PremiumFeatures\C
 
 		$this->title = esc_html__( 'Historical Versions', 'boldgrid-backup' );
 
-		$this->footer = esc_html__( 'Somehow this is different than update history?', 'boldgrid-backup' );
-
 		$this->icon = '<span class="dashicons dashicons-images-alt2"></span>';
 
-		$this->link = array(
-			'url'  => '#',
-			'text' => 'Setup Guide',
-		);
+		$this->footer = '
+			<p>' .
+			esc_html__( 'Somehow this is different than update history?', 'boldgrid-backup' ) .
+			'</p>
+			<p style="text-align:right;">
+				<a href="#">' .
+				esc_html__( 'Setup Guide' ) . '
+				</a>
+			</p>';
 	}
 }

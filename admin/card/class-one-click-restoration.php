@@ -21,7 +21,7 @@ namespace Boldgrid\Backup\Admin\Card;
  *
  * @since SINCEVERSION
  */
-class One_Click_Restoration extends \Boldgrid\Library\Library\Ui\PremiumFeatures\Card {
+class One_Click_Restoration extends \Boldgrid\Library\Library\Ui\Card {
 	/**
 	 * Init.
 	 *
@@ -32,13 +32,16 @@ class One_Click_Restoration extends \Boldgrid\Library\Library\Ui\PremiumFeatures
 
 		$this->title = esc_html__( 'One Click File Restorations', 'boldgrid-backup' );
 
-		$this->footer = esc_html__( 'Restore Backup files quickly and easily.', 'boldgrid-backup' );
-
 		$this->icon = '<span class="dashicons dashicons-undo"></span>';
 
-		$this->link = array(
-			'url'  => '#',
-			'text' => 'Setup Guide',
-		);
+		$this->footer = '
+			<p>' .
+			esc_html__( 'Restore Backup files quickly and easily.', 'boldgrid-backup' ) .
+			'</p>
+			<p style="text-align:right;">
+				<a href="#">' .
+				esc_html__( 'Setup Guide' ) . '
+				</a>
+			</p>';
 	}
 }

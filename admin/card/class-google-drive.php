@@ -21,7 +21,7 @@ namespace Boldgrid\Backup\Admin\Card;
  *
  * @since SINCEVERSION
  */
-class Google_Drive extends \Boldgrid\Library\Library\Ui\PremiumFeatures\Card {
+class Google_Drive extends \Boldgrid\Library\Library\Ui\Card {
 	/**
 	 * Init.
 	 *
@@ -32,13 +32,16 @@ class Google_Drive extends \Boldgrid\Library\Library\Ui\PremiumFeatures\Card {
 
 		$this->title = esc_html__( 'Google Drive', 'boldgrid-backup' );
 
-		$this->footer = esc_html__( 'Automatically store backups on Google Drive.', 'boldgrid-backup' );
-
 		$this->icon = '<img class="dashimages" src="' . plugin_dir_url( __FILE__ ) . '../image/remote/google-drive.png"></img>';
 
-		$this->link = array(
-			'url'  => 'https://www.boldgrid.com/support/total-upkeep-backup-plugin-product-guide/using-a-wordpress-plugin-to-backup-to-google-drive/',
-			'text' => 'Setup Guide',
-		);
+		$this->footer = '
+			<p>' .
+			esc_html__( 'Automatically store backups on Google Drive.', 'boldgrid-backup' ) .
+			'</p>
+			<p style="text-align:right;">
+				<a href="#">' .
+				esc_html__( 'Setup Guide' ) . '
+				</a>
+			</p>';
 	}
 }

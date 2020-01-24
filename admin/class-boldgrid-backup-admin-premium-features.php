@@ -96,6 +96,8 @@ class Boldgrid_Backup_Admin_Premium_Features {
 	 * @since SINCEVERSION
 	 */
 	public function page() {
+		wp_enqueue_style( 'bglib-ui-css' );
+
 		$this->admin_enqueue_scripts( 'boldgrid-backup-admin-premium-features' );
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-premium.php';
 		$this->page->setAllNoticesRead();

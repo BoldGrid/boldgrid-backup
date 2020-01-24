@@ -21,7 +21,7 @@ namespace Boldgrid\Backup\Admin\Card;
  *
  * @since SINCEVERSION
  */
-class History extends \Boldgrid\Library\Library\Ui\PremiumFeatures\Card {
+class History extends \Boldgrid\Library\Library\Ui\Card {
 	/**
 	 * Init.
 	 *
@@ -32,13 +32,16 @@ class History extends \Boldgrid\Library\Library\Ui\PremiumFeatures\Card {
 
 		$this->title = esc_html__( 'Update History', 'boldgrid-backup' );
 
-		$this->footer = esc_html__( 'See detailed history of all updates.', 'boldgrid-backup' );
-
 		$this->icon = '<span class="dashicons dashicons-media-text"></span>';
 
-		$this->link = array(
-			'url'  => 'https://www.boldgrid.com/support/total-upkeep-backup-plugin-product-guide/how-to-use-the-history-in-boldgrid-backup-premium/',
-			'text' => 'Setup Guide',
-		);
+		$this->footer = '
+			<p>' .
+			esc_html__( 'See detailed history of all updates.', 'boldgrid-backup' ) .
+			'</p>
+			<p style="text-align:right;">
+				<a href="https://www.boldgrid.com/support/total-upkeep-backup-plugin-product-guide/how-to-use-the-history-in-boldgrid-backup-premium/">' .
+				esc_html__( 'Setup Guide' ) . '
+				</a>
+			</p>';
 	}
 }

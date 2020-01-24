@@ -18,21 +18,22 @@ defined( 'WPINC' ) || die;
 
 $nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
 
-$premium_listing = new \Boldgrid\Library\Library\Ui\PremiumFeatures\Listing();
+$dashboard = new \Boldgrid\Library\Library\Ui\Dashboard();
 
-$premium_listing->enqueueScripts();
+$dashboard->cards = $this->get_cards();
 
-$premium_listing->cards = $this->get_cards();
+$dashboard->classes = 'bglib-smaller';
 
 $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 	'
-	<div class="bg-box-bottom premium">
-		<p>
+	<div class="bg-box-bottom premium" style="margin:15px 0;">
+		<p style="margin-top:0;">
 			<span class="bg-box-title">%1$s</span>
 			%2$s
 		</p>
-		<p>
+		<p style="margin-bottom:0;">
 			%3$s
+		</p>
 	</div>',
 	/* 1 */ __( 'Total Upkeep Premium', 'boldgrid-backup' ),
 	/* 2 */ $this->core->go_pro->get_premium_button( $this->core->go_pro->get_premium_url( 'bgbkup-premium-features' ) ),
@@ -42,14 +43,13 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 ?>
 
 <div class='wrap'>
-	<h1><?php echo esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'Premium', 'boldgrid-backup' ) ); ?></h1>
+	<h1><?php echo esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'Dashboard', 'boldgrid-backup' ) ); ?></h1>
 
 	<?php
 	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
-	echo $premium_box; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+	echo $premium_box;
 
-	$premium_listing->printCards();
-
+	$dashboard->printCards();
 	?>
 </div>

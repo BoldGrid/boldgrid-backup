@@ -2,11 +2,6 @@
  * Style for specific premium feature cards.
  */
 
- .bglib-card-link {
-    float: right;
-    margin-right: 1em;
-}
-
 #bgbkup_amazon .bglib-card-icon {
 	border-top-color: #feb424;
 }
@@ -75,33 +70,13 @@
 	color: #f95b26;
 }
 
-.bg-box-bottom {
-	border: 1px solid #e1e1e1;
-	border-top: 0px;
-	background: #fbfbfb;
-	padding: 1em;
-	margin: 2em 1em;
-}
+/**
+ * Misc.
+ */
 
-.bg-box-bottom.premium {
-    border-left: 4px solid 
-    #46b450;
-}
-
-.bg-box-bottom.premium .button-success,
-.postbox .premium .button-success {
-	margin: 0px 0px 10px 10px;
-	border-color: darkgreen;
-	box-shadow: 0 1px 0	darkgreen;
-	background: green;
-	color: #fff;
-}
-
-.button.button-success {
-    border-color: darkgreen;
-	box-shadow: 0 1px 0darkgreen;
-	background:green;
-	color: #fff;
+/* The get premium button in the top notice. */
+.bg-box-bottom.premium .button-success {
+	float: none;
 }
 
 .bg-box-title {

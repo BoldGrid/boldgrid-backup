@@ -21,7 +21,7 @@ namespace Boldgrid\Backup\Admin\Card;
  *
  * @since SINCEVERSION
  */
-class Dream_Objects extends \Boldgrid\Library\Library\Ui\PremiumFeatures\Card {
+class Dream_Objects extends \Boldgrid\Library\Library\Ui\Card {
 	/**
 	 * Init.
 	 *
@@ -32,15 +32,18 @@ class Dream_Objects extends \Boldgrid\Library\Library\Ui\PremiumFeatures\Card {
 
 		$this->title = esc_html__( 'DreamObjects', 'boldgrid-backup' );
 
-		$this->footer = esc_html__( 'Do whatever it does that being part of DreamObjects is?', 'boldgrid-backup' );
+		$this->footer = '
+			<p>' .
+			esc_html__( 'Do whatever it does that being part of DreamObjects is?', 'boldgrid-backup' ) .
+			'</p>
+			<p style="text-align:right;">
+				<a href="#">' .
+				esc_html__( 'Setup Guide' ) . '
+				</a>
+			</p>';
 
 		$this->icon = '<img class="dashimages" src="' . plugin_dir_url( __FILE__ ) . '../image/remote/dreamhost-logo.png"></img>';
 
 		$this->features = [];
-
-		$this->link = array(
-			'url'  => '#',
-			'text' => 'Setup Guide',
-		);
 	}
 }

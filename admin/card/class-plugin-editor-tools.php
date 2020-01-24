@@ -21,7 +21,7 @@ namespace Boldgrid\Backup\Admin\Card;
  *
  * @since SINCEVERSION
  */
-class Plugin_Editor_Tools extends \Boldgrid\Library\Library\Ui\PremiumFeatures\Card {
+class Plugin_Editor_Tools extends \Boldgrid\Library\Library\Ui\Card {
 	/**
 	 * Init.
 	 *
@@ -32,13 +32,16 @@ class Plugin_Editor_Tools extends \Boldgrid\Library\Library\Ui\PremiumFeatures\C
 
 		$this->title = esc_html__( 'Plugin Editor Tools', 'boldgrid-backup' );
 
-		$this->footer = esc_html__( 'All the tools you would ever need to edit your plugins ( or ours ).', 'boldgrid-backup' );
-
 		$this->icon = '<span class="dashicons dashicons-media-code"></span>';
 
-		$this->link = array(
-			'url'  => '#',
-			'text' => 'Setup Guide',
-		);
+		$this->footer = '
+			<p>' .
+			esc_html__( 'All the tools you would ever need to edit your plugins ( or ours ).', 'boldgrid-backup' ) .
+			'</p>
+			<p style="text-align:right;">
+				<a href="#">' .
+				esc_html__( 'Setup Guide' ) . '
+				</a>
+			</p>';
 	}
 }

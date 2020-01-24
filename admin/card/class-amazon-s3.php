@@ -20,7 +20,7 @@ namespace Boldgrid\Backup\Admin\Card;
  *
  * @since SINCEVERSION
  */
-class Amazon_S3 extends \Boldgrid\Library\Library\Ui\PremiumFeatures\Card {
+class Amazon_S3 extends \Boldgrid\Library\Library\Ui\Card {
 	/**
 	 * Init.
 	 *
@@ -31,13 +31,16 @@ class Amazon_S3 extends \Boldgrid\Library\Library\Ui\PremiumFeatures\Card {
 
 		$this->title = esc_html__( 'Amazon S3', 'boldgrid-backup' );
 
-		$this->footer = esc_html__( 'Automatically store backups on Amazon S3 Storage.', 'boldgrid-backup' );
+		$this->footer = '
+			<p>' .
+				esc_html__( 'Automatically store backups on Amazon S3 Storage.', 'boldgrid-backup' ) .
+			'</p>
+			<p style="text-align:right;">
+				<a href="https://www.boldgrid.com/support/total-upkeep-backup-plugin-product-guide/how-do-i-upload-my-wordpress-backup-to-amazon-s3/">' .
+					esc_html__( 'Setup Guide' ) . '
+				</a>
+			</p>';
 
 		$this->icon = '<img class="dashimages" src="' . plugin_dir_url( __FILE__ ) . '../image/remote/amazon-s3-logo.png"></img>';
-
-		$this->link = array(
-			'url'  => 'https://www.boldgrid.com/support/total-upkeep-backup-plugin-product-guide/how-do-i-upload-my-wordpress-backup-to-amazon-s3/',
-			'text' => 'Setup Guide',
-		);
 	}
 }
