@@ -41,6 +41,6 @@ class Database_Encryption extends \Boldgrid\Library\Library\Ui\Card {
 				</a>
 			</p>';
 
-		$this->icon = '<img class="dashimages" src="' . plugin_dir_url( __FILE__ ) . '../image/db-lock-64.png" />';
+		$this->icon = '<img src="' . plugin_dir_url( __FILE__ ) . '../image/db-lock-64.png" />';
 	}
 }

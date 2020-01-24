@@ -42,7 +42,7 @@ class Dream_Objects extends \Boldgrid\Library\Library\Ui\Card {
 				</a>
 			</p>';
 
-		$this->icon = '<img class="dashimages" src="' . plugin_dir_url( __FILE__ ) . '../image/remote/dreamhost-logo.png"></img>';
+		$this->icon = '<img src="' . plugin_dir_url( __FILE__ ) . '../image/remote/dreamhost-logo.png"></img>';
 
 		$this->features = [];
 	}

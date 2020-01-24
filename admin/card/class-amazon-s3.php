@@ -41,6 +41,6 @@ class Amazon_S3 extends \Boldgrid\Library\Library\Ui\Card {
 				</a>
 			</p>';
 
-		$this->icon = '<img class="dashimages" src="' . plugin_dir_url( __FILE__ ) . '../image/remote/amazon-s3-logo.png"></img>';
+		$this->icon = '<img src="' . plugin_dir_url( __FILE__ ) . '../image/remote/amazon-s3-logo.png"></img>';
 	}
 }
