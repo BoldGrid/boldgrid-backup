@@ -48,7 +48,7 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 	<?php
 	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
-	echo $premium_box;
+	echo $premium_box; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
 	$dashboard->printCards();
 	?>

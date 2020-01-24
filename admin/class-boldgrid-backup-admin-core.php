@@ -686,7 +686,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->dashboard = new Boldgrid_Backup_Admin_Dashboard( $this );
 
-				// Ensure there is a backup identifier.
+		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
 
 		$this->set_lang();

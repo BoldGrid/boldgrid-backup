@@ -27,7 +27,7 @@ class Database_Encryption extends \Boldgrid\Library\Library\Ui\Feature {
 	public function init() {
 		$core = apply_filters( 'boldgrid_backup_get_core', null );
 
-		$this->icon = '<img class="feature-icon" src="/wp-content/plugins/boldgrid-backup/admin/image/db-lock-64.png" />';
+		$this->icon = '<img class="feature-icon" src="' . plugin_dir_url( BOLDGRID_BACKUP_PATH ) . 'boldgrid-backup/admin/image/db-lock-64.png" />';
 
 		$this->title = esc_html__( 'Database Encryption', 'boldgrid-backup' );
 
