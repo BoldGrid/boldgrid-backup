@@ -69,11 +69,19 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 				'permission_callback' => [ $this, 'permission_check' ],
 				'args'                => [
 					'url' => [
-						'required'            => true,
+						'required'            => false,
 						'description'         => esc_html__( 'Route URL to restore.', 'boldgrid-backup' ),
 						'type'                => 'string',
 						'sanitation_callback' => function ( $field ) {
 							return esc_url_raw( $field );
+						},
+					],
+					'id'  => [
+						'required'            => false,
+						'description'         => esc_html__( 'Backup id to restore.', 'boldgrid-backup' ),
+						'type'                => 'int',
+						'sanitation_callback' => function ( $field ) {
+							return (int) $field;
 						},
 					],
 				],
@@ -233,12 +241,17 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 		$task = new Boldgrid_Backup_Admin_Task();
 		$task->init( [ 'type' => 'restore' ] );
 
-		if ( ! empty( $url ) ) {
-			$task->update_data( 'url', $url );
+		if ( ! empty( $url ) || ! empty( $id ) ) {
+			// Update our task with either url or backup id.
+			if ( ! empty( $url ) ) {
+				$task->update_data( 'url', $url );
+			} else {
+				$task->update_data( 'backup_id', $id );
+			}
 
 			// Trigger our backup.
 			$nopriv = new Boldgrid_Backup_Admin_Nopriv();
-			$nopriv->do_restore_url( [ 'task_id' => $task->get_id() ] );
+			$nopriv->do_restore( [ 'task_id' => $task->get_id() ] );
 		}
 
 		return new WP_REST_Response( $task->get(), 200 );

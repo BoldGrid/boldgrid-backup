@@ -69,7 +69,7 @@ class Boldgrid_Backup_Admin_Nopriv {
 	 * @param  array $args An optional array of args.
 	 * @return mixed       Response from wp_remote_post.
 	 */
-	public function do_restore_url( $args = [] ) {
+	public function do_restore( $args = [] ) {
 		$url = $this->get_restore_url();
 
 		$body = [

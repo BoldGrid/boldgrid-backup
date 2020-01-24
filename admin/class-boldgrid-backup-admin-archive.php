@@ -116,6 +116,15 @@ class Boldgrid_Backup_Admin_Archive {
 	private $id;
 
 	/**
+	 * The archive key.
+	 *
+	 * @since SINCEVERSION
+	 * @access private
+	 * @var int
+	 */
+	private $key;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.5.3
@@ -259,6 +268,17 @@ class Boldgrid_Backup_Admin_Archive {
 	}
 
 	/**
+	 * Get the archive key.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @return int
+	 */
+	public function get_key() {
+		return $this->key;
+	}
+
+	/**
 	 * Init.
 	 *
 	 * @since 1.6.0
@@ -301,6 +321,11 @@ class Boldgrid_Backup_Admin_Archive {
 		$this->compressor = ! empty( $this->log['compressor'] ) ? $this->log['compressor'] : 'php_zip';
 
 		$this->view_details_url = admin_url( 'admin.php?page=boldgrid-backup-archive-details&filename=' . $this->filename );
+
+		// Set our key.
+		$details   = $this->get_by_name( $this->filename );
+		$this->key = isset( $details['key'] ) ? $details['key'] : null;
+
 	}
 
 	/**

@@ -126,6 +126,19 @@ class Boldgrid_Backup_Restorer {
 	}
 
 	/**
+	 * Restore a backup by id.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param string $id The backup id.
+	 */
+	public function restore_by_id( $id ) {
+		$archive = Boldgrid\Backup\Archive\Factory::get_by_id( $id );
+
+		$this->restore_by_key( $archive->get_key(), $archive->filename );
+	}
+
+	/**
 	 * Restore an archive by key (and filename).
 	 *
 	 * @since SINCEVERSION
@@ -177,6 +190,24 @@ class Boldgrid_Backup_Restorer {
 		$this->init();
 
 		$this->info = $this->core->restore_archive_file();
+
+		$this->complete();
+	}
+
+	/**
+	 * Run a restoration by backup id.
+	 *
+	 * Method run_by_id:     This method, does more than just restoration. Handles logging, etc.
+	 * Method restore_by_id: Handles just the restoration, nothing more.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param int $id The backup id.
+	 */
+	public function run_by_id( $id ) {
+		$this->init();
+
+		$this->restore_by_id( $id );
 
 		$this->complete();
 	}

@@ -45,20 +45,20 @@ class Option {
 	}
 
 	/**
-	 * Get one backup by filename.
+	 * Get one backup.
 	 *
 	 * @since SINCEVERSION
 	 *
 	 * @param  string $filename The filename to look for.
 	 * @return array
 	 */
-	public function get_by_filename( $filename ) {
+	public function get_by_key( $key, $value ) {
 		$found_backup = [];
 
 		$backups = $this->get_all();
 
 		foreach ( $backups as $backup ) {
-			if ( ! empty( $backup['filename'] ) && $backup['filename'] === $filename ) {
+			if ( ! empty( $backup[ $key ] ) && $backup[ $key ] === $value ) {
 				$found_backup = $backup;
 				break;
 			}

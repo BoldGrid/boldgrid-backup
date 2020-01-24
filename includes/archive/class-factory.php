@@ -40,6 +40,29 @@ class Factory {
 	}
 
 	/**
+	 * Get a backup by id.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param  string                        $id The backup id.
+	 * @return Boldgrid_Backup_Admin_Archive
+	 */
+	public static function get_by_id( $id ) {
+		$archive = new \Boldgrid_Backup_Admin_Archive();
+
+		// Get the filename of our backup based on id.
+		$option     = new Option();
+		$option_row = $option->get_by_key( 'id', (int) $id );
+		$filename   = ! empty( $option_row['filename'] ) ? $option_row['filename'] : null;
+
+		if ( ! empty( $filename ) ) {
+			$archive->init_by_filename( $filename );
+		}
+
+		return $archive;
+	}
+
+	/**
 	 * Give a backup an id.
 	 *
 	 * @since SINCEVERSION
@@ -50,7 +73,7 @@ class Factory {
 	private static function set_id( $archive ) {
 		$option = new Option();
 
-		$option_row = $option->get_by_filename( $archive->filename );
+		$option_row = $option->get_by_key( 'filename', $archive->filename );
 
 		if ( empty( $option_row ) ) {
 			$option_row = [ 'filename' => $archive->filename ];

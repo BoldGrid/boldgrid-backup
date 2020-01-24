@@ -1123,20 +1123,22 @@ class Boldgrid_Backup_Admin_Cron {
 		if ( ! empty( $task_id ) ) {
 			$task       = new Boldgrid_Backup_Admin_Task();
 			$task_found = $task->init_by_id( $task_id );
+			$restorer   = new Boldgrid_Backup_Restorer();
 
 			if ( ! $task_found ) {
 				$archive_info = [
 					'error' => __( 'Resore error: Unable to instantiate task.', 'boldgrid-backup' ),
 				];
-			} elseif ( false === $task->get_data( 'url' ) ) {
-				$archive_info = [
-					'error' => __( 'Restore error: Missing url.', 'boldgrid-backup' ),
-				];
-			} else {
-				$restorer = new Boldgrid_Backup_Restorer();
+			} elseif ( false !== $task->get_data( 'url' ) ) {
 				$restorer->run_by_url( $task->get_data( 'url' ) );
-
 				$archive_info = $restorer->get_info();
+			} elseif ( false !== $task->get_data( 'backup_id' ) ) {
+				$restorer->run_by_id( $task->get_data( 'backup_id' ) );
+				$archive_info = $restorer->get_info();
+			} else {
+				$archive_info = [
+					'error' => __( 'Restore error: Missing url / id.', 'boldgrid-backup' ),
+				];
 			}
 		} else {
 			if ( $this->core->restore_helper->prepare_restore() ) {
