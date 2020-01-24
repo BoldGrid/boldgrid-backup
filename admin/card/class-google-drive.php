@@ -32,7 +32,7 @@ class Google_Drive extends \Boldgrid\Library\Library\Ui\Card {
 
 		$this->title = esc_html__( 'Google Drive', 'boldgrid-backup' );
 
-		$this->icon = '<img class="dashimages" src="' . plugin_dir_url( __FILE__ ) . '../image/remote/google-drive.png"></img>';
+		$this->icon = '<img src="' . plugin_dir_url( __FILE__ ) . '../image/remote/google-drive.png"></img>';
 
 		$this->footer = '
 			<p>' .

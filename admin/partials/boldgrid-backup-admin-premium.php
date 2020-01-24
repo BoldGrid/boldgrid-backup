@@ -35,9 +35,9 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 			%3$s
 		</p>
 	</div>',
-	/* 1 */ __( 'Total Upkeep Premium', 'boldgrid-backup' ),
+	/* 1 */ esc_html__( 'Total Upkeep Premium', 'boldgrid-backup' ),
 	/* 2 */ $this->core->go_pro->get_premium_button( $this->core->go_pro->get_premium_url( 'bgbkup-premium-features' ) ),
-	/* 3 */ __( 'Upgrade to Total Upkeep Premium to take advantage of these additional features' )
+	/* 3 */ esc_html__( 'Upgrade to Total Upkeep Premium to take advantage of these additional features', 'boldgrid-backup' )
 );
 
 ?>
