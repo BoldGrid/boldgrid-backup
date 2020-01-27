@@ -580,7 +580,7 @@ class Boldgrid_Backup_Admin_Core {
 		$this->configs = Boldgrid_Backup_Admin::get_configs();
 
 		// Instantiate Boldgrid\Library\Library\Plugin\Plugin.
-		$this->plugin = new Boldgrid\Library\Library\Plugin\Plugin( 'boldgrid-backup', $this->configs );
+		$this->plugin = new \Boldgrid\Library\Library\Plugin\Plugin( 'boldgrid-backup', $this->configs );
 
 		// Instantiate Boldgrid_Backup_Admin_Settings.
 		$this->settings = new Boldgrid_Backup_Admin_Settings( $this );
