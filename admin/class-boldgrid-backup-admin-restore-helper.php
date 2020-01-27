@@ -300,6 +300,7 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 			);
 			return false;
 		}
+		return true;
 	}
 
 	/**
