@@ -28,6 +28,7 @@ if ( ! defined( 'BOLDGRID_BACKUP_TITLE' ) ) {
 
 // Require necessary files.
 $files = array(
+	'/admin/class-boldgrid-backup-admin-premium-features.php',
 	'/admin/class-boldgrid-backup-admin.php',
 	'/admin/class-boldgrid-backup-admin-core.php',
 	'/admin/class-boldgrid-backup-admin-settings.php',

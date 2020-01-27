@@ -2,11 +2,11 @@
  * Style for specific premium feature cards.
  */
 
-#bgbkup_amazon .bglib-card-icon {
+#bgbkup_amazon_s3 .bglib-card-icon {
 	border-top-color: #feb424;
 }
 
-#bgbkup_dreamobjects .bglib-card-icon {
+#bgbkup_dream_objects .bglib-card-icon {
 	border-top-color: #3e95be;
 }
 
@@ -14,7 +14,7 @@
 	border-top-color: #0073aa;
 }
 
-#bgbkup_drive .bglib-card-icon {
+#bgbkup_google_drive .bglib-card-icon {
 	border-top-color: #1ba160;
 }
 
@@ -22,7 +22,7 @@
 	border-top-color: #feb424;
 }
 
-#bgbkup_dreamobjects .bglib-card-icon {
+#bgbkup_dream_objects .bglib-card-icon {
 	border-top-color: #3e95be;
 }
 
