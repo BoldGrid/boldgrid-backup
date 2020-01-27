@@ -583,7 +583,7 @@ class Boldgrid_Backup_Admin_Core {
 		if ( class_exists( '\Boldgrid\Library\Library\Plugin\Plugin' ) ) {
 			$this->plugin = new \Boldgrid\Library\Library\Plugin\Plugin( 'boldgrid-backup', $this->configs );
 		}
-		
+
 		// Instantiate Boldgrid_Backup_Admin_Settings.
 		$this->settings = new Boldgrid_Backup_Admin_Settings( $this );
 

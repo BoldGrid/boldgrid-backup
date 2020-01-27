@@ -81,7 +81,7 @@ class Boldgrid_Backup_Admin_Premium_Features {
 			$plugin = new \Boldgrid\Library\Library\Plugin\Plugin( 'boldgrid-backup', $this->core->configs );
 		}
 		$this->page = $plugin->getPageBySlug( 'boldgrid-backup-premium-features' );
-		$cards = [
+		$cards      = [
 			new Card\Database_Encryption( $this->page ),
 			new Card\Google_Drive( $this->page ),
 			new Card\Amazon_S3( $this->page ),
