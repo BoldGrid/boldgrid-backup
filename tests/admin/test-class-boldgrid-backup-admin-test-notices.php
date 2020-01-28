@@ -25,20 +25,14 @@ class Test_Boldgrid_Backup_Admin_Notice_Counts extends WP_UnitTestCase {
 		$this->core = apply_filters( 'boldgrid_backup_get_core', null );
 	}
 	public function test_notice_not_displayed_first_install() {
-		return true;
-
 		$this->assertTrue( $this->notice_counts_in_nav( '1.16.16', '1.16.16', 0 ) );
 	}
 
 	public function test_one_notice_displayed() {
-		return true;
-
 		$this->assertTrue( $this->notice_counts_in_nav( '1.12.16', '1.16.16', 1 ) );
 	}
 
 	public function test_new_feature_added() {
-		return true;
-
 		$new_feature = [
 			'id'      => 'bgbkup_google_drive',
 			'page'    => 'boldgrid-backup-premium-features',
@@ -49,8 +43,6 @@ class Test_Boldgrid_Backup_Admin_Notice_Counts extends WP_UnitTestCase {
 	}
 
 	public function test_mark_feature_read() {
-		return true;
-
 		$this->assertTrue( $this->notice_counts_in_nav( '1.12.16', '1.16.16', 2 ) );
 		$this->core->plugin->getPageBySlug( 'boldgrid-backup-premium-features' )->setAllNoticesRead();
 		$this->assertTrue( $this->notice_counts_in_nav( '1.12.16', '1.16.16', 0 ) );
