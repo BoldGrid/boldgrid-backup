@@ -36,7 +36,7 @@ class Boldgrid_Backup_Rest_Controller extends WP_REST_Controller {
 	 * @access private
 	 * @var    string
 	 */
-	protected $namespace = '/bgbkup/v1';
+	protected $namespace = 'bgbkup/v1';
 
 	/**
 	 * Setup the core backup class.
