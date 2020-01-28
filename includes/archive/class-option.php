@@ -58,7 +58,7 @@ class Option {
 		$backups = $this->get_all();
 
 		foreach ( $backups as $backup ) {
-			if ( ! empty( $backup[ $key ] ) && $backup[ $key ] === $value ) {
+			if ( isset( $backup[ $key ] ) && $backup[ $key ] === $value ) {
 				$found_backup = $backup;
 				break;
 			}
