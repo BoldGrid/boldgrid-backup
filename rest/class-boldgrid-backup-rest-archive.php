@@ -57,7 +57,7 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 	}
 
 	/**
-	 * Register the route for restroeing a backup.
+	 * Register the route for restoring a backup.
 	 *
 	 * @since X.X.X
 	 */
@@ -252,6 +252,8 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 			// Trigger our backup.
 			$nopriv = new Boldgrid_Backup_Admin_Nopriv();
 			$nopriv->do_restore( [ 'task_id' => $task->get_id() ] );
+		} else {
+			// todo Add an error here.
 		}
 
 		return new WP_REST_Response( $task->get(), 200 );

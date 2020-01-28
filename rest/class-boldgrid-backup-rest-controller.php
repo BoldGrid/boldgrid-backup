@@ -56,8 +56,7 @@ class Boldgrid_Backup_Rest_Controller extends WP_REST_Controller {
 	 * @return boolean Has Access?
 	 */
 	public function permission_check() {
-		return true;
-		// return current_user_can( 'activate_plugins' );
+		return current_user_can( 'activate_plugins' );
 	}
 
 	/**
