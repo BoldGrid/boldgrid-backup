@@ -22,6 +22,7 @@
 		"chland/tdcron" : "dev-master"
 	},
 	"require-dev" : {
+		"boldgrid/library" : "dev-premium-cards",
 		"lox/xhprof" : "dev-master"
 	},
 	"scripts" : {

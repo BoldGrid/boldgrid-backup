@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "f4a323eb1db907619cd5e3f7d483d140",
+    "content-hash": "53fe1e0a82292deea85c06a4789b9303",
     "packages": [
         {
             "name": "boldgrid/library",
