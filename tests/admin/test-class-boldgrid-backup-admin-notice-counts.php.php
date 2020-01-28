@@ -17,8 +17,13 @@
  *
  * @since 1.11.0
  */
-
 class Test_Boldgrid_Backup_Admin_Notice_Counts extends WP_UnitTestCase {
+
+	public $core;
+
+	public function setUp() {
+		$this->core = apply_filters( 'boldgrid_backup_get_core', null );
+	}
 	public function test_notice_not_displayed_first_install() {
 		$this->assertTrue( $this->notice_counts_in_nav( '1.16.16', '1.16.16', 0 ) );
 	}
@@ -39,21 +44,19 @@ class Test_Boldgrid_Backup_Admin_Notice_Counts extends WP_UnitTestCase {
 
 	public function test_mark_feature_read() {
 		$this->assertTrue( $this->notice_counts_in_nav( '1.12.16', '1.16.16', 2 ) );
-		$core = apply_filters( 'boldgrid_backup_get_core', null );
-		$core->plugin->getPageBySlug( 'boldgrid-backup-premium-features' )->setAllNoticesRead();
+		$this->core->plugin->getPageBySlug( 'boldgrid-backup-premium-features' )->setAllNoticesRead();
 		$this->assertTrue( $this->notice_counts_in_nav( '1.12.16', '1.16.16', 0 ) );
 	}
 
 	public function notice_counts_in_nav( $first_version, $this_version, $expected_count, $new_feature = null ) {
-		$core                     = apply_filters( 'boldgrid_backup_get_core', null );
-		$core->plugin->pluginData = $this->get_plugin_data( $this_version );
+		$this->core->plugin->pluginData = $this->get_plugin_data( $this_version );
 		$plugin_config            = $this->get_plugin_config();
 		if ( $new_feature ) {
 			$plugin_config['page_notices'][] = $new_feature;
-			$core->plugin->pluginConfig      = $plugin_config;
-			$core->plugin->setPages();
+			$this->core->plugin->pluginConfig      = $plugin_config;
+			$this->core->plugin->setPages();
 		} else {
-			$core->plugin->pluginConfig = $plugin_config;
+			$this->core->plugin->pluginConfig = $plugin_config;
 		}
 		$this->set_versions( $first_version, $this_version );
 
