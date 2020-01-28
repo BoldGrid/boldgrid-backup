@@ -579,11 +579,6 @@ class Boldgrid_Backup_Admin_Core {
 		// Instantiate Configs Array
 		$this->configs = Boldgrid_Backup_Admin::get_configs();
 
-		// Instantiate Boldgrid\Library\Library\Plugin\Plugin.
-		if ( class_exists( '\Boldgrid\Library\Library\Plugin\Plugin' ) ) {
-			$this->plugin = new \Boldgrid\Library\Library\Plugin\Plugin( 'boldgrid-backup', $this->configs );
-		}
-
 		// Instantiate Boldgrid_Backup_Admin_Settings.
 		$this->settings = new Boldgrid_Backup_Admin_Settings( $this );
 
@@ -674,8 +669,6 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->support = new Boldgrid_Backup_Admin_Support( $this );
 
-		$this->premium_page = new Boldgrid_Backup_Admin_Premium_Features( $this );
-
 		$this->time = new Boldgrid_Backup_Admin_Time( $this );
 
 		$this->cron_test = new Boldgrid_Backup_Admin_Cron_Test( $this );
@@ -687,6 +680,12 @@ class Boldgrid_Backup_Admin_Core {
 		$this->dashboard_widget = new Boldgrid_Backup_Admin_Dashboard_Widget( $this );
 
 		$this->dashboard = new Boldgrid_Backup_Admin_Dashboard( $this );
+
+		// Instantiate Boldgrid\Library\Library\Plugin\Plugin.
+		if ( class_exists( '\Boldgrid\Library\Library\Plugin\Plugin' ) ) {
+			$this->plugin = new \Boldgrid\Library\Library\Plugin\Plugin( 'boldgrid-backup', $this->configs );
+}
+		$this->premium_page = new Boldgrid_Backup_Admin_Premium_Features( $this );
 
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
