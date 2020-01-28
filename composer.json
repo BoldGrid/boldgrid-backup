@@ -16,13 +16,12 @@
 		}
 	],
 	"require" : {
-		"boldgrid/library" : "dev-premium-cards",
+		"boldgrid/library" : "^2.0.0",
 		"ifsnop/mysqldump-php" : "dev-add-include-views",
 		"phpseclib/phpseclib" : "~2.0",
 		"chland/tdcron" : "dev-master"
 	},
 	"require-dev" : {
-		"boldgrid/library" : "dev-premium-cards",
 		"lox/xhprof" : "dev-master"
 	},
 	"scripts" : {
