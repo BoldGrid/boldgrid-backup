@@ -300,7 +300,7 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 	 * @since xxx
 	 */
 	public function test_restore_archive_file() {
-		// @todo this should not be needed.
+		// @todo This should not be needed. Failes in Travis for php 5.4.
 		$this->core = new Boldgrid_Backup_Admin_Core();
 
 		/*
@@ -335,6 +335,9 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 	 * @since xxx
 	 */
 	public function test_restore_cli() {
+		// @todo This should not be needed. Failes in Travis for php 5.4.
+		$this->core = new Boldgrid_Backup_Admin_Core();
+
 		$this->createWpconfig();
 
 		if ( empty( $this->info ) ) {
