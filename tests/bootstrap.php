@@ -28,6 +28,12 @@ if ( ! defined( 'BOLDGRID_BACKUP_TITLE' ) ) {
 
 // Require necessary files.
 $files = array(
+	'/vendor/boldgrid/library/src/Library/Settings.php',
+	'/vendor/boldgrid/library/src/Library/Configs.php',
+	'/vendor/boldgrid/library/src/Util/Version.php',
+	'/vendor/boldgrid/library/src/Library/Plugin/Notice.php',
+	'/vendor/boldgrid/library/src/Library/Plugin/Page.php',
+	'/vendor/boldgrid/library/src/Library/Plugin/Plugin.php',
 	'/admin/class-boldgrid-backup-admin-premium-features.php',
 	'/admin/class-boldgrid-backup-admin.php',
 	'/admin/class-boldgrid-backup-admin-core.php',
