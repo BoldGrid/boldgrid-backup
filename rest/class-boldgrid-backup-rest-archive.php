@@ -252,7 +252,7 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 			// Trigger our backup.
 			$nopriv = new Boldgrid_Backup_Admin_Nopriv();
 			$nopriv->do_restore( [ 'task_id' => $task->get_id() ] );
-		} else {
+		} else { // phpcs:ignore
 			// todo Add an error here.
 		}
 

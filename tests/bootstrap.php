@@ -90,6 +90,8 @@ $files = array(
 	'/includes/class-boldgrid-backup-download.php',
 	'/includes/class-boldgrid-backup-file.php',
 	'/includes/class-boldgrid-backup-archiver.php',
+	'/includes/archive/class-factory.php',
+	'/includes/archive/class-option.php',
 	'/admin/storage/class-boldgrid-backup-admin-storage-local.php',
 	'/admin/remote/class-boldgrid-backup-admin-ftp.php',
 	'/admin/remote/class-boldgrid-backup-admin-ftp-hooks.php',
