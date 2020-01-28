@@ -50,6 +50,8 @@ if ( ! defined( 'BOLDGRID_BACKUP_TITLE' ) ) {
 	define( 'BOLDGRID_BACKUP_TITLE', 'Total Upkeep' );
 }
 
+require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-utility.php';
+
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-boldgrid-backup-activator.php
@@ -124,11 +126,6 @@ function load_boldgrid_backup() {
 	return true;
 }
 
-/** Need to implment a way to check if this is a rest request.
- * This may help: https://wordpress.stackexchange.com/questions/221202/does-something-like-is-rest-exist
- * */
-$brad_here = 1;
-
 /*
  * Load the plugin.
  *
@@ -140,7 +137,7 @@ $brad_here = 1;
  *
  * Run the plugin only if on a wp-admin page or when DOING_CRON.
  */
-if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) || defined( 'WP_CLI' ) && WP_CLI || $brad_here ) {
+if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) || defined( 'WP_CLI' ) && WP_CLI || Boldgrid_Backup_Rest_Utility::is_rest() ) {
 	// If we could not load boldgrid_backup (missing system requirements), abort.
 	if ( load_boldgrid_backup() ) {
 		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup.php';
