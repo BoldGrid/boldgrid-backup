@@ -8,7 +8,7 @@
     "packages": [
         {
             "name": "boldgrid/library",
-            "version": "2.11.1",
+            "version": "dev-premium-cards",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BoldGrid/library.git",
