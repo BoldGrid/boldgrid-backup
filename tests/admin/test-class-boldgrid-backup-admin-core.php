@@ -300,7 +300,8 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 	 * @since xxx
 	 */
 	public function test_restore_archive_file() {
-		return true;
+		// @todo this should not be needed.
+		$this->core = new Boldgrid_Backup_Admin_Core();
 
 		/*
 		 * Test: Basic test.
