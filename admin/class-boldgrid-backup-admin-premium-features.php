@@ -48,7 +48,6 @@ class Boldgrid_Backup_Admin_Premium_Features {
 	 */
 	public function __construct( Boldgrid_Backup_Admin_Core $core ) {
 		$this->core = $core;
-		$this->page = $core->plugin->getPageBySlug( 'boldgrid-backup-premium-features' );
 	}
 
 	/**
@@ -76,7 +75,13 @@ class Boldgrid_Backup_Admin_Premium_Features {
 	 * @return array
 	 */
 	public function get_cards() {
-		$cards = [
+		if ( $this->core->plugin ) {
+			$plugin = $this->core->plugin;
+		} else {
+			$plugin = new \Boldgrid\Library\Library\Plugin\Plugin( 'boldgrid-backup', $this->core->configs );
+		}
+		$this->page = $plugin->getPageBySlug( 'boldgrid-backup-premium-features' );
+		$cards      = [
 			new Card\Database_Encryption( $this->page ),
 			new Card\Google_Drive( $this->page ),
 			new Card\Amazon_S3( $this->page ),

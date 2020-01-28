@@ -93,7 +93,7 @@ return [
 	'pages'                => [
 		'boldgrid-backup-premium-features',
 	],
-	'page-notices'         => [
+	'page_notices'         => [
 		[
 			'id'      => 'bgbkup_database_encryption',
 			'page'    => 'boldgrid-backup-premium-features',
