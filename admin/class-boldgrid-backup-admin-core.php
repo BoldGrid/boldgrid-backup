@@ -684,7 +684,7 @@ class Boldgrid_Backup_Admin_Core {
 		// Instantiate Boldgrid\Library\Library\Plugin\Plugin.
 		if ( class_exists( '\Boldgrid\Library\Library\Plugin\Plugin' ) ) {
 			$this->plugin = new \Boldgrid\Library\Library\Plugin\Plugin( 'boldgrid-backup', $this->configs );
-}
+		}
 		$this->premium_page = new Boldgrid_Backup_Admin_Premium_Features( $this );
 
 		// Ensure there is a backup identifier.
