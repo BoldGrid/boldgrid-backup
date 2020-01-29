@@ -25,10 +25,9 @@ class Boldgrid_Backup_Admin_Premium_Features {
 	 * The core class object.
 	 *
 	 * @since  SINCEVERSION
-	 * @access private
 	 * @var    Boldgrid_Backup_Admin_Core
 	 */
-	private $core;
+	public $core;
 
 	/**
 	 * The page's Boldgrid\Library\Library\Plugin\Page Object.
@@ -106,5 +105,10 @@ class Boldgrid_Backup_Admin_Premium_Features {
 		$this->admin_enqueue_scripts( 'boldgrid-backup-admin-premium-features' );
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-premium.php';
 		$this->page->setAllNoticesRead();
+		return array(
+			'nav'         => $nav,
+			'dashboard'   => $dashboard,
+			'premium_box' => $premium_box,
+		);
 	}
 }

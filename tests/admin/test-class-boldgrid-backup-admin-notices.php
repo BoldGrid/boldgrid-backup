@@ -1,6 +1,6 @@
 <?php
 /**
- * File: test-class-boldgrid-backup-admin-archive.php
+ * File: test-class-boldgrid-backup-admin-notices.php
  *
  * @link  https://www.boldgrid.com
  * @since 1.11.0
