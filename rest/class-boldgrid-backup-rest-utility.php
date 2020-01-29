@@ -31,7 +31,7 @@ class Boldgrid_Backup_Rest_Utility {
 	}
 
 	/**
-	 * Whether or not we're in a bgbkup REST call.
+	 * Whether or not we're in a REST call.
 	 *
 	 * @since SINCEVERSION
 	 *
@@ -39,9 +39,18 @@ class Boldgrid_Backup_Rest_Utility {
 	 */
 	public static function is_rest() {
 		$current_url = self::get_current_url();
-		$rest_prefix = get_site_url( null, 'wp-json/bgbkup/' );
 
-		// True when the current url begins with http://domain.com/wp-json/bgbkup/.
-		return substr( $current_url, 0, strlen( $rest_prefix ) ) === $rest_prefix;
+		// True when the current url begins with http://domain.com/wp-json/.
+		$rest_prefix         = get_site_url( null, 'wp-json/' );
+		$in_pretty_permalink = substr( $current_url, 0, strlen( $rest_prefix ) ) === $rest_prefix;
+
+		// True when the current url begins with http://domain.com/index.php/wp-json/
+		$rest_prefix  = get_site_url( null, 'index.php/wp-json/' );
+		$in_index_url = substr( $current_url, 0, strlen( $rest_prefix ) ) === $rest_prefix;
+
+		// True when url includes the rest_route parameter.
+		$in_get = ! empty( $_GET['rest_route'] );
+
+		return $in_pretty_permalink || $in_index_url || $in_get;
 	}
 }
