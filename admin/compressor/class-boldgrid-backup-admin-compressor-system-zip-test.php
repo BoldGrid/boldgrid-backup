@@ -126,6 +126,17 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip_Test {
 	}
 
 	/**
+	 * Get our error message.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @return string
+	 */
+	public function get_error() {
+		return $this->error;
+	}
+
+	/**
 	 * Create and setup our test directory.
 	 *
 	 * We will be zipping up this directory.
@@ -245,31 +256,45 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip_Test {
 	/**
 	 * Determine if system_zip is working as expected.
 	 *
+	 * On average, this takes 0.019 seconds to complete.
+	 *
 	 * @since SINCEVERSION
 	 *
-	 * @return bool True on success.
+	 * @param  bool $force Whether to run this test or get results from transient.
+	 * @return bool        True on success.
 	 */
-	public function run() {
+	public function run( $force = false ) {
+		// Force a fresh test if we're on the preflight check page.
+		$force = Boldgrid_Backup_Admin_Utility::is_admin_page( 'boldgrid-backup-test' ) ? true : $force;
+
+		$pass = 1;
+
+		$transient_key   = 'boldgrid_backup_system_zip_test';
+		$transient_value = get_transient( $transient_key );
+
+		if ( ! $force && false !== $transient_value ) {
+			return $transient_value;
+		}
+
 		// Before and after running the test, delete test files created.
 		$this->core->test->delete_test_files( $this->core->backup_dir->get() );
 
-		// Create our test directory.
+		// This is the beef of the test, where we actually test things.
 		if ( ! $this->test_dir_create() ) {
-			return false;
-		}
-
-		// Zip up our test directory.
-		if ( ! $this->test_dir_zip() ) {
-			return false;
-		}
-
-		// Restore our test directory.
-		if ( ! $this->test_dir_restore() ) {
-			return false;
+			// Create our test directory.
+			$pass = 0;
+		} elseif ( ! $this->test_dir_zip() ) {
+			// Zip up our test directory.
+			$pass = 0;
+		} elseif ( ! $this->test_dir_restore() ) {
+			// Restore our test directory.
+			$pass = 0;
 		}
 
 		$this->core->test->delete_test_files( $this->core->backup_dir->get() );
 
-		return true;
+		set_transient( $transient_key, $pass );
+
+		return ! empty( $pass );
 	}
 }
