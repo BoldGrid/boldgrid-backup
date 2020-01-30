@@ -286,7 +286,7 @@ class Boldgrid_Backup_Admin_Test {
 			$filename = $file['name'];
 
 			if ( 0 === strpos( $filename, $this->test_prefix ) ) {
-				$this->core->wp_filesystem->delete( $dir . $filename );
+				$this->core->wp_filesystem->delete( $dir . $filename, true );
 			}
 		}
 
@@ -519,9 +519,9 @@ class Boldgrid_Backup_Admin_Test {
 	 * @return bool
 	 */
 	public function is_system_zip_supported() {
-		$system_zip = new Boldgrid_Backup_Admin_Compressor_System_Zip( $this->core );
+		$system_zip_test = new Boldgrid_Backup_Admin_Compressor_System_Zip_Test( $this->core );
 
-		return $system_zip->test();
+		return $system_zip_test->run();
 	}
 
 	/**

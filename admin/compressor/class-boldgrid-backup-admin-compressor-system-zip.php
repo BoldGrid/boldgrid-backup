@@ -131,8 +131,8 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 		 *
 		 * We'll add the sql separately in self::zip_sql().
 		 */
-		if ( ( $key = array_search( $this->core->db_dump_filepath, $filelist_array) ) !== false ) {
-			unset( $filelist_array[$key] );
+		if ( ( $key = array_search( $this->core->db_dump_filepath, $filelist_array ) ) !== false ) { // phpcs:ignore
+			unset( $filelist_array[ $key ] );
 		}
 
 		$this->core->wp_filesystem->put_contents(
@@ -142,93 +142,6 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 
 		$this->core->logger->add( 'Finished creating list of files to include in zip.' );
 		$this->core->logger->add_memory();
-	}
-
-	/**
-	 * Determine if system_zip is working as expected.
-	 *
-	 * @since SINCEVERSION
-	 */
-	public function test() {
-		$items = [
-			[
-				'type' => 'f',
-				'name' => 'file.txt',
-			],
-			[
-				'type' => 'd',
-				'name' => 'folder-empty',
-			],
-			[
-				'type' => 'd',
-				'name' => 'folder-1',
-			],
-			[
-				'type' => 'f',
-				'name' => 'folder-1/file-1.txt',
-			],
-			[
-				'type' => 'd',
-				'name' => 'folder-1/folder-1a',
-			],
-			[
-				'type' => 'd',
-				'name' => 'folder-1/folder-1a/folder-1a.txt',
-			],
-		];
-
-		// Add this item to our filelist (a .txt file containing a list of files to backup).
-		$filelist = [];
-
-		$test_zip_filepath = $this->core->backup_dir->get_path_to( $this->core->test->test_prefix . 'system-zip-test.zip' );
-		$filelist_filepath = $this->core->backup_dir->get_path_to( $this->core->test->test_prefix . 'system-zip-filelist.txt' );
-
-		// Create our test directory.
-		$test_dir = $this->core->backup_dir->get_path_to( $this->core->test->test_prefix . 'system-zip-test' );
-		if ( ! $this->core->wp_filesystem->mkdir( $test_dir ) ) {
-			$this->error = sprintf(
-				esc_html__( 'Unable to create test directory: %1$s', 'boldgrid-backup' ),
-				$test_dir
-			);
-
-			return false;
-		}
-
-		// Create all the files. Above if one could not be.
-		foreach ( $items as $item ) {
-			$created = false;
-
-			switch( $item['type'] ) {
-				case 'd':
-					$created = $this->core->wp_filesystem->mkdir( $item['name'] );
-					break;
-				case 'f':
-					$created = $this->core->wp_filesystem->touch( $item['name'] );
-					break;
-			}
-
-			// Add this item to our filelist (a .txt file containing a list of files to backup).
-			$filelist[] = $item['name'];
-
-			// Above if we could not create a file.
-			if ( ! $created ) {
-				$this->error = sprintf(
-						esc_html__( 'Unable to create test file: %1$s', 'boldgrid-backup' ),
-						$item['name']
-				);
-				return false;
-			}
-		}
-
-		// Create
-		$this->core->wp_filesystem->put_contents(
-			$this->core->backup_dir->get_path_to( $this->core->test->test_prefix . 'system-zip-file-list.txt' ),
-			implode( PHP_EOL, $filelist )
-		);
-
-		$this->core->execute_command( 'cd ' . $test_dir . '; zip ' . $test_zip_filepath . ' -@ < ' . $filelist_filepath );
-
-		return true;
 	}
 
 	/**
@@ -260,15 +173,6 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 		$dir = pathinfo( $this->core->db_dump_filepath, PATHINFO_DIRNAME );
 
 		$this->core->execute_command( 'cd ' . $dir . '; zip ' . $this->filepath . ' ' . basename( $this->core->db_dump_filepath ) . ';' );
-
-		error_log( 'running blah' );
-		$output = $this->core->execute_command( 'blah;', $success );
-		error_log( print_r( [
-			'success' => $success,
-			'return' => $return,
-			'output' => $output,
-		],1));
-
 
 		$this->core->logger->add( 'Finished adding db dump to the zip file.' );
 		$this->core->logger->add_memory();
