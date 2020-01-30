@@ -272,7 +272,6 @@ class Boldgrid_Backup {
 		}
 
 		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-activator.php';
-		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-job.php';
 
 		// REST API support.
 		require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-controller.php';

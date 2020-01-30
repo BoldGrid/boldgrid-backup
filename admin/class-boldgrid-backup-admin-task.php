@@ -23,6 +23,16 @@
  */
 class Boldgrid_Backup_Admin_Task {
 	/**
+	 * A date format used in returning times.
+	 *
+	 * For example, 'c' in date( 'c', time() ).
+	 *
+	 * @since SINCEVERSION
+	 * @var string
+	 */
+	public $date_format;
+
+	/**
 	 * The time this task was completed.
 	 *
 	 * @since SINCEVERSION
@@ -118,9 +128,9 @@ class Boldgrid_Backup_Admin_Task {
 		return [
 			'id'           => $this->id,
 			'type'         => $this->type,
-			'created_at'   => $this->created_at,
-			'started_at'   => $this->started_at,
-			'completed_at' => $this->completed_at,
+			'created_at'   => empty( $this->date_format ) ? $this->created_at : date( $this->date_format, $this->created_at ),
+			'started_at'   => empty( $this->date_format ) ? $this->started_at : date( $this->date_format, $this->started_at ),
+			'completed_at' => empty( $this->date_format ) ? $this->completed_at : date( $this->date_format, $this->completed_at ),
 			'status'       => $this->get_status(),
 			'data'         => $this->data,
 		];

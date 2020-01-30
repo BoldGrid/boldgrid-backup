@@ -208,7 +208,7 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 				'id'            => $archive->get_id(),
 				'title'         => $archive->get_attribute( 'title' ),
 				'description'   => $archive->get_attribute( 'description' ),
-				'creation_date' => $archive->timestamp,
+				'creation_date' => date( 'c', $archive->timestamp ),
 			];
 		}
 
