@@ -512,6 +512,19 @@ class Boldgrid_Backup_Admin_Test {
 	}
 
 	/**
+	 * Determine whether or not system_zip is suppored.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @return bool
+	 */
+	public function is_system_zip_supported() {
+		$system_zip = new Boldgrid_Backup_Admin_Compressor_System_Zip( $this->core );
+
+		return $system_zip->test();
+	}
+
+	/**
 	 * Perform functionality tests.
 	 *
 	 * @since 1.0
@@ -526,6 +539,8 @@ class Boldgrid_Backup_Admin_Test {
 		$available_compressors = $this->core->config->get_available_compressors();
 		$compressor            = $this->core->compressors->get();
 
+		$compressor = 'system_zip';
+
 		if ( ! self::is_filesystem_supported() ) {
 			$this->is_functional = false;
 		} elseif ( ! $this->get_is_abspath_writable() ) {
@@ -537,6 +552,8 @@ class Boldgrid_Backup_Admin_Test {
 		} elseif ( 'php_zip' === $compressor && ! $this->is_php_zip_supported() ) {
 			$this->is_functional = false;
 		} elseif ( 'pcl_zip' === $compressor && ! $this->is_pcl_zip_supported() ) {
+			$this->is_functional = false;
+		} elseif ( 'system_zip' === $compressor && ! $this->is_system_zip_supported() ) {
 			$this->is_functional = false;
 		} elseif ( $this->is_php_safemode() ) {
 			$this->is_functional = false;
