@@ -253,7 +253,11 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 			$nopriv = new Boldgrid_Backup_Admin_Nopriv();
 			$nopriv->do_restore( [ 'task_id' => $task->get_id() ] );
 		} else { // phpcs:ignore
-			// todo Add an error here.
+			return new WP_Error(
+				'bgbkup_rest_missing_param',
+				__( 'Unable to restore. Missing required parameters.', 'boldgrid-backup' ),
+				[ 'status' => 400 ]
+			);
 		}
 
 		return new WP_REST_Response( $task->get(), 200 );
