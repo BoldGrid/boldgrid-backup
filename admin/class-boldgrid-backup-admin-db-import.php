@@ -58,7 +58,8 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * @return bool TRUE on success.
 	 */
 	public function import( $file ) {
-		$lines = file( $file );
+
+		$lines = $this->fix_view_statements( $file );
 
 		if ( false === $lines ) {
 			return array(
@@ -169,5 +170,73 @@ class Boldgrid_Backup_Admin_Db_Import {
 		$success = $this->import_lines( $lines );
 
 		return $success;
+	}
+
+	/**
+	 * Fix View Statements.
+	 *
+	 * Fixes view statements to ensure the definer matches the
+	 * current db user.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param string $file db dump filename.
+	 * @return array an array of lines from db file.
+	 */
+	public function fix_view_statements( $file ) {
+		$lines = file( $file );
+
+		$has_drop_view_if_exists = false;
+
+		foreach ( $lines as $line ) {
+			if ( strpos( $line, 'DROP VIEW IF EXISTS' ) ) {
+				$has_drop_view_if_exists = true;
+			}
+		}
+
+		if ( false === $has_drop_view_if_exists ) {
+			return $lines;
+		}
+
+		$fixed_lines = [];
+
+		foreach ( $lines as $line ) {
+			if ( strpos( $line, 'DEFINER=' ) === 9 ) {
+				$fixed_lines[] = $this->fix_definer( $line );
+			} else {
+				$fixed_lines[] = $line;
+			}
+		}
+
+		return $fixed_lines;
+	}
+
+	/**
+	 * Fix Definer
+	 *
+	 * Fixes the actual definer line.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param string $line The line from db dump file to fix.
+	 * @return string The line with the DEFINER option removed.
+	 */
+	public function fix_definer( $line ) {
+		$line_fixed_definer  = '';
+		$sql_security_offset = strpos( $line, 'SQL SECURITY' );
+		$line_fixed_definer  = substr( $line, 0, 9 );
+		if ( strpos( $line, '@`%`' ) ) {
+			$line_fixed_definer .= 'DEFINER=`' . DB_USER . '`@`%` ';
+		} else {
+			$line_fixed_definer .= 'DEFINER=`' . DB_USER . '`@`' . DB_HOST . '` ';
+		}
+
+		if ( strpos( $line, 'SQL SECURITY' ) ) {
+			$line_fixed_definer .= subStr( $line, $sql_security_offset );
+		} else {
+			$line_fixed_definer .= '*/';
+		}
+
+		return $line_fixed_definer;
 	}
 }
