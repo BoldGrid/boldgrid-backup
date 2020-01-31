@@ -39,7 +39,8 @@ class Test_Factory extends WP_UnitTestCase {
 		// This will add the backup id to the database.
 		$archive = Boldgrid\Backup\Archive\Factory::get_by_filename( basename( $latest_backup['filepath'] ) );
 
-		$archive = Boldgrid\Backup\Archive\Factory::get_by_id( 0 );
+		// We should only have 1 backup, so the id is 1.
+		$archive = Boldgrid\Backup\Archive\Factory::get_by_id( 1 );
 		$this->assertEquals( $archive->filepath, $latest_backup['filepath'] );
 	}
 }

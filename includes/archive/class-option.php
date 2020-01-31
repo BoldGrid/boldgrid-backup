@@ -75,12 +75,12 @@ class Option {
 	 * @return int
 	 */
 	public function get_next_id() {
-		$next_id = 0;
+		$next_id = 1;
 
 		$backups = $this->get_all();
 
 		foreach ( $backups as $backup ) {
-			$id = isset( $backup['id'] ) ? $backup['id'] : 0;
+			$id = isset( $backup['id'] ) ? $backup['id'] : 1;
 
 			$next_id = $id >= $next_id ? ( $id + 1 ) : $next_id;
 		}

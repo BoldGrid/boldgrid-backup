@@ -117,7 +117,8 @@ class Test_Boldgrid_Backup_Admin_Archive extends WP_UnitTestCase {
 		// The factory will call set_id().
 		$archive = Boldgrid\Backup\Archive\Factory::get_by_filename( basename( $latest_backup['filepath'] ) );
 
-		$this->assertEquals( 0, $archive->get_id() );
+		// We should only have 1 backup. Its id should be 1.
+		$this->assertEquals( 1, $archive->get_id() );
 		$this->assertEquals( 0, $archive->get_key() );
 	}
 }

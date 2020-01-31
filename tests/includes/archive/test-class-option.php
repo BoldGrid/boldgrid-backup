@@ -46,13 +46,14 @@ class Test_Option extends WP_UnitTestCase {
 
 		delete_option( 'boldgrid_backup_backups' );
 
-		$this->assertEquals( 0, $option->get_next_id() );
+		// When we have no backups, the first id of the next backup will be 1.
+		$this->assertEquals( 1, $option->get_next_id() );
 
 		// Make sure we have a backup and it's been added to the boldgrid_backup_backups option.
 		$latest_backup = $this->get_latest_backup();
 		$archive       = Boldgrid\Backup\Archive\Factory::get_by_filename( basename( $latest_backup['filepath'] ) );
 
-		$this->assertEquals( 1, $option->get_next_id() );
+		$this->assertEquals( 2, $option->get_next_id() );
 	}
 
 	/**
