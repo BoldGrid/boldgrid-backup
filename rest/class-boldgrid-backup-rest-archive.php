@@ -174,6 +174,7 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 		$task = new Boldgrid_Backup_Admin_Task();
 		$task->init( [ 'type' => 'backup' ] );
 		$task->update();
+		$task->date_format = 'c';
 
 		// Trigger our backup.
 		$nopriv = new Boldgrid_Backup_Admin_Nopriv();
@@ -240,6 +241,7 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 		// Initialize a new task.
 		$task = new Boldgrid_Backup_Admin_Task();
 		$task->init( [ 'type' => 'restore' ] );
+		$task->date_format = 'c';
 
 		if ( ! empty( $url ) || ! empty( $id ) ) {
 			// Update our task with either url or backup id.
