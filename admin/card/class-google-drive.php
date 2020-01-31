@@ -36,8 +36,12 @@ class Google_Drive extends \Boldgrid\Library\Library\Ui\Card {
 
 		$this->footer = '
 			<p>' .
-			esc_html__( 'Automatically store backups on Google Drive.', 'boldgrid-backup' ) .
-			'</p>
+			esc_html__(
+				'Keep your backup archives safe and secure with remote, automated backups to Google Drive.',
+			'boldgrid-backup' ) .
+			'</p>';
+
+		$this->links = '
 			<p style="text-align:right;">
 				<a href="#">' .
 				esc_html__( 'Setup Guide' ) . '

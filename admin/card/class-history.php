@@ -36,10 +36,14 @@ class History extends \Boldgrid\Library\Library\Ui\Card {
 
 		$this->footer = '
 			<p>' .
-			esc_html__( 'See detailed history of all updates.', 'boldgrid-backup' ) .
-			'</p>
+			esc_html__(
+				'Search for all files modified within a certain time period.You can also look for other versions of that file within your backups.',
+			'boldgrid-backup' ) .
+			'</p>';
+
+		$this->links = '
 			<p style="text-align:right;">
-				<a href="https://www.boldgrid.com/support/total-upkeep-backup-plugin-product-guide/how-to-use-the-history-in-boldgrid-backup-premium/">' .
+				<a href="#">' .
 				esc_html__( 'Setup Guide' ) . '
 				</a>
 			</p>';

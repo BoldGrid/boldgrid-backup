@@ -36,8 +36,12 @@ class Plugin_Editor_Tools extends \Boldgrid\Library\Library\Ui\Card {
 
 		$this->footer = '
 			<p>' .
-			esc_html__( 'All the tools you would ever need to edit your plugins ( or ours ).', 'boldgrid-backup' ) .
-			'</p>
+			esc_html__(
+				'When using the WordPress Plugin Editor, Total Upkeep Premium will save a copy of the file in case you need to undo any changes.',
+			'boldgrid-backup' ) .
+			'</p>';
+
+		$this->links = '
 			<p style="text-align:right;">
 				<a href="#">' .
 				esc_html__( 'Setup Guide' ) . '

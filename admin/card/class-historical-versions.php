@@ -36,8 +36,12 @@ class Historical_Versions extends \Boldgrid\Library\Library\Ui\Card {
 
 		$this->footer = '
 			<p>' .
-			esc_html__( 'Somehow this is different than update history?', 'boldgrid-backup' ) .
-			'</p>
+			esc_html__(
+				'Search through all backup archives for a particular, individual file and restore it.',
+			'boldgrid-backup' ) .
+			'</p>';
+
+		$this->links = '
 			<p style="text-align:right;">
 				<a href="#">' .
 				esc_html__( 'Setup Guide' ) . '

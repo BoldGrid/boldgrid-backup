@@ -34,8 +34,12 @@ class Dream_Objects extends \Boldgrid\Library\Library\Ui\Card {
 
 		$this->footer = '
 			<p>' .
-			esc_html__( 'Do whatever it does that being part of DreamObjects is?', 'boldgrid-backup' ) .
-			'</p>
+			esc_html__(
+				'Safely store backups in the cloud via DreamObjects by DreamHost. Compatible with automated backups feature.',
+			'boldgrid-backup' ) .
+			'</p>';
+
+		$this->links = '
 			<p style="text-align:right;">
 				<a href="#">' .
 				esc_html__( 'Setup Guide' ) . '

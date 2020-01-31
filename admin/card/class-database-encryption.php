@@ -33,8 +33,12 @@ class Database_Encryption extends \Boldgrid\Library\Library\Ui\Card {
 
 		$this->footer = '
 			<p>' .
-			esc_html__( 'Provide higher security for confidential database.', 'boldgrid-backup' ) .
-			'</p>
+			esc_html__(
+				'Provides another level of protection by preventing unauthorized access to your database backup archives.',
+			'boldgrid-backup' ) .
+			'</p>';
+
+		$this->links = '
 			<p style="text-align:right;">
 				<a href="#">' .
 				esc_html__( 'Setup Guide' ) . '

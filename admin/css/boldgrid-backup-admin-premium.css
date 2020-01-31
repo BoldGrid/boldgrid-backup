@@ -71,11 +71,36 @@
  */
 
 /* The get premium button in the top notice. */
+.bglib-card {
+	display: flex;
+	flex-direction: column;
+}
+
+.bglib-card-icon {
+	height: 60px;
+}
+
 .bg-box-bottom.premium .button-success {
 	float: none;
+}
+
+.bglib-card-footer {
+	flex-grow: 10;
+}
+
+.bglib-card-links {
+	flex-grow: 1;
+}
+
+.bglib-card-links a {
+	margin: 1em;
 }
 
 .bg-box-title {
 	font-size: 1.25em;
 	font-weight: 600;
+}
+
+.bglib-card-title {
+	height: 2em;
 }

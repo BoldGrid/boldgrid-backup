@@ -36,8 +36,12 @@ class One_Click_Restoration extends \Boldgrid\Library\Library\Ui\Card {
 
 		$this->footer = '
 			<p>' .
-			esc_html__( 'Restore Backup files quickly and easily.', 'boldgrid-backup' ) .
-			'</p>
+			esc_html__(
+				'Restore a single file within the backup browser. Helpful when modifying individual files.',
+			'boldgrid-backup' ) .
+			'</p>';
+
+		$this->links = '
 			<p style="text-align:right;">
 				<a href="#">' .
 				esc_html__( 'Setup Guide' ) . '

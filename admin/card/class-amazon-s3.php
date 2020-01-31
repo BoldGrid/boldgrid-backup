@@ -33,11 +33,15 @@ class Amazon_S3 extends \Boldgrid\Library\Library\Ui\Card {
 
 		$this->footer = '
 			<p>' .
-				esc_html__( 'Automatically store backups on Amazon S3 Storage.', 'boldgrid-backup' ) .
-			'</p>
+				esc_html__(
+					'Safely store backups in the cloud via Amazon S3. Compatible with automated remote backups feature.',
+				'boldgrid-backup' ) .
+			'</p>';
+
+		$this->links = '
 			<p style="text-align:right;">
-				<a href="https://www.boldgrid.com/support/total-upkeep-backup-plugin-product-guide/how-do-i-upload-my-wordpress-backup-to-amazon-s3/">' .
-					esc_html__( 'Setup Guide' ) . '
+				<a href="#">' .
+				esc_html__( 'Setup Guide' ) . '
 				</a>
 			</p>';
 
