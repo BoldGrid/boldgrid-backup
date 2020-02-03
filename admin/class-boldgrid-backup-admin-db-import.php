@@ -59,13 +59,24 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 */
 	public function import( $file ) {
 
-		$lines = $this->fix_view_statements( $file );
+		$lines = file( $file );
 
 		if ( false === $lines ) {
 			return array(
 				'error' => sprintf(
 					// translators: 1: File path.
 					__( 'Unable to open mysqldump, %1$s.', 'boldgrid-backup' ),
+					$file
+				),
+			);
+		}
+
+		$lines = $this->fix_view_statements( $lines );
+
+		if ( false === $lines ) {
+			return array(
+				'error' => sprintf(
+					__( 'MySQL Database User does not have necessary priviliges to restore this database.', 'boldgrid-backup' ),
 					$file
 				),
 			);
@@ -167,6 +178,8 @@ class Boldgrid_Backup_Admin_Db_Import {
 	public function import_string( $string ) {
 		$lines = preg_split( "/\\r\\n|\\r|\\n/", $string );
 
+		$lines = $this->fix_view_statements( $lines );
+
 		$success = $this->import_lines( $lines );
 
 		return $success;
@@ -183,8 +196,8 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * @param string $file db dump filename.
 	 * @return array an array of lines from db file.
 	 */
-	public function fix_view_statements( $file ) {
-		$lines = file( $file );
+	public function fix_view_statements( $lines ) {
+		global $wpdb;
 
 		$has_drop_view_if_exists = false;
 
@@ -196,6 +209,28 @@ class Boldgrid_Backup_Admin_Db_Import {
 
 		if ( false === $has_drop_view_if_exists ) {
 			return $lines;
+		}
+
+		$db           = new PDO( sprintf( 'mysql:host=%1$s;dbname=%2$s;', DB_HOST, DB_NAME ), DB_USER, DB_PASSWORD );
+		$db_statement = $db->query( 'SHOW GRANTS' );
+		$db_result    = $db_statement->fetchAll();
+
+		$has_privileges = 0;
+
+		foreach ( $db_result as $result_line ) {
+			$has_grants_for_this_db   = strpos( $result_line[0], '`' . DB_NAME . '`.*' );
+			$has_grant_all_privileges = strpos( $result_line[0], 'GRANT ALL PRIVILEGES' );
+			$has_show_views_grant     = strpos( $result_line[0], 'SHOW VIEW' );
+			$has_create_views_grant   = strpos( $result_line[0], 'CREATE VIEW' );
+			if ( false !== $has_grants_for_this_db && false !== $has_grant_all_privileges ) {
+				$has_privileges++;
+			} elseif ( false !== $has_grants_for_this_db && false !== $has_show_views_grant && false !== $has_create_views_grant ) {
+				$has_privileges++;
+			}
+		}
+
+		if ( ! $has_privileges ) {
+			return false;
 		}
 
 		$fixed_lines = [];
