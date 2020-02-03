@@ -85,7 +85,7 @@ return [
 	// The time, in seconds, that log files are kept for.
 	'max_log_age'          => 30 * DAY_IN_SECONDS,
 
-	/**
+	/*
 	 * Plugin_notices is used to add "unread" notice counts to various
 	 * UI locations within boldgrid plugin. This config is used by
 	 * Boldgrid\Library\Library\NoticeCounts
