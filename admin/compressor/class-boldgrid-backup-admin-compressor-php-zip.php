@@ -56,6 +56,15 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 	public $zip;
 
 	/**
+	 * Key.
+	 *
+	 * @since SINCEVERSION
+	 * @access protected
+	 * @var string
+	 */
+	protected $key = 'php_zip';
+
+	/**
 	 * Add a file's directories to the zip.
 	 *
 	 * When you add a file, the parent directories are not always explicitly
@@ -277,7 +286,7 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 	 *
 	 * @since 1.5.2
 	 */
-	public static function is_available() {
+	public static function is_extension_available() {
 		return extension_loaded( 'zip' ) && class_exists( 'ZipArchive' );
 	}
 

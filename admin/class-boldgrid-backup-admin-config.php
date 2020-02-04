@@ -431,7 +431,7 @@ class Boldgrid_Backup_Admin_Config {
 		$this->available_compressors = array();
 
 		// PHP zip (ZipArchive).
-		if ( Boldgrid_Backup_Admin_Compressor_Php_Zip::is_available() ) {
+		if ( Boldgrid_Backup_Admin_Compressor_Php_Zip::is_extension_available() ) {
 			$this->add_compressor( 'php_zip' );
 		}
 

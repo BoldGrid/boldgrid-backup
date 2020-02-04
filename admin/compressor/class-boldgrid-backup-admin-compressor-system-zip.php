@@ -55,6 +55,15 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	private $filepath;
 
 	/**
+	 * Key.
+	 *
+	 * @since SINCEVERSION
+	 * @access protected
+	 * @var string
+	 */
+	protected $key = 'system_zip';
+
+	/**
 	 * Archive files.
 	 *
 	 * @since 1.5.1

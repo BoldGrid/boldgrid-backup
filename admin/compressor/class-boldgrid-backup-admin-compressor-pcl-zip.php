@@ -48,6 +48,15 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 	public $test_errors = array();
 
 	/**
+	 * Key.
+	 *
+	 * @since SINCEVERSION
+	 * @access proteced
+	 * @var string
+	 */
+	protected $key = 'pcl_zip';
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.5.1

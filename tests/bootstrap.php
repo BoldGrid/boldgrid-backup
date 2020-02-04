@@ -81,19 +81,25 @@ $files = array(
 	'/admin/class-boldgrid-backup-admin-compressor.php',
 	'/admin/class-boldgrid-backup-admin-log.php',
 	'/admin/class-boldgrid-backup-admin-log-page.php',
+	// Compressors.
 	'/admin/compressor/class-boldgrid-backup-admin-compressor-php-zip.php',
 	'/admin/compressor/class-boldgrid-backup-admin-compressor-pcl-zip.php',
+	'/admin/compressor/class-boldgrid-backup-admin-compressor-system-zip.php',
+	'/admin/compressor/class-boldgrid-backup-admin-compressor-system-zip-test.php',
 	'/admin/cron/class-crontab.php',
 	'/includes/class-boldgrid-backup-authentication.php',
 	'/includes/class-boldgrid-backup-download.php',
 	'/includes/class-boldgrid-backup-file.php',
 	'/admin/storage/class-boldgrid-backup-admin-storage-local.php',
+	// Remote storage providers.
 	'/admin/remote/class-boldgrid-backup-admin-ftp.php',
 	'/admin/remote/class-boldgrid-backup-admin-ftp-hooks.php',
 	'/admin/remote/class-boldgrid-backup-admin-ftp-page.php',
 	'/admin/remote/class-boldgrid-backup-admin-remote-settings.php',
+	// Vendor.
 	'/vendor/phpseclib/phpseclib/phpseclib/Net/SSH2.php',
 	'/vendor/ifsnop/mysqldump-php/src/Ifsnop/Mysqldump/Mysqldump.php',
+	// Cli.
 	'/cli/class-info.php',
 	'/cli/class-log.php',
 	'/cli/class-email.php',

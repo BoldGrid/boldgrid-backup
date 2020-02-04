@@ -1684,9 +1684,6 @@ class Boldgrid_Backup_Admin_Core {
 
 		Boldgrid_Backup_Admin_In_Progress_Data::set_args( [ 'total_files_todo' => count( $filelist ) ] );
 
-		// tmp
-		$info['compressor'] = 'system_zip';
-
 		$this->logger->add( 'Starting archiving of files. Chosen compressor: ' . $info['compressor'] );
 		$this->logger->add_memory();
 
