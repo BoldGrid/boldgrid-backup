@@ -197,7 +197,6 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * @return array an array of lines from db file.
 	 */
 	public function fix_view_statements( $lines ) {
-		global $wpdb;
 
 		$has_drop_view_if_exists = false;
 
@@ -211,25 +210,9 @@ class Boldgrid_Backup_Admin_Db_Import {
 			return $lines;
 		}
 
-		$db           = new PDO( sprintf( 'mysql:host=%1$s;dbname=%2$s;', DB_HOST, DB_NAME ), DB_USER, DB_PASSWORD );
-		$db_statement = $db->query( 'SHOW GRANTS' );
-		$db_result    = $db_statement->fetchAll();
+		$user_has_privileges = $this->has_db_privileges( [ 'SHOW VIEW', 'CREATE VIEW' ] );
 
-		$has_privileges = 0;
-
-		foreach ( $db_result as $result_line ) {
-			$has_grants_for_this_db   = strpos( $result_line[0], '`' . DB_NAME . '`.*' );
-			$has_grant_all_privileges = strpos( $result_line[0], 'GRANT ALL PRIVILEGES' );
-			$has_show_views_grant     = strpos( $result_line[0], 'SHOW VIEW' );
-			$has_create_views_grant   = strpos( $result_line[0], 'CREATE VIEW' );
-			if ( false !== $has_grants_for_this_db && false !== $has_grant_all_privileges ) {
-				$has_privileges++;
-			} elseif ( false !== $has_grants_for_this_db && false !== $has_show_views_grant && false !== $has_create_views_grant ) {
-				$has_privileges++;
-			}
-		}
-
-		if ( ! $has_privileges ) {
+		if ( false === $user_has_privileges ) {
 			return false;
 		}
 
@@ -273,5 +256,69 @@ class Boldgrid_Backup_Admin_Db_Import {
 		}
 
 		return $line_fixed_definer;
+	}
+
+	/**
+	 * Tests if database user has specific privileges
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param array $privileges An array of permissions to check against.
+	 * @return bool True if user has specified privileges.
+	 */
+	public function has_db_privileges( array $privileges ) {
+		$user_grants = $this->get_db_privileges();
+		if ( in_array( 'ALL', $user_grants, true ) ) {
+			return true;
+		}
+		if ( count( $privileges ) === count( array_intersect( $privileges, $user_grants ) ) ) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Get database user privileges
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @global wpdb $wpdb The WordPress database class object.
+	 *
+	 * @return array An array of database user privileges.
+	 */
+	public function get_db_privileges() {
+		$db_grant_string = 'ON `' . DB_NAME . '`';
+
+		$db           = new PDO( sprintf( 'mysql:host=%1$s;dbname=%2$s;', DB_HOST, DB_NAME ), DB_USER, DB_PASSWORD );
+		$db_statement = $db->query( 'SHOW GRANTS' );
+		$results      = $db_statement->fetchAll();
+
+		foreach ( $results as $result ) {
+			if ( false !== strpos( $result[0], $db_grant_string ) && false !== strpos( $result[0], 'GRANT ALL PRIVILEGES' ) ) {
+				return [ 'ALL' ];
+			}
+			if ( false !== strpos( $result[0], $db_grant_string ) && false === strpos( $result[0], 'GRANT ALL PRIVILEGES' ) ) {
+				return $this->get_grants_array( $result[0] );
+			}
+		}
+	}
+
+	/**
+	 * Get a user's grants in the form of an array
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param string $grants_string.
+	 * @return array An array of grants.
+	 */
+	public function get_grants_array( $grants_string ) {
+		if ( strpos( $grants_string, 'GRANT' ) === 0 ) {
+			$grants_string = substr( $grants_string, 6 );
+		}
+		if ( strpos( $grants_string, 'ON' ) ) {
+			$grants_string = substr( $grants_string, 0, strpos( $grants_string, ' ON ' ) );
+		}
+
+		return explode( ', ', $grants_string );
 	}
 }

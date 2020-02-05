@@ -1201,7 +1201,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Import the dump file.
-		$importer = new Boldgrid_Backup_Admin_Db_Import();
+		$importer = new Boldgrid_Backup_Admin_Db_Import( $this );
 		$status   = $importer->import( $db_dump_filepath );
 
 		if ( ! empty( $status['error'] ) ) {
