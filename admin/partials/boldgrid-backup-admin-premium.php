@@ -5,7 +5,7 @@
  * This file is used to markup premium cards page.
  *
  * @link https://www.boldgrid.com
- * @since SINCEVERSION
+ * @since 1.13.0
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin/partials

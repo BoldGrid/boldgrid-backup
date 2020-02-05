@@ -79,7 +79,7 @@ class Boldgrid_Backup_Admin_Core {
 	/**
 	 * Plugin class.
 	 *
-	 * @since  SINCEVERSION
+	 * @since  1.13.0
 	 * @var    Boldgrid\Library\Library\Plugin\Plugin
 	 */
 	public $plugin;

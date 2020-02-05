@@ -3,7 +3,7 @@
  * Database_Encryption class.
  *
  * @link       https://www.boldgrid.com
- * @since      SINCEVERSION
+ * @since      1.13.0
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Card
@@ -16,13 +16,13 @@ namespace Boldgrid\Backup\Admin\Card\Feature;
 /**
  * Class: Database_Encryption
  *
- * @since SINCEVERSION
+ * @since 1.13.0
  */
 class Database_Encryption extends \Boldgrid\Library\Library\Ui\Feature {
 	/**
 	 * Init.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 */
 	public function init() {
 		$core = apply_filters( 'boldgrid_backup_get_core', null );

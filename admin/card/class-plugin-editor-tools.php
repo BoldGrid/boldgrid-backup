@@ -3,7 +3,7 @@
  * PluginEditorTools class.
  *
  * @link       https://www.boldgrid.com
- * @since      SINCEVERSION
+ * @since      1.13.0
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Card
@@ -19,13 +19,13 @@ namespace Boldgrid\Backup\Admin\Card;
  * This class is responsible for rendering the "Plugin Editor Tools"
  * card on this plugin's Premium Features Page.
  *
- * @since SINCEVERSION
+ * @since 1.13.0
  */
 class Plugin_Editor_Tools extends \Boldgrid\Library\Library\Ui\Card {
 	/**
 	 * Init.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 */
 	public function init() {
 		$this->id = 'bgbkup_plugin_editor_tools';

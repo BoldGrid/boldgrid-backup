@@ -3,7 +3,7 @@
  * File: class-boldgrid-backup-admin-premium-features.php
  *
  * @link       https://www.boldgrid.com
- * @since      SINCEVERSION
+ * @since      1.13.0
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
@@ -17,14 +17,14 @@ use Boldgrid\Backup\Admin\Card;
 /**
  * Class: Boldgrid_Backup_Admin_Premium_Features
  *
- * @since SINCEVERSION
+ * @since 1.13.0
  */
 class Boldgrid_Backup_Admin_Premium_Features {
 
 	/**
 	 * The core class object.
 	 *
-	 * @since  SINCEVERSION
+	 * @since  1.13.0
 	 * @var    Boldgrid_Backup_Admin_Core
 	 */
 	public $core;
@@ -32,7 +32,7 @@ class Boldgrid_Backup_Admin_Premium_Features {
 	/**
 	 * The page's Boldgrid\Library\Library\Plugin\Page Object.
 	 *
-	 * @since  SINCEVERSION
+	 * @since  1.13.0
 	 * @access private
 	 * @var    Boldgrid\Library\Library\Plugin\Page
 	 */
@@ -41,7 +41,7 @@ class Boldgrid_Backup_Admin_Premium_Features {
 	/**
 	 * Constructor.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 *
 	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
 	 */
@@ -52,7 +52,7 @@ class Boldgrid_Backup_Admin_Premium_Features {
 	/**
 	 * Enqueue scripts.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 *
 	 * @param string $hook Hook name.
 	 */
@@ -69,7 +69,7 @@ class Boldgrid_Backup_Admin_Premium_Features {
 	/**
 	 * Get cards needed for the dashboard.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 *
 	 * @return array
 	 */
@@ -97,7 +97,7 @@ class Boldgrid_Backup_Admin_Premium_Features {
 	/**
 	 * Render the dashboard page.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 */
 	public function page() {
 		wp_enqueue_style( 'bglib-ui-css' );
