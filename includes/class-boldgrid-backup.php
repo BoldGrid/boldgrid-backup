@@ -166,6 +166,7 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/compressor/class-boldgrid-backup-admin-compressor-pcl-zip.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/compressor/class-boldgrid-backup-admin-compressor-system-zip.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/compressor/class-boldgrid-backup-admin-compressor-system-zip-test.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/compressor/class-boldgrid-backup-admin-compressor-system-zip-temp-folder.php';
 
 		require_once BOLDGRID_BACKUP_PATH . '/vendor/ifsnop/mysqldump-php/src/Ifsnop/Mysqldump/Mysqldump.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-db-dump.php';
@@ -207,6 +208,7 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-in-progress.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-in-progress-data.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-in-progress-tmp.php';
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/remote/class-boldgrid-backup-admin-ftp.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/remote/class-boldgrid-backup-admin-ftp-hooks.php';

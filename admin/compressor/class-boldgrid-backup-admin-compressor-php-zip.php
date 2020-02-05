@@ -120,8 +120,6 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 	 * }
 	 */
 	public function archive_files( $filelist, &$info ) {
-		$info['filepath'] = $this->core->generate_archive_path( 'zip' );
-
 		// Init vars used for our "in progress" bar.
 		$number_files_archived = 0;
 		$total_size_archived   = 0;

@@ -55,6 +55,15 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	private $filepath;
 
 	/**
+	 * The temporary folder used when saving a zip file.
+	 *
+	 * @since SINCEVERSION
+	 * @access private
+	 * @var Boldgrid_Backup_Admin_Compressor_System_Zip_Temp_Folder
+	 */
+	private $temp_folder;
+
+	/**
 	 * Key.
 	 *
 	 * @since SINCEVERSION
@@ -62,6 +71,18 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	 * @var string
 	 */
 	protected $key = 'system_zip';
+
+	/**
+	 * Constructor.
+	 *
+	 * @since SINCEVERSION
+	 */
+	public function __construct() {
+		$core = apply_filters( 'boldgrid_backup_get_core', null );
+		parent::__construct( $core );
+
+		$this->temp_folder = new Boldgrid_Backup_Admin_Compressor_System_Zip_Temp_Folder();
+	}
 
 	/**
 	 * Archive files.
@@ -100,15 +121,17 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 
 		$this->filelist = $filelist;
 
-		// Set the filepath to the .zip file.
-		$this->filepath   = $this->core->generate_archive_path( 'zip' );
-		$info['filepath'] = $this->filepath;
+		$this->filepath = $info['filepath'];
 
 		$this->filelist_create();
+
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'step', 3 );
 
 		$this->zip();
 
 		$this->zip_sql();
+
+		Boldgrid_Backup_Admin_In_Progress_Data::delete_arg( 'step' );
 
 		// Actions to take when we're all done / cleanup.
 		$this->core->wp_filesystem->delete( $this->filelist_path );
@@ -125,13 +148,24 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 		$this->core->logger->add( 'Starting to create list of files to include in zip.' );
 		$this->core->logger->add_memory();
 
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'step', 2 );
+
 		$this->filelist_path = $this->core->backup_dir->get_path_to( 'system_zip_filelist-' . time() . '.txt' );
+
+		$total_size_archived = 0;
 
 		// Create the file list.
 		$filelist_array = [];
 		foreach ( $this->filelist as $file ) {
 			$filelist_array[] = str_replace( ABSPATH, '', $file[0] );
+
+			$total_size_archived += empty( $file[2] ) ? 0 : $file[2];
 		}
+
+		// Add some values for "In progress".
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'total_files_done', count( $this->filelist ) );
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'total_size_archived', $total_size_archived );
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'total_size_archived_size_format', size_format( $total_size_archived, 2 ) );
 
 		/*
 		 * Remove our db_dump_filepath from the list.
@@ -162,7 +196,11 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 		$this->core->logger->add( 'Starting to close the zip file.' );
 		$this->core->logger->add_memory();
 
-		$this->core->execute_command( 'cd ' . ABSPATH . '; zip ' . $this->filepath . ' -@ < ' . $this->filelist_path );
+		$this->temp_folder->create();
+
+		$this->core->execute_command( 'cd ' . ABSPATH . '; zip -b ' . $this->temp_folder->get_path() . ' ' . $this->filepath . ' -@ < ' . $this->filelist_path );
+
+		$this->temp_folder->delete();
 
 		$this->core->logger->add( 'Finished closing the zip file.' );
 		$this->core->logger->add_memory();
