@@ -296,7 +296,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip_Test {
 
 		$this->core->test->delete_test_files( $this->core->backup_dir->get() );
 
-		set_transient( $transient_key, $pass );
+		set_transient( $transient_key, $pass, 24 * HOUR_IN_SECONDS );
 
 		return ! empty( $pass );
 	}
