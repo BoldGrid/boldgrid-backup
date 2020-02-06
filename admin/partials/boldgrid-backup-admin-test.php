@@ -453,6 +453,7 @@ $table .= '</table>';
 	echo $fail_tips; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
 	echo $table; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+
 	?>
 
 </div>

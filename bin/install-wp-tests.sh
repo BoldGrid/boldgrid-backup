@@ -43,6 +43,7 @@ install_test_suite() {
 	# set up testing suite
 	mkdir -p $WP_TESTS_DIR
 	cd $WP_TESTS_DIR
+
 	# phpunit tests temporarily changed from "trunk" to "5.2". They should be reverted after a resolution
 	# is found here: https://core.trac.wordpress.org/ticket/49377#ticket
 	svn co --quiet https://develop.svn.wordpress.org/branches/5.2/tests/phpunit/includes/
