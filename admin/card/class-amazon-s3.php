@@ -41,11 +41,9 @@ class Amazon_S3 extends \Boldgrid\Library\Library\Ui\Card {
 		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/backup-wordpress-to-amazon-s3/' );
 
 		$this->links = '
-			<p style="text-align:right;">
-				<a target="_blank" href="' . $url . '">' .
+			<a target="_blank" href="' . $url . '">' .
 				esc_html__( 'Setup Guide' ) . '
-				</a>
-			</p>';
+			</a>;
 
 		$this->icon = '<img src="' . plugin_dir_url( __FILE__ ) . '../image/remote/amazon-s3-logo.png"></img>';
 	}

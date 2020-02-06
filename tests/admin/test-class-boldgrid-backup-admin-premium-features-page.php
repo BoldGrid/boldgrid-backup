@@ -50,15 +50,12 @@ class Test_Boldgrid_Backup_Admin_Premium_Features_Page extends WP_UnitTestCase {
 			require_once BOLDGRID_BACKUP_PATH . $card;
 		}
 
-		$this->core         = apply_filters( 'boldgrid_backup_get_core', null );
-		$this->premium_page = $this->core->premium_page;
+		$this->core         = new \Boldgrid_Backup_Admin_Core();
+		$this->premium_page = new \Boldgrid_Backup_Admin_Premium_Features( $this->core );
 	}
 
 	public function test_get_cards() {
 		$cards = $this->premium_page->get_cards();
-		$this->assertEquals( count( $cards ), count( $this->card_files ) );
-		$this->premium_page->core->plugin = null;
-		$cards                            = $this->premium_page->get_cards();
 		$this->assertEquals( count( $cards ), count( $this->card_files ) );
 		$this->premium_page->core->plugin = new \Boldgrid\Library\Library\Plugin\Plugin( 'boldgrid-backup', $this->core->configs );
 	}

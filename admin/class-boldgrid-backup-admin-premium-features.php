@@ -74,11 +74,8 @@ class Boldgrid_Backup_Admin_Premium_Features {
 	 * @return array
 	 */
 	public function get_cards() {
-		if ( $this->core->plugin ) {
-			$plugin = $this->core->plugin;
-		} else {
-			$plugin = new \Boldgrid\Library\Library\Plugin\Plugin( 'boldgrid-backup', $this->core->configs );
-		}
+		$plugin = $this->core->plugin;
+
 		$this->page = $plugin->getPageBySlug( 'boldgrid-backup-premium-features' );
 		$cards      = [
 			new Card\Database_Encryption( $this->page ),
@@ -98,6 +95,8 @@ class Boldgrid_Backup_Admin_Premium_Features {
 	 * Render the dashboard page.
 	 *
 	 * @since 1.13.0
+	 *
+	 * @return array returns an array of the $nav, $dashboard, and $premium_box for validation.
 	 */
 	public function page() {
 		wp_enqueue_style( 'bglib-ui-css' );

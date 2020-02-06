@@ -41,11 +41,9 @@ class Database_Encryption extends \Boldgrid\Library\Library\Ui\Card {
 		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/encrypt-database-backups/' );
 
 		$this->links = '
-			<p style="text-align:right;">
-				<a target="_blank" href="' . $url . '">' .
-				esc_html__( 'Setup Guide' ) . '
-				</a>
-			</p>';
+			<a target="_blank" href="' . $url . '">' .
+			esc_html__( 'Setup Guide' ) . '
+			</a>';
 
 		$this->icon = '<img src="' . plugin_dir_url( __FILE__ ) . '../image/db-lock-64.png" />';
 	}

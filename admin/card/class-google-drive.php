@@ -44,10 +44,8 @@ class Google_Drive extends \Boldgrid\Library\Library\Ui\Card {
 		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/auto-backup-to-google-drive/' );
 
 		$this->links = '
-			<p style="text-align:right;">
-				<a target="_blank" href=" ' . $url . '">' .
-				esc_html__( 'Setup Guide' ) . '
-				</a>
-			</p>';
+			<a target="_blank" href=" ' . $url . '">' .
+			esc_html__( 'Setup Guide' ) . '
+			</a>';
 	}
 }

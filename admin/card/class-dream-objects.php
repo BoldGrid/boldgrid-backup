@@ -42,14 +42,10 @@ class Dream_Objects extends \Boldgrid\Library\Library\Ui\Card {
 		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/dreamobjects-storage/' );
 
 		$this->links = '
-			<p style="text-align:right;">
-				<a target="_blank" href="' . $url . '">' .
-				esc_html__( 'Setup Guide' ) . '
-				</a>
-			</p>';
+			<a target="_blank" href="' . $url . '">' .
+			esc_html__( 'Setup Guide' ) . '
+			</a>';
 
 		$this->icon = '<img src="' . plugin_dir_url( __FILE__ ) . '../image/remote/dreamhost-logo.png"></img>';
-
-		$this->features = [];
 	}
 }
