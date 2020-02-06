@@ -465,7 +465,8 @@ class Boldgrid_Backup_Admin_Config {
 		}
 
 		// System zip.
-		if ( $this->core->execute_command( '/usr/bin/zip -v ' ) ) {
+		$system_zip_test = new Boldgrid_Backup_Admin_Compressor_System_Zip_Test( $this->core );
+		if ( $system_zip_test->run() ) {
 			$this->add_compressor( 'system_zip' );
 		}
 

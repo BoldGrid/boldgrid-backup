@@ -280,7 +280,10 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip_Test {
 		$this->core->test->delete_test_files( $this->core->backup_dir->get() );
 
 		// This is the beef of the test, where we actually test things.
-		if ( ! $this->test_dir_create() ) {
+		if ( ! $this->core->execute_command( '/usr/bin/zip -v ' ) ) {
+			$this->error = __( '/usr/bin/zip is not available.', 'boldgrid-backup' );
+			$pass        = 0;
+		} elseif ( ! $this->test_dir_create() ) {
 			// Create our test directory.
 			$pass = 0;
 		} elseif ( ! $this->test_dir_zip() ) {
