@@ -612,6 +612,8 @@ class Boldgrid_Backup_Admin_Settings {
 			/*
 			 * Save extractor settings.
 			 *
+			 * At this time, the extractor cannot be selected within the settings.
+			 *
 			 * @since 1.5.1
 			 */
 			if ( ! empty( $_POST['extractor'] ) ) {

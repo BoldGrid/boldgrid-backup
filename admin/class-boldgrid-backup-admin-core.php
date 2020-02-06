@@ -1719,10 +1719,19 @@ class Boldgrid_Backup_Admin_Core {
 		 */
 		$info = apply_filters( 'boldgrid_backup_pre_archive_info', $info );
 
-		Boldgrid_Backup_Admin_In_Progress_Data::set_args( [ 'total_files_todo' => count( $filelist ) ] );
-
 		$this->logger->add( 'Starting archiving of files. Chosen compressor: ' . $info['compressor'] );
 		$this->logger->add_memory();
+
+		// Determine the path to our zip file.
+		$info['filepath'] = $this->generate_archive_path( 'zip' );
+
+		Boldgrid_Backup_Admin_In_Progress_Data::set_args(
+			[
+				'total_files_todo' => count( $filelist ),
+				'filepath'         => $info['filepath'],
+				'compressor'       => $info['compressor'],
+			]
+		);
 
 		/*
 		 * Use the chosen compressor to build an archive.
@@ -1754,8 +1763,8 @@ class Boldgrid_Backup_Admin_Core {
 				$info['filepath'] = $this->generate_archive_path( 'tar.gz' );
 				break;
 			case 'system_zip':
-				// Generate a new archive file path.
-				$info['filepath'] = $this->generate_archive_path( 'zip' );
+				$compressor = new Boldgrid_Backup_Admin_Compressor_System_Zip( $this );
+				$status     = $compressor->archive_files( $filelist, $info );
 				break;
 			default:
 				$status = [ 'error' => 'No available compressor' ];

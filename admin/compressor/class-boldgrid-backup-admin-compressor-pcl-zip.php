@@ -48,6 +48,15 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 	public $test_errors = array();
 
 	/**
+	 * Key.
+	 *
+	 * @since SINCEVERSION
+	 * @access proteced
+	 * @var string
+	 */
+	protected $key = 'pcl_zip';
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.5.1
@@ -159,8 +168,6 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 	 * }
 	 */
 	public function archive_files( $filelist, &$info ) {
-		$info['filepath'] = $this->core->generate_archive_path( 'zip' );
-
 		if ( $info['dryrun'] ) {
 			return true;
 		}
@@ -185,16 +192,22 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 		 * is an array of arrays, so we need to convert to simply an array of
 		 * strings (filenames to archive).
 		 */
-		$new_filelist = array();
-		foreach ( $filelist as $key => $file ) {
-
+		$total_size_archived = 0;
+		$new_filelist        = [];
+		foreach ( $filelist as $file ) {
 			// Don't add the database dump at this time, it will be added later.
 			if ( ! empty( $this->core->db_dump_filepath ) && $file[0] === $this->core->db_dump_filepath ) {
 				continue;
 			}
 
+			$total_size_archived += empty( $file[2] ) ? 0 : $file[2];
+
 			$new_filelist[] = $file[0];
 		}
+
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'step', 3 );
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'total_size_archived', $total_size_archived );
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'total_size_archived_size_format', size_format( $total_size_archived, 2 ) );
 
 		$status = $archive->add(
 			$new_filelist,
@@ -231,6 +244,8 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 				);
 			}
 		}
+
+		Boldgrid_Backup_Admin_In_Progress_Data::delete_arg( 'step' );
 
 		$this->wp_filesystem->chdir( $cwd );
 
