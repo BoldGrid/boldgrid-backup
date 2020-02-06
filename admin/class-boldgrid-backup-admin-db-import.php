@@ -300,7 +300,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 			if ( false !== strpos( $result[0], $db_grant_string ) && false === strpos( $result[0], 'GRANT ALL PRIVILEGES' ) ) {
 				return $this->get_grants_array( $result[0] );
 			} else {
-				print_r( $result[0] );
+				print_r( serialize( ( $result[0] ) ) );
 			}
 		}
 		return $result;
