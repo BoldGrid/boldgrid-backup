@@ -287,21 +287,22 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * @return array An array of database user privileges.
 	 */
 	public function get_db_privileges() {
-		$db_grant_string = 'ON `' . DB_NAME . '`';
-
 		$db           = new PDO( sprintf( 'mysql:host=%1$s;dbname=%2$s;', DB_HOST, DB_NAME ), DB_USER, DB_PASSWORD );
 		$db_statement = $db->query( 'SHOW GRANTS' );
 		$results      = $db_statement->fetchAll();
 
 		foreach ( $results as $result ) {
-			if ( false !== strpos( $result[0], $db_grant_string ) && false !== strpos( $result[0], 'GRANT ALL PRIVILEGES' ) ) {
+			$is_string_db_grant      = ( false !== strpos( $result[0], 'ON `' . DB_NAME . '`' ) );
+			$is_string_all_grant     = ( false !== strpos( $result[0], 'ON *.*' ) );
+			$is_grant_all_privileges = ( false !== strpos( $result[0], 'GRANT ALL PRIVILEGES' ) );
+
+			if ( ( $is_string_db_grant || $is_string_all_grant ) && $is_grant_all_privileges ) {
 				return [ 'ALL' ];
 			}
-			if ( false !== strpos( $result[0], $db_grant_string ) && false === strpos( $result[0], 'GRANT ALL PRIVILEGES' ) ) {
+			if ( ( $is_string_db_grant || $is_string_all_grant ) && false === $is_grant_all_privileges ) {
 				return $this->get_grants_array( $result[0] );
 			}
 		}
-		return $result;
 	}
 
 	/**
