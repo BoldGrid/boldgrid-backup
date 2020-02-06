@@ -273,14 +273,9 @@ $tests[] = array(
 	'v' => ( $this->config->is_compressor_available( 'system_tar' ) ? 'Yes' : 'No' ),
 );
 
-$tests[] = array(
-	'k' => __( 'System ZIP available?', 'boldgrid-backup' ),
-	'v' => ( $this->config->is_compressor_available( 'system_zip' ) ? 'Yes' : 'No' ),
-);
-
 $system_zip_test = new Boldgrid_Backup_Admin_Compressor_System_Zip_Test( $this );
 $tests[]         = array(
-	'k' => __( 'System ZIP working as expected?', 'boldgrid-backup' ),
+	'k' => __( 'System ZIP available?', 'boldgrid-backup' ),
 	'v' => $system_zip_test->run() ?
 		'Yes' :
 		sprintf( $warning_span, $lang['no'], $system_zip_test->get_error() ),
