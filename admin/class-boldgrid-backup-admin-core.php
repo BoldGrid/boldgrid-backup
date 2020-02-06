@@ -77,6 +77,14 @@ class Boldgrid_Backup_Admin_Core {
 	public $configs;
 
 	/**
+	 * Plugin class.
+	 *
+	 * @since  1.13.0
+	 * @var    Boldgrid\Library\Library\Plugin\Plugin
+	 */
+	public $plugin;
+
+	/**
 	 * Core Files class.
 	 *
 	 * @since 1.6.0
@@ -179,6 +187,14 @@ class Boldgrid_Backup_Admin_Core {
 	 * @var    Boldgrid_Backup_Admin_Support
 	 */
 	public $support;
+
+	/**
+	 * An instance of Boldgrid_Backup_Admin_Premium.
+	 *
+	 * @since 1.12.4
+	 * @var    Boldgrid_Backup_Admin_Premium_Features
+	 */
+	public $premium_page;
 
 	/**
 	 * An instance of Boldgrid_Backup_Admin_Utility.
@@ -560,6 +576,9 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->pagenow = $pagenow;
 
+		// Instantiate Configs Array
+		$this->configs = Boldgrid_Backup_Admin::get_configs();
+
 		// Instantiate Boldgrid_Backup_Admin_Settings.
 		$this->settings = new Boldgrid_Backup_Admin_Settings( $this );
 
@@ -662,10 +681,12 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->dashboard = new Boldgrid_Backup_Admin_Dashboard( $this );
 
+		// Instantiate Boldgrid\Library\Library\Plugin\Plugin.
+		$this->plugin       = new \Boldgrid\Library\Library\Plugin\Plugin( 'boldgrid-backup', $this->configs );
+		$this->premium_page = new Boldgrid_Backup_Admin_Premium_Features( $this );
+
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
-
-		$this->configs = Boldgrid_Backup_Admin::get_configs();
 
 		$this->set_lang();
 
@@ -871,6 +892,7 @@ class Boldgrid_Backup_Admin_Core {
 			'tools'           => esc_html__( 'Tools', 'boldgrid-backup' ),
 			'transfers'       => esc_html__( 'Transfers', 'boldgrid-backup' ),
 			'support'         => esc_html__( 'Support', 'boldgrid-backup' ),
+			'premium'         => esc_html__( 'Premium Features', 'boldgrid-backup' ),
 		];
 
 		// The main slug all sub menu items are children of.
@@ -882,7 +904,8 @@ class Boldgrid_Backup_Admin_Core {
 		// Add the main menu item.
 		add_menu_page(
 			$lang['boldgrid_backup'],
-			$lang['boldgrid_backup'],
+			// This value is escaped already by Library\Plugin\Page::getUnreadMarkup
+			$lang['boldgrid_backup'] . $this->plugin->getUnreadMarkup(),
 			$capability,
 			$main_slug,
 			[
@@ -996,6 +1019,20 @@ class Boldgrid_Backup_Admin_Core {
 			'boldgrid-backup-support',
 			[
 				$this->support,
+				'page',
+			]
+		);
+
+		// Add "Premium" page.
+		add_submenu_page(
+			$main_slug,
+			$lang['boldgrid_backup'] . ' ' . $lang['premium'],
+			// Count value is escaped already by Library\Plugin\Page::getUnreadMarkup
+			$lang['premium'] . $this->plugin->getPageBySlug( 'boldgrid-backup-premium-features' )->getUnreadMarkup(),
+			$capability,
+			'boldgrid-backup-premium-features',
+			[
+				$this->premium_page,
 				'page',
 			]
 		);

@@ -18,6 +18,8 @@
 
 defined( 'WPINC' ) || die;
 
+$core = apply_filters( 'boldgrid_backup_get_core', null );
+
 $active = 'nav-tab-active';
 
 // phpcs:disable WordPress.CSRF.NonceVerification.NoNonceVerification
@@ -57,6 +59,12 @@ $navs = [
 		'href'  => 'admin.php?page=boldgrid-backup-support',
 		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup-support' === $_GET['page'] ? $active : '',
 	],
+	[
+		'title' => __( 'Premium Features', 'boldgrid-backup' ),
+		'href'  => 'admin.php?page=boldgrid-backup-premium-features',
+		'class' => ! empty( $_GET['page'] ) && 'boldgrid-backup-premium-features' === $_GET['page'] ? $active : '',
+		'count' => $core->plugin->getPageBySlug( 'boldgrid-backup-premium-features' )->getUnreadMarkup(),
+	],
 ];
 // phpcs:enable WordPress.CSRF.NonceVerification.NoNonceVerification
 
@@ -72,11 +80,18 @@ $navs = apply_filters( 'boldgrid_backup_navs', $navs );
 $markup = '<h2 class="nav-tab-wrapper">';
 foreach ( $navs as $nav ) {
 	$markup .= sprintf(
-		'<a class="nav-tab %1$s" href="%2$s">%3$s</a>',
-		$nav['class'],
-		$nav['href'],
-		$nav['title']
+		'<a class="nav-tab %1$s" href="%2$s">%3$s',
+		esc_attr( $nav['class'] ),
+		esc_url( $nav['href'] ),
+		esc_html( $nav['title'] )
 	);
+	if ( isset( $nav['count'] ) ) {
+		$markup .= sprintf(
+			' %1$s',
+			$nav['count'] // This value is escaped already by Library\Plugin\Page::getUnreadMarkup
+		);
+	}
+	$markup .= '</a>';
 }
 $markup .= '</h2>';
 
