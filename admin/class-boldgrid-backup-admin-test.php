@@ -539,8 +539,6 @@ class Boldgrid_Backup_Admin_Test {
 		$available_compressors = $this->core->config->get_available_compressors();
 		$compressor            = $this->core->compressors->get();
 
-		$compressor = 'system_zip';
-
 		if ( ! self::is_filesystem_supported() ) {
 			$this->is_functional = false;
 		} elseif ( ! $this->get_is_abspath_writable() ) {
