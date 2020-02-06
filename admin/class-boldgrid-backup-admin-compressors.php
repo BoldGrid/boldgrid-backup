@@ -28,9 +28,11 @@ class Boldgrid_Backup_Admin_Compressors {
 	private $core;
 
 	/**
-	 * The default compressors.
+	 * The default compressor.
 	 *
 	 * WordPress ships out of the box with pcl_zip.
+	 *
+	 * In the contructor, if php_zip is available, it will be set as the default.
 	 *
 	 * @since  1.5.1
 	 * @access public
@@ -52,7 +54,7 @@ class Boldgrid_Backup_Admin_Compressors {
 		 * If ZipArchive is available, make it the default. Tests show it is
 		 * superior to PclZip.
 		 */
-		if ( class_exists( 'Boldgrid_Backup_Admin_Compressor_Php_Zip' ) && Boldgrid_Backup_Admin_Compressor_Php_Zip::is_available() ) {
+		if ( class_exists( 'Boldgrid_Backup_Admin_Compressor_Php_Zip' ) && Boldgrid_Backup_Admin_Compressor_Php_Zip::is_extension_available() ) {
 			$this->default = 'php_zip';
 		}
 	}
@@ -92,6 +94,36 @@ class Boldgrid_Backup_Admin_Compressors {
 	}
 
 	/**
+	 * Get the default compressor.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @return string
+	 */
+	public function get_default() {
+		return $this->default;
+	}
+
+	/**
+	 * Get our compressor object.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param  string $compressor The id of a compressor to get.
+	 * @return mixed
+	 */
+	public function get_object( $compressor ) {
+		switch ( $compressor ) {
+			case 'pcl_zip':
+				return new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this->core );
+			case 'php_zip':
+				return new Boldgrid_Backup_Admin_Compressor_Php_Zip( $this->core );
+			case 'system_zip':
+				return new Boldgrid_Backup_Admin_Compressor_System_Zip( $this->core );
+		}
+	}
+
+	/**
 	 * Set php_zip (ZipArchive) as our compressor/extractor.
 	 *
 	 * @since 1.5.2
@@ -99,7 +131,7 @@ class Boldgrid_Backup_Admin_Compressors {
 	 * @return bool True on success.
 	 */
 	public function set_php_zip() {
-		if ( Boldgrid_Backup_Admin_Compressor_Php_Zip::is_available() ) {
+		if ( Boldgrid_Backup_Admin_Compressor_Php_Zip::is_extension_available() ) {
 			$settings               = $this->core->settings->get_settings();
 			$settings['compressor'] = 'php_zip';
 			$settings['extractor']  = 'php_zip';
