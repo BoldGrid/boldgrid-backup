@@ -36,6 +36,7 @@ class Boldgrid_Backup_Rest_Setting extends Boldgrid_Backup_Rest_Controller {
 	 */
 	public function register_routes() {
 		$this->register_get();
+		$this->register_update();
 	}
 
 	/**
@@ -48,6 +49,22 @@ class Boldgrid_Backup_Rest_Setting extends Boldgrid_Backup_Rest_Controller {
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_item' ],
+				'permission_callback' => [ $this, 'permission_check' ],
+			],
+			'schema' => [ $this, 'get_schema' ],
+		] );
+	}
+
+	/**
+	 * Register router for updating settings.
+	 *
+	 * @since X.X.X
+	 */
+	public function register_update() {
+		register_rest_route( $this->namespace, '/' . $this->resource, [
+			[
+				'methods'             => WP_REST_Server::EDITABLE,
+				'callback'            => [ $this, 'update_item' ],
 				'permission_callback' => [ $this, 'permission_check' ],
 			],
 			'schema' => [ $this, 'get_schema' ],
@@ -83,6 +100,11 @@ class Boldgrid_Backup_Rest_Setting extends Boldgrid_Backup_Rest_Controller {
 				'schedule'                 => [
 					'context'     => [ 'view' ],
 					'description' => esc_html__( 'Date the backup was created.', 'boldgrid-backup' ),
+					'type'        => 'array',
+				],
+				'autoupdate'               => [
+					'context'     => [ 'view' ],
+					'description' => esc_html__( 'Automatic Update.', 'boldgrid-backup' ),
 					'type'        => 'array',
 				],
 				'notification_email'       => [
@@ -121,10 +143,47 @@ class Boldgrid_Backup_Rest_Setting extends Boldgrid_Backup_Rest_Controller {
 	 *
 	 * @since X.X.X
 	 *
-	 * @return array Plugin settings.
+	 * @param WP_REST_Request $request Request object.
+	 * @return array                   Plugin settings.
 	 */
 	public function get_item( $request ) {
-		$settings = get_option( 'boldgrid_backup_settings', [] );
+		$settings          = get_option( 'boldgrid_backup_settings', [] );
+		$boldgrid_settings = get_option( 'boldgrid_settings' );
+
+		$settings['autoupdate'] = isset( $boldgrid_settings['autoupdate'] ) ? $boldgrid_settings['autoupdate'] : null;
+
 		return $this->prepare_item_for_response( $settings, $request );
+	}
+
+	/**
+	 * Update settings through API.
+	 *
+	 * @since X.X.X
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return array                   Updated Settings.
+	 */
+	public function update_item( $request ) {
+		$schema             = $this->get_schema();
+		$settings           = get_option( 'boldgrid_backup_settings', [] );
+		$requested_settings = $request->get_param( 'settings' );
+
+		foreach ( $schema['properties'] as $name => $value ) {
+			if ( isset( $requested_settings[ $name ] ) ) {
+				$settings[ $name ] = $requested_settings[ $name ];
+			}
+		}
+
+		// Update Settings.
+		update_option( 'boldgrid_backup_settings', $settings );
+
+		// Update the auto update setting.
+		if ( ! empty( $requested_settings['autoupdate'] ) ) {
+			$boldgrid_settings               = get_option( 'boldgrid_settings' );
+			$boldgrid_settings['autoupdate'] = $requested_settings['autoupdate'];
+			update_option( 'boldgrid_settings', $boldgrid_settings );
+		}
+
+		return $this->get_item( $request );
 	}
 }

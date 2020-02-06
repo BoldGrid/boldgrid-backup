@@ -134,6 +134,11 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 					'description' => esc_html__( 'Description of the archive.', 'boldgrid-backup' ),
 					'type'        => 'array',
 				],
+				'filename'      => [
+					'context'     => [ 'view' ],
+					'description' => esc_html__( 'Filename of backup.', 'boldgrid-backup' ),
+					'type'        => 'string',
+				],
 				'creation_date' => [
 					'context'     => [ 'view' ],
 					'description' => esc_html__( 'Date the archive was created.', 'boldgrid-backup' ),
@@ -209,6 +214,7 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 				'id'            => $archive->get_id(),
 				'title'         => $archive->get_attribute( 'title' ),
 				'description'   => $archive->get_attribute( 'description' ),
+				'filename'      => $backup['filename'],
 				'creation_date' => date( 'c', $archive->timestamp ),
 			];
 		}
