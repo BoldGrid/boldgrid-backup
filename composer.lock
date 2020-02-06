@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/BoldGrid/library.git",
-                "reference": "f9a4f26a888168d9f467e401174ff71aab2db621"
+                "reference": "02d8f828136ba6df876c1d5ddaf3d1e7309765a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BoldGrid/library/zipball/f9a4f26a888168d9f467e401174ff71aab2db621",
-                "reference": "f9a4f26a888168d9f467e401174ff71aab2db621",
+                "url": "https://api.github.com/repos/BoldGrid/library/zipball/02d8f828136ba6df876c1d5ddaf3d1e7309765a9",
+                "reference": "02d8f828136ba6df876c1d5ddaf3d1e7309765a9",
                 "shasum": ""
             },
             "type": "library",
