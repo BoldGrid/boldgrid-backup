@@ -43,7 +43,7 @@ class Amazon_S3 extends \Boldgrid\Library\Library\Ui\Card {
 		$this->links = '
 			<a target="_blank" href="' . $url . '">' .
 				esc_html__( 'Setup Guide' ) . '
-			</a>;
+			</a>';
 
 		$this->icon = '<img src="' . plugin_dir_url( __FILE__ ) . '../image/remote/amazon-s3-logo.png"></img>';
 	}

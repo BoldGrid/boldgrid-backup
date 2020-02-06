@@ -43,9 +43,9 @@ install_test_suite() {
 	# set up testing suite
 	mkdir -p $WP_TESTS_DIR
 	cd $WP_TESTS_DIR
-	svn co --quiet https://develop.svn.wordpress.org/trunk/tests/phpunit/includes/
+	svn co --quiet https://develop.svn.wordpress.org/branches/5.2/tests/phpunit/includes/
 
-	wget -nv -O wp-tests-config.php https://develop.svn.wordpress.org/trunk/wp-tests-config-sample.php
+	wget -nv -O wp-tests-config.php https://develop.svn.wordpress.org/branches/5.2/wp-tests-config-sample.php
 	sed $ioption "s:dirname( __FILE__ ) . '/build/':'$WP_CORE_DIR':" "$WP_TESTS_DIR"/wp-tests-config.php
 	sed $ioption "s:dirname( __FILE__ ) . '/src/':'$WP_CORE_DIR':" "$WP_TESTS_DIR"/wp-tests-config.php
 	sed $ioption "s/youremptytestdbnamehere/$DB_NAME/" wp-tests-config.php
@@ -72,6 +72,7 @@ install_db() {
 	fi
 
 	# create database
+	mysql -u$DB_USER -p$DB_PASS -e "DROP DATABASE IF EXISTS $DB_NAME"
 	mysqladmin create $DB_NAME --user="$DB_USER" --password="$DB_PASS"$EXTRA
 }
 
