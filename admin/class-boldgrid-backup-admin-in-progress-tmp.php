@@ -3,7 +3,7 @@
  * File: class-boldgrid-backup-admin-in-progress-tmp.php
  *
  * @link  https://www.boldgrid.com
- * @since SINCEVERSION
+ * @since 1.13.0
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
@@ -26,13 +26,13 @@
  * system_zip: /backup_dir/system_zip_temp/zigWlkvV The "system_zip_temp" folder is optional and
  *                                                  created by us.
  *
- * @since SINCEVERSION
+ * @since 1.13.0
  */
 class Boldgrid_Backup_Admin_In_Progress_Tmp {
 	/**
 	 * An instance of core.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 * @access private
 	 * @var Boldgrid_Backup_Admin_Core
 	 */
@@ -41,7 +41,7 @@ class Boldgrid_Backup_Admin_In_Progress_Tmp {
 	/**
 	 * Constructor.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 *
 	 * @param Boldgrid_Backup_Admin_Core $core
 	 */
@@ -52,7 +52,7 @@ class Boldgrid_Backup_Admin_In_Progress_Tmp {
 	/**
 	 * Get an array of data for the temporary .zip file.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 *
 	 * @return array
 	 */
@@ -79,7 +79,7 @@ class Boldgrid_Backup_Admin_In_Progress_Tmp {
 	/**
 	 * Get temporary .zip file info for system_zip compressor.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 *
 	 * @return array
 	 */
@@ -105,7 +105,7 @@ class Boldgrid_Backup_Admin_In_Progress_Tmp {
 	/**
 	 * Get data for pcl_zip.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 *
 	 * @return array
 	 */

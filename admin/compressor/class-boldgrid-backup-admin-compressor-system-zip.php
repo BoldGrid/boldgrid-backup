@@ -5,7 +5,7 @@
  * System Zip Compressor.
  *
  * @link  https://www.boldgrid.com
- * @since SINCEVERSION
+ * @since 1.13.0
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin/compressor
@@ -17,13 +17,13 @@
 /**
  * Class: Boldgrid_Backup_Admin_Compressor_System_Zip
  *
- * @since SINCEVERSION
+ * @since 1.13.0
  */
 class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_Compressor {
 	/**
 	 * An array of files that should be archived.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 * @access private
 	 * @var array {
 	 *     An array of files.
@@ -39,7 +39,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	/**
 	 * The filepath to our text file holding list of files to archive.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 * @access private
 	 * @var string
 	 */
@@ -48,7 +48,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	/**
 	 * The filepath to the zip file.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 * @access PRIVATE
 	 * @var string
 	 */
@@ -57,7 +57,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	/**
 	 * The temporary folder used when saving a zip file.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 * @access private
 	 * @var Boldgrid_Backup_Admin_Compressor_System_Zip_Temp_Folder
 	 */
@@ -66,7 +66,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	/**
 	 * Key.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 * @access protected
 	 * @var string
 	 */
@@ -75,7 +75,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	/**
 	 * Constructor.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 */
 	public function __construct() {
 		$core = apply_filters( 'boldgrid_backup_get_core', null );
@@ -142,7 +142,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	/**
 	 * Create the file containing a list of files to backup.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 */
 	private function filelist_create() {
 		$this->core->logger->add( 'Starting to create list of files to include in zip.' );
@@ -190,7 +190,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	/**
 	 * Run the command to actually zip the files.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 */
 	private function zip() {
 		$this->core->logger->add( 'Starting to close the zip file.' );
@@ -209,7 +209,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	/**
 	 * Add the .sql file individually.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 *
 	 * @see self::filelist_create
 	 */

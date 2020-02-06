@@ -3,7 +3,7 @@
  * File: test-class-boldgrid-backup-admin-compressor.php
  *
  * @link https://www.boldgrid.com
- * @since SINCEVERSION
+ * @since 1.13.0
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/tests/admin
@@ -27,7 +27,7 @@ class Test_Boldgrid_Backup_Admin_Compressor extends WP_UnitTestCase {
 	/**
 	 * Setup.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 */
 	public function setUp() {
 		if ( ! defined( 'BOLDGRID_BACKUP_VERSION' ) ) {
@@ -46,7 +46,7 @@ class Test_Boldgrid_Backup_Admin_Compressor extends WP_UnitTestCase {
 	/**
 	 * Test archive_files.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 */
 	public function test_archive_files() {
 		$compressors = [
@@ -132,7 +132,7 @@ class Test_Boldgrid_Backup_Admin_Compressor extends WP_UnitTestCase {
 	/**
 	 * Test is_available.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 */
 	public function test_is_available() {
 		$this->assertTrue( $this->pcl_zip->is_available() );
@@ -145,7 +145,7 @@ class Test_Boldgrid_Backup_Admin_Compressor extends WP_UnitTestCase {
 	/**
 	 * Test is_default.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 */
 	public function test_is_default() {
 		// Either pcl_zip or php_zip will be default.
@@ -158,7 +158,7 @@ class Test_Boldgrid_Backup_Admin_Compressor extends WP_UnitTestCase {
 	/**
 	 * Test is_saved_compressor.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 */
 	public function test_is_saved_compressor() {
 		// When there is no saved compressor, all compressors should return false.

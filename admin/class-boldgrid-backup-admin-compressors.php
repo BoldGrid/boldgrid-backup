@@ -96,7 +96,7 @@ class Boldgrid_Backup_Admin_Compressors {
 	/**
 	 * Get the default compressor.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 *
 	 * @return string
 	 */
@@ -107,7 +107,7 @@ class Boldgrid_Backup_Admin_Compressors {
 	/**
 	 * Get our compressor object.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 *
 	 * @param  string $compressor The id of a compressor to get.
 	 * @return mixed

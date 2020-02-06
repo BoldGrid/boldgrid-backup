@@ -5,7 +5,7 @@
  * System Zip Compressor Tester.
  *
  * @link  https://www.boldgrid.com
- * @since SINCEVERSION
+ * @since 1.13.0
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin/compressor
@@ -17,13 +17,13 @@
 /**
  * Class: Boldgrid_Backup_Admin_Compressor_System_Zip_Test
  *
- * @since SINCEVERSION
+ * @since 1.13.0
  */
 class Boldgrid_Backup_Admin_Compressor_System_Zip_Test {
 	/**
 	 * An instance of core.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 * @access private
 	 * @var Boldgrid_Backup_Admin_Core
 	 */
@@ -32,7 +32,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip_Test {
 	/**
 	 * An error message.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 * @access private
 	 * @var string
 	 */
@@ -41,7 +41,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip_Test {
 	/**
 	 * An array of files that will make up the self::filelist_filepath file.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 * @access private
 	 * @var array
 	 */
@@ -50,7 +50,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip_Test {
 	/**
 	 * A filepath to the file containing a list of files we will zip.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 * @access private
 	 * @var array
 	 */
@@ -59,7 +59,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip_Test {
 	/**
 	 * An array of files and folders that we will create.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 * @access private
 	 * @var array
 	 */
@@ -68,7 +68,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip_Test {
 	/**
 	 * A path to a directory we will be creating, filling with files, and zipping.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 * @access private
 	 * @var string
 	 */
@@ -77,7 +77,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip_Test {
 	/**
 	 * A filepath to the zip we will be creating.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 * @access private
 	 * @var string
 	 */
@@ -86,7 +86,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip_Test {
 	/**
 	 * Constructor.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 *
 	 * @param Boldgrid_Backup_Admin_Core $core
 	 */
@@ -128,7 +128,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip_Test {
 	/**
 	 * Get our error message.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 *
 	 * @return string
 	 */
@@ -141,7 +141,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip_Test {
 	 *
 	 * We will be zipping up this directory.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 *
 	 * @return bool True on success.
 	 */
@@ -198,7 +198,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip_Test {
 	/**
 	 * Restore our test directory from zip and make sure everything was restored.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 *
 	 * @return bool True on success.
 	 */
@@ -238,7 +238,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip_Test {
 	/**
 	 * Zip up our test directory.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 *
 	 * @return bool True on success.
 	 */
@@ -258,7 +258,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip_Test {
 	 *
 	 * On average, this takes 0.019 seconds to complete.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 *
 	 * @param  bool $force Whether to run this test or get results from transient.
 	 * @return bool        True on success.

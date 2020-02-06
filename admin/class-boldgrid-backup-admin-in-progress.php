@@ -29,7 +29,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 	/**
 	 * Our tmp class.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 * @access private
 	 * @var Boldgrid_Backup_Admin_In_Progress_Tmp
 	 */
