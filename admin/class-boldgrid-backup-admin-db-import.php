@@ -303,7 +303,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 				print_r( serialize( ( $result[0] ) ) );
 			}
 		}
-		return $result;
+		return [ $result ];
 	}
 
 	/**
