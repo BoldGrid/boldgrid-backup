@@ -58,7 +58,7 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 	/**
 	 * Key.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 * @access protected
 	 * @var string
 	 */

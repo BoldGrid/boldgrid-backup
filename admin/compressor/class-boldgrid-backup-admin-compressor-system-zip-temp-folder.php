@@ -3,7 +3,7 @@
  * File: class-boldgrid-backup-admin-compressor-system-zip-temp-folder.php
  *
  * @link  https://www.boldgrid.com
- * @since SINCEVERSION
+ * @since 1.13.0
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin/compressor
@@ -15,13 +15,13 @@
 /**
  * Class: Boldgrid_Backup_Admin_Compressor_System_Zip_Temp_Folder
  *
- * @since SINCEVERSION
+ * @since 1.13.0
  */
 class Boldgrid_Backup_Admin_Compressor_System_Zip_Temp_Folder {
 	/**
 	 * An instance of core.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 * @access private
 	 * @var Boldgrid_Backup_Admin_Core
 	 */
@@ -30,7 +30,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip_Temp_Folder {
 	/**
 	 * The name of the temporary folder where the compression will take place.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 * @access private
 	 * @var string
 	 */
@@ -39,7 +39,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip_Temp_Folder {
 	/**
 	 * Constructor.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 */
 	public function __construct() {
 		$this->core = apply_filters( 'boldgrid_backup_get_core', null );
@@ -48,7 +48,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip_Temp_Folder {
 	/**
 	 * Create the temp folder.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 *
 	 * @return bool True on success.
 	 */
@@ -59,7 +59,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip_Temp_Folder {
 	/**
 	 * Delete the temp folder.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 *
 	 * @return bool True on success.
 	 */
@@ -70,7 +70,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip_Temp_Folder {
 	/**
 	 * Get the path to our temp folder.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 *
 	 * @return string
 	 */

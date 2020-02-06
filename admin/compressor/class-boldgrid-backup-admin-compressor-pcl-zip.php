@@ -50,7 +50,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 	/**
 	 * Key.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 * @access proteced
 	 * @var string
 	 */

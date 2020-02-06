@@ -78,7 +78,7 @@ class Boldgrid_Backup_Admin_Compressor {
 	/**
 	 * Determine whether or not this compressor is available.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 *
 	 * @param  string $compressor A compressor.
 	 * @return bool               True if is available.
@@ -90,7 +90,7 @@ class Boldgrid_Backup_Admin_Compressor {
 	/**
 	 * Determine whether or not the given compressor is the default.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 *
 	 * @param  string $compressor A compressor.
 	 * @return bool               True if is default compressor.
@@ -102,7 +102,7 @@ class Boldgrid_Backup_Admin_Compressor {
 	/**
 	 * Determine whether or not the given compressor is the one saved in the settings.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 *
 	 * @param  string $compressor A compressor.
 	 * @return bool               True if compressor is saved in settings.

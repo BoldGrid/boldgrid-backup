@@ -514,7 +514,7 @@ class Boldgrid_Backup_Admin_Test {
 	/**
 	 * Determine whether or not system_zip is suppored.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.0
 	 *
 	 * @return bool
 	 */
