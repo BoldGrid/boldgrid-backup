@@ -132,6 +132,14 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
+= 1.13.0 =
+
+Release date: February 6th, 2020
+
+* Update:      Added new "Premium Features" dashboard page.
+* Update:      Added support for system zip for generating backups.
+* Update:      Updated dependencies.
+
 = 1.12.6 =
 
 Release date: January 16th, 2020
