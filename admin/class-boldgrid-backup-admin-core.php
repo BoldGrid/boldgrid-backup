@@ -359,6 +359,14 @@ class Boldgrid_Backup_Admin_Core {
 	public $db_omit;
 
 	/**
+	 * Database Restoration errro
+	 *
+	 * @since SINCEVERSION
+	 * @var string
+	 */
+	public $db_restore_error;
+
+	/**
 	 * An instance of Boldgrid_Backup_Admin_Filelist.
 	 *
 	 * @since 1.5.1
@@ -1205,6 +1213,7 @@ class Boldgrid_Backup_Admin_Core {
 		$status   = $importer->import( $db_dump_filepath );
 
 		if ( ! empty( $status['error'] ) ) {
+			$this->db_restore_error = $status['error'];
 			do_action( 'boldgrid_backup_notice', $status['error'], 'notice notice-error is-dismissible' );
 			return false;
 		}
@@ -2315,7 +2324,12 @@ class Boldgrid_Backup_Admin_Core {
 			$this->wp_filesystem->delete( $db_dump_filepath, false, 'f' );
 
 			// Display notice of deletion status.
-			if ( ! $restore_ok ) {
+			if ( ! $restore_ok && $this->db_restore_error ) {
+				return [
+					'error' => $this->db_restore_error,
+				];
+			}
+			if ( ! $restore_ok && ! $this->db_restore_error ) {
 				return [
 					'error' => esc_html__( 'Could not restore database.', 'boldgrid-backup' ),
 				];

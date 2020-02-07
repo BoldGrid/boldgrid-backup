@@ -22,10 +22,9 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * The core class object.
 	 *
 	 * @since 1.6.0
-	 * @access private
 	 * @var    Boldgrid_Backup_Admin_Core
 	 */
-	private $core;
+	public $core;
 
 	/**
 	 * Errors.
@@ -50,6 +49,23 @@ class Boldgrid_Backup_Admin_Db_Import {
 	}
 
 	/**
+	 * Get Lines from file
+	 *
+	 * Gets an array of lines from a file
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param string $file String ocntaining the path of the file.
+	 *
+	 * @return array An array of lines
+	 */
+	public function get_lines( $file ) {
+		if ( false === file_exists( $file ) ) {
+			return false;
+		}
+		return file( $file );
+	}
+	/**
 	 * Import a mysqldump.
 	 *
 	 * @since 1.5.1
@@ -58,8 +74,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * @return bool TRUE on success.
 	 */
 	public function import( $file ) {
-
-		$lines = file( $file );
+		$lines = $this->get_lines( $file );
 
 		if ( false === $lines ) {
 			return array(
@@ -76,7 +91,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 		if ( false === $lines ) {
 			return array(
 				'error' => sprintf(
-					__( 'MySQL Database User does not have necessary priviliges to restore this database.', 'boldgrid-backup' ),
+					__( 'MySQL Database User does not have necessary priviliges to restore mysqldump, %1$s.', 'boldgrid-backup' ), //phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
 					$file
 				),
 			);
@@ -102,8 +117,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	public function import_from_archive( $archive_filepath, $file ) {
 		$this->core->archive->init( $archive_filepath );
 		$file_contents = $this->core->archive->get_dump_file( $file );
-
-		$sql = ! empty( $file_contents[0]['content'] ) ? $file_contents[0]['content'] : null;
+		$sql           = ! empty( $file_contents[0]['content'] ) ? $file_contents[0]['content'] : null;
 		if ( empty( $sql ) ) {
 			$this->errors[] = __( 'Unable to get contents of file.', 'boldgrid-backup' );
 			return false;
@@ -151,7 +165,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 
 			// Check if this is the end of the query.
 			if ( substr( trim( $line ), -1, 1 ) === ';' ) {
-				$affected_rows = $db->exec( $templine );
+				$affected_rows = $this->exec_import( $db, $templine );
 				if ( false === $affected_rows ) {
 					return false;
 				}
@@ -179,6 +193,10 @@ class Boldgrid_Backup_Admin_Db_Import {
 		$lines = preg_split( "/\\r\\n|\\r|\\n/", $string );
 
 		$lines = $this->fix_view_statements( $lines );
+
+		if ( false === $lines ) {
+			return __( 'The Database User does not have the necessary priviliges to restore this database.', 'boldgrid-backup' );
+		}
 
 		$success = $this->import_lines( $lines );
 
@@ -287,9 +305,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * @return array An array of database user privileges.
 	 */
 	public function get_db_privileges() {
-		$db           = new PDO( sprintf( 'mysql:host=%1$s;dbname=%2$s;', DB_HOST, DB_NAME ), DB_USER, DB_PASSWORD );
-		$db_statement = $db->query( 'SHOW GRANTS' );
-		$results      = $db_statement->fetchAll();
+		$results = $this->show_grants_query();
 
 		foreach ( $results as $result ) {
 			$is_string_db_grant      = ( false !== strpos( $result[0], 'ON `' . DB_NAME . '`' ) );
@@ -299,10 +315,42 @@ class Boldgrid_Backup_Admin_Db_Import {
 			if ( ( $is_string_db_grant || $is_string_all_grant ) && $is_grant_all_privileges ) {
 				return [ 'ALL' ];
 			}
-			if ( ( $is_string_db_grant || $is_string_all_grant ) && false === $is_grant_all_privileges ) {
+			if ( ( $is_string_db_grant ) && false === $is_grant_all_privileges ) {
 				return $this->get_grants_array( $result[0] );
 			}
 		}
+		return [];
+	}
+
+	/**
+	 * Show Grants Query
+	 *
+	 * Queries the database for 'SHOW GRANTS'
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @return array an array of results from the database query
+	 */
+	public function show_grants_query() {
+		$db           = new PDO( sprintf( 'mysql:host=%1$s;dbname=%2$s;', DB_HOST, DB_NAME ), DB_USER, DB_PASSWORD );
+		$db_statement = $db->query( 'SHOW GRANTS' );
+		return $db_statement->fetchAll();
+	}
+
+	/**
+	 * Execute Import
+	 *
+	 * Executes Import MySql Query
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param PDO $db The PDO Object.
+	 * @param string $sql_line The line of sql to execute.
+	 *
+	 * @return int Number of affected rows
+	 */
+	public function exec_import( PDO $db, $sql_line ) {
+		return $db->exec( $sql_line );
 	}
 
 	/**
