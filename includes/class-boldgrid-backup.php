@@ -293,6 +293,8 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-log.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-log-page.php';
 
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-plugin-notices.php';
+
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
 
@@ -541,6 +543,15 @@ class Boldgrid_Backup {
 
 		// Tools page.
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core->tools, 'admin_enqueue_scripts' );
+
+		/*
+		 * Plugin notices.
+		 *
+		 * The library's plugin notices class is instantiated below in order to add necessary filters.
+		 */
+		new \Boldgrid\Library\Library\Plugin\Notices();
+		$plugin_notices = new Boldgrid_Backup_Admin_Plugin_Notices();
+		$this->loader->add_filter( 'Boldgrid\Library\Plugin\Notices\admin_enqueue_scripts', $plugin_notices, 'filter' );
 	}
 
 	/**

@@ -905,7 +905,7 @@ class Boldgrid_Backup_Admin_Core {
 		add_menu_page(
 			$lang['boldgrid_backup'],
 			// This value is escaped already by Library\Plugin\Page::getUnreadMarkup
-			$lang['boldgrid_backup'] . $this->plugin->getUnreadMarkup(),
+			$lang['boldgrid_backup'],
 			$capability,
 			$main_slug,
 			[
@@ -1028,7 +1028,7 @@ class Boldgrid_Backup_Admin_Core {
 			$main_slug,
 			$lang['boldgrid_backup'] . ' ' . $lang['premium'],
 			// Count value is escaped already by Library\Plugin\Page::getUnreadMarkup
-			$lang['premium'] . $this->plugin->getPageBySlug( 'boldgrid-backup-premium-features' )->getUnreadMarkup(),
+			$lang['premium'],
 			$capability,
 			'boldgrid-backup-premium-features',
 			[
