@@ -41,7 +41,7 @@ class Historical_Versions extends \Boldgrid\Library\Library\Ui\Card {
 			'boldgrid-backup' ) .
 			'</p>';
 
-		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/restore-historical-files?source=historical-versions' );
+		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/restore-historical-files/?source=historical-versions' );
 
 		$this->links = '
 			<a target="_blank" href="' . $url . '">' .

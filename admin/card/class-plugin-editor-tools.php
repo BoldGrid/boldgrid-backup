@@ -41,7 +41,7 @@ class Plugin_Editor_Tools extends \Boldgrid\Library\Library\Ui\Card {
 			'boldgrid-backup' ) .
 			'</p>';
 
-		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/plugin-editor-backup?source=plugin-editor-tools' );
+		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/plugin-editor-backup/?source=plugin-editor-tools' );
 
 		$this->links = '
 			<a target="_blank" href="' . $url . '">' .
