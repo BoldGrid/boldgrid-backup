@@ -67,7 +67,7 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 	public function test_get_lines() {
 		$db_import = new \Boldgrid_Backup_Admin_Db_Import();
 		$file      = __FILE__;
-		$this->assertIsArray( $db_import->get_lines( $file ) );
+		$this->assertTrue( is_array( $db_import->get_lines( $file ) ) );
 		$this->assertFalse( $db_import->get_lines( 'x' ) );
 	}
 
