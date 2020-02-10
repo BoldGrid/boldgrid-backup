@@ -41,6 +41,7 @@ class Test_Boldgrid_Backup_Admin_Premium_Features_Page extends WP_UnitTestCase {
 			'/admin/card/class-history.php',
 			'/admin/card/class-one-click-restoration.php',
 			'/admin/card/class-plugin-editor-tools.php',
+			'/admin/card/class-find-modified-files.php',
 		);
 
 		foreach ( $files as $file ) {
