@@ -259,6 +259,7 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-plugin-editor-tools.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-premium.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-updates.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-find-modified-files.php';
 
 		// Features.
 		if ( class_exists( '\Boldgrid\Library\Library\Ui\Feature' ) ) {

@@ -37,7 +37,7 @@ class History extends \Boldgrid\Library\Library\Ui\Card {
 		$this->footer = '
 			<p>' .
 			esc_html__(
-				'Search for all files modified within a certain time period. You can also look for other versions of that file within your backups.',
+				'View a running log of significant actions to your WordPress site, including which users updated a plugin, theme, or WordPress itself.',
 			'boldgrid-backup' ) .
 			'</p>';
 
