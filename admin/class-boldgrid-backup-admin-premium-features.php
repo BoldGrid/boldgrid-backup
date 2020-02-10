@@ -86,6 +86,7 @@ class Boldgrid_Backup_Admin_Premium_Features {
 			new Card\History( $this->page ),
 			new Card\Historical_Versions( $this->page ),
 			new Card\Plugin_Editor_Tools( $this->page ),
+			new Card\Find_Modified_Files( $this->page ),
 		];
 
 		return $cards;
