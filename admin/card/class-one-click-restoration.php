@@ -41,7 +41,7 @@ class One_Click_Restoration extends \Boldgrid\Library\Library\Ui\Card {
 			'boldgrid-backup' ) .
 			'</p>';
 
-		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/individual-file-restorations/' );
+		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/individual-file-restorations?source=one-click-restore' );
 
 		$this->links = '
 			<a target="_blank" href="' . $url . '">' .

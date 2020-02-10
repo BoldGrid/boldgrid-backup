@@ -41,7 +41,7 @@ class History extends \Boldgrid\Library\Library\Ui\Card {
 			'boldgrid-backup' ) .
 			'</p>';
 
-		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/backup-changed-files-history/' );
+		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/backup-changed-files-history?source=update-history' );
 
 		$this->links = '
 			<a target="_blank" href="' . $url . '">' .

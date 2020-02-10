@@ -38,7 +38,7 @@ class Database_Encryption extends \Boldgrid\Library\Library\Ui\Card {
 			'boldgrid-backup' ) .
 			'</p>';
 
-		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/encrypt-database-backups/' );
+		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/encrypt-database-backups?source=encrypt-database-backups' );
 
 		$this->links = '
 			<a target="_blank" href="' . $url . '">' .
