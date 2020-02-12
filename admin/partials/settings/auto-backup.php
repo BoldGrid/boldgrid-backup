@@ -17,37 +17,35 @@ defined( 'WPINC' ) || die;
 
 ob_start();
 ?>
+<h1><?php esc_html_e( 'Auto Updates', 'boldgrid-backup' ); ?></h1>
+<p>
+	<?php esc_html_e(
+	'WordPress has the ability to auto update both itself and your plugins and themes.
+	Keeping your software up to date is very important, and this automation helps you more easily do that.',
+	'boldgrid-backup'); ?>
+</p>
+<p>
+	<?php esc_html_e(
+	'Total Upkeep adds on top of this functionality by giving you the ability to have backups made before any auto update,
+	and by making it easier to control what is updated and when.',
+	'boldgrid-backup'); ?>
+</p>
 <div class="bg-box">
 	<div class="bg-box-top">
-		<?php esc_html_e( 'Automation', 'boldgrid-backup' ); ?>
-		<span class='dashicons dashicons-editor-help' data-id='automation'></span>
+		<?php esc_html_e( 'Backup Before Updating', 'boldgrid-backup' ); ?>
 	</div>
 	<div class="bg-box-bottom">
-		<p class='help' data-id='automation'>
-			<?php
-			printf(
-				// translators: 1: HTML anchor open tag, 2: HTML anchor close tag.
-				esc_html__(
-					'Auto Backup Before Update: Automatically perform a backup before WordPress updates. When this feature is enabled, a full backup will be made during the %1$spre_auto_update action%2$s.',
-					'boldgrid-backup'
-				),
-				'<a target="_blank" href="https://developer.wordpress.org/reference/hooks/pre_auto_update/">',
-				'</a>'
-			);
-			?>
-		</p>
-		<p class='help' data-id='automation'>
-			<?php
-			esc_html_e(
-				'Auto Rollback: If something goes wrong while performing WordPress updates, automatically restore the site using a backup made before updating WordPress. This feature does not apply to auto updates.',
-				'boldgrid-backup'
-			);
-			?>
+		<p>
+		<?php esc_html_e(
+			'Sometimes updating your software can break your site. It\'s recommended to make a backup before updates,
+			so in the event something goes wrong, you can reasily restore your site.',
+			'boldgrid-backup'); ?>
 		</p>
 		<table class="form-table">
 			<tr>
 				<th>
 					<?php esc_html_e( 'Auto Backup Before Update', 'boldgrid-backup' ); ?>
+					<span class='dashicons dashicons-editor-help' data-id='auto-backup'></span>
 				</th>
 				<td>
 					<input id='auto-backup-enabled' type='radio' name='auto_backup' value='1'
@@ -68,7 +66,27 @@ ob_start();
 				</td>
 			</tr>
 			<tr>
-				<th><?php esc_html_e( 'Auto Rollback', 'boldgrid-backup' ); ?></th>
+				<td colspan='2'>
+					<p class='help' data-id='auto-backup'>
+						<?php
+						printf(
+							// translators: 1: HTML anchor open tag, 2: HTML anchor close tag.
+							esc_html__(
+								'Auto Backup Before Update: Automatically perform a backup before WordPress updates. When this feature is enabled, a full backup will be made during the %1$spre_auto_update action%2$s.',
+								'boldgrid-backup'
+							),
+							'<a target="_blank" href="https://developer.wordpress.org/reference/hooks/pre_auto_update/">',
+							'</a>'
+						);
+						?>
+					</p>
+				</td>
+		</tr>
+			<tr>
+				<th>
+					<?php esc_html_e( 'Auto Rollback', 'boldgrid-backup' ); ?>
+					<span class='dashicons dashicons-editor-help' data-id='auto-rollback'></span>
+				</th>
 				<td>
 					<input id='auto-rollback-enabled' type='radio' name='auto_rollback' value='1'
 					<?php
@@ -86,6 +104,18 @@ ob_start();
 					}
 					?>
 					/> <?php esc_html_e( 'Disabled', 'boldgrid-backup' ); ?>
+				</td>
+			</tr>
+			<tr>
+				<td colspan='2'>
+					<p class='help' data-id='auto-rollback'>
+						<?php
+						esc_html_e(
+							'Auto Rollback: If something goes wrong while performing WordPress updates, automatically restore the site using a backup made before updating WordPress. This feature does not apply to auto updates.',
+							'boldgrid-backup'
+						);
+						?>
+					</p>
 				</td>
 			</tr>
 		</table>
