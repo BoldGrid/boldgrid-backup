@@ -335,7 +335,7 @@ class Boldgrid_Backup {
 		}
 
 		// Get Plugin Update Data for all active plugins
-		$this->loader->add_filter('boldgrid_backup_active_plugins', new \Boldgrid\Library\Library\Plugin\Plugins(), 'getAllActivePlugins');
+		$this->loader->add_filter( 'boldgrid_backup_active_plugins', new \Boldgrid\Library\Library\Plugin\Plugins(), 'getAllActivePlugins' );
 
 		$activator = new Boldgrid_Backup_Activator();
 		$this->loader->add_action( 'admin_notices', $activator, 'post_activate_notice' );
@@ -528,7 +528,7 @@ class Boldgrid_Backup {
 		$plugins = new Boldgrid_Backup_Admin_Plugins();
 		$this->loader->add_filter( 'plugin_action_links_boldgrid-backup/boldgrid-backup.php', $plugins, 'plugin_action_links', 10, 4 );
 		$this->loader->add_filter( 'boldgrid_backup_get_plugin', new \Boldgrid\Library\Library\Plugin\Plugins(), 'getActivePluginBySlug', 10, 2 );
-		$this->loader->add_action( 'load-plugins.php', $plugins, 'add_auto_update_message');
+		$this->loader->add_action( 'load-plugins.php', $plugins, 'add_auto_update_message' );
 
 		// This plugin's Dashboard.
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core->dashboard, 'admin_enqueue_scripts' );

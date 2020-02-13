@@ -34,6 +34,7 @@ $files = array(
 	'/vendor/boldgrid/library/src/Library/Plugin/Notice.php',
 	'/vendor/boldgrid/library/src/Library/Plugin/Page.php',
 	'/vendor/boldgrid/library/src/Library/Plugin/Plugin.php',
+	'/vendor/boldgrid/library/src/Library/Plugin/UpdateData.php',
 	'/admin/class-boldgrid-backup-admin-premium-features.php',
 	'/admin/class-boldgrid-backup-admin-core.php',
 	'/admin/class-boldgrid-backup-admin.php',
