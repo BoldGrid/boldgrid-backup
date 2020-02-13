@@ -199,9 +199,12 @@ foreach ( $statuses as $status ) {
 
 	$return .= '<tr>
 	<td colspan=2 />
-	<td colspan=2>
+	<td id="' . $statusLower . '-header">
 		<h3>' . $translations[ $statusLower ] . '</h3>
-		<span class="dashicons dashicons-arrow-down-alt2 bglib-collapsible-' . $statusLower . '"></span>
+	</td>
+	<td>
+		<span class="dashicons-arrow-down-alt2 dashicons bglib-collapsible-control" data-target=".' .
+		$statusLower . '-collapsible" />
 	</td>
 	</tr>';
 
@@ -211,11 +214,11 @@ foreach ( $statuses as $status ) {
 			( ! isset( $autoupdateSettings['plugins'][ $slug ] ) && $pluginsDefault );
 
 		$return .= '
-			<tr class="collapse ' . $status . '-collapse">
+			<tr id="' . $slug . '-row" class="' . $statusLower . '-collapsible bglib-collapsible bglib-collapsible-open">
 				<td colspan=2 />
-				<td>' . $pluginData['Name'] . '</td>
+				<td><div class="td-slider">' . $pluginData['Name'] . '</td>
 				<td>
-					<div class="toggle toggle-light plugin-toggle"
+					<div class="td-slider toggle toggle-light plugin-toggle"
 						data-plugin="' . $slug . '"
 						data-toggle-on="' . ( $toggle ? 'true' : 'false' ) . '">
 					</div>
