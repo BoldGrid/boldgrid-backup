@@ -15,3 +15,26 @@
 #auto-recovery-tr {
 	display: none;
 }
+
+.auto-update-settings.form-table .table-help td,
+.auto-update-settings.form-table .table-help td p {
+	padding: 0;
+}
+
+.form-table .bglib-divider {
+	border-bottom: 1px solid #e2e4e7;
+}
+#section_auto_updates .form-table th {
+	width: 200px;
+}
+.auto-update-settings.form-table td {
+	padding: 5px 5px;
+}
+
+.auto-update-settings .toggle.right {
+	float: right;
+}
+
+.auto-update-settings input[type="number"] {
+	width: 5em;
+}

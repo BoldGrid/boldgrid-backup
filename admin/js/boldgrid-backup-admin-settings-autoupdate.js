@@ -48,12 +48,12 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 				.not( '.toggle-group' )
 				.on( 'click swipe contextmenu', self._setMasterToggles );
 
+			$bgBox.find( '.table-help td p' ).attr('style', 'height: 0em; opacity: 0%' );
 			$bgBox.find( '.dashicons-editor-help' ).on( 'click', self._toggleHelp );
 
 			$bgBox.find( '.bglib-collapsible-control' ).on( 'click', function() {
 				var target = $(this).attr('data-target');
 				$( target ).animate({ height: 'toggle', opacity: 'toggle' }, 'slow');
-				
 			} );
 		},
 
@@ -185,15 +185,19 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 		 */
 		_toggleHelp: function( e ) {
 			var id = $( this ).attr( 'data-id' );
-
+			var target = $('.table-help[data-id="' + id + '"]');
 			e.preventDefault();
 
 			if ( id === undefined ) {
 				return false;
 			}
+			
+			$( target).toggleClass('show-help');
+			$( target).toggleClass('hide-help');
+			$( '.table-help.show-help[data-id="' + id + '"] td p' ).animate({ height: '1.5em', opacity: '100%' }, 400 );
+			$( '.table-help.hide-help[data-id="' + id + '"] td p' ).animate({ height: '0em', opacity: '0%' }, 400 );
 
-			$( '.help[data-id="' + id + '"]' ).slideToggle();
-
+			
 			return false;
 		}
 	};

@@ -59,22 +59,35 @@ class Boldgrid_Backup_Admin_Plugins {
 		return $actions;
 	}
 
-	function add_auto_update_message() {
-		$this->active_plugins = apply_filters( 'boldgrid_backup_active_plugins', null);
+	/**
+	 * Add Auto Update Message
+	 *
+	 * @since SINCEVERSION
+	 */
+	public function add_auto_update_message() {
+		$this->active_plugins = apply_filters( 'boldgrid_backup_active_plugins', null );
 		foreach ( $this->active_plugins as $plugin ) {
 			add_action( 'in_plugin_update_message-' . $plugin->getFile(), array( $this, 'print_update_message' ), 10, 2 );
 		}
 	}
-	function print_update_message( $data, $response ) {
-		$core = apply_filters( 'boldgrid_backup_get_core', null );
+	/**
+	 * Prints Update Message
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param array $data
+	 * @param array $data
+	 */
+	public function print_update_message( $data, $response ) {
+		$core   = apply_filters( 'boldgrid_backup_get_core', null );
 		$plugin = apply_filters( 'boldgrid_backup_get_plugin', $this->active_plugins, $data['slug'] );
 		printf(
 			'<br/>Version <strong>%s</strong> was released <strong>%s</strong> days ago.<br/>
 			Total Upkeep will Automatically update this plugin after <strong>XX</strong> days.
 			<a href="%s">View Update Settings</a>',
-			$plugin->updateData->version,
-			$plugin->updateData->days,
-			esc_url( $core->settings->get_settings_url('section_auto_updates') )
+			esc_html( $plugin->updateData->version ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
+			esc_html( $plugin->updateData->days ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
+			esc_url( $core->settings->get_settings_url( 'section_auto_updates' ) )
 		);
 	}
 }
