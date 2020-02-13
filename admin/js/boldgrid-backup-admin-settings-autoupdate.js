@@ -51,7 +51,9 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 			$bgBox.find( '.dashicons-editor-help' ).on( 'click', self._toggleHelp );
 
 			$bgBox.find( '.bglib-collapsible-control' ).on( 'click', function() {
-				$( this ).toggleClass( 'bglib-collapsible-open' );
+				var target = $(this).attr('data-target');
+				$( target ).animate({ height: 'toggle', opacity: 'toggle' }, 'slow');
+				
 			} );
 		},
 
