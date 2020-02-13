@@ -8,7 +8,7 @@
     "packages": [
         {
             "name": "boldgrid/library",
-            "version": "2.12.0",
+            "version": "2.12.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BoldGrid/library.git",

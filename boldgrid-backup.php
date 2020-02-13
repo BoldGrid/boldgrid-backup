@@ -142,3 +142,18 @@ if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) || defined( 'WP_CLI
 		run_boldgrid_backup();
 	}
 }
+
+
+
+add_action( 'admin_enqueue_scripts', function () {
+	$asset_file = include( plugin_dir_path( __FILE__ ) . 'build/index.asset.php');
+	wp_enqueue_script(
+		'boldgrid-block-map',
+		plugins_url( 'build/index.js', __FILE__ ),
+		$asset_file['dependencies'],
+		$asset_file['version'],
+		true
+	);
+
+	wp_enqueue_style( 'wp-components' );
+} );

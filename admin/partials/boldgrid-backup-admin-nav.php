@@ -94,5 +94,6 @@ foreach ( $navs as $nav ) {
 	$markup .= '</a>';
 }
 $markup .= '</h2>';
+$markup .= '<div id="bg-nav-component"></div>';
 
 return $markup;
