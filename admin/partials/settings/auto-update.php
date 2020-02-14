@@ -10,7 +10,8 @@
 
 // Get BoldGrid settings.
 \Boldgrid\Library\Util\Option::init();
-$auto_update_settings = \Boldgrid\Library\Util\Option::get( 'autoupdate' );
+$boldgrid_backup_settings = get_site_option( 'boldgrid_backup_settings', array() );
+$auto_update_settings = $boldgrid_backup_settings['auto_update'];
 $plugins_default      = ! empty( $auto_update_settings['plugins']['default'] );
 $themes_default       = ! empty( $auto_update_settings['themes']['default'] );
 
@@ -20,6 +21,9 @@ $boldgrid_backup_settings = get_site_option( 'boldgrid_backup_settings', array()
 // Get deprecated settings.
 $plugin_auto_update = (bool) \Boldgrid\Library\Util\Option::get( 'plugin_autoupdate' );
 $theme_auto_update  = (bool) \Boldgrid\Library\Util\Option::get( 'theme_autoupdate' );
+
+$timely_updates_enabled = $auto_update_settings['timely-updates-enabled'];
+$timely_updates_days = $auto_update_settings['days'];
 
 // Get WordPress Core auto-update setting.
 $wpcore_auto_updates = ! empty( $auto_update_settings['wpcore'] ) ?
@@ -132,16 +136,16 @@ $return .= '
 						</p>
 					</th>
 					<td>
-						<input id="timely-updates-enabled" type="radio" name="timely_updates" value="1"';
+						<input id="timely-updates-enabled" type="radio" name="auto_update[timely-updates-enabled]" value="1"';
 
-if ( ! isset( $settings['timely_updates'] ) || 1 === $settings['timely_updates'] ) {
+if ( ! isset( $timely_updates_enabled ) || "1" === $timely_updates_enabled ) {
 	$return .= ' checked';
 }
 
 $return .= '/>' . esc_html__( 'Enabled (Recommended)', 'boldgrid-backup' ) . ' &nbsp; 
-						<input id="timely-updates-disabled" type="radio" name="timely_updates" value="0"';
+						<input id="timely-updates-disabled" type="radio" name="auto_update[timely-updates-enabled]" value="0"';
 
-if ( isset( $settings['auto_backup'] ) && 0 === $settings['auto_backup'] ) {
+if ( isset( $timely_updates_enabled ) && "0" === $timely_updates_enabled ) {
 	$return .= ' checked';
 }
 
@@ -155,11 +159,11 @@ $return .= '/>' . esc_html__( 'Disabled', 'boldgrid-backup' ) .
 						</p>
 					</th>
 					<td>
-						<input id="timely-updates-days" type="number" name="timely_updates_days" value="';
-if ( ! isset( $settings['timely_updates_days'] ) || 1 === $settings['timely_updates_days'] ) {
+						<input id="timely-updates-days" type="number" name="auto_update[days]" value="';
+if ( ! isset( $timely_updates_days ) || '1' === $timely_updates_days ) {
 	$return .= '1" />';
 } else {
-	$return .= $settings['timely_updates_days'] . '" />';
+	$return .= $timely_updates_days . '" />';
 }
 
 $return .= '<span>&nbsp;' . esc_html__( 'Days since update was release' ) . '</span>
@@ -197,7 +201,7 @@ $return .= '
 				data-wpcore="all"
 				data-toggle-on="' . ( $wpcore_all ? 'true' : 'false' ) . '">
 			</div>
-			<input type="hidden" name="autoupdate[wpcore][all]"
+			<input type="hidden" name="auto_update[wpcore][all]"
 				value="' . ( $wpcore_all ? 1 : 0 ) . '" />
 		</td>
 	</tr>
@@ -206,10 +210,10 @@ $return .= '
 		<td>' . esc_html__( 'Major Updates', 'boldgrid-library' ) . '</td>
 		<td class="td-toggle">
 			<div class="toggle toggle-light wpcore-toggle"
-				data-wpcore="all"
+				data-wpcore="major"
 				data-toggle-on="' . ( $wpcore_major ? 'true' : 'false' ) . '">
 			</div>
-			<input type="hidden" name="autoupdate[wpcore][major]"
+			<input type="hidden" name="auto_update[wpcore][major]"
 				value="' . ( $wpcore_major ? 1 : 0 ) . '" />
 		</td>
 	</tr>
@@ -218,10 +222,10 @@ $return .= '
 		<td>' . esc_html__( 'Minor Updates', 'boldgrid-library' ) . '</td>
 		<td class="td-toggle">
 			<div class="toggle toggle-light wpcore-toggle"
-				data-wpcore="all"
+				data-wpcore="minor"
 				data-toggle-on="' . ( $wpcore_minor ? 'true' : 'false' ) . '">
 			</div>
-			<input type="hidden" name="autoupdate[wpcore][minor]"
+			<input type="hidden" name="auto_update[wpcore][minor]"
 				value="' . ( $wpcore_minor ? 1 : 0 ) . '" />
 		</td>
 	</tr>
@@ -230,10 +234,10 @@ $return .= '
 		<td>' . esc_html__( 'Development Updates', 'boldgrid-library' ) . '</td>
 		<td class="td-toggle">
 			<div class="toggle toggle-light wpcore-toggle"
-				data-wpcore="all"
+				data-wpcore="dev"
 				data-toggle-on="' . ( $wpcore_dev ? 'true' : 'false' ) . '">
 			</div>
-			<input type="hidden" name="autoupdate[wpcore][dev]"
+			<input type="hidden" name="auto_update[wpcore][dev]"
 				value="' . ( $wpcore_dev ? 1 : 0 ) . '" />
 		</td>
 	</tr>
@@ -242,10 +246,10 @@ $return .= '
 		<td>' . esc_html__( 'Translation Updates', 'boldgrid-library' ) . '</td>
 		<td class="td-toggle">
 			<div class="toggle toggle-light wpcore-toggle"
-				data-wpcore="all"
+				data-wpcore="translation"
 				data-toggle-on="' . ( $wpcore_translation ? 'true' : 'false' ) . '">
 			</div>
-			<input type="hidden" name="autoupdate[wpcore][translation]"
+			<input type="hidden" name="auto_update[wpcore][translation]"
 				value="' . ( $wpcore_translation ? 1 : 0 ) . '" />
 		</td>
 	</tr>
@@ -266,7 +270,7 @@ $return .= '<tbody class="div-table-body">
 		<td>' . esc_html__( 'Default For New Plugins', 'boldgrid-library' ) .
 			'<div class="toggle toggle-light right" id="toggle-default-plugins"
 			data-toggle-on="' . ( $plugins_default ? 'true' : 'false' ) . '"></div>
-			<input type="hidden" name="autoupdate[plugins][default]" value="' . ( $plugins_default ? 1 : 0 ) . '" />
+			<input type="hidden" name="auto_update[plugins][default]" value="' . ( $plugins_default ? 1 : 0 ) . '" />
 		</td>
 		<td />
 		<td>' . esc_html__( 'All Plugins', 'boldgrid-library' ) . '</td>
@@ -289,7 +293,7 @@ foreach ( $statuses as $status ) {
 	</td>
 	</tr>';
 
-	foreach ( ${ 'plugins' . $status } as $slug => $plugin_data ) {
+	foreach ( ${ 'plugins_' . $status_lower } as $slug => $plugin_data ) {
 		// Enable if global setting is on, individual settings is on, or not set and default is on.
 		$toggle = $plugin_auto_update || ! empty( $auto_update_settings['plugins'][ $slug ] ) ||
 			( ! isset( $auto_update_settings['plugins'][ $slug ] ) && $plugins_default );
@@ -303,7 +307,7 @@ foreach ( $statuses as $status ) {
 						data-plugin="' . $slug . '"
 						data-toggle-on="' . ( $toggle ? 'true' : 'false' ) . '">
 					</div>
-					<input type="hidden" name="autoupdate[plugins][' . $slug . ']"
+					<input type="hidden" name="auto_update[plugins][' . $slug . ']"
 					value="' . ( $toggle ? 1 : 0 ) . '" />
 				</td>
 			</tr>';
@@ -323,7 +327,7 @@ $return .= '<tbody class="div-table-body">
 		<td>' . esc_html__( 'Default For New Themes', 'boldgrid-library' ) .
 			'<div class="toggle toggle-light right" id="toggle-default-themes"
 			data-toggle-on="' . ( $themes_default ? 'true' : 'false' ) . '"></div>
-			<input type="hidden" name="autoupdate[themes][default]" value="' . ( $themes_default ? 1 : 0 ) . '" />
+			<input type="hidden" name="auto_update[themes][default]" value="' . ( $themes_default ? 1 : 0 ) . '" />
 		</td>
 		<td />
 		<td>' . esc_html__( 'All Themes', 'boldgrid-library' ) . '</td>
@@ -346,7 +350,7 @@ foreach ( $theme_statuses as $status ) {
 	</td>
 	</tr>';
 
-	foreach ( ${ 'themes' . $status } as $stylesheet => $theme ) {
+	foreach ( ${ 'themes_' . $status_lower } as $stylesheet => $theme ) {
 		$is_parent = ( $active_stylesheet !== $active_template && $stylesheet === $active_template );
 
 		// Enable if global setting is on, individual settings is on, or not set and default is on.
@@ -365,7 +369,7 @@ foreach ( $theme_statuses as $status ) {
 						data-stylesheet="' . $stylesheet . '"
 						data-toggle-on="' . ( $toggle ? 'true' : 'false' ) . '">
 					</div>
-					<input type="hidden" name="autoupdate[themes][' . $stylesheet . ']"
+					<input type="hidden" name="auto_update[themes][' . $stylesheet . ']"
 					value="' . ( $toggle ? 1 : 0 ) . '" />
 				</td>
 			</tr>';
