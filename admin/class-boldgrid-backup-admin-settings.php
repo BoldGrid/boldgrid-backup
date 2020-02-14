@@ -700,6 +700,15 @@ class Boldgrid_Backup_Admin_Settings {
 			$settings['folder_exclusion_exclude'] = $this->core->folder_exclusion->from_post( 'exclude' );
 			$settings['folder_exclusion_type']    = $this->core->folder_exclusion->from_post( 'type' );
 
+			/*
+			 * Save Auto Backup options
+			 *
+			 * @since SINCEVERSION
+			 */
+			if ( ! empty( $_POST['auto_update'] ) ) {
+				$settings['auto_update'] = $_POST['auto_update'];
+			}
+
 			// Read BoldGrid settings form POST request, sanitize, and merge settings with saved.
 			$boldgrid_settings = array_merge(
 				get_option( 'boldgrid_settings' ),
