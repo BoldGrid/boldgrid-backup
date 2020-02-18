@@ -86,6 +86,7 @@ class Boldgrid_Backup_Admin_In_Progress_Tmp {
 	private function get_system_zip() {
 		$dir         = Boldgrid_Backup_Admin_Compressor_System_Zip_Temp_Folder::get_path();
 		$dirlist     = $this->core->wp_filesystem->dirlist( $dir );
+		$dirlist     = is_array( $dirlist ) ? $dirlist : [];
 		$size        = 0;
 		$lastmodunix = 0;
 
