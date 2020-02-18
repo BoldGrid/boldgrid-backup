@@ -58,45 +58,4 @@ class Boldgrid_Backup_Admin_Plugins {
 
 		return $actions;
 	}
-
-	/**
-	 * Add Auto Update Message
-	 *
-	 * @since SINCEVERSION
-	 */
-	public function add_auto_update_message() {
-		$settings = get_site_option( 'boldgrid_backup_settings', array() );
-		$auto_update_settings = $settings['auto_update'];
-		$this->active_plugins = apply_filters( 'boldgrid_backup_active_plugins', null );
-		foreach ( $this->active_plugins as $plugin ) {
-			if ( "1" === $auto_update_settings['timely-updates-enabled'] && 
-				"1" === $auto_update_settings['plugins'][$plugin->getFile()] ) {
-				add_action( 'in_plugin_update_message-' . $plugin->getFile(), array( $this, 'print_update_message' ), 10, 2 );
-			}
-		}
-	}
-	/**
-	 * Prints Update Message
-	 *
-	 * @since SINCEVERSION
-	 *
-	 * @param array $data
-	 * @param array $data
-	 */
-	public function print_update_message( $data, $response ) {
-		$core   = apply_filters( 'boldgrid_backup_get_core', null );
-		$plugin = apply_filters( 'boldgrid_backup_get_plugin', $this->active_plugins, $data['slug'] );
-		$settings = get_site_option( 'boldgrid_backup_settings', array() );
-		$auto_update_settings = $settings['auto_update'];
-		$days_setting = $auto_update_settings['days'];
-		printf(
-			'<br/>Version <strong>%s</strong> was released <strong>%s</strong> days ago.<br/>
-			Total Upkeep will Automatically update this plugin after <strong>%s</strong> days.
-			<a href="%s">View Update Settings</a>',
-			esc_html( $plugin->updateData->version ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
-			esc_html( $plugin->updateData->days ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
-			esc_html( $days_setting ),
-			esc_url( $core->settings->get_settings_url( 'section_auto_updates' ) )
-		);
-	}
 }

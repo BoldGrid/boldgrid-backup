@@ -555,6 +555,14 @@ class Boldgrid_Backup_Admin_Core {
 	public $activity;
 
 	/**
+	 * An instance of the Auto Updates class
+	 *
+	 * @since SINCEVERSION
+	 * @var Boldgrid_Backup_Admin_Auto_Updates
+	 */
+	public $auto_updates;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.0
@@ -684,6 +692,9 @@ class Boldgrid_Backup_Admin_Core {
 		// Instantiate Boldgrid\Library\Library\Plugin\Plugin.
 		$this->plugin       = new \Boldgrid\Library\Library\Plugin\Plugin( 'boldgrid-backup', $this->configs );
 		$this->premium_page = new Boldgrid_Backup_Admin_Premium_Features( $this );
+
+		// Instantiate Boldgrid_Backup_Admin_Auto_Updates.
+		$this->auto_updates = new Boldgrid_Backup_Admin_Auto_Updates();
 
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
