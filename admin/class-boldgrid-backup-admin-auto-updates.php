@@ -33,16 +33,14 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 
 		$this->set_settings();
 
-		$this->set_plugins();
-
-		$this->set_themes();
+		$this->plugins = \Boldgrid\Library\Library\Plugin\Plugins::getAllActivePlugins();
+		$this->themes  = new \Boldgrid\Library\Library\Theme\Themes();
 
 		add_filter( 'automatic_updater_disabled', '__return_false' );
 		add_filter( 'auto_update_plugin', array( $this, 'auto_update_plugins' ), 10, 2 );
 		add_filter( 'auto_update_themes', array( $this, 'auto_update_themes' ), 10, 2 );
-		$this->set_update_plugins();
 
-		$this->set_update_themes();
+		add_action( 'admin_init', array( $this, 'auto_update_core' ) );
 	}
 
 	public function is_premium_done() {
@@ -60,14 +58,6 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		} else {
 			$this->settings = [];
 		}
-	}
-
-	public function set_plugins() {
-		$this->plugins = \Boldgrid\Library\Library\Plugin\Plugins::getAllActivePlugins();
-	}
-
-	public function set_themes() {
-		$this->themes = new \Boldgrid\Library\Library\Theme\Themes();
 	}
 
 	public function maybe_update_plugin( $slug ) {
@@ -109,31 +99,6 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		}
 	}
 
-	public function set_update_plugins() {
-		foreach ( $this->plugins as $plugin ) {
-			$will_update = $this->maybe_update_plugin( $plugin->getSlug() );
-			if ( true === $will_update ) {
-				$will_update = apply_filters( 'auto_update_plugin', true, $plugin->getSlug() );
-			} else {
-				$will_update = apply_filters( 'auto_update_plugin', false, $plugin->getSlug() );
-			}
-		}
-		
-		return $will_update;
-	}
-
-	public function set_update_themes() {
-		foreach ( $this->themes->list() as $theme ) {
-			$will_update = $this->maybe_update_theme( $theme->stylesheet );
-			if ( true === $will_update ) {
-				$will_update = apply_filters( 'auto_update_theme', true, $theme->stylesheet );
-			} else {
-				$will_update = apply_filters( 'auto_update_theme', false, $theme->stylesheet );
-			}
-		}
-		return $will_update;
-	}
-
 	function auto_update_plugins ( $update, $item ) {
 		// Array of plugin slugs to always auto-update
 		$plugins = [];
@@ -151,23 +116,22 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		}
 	}
 
-	function auto_update_themes ( $update, $item ) {
-		error_log('TRIGGERED');
-		// Array of theme stylesheets to always auto-update
-		$themes = [];
-		foreach ( $this->themes->list() as $theme ) {
-			if ( $this->maybe_update_theme( $theme->stylesheet ) ) {
-				$themes[] = $theme->stylesheet;
-			}
+	function auto_update_core () {
+		$wpcs        = $this->settings['wpcore'];
+		if ( $wpcs['all'] ) {
+			add_filter( 'auto_update_core', '__return_true' );
 		}
+
+		$dev         = ( $wpcs['dev'] ) ? 'true' : 'false';
+		$major       = ( $wpcs['major'] ) ? 'true' : 'false';
+		$minor       = ( $wpcs['minor'] ) ? 'true' : 'false';
+		$translation = ( $wpcs['translation'] ) ? 'true' : 'false';
 		
-		error_log( serialize( $item->theme ) );
-		if ( in_array( $item->theme, $themes ) ) {
-			// Always update themes in this array
-			return true;
-		} else {
-			// Else, Do Not Update Theme
-			return false;
-		}
+		add_filter( 'allow_dev_auto_core_updates', '__return_' . $dev );
+		add_filter( 'allow_major_auto_core_updates', '__return_' . $major );
+		add_filter( 'allow_minor_auto_core_updates', '__return_' . $minor );
+		add_filter( 'auto_update_translation', '__return_' . $translation );
+		error_log(serialize( apply_filters( 'auto_update_translation', false ) ));
+		wp_maybe_auto_update();
 	}
 }

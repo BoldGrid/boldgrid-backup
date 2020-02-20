@@ -527,6 +527,7 @@ class Boldgrid_Backup {
 
 		$this->loader->add_filter( 'Boldgrid\Library\Notifications\DashboardWidget\getFeaturePlugin\boldgrid-backup', $plugin_admin_core->dashboard_widget, 'filter_feature', 10, 2 );
 
+		$this->loader->add_action( 'init', $plugin_admin_core->auto_updates, 'auto_update_core' );
 		$this->loader->add_filter( 'auto_update_plugin', $plugin_admin_core->auto_updates, 'auto_update_plugins', 10, 2 );
 		$this->loader->add_filter( 'auto_update_theme', $plugin_admin_core->auto_updates, 'auto_update_themes', 10, 2 );
 

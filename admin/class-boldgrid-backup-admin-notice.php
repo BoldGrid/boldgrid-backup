@@ -236,15 +236,42 @@ class Boldgrid_Backup_Admin_Notice {
 	 * @since 1.7.0
 	 */
 	public function display_autoupdate_notice() {
+		$auto_update_array = [
+			( apply_filters( 'allow_major_auto_core_updates', false ) ) ? 'Major' : false,
+			( apply_filters( 'allow_minor_auto_core_updates', false ) ) ? 'Minor' : false,
+			( apply_filters( 'allow_dev_auto_core_updates', false ) ) ? 'Development' : false,
+			( apply_filters( 'auto_update_translation', false ) ) ? 'Translation' : false,
+		];
+		$auto_update_array = array_filter($auto_update_array);
+		$update_msg        = '';
+		error_log( count( $auto_update_array) );
+		switch ( count( $auto_update_array ) ) {
+			case 0:
+				$update_msg = "disabled for all";
+				break;
+			case 1:
+				$update_msg = "enabled for $auto_update_array[0]";
+				break;
+			case 4:
+				$update_msg = "enabled for all";
+			break;
+			default:
+				$x = array_slice($auto_update_array, 0, -1);
+				$auto_update_string = implode( ', ', $x );
+				$update_msg = sprintf( "enabled for %s and %s", $auto_update_string, end( $auto_update_array ) );
+				break;
+		}
+
 		$message = sprintf(
 			// translators: 1: HTML anchor opening tag, 2: HTML anchor closing tag, 3: Plugin title.
 			esc_html__(
-				'Auto Updates can be configured in the %1$s%3$s Settings%2$s.',
+				'Auto Updates are %4$s WordPress Core Updates. This can be configured in the %1$s%3$s Settings%2$s.',
 				'boldgrid-backup'
 			),
 			'<a href="' . admin_url( 'admin.php?page=boldgrid-backup-settings&section=section_auto_updates' ) . '">',
 			'</a>',
-			BOLDGRID_BACKUP_TITLE
+			BOLDGRID_BACKUP_TITLE,
+			esc_html__($update_msg, 'boldgrid-backup' )
 		);
 
 		do_action( 'boldgrid_backup_notice', $message, 'notice notice-info is-dismissible' );
