@@ -181,7 +181,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	public function auto_update_themes( $update, stdClass $item ) {
 		// Array of theme stylesheets to always auto-update
 		$themes = [];
-		foreach ( $this->themes->list() as $theme ) {
+		foreach ( $this->themes->getList() as $theme ) {
 			if ( $this->maybe_update_plugin( $theme->stylesheet ) ) {
 				$themes[] = $theme->stylesheet;
 			}
