@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/BoldGrid/library.git",
-                "reference": "20e709907f62b790fd6f4d340d9e4d7adef1f995"
+                "reference": "7a8c586debc29385c9ce93f6c4d181476e14e478"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BoldGrid/library/zipball/20e709907f62b790fd6f4d340d9e4d7adef1f995",
-                "reference": "20e709907f62b790fd6f4d340d9e4d7adef1f995",
+                "url": "https://api.github.com/repos/BoldGrid/library/zipball/7a8c586debc29385c9ce93f6c4d181476e14e478",
+                "reference": "7a8c586debc29385c9ce93f6c4d181476e14e478",
                 "shasum": ""
             },
             "type": "library",
@@ -54,11 +54,7 @@
                 }
             ],
             "description": "The BoldGrid Library for shared code used in official BoldGrid plugins and themes.",
-<<<<<<< HEAD
-            "time": "2020-02-07T18:48:57+00:00"
-=======
-            "time": "2020-02-19T21:24:13+00:00"
->>>>>>> Made php-cs and phpunit needed changes
+            "time": "2020-02-20T20:53:59+00:00"
         },
         {
             "name": "chland/tdcron",
