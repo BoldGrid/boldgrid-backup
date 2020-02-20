@@ -242,23 +242,35 @@ class Boldgrid_Backup_Admin_Notice {
 			( apply_filters( 'allow_dev_auto_core_updates', false ) ) ? 'Development' : false,
 			( apply_filters( 'auto_update_translation', false ) ) ? 'Translation' : false,
 		];
-		$auto_update_array = array_filter($auto_update_array);
+		$auto_update_array = array_filter( $auto_update_array );
 		$update_msg        = '';
-		error_log( count( $auto_update_array) );
 		switch ( count( $auto_update_array ) ) {
 			case 0:
-				$update_msg = "disabled for all";
+				$update_msg = esc_html( 'disabled for all', 'boldgrid-backup' );
 				break;
 			case 1:
-				$update_msg = "enabled for $auto_update_array[0]";
+				$update_msg = sprintf(
+					// translators: 1: Auto Update Type.
+					esc_html__( 'enabled for %s', 'boldgrid-backup' ),
+					$auto_update_array[0]
+				);
 				break;
 			case 4:
-				$update_msg = "enabled for all";
-			break;
+				$update_msg = esc_html__( 'enabled for all', 'boldgrid-backup' );
+				break;
 			default:
-				$x = array_slice($auto_update_array, 0, -1);
+				$x = array_slice( $auto_update_array, 0, -1 );
+
 				$auto_update_string = implode( ', ', $x );
-				$update_msg = sprintf( "enabled for %s and %s", $auto_update_string, end( $auto_update_array ) );
+				$update_msg         = sprintf(
+					// translators: 1: Auto Update Types, 2: Auto Update Type.
+					esc_html__(
+						'enabled for %1$s and %2$s',
+						'boldgrid-backup'
+					),
+					$auto_update_string,
+					end( $auto_update_array )
+				);
 				break;
 		}
 
@@ -271,7 +283,7 @@ class Boldgrid_Backup_Admin_Notice {
 			'<a href="' . admin_url( 'admin.php?page=boldgrid-backup-settings&section=section_auto_updates' ) . '">',
 			'</a>',
 			BOLDGRID_BACKUP_TITLE,
-			esc_html__($update_msg, 'boldgrid-backup' )
+			$update_msg
 		);
 
 		do_action( 'boldgrid_backup_notice', $message, 'notice notice-info is-dismissible' );
