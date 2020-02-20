@@ -1,23 +1,23 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "00f1abd158c93ffde8b00cf13e347927",
+    "content-hash": "77756fdd464a8b2ffe244781ca43f5a9",
     "packages": [
         {
             "name": "boldgrid/library",
-            "version": "2.12.0",
+            "version": "dev-auto-updates",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BoldGrid/library.git",
-                "reference": "02d8f828136ba6df876c1d5ddaf3d1e7309765a9"
+                "reference": "20e709907f62b790fd6f4d340d9e4d7adef1f995"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BoldGrid/library/zipball/02d8f828136ba6df876c1d5ddaf3d1e7309765a9",
-                "reference": "02d8f828136ba6df876c1d5ddaf3d1e7309765a9",
+                "url": "https://api.github.com/repos/BoldGrid/library/zipball/20e709907f62b790fd6f4d340d9e4d7adef1f995",
+                "reference": "20e709907f62b790fd6f4d340d9e4d7adef1f995",
                 "shasum": ""
             },
             "type": "library",
@@ -54,7 +54,7 @@
                 }
             ],
             "description": "The BoldGrid Library for shared code used in official BoldGrid plugins and themes.",
-            "time": "2020-02-06T17:29:29+00:00"
+            "time": "2020-02-19T21:24:13+00:00"
         },
         {
             "name": "chland/tdcron",
@@ -261,6 +261,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "boldgrid/library": 20,
         "ifsnop/mysqldump-php": 20,
         "chland/tdcron": 20,
         "lox/xhprof": 20
