@@ -24,17 +24,24 @@ $translations             = array(
 );
 
 
-// Get Heading Markup
+/**
+ * Get Heading markup
+ *
+ * @since SINCEVERSION
+ *
+ * @param array $auto_update_settings
+ * @return string
+ */
 function get_heading_markup( $auto_update_settings ) {
 	if ( empty( $auto_update_settings ) ) {
 		$bbs_link_open  = '';
 		$bbs_link_close = '';
-	
+
 		if ( empty( $_GET['page'] ) || 'boldgrid-backup-settings' !== $_GET['page'] ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			$bbs_link_open  = '<a href="' . admin_url( 'admin.php?page=boldgrid-backup-settings&section=section_auto_rollback' ) . '">';
 			$bbs_link_close = '</a>';
 		}
-	
+
 		return '
 			<div><p>' .
 			sprintf(
@@ -53,37 +60,45 @@ function get_heading_markup( $auto_update_settings ) {
 	}
 }
 
-// GET PREMIUM MARKUP
-function get_premium_markup ( $auto_update_settings ) {
-	$core = apply_filters( 'boldgrid_backup_get_core', null );
+/**
+ * Get Premium markup
+ *
+ * @since SINCEVERSION
+ *
+ * @return string
+ */
+function get_premium_markup() {
+	$core        = apply_filters( 'boldgrid_backup_get_core', null );
 	$premium_url = $core->go_pro->get_premium_url( 'bgbkup-settings-auto-update' );
 	$premium_box = sprintf(
 		'
 		<div class="bg-box-bottom premium">
-			%1$s
-
 			<p>
+				%1$s
 				%2$s
-				%3$s
 			</p>
 		</div>',
-		/* 1 */ $premium_inputs,
-		/* 2 */ $core->go_pro->get_premium_button( $premium_url ),
-		/* 3 */ __( 'Upgrade to premium for the option to configure a delay on updates!', 'boldgrid-backup' )
+		/* 1 */ $core->go_pro->get_premium_button( $premium_url ),
+		/* 2 */ __( 'Upgrade to premium for the option to configure a delay on updates!', 'boldgrid-backup' )
 	);
 
 	$premium_markup = '<div class="bg-box">
 		<div class="bg-box-top">' .
 			esc_html__( 'Configure When Auto Updates Occur', 'boldgrid-library' ) . '
 		</div>' . $premium_box . '</div>';
-		
+
 	return $premium_markup;
 }
 
-// CONFIGURE WHAT IS AUTO UPDATED
-
-// WPCORE MARKUP SECTION
-function get_wpcore_update_markup( $auto_update_settings, $translations ) {
+/**
+ * Get WP Core Update markup
+ *
+ * @since SINCEVERSION
+ *
+ * @param array $auto_update_settings
+ * @return string
+ */
+function get_wpcore_update_markup( $auto_update_settings ) {
 	$wpcore_auto_updates = ! empty( $auto_update_settings['wpcore'] ) ?
 		$auto_update_settings['wpcore'] : array();
 	$wpcore_major        = ! empty( $wpcore_auto_updates['major'] );
@@ -177,7 +192,15 @@ function get_wpcore_update_markup( $auto_update_settings, $translations ) {
 	return $wpcore_update_markup;
 }
 
-// PLUGINS MARKUP SECTION
+/**
+ * Get Plugins Update Markup
+ *
+ * @since SINCEVERSION
+ *
+ * @param array $auto_update_settings
+ * @param array $translations
+ * @return string
+ */
 function get_plugins_update_markup( $auto_update_settings, $translations ) {
 	$plugins_default    = ! empty( $auto_update_settings['plugins']['default'] );
 	$plugin_auto_update = (bool) \Boldgrid\Library\Util\Option::get( 'plugin_autoupdate' );
@@ -197,7 +220,7 @@ function get_plugins_update_markup( $auto_update_settings, $translations ) {
 		'Active',
 		'Inactive',
 	);
-	
+
 	$plugins_update_markup = '<tbody class="div-table-body">
 	<tr>
 		<th>' . esc_html__( 'Plugins', 'boldgrid-library' ) .
@@ -256,16 +279,22 @@ function get_plugins_update_markup( $auto_update_settings, $translations ) {
 	return $plugins_update_markup;
 }
 
-// THEMES MARKUP SECTION
+/**
+ * Get Themes Update Markup
+ *
+ * @since SINCEVERSION
+ *
+ * @param array $auto_update_settings
+ * @param array $translations
+ * @return string
+ */
 function get_themes_update_markup( $auto_update_settings, $translations ) {
 	$themes_default    = ! empty( $auto_update_settings['themes']['default'] );
 	$active_stylesheet = get_option( 'stylesheet' );
 	$active_template   = get_option( 'template' );
 	$themes            = wp_get_themes();
-
-
-	$themes_active   = array();
-	$themes_inactive = array();
+	$themes_active     = array();
+	$themes_inactive   = array();
 
 	foreach ( $themes as $stylesheet => $theme ) {
 		$is_active = $stylesheet === $active_stylesheet;
@@ -346,16 +375,19 @@ function get_themes_update_markup( $auto_update_settings, $translations ) {
 
 	return $themes_update_markup;
 }
+
 $auto_update_markup = ' ' . get_heading_markup( $auto_update_settings );
+
 if ( $this->core->config->is_premium_done ) {
 	include_once BOLDGRID_BACKUP_PREMIUM_PATH . '/admin/partials/settings/timely-auto-updates.php';
 	$auto_update_markup .= get_when_update_markup( $auto_update_settings );
 } else {
 	$auto_update_markup .= get_premium_markup( $auto_update_settings );
 }
-$auto_update_markup .= get_wpcore_update_markup($auto_update_settings, $translations) .
-	get_plugins_update_markup($auto_update_settings, $translations) .
-	get_themes_update_markup($auto_update_settings, $translations) .
+
+$auto_update_markup .= get_wpcore_update_markup( $auto_update_settings, $translations ) .
+	get_plugins_update_markup( $auto_update_settings, $translations ) .
+	get_themes_update_markup( $auto_update_settings, $translations ) .
 	'</table></div>';
 
 return $auto_update_markup;
