@@ -93,7 +93,7 @@ function get_wpcore_update_markup( $auto_update_settings, $translations ) {
 	$wpcore_all          = ! empty( $wpcore_auto_updates['all'] ) ||
 		( $wpcore_major && $wpcore_minor && $wpcore_dev && $wpcore_translation );
 
-	$wpcore_update_markup .= '
+	$wpcore_update_markup = '
 	<div class="bg-box">
 		<div class="bg-box-top">
 			' . esc_html__( 'Configure what is Auto Updated', 'boldgrid-library' ) . '
@@ -198,7 +198,7 @@ function get_plugins_update_markup( $auto_update_settings, $translations ) {
 		'Inactive',
 	);
 	
-	$plugins_update_markup .= '<tbody class="div-table-body">
+	$plugins_update_markup = '<tbody class="div-table-body">
 	<tr>
 		<th>' . esc_html__( 'Plugins', 'boldgrid-library' ) .
 			'<span class="dashicons dashicons-editor-help" data-id="update-types"></span>
@@ -283,7 +283,7 @@ function get_themes_update_markup( $auto_update_settings, $translations ) {
 		'Inactive',
 	);
 
-	$themes_update_markup .= '<tbody class="div-table-body">
+	$themes_update_markup = '<tbody class="div-table-body">
 	<tr>
 		<th>' . esc_html__( 'Themes', 'boldgrid-library' ) .
 			'<span class="dashicons dashicons-editor-help" data-id="update-types"></span>
@@ -320,7 +320,7 @@ function get_themes_update_markup( $auto_update_settings, $translations ) {
 			$is_parent = ( $active_stylesheet !== $active_template && $stylesheet === $active_template );
 
 			// Enable if global setting is on, individual settings is on, or not set and default is on.
-			$toggle = $theme_auto_update || ! empty( $auto_update_settings['themes'][ $stylesheet ] ) ||
+			$toggle = ! empty( $auto_update_settings['themes'][ $stylesheet ] ) ||
 				( ! isset( $auto_update_settings['themes'][ $stylesheet ] ) && $themes_default );
 
 			$themes_update_markup .= '
