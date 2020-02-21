@@ -10,6 +10,9 @@ var BOLDGRID = BOLDGRID || {};
 BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 
 ( function( $ ) {
+
+	var self;
+
 	BOLDGRID.SETTINGS.AutoUpdate = {
 
 		/**
@@ -48,12 +51,12 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 				.not( '.toggle-group' )
 				.on( 'click swipe contextmenu', self._setMasterToggles );
 
-			$bgBox.find( '.table-help td p' ).attr('style', 'height: 0em; opacity: 0%' );
+			$bgBox.find( '.table-help td p' ).attr( 'style', 'height: 0em; opacity: 0%' );
 			$bgBox.find( '.dashicons-editor-help' ).on( 'click', self._toggleHelp );
 
 			$bgBox.find( '.bglib-collapsible-control' ).on( 'click', function() {
-				var target = $(this).attr('data-target');
-				$( target ).animate({ height: 'toggle', opacity: 'toggle' }, 'slow');
+				var target = $( this ).attr( 'data-target' );
+				$( target ).animate( { height: 'toggle', opacity: 'toggle' }, 'slow' );
 			} );
 		},
 
@@ -71,7 +74,7 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 				$themesDefault = $bgBox.find( '#toggle-default-themes' ),
 				$timelyUpdatesEnabled = $bgBox.find( '#timely-updates-enabled' ),
 				$timelyUpdatesDisabled = $bgBox.find( '#timely-updates-disabled' ),
-				$timelyUpdatesDays = $bgBox.find( '#timely-updates-days');
+				$timelyUpdatesDays = $bgBox.find( '#timely-updates-days' );
 
 			// If the updates section is not in use, then just return.
 			// if ( ! $pluginsDefault.data( 'toggles' ) ) {
@@ -86,7 +89,7 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 					.attr( 'name', 'auto_update[wpcore][' + $this.data( 'wpcore' ) + ']' )
 					.val( $this.data( 'toggles' ).active ? 1 : 0 );
 				$this.change( function() {
-					if ( $this.prop('checked') == true ) {
+					if ( true == $this.prop( 'checked' ) ) {
 						$thisInput.val( '1' );
 					} else {
 						$thisInput.val( '0' );
@@ -103,7 +106,7 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 					.val( $this.data( 'toggles' ).active ? 1 : 0 );
 
 				$this.change( function() {
-					if ( $this.prop('checked') == true ) {
+					if ( true == $this.prop( 'checked' ) ) {
 						$thisInput.val( '1' );
 					} else {
 						$thisInput.val( '0' );
@@ -119,7 +122,7 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 					.attr( 'name', 'auto_update[themes][' + $this.data( 'stylesheet' ) + ']' )
 					.val( $this.data( 'toggles' ).active ? 1 : 0 );
 				$this.change( function() {
-					if ( $this.prop('checked') == true ) {
+					if ( true == $this.prop( 'checked' ) ) {
 						$thisInput.val( '1' );
 					} else {
 						$thisInput.val( '0' );
@@ -134,20 +137,6 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 			$themesDefault
 				.next( 'input' )
 				.val( $themesDefault.data( 'toggles' ).active ? 1 : 0 );
-			
-			// $timelyUpdatesEnabled.change( function(){
-			// 	$isChecked = $timelyUpdatesEnabled.prop('checked');
-			// 	$timelyUpdatesEnabled.val( $isChecked ? 1 : 0 );
-			// 	$timelyUpdatesDisabled.val( $isChecked ? 0 : 1 );
-			// });
-
-			// $timelyUpdatesDisabled.change( function(){
-			// 	$isChecked = $timelyUpdatesDisabled.prop( 'checked' );
-			// 	$timelyUpdatesDisabled.val( $isChecked ? 1 : 0 );
-			// 	$timelyUpdatesEnabled.val( $isChecked ? 0 : 1 );
-			// });
-
-
 		},
 
 		/**
@@ -220,23 +209,24 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 		 */
 		_toggleHelp: function( e ) {
 			var id = $( this ).attr( 'data-id' );
-			var target = $('.table-help[data-id="' + id + '"]');
+			var target = $( '.table-help[data-id="' + id + '"]' );
 			e.preventDefault();
 
 			if ( id === undefined ) {
 				return false;
 			}
-			
-			$( target).toggleClass('show-help');
-			$( target).toggleClass('hide-help');
-			$( '.table-help.show-help[data-id="' + id + '"] td p' ).animate({ height: '1.5em', opacity: '100%' }, 400 );
-			$( '.table-help.hide-help[data-id="' + id + '"] td p' ).animate({ height: '0em', opacity: '0%' }, 400 );
 
-			
+			$( target ).toggleClass( 'show-help' );
+			$( target ).toggleClass( 'hide-help' );
+			$( '.table-help.show-help[data-id="' + id + '"] td p' ).animate( { height: '1.5em', opacity: '100%' }, 400 );
+			$( '.table-help.hide-help[data-id="' + id + '"] td p' ).animate( { height: '0em', opacity: '0%' }, 400 );
+
 			return false;
 		}
 	};
 
+	// eslint-disable-next-line vars-on-top
 	var self = BOLDGRID.SETTINGS.AutoUpdate;
+
 	BOLDGRID.SETTINGS.AutoUpdate.init();
 } )( jQuery );
