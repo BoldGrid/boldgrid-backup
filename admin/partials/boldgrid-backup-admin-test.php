@@ -442,18 +442,15 @@ foreach ( $tests as $test ) {
 $table .= '</table>';
 
 ?>
-<div class="functionality-test-section wrap">
+<div class="functionality-test-section">
 
 	<?php
-	printf( '<h1>%1$s</h1>', esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'Preflight Check', 'boldgrid-backup' ) ) );
-
 	$nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
 	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
 	echo $fail_tips; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
 	echo $table; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
-
 	?>
 
 </div>

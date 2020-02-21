@@ -79,6 +79,20 @@ class Boldgrid_Backup_Admin_Dashboard {
 	 * @since 1.11.0
 	 */
 	public function page() {
+		echo '
+		<div class="wrap">
+			<div id="bglib-page-container" class="bgbkup-page-container">
+				<div id="bglib-page-top">
+					<div id="bglib-page-header">
+						<h1>' . esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'Dashboard', 'boldgrid-backup' ) ) . '</h1>
+					</div>
+				</div>
+				<div id="bglib-page-content">
+					<div class="wp-header-end"></div>';
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-dashboard.php';
+		echo '
+				</div>
+			</div>
+		</div>';
 	}
 }

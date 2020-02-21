@@ -54,6 +54,20 @@ class Boldgrid_Backup_Admin_Transfers {
 			BOLDGRID_BACKUP_VERSION
 		);
 
+		echo '
+		<div class="wrap">
+			<div id="bglib-page-container" class="bgbkup-page-container">
+				<div id="bglib-page-top">
+					<div id="bglib-page-header">
+						<h1>' . esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'Total Upkeep Transfers', 'boldgrid-backup' ) ) . '</h1>
+					</div>
+				</div>
+				<div id="bglib-page-content">
+					<div class="wp-header-end"></div>';
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-transfers.php';
+		echo '
+				</div>
+			</div>
+		</div>';
 	}
 }

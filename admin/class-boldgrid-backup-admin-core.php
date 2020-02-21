@@ -2674,8 +2674,21 @@ class Boldgrid_Backup_Admin_Core {
 			BOLDGRID_BACKUP_VERSION, 'all'
 		);
 
-		// Load template view.
+		echo '
+		<div class="wrap">
+			<div id="bglib-page-container" class="bgbkup-page-container">
+				<div id="bglib-page-top">
+					<div id="bglib-page-header">
+						<h1>' . esc_html__( 'Total Upkeep Preflight Check', 'boldgrid-backup' ) . '</h1>
+					</div>
+				</div>
+				<div id="bglib-page-content">
+					<div class="wp-header-end"></div>';
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-test.php';
+		echo '
+				</div>
+			</div>
+		</div>';
 	}
 
 	/**
