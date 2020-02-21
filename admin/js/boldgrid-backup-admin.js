@@ -116,6 +116,7 @@ BoldGrid.Backup = function( $ ) {
 		self.bindHelpClick();
 		self.hideBackupNotice();
 		self.updatePremiumLink();
+		self.installPremiumLink();
 
 		$( 'body' ).on( 'click', '[data-toggle-target]', self.onClickToggle );
 		$( 'body' ).on( 'make_notices_dismissible', self.makeNoticesDismissible );
@@ -144,6 +145,49 @@ BoldGrid.Backup = function( $ ) {
 			.find( 'a[href="' + BoldGridBackupAdmin.get_premium_url + '"]' )
 			.attr( 'target', '_blank' );
 	};
+
+	self.installPremiumLink = function() {
+		$( '.install-premium' ).one( "click", function( event ) {
+			event.preventDefault();
+			downloadUrl = $(this).attr( 'href' );
+			noticeP = $(this).parent();
+			noticeDiv = $(noticeP).parent();
+			$( noticeP ).html('<span class="spinner inline"></span><span class="in-progress">&nbsp;Installing Premium Plugin.</span>');
+
+			adminAjaxUrl = $( this ).attr( 'href' );
+			nonce = $( this ).attr( 'data-nonce' );
+
+			$.post( adminAjaxUrl, {action: 'boldgrid_backup_install_premium', nonce: nonce, data: 'install'}, function( response ) {
+				console.log( response.data.installed );
+				if ( true === response.data.installed ) {
+					$(noticeDiv).find( '.spinner' ).remove();
+					$(noticeDiv).find( '.in-progress' ).html('&#x2714;&nbsp;Premium Plugin Installed' );
+					$(noticeDiv).find( '.in-progress' ).attr( 'class', 'complete' );
+					$(noticeDiv).append( '<p><span class="spinner inline"></span><span class="in-progress">&nbsp;Activating Premium Plugin.</span></p>' );
+					self.activatePremium(adminAjaxUrl, nonce, noticeDiv);
+				} else {
+					$(noticeDiv).find( '.spinner').remove();
+					$(noticeDiv).find( '.in-progress').html( '&#x2718;&nbsp;Premium plugin installation Failed. <a href="' + downloadUrl + '">Click Here</a> to download and install manually.');
+					$(noticeDiv).find( '.in-progress' ).attr( 'class', 'failed' );
+				}
+			} );
+		} );
+	};
+
+	self.activatePremium = function(adminAjaxUrl, nonce, noticeDiv) {
+		$.post( adminAjaxUrl, {action: 'boldgrid_backup_install_premium', nonce: nonce, data: 'activate'}, function( response ) {
+			console.log( response.data.activated );
+			if ( true === response.data.activated ) {
+				$(noticeDiv).find( '.spinner' ).remove();
+				$(noticeDiv).find( '.in-progress' ).html('&#x2714;&nbsp;Premium Plugin Activated' );
+				$(noticeDiv).find( '.in-progress' ).attr( 'class', 'complete' );
+			} else {
+				$(noticeDiv).find( '.spinner').remove();
+				$(noticeDiv).find( '.in-progress').html( '&#x2718;&nbsp;Premium plugin activation Failed.');
+				$(noticeDiv).find( '.in-progress' ).attr( 'class', 'failed' ); 
+			}
+		});
+	}
 };
 
 BoldGrid.Backup( jQuery );

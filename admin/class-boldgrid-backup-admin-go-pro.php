@@ -45,6 +45,30 @@ class Boldgrid_Backup_Admin_Go_Pro {
 	 */
 	public function __construct( $core ) {
 		$this->core = $core;
+		$this->premium_plugin = new \Boldgrid\Library\Library\Plugin\Plugin( 'boldgrid-backup-premium' );
+	}
+
+	public function wp_ajax_boldgrid_backup_install_premium() {
+		if ( !wp_verify_nonce( $_REQUEST['nonce'], 'boldgrid_backup_install_premium_nonce') ) {
+			wp_send_json_failure('Install Premium Action Triggered - Nonce Failed');
+		}
+		switch( $_REQUEST['data'] ) {
+			case 'install':
+				$file = download_url( $this->premium_plugin->getDownloadUrl() );
+				$installed = unzip_file( $file, WP_PLUGIN_DIR );
+				wp_send_json_success( [ 'installed' => $installed ] );
+				break;
+			case 'activate':
+				$error = activate_plugin('boldgrid-backup-premium/boldgrid-backup-premium.php');
+				if ( null === $error ) {
+					wp_send_json_success( [ 'activated' => true ] );
+				} else {
+					wp_send_json_failure( [ 'activated' => $error ] );
+				}
+				break;
+			default:
+			wp_send_json_failure( [ 'error' => 'Must Specify "install" or "activate"' ] );
+		}
 	}
 
 	/**
@@ -92,6 +116,8 @@ class Boldgrid_Backup_Admin_Go_Pro {
 
 		$premium_plugin = new \Boldgrid\Library\Library\Plugin\Plugin( 'boldgrid-backup-premium' );
 
+		$nonce = wp_create_nonce( 'boldgrid_backup_install_premium_nonce' );
+
 		$notices = [
 			[
 				'id'      => 'boldgrid_backup_activate_premium',
@@ -125,11 +151,11 @@ class Boldgrid_Backup_Admin_Go_Pro {
 				'message' => '<p>' . sprintf(
 					// translators: 1: URL address to download plugin 2: URL to plugin-installer.php, 3: Plugin title, 4: Premium plugin title.
 					__(
-						'Hello there! We see that you have a <strong>Premium BoldGrid Connect Key</strong> and you have the <strong>%3$s</strong> plugin activated! <a href="%1$s">Click here</a> to download the <strong>%4$s</strong> plugin and gain access to more features! After the download completes, go to <a href="%2$s">Plugins &raquo; Add New</a> and click the <em>Upload Plugin</em> button at the top of the page to upload your new plugin.',
+						'Hello there! We see that you have a <strong>Premium BoldGrid Connect Key</strong> and you have the <strong>%3$s</strong> plugin activated! <a class="install-premium" data-nonce="%2$s" href="%1$s">Click here</a> to install and activate the <strong>%4$s</strong> plugin and gain access to more features!',
 						'boldgrid-backup'
 					),
-					$premium_plugin->getDownloadUrl(),
-					admin_url( 'plugin-install.php' ),
+					admin_url( 'admin-ajax.php' ),
+					$nonce,
 					BOLDGRID_BACKUP_TITLE,
 					BOLDGRID_BACKUP_TITLE . ' Premium'
 				) . '</p>',
