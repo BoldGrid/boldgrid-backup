@@ -47,7 +47,14 @@ class Boldgrid_Backup_Admin_Go_Pro {
 		$this->core = $core;
 		$this->premium_plugin = new \Boldgrid\Library\Library\Plugin\Plugin( 'boldgrid-backup-premium' );
 	}
-
+	
+	/**
+	 * Ajax callback to auto install premium.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
+	 */
 	public function wp_ajax_boldgrid_backup_install_premium() {
 		if ( !wp_verify_nonce( $_REQUEST['nonce'], 'boldgrid_backup_install_premium_nonce') ) {
 			wp_send_json_failure('Install Premium Action Triggered - Nonce Failed');
