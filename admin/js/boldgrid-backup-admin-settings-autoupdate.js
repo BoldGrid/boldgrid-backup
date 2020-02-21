@@ -10,7 +10,6 @@ var BOLDGRID = BOLDGRID || {};
 BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 
 ( function( $ ) {
-
 	var self;
 
 	BOLDGRID.SETTINGS.AutoUpdate = {
@@ -130,13 +129,9 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 				} );
 			} );
 
-			$pluginsDefault
-				.next( 'input' )
-				.val( $pluginsDefault.data( 'toggles' ).active ? 1 : 0 );
+			$pluginsDefault.next( 'input' ).val( $pluginsDefault.data( 'toggles' ).active ? 1 : 0 );
 
-			$themesDefault
-				.next( 'input' )
-				.val( $themesDefault.data( 'toggles' ).active ? 1 : 0 );
+			$themesDefault.next( 'input' ).val( $themesDefault.data( 'toggles' ).active ? 1 : 0 );
 		},
 
 		/**
@@ -218,8 +213,14 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 
 			$( target ).toggleClass( 'show-help' );
 			$( target ).toggleClass( 'hide-help' );
-			$( '.table-help.show-help[data-id="' + id + '"] td p' ).animate( { height: '1.5em', opacity: '100%' }, 400 );
-			$( '.table-help.hide-help[data-id="' + id + '"] td p' ).animate( { height: '0em', opacity: '0%' }, 400 );
+			$( '.table-help.show-help[data-id="' + id + '"] td p' ).animate(
+				{ height: '1.5em', opacity: '100%' },
+				400
+			);
+			$( '.table-help.hide-help[data-id="' + id + '"] td p' ).animate(
+				{ height: '0em', opacity: '0%' },
+				400
+			);
 
 			return false;
 		}
