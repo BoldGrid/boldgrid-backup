@@ -265,6 +265,7 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-premium.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-updates.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-find-modified-files.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-timely-auto-updates.php';
 
 		// Features.
 		if ( class_exists( '\Boldgrid\Library\Library\Ui\Feature' ) ) {

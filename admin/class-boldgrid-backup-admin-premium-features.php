@@ -78,6 +78,7 @@ class Boldgrid_Backup_Admin_Premium_Features {
 
 		$this->page = $plugin->getPageBySlug( 'boldgrid-backup-premium-features' );
 		$cards      = [
+			new Card\Timely_Auto_Updates( $this->page ),
 			new Card\Database_Encryption( $this->page ),
 			new Card\Google_Drive( $this->page ),
 			new Card\Amazon_S3( $this->page ),
