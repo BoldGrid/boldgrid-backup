@@ -29,11 +29,12 @@ $translations             = array(
  *
  * @since SINCEVERSION
  *
+ * @param array $boldgrid_backup_settings Boldgrid Backup Settings.
  * @param array $auto_update_settings Auto Update Settings from DB.
  * @return string
  */
-function get_heading_markup( $auto_update_settings ) {
-	if ( empty( $auto_update_settings ) ) {
+function get_heading_markup( $boldgrid_backup_settings, $auto_update_settings ) {
+	if ( empty( $auto_update_settings ) || 0 === $boldgrid_backup_settings['auto_backup'] ) {
 		$bbs_link_open  = '';
 		$bbs_link_close = '';
 
@@ -376,7 +377,7 @@ function get_themes_update_markup( $auto_update_settings, $translations ) {
 	return $themes_update_markup;
 }
 
-$auto_update_markup = ' ' . get_heading_markup( $auto_update_settings );
+$auto_update_markup = ' ' . get_heading_markup( $boldgrid_backup_settings, $auto_update_settings );
 
 if ( $this->core->config->is_premium_done ) {
 	include_once BOLDGRID_BACKUP_PREMIUM_PATH . '/admin/partials/settings/timely-auto-updates.php';
