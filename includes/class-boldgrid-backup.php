@@ -259,6 +259,7 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-plugin-editor-tools.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-premium.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-updates.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-find-modified-files.php';
 
 		// Features.
 		if ( class_exists( '\Boldgrid\Library\Library\Ui\Feature' ) ) {
@@ -549,7 +550,10 @@ class Boldgrid_Backup {
 		 *
 		 * The library's plugin notices class is instantiated below in order to add necessary filters.
 		 */
-		new \Boldgrid\Library\Library\Plugin\Notices();
+		if ( class_exists( '\Boldgrid\Library\Library\Plugin\Notices' ) ) {
+			new \Boldgrid\Library\Library\Plugin\Notices();
+		}
+
 		$plugin_notices = new Boldgrid_Backup_Admin_Plugin_Notices();
 		$this->loader->add_filter( 'Boldgrid\Library\Plugin\Notices\admin_enqueue_scripts', $plugin_notices, 'filter' );
 	}

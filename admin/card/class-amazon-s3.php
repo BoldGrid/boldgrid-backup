@@ -38,7 +38,7 @@ class Amazon_S3 extends \Boldgrid\Library\Library\Ui\Card {
 				'boldgrid-backup' ) .
 			'</p>';
 
-		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/backup-wordpress-to-amazon-s3/' );
+		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/backup-wordpress-to-amazon-s3/?source=amazon-s3' );
 
 		$this->links = '
 			<a target="_blank" href="' . $url . '">' .

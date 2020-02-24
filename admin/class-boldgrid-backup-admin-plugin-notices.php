@@ -3,7 +3,7 @@
  * File: class-boldgrid-backup-admin-plugin-notices.php
  *
  * @link  https://www.boldgrid.com
- * @since SINCEVERSION
+ * @since 1.13.1
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
@@ -15,13 +15,13 @@
 /**
  * Class: Boldgrid_Backup_Admin_Plugin_Notices
  *
- * @since SINCEVERSION
+ * @since 1.13.1
  */
 class Boldgrid_Backup_Admin_Plugin_Notices {
 	/**
 	 * Filter the plugin notice counts.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.1
 	 *
 	 * @param  array $translation An array of plugin notice info.
 	 * @return array
