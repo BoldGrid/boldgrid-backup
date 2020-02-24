@@ -39,6 +39,7 @@ class Updates extends \Boldgrid\Library\Library\Ui\Card {
 			new Feature\Versions(),
 			new Feature\Auto_Rollback(),
 			new Feature\Auto_Update_Backup(),
+			new Feature\Timely_Auto_Updates(),
 		];
 	}
 }
