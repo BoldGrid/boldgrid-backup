@@ -12,6 +12,8 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
+use Boldgrid\Library\Library\Plugin\Plugins;
+
 /**
  * Class: Boldgrid_Backup_Admin_Auto_Updates
  *
@@ -22,23 +24,38 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 * Settings
 	 *
 	 * @since SINCEVERSION
-	 * var array
-	*/
+	 * @var array
+	 */
 	public $settings;
 
 	/**
 	 * Active Plugins
+	 *
+	 * @since SINCEVERSION
+	 * @var array
 	 */
 	public $plugins = [];
-		public $themes;
 
-		public $core;
+	/**
+	 * Themes
+	 *
+	 * @since SINCEVERSION
+	 * @var array
+	 */
+	public $themes = [];
+
+	/**
+	 * Active Plugins
+	 *
+	 * @since SINCEVERSION
+	 * @var Boldgrid_Backup_Admin_Core
+	 */
+	public $core;
 
 	/**
 	 * Constructor
 	 *
 	 * @since SINCEVERSION
-	 *
 	 */
 	public function __construct() {
 
@@ -55,11 +72,10 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	}
 
 	/**
-	 * Constructor
+	 * Is Premium Done
 	 *
 	 * @since SINCEVERSION
-	 *
-	 * @param WP_Theme
+	 * @return bool
 	 */
 	public function is_premium_done() {
 		$license        = new \Boldgrid\Library\Library\License();
@@ -89,7 +105,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 *
 	 * @since SINCEVERSION
 	 *
-	 * @param $string $slug
+	 * @param string $slug Plugin Slug.
 	 * @return bool
 	 */
 	public function maybe_update_plugin( $slug ) {
@@ -98,7 +114,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		$days_since_release    = $plugin->updateData->days; //phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
 		$plugin_update_enabled = (bool) $this->settings['plugins'][ $plugin->getFile() ];
 
-		//if premium, check the days since it was released, if not premium then this is true.
+		// if premium, check the days since it was released, if not premium then this is true.
 		if ( $this->is_premium_done() ) {
 			$is_update_time = ( $days_since_release >= $days_to_wait );
 		} else {
@@ -117,7 +133,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 *
 	 * @since SINCEVERSION
 	 *
-	 * @param string $stylesheet
+	 * @param string $stylesheet Theme's Stylesheet.
 	 * @return bool
 	 */
 	public function maybe_update_theme( $stylesheet ) {
@@ -125,7 +141,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		$theme                = $this->themes->getFromStylesheet( $stylesheet );
 		$days_since_release   = $theme->updateData->days; //phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
 		$theme_update_enabled = (bool) $this->settings['themes'][ $stylesheet ];
-		//if premium, check the days since it was released, if not premium then this is true.
+		// if premium, check the days since it was released, if not premium then this is true.
 		if ( $this->is_premium_done() ) {
 			$is_update_time = ( $days_since_release >= $days_to_wait );
 		} else {
@@ -146,12 +162,12 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 *
 	 * @since SINCEVERSION
 	 *
-	 * @param bool $update
-	 * @param stdClass $item
+	 * @param bool     $update Whether or not to update.
+	 * @param stdClass $item The item class passed to callback.
 	 * @return bool
 	 */
 	public function auto_update_plugins( $update, stdClass $item ) {
-		// Array of plugin slugs to always auto-update
+		// Array of plugin slugs to always auto-update.
 		$plugins = [];
 		foreach ( $this->plugins as $plugin ) {
 			if ( $this->maybe_update_plugin( $plugin->getSlug() ) ) {
@@ -159,10 +175,10 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 			}
 		}
 		if ( in_array( $item->slug, $plugins, true ) ) {
-			// Always update plugins in this array
+			// Always update plugins in this array.
 			return true;
 		} else {
-			// Else, Do Not Update Plugin
+			// Else, Do Not Update Plugin.
 			return false;
 		}
 	}
@@ -174,12 +190,12 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 *
 	 * @since SINCEVERSION
 	 *
-	 * @param bool $update
-	 * @param stdClass $item
+	 * @param bool     $update Whether or not to update.
+	 * @param stdClass $item The item class passed to callback.
 	 * @return bool
 	 */
 	public function auto_update_themes( $update, stdClass $item ) {
-		// Array of theme stylesheets to always auto-update
+		// Array of theme stylesheets to always auto-update.
 		$themes = [];
 		foreach ( $this->themes->getList() as $theme ) {
 			if ( $this->maybe_update_plugin( $theme->stylesheet ) ) {
@@ -187,10 +203,10 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 			}
 		}
 		if ( in_array( $item->theme, $themes, true ) ) {
-			// Always update themes in this array
+			// Always update themes in this array.
 			return true;
 		} else {
-			// Else, Do Not Update theme
+			// Else, Do Not Update theme.
 			return false;
 		}
 	}
@@ -217,5 +233,6 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		add_filter( 'allow_major_auto_core_updates', '__return_' . $major );
 		add_filter( 'allow_minor_auto_core_updates', '__return_' . $minor );
 		add_filter( 'auto_update_translation', '__return_' . $translation );
+
 	}
 }

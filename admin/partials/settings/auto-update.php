@@ -29,7 +29,7 @@ $translations             = array(
  *
  * @since SINCEVERSION
  *
- * @param array $auto_update_settings
+ * @param array $auto_update_settings Auto Update Settings from DB.
  * @return string
  */
 function get_heading_markup( $auto_update_settings ) {
@@ -95,7 +95,7 @@ function get_premium_markup() {
  *
  * @since SINCEVERSION
  *
- * @param array $auto_update_settings
+ * @param array $auto_update_settings Auto Update Settings from DB.
  * @return string
  */
 function get_wpcore_update_markup( $auto_update_settings ) {
@@ -197,8 +197,8 @@ function get_wpcore_update_markup( $auto_update_settings ) {
  *
  * @since SINCEVERSION
  *
- * @param array $auto_update_settings
- * @param array $translations
+ * @param array $auto_update_settings Auto Update Settings from DB.
+ * @param array $translations Translations.
  * @return string
  */
 function get_plugins_update_markup( $auto_update_settings, $translations ) {
@@ -284,8 +284,8 @@ function get_plugins_update_markup( $auto_update_settings, $translations ) {
  *
  * @since SINCEVERSION
  *
- * @param array $auto_update_settings
- * @param array $translations
+ * @param array $auto_update_settings Auto Update Settings from DB.
+ * @param array $translations Translations.
  * @return string
  */
 function get_themes_update_markup( $auto_update_settings, $translations ) {
