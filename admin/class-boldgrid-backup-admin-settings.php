@@ -402,7 +402,7 @@ class Boldgrid_Backup_Admin_Settings {
 	 * @param string $new_dir Destination directory.
 	 * @return bool TRUE on success / no backups needed to be moved.
 	 */
-	private function move_backups( $old_dir, $new_dir ) {
+	public function move_backups( $old_dir, $new_dir ) {
 		$fail_count = 0;
 
 		$old_dir = Boldgrid_Backup_Admin_Utility::trailingslashit( $old_dir );
