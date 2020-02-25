@@ -108,7 +108,7 @@ class Boldgrid_Backup_Admin_Premium_Features {
 		<div class="wrap">
 			<div id="bglib-page-container" class="bgbkup-page-container">
 				<div id="bglib-page-top">
-					<div id="bglib-page-header">
+					<div id="bglib-page-header" class="bglib-has-logo">
 						<h1>' . esc_html__( 'Total Upkeep Premium Features', 'boldgrid-backup' ) . '</h1>
 					</div>
 				</div>

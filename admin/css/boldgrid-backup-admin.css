@@ -335,12 +335,7 @@ p > .bgbkup-remote-logo {
  * Override Library's Ui Page.
  */
 .bgbkup-page-container #bglib-page-header {
-	background: url( '../image/icon-128x128.png' ) no-repeat 0 5px;
-	background-size: 35px 35px;
-}
-
-.bgbkup-page-container #bglib-page-header h1 {
-	padding-left: 50px;
+	background-image: url( '../image/icon-128x128.png' );
 }
 
 /**

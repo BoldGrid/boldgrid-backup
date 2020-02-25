@@ -58,7 +58,7 @@ class Boldgrid_Backup_Admin_Transfers {
 		<div class="wrap">
 			<div id="bglib-page-container" class="bgbkup-page-container">
 				<div id="bglib-page-top">
-					<div id="bglib-page-header">
+					<div id="bglib-page-header" class="bglib-has-logo">
 						<h1>' . esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'Total Upkeep Transfers', 'boldgrid-backup' ) ) . '</h1>
 					</div>
 				</div>
