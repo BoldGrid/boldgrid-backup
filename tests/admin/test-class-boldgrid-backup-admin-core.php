@@ -240,6 +240,11 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 			define( 'BOLDGRID_BACKUP_VERSION', implode( get_file_data( $file, array( 'Version' ), 'plugin' ) ) );
 		}
 
+		$this->fake_restore_helper = $this->getMockBuilder( Boldgrid_Backup_Admin_Restore_Helper::class )
+			->setMethods( [ 'is_compressor_type' ] )
+			->getMock();
+		$this->fake_restore_helper->method( 'is_compressor_type' )->willReturn( 'PclZip' );
+
 		$this->core = apply_filters( 'boldgrid_backup_get_core', null );
 
 		$this->zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this->core );
@@ -347,6 +352,34 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 
 		// Restore.
 		exec( $cron, $output ); // phpcs:ignore
+
+		$this->deleteBasic( 'restore' );
+	}
+
+	/**
+	 * Test restore_archive_file_pcl.
+	 *
+	 * @since xxx
+	 */
+	public function test_restore_archive_file_pcl() {
+		/*
+		 * Test: Basic test.
+		 *
+		 * Create a basic backup. Delete some stuff. Restore the backup. Make sure everything worked.
+		 */
+
+		// Create a backup if don't already have one.
+		$this->core->restore_helper = $this->fake_restore_helper;
+
+		$this->info = $this->core->archive_files( true );
+
+		$this->deleteBasic( 'delete' );
+		// Pad necessary $_POST vars.
+		$_POST['restore_now']      = 1;
+		$_POST['archive_key']      = 0;
+		$_POST['archive_filename'] = basename( $this->info['filepath'] );
+
+		$this->core->restore_archive_file();
 
 		$this->deleteBasic( 'restore' );
 	}

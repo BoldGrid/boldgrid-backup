@@ -237,7 +237,8 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 	 * @return bool True if permissions were able to be updated successfully.
 	 */
 	public function set_writable_permissions( $archive_filepath ) {
-		if ( class_exists( 'ZipArchive' ) ) {
+		$is_compressor_type = $this->is_compressor_type();
+		if ( 'ZipArchive' === $is_compressor_type ) {
 			$zip = new ZipArchive();
 			if ( $zip->open( $archive_filepath ) ) {
 				for ( $i = 0; $i < $zip->numFiles; $i++ ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName
@@ -254,7 +255,7 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 					}
 				}
 			}
-		} elseif ( class_exists( 'PclZip' ) ) {
+		} elseif ( 'PclZip' === $is_compressor_type ) {
 			$zip = new PclZip( $archive_filepath );
 			if ( $zip->listContent() ) {
 				foreach ( $zip->listContent() as $file ) {
@@ -301,6 +302,22 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Is Compressor Type
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @return string
+	 */
+	public function is_compressor_type() {
+		if ( class_exists( 'ZipArchive' ) ) {
+			return 'ZipArchive';
+		}
+		if ( class_exists( 'PclZip' ) ) {
+			return 'PclZip';
+		}
 	}
 
 	/**
