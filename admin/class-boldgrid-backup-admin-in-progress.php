@@ -27,6 +27,15 @@ class Boldgrid_Backup_Admin_In_Progress {
 	private $core;
 
 	/**
+	 * Our tmp class.
+	 *
+	 * @since 1.13.0
+	 * @access private
+	 * @var Boldgrid_Backup_Admin_In_Progress_Tmp
+	 */
+	private $tmp;
+
+	/**
 	 * A unix timestamp indicating when a backup was started.
 	 *
 	 * Currently this property is only used before and after a database is dumped,
@@ -47,6 +56,8 @@ class Boldgrid_Backup_Admin_In_Progress {
 	 */
 	public function __construct( $core ) {
 		$this->core = $core;
+
+		$this->tmp = new Boldgrid_Backup_Admin_In_Progress_Tmp( $this->core );
 	}
 
 	/**
@@ -216,47 +227,6 @@ class Boldgrid_Backup_Admin_In_Progress {
 	}
 
 	/**
-	 * Get details on our temporary zip file.
-	 *
-	 * For example, if we're in the middle of saving / closing our backup file, there should be a
-	 * file.zip.temp file in our backup directory. We are getting the details of that file.
-	 *
-	 * @since 1.7.0
-	 *
-	 * @return array
-	 */
-	public function get_tmp() {
-		$data = array();
-
-		$dirlist = $this->core->backup_dir->dirlist_containing( '.zip.' );
-
-		/*
-		 * We should only have one temp zip file. If we have multiple though, something may have
-		 * gone recently. Sort by timestamp and use the newest file.
-		 */
-		if ( 1 < count( $dirlist ) ) {
-			uasort(
-				$dirlist, function( $item1, $item2 ) {
-					return $item1['lastmodunix'] < $item2['lastmodunix'] ? 1 : -1;
-				}
-			);
-		}
-
-		if ( 1 <= count( $dirlist ) ) {
-			reset( $dirlist );
-			$tmp_filename = key( $dirlist );
-
-			$data = array(
-				'size'        => $dirlist[ $tmp_filename ]['size'],
-				'lastmodunix' => $dirlist[ $tmp_filename ]['lastmodunix'],
-				'size_format' => size_format( $dirlist[ $tmp_filename ]['size'], 2 ),
-			);
-		}
-
-		return $data;
-	}
-
-	/**
 	 * Take action when the heartbeat is received.
 	 *
 	 * Include data in the heartbeat to let the user know if their backup is
@@ -291,7 +261,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 
 		// Steps to take if we're on the last step, step 3, closing the archive.
 		if ( 3 === Boldgrid_Backup_Admin_In_Progress_Data::get_arg( 'step' ) ) {
-			$tmp = $this->get_tmp();
+			$tmp = $this->tmp->get();
 			if ( ! empty( $tmp ) ) {
 				$response['in_progress_data']['tmp'] = $tmp;
 			}

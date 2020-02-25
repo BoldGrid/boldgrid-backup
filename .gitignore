@@ -9,6 +9,7 @@ node_modules
 bower_components
 build/
 vendor/
+reports/
 package-lock.json
 yarn-error.log
 cli/bgbkup-cli.log

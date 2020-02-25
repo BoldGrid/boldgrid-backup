@@ -4,7 +4,7 @@ Tags: backup, cloud backup, database backup, restore, wordpress backup
 Requires at least: 4.4
 Tested up to: 5.3
 Requires PHP: 5.4
-Stable tag: 1.12.6
+Stable tag: 1.13.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -131,6 +131,28 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 1. Activate the plugin through the Plugins menu in WordPress.
 
 == Changelog ==
+
+= 1.13.2 =
+
+Release date: Februrary 21st, 2020
+
+* Bug fix:    Resolved activation bug during BoldGrid Inspirations deployment.
+
+= 1.13.1 =
+
+Release date: February 18th, 2020
+
+* Update:      Added "Find modified files" card to Premium Features page.
+* Update:      Allow error messages to be shown for remote storage providers.
+* Update:      Updated dependencies.
+
+= 1.13.0 =
+
+Release date: February 6th, 2020
+
+* Update:      Added new "Premium Features" dashboard page.
+* Update:      Added support for system zip for generating backups.
+* Update:      Updated dependencies.
 
 = 1.12.6 =
 

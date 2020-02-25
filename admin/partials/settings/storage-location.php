@@ -55,11 +55,12 @@ $checked = isset( $location['enabled'] ) && true === $location['enabled'] ? 'che
 return sprintf(
 	'
 	<tr data-key="%4$s">
-		<td>
+		<td style="vertical-align:top; min-width:120px;">
 			<input type="checkbox" name="storage_location[%4$s]" value="1" %3$s %5$s> <strong>%1$s</strong>
 		</td>
 		<td class="configure">
 			%2$s
+			%6$s
 		</td>
 	</tr>
 	',
@@ -67,5 +68,6 @@ return sprintf(
 	$configure,
 	$disabled,
 	$location['key'],
-	$checked
+	$checked,
+	( empty( $location['error'] ) ? '' : '<div class="notice notice-error inline" style="margin-bottom:0;">' . esc_html( $location['error'] ) . '</div>' )
 );

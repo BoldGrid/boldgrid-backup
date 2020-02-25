@@ -286,7 +286,7 @@ class Boldgrid_Backup_Admin_Test {
 			$filename = $file['name'];
 
 			if ( 0 === strpos( $filename, $this->test_prefix ) ) {
-				$this->core->wp_filesystem->delete( $dir . $filename );
+				$this->core->wp_filesystem->delete( $dir . $filename, true );
 			}
 		}
 
@@ -512,6 +512,19 @@ class Boldgrid_Backup_Admin_Test {
 	}
 
 	/**
+	 * Determine whether or not system_zip is suppored.
+	 *
+	 * @since 1.13.0
+	 *
+	 * @return bool
+	 */
+	public function is_system_zip_supported() {
+		$system_zip_test = new Boldgrid_Backup_Admin_Compressor_System_Zip_Test( $this->core );
+
+		return $system_zip_test->run();
+	}
+
+	/**
 	 * Perform functionality tests.
 	 *
 	 * @since 1.0
@@ -537,6 +550,8 @@ class Boldgrid_Backup_Admin_Test {
 		} elseif ( 'php_zip' === $compressor && ! $this->is_php_zip_supported() ) {
 			$this->is_functional = false;
 		} elseif ( 'pcl_zip' === $compressor && ! $this->is_pcl_zip_supported() ) {
+			$this->is_functional = false;
+		} elseif ( 'system_zip' === $compressor && ! $this->is_system_zip_supported() ) {
 			$this->is_functional = false;
 		} elseif ( $this->is_php_safemode() ) {
 			$this->is_functional = false;
