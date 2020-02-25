@@ -39,5 +39,8 @@ class Backups extends \Boldgrid\Library\Library\Ui\Card {
 			new Feature\Scheduled_Backups(),
 			new Feature\Remote_Storage(),
 		];
+		if ( ! get_option( 'boldgrid_backup_settings' )['encrypt_db'] ) {
+			$this->features[] = new Feature\Database_Encryption();
+		}
 	}
 }
