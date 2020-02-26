@@ -366,7 +366,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 			$grants_string = substr( $grants_string, $expected_grants_string_start );
 		}
 
-		$on_strpos = strpos( $grants_string, 'ON' );
+		$on_strpos = strpos( $grants_string, ' ON ' );
 		if ( $on_strpos ) {
 			$grants_string = substr( $grants_string, 0, $on_strpos );
 		}

@@ -147,7 +147,7 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 		$mock_db_import->method( 'has_db_privileges' )->willReturn( false );
 
 		$fixed_lines = $mock_db_import->fix_view_statements( $this->original_view_lines );
-		$this->assertEquals( false, $fixed_lines );
+		$this->assertEquals( array(), $fixed_lines );
 	}
 
 	/**
