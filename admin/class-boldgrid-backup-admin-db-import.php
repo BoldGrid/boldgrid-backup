@@ -13,7 +13,7 @@
  */
 
 /**
- * Class: Boldgrid_Backup_Admin_Db_Import
+ * Class: Boldgrid_Backup_Admin_Db_Import.
  *
  * @since 1.5.1
  */
@@ -23,8 +23,9 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 *
 	 * @since 1.6.0
 	 * @var    Boldgrid_Backup_Admin_Core
+	 * @access private
 	 */
-	public $core;
+	private $core;
 
 	/**
 	 * Errors.
@@ -49,15 +50,15 @@ class Boldgrid_Backup_Admin_Db_Import {
 	}
 
 	/**
-	 * Get Lines from file
+	 * Get Lines from file.
 	 *
-	 * Gets an array of lines from a file
+	 * Gets an array of lines from a file.
 	 *
 	 * @since SINCEVERSION
 	 *
 	 * @param string $file String ocntaining the path of the file.
 	 *
-	 * @return array An array of lines
+	 * @return array An array of lines.
 	 */
 	public function get_lines( $file ) {
 		if ( false === file_exists( $file ) ) {
@@ -88,10 +89,11 @@ class Boldgrid_Backup_Admin_Db_Import {
 
 		$lines = $this->fix_view_statements( $lines );
 
-		if ( false === $lines ) {
+		if ( true === empty( $lines ) ) {
 			return array(
 				'error' => sprintf(
-					__( 'MySQL Database User does not have necessary priviliges to restore mysqldump, %1$s.', 'boldgrid-backup' ), //phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
+					/* translators: 1: Database File Name */
+					__( 'MySQL Database User does not have necessary priviliges to restore mysqldump, %1$s.', 'boldgrid-backup' ),
 					$file
 				),
 			);
@@ -105,8 +107,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	/**
 	 * Import a database dump from an archive.
 	 *
-	 * Pass in "file.zip" and "backup.sql" and we'll find "backup.sql" in the
-	 * "file.zip" file and restore it.
+	 * Pass in "file.zip" and "backup.sql" and we'll find "backup.sql" in the file.zip file and restore it.
 	 *
 	 * @since 1.6.0
 	 *
@@ -131,8 +132,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	/**
 	 * Import lines (queries).
 	 *
-	 * This method accepts an array of $lines, and loops through each $line and
-	 * imports it.
+	 * This method accepts an array of $lines, and loops through each $line and imports it.
 	 *
 	 * These lines usually come from either a .sql file, or a string is parsed
 	 * into separate lines.
@@ -180,9 +180,8 @@ class Boldgrid_Backup_Admin_Db_Import {
 	/**
 	 * Import a string into a database.
 	 *
-	 * Generally this method is used when we grab a .sql file from within a .zip
-	 * file and import it. Instead of saving the .sql file then importing, it
-	 * comes straight from the .zip file as a string to here.
+	 * Generally this method is used when we grab a .sql file from within a .zip file and import it.
+	 * Instead of saving the .sql file then importing, it comes straight from the .zip file as a string to here.
 	 *
 	 * @since 1.6.0
 	 *
@@ -194,7 +193,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 
 		$lines = $this->fix_view_statements( $lines );
 
-		if ( false === $lines ) {
+		if ( true === empty( $lines ) ) {
 			return __( 'The Database User does not have the necessary priviliges to restore this database.', 'boldgrid-backup' );
 		}
 
@@ -206,15 +205,14 @@ class Boldgrid_Backup_Admin_Db_Import {
 	/**
 	 * Fix View Statements.
 	 *
-	 * Fixes view statements to ensure the definer matches the
-	 * current db user.
+	 * Fixes view statements to ensure the definer matches the current db user.
 	 *
 	 * @since SINCEVERSION
 	 *
-	 * @param string $file db dump filename.
-	 * @return array an array of lines from db file.
+	 * @param array $lines An array of lines from db file.
+	 * @return array
 	 */
-	public function fix_view_statements( $lines ) {
+	public function fix_view_statements( array $lines ) {
 
 		$has_drop_view_if_exists = false;
 
@@ -228,13 +226,13 @@ class Boldgrid_Backup_Admin_Db_Import {
 			return $lines;
 		}
 
-		$user_has_privileges = $this->has_db_privileges( [ 'SHOW VIEW', 'CREATE VIEW' ] );
+		$user_has_privileges = $this->has_db_privileges( array( 'SHOW VIEW', 'CREATE VIEW' ) );
 
 		if ( false === $user_has_privileges ) {
-			return false;
+			return array();
 		}
 
-		$fixed_lines = [];
+		$fixed_lines = array();
 
 		foreach ( $lines as $line ) {
 			if ( strpos( $line, 'DEFINER=' ) === 9 ) {
@@ -248,7 +246,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	}
 
 	/**
-	 * Fix Definer
+	 * Fix Definer.
 	 *
 	 * Fixes the actual definer line.
 	 *
@@ -277,7 +275,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	}
 
 	/**
-	 * Tests if database user has specific privileges
+	 * Tests if database user has specific privileges.
 	 *
 	 * @since SINCEVERSION
 	 *
@@ -296,7 +294,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	}
 
 	/**
-	 * Get database user privileges
+	 * Get database user privileges.
 	 *
 	 * @since SINCEVERSION
 	 *
@@ -313,19 +311,19 @@ class Boldgrid_Backup_Admin_Db_Import {
 			$is_grant_all_privileges = ( false !== strpos( $result[0], 'GRANT ALL PRIVILEGES' ) );
 
 			if ( ( $is_string_db_grant || $is_string_all_grant ) && $is_grant_all_privileges ) {
-				return [ 'ALL' ];
+				return array( 'ALL' );
 			}
 			if ( ( $is_string_db_grant ) && false === $is_grant_all_privileges ) {
 				return $this->get_grants_array( $result[0] );
 			}
 		}
-		return [];
+		return array();
 	}
 
 	/**
-	 * Show Grants Query
+	 * Show Grants Query.
 	 *
-	 * Queries the database for 'SHOW GRANTS'
+	 * Queries the database for 'SHOW GRANTS'.
 	 *
 	 * @since SINCEVERSION
 	 *
@@ -338,13 +336,13 @@ class Boldgrid_Backup_Admin_Db_Import {
 	}
 
 	/**
-	 * Execute Import
+	 * Execute Import.
 	 *
-	 * Executes Import MySql Query
+	 * Executes Import MySql Query.
 	 *
 	 * @since SINCEVERSION
 	 *
-	 * @param PDO $db The PDO Object.
+	 * @param PDO    $db The PDO Object.
 	 * @param string $sql_line The line of sql to execute.
 	 *
 	 * @return int Number of affected rows
@@ -354,19 +352,23 @@ class Boldgrid_Backup_Admin_Db_Import {
 	}
 
 	/**
-	 * Get a user's grants in the form of an array
+	 * Get a user's grants in the form of an array.
 	 *
 	 * @since SINCEVERSION
 	 *
-	 * @param string $grants_string.
-	 * @return array An array of grants.
+	 * @param string $grants_string A string containing the user's grants.
+	 * @return array
 	 */
 	public function get_grants_array( $grants_string ) {
+		$expected_grants_string_start = 6;
+
 		if ( strpos( $grants_string, 'GRANT' ) === 0 ) {
-			$grants_string = substr( $grants_string, 6 );
+			$grants_string = substr( $grants_string, $expected_grants_string_start );
 		}
-		if ( strpos( $grants_string, 'ON' ) ) {
-			$grants_string = substr( $grants_string, 0, strpos( $grants_string, ' ON ' ) );
+
+		$on_strpos = strpos( $grants_string, 'ON' );
+		if ( $on_strpos ) {
+			$grants_string = substr( $grants_string, 0, $on_strpos );
 		}
 
 		return explode( ', ', $grants_string );
