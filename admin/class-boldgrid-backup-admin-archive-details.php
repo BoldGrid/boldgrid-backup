@@ -161,7 +161,21 @@ class Boldgrid_Backup_Admin_Archive_Details {
 		$title       = $this->core->archive->get_attribute( 'title' );
 		$description = $this->core->archive->get_attribute( 'description' );
 
+		echo '
+		<div class="wrap">
+			<div id="bglib-page-container" class="bgbkup-page-container">
+				<div id="bglib-page-top">
+					<div id="bglib-page-header" class="bglib-has-logo">
+						<h1>' . esc_html__( 'Backup Archive Details', 'boldgrid-backup' ) . '</h1>
+					</div>
+				</div>
+				<div id="bglib-page-content">
+					<div class="wp-header-end"></div>';
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-archive-details.php';
+		echo '
+				</div>
+			</div>
+		</div>';
 	}
 
 	/**

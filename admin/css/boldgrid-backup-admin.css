@@ -332,6 +332,13 @@ p > .bgbkup-remote-logo {
 }
 
 /**
+ * Override Library's Ui Page.
+ */
+.bgbkup-page-container #bglib-page-header {
+	background-image: url( '../image/icon-128x128.png' );
+}
+
+/**
  * Misc.
  */
 
