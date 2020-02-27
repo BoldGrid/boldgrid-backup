@@ -301,6 +301,8 @@ BoldGrid.Settings = function( $ ) {
 
 		$body.on( 'click', '#storage_locations .thickbox', self.on_click_provider );
 
+		$body.on( 'click', '.bglib-card .thickbox', self.on_click_provider );
+
 		$body.on( 'click', '#license_check_again', self.onClickCheckAgain );
 
 		$siteCheck = $( 'input[name="site_check"]' );

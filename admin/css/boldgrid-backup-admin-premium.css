@@ -108,3 +108,7 @@
 .bglib-card-title {
 	height: 2em;
 }
+
+.bglib-card-links span.dashicons {
+	vertical-align: middle;
+}
