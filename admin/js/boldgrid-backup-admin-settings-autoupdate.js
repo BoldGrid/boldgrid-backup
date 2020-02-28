@@ -59,7 +59,6 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 			} );
 
 			if ( true === $( '#timely-updates-disabled' ).prop( 'checked' ) ) {
-				console.log('TEST');
 				$( '#timely-updates-days' ).prop( 'disabled', true );
 			}
 
