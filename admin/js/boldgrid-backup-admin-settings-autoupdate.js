@@ -57,6 +57,19 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 				var target = $( this ).attr( 'data-target' );
 				$( target ).animate( { height: 'toggle', opacity: 'toggle' }, 'slow' );
 			} );
+
+			if ( true === $( '#timely-updates-disabled' ).prop( 'checked' ) ) {
+				console.log('TEST');
+				$( '#timely-updates-days' ).prop( 'disabled', true );
+			}
+
+			$( 'input[name="auto_update[timely-updates-enabled]"]' ).change( function() {
+				if ( true === $( '#timely-updates-disabled' ).prop( 'checked' ) ) {
+					$( '#timely-updates-days' ).prop( 'disabled', true );
+				} else {
+					$( '#timely-updates-days' ).prop( 'disabled', false );
+				}
+			} );
 		},
 
 		/**
