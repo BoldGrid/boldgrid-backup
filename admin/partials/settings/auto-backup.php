@@ -39,9 +39,8 @@ esc_html_e( 'Auto Updates', 'boldgrid-backup' );
 		<table class="form-table div-table-body auto-update-settings"><tbody class="div-table-body">
 			<tr>
 				<th>
-					<p><?php esc_html_e( 'Auto Backup Before Update', 'boldgrid-backup' ); ?>
+					<?php esc_html_e( 'Auto Backup Before Update', 'boldgrid-backup' ); ?>
 					<span class='dashicons dashicons-editor-help' data-id='auto-backup'></span>
-					</p>
 				</th>
 				<td>
 					<input id='auto-backup-enabled' type='radio' name='auto_backup' value='1'
@@ -51,7 +50,7 @@ esc_html_e( 'Auto Updates', 'boldgrid-backup' );
 						echo ' checked';
 					}
 					?>
-					/> <?php esc_html_e( 'Enabled (Recommended)', 'boldgrid-backup' ); ?> &nbsp; 
+					/> <?php esc_html_e( 'Enabled (Recommended)', 'boldgrid-backup' ); ?> &nbsp;
 					<input id='auto-backup-disabled' type='radio' name='auto_backup' value='0'
 					<?php
 					if ( isset( $settings['auto_backup'] ) && 0 === $settings['auto_backup'] ) {

@@ -25,7 +25,7 @@ $translations             = array(
 
 
 /**
- * Get Heading markup
+ * Get Heading markup.
  *
  * @since SINCEVERSION
  *
@@ -62,7 +62,7 @@ function get_heading_markup( $boldgrid_backup_settings, $auto_update_settings ) 
 }
 
 /**
- * Get Premium markup
+ * Get Premium markup.
  *
  * @since SINCEVERSION
  *
@@ -92,7 +92,7 @@ function get_premium_markup() {
 }
 
 /**
- * Get WP Core Update markup
+ * Get WP Core Update markup.
  *
  * @since SINCEVERSION
  *
@@ -115,18 +115,12 @@ function get_wpcore_update_markup( $auto_update_settings ) {
 			' . esc_html__( 'Configure what is Auto Updated', 'boldgrid-library' ) . '
 		</div>
 	<div class="bg-box-bottom">
-		<p class="help" data-id="update-types">
-				Major Updates typically done when there are extremely significant updates or changes to functionality.
-				Minor updates are typically done when new features are added or when there are modifications to existing features.
-				Sub-Minor updates are small updates that typically address bugs from previous releases. Sub-Minor updates can sometimes
-				address minor security concerns, though these are usually done in Minor or Major releases.
-		</p>
 	<table class="form-table div-table-body auto-update-settings">
 		<tbody class="div-table-body">
 		<tr>
-			<th><p>' . esc_html__( 'WordPress Core', 'boldgrid-library' ) .
-				'<span class="dashicons dashicons-editor-help" data-id="update-types"></span>
-			</p></th>
+			<th>' . esc_html__( 'WordPress Core', 'boldgrid-library' ) .
+				'<span class="dashicons dashicons-editor-help" data-id="wpcore-updates"></span>
+			</th>
 			<td></td>
 			<td>' . esc_html__( 'All Update Types', 'boldgrid-library' ) . '</td>
 			<td class="td-toggle">
@@ -136,6 +130,13 @@ function get_wpcore_update_markup( $auto_update_settings ) {
 				</div>
 				<input type="hidden" name="auto_update[wpcore][all]"
 					value="' . ( $wpcore_all ? 1 : 0 ) . '" />
+			</td>
+		</tr>
+		<tr class="table-help hide-help" data-id="wpcore-updates">
+			<td colspan=4>
+				<p>
+				Select Which WordPress Core updates you wish to have automatically updated.
+				</p>
 			</td>
 		</tr>
 		<tr>
@@ -194,7 +195,7 @@ function get_wpcore_update_markup( $auto_update_settings ) {
 }
 
 /**
- * Get Plugins Update Markup
+ * Get Plugins Update Markup.
  *
  * @since SINCEVERSION
  *
@@ -225,8 +226,13 @@ function get_plugins_update_markup( $auto_update_settings, $translations ) {
 	$plugins_update_markup = '<tbody class="div-table-body">
 	<tr>
 		<th>' . esc_html__( 'Plugins', 'boldgrid-library' ) .
-			'<span class="dashicons dashicons-editor-help" data-id="update-types"></span>
+			'<span class="dashicons dashicons-editor-help" data-id="plugin-updates"></span>
 		</th>
+	</tr>
+	<tr class="table-help hide-help" data-id="plugin-updates">
+		<td colspan=4>
+			<p>Choose which Plugins you wish to update automatically</p>
+		</td>
 	</tr>
 	<tr>
 		<td>' . esc_html__( 'Default For New Plugins', 'boldgrid-library' ) .
@@ -281,7 +287,7 @@ function get_plugins_update_markup( $auto_update_settings, $translations ) {
 }
 
 /**
- * Get Themes Update Markup
+ * Get Themes Update Markup.
  *
  * @since SINCEVERSION
  *
@@ -316,8 +322,13 @@ function get_themes_update_markup( $auto_update_settings, $translations ) {
 	$themes_update_markup = '<tbody class="div-table-body">
 	<tr>
 		<th>' . esc_html__( 'Themes', 'boldgrid-library' ) .
-			'<span class="dashicons dashicons-editor-help" data-id="update-types"></span>
+			'<span class="dashicons dashicons-editor-help" data-id="theme-updates"></span>
 		</th>
+	</tr>
+	<tr class="table-help hide-help" data-id="theme-updates">
+	<td colspan=4>
+		<p>Choose which Plugins you wish to update automatically</p>
+	</td>
 	</tr>
 	<tr>
 		<td>' . esc_html__( 'Default For New Themes', 'boldgrid-library' ) .
