@@ -566,7 +566,7 @@ class Boldgrid_Backup {
 		$this->loader->add_filter( 'Boldgrid\Library\Plugin\Notices\admin_enqueue_scripts', $plugin_notices, 'filter' );
 
 		// Get Plugin Update Data for all active plugins.
-		$this->loader->add_filter( 'boldgrid_backup_active_plugins', new \Boldgrid\Library\Library\Plugin\Plugins(), 'getAllActivePlugins' );
+		$this->loader->add_filter( 'boldgrid_backup_active_plugins', new \Boldgrid\Library\Library\Plugin\Plugins(), 'getAllPlugins' );
 	}
 
 	/**
