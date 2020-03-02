@@ -15,9 +15,14 @@
 
 // Get BoldGrid settings.
 \Boldgrid\Library\Util\Option::init();
-$boldgrid_backup_settings = get_site_option( 'boldgrid_backup_settings', array() );
-$auto_update_settings     = $boldgrid_backup_settings['auto_update'];
-$translations             = array(
+$boldgrid_backup_settings     = get_site_option( 'boldgrid_backup_settings', array() );
+$default_auto_update_settings = array(
+	'plugins' => array(),
+	'themes'  => array(),
+	'wpcore'  => array(),
+);
+$auto_update_settings         = isset( $boldgrid_backup_settings['auto_update'] ) ? $boldgrid_backup_settings['auto_update'] : $default_auto_update_settings;
+$translations                 = array(
 	'active'   => esc_attr__( 'Active', 'boldgrid-library' ),
 	'inactive' => esc_attr__( 'Inactive', 'boldgrid-library' ),
 	'parent'   => esc_attr__( 'Parent', 'boldgrid-library' ),
