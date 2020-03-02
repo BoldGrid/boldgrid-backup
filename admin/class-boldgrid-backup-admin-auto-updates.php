@@ -219,7 +219,15 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 * @since SINCEVERSION
 	 */
 	public function auto_update_core() {
-		$wpcs = $this->settings['wpcore'];
+		$wpcs_default = array(
+			'all'         => false,
+			'dev'         => false,
+			'minor'       => true,
+			'major'       => true,
+			'translation' => false,
+		);
+
+		$wpcs = isset( $this->settings['wpcore'] ) ? $this->settings['wpcore'] : $wpcs_default;
 		if ( $wpcs['all'] ) {
 			add_filter( 'auto_update_core', '__return_true' );
 		}
