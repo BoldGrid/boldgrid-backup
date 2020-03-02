@@ -15,13 +15,13 @@
 use Boldgrid\Library\Library\Plugin\Plugins;
 
 /**
- * Class: Boldgrid_Backup_Admin_Auto_Updates
+ * Class: Boldgrid_Backup_Admin_Auto_Updates.
  *
  * @since 1.2
  */
 class Boldgrid_Backup_Admin_Auto_Updates {
 	/**
-	 * Settings
+	 * Settings.
 	 *
 	 * @since SINCEVERSION
 	 * @var array
@@ -29,23 +29,23 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	public $settings;
 
 	/**
-	 * Active Plugins
+	 * Active Plugins.
 	 *
 	 * @since SINCEVERSION
 	 * @var array
 	 */
-	public $plugins = [];
+	public $plugins = array();
 
 	/**
-	 * Themes
+	 * Themes.
 	 *
 	 * @since SINCEVERSION
 	 * @var array
 	 */
-	public $themes = [];
+	public $themes = array();
 
 	/**
-	 * Active Plugins
+	 * Active Plugins.
 	 *
 	 * @since SINCEVERSION
 	 * @var Boldgrid_Backup_Admin_Core
@@ -53,15 +53,15 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	public $core;
 
 	/**
-	 * Constructor
+	 * Constructor.
 	 *
 	 * @since SINCEVERSION
 	 */
 	public function __construct() {
 
 		$this->set_settings();
-
-		$this->plugins = \Boldgrid\Library\Library\Plugin\Plugins::getAllActivePlugins();
+		$plugins       = new \Boldgrid\Library\Library\Plugin\Plugins();
+		$this->plugins = $plugins->getAllPlugins();
 		$this->themes  = new \Boldgrid\Library\Library\Theme\Themes();
 
 		add_filter( 'automatic_updater_disabled', '__return_false' );
@@ -72,7 +72,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	}
 
 	/**
-	 * Is Premium Done
+	 * Is Premium Done.
 	 *
 	 * @since SINCEVERSION
 	 * @return bool
@@ -87,7 +87,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	}
 
 	/**
-	 * Set Settings
+	 * Set Settings.
 	 *
 	 * @since SINCEVERSION
 	 */
@@ -96,12 +96,12 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		if ( isset( $boldgrid_backup_settings['auto_update'] ) ) {
 			$this->settings = $boldgrid_backup_settings['auto_update'];
 		} else {
-			$this->settings = [];
+			$this->settings = array();
 		}
 	}
 
 	/**
-	 * Maybe Update Plugin
+	 * Maybe Update Plugin.
 	 *
 	 * @since SINCEVERSION
 	 *
@@ -111,7 +111,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	public function maybe_update_plugin( $slug ) {
 		$days_to_wait          = $this->settings['days'];
 		$plugin                = \Boldgrid\Library\Library\Plugin\Plugins::getActivePluginBySlug( $this->plugins, $slug );
-		$days_since_release    = $plugin->updateData->days; //phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
+		$days_since_release    = $plugin->updateData->days; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
 		$plugin_update_enabled = (bool) $this->settings['plugins'][ $plugin->getFile() ];
 
 		// if premium, check the days since it was released, if not premium then this is true.
@@ -129,7 +129,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	}
 
 	/**
-	 * Maybe Update Theme
+	 * Maybe Update Theme.
 	 *
 	 * @since SINCEVERSION
 	 *
@@ -139,7 +139,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	public function maybe_update_theme( $stylesheet ) {
 		$days_to_wait         = $this->settings['days'];
 		$theme                = $this->themes->getFromStylesheet( $stylesheet );
-		$days_since_release   = $theme->updateData->days; //phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
+		$days_since_release   = $theme->updateData->days; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
 		$theme_update_enabled = (bool) $this->settings['themes'][ $stylesheet ];
 		// if premium, check the days since it was released, if not premium then this is true.
 		if ( $this->is_premium_done() ) {
@@ -156,9 +156,9 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	}
 
 	/**
-	 * Auto Update Plugins
+	 * Auto Update Plugins.
 	 *
-	 * This method is the callback for the 'auto_update_plugin' action hook
+	 * This method is the callback for the 'auto_update_plugin' action hook.
 	 *
 	 * @since SINCEVERSION
 	 *
@@ -168,7 +168,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 */
 	public function auto_update_plugins( $update, stdClass $item ) {
 		// Array of plugin slugs to always auto-update.
-		$plugins = [];
+		$plugins = array();
 		foreach ( $this->plugins as $plugin ) {
 			if ( $this->maybe_update_plugin( $plugin->getSlug() ) ) {
 				$plugins[] = $plugin->getSlug();
@@ -184,9 +184,9 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	}
 
 	/**
-	 * Auto Update Themes
+	 * Auto Update Themes.
 	 *
-	 * This method is the callback for the 'auto_update_theme' action hook
+	 * This method is the callback for the 'auto_update_theme' action hook.
 	 *
 	 * @since SINCEVERSION
 	 *
@@ -196,7 +196,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 */
 	public function auto_update_themes( $update, stdClass $item ) {
 		// Array of theme stylesheets to always auto-update.
-		$themes = [];
+		$themes = array();
 		foreach ( $this->themes->getList() as $theme ) {
 			if ( $this->maybe_update_plugin( $theme->stylesheet ) ) {
 				$themes[] = $theme->stylesheet;
@@ -212,7 +212,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	}
 
 	/**
-	 * Auto Update Core
+	 * Auto Update Core.
 	 *
 	 * Sets the type of updates to perform for wpcore.
 	 *
