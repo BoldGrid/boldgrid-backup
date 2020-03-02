@@ -61,7 +61,7 @@ esc_html_e( 'Auto Updates', 'boldgrid-backup' );
 				</td>
 			</tr>
 			<tr class='table-help hide-help' data-id='auto-backup'>
-				<td nowrap colspan='4'>
+				<td colspan='4'>
 					<p>
 						<?php
 						printf(
@@ -99,7 +99,7 @@ esc_html_e( 'Auto Updates', 'boldgrid-backup' );
 				</td>
 			</tr>
 			<tr class='table-help hide-help' data-id='auto-rollback'>
-				<td nowrap colspan='4'>
+				<td colspan='4'>
 					<p>
 						<?php
 						esc_html_e(

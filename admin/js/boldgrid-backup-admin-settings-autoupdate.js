@@ -226,7 +226,7 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 			$( target ).toggleClass( 'show-help' );
 			$( target ).toggleClass( 'hide-help' );
 			$( '.table-help.show-help[data-id="' + id + '"] td p' ).animate(
-				{ height: '1.5em', opacity: '100%' },
+				{ height: '3em', opacity: '100%' },
 				400
 			);
 			$( '.table-help.hide-help[data-id="' + id + '"] td p' ).animate(
