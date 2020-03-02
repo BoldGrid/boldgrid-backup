@@ -42,16 +42,8 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 						 the ability to restore from historical versions, premium support and more.', 'boldgrid-backup' )
 );
 
-?>
+echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
-<div class='wrap'>
-	<h1><?php echo esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'Dashboard', 'boldgrid-backup' ) ); ?></h1>
+echo $premium_box; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
-	<?php
-	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
-
-	echo $premium_box; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
-
-	$dashboard->printCards();
-	?>
-</div>
+$dashboard->printCards();
