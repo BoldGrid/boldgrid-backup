@@ -112,7 +112,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		$days_to_wait          = $this->settings['days'];
 		$plugin                = \Boldgrid\Library\Library\Plugin\Plugins::getActivePluginBySlug( $this->plugins, $slug );
 		$days_since_release    = $plugin->updateData->days; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
-		$plugin_update_enabled = (bool) $this->settings['plugins'][ $plugin->getFile() ];
+		$plugin_update_enabled = array_key_exists( $plugin->getFile(), $this->settings['plugins'] ) ? (bool) $this->settings['plugins'][ $plugin->getFile() ] : false;
 
 		// if premium, check the days since it was released, if not premium then this is true.
 		if ( $this->is_premium_done() ) {
@@ -140,7 +140,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		$days_to_wait         = $this->settings['days'];
 		$theme                = $this->themes->getFromStylesheet( $stylesheet );
 		$days_since_release   = $theme->updateData->days; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
-		$theme_update_enabled = (bool) $this->settings['themes'][ $stylesheet ];
+		$theme_update_enabled = isset( $this->settings['themes'][ $stylesheet ] ) ? (bool) $this->settings['themes'][ $stylesheet ] : false;
 		// if premium, check the days since it was released, if not premium then this is true.
 		if ( $this->is_premium_done() ) {
 			$is_update_time = ( $days_since_release >= $days_to_wait );
@@ -198,7 +198,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		// Array of theme stylesheets to always auto-update.
 		$themes = array();
 		foreach ( $this->themes->getList() as $theme ) {
-			if ( $this->maybe_update_plugin( $theme->stylesheet ) ) {
+			if ( $this->maybe_update_theme( $theme->stylesheet ) ) {
 				$themes[] = $theme->stylesheet;
 			}
 		}
@@ -221,10 +221,10 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	public function auto_update_core() {
 		$wpcs_default = array(
 			'all'         => false,
-			'dev'         => false,
 			'minor'       => true,
-			'major'       => true,
+			'major'       => false,
 			'translation' => false,
+			'dev'         => false,
 		);
 
 		$wpcs = isset( $this->settings['wpcore'] ) ? $this->settings['wpcore'] : $wpcs_default;
@@ -237,10 +237,10 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		$minor       = ( $wpcs['minor'] ) ? 'true' : 'false';
 		$translation = ( $wpcs['translation'] ) ? 'true' : 'false';
 
-		add_filter( 'allow_dev_auto_core_updates', '__return_' . $dev );
 		add_filter( 'allow_major_auto_core_updates', '__return_' . $major );
 		add_filter( 'allow_minor_auto_core_updates', '__return_' . $minor );
 		add_filter( 'auto_update_translation', '__return_' . $translation );
+		add_filter( 'allow_dev_auto_core_updates', '__return_' . $dev );
 
 	}
 }
