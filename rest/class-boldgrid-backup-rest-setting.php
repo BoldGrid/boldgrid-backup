@@ -174,6 +174,12 @@ class Boldgrid_Backup_Rest_Setting extends Boldgrid_Backup_Rest_Controller {
 			}
 		}
 
+		$scheduler             = new Boldgrid_Backup_Admin_Scheduler( $this->core );
+		$settings['scheduler'] = $scheduler->get();
+
+		$admin_settings = new Boldgrid_Backup_Admin_Settings( $this->core );
+		$settings       = $admin_settings->update_cron( $settings );
+
 		// Update Settings.
 		update_option( 'boldgrid_backup_settings', $settings );
 
