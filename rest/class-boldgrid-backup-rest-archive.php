@@ -139,7 +139,7 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 					'description' => esc_html__( 'Filename of backup.', 'boldgrid-backup' ),
 					'type'        => 'string',
 				],
-				'url'      => [
+				'url'           => [
 					'context'     => [ 'view' ],
 					'description' => esc_html__( 'Download link for the backup.', 'boldgrid-backup' ),
 					'type'        => 'string',
@@ -214,7 +214,7 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 
 		foreach ( $core->archives_all->all as $backup ) {
 			$archive = Boldgrid\Backup\Archive\Factory::get_by_filename( $backup['filename'] );
-			$url = $archive->generate_download_link( $backup['filename'] );
+			$url     = $archive->generate_download_link( $backup['filename'] );
 
 			$backups[] = [
 				'id'            => $archive->get_id(),

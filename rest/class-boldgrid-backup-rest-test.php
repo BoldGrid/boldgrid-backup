@@ -100,7 +100,7 @@ class Boldgrid_Backup_Rest_Test extends Boldgrid_Backup_Rest_Controller {
 	 * @return array                   Preflight check results.
 	 */
 	public function get_item( $request ) {
-		$preflight_test = new Boldgrid_Backup_Admin_Test( $this->core );
+		$preflight_test     = new Boldgrid_Backup_Admin_Test( $this->core );
 		$settings['passed'] = $preflight_test->run_functionality_tests();
 		return $this->prepare_item_for_response( $settings, $request );
 	}
