@@ -11,9 +11,9 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-include_once ABSPATH . 'wp-includes/plugin.php';
-include_once ABSPATH . 'wp-admin/includes/class-wp-automatic-updater.php';
-include_once dirname( __FILE__ ) . '/class-license.php';
+require_once ABSPATH . 'wp-includes/plugin.php';
+require_once ABSPATH . 'wp-admin/includes/class-wp-automatic-updater.php';
+require_once dirname( __FILE__ ) . '/class-license.php';
 
 /**
  * Class: Test_Boldgrid_Backup_Admin_Auto_Updates.
