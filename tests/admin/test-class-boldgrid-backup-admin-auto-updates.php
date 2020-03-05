@@ -107,12 +107,6 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 	 * @since SINCEVERSION
 	 */
 	public function test_constructor() {
-		// Test that WP's Auto Updater is disabled before Boldgrid_Backup_Admin_Auto_Updates inits.
-		add_filter( 'automatic_updater_disabled', '__return_true' );
-		$wp_auto_updater = new WP_Automatic_Updater();
-		$disabled        = $wp_auto_updater->is_disabled() ? 'True' : 'False';
-		$this->assertTrue( apply_filters( 'automatic_updater_disabled', true ) );
-
 		// Test that WP's Auto Updater is NOT disabled after init.
 		$auto_updates = new Boldgrid_Backup_Admin_Auto_Updates();
 		$this->assertFalse( apply_filters( 'automatic_updater_disabled', true ) );
