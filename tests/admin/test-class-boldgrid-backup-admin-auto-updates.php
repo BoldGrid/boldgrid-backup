@@ -337,7 +337,7 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 			'allow_major_auto_core_updates',
 		);
 
-		$i = 0;
+		$i            = 0;
 		$filter_count = count( $filters );
 		while ( $i < $filter_count ) {
 			wp_cache_flush();
