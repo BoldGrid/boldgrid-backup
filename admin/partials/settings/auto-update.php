@@ -28,7 +28,6 @@ $translations                 = array(
 	'parent'   => esc_attr__( 'Parent', 'boldgrid-library' ),
 );
 
-
 /**
  * Get Heading markup.
  *
@@ -405,6 +404,6 @@ if ( $this->core->config->is_premium_done ) {
 $auto_update_markup .= get_wpcore_update_markup( $auto_update_settings, $translations ) .
 	get_plugins_update_markup( $auto_update_settings, $translations ) .
 	get_themes_update_markup( $auto_update_settings, $translations ) .
-	'</table></div>';
+	'</table></div></div>';
 
 return $auto_update_markup;
