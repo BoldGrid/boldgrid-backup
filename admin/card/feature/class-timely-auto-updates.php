@@ -43,7 +43,7 @@ class Timely_Auto_Updates extends \Boldgrid\Library\Library\Ui\Feature {
 			$this->content = '<p>' . esc_html__( 'Timely Auto Updates are enabled!', 'boldgrid-backup' ) . '</p>';
 		} else {
 			$this->content  = '<p>' . esc_html__( 'By setting up Timely Auto Updates, you can have more control over when new updates are installed by WordPress.', 'boldgrid-backup' ) . '</p>';
-			$this->content .= '<div class="notice notice-error inline"><p>' . wp_kses(
+			$this->content .= '<div class="notice notice-warning inline"><p>' . wp_kses(
 				sprintf(
 					// translators: 1 Opening anchor tag to "Auto Updates" settings page, 2 its closing tag.
 					__( 'Timely Auto Updates are not enabled. %1$sFix this%2$s.', 'boldgrid-backup' ),
