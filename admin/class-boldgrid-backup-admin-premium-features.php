@@ -104,7 +104,23 @@ class Boldgrid_Backup_Admin_Premium_Features {
 		wp_enqueue_style( 'bglib-ui-css' );
 
 		$this->admin_enqueue_scripts( 'boldgrid-backup-admin-premium-features' );
+
+		echo '
+		<div class="wrap">
+			<div id="bglib-page-container" class="bgbkup-page-container">
+				<div id="bglib-page-top">
+					<div id="bglib-page-header" class="bglib-has-logo">
+						<h1>' . esc_html__( 'Total Upkeep Premium Features', 'boldgrid-backup' ) . '</h1>
+					</div>
+				</div>
+				<div id="bglib-page-content">
+					<div class="wp-header-end"></div>';
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-premium.php';
+		echo '
+				</div>
+			</div>
+		</div>';
+
 		$this->page->setAllNoticesRead();
 		return array(
 			'nav'         => $nav,
