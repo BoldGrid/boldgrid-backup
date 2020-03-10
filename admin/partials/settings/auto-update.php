@@ -84,7 +84,7 @@ function get_premium_markup() {
 			</p>
 		</div>',
 		/* 1 */ $core->go_pro->get_premium_button( $premium_url ),
-		/* 2 */ __( 'Upgrade to premium for the option to configure a delay on updates!', 'boldgrid-backup' )
+		/* 2 */ __( 'Upgrade to Premium for the option to configure a delay on updates!', 'boldgrid-backup' )
 	);
 
 	$premium_markup = '<div class="bg-box">
