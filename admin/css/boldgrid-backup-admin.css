@@ -355,3 +355,8 @@ p > .bgbkup-remote-logo {
 	width: calc( 100% - 40px ) !important;
 	height: calc( 100% - 60px ) !important;
 }
+
+.bgbkup-transfers-destination .bg-box-bottom.premium .button-success {
+	float: none;
+	margin: 10px;
+}

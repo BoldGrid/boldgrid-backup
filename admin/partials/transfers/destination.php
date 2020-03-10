@@ -73,7 +73,9 @@ return sprintf(
 		<h2>%1$s</h2>
 		<p>%2$s</p>
 		<p>%3$s</p>
-		<p>%9$s</p>
+		<div class="bg-box-bottom premium" style="margin:15px 0;">
+			<p style="margin-bottom:0px">%9$s</p>
+		</div>
 		<div id="url-import-section" class="wp-upload-form">
 			%4$s <input type="text" name="url" placeholder="%5$s" size="30" />
 			<input class="button" type="submit" value="%6$s" />
