@@ -110,5 +110,10 @@
 }
 
 .bglib-card-links span.dashicons {
-	vertical-align: middle;
+	vertical-align: text-top;
+	padding-right: 0.25em;
+}
+
+.bglib-card .bglib-card-links {
+	justify-content: flex-end;
 }

@@ -517,16 +517,6 @@ class Boldgrid_Backup {
 
 		$this->loader->add_action( 'admin_menu', $plugin_admin_core->local, 'add_submenus' );
 
-		// Add Premium Features Video Pages.
-		$this->loader->add_action( 'admin_menu', new \Boldgrid\Backup\Admin\Card\Plugin_Editor_Tools(), 'add_submenus' );
-		$this->loader->add_action( 'admin_menu', new \Boldgrid\Backup\Admin\Card\History(), 'add_submenus' );
-		$this->loader->add_action( 'admin_menu', new \Boldgrid\Backup\Admin\Card\Historical_Versions(), 'add_submenus' );
-		$this->loader->add_action( 'admin_menu', new \Boldgrid\Backup\Admin\Card\One_Click_Restoration(), 'add_submenus' );
-		$this->loader->add_action( 'admin_menu', new \Boldgrid\Backup\Admin\Card\Database_Encryption(), 'add_submenus' );
-		$this->loader->add_action( 'admin_menu', new \Boldgrid\Backup\Admin\Card\Dream_Objects(), 'add_submenus' );
-		$this->loader->add_action( 'admin_menu', new \Boldgrid\Backup\Admin\Card\Google_Drive(), 'add_submenus' );
-		$this->loader->add_action( 'admin_menu', new \Boldgrid\Backup\Admin\Card\Amazon_S3(), 'add_submenus' );
-
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_is_setup_local', $plugin_admin_core->local, 'is_setup_ajax' );
 
 		$this->loader->add_filter( 'boldgrid_backup_get_core', $plugin_admin_core, 'get_core' );

@@ -46,7 +46,6 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 
 <div class='wrap'>
 	<h1><?php echo esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'Dashboard', 'boldgrid-backup' ) ); ?></h1>
-
 	<?php
 	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 

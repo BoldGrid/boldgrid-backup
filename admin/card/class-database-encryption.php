@@ -41,48 +41,15 @@ class Database_Encryption extends \Boldgrid\Library\Library\Ui\Card {
 
 		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/encrypt-database-backups/?source=encrypt-database-backups' );
 
-		$video = esc_url( 'admin.php?page=database-encryption-video&TB_iframe=true&width=700&height=420' );
+		$video = esc_url( 'https://www.youtube.com/embed/Pwxous6_LKg?controls=0&autoplay=1&modestbranding=1&width=560&height=315&KeepThis=true&TB_iframe=true' );
 
 		$this->links = '
-			<a class="button thickbox" href=' . $video . '"><span class="dashicons dashicons-video-alt3"></span>' .
+			<a class="button thickbox" href=' . $video . '" title="Encrypt Your Database Backups"><span class="dashicons dashicons-video-alt3"></span>' .
 			esc_html__( 'Learn More' ) .
 			'<a target="_blank" href="' . $url . '">' .
 			esc_html__( 'Setup Guide' ) . '
 			</a>';
 
 		$this->icon = '<img src="' . plugin_dir_url( __FILE__ ) . '../image/db-lock-64.png" />';
-	}
-
-	/**
-	 * Video Subpage.
-	 *
-	 * @since SINCEVERSION
-	 */
-	public function video_subpage() {
-		wp_enqueue_style( 'boldgrid-backup-admin-hide-all' );
-		wp_enqueue_style( 'bglib-ui-css' );
-		wp_enqueue_script( 'bglib-ui-js' );
-		wp_enqueue_script( 'bglib-sticky' );
-
-		echo '<iframe width="711" height="400" src="https://www.youtube.com/embed/Pwxous6_LKg?controls=0" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
-	}
-
-	/**
-	 * Add Submenus.
-	 *
-	 * @since SINCEVERSION
-	 */
-	public function add_submenus() {
-		add_submenu_page(
-			null,
-			__( 'Database Encryption', 'boldgrid-backup' ),
-			__( 'Database Encryption', 'boldgrid-backup' ),
-			'administrator',
-			'database-encryption-video',
-			array(
-				$this,
-				'video_subpage',
-			)
-		);
 	}
 }
