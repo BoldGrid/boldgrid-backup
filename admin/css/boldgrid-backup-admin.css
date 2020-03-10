@@ -360,3 +360,7 @@ p > .bgbkup-remote-logo {
 	float: none;
 	margin: 10px;
 }
+
+.page-title-actions {
+	display: inline-block;
+}

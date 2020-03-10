@@ -801,6 +801,10 @@ class Boldgrid_Backup_Admin_Settings {
 		wp_enqueue_script( 'bglib-sticky' );
 		wp_enqueue_script( 'bglib-license' );
 
+		$this->core->auto_rollback->enqueue_home_scripts();
+		$this->core->auto_rollback->enqueue_backup_scripts();
+		$this->core->archive_actions->enqueue_scripts();
+
 		if ( ! $this->is_saving_settings ) {
 			$is_functional = $this->core->test->run_functionality_tests();
 		}
@@ -927,16 +931,27 @@ class Boldgrid_Backup_Admin_Settings {
 			$settings['encrypt_db'] = false;
 		}
 
+		$in_modal = true;
+		$modal    = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-modal.php';
+		$in_modal = false;
+
 		echo '
 		<div class="wrap">
 			<div id="bglib-page-container" class="bgbkup-page-container">
 				<div id="bglib-page-top">
 					<div id="bglib-page-header" class="bglib-has-logo">
 						<h1>' . esc_html__( 'Total Upkeep Backup and Restore Settings', 'boldgrid-backup' ) . '</h1>
+						<div class="page-title-actions">
+						<a href="#TB_inline?width=800&amp;height=600&amp;inlineId=backup_now_content" class="thickbox page-title-action page-title-action-primary">' .
+							esc_html__( 'Backup Site Now', 'boldgrid-backup' ) . '
+						</a>
+						<a class="page-title-action add-new">' . esc_html__( 'Upload Backup', 'boldgrid-backup' ) . '</a>
+					</div>
 					</div>
 				</div>
 				<div id="bglib-page-content">
 					<div class="wp-header-end"></div>';
+		echo $modal; //phpcs:ignore WordPress.Security.EscapeOutput
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-settings.php';
 		echo '
 				</div>

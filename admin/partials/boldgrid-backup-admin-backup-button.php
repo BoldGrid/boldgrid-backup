@@ -19,7 +19,6 @@
 defined( 'WPINC' ) || die;
 
 $page = empty( $_GET['page'] ) ? '' : $_GET['page'];
-
 $backup_button = '
 	<div id="backup-site-now-section">
 		<form action="#" id="backup-site-now-form" method="POST">' .
