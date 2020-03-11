@@ -101,7 +101,7 @@ class Boldgrid_Backup_Admin_Db_Omit {
 		$handle = 'boldgrid-backup-admin-table-include';
 		wp_register_script(
 			$handle,
-			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-table-include.js',
+			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-table-includes.js',
 			array( 'jquery' ),
 			BOLDGRID_BACKUP_VERSION,
 			false

@@ -128,11 +128,6 @@ if ( empty( $settings ) ) {
 
 wp_nonce_field( 'boldgrid_backup_settings' );
 
-?>
-<div class='wrap'>
-	<h1><?php echo esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'Backup and Restore Settings', 'boldgrid-backup' ) ); ?></h1>
-
-	<?php
 	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
 	/*
@@ -142,34 +137,33 @@ wp_nonce_field( 'boldgrid_backup_settings' );
 	 * being afraid it will do something you cannot easily undo. We perform a Preflight Check to see
 	 * if the needed support is available on your web hosting account.
 	 */
-	?>
-	<p>
-	<?php
-	printf(
-		wp_kses(
-			// translators: 1: Plugin title, 2:URL address.
-			__(
-				'The %1$s Backup and Restore system allows you to upgrade your themes and plugins without being afraid it will do something you cannot easily undo. We perform a <a href="%2$s">Preflight Check</a> to see if the needed support is available on your web hosting account.',
-				'boldgrid-backup'
-			),
-			[ 'a' => [ 'href' => [] ] ]
+?>
+
+<p>
+<?php
+printf(
+	wp_kses(
+		// translators: 1: Plugin title, 2:URL address.
+		__(
+			'The %1$s Backup and Restore system allows you to upgrade your themes and plugins without being afraid it will do something you cannot easily undo. We perform a <a href="%2$s">Preflight Check</a> to see if the needed support is available on your web hosting account.',
+			'boldgrid-backup'
 		),
-		esc_html( BOLDGRID_BACKUP_TITLE ),
-		esc_url( admin_url( 'admin.php?page=boldgrid-backup-test' ) )
-	);
+		[ 'a' => [ 'href' => [] ] ]
+	),
+	esc_html( BOLDGRID_BACKUP_TITLE ),
+	esc_url( admin_url( 'admin.php?page=boldgrid-backup-test' ) )
+);
 
-	$show_section = ! empty( $_REQUEST['section'] ) ? sanitize_key( $_REQUEST['section'] ) : ''; // phpcs:ignore WordPress
-	?>
-	</p>
+$show_section = ! empty( $_REQUEST['section'] ) ? sanitize_key( $_REQUEST['section'] ) : ''; // phpcs:ignore WordPress
+?>
+</p>
 
-	<hr />
+<hr />
 
-	<form id='bgb-settings-form' method='post'>
-	<?php
-		echo $col_container; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
-		wp_nonce_field( 'boldgrid-backup-settings', 'settings_auth' );
-	?>
-		<input type="hidden" name="save_time" value="<?php echo esc_attr( time() ); ?>" />
-	</form>
-
-</div>
+<form id='bgb-settings-form' method='post'>
+<?php
+	echo $col_container; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+	wp_nonce_field( 'boldgrid-backup-settings', 'settings_auth' );
+?>
+	<input type="hidden" name="save_time" value="<?php echo esc_attr( time() ); ?>" />
+</form>

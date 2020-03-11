@@ -402,7 +402,7 @@ class Boldgrid_Backup_Admin_Settings {
 	 * @param string $new_dir Destination directory.
 	 * @return bool TRUE on success / no backups needed to be moved.
 	 */
-	private function move_backups( $old_dir, $new_dir ) {
+	public function move_backups( $old_dir, $new_dir ) {
 		$fail_count = 0;
 
 		$old_dir = Boldgrid_Backup_Admin_Utility::trailingslashit( $old_dir );
@@ -918,8 +918,21 @@ class Boldgrid_Backup_Admin_Settings {
 			$settings['encrypt_db'] = false;
 		}
 
-		// Include the page template.
+		echo '
+		<div class="wrap">
+			<div id="bglib-page-container" class="bgbkup-page-container">
+				<div id="bglib-page-top">
+					<div id="bglib-page-header" class="bglib-has-logo">
+						<h1>' . esc_html__( 'Total Upkeep Backup and Restore Settings', 'boldgrid-backup' ) . '</h1>
+					</div>
+				</div>
+				<div id="bglib-page-content">
+					<div class="wp-header-end"></div>';
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-settings.php';
+		echo '
+				</div>
+			</div>
+		</div>';
 	}
 
 	/**
