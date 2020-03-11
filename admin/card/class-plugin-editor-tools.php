@@ -44,7 +44,7 @@ class Plugin_Editor_Tools extends \Boldgrid\Library\Library\Ui\Card {
 
 		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/plugin-editor-backup/?source=plugin-editor-tools' );
 
-		$video = esc_url( 'https://www.youtube.com/embed/Nb0AFEXpE00?controls=0&autoplay=1&modestbranding=1&width=560&height=315&KeepThis=true&TB_iframe=true' );
+		$video = esc_url( 'https://www.youtube.com/embed/Nb0AFEXpE00?controls=1&autoplay=1&modestbranding=1&width=560&height=315&KeepThis=true&TB_iframe=true' );
 
 		$this->links = '
 			<a class="button thickbox" href=' . $video . '" title="Save copies of Plugin Files from the Plugin Editor"><span class="dashicons dashicons-video-alt3"></span>' .

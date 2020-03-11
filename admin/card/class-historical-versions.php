@@ -44,7 +44,7 @@ class Historical_Versions extends \Boldgrid\Library\Library\Ui\Card {
 
 		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/restore-historical-files/?source=historical-versions' );
 
-		$video = esc_url( 'https://www.youtube.com/embed/wGda86tdScg?controls=0&autoplay=1&modestbranding=1&width=560&height=315&KeepThis=true&TB_iframe=true' );
+		$video = esc_url( 'https://www.youtube.com/embed/wGda86tdScg?controls=1&autoplay=1&modestbranding=1&width=560&height=315&KeepThis=true&TB_iframe=true' );
 
 		$this->links = '
 			<a class="button thickbox" href=' . $video . '" title="Restore Historical Versions of Files"><span class="dashicons dashicons-video-alt3"></span>' .

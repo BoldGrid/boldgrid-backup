@@ -44,7 +44,7 @@ class One_Click_Restoration extends \Boldgrid\Library\Library\Ui\Card {
 
 		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/individual-file-restorations/?source=one-click-restore' );
 
-		$video = esc_url( 'https://www.youtube.com/embed/r2VCQ-9fQP8?controls=0&autoplay=1&modestbranding=1&width=560&height=315&KeepThis=true&TB_iframe=true' );
+		$video = esc_url( 'https://www.youtube.com/embed/r2VCQ-9fQP8?controls=1&autoplay=1&modestbranding=1&width=560&height=315&KeepThis=true&TB_iframe=true' );
 
 		$this->links = '
 			<a class="button thickbox" href=' . $video . '" title="Restore Files with One Click"><span class="dashicons dashicons-video-alt3"></span>' .
@@ -52,38 +52,5 @@ class One_Click_Restoration extends \Boldgrid\Library\Library\Ui\Card {
 			'<a target="_blank" href="' . $url . '">' .
 			esc_html__( 'Setup Guide' ) . '
 			</a>';
-	}
-
-	/**
-	 * Video Subpage.
-	 *
-	 * @since SINCEVERSION
-	 */
-	public function video_subpage() {
-		wp_enqueue_style( 'boldgrid-backup-admin-hide-all' );
-		wp_enqueue_style( 'bglib-ui-css' );
-		wp_enqueue_script( 'bglib-ui-js' );
-		wp_enqueue_script( 'bglib-sticky' );
-
-		echo '<iframe width="711" height="400" src="https://www.youtube.com/embed/r2VCQ-9fQP8?controls=0" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
-	}
-
-	/**
-	 * Add Submenus.
-	 *
-	 * @since SINCEVERSION
-	 */
-	public function add_submenus() {
-		add_submenu_page(
-			null,
-			__( 'One Click File Restorations', 'boldgrid-backup' ),
-			__( 'One Click File Restorations', 'boldgrid-backup' ),
-			'administrator',
-			'one-click-restoration-video',
-			array(
-				$this,
-				'video_subpage',
-			)
-		);
 	}
 }

@@ -44,7 +44,7 @@ class History extends \Boldgrid\Library\Library\Ui\Card {
 
 		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/backup-changed-files-history/?source=update-history' );
 
-		$video = esc_url( 'https://www.youtube.com/embed/kaeb30pYPYU?controls=0&autoplay=1&modestbranding=1&width=560&height=315&KeepThis=true&TB_iframe=true' );
+		$video = esc_url( 'https://www.youtube.com/embed/kaeb30pYPYU?controls=1&autoplay=1&modestbranding=1&width=560&height=315&KeepThis=true&TB_iframe=true' );
 
 		$this->links = '
 			<a class="button thickbox" href=' . $video . '" title="View Site Update History"><span class="dashicons dashicons-video-alt3"></span>' .

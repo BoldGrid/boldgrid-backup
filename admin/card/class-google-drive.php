@@ -44,7 +44,7 @@ class Google_Drive extends \Boldgrid\Library\Library\Ui\Card {
 
 		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/auto-backup-to-google-drive/?source=google-drive' );
 
-		$video = esc_url( 'https://www.youtube.com/embed/p6I_xxo4TLo?controls=0&autoplay=1&modestbranding=1&width=560&height=315&KeepThis=true&TB_iframe=true' );
+		$video = esc_url( 'https://www.youtube.com/embed/p6I_xxo4TLo?controls=1&autoplay=1&modestbranding=1&width=560&height=315&KeepThis=true&TB_iframe=true' );
 
 		$this->links = '
 			<a class="button thickbox" href=' . $video . '" title="Store Backups on Google Drive" ><span class="dashicons dashicons-video-alt3"></span>' .
