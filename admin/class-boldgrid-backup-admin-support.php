@@ -186,7 +186,6 @@ class Boldgrid_Backup_Admin_Support {
 		$this->core->folder_exclusion->enqueue_scripts();
 		$this->core->db_omit->enqueue_scripts();
 
-
 		$in_modal = true;
 		$modal    = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-modal.php';
 		$in_modal = false;
@@ -207,7 +206,7 @@ class Boldgrid_Backup_Admin_Support {
 				</div>
 				<div id="bglib-page-content">
 					<div class="wp-header-end"></div>';
-		echo $modal; //phpcs:ignore WordPress.Security.EscapeOutput
+		echo $modal; //phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped, WordPress.Security.EscapeOutput
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-support.php';
 		echo '
 				</div>

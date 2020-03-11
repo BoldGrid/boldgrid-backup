@@ -58,7 +58,6 @@ class Boldgrid_Backup_Admin_Transfers {
 		$this->core->folder_exclusion->enqueue_scripts();
 		$this->core->db_omit->enqueue_scripts();
 
-
 		$in_modal = true;
 		$modal    = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-modal.php';
 		$in_modal = false;
@@ -86,7 +85,7 @@ class Boldgrid_Backup_Admin_Transfers {
 				</div>
 				<div id="bglib-page-content">
 					<div class="wp-header-end"></div>';
-		echo $modal;
+		echo $modal; //phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-transfers.php';
 		echo '
 				</div>
