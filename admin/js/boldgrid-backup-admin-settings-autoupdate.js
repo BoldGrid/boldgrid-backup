@@ -60,13 +60,16 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 
 			if ( true === $( '#timely-updates-disabled' ).prop( 'checked' ) ) {
 				$( '#timely-updates-days' ).prop( 'disabled', true );
+				$( '#timely-updates-days-hidden' ).prop( 'disabled', false );
 			}
 
 			$( 'input[name="auto_update[timely-updates-enabled]"]' ).change( function() {
 				if ( true === $( '#timely-updates-disabled' ).prop( 'checked' ) ) {
 					$( '#timely-updates-days' ).prop( 'disabled', true );
+					$( '#timely-updates-days-hidden' ).prop( 'disabled', false );
 				} else {
 					$( '#timely-updates-days' ).prop( 'disabled', false );
+					$( '#timely-updates-days-hidden' ).prop( 'disabled', true );
 				}
 			} );
 		},

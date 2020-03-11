@@ -364,3 +364,16 @@ p > .bgbkup-remote-logo {
 .page-title-actions {
 	display: inline-block;
 }
+
+.bg-auto-update.dashicons {
+	margin-right: 6px;
+	vertical-align: bottom;
+}
+
+.bg-auto-update.dashicons.dashicons-warning {
+	color: #f56e28;
+}
+
+.bg-auto-update.dashicons.dashicons-yes {
+	color: #79ba49;
+}

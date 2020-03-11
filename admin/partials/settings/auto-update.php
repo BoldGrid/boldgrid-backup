@@ -75,6 +75,7 @@ function get_heading_markup( $boldgrid_backup_settings, $auto_update_settings ) 
 function get_premium_markup() {
 	$core        = apply_filters( 'boldgrid_backup_get_core', null );
 	$premium_url = $core->go_pro->get_premium_url( 'bgbkup-settings-auto-update' );
+
 	$premium_box = sprintf(
 		'
 		<div class="bg-box-bottom premium">
