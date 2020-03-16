@@ -155,13 +155,11 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 		 * not refresh until we know a backup is in progress so that we know the in progress bar will
 		 * show when the page refreshes.
 		 */
-		if ( 'total-upkeep_page_boldgrid-backup' === pagenow ) {
-			setTimeout( function() {
-				location.reload();
-			}, 6000 );
-		} else {
-			$( 'body' ).trigger( 'boldgrid_backup_initiated' );
-		}
+
+		setTimeout( function() {
+			location.reload();
+		}, 6000 );
+
 
 		// Prevent default browser action.
 		e.preventDefault();
