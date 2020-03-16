@@ -54,7 +54,7 @@ switch ( true ) {
 		// Has a premium license and the premium plugin installed, but not activated.
 		$encrypt_message = sprintf(
 			// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag, 3: Premium plugin title.
-			__( '%3$s is not active and required for encryption features.  Please go to the %1$sPlugins%2$s page to activate it.', 'boldgrid-backup' ),
+			__( '%3$s is not active. %3$s is required for encryption features.  Please go to the %1$sPlugins%2$s page to activate it.', 'boldgrid-backup' ),
 			'<a href="' .
 				esc_url( admin_url( 'plugins.php?s=Boldgrid%20Backup%20Premium&plugin_status=inactive' ) ) .
 				'">',
