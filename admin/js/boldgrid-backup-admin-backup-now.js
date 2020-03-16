@@ -160,7 +160,6 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 			location.reload();
 		}, 6000 );
 
-
 		// Prevent default browser action.
 		e.preventDefault();
 	};
