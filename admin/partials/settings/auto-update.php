@@ -277,7 +277,6 @@ function get_plugins_update_markup( $auto_update_settings, $translations ) {
 			} else {
 				$extra_info_icon = '';
 			}
-			error_log( $slug . ':: ' . json_encode( $third_party ) );
 			$plugins_update_markup .= '
 				<tr id="' . $slug . '-row" class="' . $status_lower . '-collapsible bglib-collapsible bglib-collapsible-open">
 					<td colspan=2 />
