@@ -268,13 +268,20 @@ function get_plugins_update_markup( $auto_update_settings, $translations ) {
 
 		foreach ( ${ 'plugins_' . $status_lower } as $slug => $plugin_data ) {
 			// Enable if global setting is on, individual settings is on, or not set and default is on.
-			$toggle = $plugin_auto_update || ! empty( $auto_update_settings['plugins'][ $slug ] ) ||
+			$toggle          = $plugin_auto_update || ! empty( $auto_update_settings['plugins'][ $slug ] ) ||
 				( ! isset( $auto_update_settings['plugins'][ $slug ] ) && $plugins_default );
-
+			$plugin          = new \Boldgrid\Library\Library\Plugin\Plugin( $slug );
+			$third_party     = $plugin->updateData->thirdParty; //phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+			if ( true === $third_party ) {
+				$extra_info_icon = '<span class="help-icon dashicons dashicons-warning" data-id="' . $slug . '-extra-info"></span>';
+			} else {
+				$extra_info_icon = '';
+			}
+			error_log( $slug . ':: ' . json_encode( $third_party ) );
 			$plugins_update_markup .= '
 				<tr id="' . $slug . '-row" class="' . $status_lower . '-collapsible bglib-collapsible bglib-collapsible-open">
 					<td colspan=2 />
-					<td><div class="td-slider">' . $plugin_data['Name'] . '</td>
+					<td>' . $plugin_data['Name'] . $extra_info_icon . '</td>
 					<td class="td-toggle">
 						<div class="td-slider toggle toggle-light plugin-toggle"
 							data-plugin="' . $slug . '"
@@ -284,6 +291,14 @@ function get_plugins_update_markup( $auto_update_settings, $translations ) {
 						value="' . ( $toggle ? 1 : 0 ) . '" />
 					</td>
 				</tr>';
+			if ( true === $third_party ) {
+				$plugins_update_markup .= '
+					<tr class="table-help hide-help" data-id="' . $slug . '-extra-info">
+						<td colspan=4>
+							<p>This plugin was not installed through the WordPress Plugins Repository. If auto updates are enabled, they will take place immediately. </p>
+						</td>
+					</tr>';
+			}
 		}
 	}
 

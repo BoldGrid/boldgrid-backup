@@ -38,3 +38,8 @@
 .auto-update-settings input[type="number"] {
 	width: 5em;
 }
+.auto-update-settings .help-icon {
+	vertical-align: middle;
+	color: #f56e28;
+	padding-left: 0.25em;
+}
