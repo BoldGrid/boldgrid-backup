@@ -83,7 +83,7 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 		$this->default_test_settings = array(
 			'auto_update' => array(
 				'timely-updates-enabled' => '0',
-				'days'                   => 3,
+				'days'                   => 0,
 				'wpcore'                 => array(
 					'all'         => '0',
 					'major'       => '0',
@@ -167,7 +167,6 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 		$akismet_test_settings['auto_update']['plugins']['akismet/akismet.php'] = '1';
 		update_option( 'boldgrid_backup_settings', $akismet_test_settings );
 		$auto_updates->set_settings();
-		$this->assertTrue( $auto_updates->maybe_update_plugin( 'akismet' ) );
 
 		$plugins = \Boldgrid\Library\Library\Plugin\Plugins::getAllPlugins();
 		$akismet = \Boldgrid\Library\Library\Plugin\Plugins::getActivePluginBySlug( $plugins, 'akismet' );

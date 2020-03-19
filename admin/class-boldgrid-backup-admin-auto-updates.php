@@ -113,14 +113,12 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		$plugin                = \Boldgrid\Library\Library\Plugin\Plugins::getActivePluginBySlug( $this->plugins, $slug );
 		$days_since_release    = $plugin->updateData->days; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
 		$plugin_update_enabled = array_key_exists( $plugin->getFile(), $this->settings['plugins'] ) ? (bool) $this->settings['plugins'][ $plugin->getFile() ] : false;
-
 		// if premium, check the days since it was released, if not premium then this is true.
 		if ( $this->is_premium_done() ) {
 			$is_update_time = ( $days_since_release >= $days_to_wait );
 		} else {
 			$is_update_time = true;
 		}
-
 		if ( $is_update_time && true === $plugin_update_enabled ) {
 			return true;
 		} else {

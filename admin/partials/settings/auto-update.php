@@ -268,10 +268,11 @@ function get_plugins_update_markup( $auto_update_settings, $translations ) {
 
 		foreach ( ${ 'plugins_' . $status_lower } as $slug => $plugin_data ) {
 			// Enable if global setting is on, individual settings is on, or not set and default is on.
-			$toggle          = $plugin_auto_update || ! empty( $auto_update_settings['plugins'][ $slug ] ) ||
+			$toggle      = $plugin_auto_update || ! empty( $auto_update_settings['plugins'][ $slug ] ) ||
 				( ! isset( $auto_update_settings['plugins'][ $slug ] ) && $plugins_default );
-			$plugin          = new \Boldgrid\Library\Library\Plugin\Plugin( $slug );
-			$third_party     = $plugin->updateData->thirdParty; //phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+			$plugin      = new \Boldgrid\Library\Library\Plugin\Plugin( $slug );
+			$third_party = $plugin->updateData->thirdParty; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
+
 			if ( true === $third_party ) {
 				$extra_info_icon = '<span class="help-icon dashicons dashicons-warning" data-id="' . $slug . '-extra-info"></span>';
 			} else {
