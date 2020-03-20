@@ -34,7 +34,7 @@ $backup_button = '
  * If the page is 'boldgrid-backup', then you're in the modal. The buttons will generally be the same,
  * but the formatting will be slightly different, hence the conditional below.
  */
-if ( 'boldgrid-backup' === $page ) {
+if ( false !== strpos( $page, 'boldgrid-backup' ) ) {
 	// The first div in the grid is needed so the grid fills out properly.
 	$backup_button .= '
 			<div style="display:grid; grid-gap:2em; grid-template-columns: 5fr 2fr;">
