@@ -19,6 +19,7 @@
 .auto-update-settings.form-table .table-help td,
 .auto-update-settings.form-table .table-help td p {
 	padding: 0;
+	padding-left:5px;
 }
 
 .form-table .bglib-divider {

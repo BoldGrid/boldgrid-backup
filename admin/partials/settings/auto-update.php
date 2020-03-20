@@ -240,12 +240,12 @@ function get_plugins_update_markup( $auto_update_settings, $translations ) {
 		</td>
 	</tr>
 	<tr>
-		<td>' . esc_html__( 'Default For New Plugins', 'boldgrid-library' ) .
-			'<div class="toggle toggle-light right" id="toggle-default-plugins"
+		<td>' . esc_html__( 'Default For New Plugins', 'boldgrid-library' ) . '</td>
+		<td>
+			<div class="toggle toggle-light right" id="toggle-default-plugins"
 			data-toggle-on="' . ( $plugins_default ? 'true' : 'false' ) . '"></div>
 			<input type="hidden" name="auto_update[plugins][default]" value="' . ( $plugins_default ? 1 : 0 ) . '" />
 		</td>
-		<td />
 		<td>' . esc_html__( 'All Plugins', 'boldgrid-library' ) . '</td>
 		<td class="td-toggle">
 			<div class="toggle toggle-light toggle-group" id="toggle-plugins"></div>
@@ -268,9 +268,10 @@ function get_plugins_update_markup( $auto_update_settings, $translations ) {
 
 		foreach ( ${ 'plugins_' . $status_lower } as $slug => $plugin_data ) {
 			// Enable if global setting is on, individual settings is on, or not set and default is on.
-			$toggle      = $plugin_auto_update || ! empty( $auto_update_settings['plugins'][ $slug ] ) ||
+			$toggle = $plugin_auto_update || ! empty( $auto_update_settings['plugins'][ $slug ] ) ||
 				( ! isset( $auto_update_settings['plugins'][ $slug ] ) && $plugins_default );
-			$plugin      = new \Boldgrid\Library\Library\Plugin\Plugin( $slug );
+			$plugin = new \Boldgrid\Library\Library\Plugin\Plugin( $slug );
+			$slug   = wp_basename( $slug );
 			$third_party = $plugin->updateData->thirdParty; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
 
 			if ( true === $third_party ) {
@@ -294,9 +295,11 @@ function get_plugins_update_markup( $auto_update_settings, $translations ) {
 			if ( true === $third_party ) {
 				$plugins_update_markup .= '
 					<tr class="table-help hide-help" data-id="' . $slug . '-extra-info">
-						<td colspan=4>
+						<td colspan=2></td>
+						<td colspan=1>
 							<p>This plugin was not installed through the WordPress Plugins Repository. If auto updates are enabled, they will take place immediately. </p>
 						</td>
+						<td></td>
 					</tr>';
 			}
 		}
@@ -351,12 +354,13 @@ function get_themes_update_markup( $auto_update_settings, $translations ) {
 	</td>
 	</tr>
 	<tr>
-		<td>' . esc_html__( 'Default For New Themes', 'boldgrid-library' ) .
-			'<div class="toggle toggle-light right" id="toggle-default-themes"
-			data-toggle-on="' . ( $themes_default ? 'true' : 'false' ) . '"></div>
-			<input type="hidden" name="auto_update[themes][default]" value="' . ( $themes_default ? 1 : 0 ) . '" />
+		<td>' . esc_html__( 'Default For New Themes', 'boldgrid-library' ) . '</td>
+		<td>
+			<div class="toggle toggle-light right" id="toggle-default-themes"
+				data-toggle-on="' . ( $themes_default ? 'true' : 'false' ) . '"></div>
+				<input type="hidden" name="auto_update[themes][default]" value="' . ( $themes_default ? 1 : 0 ) . '" />
+			</div>
 		</td>
-		<td />
 		<td>' . esc_html__( 'All Themes', 'boldgrid-library' ) . '</td>
 		<td class="td-toggle">
 			<div class="toggle toggle-light toggle-group" id="toggle-themes"></div>
