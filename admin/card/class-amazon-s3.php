@@ -44,7 +44,7 @@ class Amazon_S3 extends \Boldgrid\Library\Library\Ui\Card {
 		$video = esc_url( 'https://www.youtube.com/embed/ZN0lab5ndhE?controls=1&autoplay=1&modestbranding=1&width=560&height=315&KeepThis=true&TB_iframe=true' );
 
 		$this->links = '
-			<a class="button thickbox" href=' . $video . '" title="Store Backups on Amazon S3"><span class="dashicons dashicons-video-alt3"></span>' .
+			<a class="video button thickbox" href=' . $video . '" data-id="' . $this->id . '" title="Store Backups on Amazon S3"><span class="dashicons dashicons-video-alt3"></span>' .
 			esc_html__( 'Learn More' ) .
 			'<a target="_blank" href="' . $url . '">' .
 			esc_html__( 'Setup Guide' ) . '

@@ -117,3 +117,7 @@
 .bglib-card .bglib-card-links {
 	justify-content: flex-end;
 }
+
+.bglib-smaller .bglib-card-links a.button {
+	margin-right: 10px;
+}
