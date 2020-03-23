@@ -272,6 +272,7 @@ function get_plugins_update_markup( $auto_update_settings, $translations ) {
 				( ! isset( $auto_update_settings['plugins'][ $slug ] ) && $plugins_default );
 			$plugin      = new \Boldgrid\Library\Library\Plugin\Plugin( $slug );
 			$slug        = wp_basename( $slug );
+			$slug        = explode( '.', $slug )[0];
 			$third_party = $plugin->updateData->thirdParty; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
 
 			if ( true === $third_party ) {
@@ -297,7 +298,7 @@ function get_plugins_update_markup( $auto_update_settings, $translations ) {
 					<tr class="table-help hide-help" data-id="' . $slug . '-extra-info">
 						<td colspan=2></td>
 						<td colspan=1>
-							<p>This plugin was not installed through the WordPress Plugins Repository. If auto updates are enabled, they will take place immediately. </p>
+							<p style="position:relative;z-index=-1">This plugin was not installed through the WordPress Plugins Repository. If auto updates are enabled, they will take place immediately. </p>
 						</td>
 						<td></td>
 					</tr>';

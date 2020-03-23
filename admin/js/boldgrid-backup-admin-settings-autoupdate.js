@@ -50,7 +50,7 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 				.not( '.toggle-group' )
 				.on( 'click swipe contextmenu', self._setMasterToggles );
 
-			$bgBox.find( '.table-help td p' ).attr( 'style', 'height: 0em; opacity: 0%' );
+			$bgBox.find( '.table-help td p' ).attr( 'style', 'height: 0em; opacity: 0%; position: relative; z-index:-1' );
 			$bgBox.find( '.dashicons-editor-help' ).on( 'click', self._toggleHelp );
 			$bgBox.find( '.help-icon' ).on( 'click', self._toggleHelp );
 			$bgBox.find( '.help-icon' ).css( 'cursor', 'pointer' );
@@ -231,11 +231,11 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 			$( target ).toggleClass( 'show-help' );
 			$( target ).toggleClass( 'hide-help' );
 			$( '.table-help.show-help[data-id="' + id + '"] td p' ).animate(
-				{ height: '3em', opacity: '100%' },
+				{ height: '3em', opacity: '100%', 'z-index': 0 },
 				400
 			);
 			$( '.table-help.hide-help[data-id="' + id + '"] td p' ).animate(
-				{ height: '0em', opacity: '0%' },
+				{ height: '0em', opacity: '0%', 'z-index': -1 },
 				400
 			);
 
