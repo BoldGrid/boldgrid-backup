@@ -2519,6 +2519,11 @@ class Boldgrid_Backup_Admin_Core {
 		// If there were any errors encountered during the backup, save them to the In Progress data.
 		if ( ! empty( $archive_info['error'] ) ) {
 			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'error', $archive_info['error'] );
+			$this->notice->add_user_notice(
+				'<p>' . $archive_info['error'] . '</p>',
+				'notice notice-error is-dismissible',
+				'Backup Failed'
+			);
 		}
 
 		if ( $this->is_archiving_update_protection ) {
