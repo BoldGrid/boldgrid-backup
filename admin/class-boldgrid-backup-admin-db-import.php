@@ -306,6 +306,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 		$results = $this->show_grants_query();
 
 		foreach ( $results as $result ) {
+			$result[0]               = str_replace( '\\', '', $result[0] );
 			$is_string_db_grant      = ( false !== strpos( $result[0], 'ON `' . DB_NAME . '`' ) );
 			$is_string_all_grant     = ( false !== strpos( $result[0], 'ON *.*' ) );
 			$is_grant_all_privileges = ( false !== strpos( $result[0], 'GRANT ALL PRIVILEGES' ) );
