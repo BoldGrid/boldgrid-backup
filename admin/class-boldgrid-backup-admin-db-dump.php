@@ -63,7 +63,7 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		 *
 		 * In the list below, it is important that $include_tables is processed last.
 		 */
-		$include_views  = $this->core->db_get->filter_by_type( $include_tables, 'VIEW' );
+		$include_views = $this->core->db_get->filter_by_type( $include_tables, 'VIEW' );
 
 		$include_tables = $this->core->db_get->filter_by_type( $include_tables, 'BASE TABLE' );
 
@@ -86,7 +86,7 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		$db_host = explode( ':', DB_HOST );
 
 		if ( ! empty( $include_views ) ) {
-			$db_import = new Boldgrid_Backup_Admin_Db_Import();
+			$db_import           = new Boldgrid_Backup_Admin_Db_Import();
 			$user_has_privileges = $db_import->has_db_privileges( array( 'SHOW VIEW' ) );
 			if ( false === $user_has_privileges ) {
 				return array(
