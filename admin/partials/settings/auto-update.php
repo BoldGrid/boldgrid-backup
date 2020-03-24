@@ -271,8 +271,6 @@ function get_plugins_update_markup( $auto_update_settings, $translations ) {
 			$toggle      = $plugin_auto_update || ! empty( $auto_update_settings['plugins'][ $slug ] ) ||
 				( ! isset( $auto_update_settings['plugins'][ $slug ] ) && $plugins_default );
 			$plugin      = new \Boldgrid\Library\Library\Plugin\Plugin( $slug );
-			$slug        = wp_basename( $slug );
-			$slug        = explode( '.', $slug )[0];
 			$third_party = $plugin->updateData->thirdParty; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
 
 			if ( true === $third_party ) {
