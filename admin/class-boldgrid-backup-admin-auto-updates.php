@@ -17,7 +17,7 @@ use Boldgrid\Library\Library\Plugin\Plugins;
 /**
  * Class: Boldgrid_Backup_Admin_Auto_Updates.
  *
- * @since 1.2
+ * @since SINCEVERSION
  */
 class Boldgrid_Backup_Admin_Auto_Updates {
 	/**
@@ -96,7 +96,9 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		if ( isset( $boldgrid_backup_settings['auto_update'] ) ) {
 			$this->settings = $boldgrid_backup_settings['auto_update'];
 		} else {
-			$this->settings = array();
+			$this->settings = array(
+				'days' => 7,
+			);
 		}
 	}
 
@@ -109,7 +111,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 * @return bool
 	 */
 	public function maybe_update_plugin( $slug ) {
-		$days_to_wait          = isset( $this->settings['days'] ) ? $this->settings['days'] : 3;
+		$days_to_wait          = $this->settings['days'];
 		$plugin                = \Boldgrid\Library\Library\Plugin\Plugins::getActivePluginBySlug( $this->plugins, $slug );
 		$days_since_release    = $plugin->updateData->days; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
 		$plugin_update_enabled = array_key_exists( $plugin->getFile(), $this->settings['plugins'] ) ? (bool) $this->settings['plugins'][ $plugin->getFile() ] : false;

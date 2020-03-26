@@ -3,7 +3,7 @@
  * Timely Auto Updates class.
  *
  * @link       https://www.boldgrid.com
- * @since      1.13.0
+ * @since      SINCEVERSION
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Card
@@ -14,17 +14,17 @@
 namespace Boldgrid\Backup\Admin\Card;
 
 /**
- * Class: Encryption
+ * Class: Timely Auto Updates
  *
  * This class is responsible for rendering the "Encryption" card on this plugin's Premium Features page.
  *
- * @since 1.13.0
+ * @since SINCEVERSION
  */
 class Timely_Auto_Updates extends \Boldgrid\Library\Library\Ui\Card {
 	/**
 	 * Init.
 	 *
-	 * @since 1.13.0
+	 * @since SINCEVERSION
 	 */
 	public function init() {
 		$this->id = 'bgbkup_timely_auto_updates';
@@ -42,7 +42,7 @@ class Timely_Auto_Updates extends \Boldgrid\Library\Library\Ui\Card {
 
 		$this->links = '
 			<a target="_blank" href="' . $url . '">' .
-			esc_html__( 'Setup Guide' ) . '
+			esc_html__( 'Setup Guide', 'boldgrid-backup' ) . '
 			</a>';
 
 		$this->icon = '<span class="dashicons dashicons-clock"></span>';

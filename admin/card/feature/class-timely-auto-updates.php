@@ -3,7 +3,7 @@
  * Timely_Auto_Updates class.
  *
  * @link       https://www.boldgrid.com
- * @since      1.11.0
+ * @since      SINCEVERSION
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Feature
