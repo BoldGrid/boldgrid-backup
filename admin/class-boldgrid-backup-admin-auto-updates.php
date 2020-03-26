@@ -162,8 +162,8 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 *
 	 * @since SINCEVERSION
 	 *
-	 * @param bool     $update Whether or not to update.
-	 * @param stdClass $item The item class passed to callback.
+	 * @param  bool     $update Whether or not to update.
+	 * @param  stdClass $item The item class passed to callback.
 	 * @return bool
 	 */
 	public function auto_update_plugins( $update, stdClass $item ) {
@@ -241,6 +241,5 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		add_filter( 'allow_minor_auto_core_updates', '__return_' . $minor );
 		add_filter( 'auto_update_translation', '__return_' . $translation );
 		add_filter( 'allow_dev_auto_core_updates', '__return_' . $dev );
-
 	}
 }
