@@ -78,6 +78,16 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 			} );
 		},
 
+		_onInputChange: function( toggle, input ) {
+			toggle.change( function() {
+				if ( true == $this.prop( 'checked' ) ) {
+					input.val( '1' );
+				} else {
+					input.val( '0' );
+				}
+			} );
+		},
+
 		/**
 		 * Set inputs for toggles.
 		 *
@@ -95,9 +105,9 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 				$timelyUpdatesDays = $bgBox.find( '#timely-updates-days' );
 
 			// If the updates section is not in use, then just return.
-			// if ( ! $pluginsDefault.data( 'toggles' ) ) {
-			// 	return;
-			// }
+			if ( ! $pluginsDefault.data( 'toggles' ) ) {
+				return;
+			}
 
 			$wpcoreToggles.each( function() {
 				var $this = $( this );
@@ -106,13 +116,7 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 					.next( 'input' )
 					.attr( 'name', 'auto_update[wpcore][' + $this.data( 'wpcore' ) + ']' )
 					.val( $this.data( 'toggles' ).active ? 1 : 0 );
-				$this.change( function() {
-					if ( true == $this.prop( 'checked' ) ) {
-						$thisInput.val( '1' );
-					} else {
-						$thisInput.val( '0' );
-					}
-				} );
+				self._onInputChange( $this, $thisInput );
 			} );
 
 			$pluginToggles.each( function() {
@@ -122,14 +126,7 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 					.next( 'input' )
 					.attr( 'name', 'auto_update[plugins][' + $this.data( 'plugin' ) + ']' )
 					.val( $this.data( 'toggles' ).active ? 1 : 0 );
-
-				$this.change( function() {
-					if ( true == $this.prop( 'checked' ) ) {
-						$thisInput.val( '1' );
-					} else {
-						$thisInput.val( '0' );
-					}
-				} );
+				self._onInputChange( $this, $thisInput );
 			} );
 
 			$themeToggles.each( function() {
@@ -139,13 +136,7 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 					.next( 'input' )
 					.attr( 'name', 'auto_update[themes][' + $this.data( 'stylesheet' ) + ']' )
 					.val( $this.data( 'toggles' ).active ? 1 : 0 );
-				$this.change( function() {
-					if ( true == $this.prop( 'checked' ) ) {
-						$thisInput.val( '1' );
-					} else {
-						$thisInput.val( '0' );
-					}
-				} );
+				self._onInputChange( $this, $thisInput );
 			} );
 
 			$pluginsDefault.next( 'input' ).val( $pluginsDefault.data( 'toggles' ).active ? 1 : 0 );
@@ -222,16 +213,15 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 		 * @since 1.7.0
 		 */
 		_toggleHelp: function( e ) {
-			var id = $( this ).attr( 'data-id' );
-			var target = $( '.table-help[data-id="' + id + '"]' );
+			var id = $( this ).attr( 'data-id' ),
+				target = $( '.table-help[data-id="' + id + '"]' );
 			e.preventDefault();
 
 			if ( id === undefined ) {
 				return false;
 			}
 
-			$( target ).toggleClass( 'show-help' );
-			$( target ).toggleClass( 'hide-help' );
+			$( target ).toggleClass( 'show-help hide-help' );
 			$( '.table-help.show-help[data-id="' + id + '"] td p' ).animate(
 				{ height: '3em', opacity: '100%', 'z-index': 0 },
 				400

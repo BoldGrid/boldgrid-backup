@@ -246,7 +246,7 @@ class Boldgrid_Backup_Admin_Notice {
 		$update_msg        = '';
 		switch ( count( $auto_update_array ) ) {
 			case 0:
-				$update_msg = esc_html( 'disabled for all', 'boldgrid-backup' );
+				$update_msg = esc_html__( 'disabled for all', 'boldgrid-backup' );
 				break;
 			case 1:
 				$update_msg = sprintf(

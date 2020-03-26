@@ -274,7 +274,7 @@ function get_plugins_update_markup( $auto_update_settings, $translations ) {
 			$third_party = $plugin->updateData->thirdParty; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
 
 			if ( true === $third_party ) {
-				$extra_info_icon = '<span class="help-icon dashicons dashicons-warning" data-id="' . $slug . '-extra-info"></span>';
+				$extra_info_icon = '<span class="help-icon dashicons dashicons-warning yellow" data-id="' . $slug . '-extra-info"></span>';
 			} else {
 				$extra_info_icon = '';
 			}

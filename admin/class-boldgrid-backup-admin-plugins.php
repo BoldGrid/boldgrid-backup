@@ -21,14 +21,6 @@
  */
 class Boldgrid_Backup_Admin_Plugins {
 	/**
-	 * Active Plugins.
-	 *
-	 * @since SINCEVERSION
-	 * @var array
-	 */
-	public $active_plugins;
-
-	/**
 	 * Filter this plugin's links within Plugins > Installed Plugins.
 	 *
 	 * @since 1.10.1
