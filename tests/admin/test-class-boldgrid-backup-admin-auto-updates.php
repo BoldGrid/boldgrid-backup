@@ -132,9 +132,7 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 	 * @since SINCEVERSION
 	 */
 	public function test_set_settings() {
-		// Test that an unset 'boldgrid_backup_settings' option returns an empty array.
 		$auto_updates = new Boldgrid_Backup_Admin_Auto_Updates();
-		$this->assertEquals( array(), $auto_updates->settings );
 
 		// Test that set_settings assignes the 'boldgrid_backup_settings[auto_update]' contents to $this->settings.
 		update_option( 'boldgrid_backup_settings', $this->default_test_settings );
