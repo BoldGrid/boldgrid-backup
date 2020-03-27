@@ -28,26 +28,6 @@ class Test_Boldgrid_Backup_Admin_Notice_Counts extends WP_UnitTestCase {
 		$this->assertTrue( $this->notice_counts_in_nav( '1.16.16', '1.16.16', 0 ) );
 	}
 
-	// public function test_one_notice_displayed() {
-	// 	$this->assertTrue( $this->notice_counts_in_nav( '1.12.16', '1.16.16', 1 ) );
-	// }
-
-	// public function test_new_feature_added() {
-	// 	$new_feature = [
-	// 		'id'      => 'bgbkup_google_drive',
-	// 		'page'    => 'boldgrid-backup-premium-features',
-	// 		'version' => '1.18.16',
-	// 	];
-	// 	$this->notice_counts_in_nav( '1.12.16', '1.16.16', 1 );
-	// 	$this->assertTrue( $this->notice_counts_in_nav( '1.12.16', '1.16.16', 2, $new_feature = $new_feature ) );
-	// }
-
-	// public function test_mark_feature_read() {
-	// 	$this->assertTrue( $this->notice_counts_in_nav( '1.12.16', '1.16.16', 2 ) );
-	// 	$this->core->plugin->getPageBySlug( 'boldgrid-backup-premium-features' )->setAllNoticesRead();
-	// 	$this->assertTrue( $this->notice_counts_in_nav( '1.12.16', '1.16.16', 0 ) );
-	// }
-
 	public function notice_counts_in_nav( $first_version, $this_version, $expected_count, $new_feature = null ) {
 		$this->core->plugin->pluginData = $this->get_plugin_data( $this_version );
 		$plugin_config                  = $this->get_plugin_config();

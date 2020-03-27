@@ -77,15 +77,6 @@ class Test_Boldgrid_Backup_Admin_Premium_Features_Page extends WP_UnitTestCase {
 
 	}
 
-	// public function test_page() {
-	// 	$this->premium_page->core->plugin->pluginData = $this->get_plugin_data( '2.1.1' );
-
-	// 	$page_array = $this->premium_page->page();
-	// 	$this->assertTrue( ! empty( $page_array['nav'] ) );
-	// 	$this->assertTrue( ! empty( $page_array['dashboard'] ) );
-	// 	$this->assertTrue( ! empty( $page_array['premium_box'] ) );
-	// }
-
 	public function get_plugin_data( $this_version ) {
 
 		return [
