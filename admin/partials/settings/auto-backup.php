@@ -23,10 +23,10 @@ esc_html_e( 'Auto Updates', 'boldgrid-backup' );
 ?>
 </h1>
 <p>
-	WordPress has the ability to auto update both itself and your plugins and themes. Keeping your software up to date is very important, and this automation helps you more easily do that.
+	<?php __( 'WordPress has the ability to auto update both itself and your plugins and themes. Keeping your software up to date is very important, and this automation helps you more easily do that.', 'boldgrid-backup' ); ?>
 </p>
 <p>
-	Total Upkeep adds on top of this functionality by giving you the ability to have backups made before any auto update, and by making it easier to control what is updated and when.
+<?php __( 'Total Upkeep adds on top of this functionality by giving you the ability to have backups made before any auto update, and by making it easier to control what is updated and when.', 'boldgrid-backup' ); ?>
 </p>
 <div class="bg-box">
 	<div class="bg-box-top">
@@ -34,7 +34,7 @@ esc_html_e( 'Auto Updates', 'boldgrid-backup' );
 	</div>
 	<div class="bg-box-bottom">
 		<p>
-			Sometimes updating your software can break your site. It's recommended to make a backup before updates, so in the event something goes wrong, you can reasily restore your site.
+		<?php __( 'Sometimes updating your software can break your site. It\'s recommended to make a backup before updates, so in the event something goes wrong, you can reasily restore your site.', 'boldgrid-backup' ); ?>
 		</p>
 		<table class="form-table div-table-body auto-update-settings"><tbody class="div-table-body">
 			<tr>

@@ -127,9 +127,6 @@ class Boldgrid_Backup {
 		 */
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-notice.php';
 
-		/**
-		 * The class responsible for auto updates.
-		 */
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-auto-updates.php';
 
 		/**

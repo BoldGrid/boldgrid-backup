@@ -90,7 +90,7 @@ function get_premium_markup() {
 
 	$premium_markup = '<div class="bg-box">
 		<div class="bg-box-top">' .
-			esc_html__( 'Configure When Auto Updates Occur', 'boldgrid-library' ) . '
+			esc_html__( 'Configure When Auto Updates Occur', 'boldgrid-backup' ) . '
 		</div>' . $premium_box . '</div>';
 
 	return $premium_markup;
