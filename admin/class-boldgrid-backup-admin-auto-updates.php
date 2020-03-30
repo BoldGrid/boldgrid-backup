@@ -92,7 +92,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 */
 	public function maybe_update_plugin( $slug ) {
 		$days_to_wait          = $this->settings['days'];
-		$plugin                = \Boldgrid\Library\Library\Plugin\Plugins::getActivePluginBySlug( $this->plugins, $slug );
+		$plugin                = \Boldgrid\Library\Library\Plugin\Plugins::getBySlug( $this->plugins, $slug );
 		$days_since_release    = $plugin->updateData->days; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
 		$plugin_update_enabled = array_key_exists( $plugin->getFile(), $this->settings['plugins'] ) ? (bool) $this->settings['plugins'][ $plugin->getFile() ] : false;
 		$is_update_time        = ( $days_since_release >= $days_to_wait );
@@ -167,7 +167,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	public function auto_update_themes( $update, stdClass $item ) {
 		// Array of theme stylesheets to always auto-update.
 		$themes = array();
-		foreach ( $this->themes->getList() as $theme ) {
+		foreach ( $this->themes->get() as $theme ) {
 			if ( $this->maybe_update_theme( $theme->stylesheet ) ) {
 				$themes[] = $theme->stylesheet;
 			}

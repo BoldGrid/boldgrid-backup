@@ -167,7 +167,7 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 		$auto_updates->set_settings();
 
 		$plugins = \Boldgrid\Library\Library\Plugin\Plugins::getAllPlugins();
-		$akismet = \Boldgrid\Library\Library\Plugin\Plugins::getActivePluginBySlug( $plugins, 'akismet' );
+		$akismet = \Boldgrid\Library\Library\Plugin\Plugins::getBySlug( $plugins, 'akismet' );
 		$days    = $akismet->updateData->days; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
 
 		// Create mock object to simulate premium plugin being inactive.
@@ -287,7 +287,7 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 		$mock_auto_updates->method( 'maybe_update_theme' )
 			->will( $this->returnValue( false ) );
 		$themes = new \Boldgrid\Library\Library\Theme\Themes();
-		foreach ( $themes->getList() as $theme ) {
+		foreach ( $themes->get() as $theme ) {
 			if ( 'twentytwenty' === $theme->stylesheet ) {
 				$this->assertFalse( $mock_auto_updates->auto_update_themes( true, (object) array( 'theme' => 'twentytwenty' ) ) );
 			}
