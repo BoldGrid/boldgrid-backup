@@ -526,7 +526,7 @@ class Boldgrid_Backup {
 
 		$this->loader->add_filter( 'Boldgrid\Library\Notifications\DashboardWidget\getFeaturePlugin\boldgrid-backup', $plugin_admin_core->dashboard_widget, 'filter_feature', 10, 2 );
 
-		$this->loader->add_action( 'init', $plugin_admin_core->auto_updates, 'auto_update_core' );
+		$this->loader->add_action( 'admin_init', $plugin_admin_core->auto_updates, 'auto_update_core' );
 		$this->loader->add_filter( 'auto_update_plugin', $plugin_admin_core->auto_updates, 'auto_update_plugins', 10, 2 );
 		$this->loader->add_filter( 'auto_update_theme', $plugin_admin_core->auto_updates, 'auto_update_themes', 10, 2 );
 
@@ -538,6 +538,7 @@ class Boldgrid_Backup {
 		$this->loader->add_action( 'wp_ajax_dismissBoldgridNotice', 'Boldgrid\Library\Library\Notice', 'dismiss' );
 
 		$usage = new Boldgrid_Backup_Admin_Usage();
+
 		$this->loader->add_action( 'admin_init', $usage, 'admin_init' );
 		$this->loader->add_filter( 'Boldgrid\Library\Usage\Notice\admin_notices', $usage, 'filter_notice' );
 		$this->loader->add_filter( 'Boldgrid\Library\Usage\Notice\maybeShow', $usage, 'maybe_show_notice' );

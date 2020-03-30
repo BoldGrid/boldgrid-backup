@@ -63,12 +63,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		$plugins       = new \Boldgrid\Library\Library\Plugin\Plugins();
 		$this->plugins = $plugins->getAllPlugins();
 		$this->themes  = new \Boldgrid\Library\Library\Theme\Themes();
-
 		add_filter( 'automatic_updater_disabled', '__return_false' );
-		add_filter( 'auto_update_plugin', array( $this, 'auto_update_plugins' ), 10, 2 );
-		add_filter( 'auto_update_themes', array( $this, 'auto_update_themes' ), 10, 2 );
-
-		add_action( 'admin_init', array( $this, 'auto_update_core' ) );
 	}
 
 	/**
