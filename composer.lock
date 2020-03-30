@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/BoldGrid/library.git",
-                "reference": "d822fb4d0e0b4c7561d6ad46d7e090a759d6cb26"
+                "reference": "8660c5901df95174991006ac0b6fd0a293df149b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BoldGrid/library/zipball/d822fb4d0e0b4c7561d6ad46d7e090a759d6cb26",
-                "reference": "d822fb4d0e0b4c7561d6ad46d7e090a759d6cb26",
+                "url": "https://api.github.com/repos/BoldGrid/library/zipball/8660c5901df95174991006ac0b6fd0a293df149b",
+                "reference": "8660c5901df95174991006ac0b6fd0a293df149b",
                 "shasum": ""
             },
             "type": "library",
@@ -54,7 +54,7 @@
                 }
             ],
             "description": "The BoldGrid Library for shared code used in official BoldGrid plugins and themes.",
-            "time": "2020-03-19T18:56:01+00:00"
+            "time": "2020-03-27T18:19:10+00:00"
         },
         {
             "name": "chland/tdcron",
@@ -126,18 +126,6 @@
         },
         {
             "name": "phpseclib/phpseclib",
-<<<<<<< HEAD
-            "version": "2.0.25",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "c18159618ed7cd7ff721ac1a8fec7860a475d2f0"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/c18159618ed7cd7ff721ac1a8fec7860a475d2f0",
-                "reference": "c18159618ed7cd7ff721ac1a8fec7860a475d2f0",
-=======
             "version": "2.0.26",
             "source": {
                 "type": "git",
@@ -148,7 +136,6 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/09655fcc1f8bab65727be036b28f6f20311c126c",
                 "reference": "09655fcc1f8bab65727be036b28f6f20311c126c",
->>>>>>> b1addde080df1853cc94b979f715620b6a19dc04
                 "shasum": ""
             },
             "require": {
@@ -227,11 +214,7 @@
                 "x.509",
                 "x509"
             ],
-<<<<<<< HEAD
-            "time": "2020-02-25T04:16:50+00:00"
-=======
             "time": "2020-03-13T04:15:39+00:00"
->>>>>>> b1addde080df1853cc94b979f715620b6a19dc04
         }
     ],
     "packages-dev": [
