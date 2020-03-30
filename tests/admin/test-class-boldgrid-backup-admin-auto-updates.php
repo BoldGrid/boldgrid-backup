@@ -275,7 +275,7 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 		$mock_auto_updates->method( 'maybe_update_theme' )
 			->will( $this->returnValue( true ) );
 		$themes = new \Boldgrid\Library\Library\Theme\Themes();
-		foreach ( $themes->getList() as $theme ) {
+		foreach ( $themes->get() as $theme ) {
 			if ( 'twentytwenty' === $theme->stylesheet ) {
 				$this->assertTrue( $mock_auto_updates->auto_update_themes( true, (object) array( 'theme' => 'twentytwenty' ) ) );
 			}
