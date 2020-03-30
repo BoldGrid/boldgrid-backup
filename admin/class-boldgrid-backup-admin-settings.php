@@ -794,7 +794,6 @@ class Boldgrid_Backup_Admin_Settings {
 		$is_premium_installed = $this->core->config->is_premium_installed;
 		$is_premium_active    = $this->core->config->is_premium_active;
 
-		add_thickbox();
 		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
 		wp_enqueue_style( 'bglib-ui-css' );
 		wp_enqueue_script( 'bglib-ui-js' );

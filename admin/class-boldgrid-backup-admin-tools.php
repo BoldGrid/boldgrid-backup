@@ -51,8 +51,6 @@ class Boldgrid_Backup_Admin_Tools {
 		wp_enqueue_script( 'bglib-ui-js' );
 		wp_enqueue_script( 'bglib-sticky' );
 
-		// Add thickbox functionality. Initially added to support viewing log files.
-		add_thickbox();
 	}
 
 	/**

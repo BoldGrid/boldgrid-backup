@@ -47,7 +47,6 @@ class Boldgrid_Backup_Admin_Transfers {
 		wp_enqueue_script( 'bglib-ui-js' );
 		wp_enqueue_script( 'bglib-sticky' );
 
-		add_thickbox();
 		$settings = $this->core->settings->get_settings();
 		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
 

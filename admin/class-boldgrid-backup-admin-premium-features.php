@@ -102,7 +102,6 @@ class Boldgrid_Backup_Admin_Premium_Features {
 	 */
 	public function page() {
 		wp_enqueue_style( 'bglib-ui-css' );
-		add_thickbox();
 		$settings = $this->core->settings->get_settings();
 		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
 

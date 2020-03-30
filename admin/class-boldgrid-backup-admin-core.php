@@ -2433,7 +2433,6 @@ class Boldgrid_Backup_Admin_Core {
 		global $pagenow;
 
 		// Thickbox used for Backup Site Now modal.
-		add_thickbox();
 		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
 
 		wp_enqueue_style( 'bglib-ui-css' );
@@ -2704,7 +2703,6 @@ class Boldgrid_Backup_Admin_Core {
 			BOLDGRID_BACKUP_VERSION, 'all'
 		);
 
-		add_thickbox();
 		$settings = $this->settings->get_settings();
 		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
 		wp_enqueue_style( 'bglib-ui-css' );
@@ -2993,6 +2991,18 @@ class Boldgrid_Backup_Admin_Core {
 
 			// Increment the counter.
 			$counter --;
+		}
+	}
+
+	/**
+	 * Add thickbox to bolgrid_backup admin pages.
+	 *
+	 * @since SINCEVERSION
+	 */
+	public function add_thickbox( $hook_suffix ) {
+		if ( false !== strpos( $hook_suffix, 'boldgrid-backup' ) ) {
+			error_log( json_encode( $hook_suffix ) );
+			add_thickbox();
 		}
 	}
 }
