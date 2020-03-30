@@ -23,9 +23,9 @@ $default_auto_update_settings = array(
 );
 $auto_update_settings         = isset( $boldgrid_backup_settings['auto_update'] ) ? $boldgrid_backup_settings['auto_update'] : $default_auto_update_settings;
 $translations                 = array(
-	'active'   => esc_attr__( 'Active', 'boldgrid-library' ),
-	'inactive' => esc_attr__( 'Inactive', 'boldgrid-library' ),
-	'parent'   => esc_attr__( 'Parent', 'boldgrid-library' ),
+	'active'   => esc_attr__( 'Active', 'boldgrid-backup' ),
+	'inactive' => esc_attr__( 'Inactive', 'boldgrid-backup' ),
+	'parent'   => esc_attr__( 'Parent', 'boldgrid-backup' ),
 );
 
 /**
@@ -53,7 +53,7 @@ function get_heading_markup( $boldgrid_backup_settings, $auto_update_settings ) 
 				// translators: 1: HTML anchor open tag, 2: HTML anchor close tag, 3: HTML em open tag, 4: HTML em close tag, 5: Plugin Title.
 				esc_html__(
 					'You have %3$sAuto Backup Before Update%4$s disabled in the %1$s%5$s Backup and Restore Settings%2$s.  Please consider enabling the setting.',
-					'boldgrid-library'
+					'boldgrid-backup'
 				),
 				$bbs_link_open,
 				$bbs_link_close,
@@ -117,17 +117,17 @@ function get_wpcore_update_markup( $auto_update_settings ) {
 	$wpcore_update_markup = '
 	<div class="bg-box">
 		<div class="bg-box-top">
-			' . esc_html__( 'Configure what is Auto Updated', 'boldgrid-library' ) . '
+			' . esc_html__( 'Configure what is Auto Updated', 'boldgrid-backup' ) . '
 		</div>
 	<div class="bg-box-bottom">
 	<table class="form-table div-table-body auto-update-settings">
 		<tbody class="div-table-body">
 		<tr>
-			<th>' . esc_html__( 'WordPress Core', 'boldgrid-library' ) .
+			<th>' . esc_html__( 'WordPress Core', 'boldgrid-backup' ) .
 				'<span class="dashicons dashicons-editor-help" data-id="wpcore-updates"></span>
 			</th>
 			<td></td>
-			<td>' . esc_html__( 'All Update Types', 'boldgrid-library' ) . '</td>
+			<td>' . esc_html__( 'All Update Types', 'boldgrid-backup' ) . '</td>
 			<td class="td-toggle">
 				<div class="toggle toggle-light toggle-group wpcore-toggle"
 					data-wpcore="all"
@@ -146,7 +146,7 @@ function get_wpcore_update_markup( $auto_update_settings ) {
 		</tr>
 		<tr>
 			<td colspan=2></td>
-			<td>' . esc_html__( 'Major Updates', 'boldgrid-library' ) . '</td>
+			<td>' . esc_html__( 'Major Updates', 'boldgrid-backup' ) . '</td>
 			<td class="td-toggle">
 				<div class="toggle toggle-light wpcore-toggle"
 					data-wpcore="major"
@@ -158,7 +158,7 @@ function get_wpcore_update_markup( $auto_update_settings ) {
 		</tr>
 		<tr>
 			<td colspan=2></td>
-			<td>' . esc_html__( 'Minor Updates', 'boldgrid-library' ) . '</td>
+			<td>' . esc_html__( 'Minor Updates', 'boldgrid-backup' ) . '</td>
 			<td class="td-toggle">
 				<div class="toggle toggle-light wpcore-toggle"
 					data-wpcore="minor"
@@ -170,7 +170,7 @@ function get_wpcore_update_markup( $auto_update_settings ) {
 		</tr>
 		<tr>
 			<td colspan=2></td>
-			<td>' . esc_html__( 'Development Updates', 'boldgrid-library' ) . '</td>
+			<td>' . esc_html__( 'Development Updates', 'boldgrid-backup' ) . '</td>
 			<td class="td-toggle">
 				<div class="toggle toggle-light wpcore-toggle"
 					data-wpcore="dev"
@@ -182,7 +182,7 @@ function get_wpcore_update_markup( $auto_update_settings ) {
 		</tr>
 		<tr>
 			<td colspan=2 />
-			<td>' . esc_html__( 'Translation Updates', 'boldgrid-library' ) . '</td>
+			<td>' . esc_html__( 'Translation Updates', 'boldgrid-backup' ) . '</td>
 			<td class="td-toggle">
 				<div class="toggle toggle-light wpcore-toggle"
 					data-wpcore="translation"
@@ -230,7 +230,7 @@ function get_plugins_update_markup( $auto_update_settings, $translations ) {
 
 	$plugins_update_markup = '<tbody class="div-table-body">
 	<tr>
-		<th>' . esc_html__( 'Plugins', 'boldgrid-library' ) .
+		<th>' . esc_html__( 'Plugins', 'boldgrid-backup' ) .
 			'<span class="dashicons dashicons-editor-help" data-id="plugin-updates"></span>
 		</th>
 	</tr>
@@ -240,13 +240,13 @@ function get_plugins_update_markup( $auto_update_settings, $translations ) {
 		</td>
 	</tr>
 	<tr>
-		<td>' . esc_html__( 'Default For New Plugins', 'boldgrid-library' ) . '</td>
+		<td>' . esc_html__( 'Default For New Plugins', 'boldgrid-backup' ) . '</td>
 		<td>
 			<div class="toggle toggle-light right" id="toggle-default-plugins"
 			data-toggle-on="' . ( $plugins_default ? 'true' : 'false' ) . '"></div>
 			<input type="hidden" name="auto_update[plugins][default]" value="' . ( $plugins_default ? 1 : 0 ) . '" />
 		</td>
-		<td>' . esc_html__( 'All Plugins', 'boldgrid-library' ) . '</td>
+		<td>' . esc_html__( 'All Plugins', 'boldgrid-backup' ) . '</td>
 		<td class="td-toggle">
 			<div class="toggle toggle-light toggle-group" id="toggle-plugins"></div>
 		</td>
@@ -291,12 +291,16 @@ function get_plugins_update_markup( $auto_update_settings, $translations ) {
 						value="' . ( $toggle ? 1 : 0 ) . '" />
 					</td>
 				</tr>';
+
 			if ( true === $third_party ) {
 				$plugins_update_markup .= '
 					<tr class="table-help hide-help" data-id="' . $slug . '-extra-info">
 						<td colspan=2></td>
 						<td colspan=1>
-							<p style="position:relative;z-index=-1">This plugin was not installed through the WordPress Plugins Repository. If auto updates are enabled, they will take place immediately. </p>
+							<p style="position:relative;z-index=-1">' . esc_html__(
+						'This plugin was not installed through the WordPress Plugins Repository. If auto updates are enabled, they will take place immediately.',
+						'boldrid-backup'
+					) . ' </p>
 						</td>
 						<td></td>
 					</tr>';
@@ -343,24 +347,24 @@ function get_themes_update_markup( $auto_update_settings, $translations ) {
 
 	$themes_update_markup = '<tbody class="div-table-body">
 	<tr>
-		<th>' . esc_html__( 'Themes', 'boldgrid-library' ) .
+		<th>' . esc_html__( 'Themes', 'boldgrid-backup' ) .
 			'<span class="dashicons dashicons-editor-help" data-id="theme-updates"></span>
 		</th>
 	</tr>
 	<tr class="table-help hide-help" data-id="theme-updates">
 	<td colspan=4>
-		<p>Choose which Plugins you wish to update automatically</p>
+		<p>' . esc_html__( 'Choose which Plugins you wish to update automatically ', 'boldgrid-backup' ) . '</p>
 	</td>
 	</tr>
 	<tr>
-		<td>' . esc_html__( 'Default For New Themes', 'boldgrid-library' ) . '</td>
+		<td>' . esc_html__( 'Default For New Themes', 'boldgrid-backup' ) . '</td>
 		<td>
 			<div class="toggle toggle-light right" id="toggle-default-themes"
 				data-toggle-on="' . ( $themes_default ? 'true' : 'false' ) . '"></div>
 				<input type="hidden" name="auto_update[themes][default]" value="' . ( $themes_default ? 1 : 0 ) . '" />
 			</div>
 		</td>
-		<td>' . esc_html__( 'All Themes', 'boldgrid-library' ) . '</td>
+		<td>' . esc_html__( 'All Themes', 'boldgrid-backup' ) . '</td>
 		<td class="td-toggle">
 			<div class="toggle toggle-light toggle-group" id="toggle-themes"></div>
 		</td>

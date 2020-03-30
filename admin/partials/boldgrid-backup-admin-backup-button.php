@@ -34,6 +34,7 @@ $backup_button = '
  * If the page is 'boldgrid-backup', then you're in the modal. The buttons will generally be the same,
  * but the formatting will be slightly different, hence the conditional below.
  */
+error_log( '$_GET[page] = ' . $page );
 if ( false !== strpos( $page, 'boldgrid-backup' ) ) {
 	// The first div in the grid is needed so the grid fills out properly.
 	$backup_button .= '

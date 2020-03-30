@@ -72,21 +72,6 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	}
 
 	/**
-	 * Is Premium Done.
-	 *
-	 * @since SINCEVERSION
-	 * @return bool
-	 */
-	public function is_premium_done() {
-		$license        = new \Boldgrid\Library\Library\License();
-		$is_premium     = $license->isPremium( 'boldgrid-backup' );
-		$premium_plugin = 'boldgrid-backup-premium/boldgrid-backup-premium.php';
-		$active_plugins = (array) get_option( 'active_plugins', array() );
-		$premium_active = in_array( $premium_plugin, $active_plugins, true ) || is_plugin_active_for_network( $premium_plugin );
-		return ( $is_premium && $premium_active );
-	}
-
-	/**
 	 * Set Settings.
 	 *
 	 * @since SINCEVERSION
@@ -97,7 +82,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 			$this->settings = $boldgrid_backup_settings['auto_update'];
 		} else {
 			$this->settings = array(
-				'days' => 7,
+				'days' => 0,
 			);
 		}
 	}
@@ -115,12 +100,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		$plugin                = \Boldgrid\Library\Library\Plugin\Plugins::getActivePluginBySlug( $this->plugins, $slug );
 		$days_since_release    = $plugin->updateData->days; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
 		$plugin_update_enabled = array_key_exists( $plugin->getFile(), $this->settings['plugins'] ) ? (bool) $this->settings['plugins'][ $plugin->getFile() ] : false;
-		// if premium, check the days since it was released, if not premium then this is true.
-		if ( $this->is_premium_done() ) {
-			$is_update_time = ( $days_since_release >= $days_to_wait );
-		} else {
-			$is_update_time = true;
-		}
+		$is_update_time        = ( $days_since_release >= $days_to_wait );
 		if ( $is_update_time && true === $plugin_update_enabled ) {
 			return true;
 		} else {
@@ -141,12 +121,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		$theme                = $this->themes->getFromStylesheet( $stylesheet );
 		$days_since_release   = $theme->updateData->days; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
 		$theme_update_enabled = isset( $this->settings['themes'][ $stylesheet ] ) ? (bool) $this->settings['themes'][ $stylesheet ] : false;
-		// if premium, check the days since it was released, if not premium then this is true.
-		if ( $this->is_premium_done() ) {
-			$is_update_time = ( $days_since_release >= $days_to_wait );
-		} else {
-			$is_update_time = true;
-		}
+		$is_update_time       = ( $days_since_release >= $days_to_wait );
 
 		if ( $is_update_time && true === $theme_update_enabled ) {
 			return true;

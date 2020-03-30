@@ -16,7 +16,6 @@
 
 defined( 'WPINC' ) || die;
 
-$library_dir     = \Boldgrid\Library\Library\Configs::get( 'libraryDir' );
 $nav             = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
 $scheduler       = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/scheduler.php';
 $compressor      = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/compressor.php';

@@ -16,7 +16,7 @@ namespace Boldgrid\Backup\Admin\Card;
 /**
  * Class: Timely Auto Updates
  *
- * This class is responsible for rendering the "Encryption" card on this plugin's Premium Features page.
+ * This class is responsible for rendering the "Timely Auto Updates" card on this plugin's Premium Features page.
  *
  * @since SINCEVERSION
  */

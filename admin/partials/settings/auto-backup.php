@@ -23,10 +23,10 @@ esc_html_e( 'Auto Updates', 'boldgrid-backup' );
 ?>
 </h1>
 <p>
-	<?php __( 'WordPress has the ability to auto update both itself and your plugins and themes. Keeping your software up to date is very important, and this automation helps you more easily do that.', 'boldgrid-backup' ); ?>
+	<?php esc_html_e( 'WordPress has the ability to auto update both itself and your plugins and themes. Keeping your software up to date is very important, and this automation helps you more easily do that.', 'boldgrid-backup' ); ?>
 </p>
 <p>
-<?php __( 'Total Upkeep adds on top of this functionality by giving you the ability to have backups made before any auto update, and by making it easier to control what is updated and when.', 'boldgrid-backup' ); ?>
+<?php esc_html_e( 'Total Upkeep adds on top of this functionality by giving you the ability to have backups made before any auto update, and by making it easier to control what is updated and when.', 'boldgrid-backup' ); ?>
 </p>
 <div class="bg-box">
 	<div class="bg-box-top">
