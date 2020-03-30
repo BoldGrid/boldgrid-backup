@@ -322,17 +322,19 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 		$importer = new Boldgrid_Backup_Admin_Db_Import( $this->core );
 		$success  = $importer->import_from_archive( $filepath, $file );
 
-		if ( ! $success ) {
-			$this->core->notice->add_user_notice(
-				// translators: 1: Filename 2: File path.
-				sprintf( __( 'Error, unable to import database %1$s from %2$s.', 'boldgrid-backup' ), $file, $filepath ),
-				$this->core->notice->lang['dis_error']
-			);
-		} else {
+		if ( true === $success ) {
 			$this->core->notice->add_user_notice(
 				// translators: 1: Filename 2: File path.
 				sprintf( __( 'Success! Database %1$s imported from %2$s.', 'boldgrid-backup' ), $file, $filepath ),
 				$this->core->notice->lang['dis_success']
+			);
+		} elseif ( false !== $success ) {
+			$this->core->notice->add_user_notice( $success, $this->core->notice->lang['dis_error'] );
+		} else {
+			$this->core->notice->add_user_notice(
+				// translators: 1: Filename 2: File path.
+				sprintf( __( 'Error, unable to import database %1$s from %2$s.', 'boldgrid-backup' ), $file, $filepath ),
+				$this->core->notice->lang['dis_error']
 			);
 		}
 	}
