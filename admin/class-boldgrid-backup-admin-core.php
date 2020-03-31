@@ -3001,7 +3001,6 @@ class Boldgrid_Backup_Admin_Core {
 	 */
 	public function add_thickbox( $hook_suffix ) {
 		if ( false !== strpos( $hook_suffix, 'boldgrid-backup' ) ) {
-			error_log( json_encode( $hook_suffix ) );
 			add_thickbox();
 		}
 	}

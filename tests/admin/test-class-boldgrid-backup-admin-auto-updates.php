@@ -112,21 +112,6 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 		$this->assertFalse( apply_filters( 'automatic_updater_disabled', true ) );
 	}
 
-	/**
-	 * Test is_premium_done.
-	 *
-	 * @since SINCEVERSION
-	 */
-	public function test_is_premium_done() {
-		// Verify that is_premium_done returns false if premium plugin is not activated.
-		$auto_updates = new Boldgrid_Backup_Admin_Auto_Updates();
-		$this->assertFalse( $auto_updates->is_premium_done() );
-
-		// Verify that it returns true if it is activated.
-		update_option( 'active_plugins', array( 'boldgrid-backup-premium/boldgrid-backup-premium.php' ) );
-		$this->assertTrue( $auto_updates->is_premium_done() );
-	}
-
 	/** Test set_settings.
 	 *
 	 * @since SINCEVERSION
