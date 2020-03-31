@@ -300,7 +300,7 @@ class Boldgrid_Backup_Admin_Notice {
 	 * @see \Boldgrid\Library\Library\Notice::show()
 	 */
 	public function plugin_renamed_notice() {
-		$plugin = new \Boldgrid\Library\Library\Plugin\Plugin( 'boldgrid-backup' );
+		$plugin = \Boldgrid\Library\Library\Plugin\Factory::create( 'boldgrid-backup' );
 
 		/*
 		 * Only show to existing users.

@@ -59,7 +59,7 @@ class Test_Boldgrid_Backup_Admin_Premium_Features_Page extends WP_UnitTestCase {
 	public function test_get_cards() {
 		$cards = $this->premium_page->get_cards();
 		$this->assertEquals( count( $cards ), count( $this->card_files ) );
-		$this->premium_page->core->plugin = new \Boldgrid\Library\Library\Plugin\Plugin( 'boldgrid-backup', $this->core->configs );
+		$this->premium_page->core->plugin = \Boldgrid\Library\Library\Plugin\Factory::create( 'boldgrid-backup', $this->core->configs );
 	}
 
 	public function test_admin_enqueue_scripts() {
