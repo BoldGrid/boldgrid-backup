@@ -699,7 +699,6 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Instantiate Boldgrid\Library\Library\Plugin\Plugin.
 		$this->plugin       = \Boldgrid\Library\Library\Plugin\Factory::create( 'boldgrid-backup', $this->configs );
-		error_log( serialize( $this->plugin ) );
 		$this->premium_page = new Boldgrid_Backup_Admin_Premium_Features( $this );
 
 		// Instantiate Boldgrid_Backup_Admin_Auto_Updates.
