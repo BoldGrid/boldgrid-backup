@@ -388,32 +388,28 @@ if ( ! $this->core->archive->is_stored_locally() ) {
 $page = sprintf(
 	'
 	<input type="hidden" id="filename" value="%1$s" />
-	<div class="wrap">
-		<h1 class="wp-heading-inline">%2$s</h1>
-		%3$s
-		<div id="poststuff">
-			<div id="post-body" class="metabox-holder columns-2">
-				<div id="post-body-content" style="position: relative">
+	%2$s
+	<div id="poststuff">
+		<div id="post-body" class="metabox-holder columns-2">
+			<div id="post-body-content" style="position: relative">
+				%3$s
+			</div>
+			<div id="postbox-container-1" class="postbox-container">
+				<div id="side-sortables" class="meta-box-sortables ui-sortable" style="">
+
 					%4$s
-				</div>
-				<div id="postbox-container-1" class="postbox-container">
-					<div id="side-sortables" class="meta-box-sortables ui-sortable" style="">
 
-						%5$s
-
-						%6$s
-					</div>
+					%5$s
 				</div>
 			</div>
 		</div>
 	</div>
 	',
 	/* 1 */ $archive['filename'],
-	/* 2 */ esc_html__( 'Backup Archive Details', 'boldgrid-backup' ),
-	/* 3 */ require BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php',
-	/* 4 */ $main_content,
-	/* 5 */ $main_meta_box,
-	/* 6 */ $remote_meta_box
+	/* 2 */ require BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php',
+	/* 3 */ $main_content,
+	/* 4 */ $main_meta_box,
+	/* 5 */ $remote_meta_box
 );
 
 echo $page; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped

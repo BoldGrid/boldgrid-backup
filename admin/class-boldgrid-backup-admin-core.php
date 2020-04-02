@@ -375,6 +375,14 @@ class Boldgrid_Backup_Admin_Core {
 	public $db_omit;
 
 	/**
+	 * Database Restoration errro
+	 *
+	 * @since SINCEVERSION
+	 * @var string
+	 */
+	public $db_restore_error;
+
+	/**
 	 * An instance of Boldgrid_Backup_Admin_Filelist.
 	 *
 	 * @since 1.5.1
@@ -1242,6 +1250,7 @@ class Boldgrid_Backup_Admin_Core {
 		$status   = $importer->import( $db_dump_filepath );
 
 		if ( ! empty( $status['error'] ) ) {
+			$this->db_restore_error = $status['error'];
 			do_action( 'boldgrid_backup_notice', $status['error'], 'notice notice-error is-dismissible' );
 			return false;
 		}
@@ -2361,7 +2370,12 @@ class Boldgrid_Backup_Admin_Core {
 			$this->wp_filesystem->delete( $db_dump_filepath, false, 'f' );
 
 			// Display notice of deletion status.
-			if ( ! $restore_ok ) {
+			if ( ! $restore_ok && $this->db_restore_error ) {
+				return [
+					'error' => $this->db_restore_error,
+				];
+			}
+			if ( ! $restore_ok && ! $this->db_restore_error ) {
 				return [
 					'error' => esc_html__( 'Could not restore database.', 'boldgrid-backup' ),
 				];
@@ -2505,6 +2519,11 @@ class Boldgrid_Backup_Admin_Core {
 		// If there were any errors encountered during the backup, save them to the In Progress data.
 		if ( ! empty( $archive_info['error'] ) ) {
 			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'error', $archive_info['error'] );
+			$this->notice->add_user_notice(
+				'<p>' . $archive_info['error'] . '</p>',
+				'notice notice-error is-dismissible',
+				'Backup Failed'
+			);
 		}
 
 		if ( $this->is_archiving_update_protection ) {
@@ -2674,8 +2693,21 @@ class Boldgrid_Backup_Admin_Core {
 			BOLDGRID_BACKUP_VERSION, 'all'
 		);
 
-		// Load template view.
+		echo '
+		<div class="wrap">
+			<div id="bglib-page-container" class="bgbkup-page-container">
+				<div id="bglib-page-top">
+					<div id="bglib-page-header" class="bglib-has-logo">
+						<h1>' . esc_html__( 'Total Upkeep Preflight Check', 'boldgrid-backup' ) . '</h1>
+					</div>
+				</div>
+				<div id="bglib-page-content">
+					<div class="wp-header-end"></div>';
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-test.php';
+		echo '
+				</div>
+			</div>
+		</div>';
 	}
 
 	/**

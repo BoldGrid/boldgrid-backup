@@ -56,12 +56,4 @@ $sections = apply_filters( 'boldgrid_backup_tools_sections', $sections );
  */
 $col_container = apply_filters( 'Boldgrid\Library\Ui\render_col_container', $sections );
 
-?>
-
-<div class='wrap'>
-	<h1><?php echo esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'Tools', 'boldgrid-backup' ) ); ?></h1>
-
-	<?php
-	echo $nav . $col_container; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
-	?>
-</div>
+echo $nav . $col_container; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
