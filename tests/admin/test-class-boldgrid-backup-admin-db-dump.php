@@ -19,17 +19,35 @@
  */
 class Test_Boldgrid_Backup_Admin_Db_Dump extends WP_UnitTestCase {
 	/**
-	 * Test get_db_host().
+	 * Test get_connection_string().
 	 *
 	 * @since 1.13.3
 	 */
-	public function test_get_db_host() {
+	public function test_get_connection_string() {
 		$core = apply_filters( 'boldgrid_backup_get_core', null );
 
-		$this->assertEquals( 'localhost', $core->db_dump->get_db_host( 'localhost' ) );
+		// localhost.
+		$this->assertEquals(
+			'mysql:host=localhost;dbname=db_catfish',
+			$core->db_dump->get_connection_string( 'localhost', 'db_catfish' )
+		);
 
-		$this->assertEquals( 'localhost:3306', $core->db_dump->get_db_host( 'localhost:3306' ) );
+		// localhost:3306.
+		$this->assertEquals(
+			'mysql:host=localhost;port=3306;dbname=db_catfish',
+			$core->db_dump->get_connection_string( 'localhost:3306', 'db_catfish' )
+		);
 
-		$this->assertEquals( 'localhost', $core->db_dump->get_db_host( 'localhost:/var/lib/mysql/mysql.sock' ) );
+		// localhost:/var/lib/mysql/mysql.sock.
+		$this->assertEquals(
+			'mysql:host=localhost;unix_socket=/var/lib/mysql/mysql.sock;dbname=db_catfish',
+			$core->db_dump->get_connection_string( 'localhost:/var/lib/mysql/mysql.sock', 'db_catfish' )
+		);
+
+		// /var/lib/mysql/mysql.sock.
+		$this->assertEquals(
+			'mysql:unix_socket=/var/lib/mysql/mysql.sock;dbname=db_catfish',
+			$core->db_dump->get_connection_string( '/var/lib/mysql/mysql.sock', 'db_catfish' )
+		);
 	}
 }
