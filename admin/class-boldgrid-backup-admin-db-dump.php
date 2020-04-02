@@ -83,7 +83,7 @@ class Boldgrid_Backup_Admin_Db_Dump {
 
 		try {
 			$dump = new IMysqldump\Mysqldump(
-				sprintf( 'mysql:host=%1$s;dbname=%2$s', DB_HOST, DB_NAME ),
+				sprintf( 'mysql:host=%1$s;dbname=%2$s', $this->get_db_host(), DB_NAME ),
 				DB_USER,
 				DB_PASSWORD,
 				array(
@@ -106,6 +106,29 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		do_action( 'boldgrid_backup_post_dump', $file );
 
 		return true;
+	}
+
+	/**
+	 * Get our database host to pass to our db dumper.
+	 *
+	 * @since 1.13.3
+	 *
+	 * @param  string $db_host A database hostname.
+	 * @return string
+	 */
+	public function get_db_host( $db_host = null ) {
+		$db_host = empty( $db_host ) ? DB_HOST : $db_host;
+
+		/*
+		 * @todo Sockets are not working with current db dumper. Need to resolve this. For the moment,
+		 *       if using localhost:/var/lib/mysql/mysql.sock then just use "localhost". This is the
+		 *       method that has been used up to this point anyway.
+		 */
+		if ( 'sock' === pathinfo( $db_host, PATHINFO_EXTENSION ) ) {
+			$db_host = explode( ':', $db_host )[0];
+		}
+
+		return $db_host;
 	}
 
 	/**
