@@ -31,6 +31,7 @@ $files = array(
 	'/vendor/boldgrid/library/src/Library/Settings.php',
 	'/vendor/boldgrid/library/src/Library/Configs.php',
 	'/vendor/boldgrid/library/src/Util/Version.php',
+	'/vendor/boldgrid/library/src/Library/Plugin/Factory.php',
 	'/vendor/boldgrid/library/src/Library/Plugin/Notice.php',
 	'/vendor/boldgrid/library/src/Library/Plugin/Page.php',
 	'/vendor/boldgrid/library/src/Library/Plugin/Plugin.php',
