@@ -81,12 +81,9 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		 */
 		do_action( 'boldgrid_backup_pre_dump', $file );
 
-		// Some hosts may configure the DB_HOST as localhost:3306. Strip out the port.
-		$db_host = explode( ':', DB_HOST );
-
 		try {
 			$dump = new IMysqldump\Mysqldump(
-				sprintf( 'mysql:host=%1$s;dbname=%2$s', $db_host[0], DB_NAME ),
+				sprintf( 'mysql:host=%1$s;dbname=%2$s', DB_HOST, DB_NAME ),
 				DB_USER,
 				DB_PASSWORD,
 				array(
