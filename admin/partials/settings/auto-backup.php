@@ -34,7 +34,7 @@ esc_html_e( 'Auto Updates', 'boldgrid-backup' );
 	</div>
 	<div class="bg-box-bottom">
 		<p>
-		<?php __( 'Sometimes updating your software can break your site. It\'s recommended to make a backup before updates, so in the event something goes wrong, you can reasily restore your site.', 'boldgrid-backup' ); ?>
+		<?php esc_html_e( 'Sometimes updating your software can break your site. It\'s recommended to make a backup before updates, so in the event something goes wrong, you can reasily restore your site.', 'boldgrid-backup' ); ?>
 		</p>
 		<table class="form-table div-table-body auto-update-settings"><tbody class="div-table-body">
 			<tr>

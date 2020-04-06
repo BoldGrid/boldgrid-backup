@@ -1,4 +1,4 @@
-<?php
+<?php //phpcs:ignore WordPress.Files.FileName
 /**
  * File: auto-update.php
  *
@@ -140,7 +140,7 @@ function get_wpcore_update_markup( $auto_update_settings ) {
 		<tr class="table-help hide-help" data-id="wpcore-updates">
 			<td colspan=4>
 				<p>
-				Select Which WordPress Core updates you wish to have automatically updated.
+				' . esc_html__( 'Select Which WordPress Core updates you wish to have automatically updated', 'boldgrid-backup' ) . '.
 				</p>
 			</td>
 		</tr>
@@ -236,7 +236,7 @@ function get_plugins_update_markup( $auto_update_settings, $translations ) {
 	</tr>
 	<tr class="table-help hide-help" data-id="plugin-updates">
 		<td colspan=4>
-			<p>Choose which Plugins you wish to update automatically</p>
+			<p>' . esc_html__( 'Choose which Plugins you wish to update automatically', 'boldgrid-backup' ) . '</p>
 		</td>
 	</tr>
 	<tr>
@@ -353,7 +353,7 @@ function get_themes_update_markup( $auto_update_settings, $translations ) {
 	</tr>
 	<tr class="table-help hide-help" data-id="theme-updates">
 	<td colspan=4>
-		<p>' . esc_html__( 'Choose which Plugins you wish to update automatically ', 'boldgrid-backup' ) . '</p>
+		<p>' . esc_html__( 'Choose which Themes you wish to update automatically ', 'boldgrid-backup' ) . '</p>
 	</td>
 	</tr>
 	<tr>

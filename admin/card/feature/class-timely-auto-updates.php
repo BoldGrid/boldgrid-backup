@@ -14,9 +14,9 @@
 namespace Boldgrid\Backup\Admin\Card\Feature;
 
 /**
- * Class: Timely_Auto_Updates
+ * Class: Timely_Auto_Updates.
  *
- * This class is responsible for rendering the, "Timely Auto Updates" feature on the BoldGrid
+ * This class is responsible for rendering the, "Timely Auto Updates" feature on the BoldGrid.
  * Backup Dashboard.
  *
  * @since SINCEVERSION
@@ -37,7 +37,7 @@ class Timely_Auto_Updates extends \Boldgrid\Library\Library\Ui\Feature {
 		// Determine whether or not this feature is enabled.
 		$auto_update_settings = $core->settings->get_setting( 'auto_update' );
 
-		$is_enabled = ! empty( $auto_update_settings['timely-updates-enabled'] ) && '1' === $auto_update_settings['timely-updates-enabled'];
+		$is_enabled = ! empty( $auto_update_settings['timely-updates-enabled'] );
 
 		if ( $is_enabled ) {
 			$this->content = '<p>' . esc_html__( 'Timely Auto Updates are enabled!', 'boldgrid-backup' ) . '</p>';
