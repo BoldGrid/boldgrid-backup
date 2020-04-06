@@ -59,6 +59,7 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 			$bgBox.find( '.bglib-collapsible-control' ).on( 'click', function() {
 				var target = $( this ).attr( 'data-target' );
 				$( target ).animate( { height: 'toggle', opacity: 'toggle' }, 'slow' );
+				$( this ).toggleClass( 'bglib-collapsible-open' );
 			} );
 
 			if ( true === $( '#timely-updates-disabled' ).prop( 'checked' ) ) {
