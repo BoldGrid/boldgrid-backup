@@ -377,7 +377,7 @@ class Boldgrid_Backup_Admin_Core {
 	/**
 	 * Database Restoration errro
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 * @var string
 	 */
 	public $db_restore_error;
@@ -565,7 +565,7 @@ class Boldgrid_Backup_Admin_Core {
 	/**
 	 * An instance of the Auto Updates class
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 * @var Boldgrid_Backup_Admin_Auto_Updates
 	 */
 	public $auto_updates;
@@ -2997,7 +2997,7 @@ class Boldgrid_Backup_Admin_Core {
 	/**
 	 * Add thickbox to bolgrid_backup admin pages.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 */
 	public function add_thickbox( $hook_suffix ) {
 		if ( false !== strpos( $hook_suffix, 'boldgrid-backup' ) ) {

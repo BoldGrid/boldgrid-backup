@@ -4,7 +4,7 @@
  *
  * Show "Auto Update" section on settings page.
  *
- * @since      SINCEVERSION
+ * @since      1.14.0
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin/partials/settings
  * @copyright  BoldGrid
@@ -31,7 +31,7 @@ $translations                 = array(
 /**
  * Get Heading markup.
  *
- * @since SINCEVERSION
+ * @since 1.14.0
  *
  * @param array $boldgrid_backup_settings Boldgrid Backup Settings.
  * @param array $auto_update_settings Auto Update Settings from DB.
@@ -68,7 +68,7 @@ function get_heading_markup( $boldgrid_backup_settings, $auto_update_settings ) 
 /**
  * Get Premium markup.
  *
- * @since SINCEVERSION
+ * @since 1.14.0
  *
  * @return string
  */
@@ -99,7 +99,7 @@ function get_premium_markup() {
 /**
  * Get WP Core Update markup.
  *
- * @since SINCEVERSION
+ * @since 1.14.0
  *
  * @param array $auto_update_settings Auto Update Settings from DB.
  * @return string
@@ -202,7 +202,7 @@ function get_wpcore_update_markup( $auto_update_settings ) {
 /**
  * Get Plugins Update Markup.
  *
- * @since SINCEVERSION
+ * @since 1.14.0
  *
  * @param array $auto_update_settings Auto Update Settings from DB.
  * @param array $translations Translations.
@@ -315,7 +315,7 @@ function get_plugins_update_markup( $auto_update_settings, $translations ) {
 /**
  * Get Themes Update Markup.
  *
- * @since SINCEVERSION
+ * @since 1.14.0
  *
  * @param array $auto_update_settings Auto Update Settings from DB.
  * @param array $translations Translations.

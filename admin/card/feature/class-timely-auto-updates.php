@@ -3,7 +3,7 @@
  * Timely_Auto_Updates class.
  *
  * @link       https://www.boldgrid.com
- * @since      SINCEVERSION
+ * @since      1.14.0
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Feature
@@ -19,13 +19,13 @@ namespace Boldgrid\Backup\Admin\Card\Feature;
  * This class is responsible for rendering the, "Timely Auto Updates" feature on the BoldGrid.
  * Backup Dashboard.
  *
- * @since SINCEVERSION
+ * @since 1.14.0
  */
 class Timely_Auto_Updates extends \Boldgrid\Library\Library\Ui\Feature {
 	/**
 	 * Init.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 */
 	public function init() {
 		$core = apply_filters( 'boldgrid_backup_get_core', null );

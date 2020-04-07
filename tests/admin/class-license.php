@@ -3,7 +3,7 @@
  * File: class-license.php
  *
  * @link https://www.boldgrid.com
- * @since     SINCEVERSION
+ * @since     1.14.0
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/tests/admin

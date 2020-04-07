@@ -3,12 +3,12 @@
  * File: test-class-boldgrid-backup-admin-db-import.php
  *
  * @link  https://www.boldgrid.com
- * @since SINCEVERSION
+ * @since 1.14.0
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/tests/admin
  * @copyright  BoldGrid
- * @version    SINCEVERSION
+ * @version    1.14.0
  * @author     BoldGrid <support@boldgrid.com>
  */
 
@@ -55,7 +55,7 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 	/**
 	 * Test Import From Archive.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 */
 	public function test_import_from_archive() {
 		$db_import = new \Boldgrid_Backup_Admin_Db_Import( $this->core );
@@ -66,7 +66,7 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 	/**
 	 * Test Get Lines.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 */
 	public function test_get_lines() {
 		$db_import = new \Boldgrid_Backup_Admin_Db_Import();
@@ -78,7 +78,7 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 	/**
 	 * Test Import.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 */
 	public function test_import() {
 		$file                   = __FILE__;
@@ -98,7 +98,7 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 	/**
 	 * Test Import From Lines.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 */
 	public function test_import_lines() {
 		$db_import = new \Boldgrid_Backup_Admin_Db_Import();
@@ -115,7 +115,7 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 	/**
 	 * Test Import String.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 */
 	public function test_import_string() {
 		$mock_db_import = $this->getMockBuilder( \Boldgrid_Backup_Admin_Db_Import::class )
@@ -130,7 +130,7 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 	/**
 	 * Test Fix View Statement.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 */
 	public function test_fix_view_statements() {
 		$db_import = new \Boldgrid_Backup_Admin_Db_Import();
@@ -153,7 +153,7 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 	/**
 	 * Test Fix Definer.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 */
 	public function test_fix_definer() {
 		$db_import = new \Boldgrid_Backup_Admin_Db_Import();
@@ -174,7 +174,7 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 	/**
 	 * Test has DB Privileges.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 */
 	public function test_has_db_privileges() {
 		$required_privileges = array( 'CREATE VIEW', 'SHOW VIEW' );
@@ -209,7 +209,7 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 	/**
 	 * Test Get Grants Array.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 */
 	public function test_get_grants_array() {
 		$db_import      = new \Boldgrid_Backup_Admin_Db_Import();
@@ -221,7 +221,7 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 	/**
 	 * Test Get DB Privileges.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 */
 	public function test_get_db_privileges() {
 		$mock_db_import = $this->getMockBuilder( \Boldgrid_Backup_Admin_Db_Import::class )

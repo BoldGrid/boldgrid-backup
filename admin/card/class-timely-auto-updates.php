@@ -3,7 +3,7 @@
  * Timely Auto Updates class.
  *
  * @link       https://www.boldgrid.com
- * @since      SINCEVERSION
+ * @since      1.14.0
  *
  * @package    Boldgrid\Backup
  * @subpackage Boldgrid\Backup\Card
@@ -18,13 +18,13 @@ namespace Boldgrid\Backup\Admin\Card;
  *
  * This class is responsible for rendering the "Timely Auto Updates" card on this plugin's Premium Features page.
  *
- * @since SINCEVERSION
+ * @since 1.14.0
  */
 class Timely_Auto_Updates extends \Boldgrid\Library\Library\Ui\Card {
 	/**
 	 * Init.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 */
 	public function init() {
 		$this->id = 'bgbkup_timely_auto_updates';

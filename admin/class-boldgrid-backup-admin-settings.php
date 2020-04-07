@@ -703,7 +703,7 @@ class Boldgrid_Backup_Admin_Settings {
 			/*
 			 * Save Auto Backup options
 			 *
-			 * @since SINCEVERSION
+			 * @since 1.14.0
 			 */
 			if ( ! empty( $_POST['auto_update'] ) ) {
 				$settings['auto_update'] = $_POST['auto_update'];

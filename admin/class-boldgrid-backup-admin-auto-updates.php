@@ -3,12 +3,12 @@
  * File: class-boldgrid-backup-admin-auto-updates.php
  *
  * @link       https://www.boldgrid.com
- * @since      SINCEVERSION
+ * @since      1.14.0
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
  * @copyright  BoldGrid
- * @version    SINCEVERSION
+ * @version    1.14.0
  * @author     BoldGrid <support@boldgrid.com>
  */
 
@@ -17,13 +17,13 @@ use Boldgrid\Library\Library\Plugin\Plugins;
 /**
  * Class: Boldgrid_Backup_Admin_Auto_Updates.
  *
- * @since SINCEVERSION
+ * @since 1.14.0
  */
 class Boldgrid_Backup_Admin_Auto_Updates {
 	/**
 	 * Settings.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 * @var array
 	 */
 	public $settings;
@@ -31,7 +31,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	/**
 	 * Active Plugins.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 * @var array
 	 */
 	public $plugins = array();
@@ -39,7 +39,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	/**
 	 * Themes.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 * @var array
 	 */
 	public $themes = array();
@@ -47,7 +47,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	/**
 	 * Active Plugins.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 * @var Boldgrid_Backup_Admin_Core
 	 */
 	public $core;
@@ -55,7 +55,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	/**
 	 * Constructor.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 */
 	public function __construct() {
 
@@ -69,7 +69,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	/**
 	 * Set Settings.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 */
 	public function set_settings() {
 		$boldgrid_backup_settings = get_site_option( 'boldgrid_backup_settings', array() );
@@ -85,7 +85,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	/**
 	 * Maybe Update Plugin.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 *
 	 * @param string $slug Plugin Slug.
 	 * @return bool
@@ -106,7 +106,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	/**
 	 * Maybe Update Theme.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 *
 	 * @param string $stylesheet Theme's Stylesheet.
 	 * @return bool
@@ -130,7 +130,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 *
 	 * This method is the callback for the 'auto_update_plugin' action hook.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 *
 	 * @param  bool     $update Whether or not to update.
 	 * @param  stdClass $item The item class passed to callback.
@@ -158,7 +158,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 *
 	 * This method is the callback for the 'auto_update_theme' action hook.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 *
 	 * @param bool     $update Whether or not to update.
 	 * @param stdClass $item The item class passed to callback.
@@ -186,7 +186,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 *
 	 * Sets the type of updates to perform for wpcore.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 */
 	public function auto_update_core() {
 		$wpcs_default = array(

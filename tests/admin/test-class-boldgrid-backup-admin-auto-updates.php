@@ -27,7 +27,7 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 	/**
 	 * Auto Updates.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 * @var Boldgrid_Backup_Admin_Auto_Updates
 	 */
 	private $auto_updates;
@@ -35,7 +35,7 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 	/**
 	 * Default Test Settings.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 * @var array
 	 */
 	private $default_test_settings;
@@ -43,7 +43,7 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 	/**
 	 * Install Plugin.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 * @param string $slug Plugin Slug.
 	 * @param string $version Plugin Version to Install.
 	 */
@@ -77,7 +77,7 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 	/**
 	 * Setup Tests.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 */
 	public function setUp() {
 		$this->default_test_settings = array(
@@ -104,7 +104,7 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 	/**
 	 * Test Constructor.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 */
 	public function test_constructor() {
 		// Test that WP's Auto Updater is NOT disabled after init.
@@ -114,7 +114,7 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 
 	/** Test set_settings.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 */
 	public function test_set_settings() {
 		$auto_updates = new Boldgrid_Backup_Admin_Auto_Updates();
@@ -128,7 +128,7 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 	/**
 	 * Test maybe_update_plugin.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 */
 	public function test_maybe_update_plugin() {
 		$this->install_plugin( 'akismet', '4.0' );
@@ -182,7 +182,7 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 	/**
 	 * Test Maybe Update Theme.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 */
 	public function test_maybe_update_theme() {
 		// Test does not update if this theme hasn't been configured yet.
@@ -233,7 +233,7 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 	/**
 	 * Test Auto Update Plugins.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 */
 	public function test_auto_update_plugins() {
 		$this->install_plugin( 'akismet', '4.0' );
@@ -251,7 +251,7 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 	/**
 	 * Test Auto Update Themes.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 */
 	public function test_auto_update_themes() {
 		$mock_auto_updates = $this->getMockBuilder( Boldgrid_backup_Admin_Auto_Updates::class )
@@ -282,7 +282,7 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 	/**
 	 * Test Auto Update Core.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 */
 	public function test_auto_update_core() {
 		wp_cache_flush();
@@ -304,7 +304,7 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 	/**
 	 * Apply wp core filters.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 *
 	 * @param Boldgrid_backup_Admin_Auto_Updates $auto_updates Auto Updates.
 	 * @param array                              $expected_results Expected Results.
