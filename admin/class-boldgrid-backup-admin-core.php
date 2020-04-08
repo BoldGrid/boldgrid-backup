@@ -563,6 +563,22 @@ class Boldgrid_Backup_Admin_Core {
 	public $activity;
 
 	/**
+	 * List of Directories.
+	 *
+	 * @since SINCEVERSION
+	 * @var array
+	 */
+	public $dirlist = array();
+
+	/**
+	 * Recursive Filelist.
+	 *
+	 * @since SINCEVERSION
+	 * @var array
+	 */
+	public $rec_filelist = array();
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.0
@@ -1331,6 +1347,11 @@ class Boldgrid_Backup_Admin_Core {
 		// Mark the base directory, if not set (the first run).
 		if ( empty( $this->filelist_basedir ) ) {
 			$this->filelist_basedir = $dirpath;
+			$this->dirlist[ $dirpath ] = array(
+				'relative_path' => '',
+				'files'         => array()
+			);
+			error_log( 'TRIGGERED' );
 		}
 
 		// Get the non-recursive directory listing for the specified path.
@@ -1378,6 +1399,10 @@ class Boldgrid_Backup_Admin_Core {
 		foreach ( $dirlist as $fileinfo ) {
 			// If item is a directory, then recurse, merge, and continue.
 			if ( 'd' === $fileinfo['type'] ) {
+				$this->dirlist[ $dirpath . '/' . $fileinfo['name'] ] = array(
+					'relative_path' => substr( $dirpath . '/' . $fileinfo['name'], strlen( $this->filelist_basedir ) + 1 ),
+					'files'         => array(),
+				);
 				$filelist_add = $this->get_filelist( $dirpath . '/' . $fileinfo['name'] );
 
 				$filelist = array_merge( $filelist, $filelist_add );
@@ -1398,7 +1423,6 @@ class Boldgrid_Backup_Admin_Core {
 				$fileinfo['size'],
 			];
 		}
-
 		// Return the array.
 		return $filelist;
 	}
@@ -1426,6 +1450,25 @@ class Boldgrid_Backup_Admin_Core {
 		// Get the recursive directory listing for the specified path.
 		$filelist = $this->get_filelist( $dirpath );
 
+		global $wp_filesystem;
+		$rec_file_list = array();
+		foreach ( $this->dirlist as $dir => $value ) {
+			$rec_file_list[$dir] = $value;
+			if ( $dir === ABSPATH ) {
+				error_log( 'ABSPATH DIR: ' . $value );
+			}
+			$dir_filelist        = $wp_filesystem->dirlist( $dir );
+			foreach ( $dir_filelist as $file ) {
+				if ( 'f' === $file['type'] ) {
+					$rec_file_list[$dir]['files'][] = array(
+						$dir . '/' . $file['name'],
+						substr( $dir . '/' . $file['name'], strlen( $this->filelist_basedir ) + 1 ),
+						$file['size']
+					);
+				}
+			}
+		}
+
 		// If no files were found, then return an empty array.
 		if ( empty( $filelist ) ) {
 			return [];
@@ -1450,6 +1493,21 @@ class Boldgrid_Backup_Admin_Core {
 			}
 
 			$new_filelist[] = $fileinfo;
+		}
+
+		foreach( $rec_file_list as $dir => $dir_files ) {
+			$is_node_modules     = false !== strpos( $dir, '/node_modules/' );
+			$is_backup_directory = $this->backup_dir->file_in_dir( $dir_files['relative_path'] );
+
+			if ( $is_node_modules || $is_backup_directory ) {
+				continue;
+			}
+
+			if ( ! $this->folder_exclusion->allow_file( $dir_files['relative_path'] ) ) {
+				continue;
+			}
+
+			$this->rec_filelist[$dir] = $dir_files;
 		}
 
 		// Replace filelist.

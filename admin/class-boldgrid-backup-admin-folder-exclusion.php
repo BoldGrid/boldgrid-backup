@@ -146,6 +146,10 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 			return false;
 		}
 
+		if ( false !== strpos( $file, 'wp-admin' ) || false !== strpos( $file, 'wp-includes' ) ) {
+			return false;
+		}
+
 		// Do not allow the "cron/restore-info.json" file used for emergency restorations.
 		if ( $this->is_match( 'cron/restore-info.json', $file ) ) {
 			return false;
