@@ -132,6 +132,12 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
+= 1.14.0 =
+
+Release date: TBD
+
+* New feature: Timely Auto Updates - auto update WordPress, Plugins, and Themes after a set number of days.
+
 = 1.13.3 =
 
 Release date: April 2nd, 2020

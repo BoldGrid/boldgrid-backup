@@ -1,23 +1,23 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "77756fdd464a8b2ffe244781ca43f5a9",
+    "content-hash": "3d3b40678739982514bd38cc205e6a1e",
     "packages": [
         {
             "name": "boldgrid/library",
-            "version": "dev-auto-updates",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BoldGrid/library.git",
-                "reference": "716467c1a30326cf7fd9cebe569ee915b19bded6"
+                "reference": "1d9737f68797e0eb9e5497646d3b7a31bba61d75"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BoldGrid/library/zipball/716467c1a30326cf7fd9cebe569ee915b19bded6",
-                "reference": "716467c1a30326cf7fd9cebe569ee915b19bded6",
+                "url": "https://api.github.com/repos/BoldGrid/library/zipball/1d9737f68797e0eb9e5497646d3b7a31bba61d75",
+                "reference": "1d9737f68797e0eb9e5497646d3b7a31bba61d75",
                 "shasum": ""
             },
             "type": "library",
@@ -54,7 +54,7 @@
                 }
             ],
             "description": "The BoldGrid Library for shared code used in official BoldGrid plugins and themes.",
-            "time": "2020-04-02T15:36:58+00:00"
+            "time": "2020-04-08T12:00:30+00:00"
         },
         {
             "name": "chland/tdcron",
@@ -126,16 +126,16 @@
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "2.0.26",
+            "version": "2.0.27",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "09655fcc1f8bab65727be036b28f6f20311c126c"
+                "reference": "34620af4df7d1988d8f0d7e91f6c8a3bf931d8dc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/09655fcc1f8bab65727be036b28f6f20311c126c",
-                "reference": "09655fcc1f8bab65727be036b28f6f20311c126c",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/34620af4df7d1988d8f0d7e91f6c8a3bf931d8dc",
+                "reference": "34620af4df7d1988d8f0d7e91f6c8a3bf931d8dc",
                 "shasum": ""
             },
             "require": {
@@ -214,7 +214,21 @@
                 "x.509",
                 "x509"
             ],
-            "time": "2020-03-13T04:15:39+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/terrafrost",
+                    "type": "github"
+                },
+                {
+                    "url": "https://www.patreon.com/phpseclib",
+                    "type": "patreon"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/phpseclib/phpseclib",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-04-04T23:17:33+00:00"
         }
     ],
     "packages-dev": [
@@ -258,7 +272,14 @@
             "time": "2015-08-31T22:07:48+00:00"
         }
     ],
-    "aliases": [],
+    "aliases": [
+        {
+            "alias": "2.12.2",
+            "alias_normalized": "2.12.2.0",
+            "version": "9999999-dev",
+            "package": "boldgrid/library"
+        }
+    ],
     "minimum-stability": "stable",
     "stability-flags": {
         "boldgrid/library": 20,
@@ -269,5 +290,6 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
-    "platform-dev": []
+    "platform-dev": [],
+    "plugin-api-version": "1.1.0"
 }
