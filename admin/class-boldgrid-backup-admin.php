@@ -243,7 +243,7 @@ class Boldgrid_Backup_Admin {
 	/**
 	 * Whether or not the current screen is a Total Upkeep page.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 *
 	 * @return bool
 	 */

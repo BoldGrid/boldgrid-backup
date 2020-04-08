@@ -377,7 +377,7 @@ class Boldgrid_Backup_Admin_Core {
 	/**
 	 * Database Restoration errro
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 * @var string
 	 */
 	public $db_restore_error;
@@ -563,6 +563,14 @@ class Boldgrid_Backup_Admin_Core {
 	public $activity;
 
 	/**
+	 * An instance of the Auto Updates class
+	 *
+	 * @since 1.14.0
+	 * @var Boldgrid_Backup_Admin_Auto_Updates
+	 */
+	public $auto_updates;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.0
@@ -690,8 +698,11 @@ class Boldgrid_Backup_Admin_Core {
 		$this->dashboard = new Boldgrid_Backup_Admin_Dashboard( $this );
 
 		// Instantiate Boldgrid\Library\Library\Plugin\Plugin.
-		$this->plugin       = new \Boldgrid\Library\Library\Plugin\Plugin( 'boldgrid-backup', $this->configs );
+		$this->plugin       = \Boldgrid\Library\Library\Plugin\Factory::create( 'boldgrid-backup', $this->configs );
 		$this->premium_page = new Boldgrid_Backup_Admin_Premium_Features( $this );
+
+		// Instantiate Boldgrid_Backup_Admin_Auto_Updates.
+		$this->auto_updates = new Boldgrid_Backup_Admin_Auto_Updates();
 
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
@@ -2422,7 +2433,6 @@ class Boldgrid_Backup_Admin_Core {
 		global $pagenow;
 
 		// Thickbox used for Backup Site Now modal.
-		add_thickbox();
 		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
 
 		wp_enqueue_style( 'bglib-ui-css' );
@@ -2693,16 +2703,38 @@ class Boldgrid_Backup_Admin_Core {
 			BOLDGRID_BACKUP_VERSION, 'all'
 		);
 
+		$settings = $this->settings->get_settings();
+		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
+		wp_enqueue_style( 'bglib-ui-css' );
+
+		$this->auto_rollback->enqueue_home_scripts();
+		$this->auto_rollback->enqueue_backup_scripts();
+		$this->archive_actions->enqueue_scripts();
+
+		$this->folder_exclusion->enqueue_scripts();
+		$this->db_omit->enqueue_scripts();
+
+		$in_modal = true;
+		$modal    = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-modal.php';
+		$in_modal = false;
+
 		echo '
 		<div class="wrap">
 			<div id="bglib-page-container" class="bgbkup-page-container">
 				<div id="bglib-page-top">
 					<div id="bglib-page-header" class="bglib-has-logo">
 						<h1>' . esc_html__( 'Total Upkeep Preflight Check', 'boldgrid-backup' ) . '</h1>
+						<div class="page-title-actions">
+						<a href="#TB_inline?width=800&amp;height=600&amp;inlineId=backup_now_content" class="thickbox page-title-action page-title-action-primary">' .
+							esc_html__( 'Backup Site Now', 'boldgrid-backup' ) . '
+						</a>
+						<a class="page-title-action add-new">' . esc_html__( 'Upload Backup', 'boldgrid-backup' ) . '</a>
+					</div>
 					</div>
 				</div>
 				<div id="bglib-page-content">
 					<div class="wp-header-end"></div>';
+		echo $modal; //phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-test.php';
 		echo '
 				</div>
@@ -2959,6 +2991,17 @@ class Boldgrid_Backup_Admin_Core {
 
 			// Increment the counter.
 			$counter --;
+		}
+	}
+
+	/**
+	 * Add thickbox to bolgrid_backup admin pages.
+	 *
+	 * @since 1.14.0
+	 */
+	public function add_thickbox( $hook_suffix ) {
+		if ( false !== strpos( $hook_suffix, 'boldgrid-backup' ) ) {
+			add_thickbox();
 		}
 	}
 }

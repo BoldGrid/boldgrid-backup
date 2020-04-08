@@ -54,7 +54,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 *
 	 * Gets an array of lines from a file.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 *
 	 * @param string $file String ocntaining the path of the file.
 	 *
@@ -207,7 +207,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 *
 	 * Fixes view statements to ensure the definer matches the current db user.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 *
 	 * @param array $lines An array of lines from db file.
 	 * @return array
@@ -250,7 +250,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 *
 	 * Fixes the actual definer line.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 *
 	 * @param string $line The line from db dump file to fix.
 	 * @return string The line with the DEFINER option removed.
@@ -277,7 +277,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	/**
 	 * Tests if database user has specific privileges.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 *
 	 * @param array $privileges An array of permissions to check against.
 	 * @return bool True if user has specified privileges.
@@ -296,7 +296,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	/**
 	 * Get database user privileges.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 *
 	 * @global wpdb $wpdb The WordPress database class object.
 	 *
@@ -326,7 +326,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 *
 	 * Queries the database for 'SHOW GRANTS'.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 *
 	 * @return array an array of results from the database query
 	 */
@@ -341,7 +341,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 *
 	 * Executes Import MySql Query.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 *
 	 * @param PDO    $db The PDO Object.
 	 * @param string $sql_line The line of sql to execute.
@@ -355,7 +355,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	/**
 	 * Get a user's grants in the form of an array.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 *
 	 * @param string $grants_string A string containing the user's grants.
 	 * @return array
