@@ -700,6 +700,15 @@ class Boldgrid_Backup_Admin_Settings {
 			$settings['folder_exclusion_exclude'] = $this->core->folder_exclusion->from_post( 'exclude' );
 			$settings['folder_exclusion_type']    = $this->core->folder_exclusion->from_post( 'type' );
 
+			/*
+			 * Save Auto Backup options
+			 *
+			 * @since 1.14.0
+			 */
+			if ( ! empty( $_POST['auto_update'] ) ) {
+				$settings['auto_update'] = $_POST['auto_update'];
+			}
+
 			// Read BoldGrid settings form POST request, sanitize, and merge settings with saved.
 			$boldgrid_settings = array_merge(
 				get_option( 'boldgrid_settings' ),
@@ -785,12 +794,15 @@ class Boldgrid_Backup_Admin_Settings {
 		$is_premium_installed = $this->core->config->is_premium_installed;
 		$is_premium_active    = $this->core->config->is_premium_active;
 
-		add_thickbox();
 		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
 		wp_enqueue_style( 'bglib-ui-css' );
 		wp_enqueue_script( 'bglib-ui-js' );
 		wp_enqueue_script( 'bglib-sticky' );
 		wp_enqueue_script( 'bglib-license' );
+
+		$this->core->auto_rollback->enqueue_home_scripts();
+		$this->core->auto_rollback->enqueue_backup_scripts();
+		$this->core->archive_actions->enqueue_scripts();
 
 		if ( ! $this->is_saving_settings ) {
 			$is_functional = $this->core->test->run_functionality_tests();
@@ -918,16 +930,27 @@ class Boldgrid_Backup_Admin_Settings {
 			$settings['encrypt_db'] = false;
 		}
 
+		$in_modal = true;
+		$modal    = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-modal.php';
+		$in_modal = false;
+
 		echo '
 		<div class="wrap">
 			<div id="bglib-page-container" class="bgbkup-page-container">
 				<div id="bglib-page-top">
 					<div id="bglib-page-header" class="bglib-has-logo">
 						<h1>' . esc_html__( 'Total Upkeep Backup and Restore Settings', 'boldgrid-backup' ) . '</h1>
+						<div class="page-title-actions">
+						<a href="#TB_inline?width=800&amp;height=600&amp;inlineId=backup_now_content" class="thickbox page-title-action page-title-action-primary">' .
+							esc_html__( 'Backup Site Now', 'boldgrid-backup' ) . '
+						</a>
+						<a class="page-title-action add-new">' . esc_html__( 'Upload Backup', 'boldgrid-backup' ) . '</a>
+					</div>
 					</div>
 				</div>
 				<div id="bglib-page-content">
 					<div class="wp-header-end"></div>';
+		echo $modal; //phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-settings.php';
 		echo '
 				</div>

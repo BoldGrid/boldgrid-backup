@@ -16,14 +16,13 @@
 
 defined( 'WPINC' ) || die;
 
-$library_dir     = \Boldgrid\Library\Library\Configs::get( 'libraryDir' );
 $nav             = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
 $scheduler       = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/scheduler.php';
 $compressor      = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/compressor.php';
 $folders_include = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/folders.php';
 $db              = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/db.php';
 $auto_backup     = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/auto-backup.php';
-$auto_updates    = include $library_dir . 'src/Library/Views/Connect/AutoUpdates.php';
+$auto_updates    = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/auto-update.php';
 $notifications   = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/notifications.php';
 $connect_key     = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/connect-key.php';
 $site_check      = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/site-check.php';

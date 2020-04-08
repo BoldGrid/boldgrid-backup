@@ -18,8 +18,7 @@
 
 defined( 'WPINC' ) || die;
 
-$page = empty( $_GET['page'] ) ? '' : $_GET['page'];
-
+$page          = empty( $_GET['page'] ) ? '' : $_GET['page'];
 $backup_button = '
 	<div id="backup-site-now-section">
 		<form action="#" id="backup-site-now-form" method="POST">' .
@@ -35,7 +34,7 @@ $backup_button = '
  * If the page is 'boldgrid-backup', then you're in the modal. The buttons will generally be the same,
  * but the formatting will be slightly different, hence the conditional below.
  */
-if ( 'boldgrid-backup' === $page ) {
+if ( false !== strpos( $page, 'boldgrid-backup' ) ) {
 	// The first div in the grid is needed so the grid fills out properly.
 	$backup_button .= '
 			<div style="display:grid; grid-gap:2em; grid-template-columns: 5fr 2fr;">

@@ -355,3 +355,25 @@ p > .bgbkup-remote-logo {
 	width: calc( 100% - 40px ) !important;
 	height: calc( 100% - 60px ) !important;
 }
+
+.bgbkup-transfers-destination .bg-box-bottom.premium .button-success {
+	float: none;
+	margin: 10px;
+}
+
+.page-title-actions {
+	display: inline-block;
+}
+
+.bg-auto-update.dashicons {
+	margin-right: 6px;
+	vertical-align: bottom;
+}
+
+.bg-auto-update.dashicons.dashicons-warning {
+	color: #f56e28;
+}
+
+.bg-auto-update.dashicons.dashicons-yes {
+	color: #79ba49;
+}
