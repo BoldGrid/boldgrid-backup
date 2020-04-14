@@ -19,7 +19,7 @@ BoldGrid.FolderExclude = function( $ ) {
 		exclusionList = null,
 		filteredList = [],
 		lang = BoldGridBackupAdminFolderExclude,
-		$container = $( '#folder_exclusion' ),
+		$container = $( 'div#folder_exclusion' ),
 		$excludeFoldersPreview = $container.find( '#exclude_folders_preview' ),
 		$inputInclude = $container.find( '[name="folder_exclusion_include"]' ),
 		$inputExclude = $container.find( '[name="folder_exclusion_exclude"]' ),
@@ -161,8 +161,9 @@ BoldGrid.FolderExclude = function( $ ) {
 	 *
 	 * @since 1.6.0
 	 */
-	self.onChangeType = function() {
-		self.toggleConfig();
+	self.onChangeType = function( type ) {
+		console.log( type );
+		self.toggleConfig( type );
 	};
 
 	/**
@@ -352,14 +353,14 @@ BoldGrid.FolderExclude = function( $ ) {
 	 *
 	 * @since 1.6.0
 	 */
-	self.toggleConfig = function() {
-		var type = $type.filter( ':checked' ).val(),
-			$miscInfo = $( '#folder_misc_info' );
+	self.toggleConfig = function( typeInput ) {
+		var type = $( typeInput ).filter( ':checked' ).val();
+		var $miscInfo = $( 'div#folder_misc_info' );
 
 		if ( 'full' === type ) {
 			$trs.hide();
 			$miscInfo.hide();
-		} else {
+		} else if ( 'custom' === type ) {
 			$trs.show();
 			$miscInfo.show();
 		}
@@ -400,9 +401,13 @@ BoldGrid.FolderExclude = function( $ ) {
 		$( '#configure_folder_exclude' ).on( 'click', self.onClickConfigure );
 
 		self.toggleStatus();
-		self.toggleConfig();
+		$type.each( function() {
+			self.toggleConfig( this );
+		} );
 
-		$type.on( 'change', self.onChangeType );
+		$type.on( 'change', function() {
+			self.onChangeType( this );
+		} );
 
 		$inputInclude.on( 'input', self.toggleStatus ).on( 'focusin', self.bounceHelp );
 

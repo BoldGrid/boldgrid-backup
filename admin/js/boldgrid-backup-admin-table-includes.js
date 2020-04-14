@@ -16,7 +16,7 @@ BoldGrid.TableInclude = function( $ ) {
 	'use strict';
 
 	var self = this,
-		$container = $( '#table_inclusion' ),
+		$container = $( 'div#table_inclusion' ),
 		$includeTables = $container.find( '.include-tables [type="checkbox"]' ),
 		$type = $container.find( '[name="table_inclusion_type"]' ),
 		$configContainer = $container.find( '#table_inclusion_config' ),
@@ -34,8 +34,8 @@ BoldGrid.TableInclude = function( $ ) {
 	 *
 	 * @since 1.6.0
 	 */
-	self.onChangeType = function() {
-		self.toggleConfig();
+	self.onChangeType = function( typeInput ) {
+		self.toggleConfig( typeInput );
 	};
 
 	/**
@@ -56,12 +56,12 @@ BoldGrid.TableInclude = function( $ ) {
 	 *
 	 * @since 1.6.0
 	 */
-	self.toggleConfig = function() {
-		var type = $type.filter( ':checked' ).val();
+	self.toggleConfig = function( typeInput ) {
+		var type = $( typeInput ).filter( ':checked' ).val();
 
 		if ( 'full' === type ) {
 			$configContainer.hide();
-		} else {
+		} else if ( 'custom' === type ) {
 			$configContainer.show();
 		}
 	};
@@ -101,9 +101,13 @@ BoldGrid.TableInclude = function( $ ) {
 		$buttonNone.on( 'click', self.toggleNone );
 
 		self.toggleStatus();
-		self.toggleConfig();
+		$type.each( function() {
+			self.toggleConfig( this );
+		} );
 
-		$type.on( 'change', self.onChangeType );
+		$type.on( 'change', function() {
+			self.onChangeType( this );
+		} );
 
 		$includeTables.on( 'change', self.toggleStatus );
 	} );
