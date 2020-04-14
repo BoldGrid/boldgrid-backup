@@ -162,7 +162,6 @@ BoldGrid.FolderExclude = function( $ ) {
 	 * @since 1.6.0
 	 */
 	self.onChangeType = function( type ) {
-		console.log( type );
 		self.toggleConfig( type );
 	};
 
