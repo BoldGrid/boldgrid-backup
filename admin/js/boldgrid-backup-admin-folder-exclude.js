@@ -353,7 +353,9 @@ BoldGrid.FolderExclude = function( $ ) {
 	 * @since 1.6.0
 	 */
 	self.toggleConfig = function( typeInput ) {
-		var type = $( typeInput ).filter( ':checked' ).val();
+		var type = $( typeInput )
+			.filter( ':checked' )
+			.val();
 		var $miscInfo = $( 'div#folder_misc_info' );
 
 		if ( 'full' === type ) {

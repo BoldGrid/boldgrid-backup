@@ -57,7 +57,9 @@ BoldGrid.TableInclude = function( $ ) {
 	 * @since 1.6.0
 	 */
 	self.toggleConfig = function( typeInput ) {
-		var type = $( typeInput ).filter( ':checked' ).val();
+		var type = $( typeInput )
+			.filter( ':checked' )
+			.val();
 
 		if ( 'full' === type ) {
 			$configContainer.hide();
