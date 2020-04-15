@@ -53,7 +53,7 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 			$bgBox
 				.find( '.table-help td p' )
 				.attr( 'style', 'height: 0em; opacity: 0%; position: relative; z-index:-1' );
-			$bgBox.find( '.dashicons-editor-help, .help-icon' ).on( 'click', self._toggleHelp );
+			$bgBox.find( '.div-table-body .dashicons-editor-help, .help-icon' ).on( 'click', self._toggleHelp );
 			$bgBox.find( '.help-icon' ).css( 'cursor', 'pointer' );
 
 			$bgBox.find( '.bglib-collapsible-control' ).on( 'click', function() {
