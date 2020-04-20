@@ -145,7 +145,7 @@ class Boldgrid_Backup_Admin_Upload {
 			// Display an error notice.
 			do_action(
 				'boldgrid_backup_notice',
-				esc_html__( 'Upload File is not a Total Upkeep backup file.', 'boldgrid-backup' ),
+				esc_html__( 'Uploaded File is not a Total Upkeep backup file.', 'boldgrid-backup' ),
 				'notice notice-error is-dismissible'
 			);
 
