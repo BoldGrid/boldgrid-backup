@@ -377,3 +377,16 @@ p > .bgbkup-remote-logo {
 .bg-auto-update.dashicons.dashicons-yes {
 	color: #79ba49;
 }
+
+.bgbkup-page-container .upload-plugin .wp-upload-form {
+	max-width: 85%;
+	align-items: center;
+}
+
+.bgbkup-page-container .upload-plugin .wp-upload-form p {
+	padding-right: 1em;
+}
+
+.bgbkup-page-container .upload-plugin #upload-archive-section {
+	align-items: center;
+}
