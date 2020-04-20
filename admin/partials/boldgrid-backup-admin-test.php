@@ -448,6 +448,8 @@ $table .= '</table>';
 	$nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
 	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
+	require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
+
 	echo $fail_tips; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
 	echo $table; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped

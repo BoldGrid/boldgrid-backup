@@ -317,6 +317,7 @@ class Boldgrid_Backup_Admin_Upload {
 	 * @return bool Success of the operation.
 	 */
 	public function upload_archive_file() {
+		error_log( 'TRIGGERED' );
 		// Verify upload archive access and validate input.
 		if ( ! $this->verify_upload_access() ) {
 			return false;

@@ -2695,6 +2695,10 @@ class Boldgrid_Backup_Admin_Core {
 
 		$cli_support = $this->test->get_cli_support();
 
+		if ( ! empty( $_FILES['file'] ) ) {
+			$this->upload->upload_archive_file();
+		}
+
 		// Enqueue CSS for the test page.
 		wp_enqueue_style(
 			'boldgrid-backup-admin-test',

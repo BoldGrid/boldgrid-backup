@@ -59,6 +59,10 @@ class Boldgrid_Backup_Admin_Tools {
 	 * @since 1.6.0
 	 */
 	public function page() {
+		if ( ! empty( $_FILES['file'] ) ) {
+			$this->core->upload->upload_archive_file();
+		}
+
 		$settings = $this->core->settings->get_settings();
 		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
 

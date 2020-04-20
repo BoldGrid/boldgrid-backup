@@ -47,6 +47,10 @@ class Boldgrid_Backup_Admin_Transfers {
 		wp_enqueue_script( 'bglib-ui-js' );
 		wp_enqueue_script( 'bglib-sticky' );
 
+		if ( ! empty( $_FILES['file'] ) ) {
+			$this->core->upload->upload_archive_file();
+		}
+
 		$settings = $this->core->settings->get_settings();
 		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
 
