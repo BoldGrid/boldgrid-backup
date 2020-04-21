@@ -87,10 +87,19 @@ class Boldgrid_Backup_Admin_Db_Dump {
 				DB_USER,
 				DB_PASSWORD,
 				array(
-					'include-tables' => $include_tables,
-					'include-views'  => $include_views,
-					'add-drop-table' => true,
-					'no-autocommit'  => false,
+					'include-tables'        => $include_tables,
+					'include-views'         => $include_views,
+					'add-drop-table'        => true,
+					'no-autocommit'         => false,
+					/*
+					 * Set default character set.
+					 *
+					 * While utf8mb4 seems to be the norm, utf8 is still being referenced in wp-config-sample.php
+					 * and is also seen defined as DB_CHARSET in the config for various test accounts.
+					 *
+					 * @link https://make.wordpress.org/core/2015/04/02/the-utf8mb4-upgrade/
+					 */
+					'default-character-set' => defined( 'DB_CHARSET' ) ? DB_CHARSET : 'utf8',
 				)
 			);
 			$dump->start( $file );

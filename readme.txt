@@ -132,6 +132,12 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
+= 1.13.4 =
+
+Release date: April 21st, 2020
+
+* Bug fix:    Use WordPress DB_CHARSET when creating database dump.
+
 = 1.13.3 =
 
 Release date: April 2nd, 2020
