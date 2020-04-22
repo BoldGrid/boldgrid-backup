@@ -353,12 +353,14 @@ BoldGrid.FolderExclude = function( $ ) {
 	 * @summary Toggle display of everything after the "full" or "custom" options.
 	 *
 	 * @since 1.6.0
+	 *
+	 * @param typeInput The type input element clicked in the toggle.
 	 */
 	self.toggleConfig = function( typeInput ) {
 		var type = $( typeInput )
-			.filter( ':checked' )
-			.val();
-		var $miscInfo = $( 'div#folder_misc_info' );
+				.filter( ':checked' )
+				.val(),
+			$miscInfo = $( 'div#folder_misc_info' );
 
 		if ( 'full' === type ) {
 			$trs.hide();
