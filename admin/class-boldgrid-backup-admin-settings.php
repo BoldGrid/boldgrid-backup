@@ -790,9 +790,6 @@ class Boldgrid_Backup_Admin_Settings {
 	 * @see Boldgrid_Backup_Admin_Config::is_premium_active
 	 */
 	public function page_backup_settings() {
-		if ( ! empty( $_FILES['file'] ) ) {
-			$this->core->upload->upload_archive_file();
-		}
 
 		$is_premium           = $this->core->config->get_is_premium();
 		$is_premium_installed = $this->core->config->is_premium_installed;

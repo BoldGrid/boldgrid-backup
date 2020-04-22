@@ -131,10 +131,6 @@ class Boldgrid_Backup_Admin_Archive_Details {
 			$this->core->delete_archive_file();
 		}
 
-		if ( ! empty( $_FILES['file'] ) ) {
-			$this->core->upload->upload_archive_file();
-		}
-
 		$this->enqueue_scripts();
 		$this->core->archive_actions->enqueue_scripts();
 		$this->core->auto_rollback->enqueue_home_scripts();
