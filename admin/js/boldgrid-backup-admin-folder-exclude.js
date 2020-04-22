@@ -424,15 +424,19 @@ BoldGrid.FolderExclude = function( $ ) {
 		} );
 
 		$inputInclude.each( function() {
-			$( this ).on( 'input', function() {
-				self.toggleStatus( this );
-			} ).on( 'focusin', function() {
-				self.bounceHelp( this );
-			} );
+			$( this )
+				.on( 'input', function() {
+					self.toggleStatus( this );
+				} )
+				.on( 'focusin', function() {
+					self.bounceHelp( this );
+				} );
 		} );
 
 		$inputExclude.each( function() {
-			$( this ).on( 'input', self.toggleStatus ).on( 'focusin', self.bounceHelp );
+			$( this )
+				.on( 'input', self.toggleStatus )
+				.on( 'focusin', self.bounceHelp );
 		} );
 	} );
 };
