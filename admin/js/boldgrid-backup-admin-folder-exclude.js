@@ -372,7 +372,11 @@ BoldGrid.FolderExclude = function( $ ) {
 	};
 
 	/**
+	 * Toggle Status
 	 *
+	 * @since 1.6.0
+	 *
+	 * @param eventTarget The target of the triggering event.
 	 */
 	self.toggleStatus = function( eventTarget ) {
 		var parentContainer;
