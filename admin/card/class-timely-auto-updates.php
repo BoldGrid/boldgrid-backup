@@ -38,7 +38,7 @@ class Timely_Auto_Updates extends \Boldgrid\Library\Library\Ui\Card {
 			'boldgrid-backup' ) .
 			'</p>';
 
-		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/timely-auto-updates/?source=timely-auto-updates' );
+		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/timely-auto-updates/' );
 
 		$this->links = '
 			<a target="_blank" href="' . $url . '">' .
