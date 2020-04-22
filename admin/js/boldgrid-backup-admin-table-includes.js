@@ -33,6 +33,8 @@ BoldGrid.TableInclude = function( $ ) {
 	 * @summary Action to take when the type (full / custom) has been changed.
 	 *
 	 * @since 1.6.0
+	 *
+	 * @param typeInput The type input element clicked in the toggle.
 	 */
 	self.onChangeType = function( typeInput ) {
 		self.toggleConfig( typeInput );
@@ -55,6 +57,8 @@ BoldGrid.TableInclude = function( $ ) {
 	 * @summary Toggle the area that allows you to choose which tables to backup.
 	 *
 	 * @since 1.6.0
+	 *
+	 * @param typeInput The type input element clicked in the toggle.
 	 */
 	self.toggleConfig = function( typeInput ) {
 		var type = $( typeInput )
