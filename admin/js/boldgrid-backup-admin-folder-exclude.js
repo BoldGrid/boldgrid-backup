@@ -160,6 +160,8 @@ BoldGrid.FolderExclude = function( $ ) {
 	 * @summary Action to take when backup type has been changed.
 	 *
 	 * @since 1.6.0
+	 *
+	 * @param type The type element triggering the 'onChange' listener.
 	 */
 	self.onChangeType = function( type ) {
 		self.toggleConfig( type );
