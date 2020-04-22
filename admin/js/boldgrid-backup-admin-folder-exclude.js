@@ -374,7 +374,16 @@ BoldGrid.FolderExclude = function( $ ) {
 	/**
 	 *
 	 */
-	self.toggleStatus = function() {
+	self.toggleStatus = function( eventTarget ) {
+		var parentContainer;
+		if ( eventTarget ) {
+			parentContainer = eventTarget.closest( 'div#folder_exclusion' );
+			$inputInclude = $( parentContainer ).find( 'input[name=folder_exclusion_include]' );
+			$inputExclude = $( parentContainer ).find( 'input[name=folder_exclusion_exclude]' );
+		}
+
+		console.log( $inputInclude );
+		console.log( $inputExclude );
 		var usingDefaults =
 				$inputInclude.val() &&
 				$inputInclude.val().trim() === lang.default_include &&
@@ -414,9 +423,17 @@ BoldGrid.FolderExclude = function( $ ) {
 			self.onChangeType( this );
 		} );
 
-		$inputInclude.on( 'input', self.toggleStatus ).on( 'focusin', self.bounceHelp );
+		$inputInclude.each( function() {
+			$( this ).on( 'input', function() {
+				self.toggleStatus( this );
+			} ).on( 'focusin', function() {
+				self.bounceHelp( this );
+			} );
+		} );
 
-		$inputExclude.on( 'input', self.toggleStatus ).on( 'focusin', self.bounceHelp );
+		$inputExclude.each( function() {
+			$( this ).on( 'input', self.toggleStatus ).on( 'focusin', self.bounceHelp );
+		} );
 	} );
 };
 
