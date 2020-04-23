@@ -499,4 +499,16 @@ class Boldgrid_Backup_Admin_Upload {
 			]
 		);
 	}
+
+	/**
+	 * Archive Upload Action
+	 *
+	 * @since 1.14.0
+	 */
+	public function archive_upload_action() {
+		$page_is_bgbkup = apply_filters( 'is_boldgrid_backup_page', null );
+		if ( $page_is_bgbkup && ! empty( $_FILES['file'] ) ) {
+			$this->core->upload->upload_archive_file();
+		}
+	}
 }

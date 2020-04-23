@@ -101,6 +101,7 @@ class Boldgrid_Backup_Admin_Premium_Features {
 	 * @return array returns an array of the $nav, $dashboard, and $premium_box for validation.
 	 */
 	public function page() {
+
 		wp_enqueue_style( 'bglib-ui-css' );
 		$settings = $this->core->settings->get_settings();
 		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
