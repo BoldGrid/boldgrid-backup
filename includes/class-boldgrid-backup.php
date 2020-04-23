@@ -544,6 +544,8 @@ class Boldgrid_Backup {
 		$this->loader->add_filter( 'Boldgrid\Library\Usage\Notice\admin_notices', $usage, 'filter_notice' );
 		$this->loader->add_filter( 'Boldgrid\Library\Usage\Notice\maybeShow', $usage, 'maybe_show_notice' );
 		$this->loader->add_filter( 'Boldgrid\Library\Usage\getPrefixes', $usage, 'filter_prefixes' );
+		$this->loader->add_filter( 'is_boldgrid_backup_page', $usage, 'has_screen_prefix' );
+		$this->loader->add_action( 'in_admin_header', $plugin_admin_core->upload, 'archive_upload_action' );
 
 		// Log system.
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core->log_page, 'admin_enqueue_scripts' );
