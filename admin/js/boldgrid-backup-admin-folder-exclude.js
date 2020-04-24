@@ -385,9 +385,6 @@ BoldGrid.FolderExclude = function( $ ) {
 			$inputInclude = $( parentContainer ).find( 'input[name=folder_exclusion_include]' );
 			$inputExclude = $( parentContainer ).find( 'input[name=folder_exclusion_exclude]' );
 		}
-
-		console.log( $inputInclude );
-		console.log( $inputExclude );
 		var usingDefaults =
 				$inputInclude.val() &&
 				$inputInclude.val().trim() === lang.default_include &&
