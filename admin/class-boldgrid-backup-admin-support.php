@@ -174,6 +174,7 @@ class Boldgrid_Backup_Admin_Support {
 	 * @since 1.10.1
 	 */
 	public function page() {
+
 		wp_enqueue_style( 'bglib-ui-css' );
 		$settings = $this->core->settings->get_settings();
 		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );

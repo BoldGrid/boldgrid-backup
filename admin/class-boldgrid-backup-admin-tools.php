@@ -59,6 +59,7 @@ class Boldgrid_Backup_Admin_Tools {
 	 * @since 1.6.0
 	 */
 	public function page() {
+
 		$settings = $this->core->settings->get_settings();
 		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
 
