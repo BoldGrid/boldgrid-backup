@@ -118,7 +118,6 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 		isTooBig = 0 > maxSize - size;
 		isBadExtension = 'zip' !== extension;
 		isBadFilename = ! name.match( /boldgrid-backup-.*-\d{8}-\d{6}/ );
-		console.log( isBadFilename );
 
 		if ( isBadExtension ) {
 			$badExtension.slideDown();
