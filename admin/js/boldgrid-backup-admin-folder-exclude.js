@@ -381,7 +381,7 @@ BoldGrid.FolderExclude = function( $ ) {
 	self.toggleStatus = function( eventTarget ) {
 		var parentContainer;
 		if ( eventTarget ) {
-			parentContainer = eventTarget.closest( 'div#folder_exclusion' );
+			parentContainer = eventTarget.closest( '.form-table' );
 			$inputInclude = $( parentContainer ).find( 'input[name=folder_exclusion_include]' );
 			$inputExclude = $( parentContainer ).find( 'input[name=folder_exclusion_exclude]' );
 		}
@@ -436,8 +436,12 @@ BoldGrid.FolderExclude = function( $ ) {
 
 		$inputExclude.each( function() {
 			$( this )
-				.on( 'input', self.toggleStatus )
-				.on( 'focusin', self.bounceHelp );
+			.on( 'input', function() {
+				self.toggleStatus( this );
+			} )
+			.on( 'focusin', function() {
+				self.bounceHelp( this );
+			} );
 		} );
 	} );
 };
