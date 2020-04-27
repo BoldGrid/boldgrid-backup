@@ -436,12 +436,12 @@ BoldGrid.FolderExclude = function( $ ) {
 
 		$inputExclude.each( function() {
 			$( this )
-			.on( 'input', function() {
-				self.toggleStatus( this );
-			} )
-			.on( 'focusin', function() {
-				self.bounceHelp( this );
-			} );
+				.on( 'input', function() {
+					self.toggleStatus( this );
+				} )
+				.on( 'focusin', function() {
+					self.bounceHelp( this );
+				} );
 		} );
 	} );
 };
