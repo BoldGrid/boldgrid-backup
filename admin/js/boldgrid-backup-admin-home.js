@@ -93,8 +93,10 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 			$fileSizeWarning = $( '[data-id="upload-backup"]:not(span)' ),
 			$fileTooLarge = $( '#file_too_large' ),
 			$submit = $( 'input:submit' ),
+			$badFilename = $( '#bad_filename' ),
 			extension,
 			isBadExtension,
+			isBadFilename,
 			isTooBig,
 			maxSize = parseInt( $( '[name="MAX_FILE_SIZE"]' ).val() ),
 			name,
@@ -104,6 +106,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 			$fileSizeWarning.slideUp();
 			$fileTooLarge.slideUp();
 			$badExtension.slideUp();
+			$badFilename.slideUp();
 			$submit.attr( 'disabled', true );
 			return;
 		}
@@ -114,11 +117,19 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 
 		isTooBig = 0 > maxSize - size;
 		isBadExtension = 'zip' !== extension;
+		isBadFilename = ! name.match( /boldgrid-backup-.*-\d{8}-\d{6}/ );
+		console.log( isBadFilename );
 
 		if ( isBadExtension ) {
 			$badExtension.slideDown();
 		} else {
 			$badExtension.slideUp();
+		}
+
+		if ( isBadFilename ) {
+			$badFilename.slideDown();
+		} else {
+			$badFilename.slideUp();
 		}
 
 		if ( isTooBig ) {
@@ -129,7 +140,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 			$fileTooLarge.slideUp();
 		}
 
-		if ( isTooBig || isBadExtension ) {
+		if ( isTooBig || isBadExtension || isBadFilename ) {
 			$submit.attr( 'disabled', true );
 		} else {
 			$submit.attr( 'disabled', false );
