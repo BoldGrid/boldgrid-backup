@@ -426,7 +426,7 @@ BoldGrid.FolderExclude = function( $ ) {
 
 	// Onload event listener.
 	$( function() {
-		$( '#exclude_folders_button' ).on( 'click', self.onClickPreview );
+		$( 'button#exclude_folders_button' ).on( 'click', self.onClickPreview );
 
 		$( 'body' )
 			.on( 'click', '#exclude_folders_preview .pagination-links a', self.onClickPagination )
