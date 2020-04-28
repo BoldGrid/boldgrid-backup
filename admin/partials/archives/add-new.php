@@ -40,6 +40,9 @@ $upload_info = sprintf(
 	BOLDGRID_BACKUP_TITLE
 );
 
+$core              = apply_filters( 'boldgrid_backup_get_core', null );
+$backup_identifier = $core->get_backup_identifier();
+
 $backup_id_notice = sprintf(
 	// translators: 1: HTML tag, 2: Filename part, 3: Backup identifier, 4: File extension, 5: Archive filename, 6: Backup directory path, 7: Plugin title.
 	__(
