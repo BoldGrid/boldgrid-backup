@@ -86,6 +86,27 @@ BoldGrid.TableInclude = function( $ ) {
 	};
 
 	/**
+	 * Update Values
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param eventTarget The target of the triggering event.
+	 * @param $container The set of container divs.
+	 */
+	self.updateValues = function( eventTarget, $container ) {
+		var name = $( eventTarget ).attr( 'name' ),
+			value = $( eventTarget ).val(),
+			type = $( eventTarget ).attr( 'type' );
+		if ( 'radio' == type || 'checkbox' == type ) {
+			$container
+				.find( 'input[name="' + name + '"][value="' + value + '"]' )
+				.prop( 'checked', $( eventTarget ).prop( 'checked' ) );
+		} else {
+			$container.find( 'input[name=' + name + ']' ).val( value );
+		}
+	};
+
+	/**
 	 * @summary Toogle the status that tells the user if they're backing up all tables.
 	 *
 	 * @since 1.6.0
@@ -113,6 +134,12 @@ BoldGrid.TableInclude = function( $ ) {
 
 		$type.on( 'change', function() {
 			self.onChangeType( this );
+		} );
+
+		$container.find( 'input' ).each( function() {
+			$( this ).on( 'input', function() {
+				self.updateValues( this, $container );
+			} );
 		} );
 
 		$includeTables.on( 'change', self.toggleStatus );

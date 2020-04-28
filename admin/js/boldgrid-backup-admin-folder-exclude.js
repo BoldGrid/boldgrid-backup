@@ -379,18 +379,21 @@ BoldGrid.FolderExclude = function( $ ) {
 	 * @param eventTarget The target of the triggering event.
 	 */
 	self.toggleStatus = function( eventTarget ) {
-		var parentContainer;
+		var parentContainer,
+			usingDefaults,
+			$yesDefault = $container.find( '.yes-default' ),
+			$noDefault = $container.find( '.no-default' );
+
 		if ( eventTarget ) {
 			parentContainer = eventTarget.closest( '.form-table' );
 			$inputInclude = $( parentContainer ).find( 'input[name=folder_exclusion_include]' );
 			$inputExclude = $( parentContainer ).find( 'input[name=folder_exclusion_exclude]' );
 		}
-		var usingDefaults =
-				$inputInclude.val() &&
-				$inputInclude.val().trim() === lang.default_include &&
-				$inputExclude.val().trim() === lang.default_exclude,
-			$yesDefault = $container.find( '.yes-default' ),
-			$noDefault = $container.find( '.no-default' );
+
+		usingDefaults =
+			$inputInclude.val() &&
+			$inputInclude.val().trim() === lang.default_include &&
+			$inputExclude.val().trim() === lang.default_exclude;
 
 		if ( usingDefaults ) {
 			$yesDefault.show();
@@ -398,6 +401,26 @@ BoldGrid.FolderExclude = function( $ ) {
 		} else {
 			$yesDefault.hide();
 			$noDefault.show();
+		}
+	};
+
+	/**
+	 * Update Values
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param eventTarget The target of the triggering event.
+	 * @param $container The set of container divs.
+	 */
+	self.updateValues = function( eventTarget, $container ) {
+		var name = $( eventTarget ).attr( 'name' ),
+			value = $( eventTarget ).val();
+		if ( 'radio' == $( eventTarget ).attr( 'type' ) ) {
+			$container
+				.find( 'input[name=' + name + '][value=' + value + ']' )
+				.prop( 'checked', $( eventTarget ).prop( 'checked' ) );
+		} else {
+			$container.find( 'input[name=' + name + ']' ).val( value );
 		}
 	};
 
@@ -422,6 +445,12 @@ BoldGrid.FolderExclude = function( $ ) {
 
 		$type.on( 'change', function() {
 			self.onChangeType( this );
+		} );
+
+		$container.find( 'input' ).each( function() {
+			$( this ).on( 'input', function() {
+				self.updateValues( this, $container );
+			} );
 		} );
 
 		$inputInclude.each( function() {
