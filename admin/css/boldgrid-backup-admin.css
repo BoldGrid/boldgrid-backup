@@ -378,6 +378,9 @@ p > .bgbkup-remote-logo {
 	color: #79ba49;
 }
 
+#upload-archive-section.wp-upload-form {
+	flex-wrap: wrap;
+}
 .bgbkup-page-container .upload-plugin .wp-upload-form {
 	max-width: 85%;
 	align-items: center;
@@ -385,7 +388,10 @@ p > .bgbkup-remote-logo {
 
 .bgbkup-page-container .upload-plugin .wp-upload-form p {
 	padding-right: 1em;
-	width: 30%;
+}
+
+.bgbkup-page-container .upload-plugin .wp-upload-form .error_messages p {
+	width: 100%;
 }
 
 .bgbkup-page-container .upload-plugin .wp-upload-form input[type=text] {
@@ -403,5 +409,9 @@ p > .bgbkup-remote-logo {
 
 .bgbkup-page-container .upload-plugin #upload-archive-section form input[type="file"] {
 	width: 50%;
+}
+
+.bgbkup-page-container .upload-plugin #upload-archive-section .error_messages {
+	width: 100%;
 }
 

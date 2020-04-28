@@ -99,17 +99,20 @@ printf(
 			<span class='spinner'></span>
 		</form>
 
-		<p id="file_too_large" class="hidden">
-			<span class="dashicons dashicons-warning yellow"></span> <?php esc_html_e( 'The file you selected is too large.', 'boldgrid-bacup' ); ?>
-		</p>
+		<div class="error_messages">
 
-		<p id="bad_filename" class="hidden">
-			<span class="dashicons dashicons-warning yellow"></span> <?php esc_html_e( 'Invalid file name. Please choose a valid backup file.', 'boldgrid-bacup' ); ?>
-		</p>
+			<p id="file_too_large" class="hidden">
+				<span class="dashicons dashicons-warning yellow"></span> <?php esc_html_e( 'The file you selected is too large.', 'boldgrid-bacup' ); ?>
+			</p>
 
-		<p id="bad_extension" class="hidden">
-			<span class="dashicons dashicons-warning yellow"></span> <?php esc_html_e( 'Invalid file format. Please choose a .zip file.', 'boldgrid-bacup' ); ?>
-		</p>
+			<p id="bad_filename" class="hidden">
+				<span class="dashicons dashicons-warning yellow"></span> <?php esc_html_e( 'Invalid file name. Please choose a valid backup file.', 'boldgrid-bacup' ); ?>
+			</p>
+
+			<p id="bad_extension" class="hidden">
+				<span class="dashicons dashicons-warning yellow"></span> <?php esc_html_e( 'Invalid file format. Please choose a .zip file.', 'boldgrid-bacup' ); ?>
+			</p>
+		</div>
 	</div>
 
 	<p class="install-help">
