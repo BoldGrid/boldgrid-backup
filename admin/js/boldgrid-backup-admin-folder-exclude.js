@@ -19,7 +19,7 @@ BoldGrid.FolderExclude = function( $ ) {
 		exclusionList = null,
 		filteredList = [],
 		lang = BoldGridBackupAdminFolderExclude,
-		$container = $( '#folder_exclusion' ),
+		$container = $( 'div#folder_exclusion' ),
 		$excludeFoldersPreview = $container.find( '#exclude_folders_preview' ),
 		$inputInclude = $container.find( '[name="folder_exclusion_include"]' ),
 		$inputExclude = $container.find( '[name="folder_exclusion_exclude"]' ),
@@ -160,9 +160,11 @@ BoldGrid.FolderExclude = function( $ ) {
 	 * @summary Action to take when backup type has been changed.
 	 *
 	 * @since 1.6.0
+	 *
+	 * @param type The type element triggering the 'onChange' listener.
 	 */
-	self.onChangeType = function() {
-		self.toggleConfig();
+	self.onChangeType = function( type ) {
+		self.toggleConfig( type );
 	};
 
 	/**
@@ -351,30 +353,47 @@ BoldGrid.FolderExclude = function( $ ) {
 	 * @summary Toggle display of everything after the "full" or "custom" options.
 	 *
 	 * @since 1.6.0
+	 *
+	 * @param typeInput The type input element clicked in the toggle.
 	 */
-	self.toggleConfig = function() {
-		var type = $type.filter( ':checked' ).val(),
-			$miscInfo = $( '#folder_misc_info' );
+	self.toggleConfig = function( typeInput ) {
+		var type = $( typeInput )
+				.filter( ':checked' )
+				.val(),
+			$miscInfo = $( 'div#folder_misc_info' );
 
 		if ( 'full' === type ) {
 			$trs.hide();
 			$miscInfo.hide();
-		} else {
+		} else if ( 'custom' === type ) {
 			$trs.show();
 			$miscInfo.show();
 		}
 	};
 
 	/**
+	 * Toggle Status
 	 *
+	 * @since 1.6.0
+	 *
+	 * @param eventTarget The target of the triggering event.
 	 */
-	self.toggleStatus = function() {
-		var usingDefaults =
-				$inputInclude.val() &&
-				$inputInclude.val().trim() === lang.default_include &&
-				$inputExclude.val().trim() === lang.default_exclude,
+	self.toggleStatus = function( eventTarget ) {
+		var parentContainer,
+			usingDefaults,
 			$yesDefault = $container.find( '.yes-default' ),
 			$noDefault = $container.find( '.no-default' );
+
+		if ( eventTarget ) {
+			parentContainer = eventTarget.closest( '.form-table' );
+			$inputInclude = $( parentContainer ).find( 'input[name=folder_exclusion_include]' );
+			$inputExclude = $( parentContainer ).find( 'input[name=folder_exclusion_exclude]' );
+		}
+
+		usingDefaults =
+			$inputInclude.val() &&
+			$inputInclude.val().trim() === lang.default_include &&
+			$inputExclude.val().trim() === lang.default_exclude;
 
 		if ( usingDefaults ) {
 			$yesDefault.show();
@@ -385,9 +404,29 @@ BoldGrid.FolderExclude = function( $ ) {
 		}
 	};
 
+	/**
+	 * Update Values
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param eventTarget The target of the triggering event.
+	 * @param $container The set of container divs.
+	 */
+	self.updateValues = function( eventTarget, $container ) {
+		var name = $( eventTarget ).attr( 'name' ),
+			value = $( eventTarget ).val();
+		if ( 'radio' == $( eventTarget ).attr( 'type' ) ) {
+			$container
+				.find( 'input[name=' + name + '][value=' + value + ']' )
+				.prop( 'checked', $( eventTarget ).prop( 'checked' ) );
+		} else {
+			$container.find( 'input[name=' + name + ']' ).val( value );
+		}
+	};
+
 	// Onload event listener.
 	$( function() {
-		$( '#exclude_folders_button' ).on( 'click', self.onClickPreview );
+		$( 'button#exclude_folders_button' ).on( 'click', self.onClickPreview );
 
 		$( 'body' )
 			.on( 'click', '#exclude_folders_preview .pagination-links a', self.onClickPagination )
@@ -400,13 +439,39 @@ BoldGrid.FolderExclude = function( $ ) {
 		$( '#configure_folder_exclude' ).on( 'click', self.onClickConfigure );
 
 		self.toggleStatus();
-		self.toggleConfig();
+		$type.each( function() {
+			self.toggleConfig( this );
+		} );
 
-		$type.on( 'change', self.onChangeType );
+		$type.on( 'change', function() {
+			self.onChangeType( this );
+		} );
 
-		$inputInclude.on( 'input', self.toggleStatus ).on( 'focusin', self.bounceHelp );
+		$container.find( 'input' ).each( function() {
+			$( this ).on( 'input', function() {
+				self.updateValues( this, $container );
+			} );
+		} );
 
-		$inputExclude.on( 'input', self.toggleStatus ).on( 'focusin', self.bounceHelp );
+		$inputInclude.each( function() {
+			$( this )
+				.on( 'input', function() {
+					self.toggleStatus( this );
+				} )
+				.on( 'focusin', function() {
+					self.bounceHelp( this );
+				} );
+		} );
+
+		$inputExclude.each( function() {
+			$( this )
+				.on( 'input', function() {
+					self.toggleStatus( this );
+				} )
+				.on( 'focusin', function() {
+					self.bounceHelp( this );
+				} );
+		} );
 	} );
 };
 
