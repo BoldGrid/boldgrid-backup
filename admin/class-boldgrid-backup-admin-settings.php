@@ -790,6 +790,7 @@ class Boldgrid_Backup_Admin_Settings {
 	 * @see Boldgrid_Backup_Admin_Config::is_premium_active
 	 */
 	public function page_backup_settings() {
+
 		$is_premium           = $this->core->config->get_is_premium();
 		$is_premium_installed = $this->core->config->is_premium_installed;
 		$is_premium_active    = $this->core->config->is_premium_active;

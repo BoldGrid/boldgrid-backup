@@ -67,5 +67,10 @@ $col_container = apply_filters( 'Boldgrid\Library\Ui\render_col_container', $sec
 ?>
 
 <div class="bgbkup-transfers-page">
-	<?php echo $nav . $col_container; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped ?>
+	<?php
+		echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+		require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
+		echo $col_container; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+
+	?>
 </div>

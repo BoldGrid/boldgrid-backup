@@ -384,11 +384,17 @@ if ( ! $this->core->archive->is_stored_locally() ) {
 		$remote_meta_box = '';
 	}
 }
-
-$page = sprintf(
+$pre_page = sprintf(
 	'
 	<input type="hidden" id="filename" value="%1$s" />
 	%2$s
+	',
+	/* 1 */ $archive['filename'],
+	/* 2 */ require BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php'
+);
+
+$page = sprintf(
+	'
 	<div id="poststuff">
 		<div id="post-body" class="metabox-holder columns-2">
 			<div id="post-body-content" style="position: relative">
@@ -411,5 +417,8 @@ $page = sprintf(
 	/* 4 */ $main_meta_box,
 	/* 5 */ $remote_meta_box
 );
+echo $pre_page; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+
+require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
 
 echo $page; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped

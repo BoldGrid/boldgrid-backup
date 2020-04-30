@@ -129,6 +129,8 @@ wp_nonce_field( 'boldgrid_backup_settings' );
 
 	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
+	require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
+
 	/*
 	 * Print this text:
 	 *

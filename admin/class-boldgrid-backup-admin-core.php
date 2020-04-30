@@ -2454,11 +2454,6 @@ class Boldgrid_Backup_Admin_Core {
 		$this->folder_exclusion->enqueue_scripts();
 		$this->db_omit->enqueue_scripts();
 
-		// If uploading an archive file.
-		if ( ! empty( $_FILES['file'] ) ) {
-			$this->upload->upload_archive_file();
-		}
-
 		// Get archive list.
 		$archives = $this->get_archive_list();
 
