@@ -40,6 +40,9 @@ $upload_info = sprintf(
 	BOLDGRID_BACKUP_TITLE
 );
 
+$core              = apply_filters( 'boldgrid_backup_get_core', null );
+$backup_identifier = $core->get_backup_identifier();
+
 $backup_id_notice = sprintf(
 	// translators: 1: HTML tag, 2: Filename part, 3: Backup identifier, 4: File extension, 5: Archive filename, 6: Backup directory path, 7: Plugin title.
 	__(
@@ -99,13 +102,20 @@ printf(
 			<span class='spinner'></span>
 		</form>
 
-		<p id="file_too_large" class="hidden">
-			<span class="dashicons dashicons-warning yellow"></span> <?php esc_html_e( 'The file you selected is too large.', 'boldgrid-bacup' ); ?>
-		</p>
+		<div class="error_messages">
 
-		<p id="bad_extension" class="hidden">
-			<span class="dashicons dashicons-warning yellow"></span> <?php esc_html_e( 'Invalid file format. Please choose a .zip file.', 'boldgrid-bacup' ); ?>
-		</p>
+			<p id="file_too_large" class="hidden">
+				<span class="dashicons dashicons-warning yellow"></span> <?php esc_html_e( 'The file you selected is too large.', 'boldgrid-bacup' ); ?>
+			</p>
+
+			<p id="bad_filename" class="hidden">
+				<span class="dashicons dashicons-warning yellow"></span> <?php esc_html_e( 'Invalid file name. Please choose a valid backup file.', 'boldgrid-bacup' ); ?>
+			</p>
+
+			<p id="bad_extension" class="hidden">
+				<span class="dashicons dashicons-warning yellow"></span> <?php esc_html_e( 'Invalid file format. Please choose a .zip file.', 'boldgrid-bacup' ); ?>
+			</p>
+		</div>
 	</div>
 
 	<p class="install-help">
