@@ -1669,7 +1669,6 @@ class Boldgrid_Backup_Admin_Core {
 		if ( $save && ! $dryrun ) {
 
 			$this->utility->bump_memory_limit( '1G' );
-
 			$this->logger->add( 'Starting dump of database...' );
 			$this->logger->add_memory();
 
