@@ -1660,6 +1660,14 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Backup the database, if saving an archive file and not a dry run.
 		if ( $save && ! $dryrun ) {
+
+			$this->utility->bump_memory_limit( '1G' );
+			$this->logger->add(
+				sprintf(
+					'Memory Limit: %1$s',
+					size_format( ini_get( 'memory_limit' ), 2 )
+				)
+			);
 			$this->logger->add( 'Starting dump of database...' );
 			$this->logger->add_memory();
 
