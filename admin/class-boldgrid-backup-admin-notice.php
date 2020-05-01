@@ -249,6 +249,7 @@ class Boldgrid_Backup_Admin_Notice {
 				$update_msg = esc_html__( 'disabled for all', 'boldgrid-backup' );
 				break;
 			case 1:
+				$auto_update_array = array_values( $auto_update_array );
 				$update_msg = sprintf(
 					// translators: 1: Auto Update Type.
 					esc_html__( 'enabled for %s', 'boldgrid-backup' ),
