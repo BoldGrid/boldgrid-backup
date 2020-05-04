@@ -92,7 +92,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 		var $badExtension = $( '#bad_extension' ),
 			$fileSizeWarning = $( '[data-id="upload-backup"]:not(span)' ),
 			$fileTooLarge = $( '#file_too_large' ),
-			$submit = $( 'input:submit' ),
+			$submit = $( $( this ).closest( 'input:submit' ) ),
 			$badFilename = $( '#bad_filename' ),
 			extension,
 			isBadExtension,
