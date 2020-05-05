@@ -268,9 +268,12 @@ function get_plugins_update_markup( $auto_update_settings, $translations ) {
 
 		foreach ( ${ 'plugins_' . $status_lower } as $slug => $plugin_data ) {
 			// Enable if global setting is on, individual settings is on, or not set and default is on.
-			$toggle      = $plugin_auto_update || ! empty( $auto_update_settings['plugins'][ $slug ] ) ||
+			$toggle = $plugin_auto_update || ! empty( $auto_update_settings['plugins'][ $slug ] ) ||
 				( ! isset( $auto_update_settings['plugins'][ $slug ] ) && $plugins_default );
-			$plugin      = \Boldgrid\Library\Library\Plugin\Factory::create( $slug );
+			$plugin = \Boldgrid\Library\Library\Plugin\Factory::create( $slug );
+
+			$plugin->setUpdateData();
+
 			$third_party = $plugin->updateData->thirdParty; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
 
 			if ( true === $third_party ) {
