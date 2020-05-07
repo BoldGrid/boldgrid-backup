@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "e0df909dbe2695ade92c9b36df03a375",
+    "content-hash": "3d3b40678739982514bd38cc205e6a1e",
     "packages": [
         {
             "name": "boldgrid/library",
-            "version": "dev-issue-253",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BoldGrid/library.git",
-                "reference": "51045699de74270912c5e570cbc61b45043b5c90"
+                "reference": "8b9e12e3332135a20d8bdfab4367e7f4a41f9ab4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BoldGrid/library/zipball/51045699de74270912c5e570cbc61b45043b5c90",
-                "reference": "51045699de74270912c5e570cbc61b45043b5c90",
+                "url": "https://api.github.com/repos/BoldGrid/library/zipball/8b9e12e3332135a20d8bdfab4367e7f4a41f9ab4",
+                "reference": "8b9e12e3332135a20d8bdfab4367e7f4a41f9ab4",
                 "shasum": ""
             },
             "type": "library",
@@ -54,7 +54,7 @@
                 }
             ],
             "description": "The BoldGrid Library for shared code used in official BoldGrid plugins and themes.",
-            "time": "2020-05-05T14:31:08+00:00"
+            "time": "2020-05-07T17:17:59+00:00"
         },
         {
             "name": "chland/tdcron",
@@ -258,7 +258,14 @@
             "time": "2015-08-31T22:07:48+00:00"
         }
     ],
-    "aliases": [],
+    "aliases": [
+        {
+            "alias": "2.12.2",
+            "alias_normalized": "2.12.2.0",
+            "version": "9999999-dev",
+            "package": "boldgrid/library"
+        }
+    ],
     "minimum-stability": "stable",
     "stability-flags": {
         "boldgrid/library": 20,
