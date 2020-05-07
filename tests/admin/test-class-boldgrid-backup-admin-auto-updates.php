@@ -153,7 +153,8 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 
 		$plugins = \Boldgrid\Library\Library\Plugin\Plugins::getAllPlugins();
 		$akismet = \Boldgrid\Library\Library\Plugin\Plugins::getBySlug( $plugins, 'akismet' );
-		$days    = $akismet->updateData->days; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
+		$akismet->setUpdateData();
+		$days = $akismet->updateData->days; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
 
 		// Create mock object to simulate premium plugin being inactive.
 		$mock_auto_updates = $this->getMockBuilder( Boldgrid_backup_Admin_Auto_Updates::class )
