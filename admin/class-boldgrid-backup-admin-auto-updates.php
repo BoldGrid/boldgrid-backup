@@ -91,8 +91,10 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 * @return bool
 	 */
 	public function maybe_update_plugin( $slug ) {
-		$days_to_wait          = $this->settings['days'];
-		$plugin                = \Boldgrid\Library\Library\Plugin\Plugins::getBySlug( $this->plugins, $slug );
+		$days_to_wait = $this->settings['days'];
+		$plugin       = \Boldgrid\Library\Library\Plugin\Plugins::getBySlug( $this->plugins, $slug );
+		$plugin->setUpdateData();
+
 		$days_since_release    = $plugin->updateData->days; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
 		$plugin_update_enabled = array_key_exists( $plugin->getFile(), $this->settings['plugins'] ) ? (bool) $this->settings['plugins'][ $plugin->getFile() ] : (bool) $this->settings['plugins']['default'];
 		$is_update_time        = ( $days_since_release >= $days_to_wait );
