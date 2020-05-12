@@ -215,7 +215,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 		$filelist       = $this->core->wp_filesystem->get_contents( $this->filelist_path );
 		$filelist_array = explode( PHP_EOL, $filelist );
 		foreach ( $filelist_array as $file ) {
-			$this->core->execute_command( 'cd ' . ABSPATH . '; zip ' . $this->temp_folder->get_path() . ' ' . $this->filepath . ' ' . $file );
+			$this->core->execute_command( 'cd ' . ABSPATH . '; zip ' . $this->filepath . ' ' . $file );
 		}
 
 	}
