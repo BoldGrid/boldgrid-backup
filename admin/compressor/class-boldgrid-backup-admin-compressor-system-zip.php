@@ -219,7 +219,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 		$filelist_chunks = array_chunk( $filelist_array, 100 );
 		foreach ( $filelist_chunks as $filelist_chunk ) {
 			$add_file_string = implode( ' ', $filelist_chunk );
-			$this->core->execute_command( 'cd ' . ABSPATH . '; zip -0 -g -q ' . $this->filepath . ' ' . $add_file_string );
+			$this->core->execute_command( 'cd ' . ABSPATH . '; zip -6 -g -q ' . $this->filepath . ' ' . $add_file_string );
 			$files_closed     = $files_closed + count( $filelist_chunk );
 			$percent_complete = round( $files_closed / $total_files, 2 );
 			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'percent_closed', $percent_complete );
@@ -240,7 +240,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 
 		$dir = pathinfo( $this->core->db_dump_filepath, PATHINFO_DIRNAME );
 
-		$this->core->execute_command( 'cd ' . $dir . '; zip -0 -g -q ' . $this->filepath . ' ' . basename( $this->core->db_dump_filepath ) . ';' );
+		$this->core->execute_command( 'cd ' . $dir . '; zip -6 -g -q ' . $this->filepath . ' ' . basename( $this->core->db_dump_filepath ) . ';' );
 
 		$this->core->logger->add( 'Finished adding db dump to the zip file.' );
 		$this->core->logger->add_memory();
