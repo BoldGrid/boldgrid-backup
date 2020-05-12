@@ -5,7 +5,7 @@ $abspath  = $args[1];
 $filename = $args[2];
 $filelist = file_get_contents( $args[3] );
 $index    = $args[4];
-ini_set( 'max_execution_time', 900 );
+ini_set( 'max_execution_time', '900' );
 
 $filelist_array  = explode( PHP_EOL, $filelist );
 $filelist_chunks = array_chunk( $filelist_array, 100 );
