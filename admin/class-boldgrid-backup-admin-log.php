@@ -225,8 +225,8 @@ class Boldgrid_Backup_Admin_Log {
 	 *
 	 * @param int The signal being handled.
 	 */
-	public function signal_handler( $signo ) {
-		$this->add( 'Signal received: ' . $signo );
+	public function signal_handler( $signo, $signinfo ) {
+		$this->add( 'Signal received: ' . $signo . ' ' . json_encode( $signinfo ) );
 
 		exit;
 	}
