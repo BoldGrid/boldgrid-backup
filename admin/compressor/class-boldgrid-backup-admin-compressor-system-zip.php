@@ -221,7 +221,6 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 		foreach ( $filelist_chunks as $filelist_chunk ) {
 			$add_file_string = implode( ' ', $filelist_chunk );
 			$result = exec( 'php -f ' . BOLDGRID_BACKUP_PATH . '/cli/system-zip.php ' . ABSPATH . ' ' . $this->filepath . ' ' . $this->filelist_path . ' ' . $chunks_closed );
-			error_log( $result );
 			$files_closed = $files_closed + count( $filelist_chunk );
 			$chunks_closed++;
 
