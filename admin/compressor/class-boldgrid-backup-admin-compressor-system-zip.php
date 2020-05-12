@@ -183,7 +183,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 			implode( PHP_EOL, $filelist_array )
 		);
 
-		$this->core->logger->add( 'Finished creating list of files to include in zip.' );
+		$this->core->logger->add( 'Finished creating list of files to include in zip. ' . count( $filelist_array ) . ' files in zip.' );
 		$this->core->logger->add_memory();
 	}
 
@@ -219,7 +219,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 		$filelist_chunks = array_chunk( $filelist_array, 100 );
 		foreach ( $filelist_chunks as $filelist_chunk ) {
 			$add_file_string = implode( ' ', $filelist_chunk );
-			$this->core->execute_command( 'cd ' . ABSPATH . '; zip ' . $this->filepath . ' ' . $add_file_string . ' > /dev/null 2>&1 &' );
+			$this->core->execute_command( 'cd ' . ABSPATH . '; zip -0 -g -q ' . $this->filepath . ' ' . $add_file_string );
 			$files_closed     = $files_closed + count( $filelist_chunk );
 			$percent_complete = round( $files_closed / $total_files, 2 );
 			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'percent_closed', $percent_complete );
