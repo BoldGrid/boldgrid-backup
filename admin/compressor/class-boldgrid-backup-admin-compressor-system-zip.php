@@ -324,7 +324,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 
 		$dir = pathinfo( $this->core->db_dump_filepath, PATHINFO_DIRNAME );
 
-		$this->core->execute_command( 'cd ' . $dir . '; zip -6 -g -q ' . $this->filepath . ' ' . basename( $this->core->db_dump_filepath ) . ';' );
+		$this->core->execute_command( 'cd ' . $dir . '; zip -0 -g -q ' . $this->filepath . ' ' . basename( $this->core->db_dump_filepath ) . ';' );
 
 		$this->core->logger->add( 'Finished adding db dump to the zip file.' );
 		$this->core->logger->add_memory();
