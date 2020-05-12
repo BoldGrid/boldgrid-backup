@@ -213,14 +213,18 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	 */
 	private function close() {
 		$files_closed    = 0;
+		$chunks_closed   = 0;
 		$filelist        = $this->core->wp_filesystem->get_contents( $this->filelist_path );
 		$filelist_array  = explode( PHP_EOL, $filelist );
 		$total_files     = count( $filelist_array );
 		$filelist_chunks = array_chunk( $filelist_array, 100 );
 		foreach ( $filelist_chunks as $filelist_chunk ) {
 			$add_file_string = implode( ' ', $filelist_chunk );
-			$this->core->execute_command( 'cd ' . ABSPATH . '; zip -6 -g -q ' . $this->filepath . ' ' . $add_file_string );
-			$files_closed     = $files_closed + count( $filelist_chunk );
+			$result = exec( 'php -f ' . BOLDGRID_BACKUP_PATH . '/cli/system-zip.php ' . ABSPATH . ' ' . $this->filepath . ' ' . $this->filelist_path . ' ' . $chunks_closed );
+			error_log( $result );
+			$files_closed = $files_closed + count( $filelist_chunk );
+			$chunks_closed++;
+
 			$percent_complete = round( $files_closed / $total_files, 2 );
 			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'percent_closed', $percent_complete );
 			$this->core->logger->add( $percent_complete * 100 . '% complete closing' );
