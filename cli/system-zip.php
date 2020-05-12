@@ -15,7 +15,7 @@ if ( function_exists( pcntl_fork() ) ) {
 } else {
 	echo ( "PCNTL NOT EXIST" );
 }
-$result = exec( 'cd ' . $abspath . '; zip -6 -g -q ' . $filename . ' ' . $add_file_string . ' 2>&1' );
+$result = exec( 'cd ' . $abspath . '; zip -0 -g -q ' . $filename . ' ' . $add_file_string . ' 2>&1' );
 
 //echo json_encode( 'Chunk No ' . $index . ': ' . $result );
 
