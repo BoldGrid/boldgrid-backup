@@ -269,6 +269,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 				' seconds. ' . $percent_complete * 100 .
 				'% complete closing'
 			);
+			$this->core->logger->add_memory();
 		}
 	}
 
