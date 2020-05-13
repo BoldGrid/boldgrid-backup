@@ -73,6 +73,14 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	protected $key = 'system_zip';
 
 	/**
+	 * Total Size Archived.
+	 *
+	 * @since SINCEVERSION
+	 * @var int
+	 */
+	public $total_size_archived;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.13.0
@@ -152,20 +160,20 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 
 		$this->filelist_path = $this->core->backup_dir->get_path_to( 'system_zip_filelist-' . time() . '.txt' );
 
-		$total_size_archived = 0;
+		$this->total_size_archived = 0;
 
 		// Create the file list.
 		$filelist_array = [];
 		foreach ( $this->filelist as $file ) {
 			$filelist_array[] = str_replace( ABSPATH, '', $file[0] );
 
-			$total_size_archived += empty( $file[2] ) ? 0 : $file[2];
+			$this->total_size_archived += empty( $file[2] ) ? 0 : $file[2];
 		}
 
 		// Add some values for "In progress".
 		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'total_files_done', count( $this->filelist ) );
-		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'total_size_archived', $total_size_archived );
-		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'total_size_archived_size_format', size_format( $total_size_archived, 2 ) );
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'total_size_archived', $this->total_size_archived );
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'total_size_archived_size_format', size_format( $this->total_size_archived, 2 ) );
 
 		/*
 		 * Remove our db_dump_filepath from the list.
@@ -207,23 +215,60 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	}
 
 	/**
+	 * Get Filelist Chunks.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @return array
+	 */
+	public function get_filelist_chunks() {
+		// Chunk size in bytes.
+		$max_chunk_size  = 26214400;
+		$size_of_chunk   = 0;
+		$filelist_chunks = array( array() );
+		$chunk_position  = 0;
+		foreach ( $this->filelist as $file ) {
+			// Adds file to this chunk.
+			$filelist_chunks[ $chunk_position ][] = str_replace( ABSPATH, '', $file[0] );
+
+			// Adds the most recent file's size to chunk size.
+			$size_of_chunk = $size_of_chunk + (int) $file[2];
+
+			// If the chunk size is >= the max chunk size, then move to next chunk.
+			if ( $size_of_chunk >= $max_chunk_size ) {
+				$chunk_position++;
+				$size_of_chunk = 0;
+			}
+		}
+
+		return $filelist_chunks;
+	}
+
+	/**
 	 * Close.
 	 *
 	 * @since SINCEVERSION
 	 */
 	private function close() {
-		$files_closed    = 0;
-		$filelist        = $this->core->wp_filesystem->get_contents( $this->filelist_path );
-		$filelist_array  = explode( PHP_EOL, $filelist );
-		$total_files     = count( $filelist_array );
-		$filelist_chunks = array_chunk( $filelist_array, 100 );
+		$chunks_closed   = 0;
+		$filelist_chunks = $this->get_filelist_chunks();
+		$total_chunks    = count( $filelist_chunks );
+
 		foreach ( $filelist_chunks as $filelist_chunk ) {
-			$add_file_string = implode( ' ', $filelist_chunk );
-			$this->core->execute_command( 'cd ' . ABSPATH . '; zip -0 -g -q ' . $this->filepath . ' ' . $add_file_string );
-			$files_closed     = $files_closed + count( $filelist_chunk );
-			$percent_complete = round( $files_closed / $total_files, 2 );
+			$chunk_start_time = microtime( true );
+			$add_file_string  = implode( ' ', $filelist_chunk );
+			$this->core->execute_command( 'cd ' . ABSPATH . '; zip -6 -g -q ' . $this->filepath . ' ' . $add_file_string );
+			$chunks_closed++;
+			$percent_complete = round( $chunks_closed / $total_chunks, 2 );
+			$chunk_end_time   = microtime( true );
+			$close_duration   = $chunk_end_time - $chunk_start_time;
 			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'percent_closed', $percent_complete );
-			$this->core->logger->add( $percent_complete * 100 . '% complete closing' );
+			$this->core->logger->add(
+				'Chunk closed in ' .
+				$close_duration .
+				' seconds. ' . $percent_complete * 100 .
+				'% complete closing'
+			);
 		}
 	}
 
