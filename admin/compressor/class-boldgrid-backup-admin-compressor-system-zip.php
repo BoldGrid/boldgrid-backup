@@ -257,7 +257,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 		foreach ( $filelist_chunks as $filelist_chunk ) {
 			$chunk_start_time = microtime( true );
 			$add_file_string  = implode( ' ', $filelist_chunk );
-			$this->core->execute_command( 'cd ' . ABSPATH . '; zip -6 -g -q ' . $this->filepath . ' ' . $add_file_string );
+			$this->core->execute_command( 'cd ' . ABSPATH . '; zip -0 -g -q ' . $this->filepath . ' ' . $add_file_string );
 			$chunks_closed++;
 			$percent_complete = round( $chunks_closed / $total_chunks, 2 );
 			$chunk_end_time   = microtime( true );
