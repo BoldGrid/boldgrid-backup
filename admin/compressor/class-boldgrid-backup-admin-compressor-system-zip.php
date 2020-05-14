@@ -229,7 +229,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 		$chunk_position  = 0;
 		foreach ( $this->filelist as $file ) {
 			// Adds file to this chunk.
-			$filelist_chunks[ $chunk_position ][] = str_replace( ABSPATH, '', $file[0] );
+			$filelist_chunks[ $chunk_position ][] = $file[1];
 
 			// Adds the most recent file's size to chunk size.
 			$size_of_chunk = $size_of_chunk + (int) $file[2];
