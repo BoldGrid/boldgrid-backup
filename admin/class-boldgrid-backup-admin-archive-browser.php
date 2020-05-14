@@ -56,7 +56,8 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 		if ( ! current_user_can( 'update_plugins' ) ) {
 			wp_send_json_error( __( 'Permission denied.', 'boldgrid-backup' ) );
 		}
-		error_log( json_encode( $_POST ) );
+
+		// With Recent UI changes, sometimes this ajax call can be for one of either actions.
 		if ( ! check_ajax_referer( 'boldgrid_backup_remote_storage_upload', 'security', false ) &&
 			! check_ajax_referer( 'boldgrid_backup_browse_archive', 'security', false ) ) {
 			wp_send_json_error( __( 'Invalid nonce; security check failed.', 'boldgrid-backup' ) );
