@@ -269,8 +269,6 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 
 		$spinner.addClass( 'inline' );
 
-		console.log( data.url );
-
 		jqxhr = $.post( ajaxurl, data, function( response ) {
 			if ( response.data !== undefined && response.data.filepath !== undefined ) {
 				$notice
