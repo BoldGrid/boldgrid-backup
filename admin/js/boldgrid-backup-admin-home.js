@@ -89,11 +89,14 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 	 * @since 1.5.2
 	 */
 	self.onChangeInput = function() {
-		console.log( $(this).parent().find( 'input:submit') );
 		var $badExtension = $( '#bad_extension' ),
 			$fileSizeWarning = $( '[data-id="upload-backup"]:not(span)' ),
 			$fileTooLarge = $( '#file_too_large' ),
-			$submit = $( $(this).parent().find( 'input:submit') ),
+			$submit = $(
+				$( this )
+					.parent()
+					.find( 'input:submit' )
+			),
 			$badFilename = $( '#bad_filename' ),
 			extension,
 			isBadExtension,
