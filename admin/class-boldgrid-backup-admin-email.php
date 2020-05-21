@@ -225,10 +225,10 @@ class Boldgrid_Backup_Admin_Email {
 		 *
 		 * In those rare cases, the user can define BGBKUP_SKIP_EMAIL_HEADERS to skip adding the headers.
 		 */
-		if ( ! defined( 'BGBKUP_SKIP_EMAIL_HEADERS' ) ) {
-			$status = wp_mail( $admin_email, $subject, $body, $headers );
-		} else {
+		if ( defined( 'BGBKUP_SKIP_EMAIL_HEADERS' ) ) {
 			$status = wp_mail( $admin_email, $subject, $body );
+		} else {
+			$status = wp_mail( $admin_email, $subject, $body, $headers );
 		}
 
 		// Return status.
