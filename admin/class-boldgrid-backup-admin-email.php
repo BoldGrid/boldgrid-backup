@@ -233,4 +233,23 @@ class Boldgrid_Backup_Admin_Email {
 
 		return ! empty( $settings['notifications'][ $task ] );
 	}
+
+	/**
+	 * Hook into the wp_mail_failed action.
+	 *
+	 * @since 1.13.4
+	 *
+	 * @param WP_Error $wp_error A WP error object.
+	 */
+	public function wp_mail_failed( $wp_error ) {
+		// If in the middle of archiving files and an email failed, add info about it to the log.
+		if ( $this->core->archiving_files ) {
+			$errors = array(
+				'wp_error'   => $wp_error,
+				'last_error' => error_get_last(),
+			);
+
+			$this->core->logger->add( 'wp_mail_failed: ' . print_r( $errors, 1 ) ); // phpcs:ignore
+		}
+	}
 }
