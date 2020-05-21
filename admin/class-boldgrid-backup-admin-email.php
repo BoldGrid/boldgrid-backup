@@ -233,4 +233,13 @@ class Boldgrid_Backup_Admin_Email {
 
 		return ! empty( $settings['notifications'][ $task ] );
 	}
+
+	/**
+	 *
+	 */
+	public function wp_mail_failed() {
+		add_action( 'wp_mail_failed', function( $wp_error ) {
+			$this->core->logger->add( 'wp_mail_failed: ' . print_r( $wp_error, 1 ) );
+		} );
+	}
 }
