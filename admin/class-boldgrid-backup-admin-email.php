@@ -214,8 +214,22 @@ class Boldgrid_Backup_Admin_Email {
 		$headers = 'From: ' . $site_title . ' <' . $admin_email . '>' . "\r\n" . 'X-Mailer: PHP/' .
 			phpversion() . "\r\n";
 
-		// Send mail.
-		$status = wp_mail( $admin_email, $subject, $body, $headers );
+		/*
+		 * Send mail.
+		 *
+		 * The default behaviour is to include $headers in our call to wp_mail. In very rare circumstances,
+		 * this will cause the following error:
+		 *
+		 * # Could not instantiate mail function.
+		 * # phpmailer_exception_code 2
+		 *
+		 * In those rare cases, the user can define BGBKUP_SKIP_EMAIL_HEADERS to skip adding the headers.
+		 */
+		if ( defined( 'BGBKUP_SKIP_EMAIL_HEADERS' ) ) {
+			$status = wp_mail( $admin_email, $subject, $body );
+		} else {
+			$status = wp_mail( $admin_email, $subject, $body, $headers );
+		}
 
 		// Return status.
 		return $status;
