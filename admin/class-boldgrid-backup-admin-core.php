@@ -2296,7 +2296,7 @@ class Boldgrid_Backup_Admin_Core {
 			'archive_key' => $archive_key,
 			'restore_ok'  => $restore_ok,
 		];
-		$this->logger->add( 'Restore info: ' . print_r( $info, 1 ) );
+		$this->logger->add( 'Restore info: ' . print_r( $info, 1 ) ); // phpcs:ignore
 
 		// Prevent this script from dying.
 		ignore_user_abort( true );
@@ -2322,7 +2322,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		$unzip_status = ! $dryrun ? unzip_file( $info['filepath'], ABSPATH ) : null;
-		$this->logger->add( 'Unzip status: ' . print_r( $unzip_status, 1 ) );
+		$this->logger->add( 'Unzip status: ' . print_r( $unzip_status, 1 ) ); // phpcs:ignore
 
 		if ( is_wp_error( $unzip_status ) ) {
 			$error = false;
