@@ -2319,9 +2319,13 @@ class Boldgrid_Backup_Admin_Core {
 		 * Attempt to fix any permissions related issues before the restoration begins. If we're
 		 * unable to, the restoration will not continue.
 		 */
-		if ( ! $this->restore_helper->set_writable_permissions( $info['filepath'] ) ) {
-			$this->logger->add( 'Failed to fix permissions related issues.' );
-			return [ 'error' => $this->restore_helper->get_last_error() ];
+		if ( class_exists( 'ZipArchive' ) ) {
+			if ( ! $this->restore_helper->set_writable_permissions( $info['filepath'] ) ) {
+				$this->logger->add( 'Failed to fix permissions related issues.' );
+				return [ 'error' => $this->restore_helper->get_last_error() ];
+			}
+		} else {
+			$this->logger->add( 'ZipArchive not available. Unable to set_writable_permissions. Trying restore anyways...' );
 		}
 
 		$this->logger->add( 'Unzipping archive... filepath / ABSPATH: ' . $info['filepath'] . ' / ' . ABSPATH );
