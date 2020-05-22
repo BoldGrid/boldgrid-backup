@@ -28,9 +28,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 		var $urlImportSection = $( 'div#url-import-section' );
 
 		// On click action for the Upload button.
-		$( 'div#url-import-section' )
-			.find( '.button' )
-			.on( 'click', self.uploadButtonClicked );
+		$urlImportSection.find( '.button' ).on( 'click', self.uploadButtonClicked );
 
 		$( '.page-title-action.add-new' ).on( 'click', function() {
 			$( '#add_new' ).toggle();
