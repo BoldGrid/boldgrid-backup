@@ -2226,6 +2226,9 @@ class Boldgrid_Backup_Admin_Core {
 	public function restore_archive_file( $dryrun = false ) {
 		$this->logger->init( 'restore-' . time() . '.log' );
 		$this->logger->add( 'Restoration process initialized.' );
+		$this->logger->add_memory();
+
+		Boldgrid_Backup_Admin_Utility::bump_memory_limit( '1G' );
 
 		// If we have an error, add it to the log.
 		add_action( 'shutdown', array( $this->logger, 'add_last_error' ) );
@@ -2329,8 +2332,10 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		$this->logger->add( 'Unzipping archive... filepath / ABSPATH: ' . $info['filepath'] . ' / ' . ABSPATH );
+		$this->logger->add_memory();
 		$unzip_status = ! $dryrun ? unzip_file( $info['filepath'], ABSPATH ) : null;
-		$this->logger->add( 'Unzip status: ' . print_r( $unzip_status, 1 ) ); // phpcs:ignore
+		$this->logger->add( 'Unzip complete! Status: ' . print_r( $unzip_status, 1 ) ); // phpcs:ignore
+		$this->logger->add_memory();
 
 		if ( is_wp_error( $unzip_status ) ) {
 			$error = false;
