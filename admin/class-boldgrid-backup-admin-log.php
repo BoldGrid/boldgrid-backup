@@ -92,6 +92,18 @@ class Boldgrid_Backup_Admin_Log {
 	}
 
 	/**
+	 * Add the last error to the log.
+	 *
+	 * @since SINCEVERSION
+	 */
+	public function add_last_error() {
+		$last_error = error_get_last();
+
+		$this->add( 'Last error: ' . print_r( $last_error, 1 ) ); // phpcs:ignore
+	}
+
+
+	/**
 	 * Add info to the log about memory usage.
 	 *
 	 * @since 1.12.5

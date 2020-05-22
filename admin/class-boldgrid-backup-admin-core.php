@@ -2227,6 +2227,9 @@ class Boldgrid_Backup_Admin_Core {
 		$this->logger->init( 'restore-' . time() . '.log' );
 		$this->logger->add( 'Restoration process initialized.' );
 
+		// If we have an error, add it to the log.
+		add_action( 'shutdown', array( $this->logger, 'add_last_error' ) );
+
 		$restore_ok = true;
 
 		// If a restoration was not requested, then abort.
@@ -2321,6 +2324,7 @@ class Boldgrid_Backup_Admin_Core {
 			return [ 'error' => $this->restore_helper->get_last_error() ];
 		}
 
+		$this->logger->add( 'Unzipping archive... filepath / ABSPATH: ' . $info['filepath'] . ' / ' . ABSPATH );
 		$unzip_status = ! $dryrun ? unzip_file( $info['filepath'], ABSPATH ) : null;
 		$this->logger->add( 'Unzip status: ' . print_r( $unzip_status, 1 ) ); // phpcs:ignore
 
