@@ -541,6 +541,16 @@ class Boldgrid_Backup_Admin_Core {
 	public $restore_helper;
 
 	/**
+	 * Whether or not we are in the middle of restoring an archive.
+	 *
+	 * @since 1.13.5
+	 * @var bool
+	 *
+	 * @see self::archiving_files
+	 */
+	public $restoring_archive_file = false;
+
+	/**
 	 * The scheduler class object.
 	 *
 	 * @since  1.5.1
@@ -2224,6 +2234,8 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return array An array of archive file information.
 	 */
 	public function restore_archive_file( $dryrun = false ) {
+		$this->restoring_archive_file = true;
+
 		$this->logger->init( 'restore-' . time() . '.log' );
 		$this->logger->add( 'Restoration process initialized.' );
 		$this->logger->add_memory();
@@ -2426,12 +2438,16 @@ class Boldgrid_Backup_Admin_Core {
 
 		// If enabled, send email notification for restoration completed.
 		if ( ! empty( $settings['notifications']['restore'] ) ) {
+			$this->logger->add( 'Sending "restoration complete" email notification...' );
+
 			// Include the mail template.
 			include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-mail-restore.php';
 
 			// Send the notification.
 			// Parameters come from the included mail template file.
 			$info['mail_success'] = $this->email->send( $subject, $body );
+
+			$this->logger->add( 'Email sent. Status: ' . empty( $info['mail_success'] ) ? 'Fail' : 'Success' );
 		}
 
 		// Update status.
@@ -2439,6 +2455,10 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Check backup directory.
 		$info['backup_directory_set'] = $this->backup_dir->get();
+
+		$this->logger->add( 'Restoration complete!' );
+
+		$this->restoring_archive_file = false;
 
 		// Return info array.
 		return $info;
