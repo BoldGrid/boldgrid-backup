@@ -70,15 +70,19 @@ class Boldgrid_Backup_Admin_Log {
 	 *
 	 * @since 1.12.5
 	 *
-	 * @param string $message The message to add to the log.
+	 * @param string $message        The message to add to the log.
+	 * @param bool   $log_last_error Whether or not to log the last error. Most useful for self::add_last_error
+	 *                               to avoid infinite loop when calling this method.
 	 */
-	public function add( $message ) {
+	public function add( $message, $log_last_error = true ) {
 		/*
 		 * Before we do anything, log the last error. This is important to go first because when looking
 		 * at the log, the error should come first because it was triggered before whatever it is we're
 		 * adding a message about right now.
 		 */
-		$this->add_last_error();
+		if ( $log_last_error ) {
+			$this->add_last_error();
+		}
 
 		// Add a timestamp to the message.
 		$message = date( '[Y-m-d H:i:s e]' ) . ' ' . $message;
@@ -119,7 +123,7 @@ class Boldgrid_Backup_Admin_Log {
 
 		// Only new errors are logged.
 		if ( $current_error !== $this->last_error ) {
-			$this->add( 'Last error: ' . print_r( $current_error, 1 ) ); // phpcs:ignore
+			$this->add( 'Last error: ' . print_r( $current_error, 1 ), false ); // phpcs:ignore
 		}
 
 		// This method will be called often, so keep track of errors to avoid logging duplicates.
