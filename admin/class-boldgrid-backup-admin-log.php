@@ -46,6 +46,15 @@ class Boldgrid_Backup_Admin_Log {
 	private $filepath;
 
 	/**
+	 * The last error, as per error_get_last().
+	 *
+	 * @since 1.13.5
+	 * @var array
+	 * @access private
+	 */
+	private $last_error;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.10.1
@@ -64,6 +73,13 @@ class Boldgrid_Backup_Admin_Log {
 	 * @param string $message The message to add to the log.
 	 */
 	public function add( $message ) {
+		/*
+		 * Before we do anything, log the last error. This is important to go first because when looking
+		 * at the log, the error should come first because it was triggered before whatever it is we're
+		 * adding a message about right now.
+		 */
+		$this->add_last_error();
+
 		// Add a timestamp to the message.
 		$message = date( '[Y-m-d H:i:s e]' ) . ' ' . $message;
 
@@ -94,12 +110,20 @@ class Boldgrid_Backup_Admin_Log {
 	/**
 	 * Add the last error to the log.
 	 *
-	 * @since SINCEVERSION
+	 * The error is only added to the log if it hasn't been logged before.
+	 *
+	 * @since 1.13.5
 	 */
 	public function add_last_error() {
-		$last_error = error_get_last();
+		$current_error = error_get_last();
 
-		$this->add( 'Last error: ' . print_r( $last_error, 1 ) ); // phpcs:ignore
+		// Only new errors are logged.
+		if ( $current_error !== $this->last_error ) {
+			$this->add( 'Last error: ' . print_r( $current_error, 1 ) ); // phpcs:ignore
+		}
+
+		// This method will be called often, so keep track of errors to avoid logging duplicates.
+		$this->last_error = $current_error;
 	}
 
 
@@ -227,6 +251,21 @@ class Boldgrid_Backup_Admin_Log {
 
 		foreach ( $signals as $signal ) {
 			pcntl_signal( $signal, [ $this, 'signal_handler' ] );
+		}
+	}
+
+	/**
+	 * Hook into shutdown.
+	 *
+	 * @since 1.13.5
+	 */
+	public function shutdown() {
+		/*
+		 * This method is always added to the shutdown. Only log errors if we've initialized and are
+		 * using this logging system (IE don't log errors unrelated to this plugin).
+		 */
+		if ( ! empty( $this->filename ) ) {
+			$this->add_last_error();
 		}
 	}
 
