@@ -2447,7 +2447,7 @@ class Boldgrid_Backup_Admin_Core {
 			// Parameters come from the included mail template file.
 			$info['mail_success'] = $this->email->send( $subject, $body );
 
-			$this->logger->add( 'Email sent. Status: ' . empty( $info['mail_success'] ) ? 'Fail' : 'Success' );
+			$this->logger->add( 'Email sent. Status: ' . ( empty( $info['mail_success'] ) ? 'Fail' : 'Success' ) );
 		}
 
 		// Update status.
