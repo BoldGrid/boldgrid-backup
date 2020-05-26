@@ -542,7 +542,7 @@ class Boldgrid_Backup {
 		// Log system.
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core->log_page, 'admin_enqueue_scripts' );
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_view_log', $plugin_admin_core->log_page, 'wp_ajax_boldgrid_backup_view_log' );
-		$this->loader->add_action( 'shutdown', array( $plugin_admin_core->logger, 'shutdown' ) );
+		$this->loader->add_action( 'shutdown', $plugin_admin_core->logger, 'shutdown' );
 
 		// Tools page.
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core->tools, 'admin_enqueue_scripts' );
