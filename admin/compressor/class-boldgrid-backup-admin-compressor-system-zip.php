@@ -257,7 +257,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 		foreach ( $filelist_chunks as $filelist_chunk ) {
 			$chunk_start_time = microtime( true );
 			$add_file_string  = implode( ' ', $filelist_chunk );
-			$this->core->execute_command( 'cd ' . ABSPATH . '; zip -0 -g -q ' . $this->filepath . ' ' . $add_file_string );
+			$this->zip_proc( $filelist_chunk );
 			$chunks_closed++;
 			$percent_complete = round( $chunks_closed / $total_chunks, 2 );
 			$chunk_end_time   = microtime( true );
@@ -270,6 +270,44 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 				'% complete closing'
 			);
 			$this->core->logger->add_memory();
+		}
+	}
+
+	/**
+	 * Close Zip using proc_open.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param array $filelist_chunk Array of Files to be added.
+	 */
+	private function zip_proc( $filelist_chunk ) {
+		$descriptorspec = array(
+			0 => array( 'pipe', 'r' ),  // stdin is a pipe that the child will read from.
+			1 => array( 'pipe', 'w' ),  // stdout is a pipe that the child will write to.
+			2 => array( 'file', '/tmp/error-output.txt', 'a' ), // stderr is a file to write to.
+		);
+
+		$cwd = ABSPATH;
+
+		$process = proc_open( 'zip -0 -g -@ ' . $this->filepath, $descriptorspec, $pipes, $cwd ); //phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.system_calls_proc_open
+
+		if ( is_resource( $process ) ) {
+			// $pipes now looks like this:
+			// 0 => writeable handle connected to child stdin
+			// 1 => readable handle connected to child stdout
+			// Any error output will be appended to /tmp/error-output.txt
+
+			foreach ( $filelist_chunk as $file ) {
+				fwrite( $pipes[0], $file . "\n" ); //phpcs:ignore WordPress.WP.AlternativeFunctions
+			}
+
+			fclose( $pipes[0] ); //phpcs:ignore WordPress.WP.AlternativeFunctions
+
+			fclose( $pipes[1] ); //phpcs:ignore WordPress.WP.AlternativeFunctions
+
+			// It is important that you close any pipes before calling.
+			// proc_close in order to avoid a deadlock.
+			$return_value = proc_close( $process );
 		}
 	}
 
