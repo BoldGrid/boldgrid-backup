@@ -706,7 +706,10 @@ class Boldgrid_Backup_Admin_Core {
 		$this->premium_page = new Boldgrid_Backup_Admin_Premium_Features( $this );
 
 		// Instantiate Boldgrid_Backup_Admin_Auto_Updates.
-		$this->auto_updates = new Boldgrid_Backup_Admin_Auto_Updates();
+
+		if ( Boldgrid_Backup_Admin_Utility::is_active() ) {
+			$this->auto_updates = new Boldgrid_Backup_Admin_Auto_Updates();
+		}
 
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
