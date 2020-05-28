@@ -176,9 +176,9 @@ class Boldgrid_Backup_Admin_Support {
 				__(
 					'One or more library files are missing. Registered libraries: %1$s',
 					'boldgrid-backup'
-					),
+				),
 				! empty( $boldgrid_settings['library'] ) ? '<pre>' . print_r( $boldgrid_settings['library'], 1 ) . '</pre>' : __( 'None', 'boldgrid-backup' ) // phpcs:ignore
-				));
+			));
 
 			return false;
 		}
