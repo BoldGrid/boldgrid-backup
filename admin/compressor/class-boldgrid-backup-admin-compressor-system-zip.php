@@ -274,6 +274,19 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	}
 
 	/**
+	 * Get Compression Level.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @return string
+	 */
+	private function get_compression_level() {
+		$default_compression_level = 6;
+		$compression_level         = $this->core->settings->get_setting( 'compression_level' );
+		return isset( $compression_level ) ? $compression_level : $default_compression_level;
+	}
+
+	/**
 	 * Close Zip using proc_open.
 	 *
 	 * @since SINCEVERSION
@@ -289,7 +302,14 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 
 		$cwd = ABSPATH;
 
-		$process = proc_open( 'zip -0 -g -@ ' . $this->filepath, $descriptorspec, $pipes, $cwd ); //phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.system_calls_proc_open
+		$compression_level = $this->get_compression_level();
+
+		$process = proc_open( //phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.system_calls_proc_open
+			'zip -' . $compression_level . ' -g -q -@ ' . $this->filepath,
+			$descriptorspec,
+			$pipes,
+			$cwd
+		);
 
 		if ( is_resource( $process ) ) {
 			// $pipes now looks like this:
@@ -324,7 +344,9 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 
 		$dir = pathinfo( $this->core->db_dump_filepath, PATHINFO_DIRNAME );
 
-		$this->core->execute_command( 'cd ' . $dir . '; zip -0 -g -q ' . $this->filepath . ' ' . basename( $this->core->db_dump_filepath ) . ';' );
+		$compression_level = $this->get_compression_level();
+
+		$this->core->execute_command( 'cd ' . $dir . '; zip -' . $compression_level . ' -g -q ' . $this->filepath . ' ' . basename( $this->core->db_dump_filepath ) . ';' );
 
 		$this->core->logger->add( 'Finished adding db dump to the zip file.' );
 		$this->core->logger->add_memory();

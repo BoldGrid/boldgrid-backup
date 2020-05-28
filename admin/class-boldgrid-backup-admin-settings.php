@@ -614,7 +614,7 @@ class Boldgrid_Backup_Admin_Settings {
 			 *
 			 * @since SINCEVERSIONI
 			 */
-			if ( ! empty( $_POST['compression_level'] ) ) {
+			if ( isset( $_POST['compression_level'] ) ) {
 				$settings['compression_level'] = $_POST['compression_level'];
 			}
 

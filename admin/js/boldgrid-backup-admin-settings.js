@@ -284,7 +284,7 @@ BoldGrid.Settings = function( $ ) {
 
 	self.toggleCompressionInfo = function() {
 		var isSystemZip = false,
-			compressorSelector = $( 'select[name="compressor"]');
+			compressorSelector = $( 'select[name="compressor"]' );
 
 		if ( 'system_zip' === $( compressorSelector ).val() ) {
 			isSystemZip = true;
