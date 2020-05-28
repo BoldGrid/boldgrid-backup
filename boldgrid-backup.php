@@ -118,6 +118,11 @@ function load_boldgrid_backup() {
 		)
 	);
 
+	// Make sure we have necessary library files.
+	if ( ! $support->run_library_tests() ) {
+		return false;
+	}
+
 	register_activation_hook( __FILE__, 'activate_boldgrid_backup' );
 	register_deactivation_hook( __FILE__, 'deactivate_boldgrid_backup' );
 

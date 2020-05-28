@@ -156,6 +156,37 @@ class Boldgrid_Backup_Admin_Support {
 	}
 
 	/**
+	 * Do a basic test and ensure we have access to the library.
+	 *
+	 * In theory, we should never have an issue with the library loading. This method should never
+	 * be needed, and any issues with the library should be troubleshooted and resolved. However,
+	 * we cannot have a library issue cause a fatal error, hence this check.
+	 *
+	 * @since 1.13.5
+	 *
+	 * @return bool
+	 */
+	public function run_library_tests() {
+		// Total Upkeep's library is only registered after activation, hence the is_active() check below.
+		if ( Boldgrid_Backup_Admin_Utility::is_active() && ! $this->has_library() ) {
+			$boldgrid_settings = get_option( 'boldgrid_settings', array() );
+
+			$this->add_admin_notice( sprintf(
+				// translators: 1 A list of library versions that are registered. It will be within a <pre> tag.
+				__(
+					'One or more library files are missing. Registered libraries: %1$s',
+					'boldgrid-backup'
+					),
+				! empty( $boldgrid_settings['library'] ) ? '<pre>' . print_r( $boldgrid_settings['library'], 1 ) . '</pre>' : __( 'None', 'boldgrid-backup' ) // phpcs:ignore
+				));
+
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Run tests.
 	 *
 	 * These tests are triggered by the main class-boldgrid-backup.php file. If these tests fail, the
@@ -198,30 +229,6 @@ class Boldgrid_Backup_Admin_Support {
 					'boldgrid-backup'
 				)
 			);
-
-			return false;
-		}
-
-		/*
-		 * Do a basic test and ensure we have access to the library.
-		 *
-		 * In theory, we should never have an issue with the library loading. This method should never
-		 * be needed, and any issues with the library should be troubleshooted and resolved. However,
-		 * we cannot have a library issue cause a fatal error, hence this check.
-		 *
-		 * Total Upkeep's library is only registered after activation, hence the is_active() check below.
-		 */
-		if ( Boldgrid_Backup_Admin_Utility::is_active() && ! $this->has_library() ) {
-			$boldgrid_settings = get_option( 'boldgrid_settings', array() );
-
-			$this->add_admin_notice( sprintf(
-				// translators: 1 A list of library versions that are registered. It will be within a <pre> tag.
-				__(
-					'One or more library files are missing. Registered libraries: %1$s',
-					'boldgrid-backup'
-				),
-				! empty( $boldgrid_settings['library'] ) ? '<pre>' . print_r( $boldgrid_settings['library'], 1 ) . '</pre>' : __( 'None', 'boldgrid-backup' ) // phpcs:ignore
-			));
 
 			return false;
 		}
