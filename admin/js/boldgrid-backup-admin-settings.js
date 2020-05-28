@@ -295,7 +295,7 @@ BoldGrid.Settings = function( $ ) {
 		} else {
 			$( '.compression-level' ).hide();
 		}
-	}
+	};
 
 	// Onload event listener.
 	$( function() {
