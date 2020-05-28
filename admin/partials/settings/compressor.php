@@ -58,7 +58,7 @@ $default_compression_level  = 6;
 $selected_compression_level = isset( $settings['compression_level'] ) ? $settings['compression_level'] : $default_compression_level;
 $select_compression_level   = '<select name="compression_level">';
 foreach ( range( 0, 9 ) as $level ) {
-	$is_default = $default_compression_level === $level;
+	$is_default  = $default_compression_level === $level;
 	$is_selected = (int) $selected_compression_level === $level;
 
 	$select_compression_level .= sprintf(
