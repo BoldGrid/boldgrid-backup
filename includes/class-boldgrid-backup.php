@@ -426,6 +426,7 @@ class Boldgrid_Backup {
 		$this->loader->add_action( 'boldgrid_backup_wp_cron_restore', $plugin_admin_core->wp_cron, 'restore' );
 
 		$this->loader->add_action( 'boldgrid_backup_archive_files_init', $plugin_admin_core->archive_fail, 'archive_files_init' );
+		$this->loader->add_action( 'wp_mail_failed', $plugin_admin_core->email, 'wp_mail_failed' );
 
 		$this->loader->add_action( 'boldgrid_backup_wp_cron_run_jobs', $plugin_admin_core->jobs, 'run' );
 
@@ -541,6 +542,7 @@ class Boldgrid_Backup {
 		// Log system.
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core->log_page, 'admin_enqueue_scripts' );
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_view_log', $plugin_admin_core->log_page, 'wp_ajax_boldgrid_backup_view_log' );
+		$this->loader->add_action( 'shutdown', $plugin_admin_core->logger, 'shutdown' );
 
 		// Tools page.
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core->tools, 'admin_enqueue_scripts' );

@@ -150,11 +150,6 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 
 		$last_error = error_get_last();
 
-		// Add a message to the log.
-		if ( ! empty( $last_error ) ) {
-			$this->core->logger->add( 'PHP shutdown - Error found: ' . print_r( $last_error, 1 ) ); // phpcs:ignore
-		}
-
 		/*
 		 * If there's no error or this is not fatal, abort.
 		 *
