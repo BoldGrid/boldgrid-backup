@@ -92,7 +92,6 @@ class Boldgrid_Backup_Admin_Support {
 					'<a href="https://wordpress.org/support/plugin/boldgrid-backup/#new-topic-0" target="_blank">'
 				) . '</p>';
 
-
 				// Echo our admin notice. Hide the "plugin activated" notice.
 				echo '
 				<div class="notice notice-error is-dismissible">' . wp_kses( $error, $allowed_html ) . '</div>
@@ -216,11 +215,12 @@ class Boldgrid_Backup_Admin_Support {
 			$boldgrid_settings = get_option( 'boldgrid_settings', array() );
 
 			$this->add_admin_notice( sprintf(
+				// translators: 1 A list of library versions that are registered. It will be within a <pre> tag.
 				__(
 					'One or more library files are missing. Registered libraries: %1$s',
 					'boldgrid-backup'
 				),
-				! empty( $boldgrid_settings['library'] ) ? '<pre>' . print_r( $boldgrid_settings['library'], 1 ) . '</pre>' : __( 'None', 'boldgrid-backup' )
+				! empty( $boldgrid_settings['library'] ) ? '<pre>' . print_r( $boldgrid_settings['library'], 1 ) . '</pre>' : __( 'None', 'boldgrid-backup' ) // phpcs:ignore
 			));
 
 			return false;
