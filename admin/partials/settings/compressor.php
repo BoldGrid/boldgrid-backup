@@ -53,6 +53,30 @@ foreach ( $compressors as $compressor ) {
 }
 $select_compressor .= '</select>';
 
+// Create the Compression level options.
+$default_compression_level  = 6;
+$selected_compression_level = ! empty( $settings['compression_level'] ) ? $settings['compression_level'] : $default_compression_level;
+$select_compression_level   = '<select name="compression_level">';
+foreach ( range( 0, 9 ) as $level ) {
+	$is_default = $default_compression_level === $level;
+
+	$is_selected = (int) $selected_compression_level === $level;
+
+	$select_compression_level .= sprintf(
+		'<option value="%1$s" %2$s>%3$s</option>',
+		esc_attr( $level ),
+		$is_selected ? 'selected="selected"' : '',
+		$is_default ? '6 ( ' . __( 'default' ) . ' )' : esc_html( $level )
+	);
+}
+
+$compression_level_info = __(
+	'The Compression level defines how compacted the files will be within the backup file.
+	Higher compression levels result in smaller backup files, but take longer to create and use more system resources.
+	If you are having trouble getting backups to complete successfully, try using a lower compression level.',
+	'boldgrid-backup'
+);
+
 ob_start();
 ?>
 <div class="bg-box">
@@ -74,6 +98,18 @@ ob_start();
 				<th><?php esc_html_e( 'Compressor', 'boldgrid-backup' ); ?>:</th>
 				<td>
 					<?php echo $select_compressor; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped ?>
+				</td>
+			</tr>
+			<tr class="compression-level hidden">
+				<th><?php esc_html_e( 'Compression Level', 'boldgrid-backup' ); ?>:</th>
+				<td>
+					<?php echo $select_compression_level; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped ?>
+				</td>
+			</tr>
+			<tr class="compression-level hidden">
+				<td></td>
+				<td>
+					<?php echo $compression_level_info; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped ?>
 				</td>
 			</tr>
 		</table>
