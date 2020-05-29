@@ -1542,6 +1542,7 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return array An array of archive file information.
 	 */
 	public function archive_files( $save = false, $dryrun = false ) {
+		$this->utility->bump_memory_limit( '1G' );
 		$this->logger->init( 'archive-' . time() . '.log' );
 		$this->logger->add( 'Backup process initialized.' );
 
@@ -1667,8 +1668,6 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Backup the database, if saving an archive file and not a dry run.
 		if ( $save && ! $dryrun ) {
-
-			$this->utility->bump_memory_limit( '1G' );
 			$this->logger->add( 'Starting dump of database...' );
 			$this->logger->add_memory();
 

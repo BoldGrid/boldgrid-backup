@@ -54,18 +54,18 @@ foreach ( $compressors as $compressor ) {
 $select_compressor .= '</select>';
 
 // Create the Compression level options.
-$default_compression_level  = 6;
-$selected_compression_level = isset( $settings['compression_level'] ) ? $settings['compression_level'] : $default_compression_level;
+$default_compression_level  = (int) $core->compressors->get_object( 'system_zip' )->default_compression_level;
+$selected_compression_level = isset( $settings['compression_level'] ) ? (int) $settings['compression_level'] : $default_compression_level;
 $select_compression_level   = '<select name="compression_level">';
 foreach ( range( 0, 9 ) as $level ) {
-	$is_default = $default_compression_level === $level;
-	$is_selected = (int) $selected_compression_level === $level;
+	$is_default  = $default_compression_level === $level;
+	$is_selected = $selected_compression_level === $level;
 
 	$select_compression_level .= sprintf(
 		'<option value="%1$s" %2$s>%3$s</option>',
 		esc_attr( $level ),
 		$is_selected ? 'selected="selected"' : '',
-		$is_default ? '6 ( ' . __( 'default' ) . ' )' : esc_html( $level )
+		$is_default ? $default_compression_level . ' ( ' . __( 'default' ) . ' )' : esc_html( $level )
 	);
 }
 

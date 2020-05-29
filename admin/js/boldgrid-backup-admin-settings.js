@@ -286,16 +286,14 @@ BoldGrid.Settings = function( $ ) {
 		var isSystemZip = false,
 			compressorSelector = $( 'select[name="compressor"]' );
 
-		if ( 'system_zip' === $( compressorSelector ).val() ) {
-			isSystemZip = true;
-		}
+		isSystemZip = 'system_zip' === $( compressorSelector ).val();
 
 		if ( isSystemZip ) {
 			$( '.compression-level' ).show();
 		} else {
 			$( '.compression-level' ).hide();
 		}
-	}
+	};
 
 	// Onload event listener.
 	$( function() {

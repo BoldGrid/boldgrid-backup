@@ -81,6 +81,14 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	public $total_size_archived;
 
 	/**
+	 * Default Compression Level.
+	 *
+	 * @since SINCEVERSION
+	 * @var string
+	 */
+	public $default_compression_level = '6';
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.13.0
@@ -281,9 +289,8 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	 * @return string
 	 */
 	private function get_compression_level() {
-		$default_compression_level = 6;
-		$compression_level         = $this->core->settings->get_setting( 'compression_level' );
-		return isset( $compression_level ) ? $compression_level : $default_compression_level;
+		$compression_level = $this->core->settings->get_setting( 'compression_level' );
+		return isset( $compression_level ) ? $compression_level : $this->default_compression_level;
 	}
 
 	/**
@@ -312,11 +319,11 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 		);
 
 		if ( is_resource( $process ) ) {
-			// $pipes now looks like this:
-			// 0 => writeable handle connected to child stdin
-			// 1 => readable handle connected to child stdout
-			// Any error output will be appended to /tmp/error-output.txt
-
+			/* $pipes now looks like this:
+			 * 0 => writeable handle connected to child stdin
+			 * 1 => readable handle connected to child stdout
+			 * Any error output will be appended to /tmp/error-output.txt
+			 */
 			foreach ( $filelist_chunk as $file ) {
 				fwrite( $pipes[0], $file . "\n" ); //phpcs:ignore WordPress.WP.AlternativeFunctions
 			}
@@ -327,7 +334,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 
 			// It is important that you close any pipes before calling.
 			// proc_close in order to avoid a deadlock.
-			$return_value = proc_close( $process );
+			proc_close( $process );
 		}
 	}
 
