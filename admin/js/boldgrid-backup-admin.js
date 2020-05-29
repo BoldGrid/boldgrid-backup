@@ -52,9 +52,9 @@ BoldGrid.Backup = function( $ ) {
 	/**
 	 * @summary Handle the clicking of a show / hide toggle.
 	 *
-	 * In the example below, the show / hide link has a data-toggle-target attr
+	 * In the example below, the show / hide link has a data-bgbkup-toggle-target attr
 	 * that helps to identify the element to toggle.
-	 * # <a href="" data-toggle-target="#more_info">Show</a>
+	 * # <a href="" data-bgbkup-toggle-target="#more_info">Show</a>
 	 * # <div id="more_info" class="hidden">
 	 *
 	 * @since 1.6.0
@@ -63,7 +63,7 @@ BoldGrid.Backup = function( $ ) {
 		var $e = $( this ),
 			show = 'Show',
 			hide = 'Hide',
-			target = $e.attr( 'data-toggle-target' ),
+			target = $e.attr( 'data-bgbkup-toggle-target' ),
 			$target = $( target ),
 			isVisible = $target.is( ':visible' );
 
@@ -117,7 +117,7 @@ BoldGrid.Backup = function( $ ) {
 		self.hideBackupNotice();
 		self.updatePremiumLink();
 
-		$( 'body' ).on( 'click', '[data-toggle-target]', self.onClickToggle );
+		$( 'body' ).on( 'click', '[data-bgbkup-toggle-target]', self.onClickToggle );
 		$( 'body' ).on( 'make_notices_dismissible', self.makeNoticesDismissible );
 
 		/*
