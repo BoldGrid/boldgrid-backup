@@ -4,7 +4,7 @@ Tags: backup, cloud backup, database backup, restore, wordpress backup
 Requires at least: 4.4
 Tested up to: 5.4
 Requires PHP: 5.4
-Stable tag: 1.13.4
+Stable tag: 1.13.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -131,6 +131,15 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 1. Activate the plugin through the Plugins menu in WordPress.
 
 == Changelog ==
+
+= 1.13.5 =
+
+Release date: May 28th, 2020
+
+* Update:     Create a restore log (like the backup log).
+* Update:     Updated dependencies.
+* Bug fix:    Avoid fatals on library issues.
+
 
 = 1.13.4 =
 
