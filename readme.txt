@@ -139,7 +139,7 @@ Release date: May 28th, 2020
 * Update:     Create a restore log (like the backup log).
 * Update:     Updated dependencies.
 * Bug fix:    Avoid fatals on library issues.
-
+* Bug fix:    Be more specific with data-toggle-target attribute.
 
 = 1.13.4 =
 
