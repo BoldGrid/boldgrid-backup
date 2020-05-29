@@ -219,7 +219,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	 *
 	 * @since SINCEVERSION
 	 *
-	 * @return array
+	 * @return array Example https://pastebin.com/JsSEzNwA
 	 */
 	public function get_filelist_chunks() {
 		// Chunk size in bytes.
