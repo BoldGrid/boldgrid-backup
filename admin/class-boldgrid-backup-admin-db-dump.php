@@ -45,10 +45,14 @@ class Boldgrid_Backup_Admin_Db_Dump {
 	 *
 	 * @since 1.5.1
 	 *
+	 * @global wpdb $wpdb
+	 *
 	 * @param  string $file The filepath to our file.
 	 * @return bool   True on success.
 	 */
 	public function dump( $file ) {
+		global $wpdb;
+
 		$include_tables = $this->core->db_omit->get_filtered_tables();
 		if ( empty( $include_tables ) ) {
 			return array( 'error' => esc_html__( 'No tables selected to backup.', 'boldgrid-backup' ) );
@@ -82,25 +86,33 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		do_action( 'boldgrid_backup_pre_dump', $file );
 
 		try {
+			$settings = array(
+				'include-tables' => $include_tables,
+				'include-views'  => $include_views,
+				'add-drop-table' => true,
+				'no-autocommit'  => false,
+			);
+
+			/*
+			 * Set default character set.
+			 *
+			 * By default, IMysqldump\Mysqldump uses utf8.
+			 *
+			 * By default, WordPress sets CHARSET to utf8 in wp-config but will default to utf8mb4
+			 * if it's available.
+			 *
+			 * @see wpdb::determine_charset
+			 *
+			 */
+			if ( ! empty( $wpdb->charset ) ) {
+				$settings['default-character-set'] = $wpdb->charset;
+			}
+
 			$dump = new IMysqldump\Mysqldump(
 				$this->get_connection_string(),
 				DB_USER,
 				DB_PASSWORD,
-				array(
-					'include-tables'        => $include_tables,
-					'include-views'         => $include_views,
-					'add-drop-table'        => true,
-					'no-autocommit'         => false,
-					/*
-					 * Set default character set.
-					 *
-					 * While utf8mb4 seems to be the norm, utf8 is still being referenced in wp-config-sample.php
-					 * and is also seen defined as DB_CHARSET in the config for various test accounts.
-					 *
-					 * @link https://make.wordpress.org/core/2015/04/02/the-utf8mb4-upgrade/
-					 */
-					'default-character-set' => defined( 'DB_CHARSET' ) ? DB_CHARSET : 'utf8',
-				)
+				$settings
 			);
 			$dump->start( $file );
 		} catch ( \Exception $e ) {
