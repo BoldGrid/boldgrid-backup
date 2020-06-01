@@ -102,7 +102,6 @@ class Boldgrid_Backup_Admin_Db_Dump {
 			 * if it's available.
 			 *
 			 * @see wpdb::determine_charset
-			 *
 			 */
 			if ( ! empty( $wpdb->charset ) ) {
 				$settings['default-character-set'] = $wpdb->charset;
