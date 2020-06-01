@@ -85,28 +85,28 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		 */
 		do_action( 'boldgrid_backup_pre_dump', $file );
 
+		$settings = array(
+			'include-tables' => $include_tables,
+			'include-views'  => $include_views,
+			'add-drop-table' => true,
+			'no-autocommit'  => false,
+		);
+
+		/*
+		 * Set default character set.
+		 *
+		 * By default, IMysqldump\Mysqldump uses utf8.
+		 *
+		 * By default, WordPress sets CHARSET to utf8 in wp-config but will default to utf8mb4
+		 * if it's available.
+		 *
+		 * @see wpdb::determine_charset
+		 */
+		if ( ! empty( $wpdb->charset ) ) {
+			$settings['default-character-set'] = $wpdb->charset;
+		}
+
 		try {
-			$settings = array(
-				'include-tables' => $include_tables,
-				'include-views'  => $include_views,
-				'add-drop-table' => true,
-				'no-autocommit'  => false,
-			);
-
-			/*
-			 * Set default character set.
-			 *
-			 * By default, IMysqldump\Mysqldump uses utf8.
-			 *
-			 * By default, WordPress sets CHARSET to utf8 in wp-config but will default to utf8mb4
-			 * if it's available.
-			 *
-			 * @see wpdb::determine_charset
-			 */
-			if ( ! empty( $wpdb->charset ) ) {
-				$settings['default-character-set'] = $wpdb->charset;
-			}
-
 			$dump = new IMysqldump\Mysqldump(
 				$this->get_connection_string(),
 				DB_USER,
