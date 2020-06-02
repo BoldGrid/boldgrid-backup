@@ -343,6 +343,16 @@ class Boldgrid_Backup_Admin_Core {
 	public $archive_fail;
 
 	/**
+	 * Whether or not we're in the middle of archiving files.
+	 *
+	 * This is set at the beginning and end of self::archive_files().
+	 *
+	 * @since 1.13.4
+	 * @var bool
+	 */
+	public $archiving_files = false;
+
+	/**
 	 * Db Dump.
 	 *
 	 * @since  1.5.3
@@ -1542,9 +1552,12 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return array An array of archive file information.
 	 */
 	public function archive_files( $save = false, $dryrun = false ) {
-		$this->utility->bump_memory_limit( '1G' );
+		$this->archiving_files = true;
+
 		$this->logger->init( 'archive-' . time() . '.log' );
 		$this->logger->add( 'Backup process initialized.' );
+
+		$this->utility->bump_memory_limit( '1G' );
 
 		$this->pre_auto_update = 'pre_auto_update' === current_filter();
 
@@ -1925,6 +1938,8 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->logger->add( 'Backup complete!' );
 		$this->logger->add_memory();
+
+		$this->archiving_files = false;
 
 		// Return the array of archive information.
 		return $info;
