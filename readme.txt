@@ -4,7 +4,7 @@ Tags: backup, cloud backup, database backup, restore, wordpress backup
 Requires at least: 4.4
 Tested up to: 5.4
 Requires PHP: 5.4
-Stable tag: 1.13.5
+Stable tag: 1.13.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -137,6 +137,12 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 Release date: TBD
 
 * New feature: Timely Auto Updates - auto update WordPress, Plugins, and Themes after a set number of days.
+
+= 1.13.6 =
+
+Release date: June 1st, 2020
+
+* Bug fix:    Adjust the charset used when dumping database (derived from WordPress DB_CHARSET).
 
 = 1.13.5 =
 
