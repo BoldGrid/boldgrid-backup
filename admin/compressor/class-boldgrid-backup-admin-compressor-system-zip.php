@@ -75,7 +75,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	/**
 	 * Total Size Archived.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 * @var int
 	 */
 	public $total_size_archived;
@@ -83,7 +83,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	/**
 	 * Default Compression Level.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 * @var string
 	 */
 	public $default_compression_level = '6';
@@ -225,7 +225,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	/**
 	 * Get Filelist Chunks.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 *
 	 * @return array Example https://pastebin.com/JsSEzNwA
 	 */
@@ -255,7 +255,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	/**
 	 * Close.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 */
 	private function close() {
 		$chunks_closed   = 0;
@@ -284,7 +284,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	/**
 	 * Get Compression Level.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 *
 	 * @return string
 	 */
@@ -296,7 +296,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	/**
 	 * Close Zip using proc_open.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.0
 	 *
 	 * @param array $filelist_chunk Array of Files to be added.
 	 */
