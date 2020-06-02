@@ -16,7 +16,7 @@
 		}
 	],
 	"require" : {
-		"boldgrid/library" : "^2.0.0",
+		"boldgrid/library" : "dev-master as 2.12.3",
 		"ifsnop/mysqldump-php" : "dev-add-include-views",
 		"phpseclib/phpseclib" : "~2.0",
 		"chland/tdcron" : "dev-master"

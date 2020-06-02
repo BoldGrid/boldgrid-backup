@@ -358,27 +358,25 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 * @since 1.6.0
 	 */
 	public function enqueue_update_selectors() {
-		if ( $this->on_update_page || $this->core->utility->is_admin_page( 'boldgrid-backup' ) ) {
-			$handle = 'boldgrid-backup-admin-update-selectors';
+		$handle = 'boldgrid-backup-admin-update-selectors';
 
-			wp_register_script(
-				$handle,
-				plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-update-selectors.js',
-				array( 'jquery' ),
-				BOLDGRID_BACKUP_VERSION,
-				false
-			);
+		wp_register_script(
+			$handle,
+			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-update-selectors.js',
+			array( 'jquery' ),
+			BOLDGRID_BACKUP_VERSION,
+			false
+		);
 
-			$localize_script_data = array(
-				// Generally used as the title attr of a disable update button.
-				'backupInProgress' => __( 'Your website is currently being backed up. You can perform updates when the backup is complete.', 'boldgrid-backup' ),
-				'waitClass'        => 'bgbu-wait',
-			);
+		$localize_script_data = array(
+			// Generally used as the title attr of a disable update button.
+			'backupInProgress' => __( 'Your website is currently being backed up. You can perform updates when the backup is complete.', 'boldgrid-backup' ),
+			'waitClass'        => 'bgbu-wait',
+		);
 
-			wp_localize_script( $handle, 'boldgrid_backup_admin_update_selectors', $localize_script_data );
+		wp_localize_script( $handle, 'boldgrid_backup_admin_update_selectors', $localize_script_data );
 
-			wp_enqueue_script( $handle );
-		}
+		wp_enqueue_script( $handle );
 	}
 
 	/**

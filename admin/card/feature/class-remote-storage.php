@@ -55,7 +55,7 @@ class Remote_Storage extends \Boldgrid\Library\Library\Ui\Feature {
 			$this->content .= '<div class="notice notice-error inline"><p>' . wp_kses(
 				sprintf(
 					// translators: 1 An opening anchor tag to the Remote Storage settings, 2 its closing anchor tag.
-					__( 'Remote storage is not configured. %1$sFix this%2$s', 'boldgrid-backup' ),
+					__( 'Remote Storage is not configured. %1$sFix this%2$s', 'boldgrid-backup' ),
 					'<a href="' . esc_url( $core->settings->get_settings_url( 'section_storage' ) ) . '">',
 					'</a>'
 				),

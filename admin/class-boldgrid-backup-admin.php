@@ -92,6 +92,10 @@ class Boldgrid_Backup_Admin {
 	 * @since 1.0
 	 */
 	public function enqueue_styles() {
+		if ( self::is_upkeep_page() ) {
+			Boldgrid\Library\Library\Ui\Page::enqueueScripts();
+		}
+
 		$core = apply_filters( 'boldgrid_backup_get_core', null );
 
 		/*
@@ -234,5 +238,30 @@ class Boldgrid_Backup_Admin {
 
 		// Return the configuration array.
 		return $configs;
+	}
+
+	/**
+	 * Whether or not the current screen is a Total Upkeep page.
+	 *
+	 * @since 1.14.0
+	 *
+	 * @return bool
+	 */
+	public static function is_upkeep_page() {
+		$screen = get_current_screen();
+
+		$prefixes = [
+			'toplevel_page_boldgrid-backup-',
+			'total-upkeep_page_',
+			'admin_page_boldgrid-backup-',
+		];
+
+		foreach ( $prefixes as $prefix ) {
+			if ( substr( $screen->id, 0, strlen( $prefix ) ) === $prefix ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

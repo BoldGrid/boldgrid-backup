@@ -236,15 +236,55 @@ class Boldgrid_Backup_Admin_Notice {
 	 * @since 1.7.0
 	 */
 	public function display_autoupdate_notice() {
+		$auto_update_array = [
+			( apply_filters( 'allow_major_auto_core_updates', false ) ) ? 'Major' : false,
+			( apply_filters( 'allow_minor_auto_core_updates', false ) ) ? 'Minor' : false,
+			( apply_filters( 'allow_dev_auto_core_updates', false ) ) ? 'Development' : false,
+			( apply_filters( 'auto_update_translation', false ) ) ? 'Translation' : false,
+		];
+		$auto_update_array = array_filter( $auto_update_array );
+		$update_msg        = '';
+		switch ( count( $auto_update_array ) ) {
+			case 0:
+				$update_msg = esc_html__( 'disabled for all', 'boldgrid-backup' );
+				break;
+			case 1:
+				$auto_update_array = array_values( $auto_update_array );
+				$update_msg        = sprintf(
+					// translators: 1: Auto Update Type.
+					esc_html__( 'enabled for %s', 'boldgrid-backup' ),
+					$auto_update_array[0]
+				);
+				break;
+			case 4:
+				$update_msg = esc_html__( 'enabled for all', 'boldgrid-backup' );
+				break;
+			default:
+				$x = array_slice( $auto_update_array, 0, -1 );
+
+				$auto_update_string = implode( ', ', $x );
+				$update_msg         = sprintf(
+					// translators: 1: Auto Update Types, 2: Auto Update Type.
+					esc_html__(
+						'enabled for %1$s and %2$s',
+						'boldgrid-backup'
+					),
+					$auto_update_string,
+					end( $auto_update_array )
+				);
+				break;
+		}
+
 		$message = sprintf(
 			// translators: 1: HTML anchor opening tag, 2: HTML anchor closing tag, 3: Plugin title.
 			esc_html__(
-				'Auto Updates can be configured in the %1$s%3$s Settings%2$s.',
+				'Auto Updates are %4$s WordPress Core Updates. This can be configured in the %1$s%3$s Settings%2$s.',
 				'boldgrid-backup'
 			),
 			'<a href="' . admin_url( 'admin.php?page=boldgrid-backup-settings&section=section_auto_updates' ) . '">',
 			'</a>',
-			BOLDGRID_BACKUP_TITLE
+			BOLDGRID_BACKUP_TITLE,
+			$update_msg
 		);
 
 		do_action( 'boldgrid_backup_notice', $message, 'notice notice-info is-dismissible' );
@@ -261,7 +301,7 @@ class Boldgrid_Backup_Admin_Notice {
 	 * @see \Boldgrid\Library\Library\Notice::show()
 	 */
 	public function plugin_renamed_notice() {
-		$plugin = new \Boldgrid\Library\Library\Plugin\Plugin( 'boldgrid-backup' );
+		$plugin = \Boldgrid\Library\Library\Plugin\Factory::create( 'boldgrid-backup' );
 
 		/*
 		 * Only show to existing users.
