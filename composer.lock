@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
     "content-hash": "050b3199623c97d6b10acc9c2ec3c997",
@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/BoldGrid/library.git",
-                "reference": "34315ca07fdb363fc2bc20774e0cef9c99ebe997"
+                "reference": "91dc1bd991589b7b02e5afa01592a4a9e41fa556"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BoldGrid/library/zipball/34315ca07fdb363fc2bc20774e0cef9c99ebe997",
-                "reference": "34315ca07fdb363fc2bc20774e0cef9c99ebe997",
+                "url": "https://api.github.com/repos/BoldGrid/library/zipball/91dc1bd991589b7b02e5afa01592a4a9e41fa556",
+                "reference": "91dc1bd991589b7b02e5afa01592a4a9e41fa556",
                 "shasum": ""
             },
             "type": "library",
@@ -54,7 +54,7 @@
                 }
             ],
             "description": "The BoldGrid Library for shared code used in official BoldGrid plugins and themes.",
-            "time": "2020-05-26T18:02:08+00:00"
+            "time": "2020-06-02T15:44:50+00:00"
         },
         {
             "name": "chland/tdcron",
@@ -214,20 +214,6 @@
                 "x.509",
                 "x509"
             ],
-            "funding": [
-                {
-                    "url": "https://github.com/terrafrost",
-                    "type": "github"
-                },
-                {
-                    "url": "https://www.patreon.com/phpseclib",
-                    "type": "patreon"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/phpseclib/phpseclib",
-                    "type": "tidelift"
-                }
-            ],
             "time": "2020-04-04T23:17:33+00:00"
         }
     ],
@@ -290,6 +276,5 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
-    "platform-dev": [],
-    "plugin-api-version": "1.1.0"
+    "platform-dev": []
 }
