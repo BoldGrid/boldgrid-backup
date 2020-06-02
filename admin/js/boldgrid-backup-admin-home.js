@@ -25,12 +25,10 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 
 	// Onload event listener.
 	$( function() {
-		var $urlImportSection = $( '#url-import-section' );
+		var $urlImportSection = $( 'div#url-import-section' );
 
 		// On click action for the Upload button.
-		$( '#upload-archive-form' )
-			.find( '.button' )
-			.on( 'click', self.uploadButtonClicked );
+		$urlImportSection.find( '.button' ).on( 'click', self.uploadButtonClicked );
 
 		$( '.page-title-action.add-new' ).on( 'click', function() {
 			$( '#add_new' ).toggle();
@@ -92,9 +90,15 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 		var $badExtension = $( '#bad_extension' ),
 			$fileSizeWarning = $( '[data-id="upload-backup"]:not(span)' ),
 			$fileTooLarge = $( '#file_too_large' ),
-			$submit = $( 'input:submit' ),
+			$submit = $(
+				$( this )
+					.parent()
+					.find( 'input:submit' )
+			),
+			$badFilename = $( '#bad_filename' ),
 			extension,
 			isBadExtension,
+			isBadFilename,
 			isTooBig,
 			maxSize = parseInt( $( '[name="MAX_FILE_SIZE"]' ).val() ),
 			name,
@@ -104,6 +108,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 			$fileSizeWarning.slideUp();
 			$fileTooLarge.slideUp();
 			$badExtension.slideUp();
+			$badFilename.slideUp();
 			$submit.attr( 'disabled', true );
 			return;
 		}
@@ -114,11 +119,18 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 
 		isTooBig = 0 > maxSize - size;
 		isBadExtension = 'zip' !== extension;
+		isBadFilename = ! name.match( /boldgrid-backup-.*-\d{8}-\d{6}/ );
 
 		if ( isBadExtension ) {
 			$badExtension.slideDown();
 		} else {
 			$badExtension.slideUp();
+		}
+
+		if ( isBadFilename ) {
+			$badFilename.slideDown();
+		} else {
+			$badFilename.slideUp();
 		}
 
 		if ( isTooBig ) {
@@ -129,7 +141,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 			$fileTooLarge.slideUp();
 		}
 
-		if ( isTooBig || isBadExtension ) {
+		if ( isTooBig || isBadExtension || isBadFilename ) {
 			$submit.attr( 'disabled', true );
 		} else {
 			$submit.attr( 'disabled', false );
@@ -214,14 +226,22 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 		var jqxhr,
 			$this = $( this ),
 			$spinner = $this.next(),
-			$notice = $( '#url-import-notice' ),
-			wpnonce = $( '#_wpnonce' ).val(),
+			$notice = $( this )
+				.parent()
+				.find( 'div#url-import-notice' ),
+			wpnonce = $( this )
+				.parent()
+				.find( 'input#_wpnonce' )
+				.val(),
 			urlRegex = new RegExp( lang.urlRegex, 'i' ),
 			data = {
 				action: 'boldgrid_backup_url_upload',
 				_wpnonce: wpnonce,
 				_wp_http_referer: $( 'input[name="_wp_http_referer"]' ).val(),
-				url: $( 'input[name="url"]' ).val()
+				url: $( this )
+					.parent()
+					.find( 'input[name="url"]' )
+					.val()
 			};
 
 		e.preventDefault();
@@ -246,7 +266,6 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 		$this.attr( 'disabled', 'disabled' );
 
 		$spinner.addClass( 'inline' );
-
 		jqxhr = $.post( ajaxurl, data, function( response ) {
 			if ( response.data !== undefined && response.data.filepath !== undefined ) {
 				$notice
@@ -255,7 +274,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 					.html(
 						lang.savedTo +
 							response.data.filepath +
-							' <a class="button" href="' +
+							'<br/> <a class="button" href="' +
 							response.data.detailsUrl +
 							'">' +
 							lang.viewDetails +
@@ -300,6 +319,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 			} )
 			.always( function() {
 				$notice.wrapInner( '<p></p>' ).show();
+				$spinner.removeClass( 'is-active' );
 				$spinner.removeClass( 'inline' );
 			} );
 	};
