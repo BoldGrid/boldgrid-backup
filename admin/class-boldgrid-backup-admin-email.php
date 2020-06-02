@@ -257,7 +257,7 @@ class Boldgrid_Backup_Admin_Email {
 	 */
 	public function wp_mail_failed( $wp_error ) {
 		// If in the middle of archiving files and an email failed, add info about it to the log.
-		if ( $this->core->archiving_files ) {
+		if ( $this->core->archiving_files || $this->core->restoring_archive_file ) {
 			$errors = array(
 				'wp_error'   => $wp_error,
 				'last_error' => error_get_last(),

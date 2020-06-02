@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3d3b40678739982514bd38cc205e6a1e",
+    "content-hash": "050b3199623c97d6b10acc9c2ec3c997",
     "packages": [
         {
             "name": "boldgrid/library",
@@ -214,6 +214,20 @@
                 "x.509",
                 "x509"
             ],
+            "funding": [
+                {
+                    "url": "https://github.com/terrafrost",
+                    "type": "github"
+                },
+                {
+                    "url": "https://www.patreon.com/phpseclib",
+                    "type": "patreon"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/phpseclib/phpseclib",
+                    "type": "tidelift"
+                }
+            ],
             "time": "2020-04-04T23:17:33+00:00"
         }
     ],
@@ -260,8 +274,8 @@
     ],
     "aliases": [
         {
-            "alias": "2.12.2",
-            "alias_normalized": "2.12.2.0",
+            "alias": "2.12.3",
+            "alias_normalized": "2.12.3.0",
             "version": "9999999-dev",
             "package": "boldgrid/library"
         }
@@ -276,5 +290,6 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
-    "platform-dev": []
+    "platform-dev": [],
+    "plugin-api-version": "1.1.0"
 }

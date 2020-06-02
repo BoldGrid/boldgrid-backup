@@ -549,6 +549,16 @@ class Boldgrid_Backup_Admin_Core {
 	public $restore_helper;
 
 	/**
+	 * Whether or not we are in the middle of restoring an archive.
+	 *
+	 * @since 1.13.5
+	 * @var bool
+	 *
+	 * @see self::archiving_files
+	 */
+	public $restoring_archive_file = false;
+
+	/**
 	 * The scheduler class object.
 	 *
 	 * @since  1.5.1
@@ -2253,16 +2263,29 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return array An array of archive file information.
 	 */
 	public function restore_archive_file( $dryrun = false ) {
+		$this->restoring_archive_file = true;
+
+		$this->logger->init( 'restore-' . time() . '.log' );
+		$this->logger->add( 'Restoration process initialized.' );
+		$this->logger->add_memory();
+
+		// Using pcl_zip (ZipArchive unavailable), a 400MB+ zip used over 500MB+ of memory to restore.
+		Boldgrid_Backup_Admin_Utility::bump_memory_limit( '1G' );
+
 		$restore_ok = true;
 
 		// If a restoration was not requested, then abort.
 		if ( empty( $_POST['restore_now'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
-			return [ 'error' => esc_html__( 'Invalid restore_now value.', 'boldgrid-backup' ) ];
+			$error_message = esc_html__( 'Invalid restore_now value.', 'boldgrid-backup' );
+			$this->logger->add( $error_message );
+			return [ 'error' => $error_message ];
 		}
 
 		// Check if functional.
 		if ( ! $this->test->run_functionality_tests() ) {
-			return [ 'error' => esc_html__( 'Functionality tests fail.', 'boldgrid-backup' ) ];
+			$error_message = esc_html__( 'Functionality tests fail.', 'boldgrid-backup' );
+			$this->logger->add( $error_message );
+			return [ 'error' => $error_message ];
 		}
 
 		// Initialize variables.
@@ -2273,14 +2296,18 @@ class Boldgrid_Backup_Admin_Core {
 		if ( isset( $_POST['archive_key'] ) && is_numeric( $_POST['archive_key'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			$archive_key = (int) $_POST['archive_key'];
 		} else {
-			return [ 'error' => esc_html__( 'Invalid key for the selected archive file.', 'boldgrid-backup' ) ];
+			$error_message = esc_html__( 'Invalid key for the selected archive file.', 'boldgrid-backup' );
+			$this->logger->add( $error_message );
+			return [ 'error' => $error_message ];
 		}
 
 		// Validate archive_filename.
 		if ( ! empty( $_POST['archive_filename'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			$archive_filename = sanitize_file_name( $_POST['archive_filename'] );
 		} else {
-			return [ 'error' => esc_html__( 'Invalid filename for the selected archive file.', 'boldgrid-backup' ) ];
+			$error_message = esc_html__( 'Invalid filename for the selected archive file.', 'boldgrid-backup' );
+			$this->logger->add( $error_message );
+			return [ 'error' => $error_message ];
 		}
 
 		// Close any PHP session, so that another session can open during this restore operation.
@@ -2288,13 +2315,17 @@ class Boldgrid_Backup_Admin_Core {
 
 		$archives = $this->get_archive_list( $archive_filename );
 		if ( empty( $archives ) ) {
-			return [ 'error' => esc_html__( 'No archive files were found.', 'boldgrid-backup' ) ];
+			$error_message = esc_html__( 'No archive files were found.', 'boldgrid-backup' );
+			$this->logger->add( $error_message );
+			return [ 'error' => $error_message ];
 		}
 
 		$filename = ! empty( $archives[ $archive_key ]['filename'] ) ? $archives[ $archive_key ]['filename'] : null;
 
 		if ( $archive_filename !== $filename ) {
-			return [ 'error' => esc_html__( 'The selected archive file was not found.', 'boldgrid-backup' ) ];
+			$error_message = esc_html__( 'The selected archive file was not found.', 'boldgrid-backup' );
+			$this->logger->add( $error_message );
+			return [ 'error' => $error_message ];
 		}
 
 		$filepath = ! empty( $archives[ $archive_key ]['filepath'] ) ? $archives[ $archive_key ]['filepath'] : null;
@@ -2302,7 +2333,9 @@ class Boldgrid_Backup_Admin_Core {
 		if ( ! empty( $filepath ) && $this->wp_filesystem->exists( $filepath ) ) {
 			$filesize = $this->wp_filesystem->size( $filepath );
 		} else {
-			return [ 'error' => esc_html__( 'The selected archive file is empty.', 'boldgrid-backup' ) ];
+			$error_message = esc_html__( 'The selected archive file is empty.', 'boldgrid-backup' );
+			$this->logger->add( $error_message );
+			return [ 'error' => $error_message ];
 		}
 
 		// Populate $info.
@@ -2315,6 +2348,7 @@ class Boldgrid_Backup_Admin_Core {
 			'archive_key' => $archive_key,
 			'restore_ok'  => $restore_ok,
 		];
+		$this->logger->add( 'Restore info: ' . print_r( $info, 1 ) ); // phpcs:ignore
 
 		// Prevent this script from dying.
 		ignore_user_abort( true );
@@ -2332,13 +2366,23 @@ class Boldgrid_Backup_Admin_Core {
 
 		/*
 		 * Attempt to fix any permissions related issues before the restoration begins. If we're
-		 * unable to, the restoration will not continue.
+		 * unable to, the restoration may not continue.
 		 */
-		if ( ! $this->restore_helper->set_writable_permissions( $info['filepath'] ) ) {
-			return [ 'error' => $this->restore_helper->get_last_error() ];
+		if ( class_exists( 'ZipArchive' ) ) {
+			if ( ! $this->restore_helper->set_writable_permissions( $info['filepath'] ) ) {
+				$error_message = $this->restore_helper->get_last_error();
+				$this->logger->add( $error_message );
+				return [ 'error' => $error_message ];
+			}
+		} else {
+			$this->logger->add( 'ZipArchive not available. Unable to set_writable_permissions. Trying restore anyways...' );
 		}
 
+		$this->logger->add( 'Unzipping archive... filepath / ABSPATH: ' . $info['filepath'] . ' / ' . ABSPATH );
+		$this->logger->add_memory();
 		$unzip_status = ! $dryrun ? unzip_file( $info['filepath'], ABSPATH ) : null;
+		$this->logger->add( 'Unzip complete! Status: ' . print_r( $unzip_status, 1 ) ); // phpcs:ignore
+		$this->logger->add_memory();
 
 		if ( is_wp_error( $unzip_status ) ) {
 			$error = false;
@@ -2379,6 +2423,8 @@ class Boldgrid_Backup_Admin_Core {
 		 * will contain a database dump, so we may be able to skip this step.
 		 */
 		$db_dump_filepath = $this->get_dump_file( $filepath );
+		$this->logger->add( 'Attempting database restoration... $db_dump_filepath = ' . $db_dump_filepath );
+		$this->logger->add_memory();
 		if ( ! $dryrun && ! empty( $db_dump_filepath ) ) {
 			$db_prefix = null;
 
@@ -2404,17 +2450,14 @@ class Boldgrid_Backup_Admin_Core {
 			$this->wp_filesystem->delete( $db_dump_filepath, false, 'f' );
 
 			// Display notice of deletion status.
-			if ( ! $restore_ok && $this->db_restore_error ) {
-				return [
-					'error' => $this->db_restore_error,
-				];
-			}
-			if ( ! $restore_ok && ! $this->db_restore_error ) {
-				return [
-					'error' => esc_html__( 'Could not restore database.', 'boldgrid-backup' ),
-				];
+			if ( ! $restore_ok ) {
+				$error_message = $this->db_restore_error ? $this->db_restore_error : esc_html__( 'Could not restore database.', 'boldgrid-backup' );
+				$this->logger->add( $error_message );
+				return [ 'error' => $error_message ];
 			}
 		}
+		$this->logger->add( 'Database restoration complete.' );
+		$this->logger->add_memory();
 
 		// Clear rollback information and restoration cron jobs that may be present.
 		$this->auto_rollback->cancel();
@@ -2424,12 +2467,16 @@ class Boldgrid_Backup_Admin_Core {
 
 		// If enabled, send email notification for restoration completed.
 		if ( ! empty( $settings['notifications']['restore'] ) ) {
+			$this->logger->add( 'Sending "restoration complete" email notification...' );
+
 			// Include the mail template.
 			include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-mail-restore.php';
 
 			// Send the notification.
 			// Parameters come from the included mail template file.
 			$info['mail_success'] = $this->email->send( $subject, $body );
+
+			$this->logger->add( 'Email sent. Status: ' . ( empty( $info['mail_success'] ) ? 'Fail' : 'Success' ) );
 		}
 
 		// Update status.
@@ -2437,6 +2484,10 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Check backup directory.
 		$info['backup_directory_set'] = $this->backup_dir->get();
+
+		$this->logger->add( 'Restoration complete!' );
+
+		$this->restoring_archive_file = false;
 
 		// Return info array.
 		return $info;

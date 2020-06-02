@@ -506,7 +506,7 @@ class Boldgrid_Backup_Admin_Utility {
 	 * Because the library may not be available until activation, this method can help us determine
 	 * whether or not we should instantiate library classes at a certain time.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.13.5
 	 *
 	 * @return bool
 	 */
