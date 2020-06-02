@@ -497,6 +497,26 @@ class Boldgrid_Backup_Admin_Utility {
 	}
 
 	/**
+	 * Determine whether or not Total Upkeep is active.
+	 *
+	 * The fact that Total Upkeep is calling this method shows that it is installed and activated.
+	 * However, it we are not listed in the "active_plugins" option, then we are in the middle of
+	 * activation.
+	 *
+	 * Because the library may not be available until activation, this method can help us determine
+	 * whether or not we should instantiate library classes at a certain time.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @return bool
+	 */
+	public static function is_active() {
+		$active_plugins = get_option( 'active_plugins', array() );
+
+		return in_array( 'boldgrid-backup/boldgrid-backup.php', $active_plugins, true );
+	}
+
+	/**
 	 * Determine whether or not the given $page is the current.
 	 *
 	 * @since 1.7.0
