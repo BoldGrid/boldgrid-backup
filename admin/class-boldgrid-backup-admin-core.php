@@ -2940,18 +2940,26 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return null
 	 */
 	public function enforce_retention() {
-		// Get backup settings.
+		$logger = new Boldgrid_Backup_Admin_Log( $this );
+		$logger->init( 'retention-local.log' );
+		$logger->add( 'Beginning core::enforce_retention...' );
+
 		$settings = $this->settings->get_settings();
+		$logger->add( 'Retention count: ' . $settings['retention_count'] );
 
 		$archives = $this->get_archive_list();
+		$logger->add( 'Number of archives found: ' . count( $archives ) );
 
 		// Remove from the list of archives any that have been flagged as being protected.
+		$protected_count = 0;
 		foreach ( $archives as $key => $archive ) {
 			$this->archive->init( $archive['filepath'] );
 			if ( '1' === $this->archive->get_attribute( 'protect' ) ) {
 				unset( $archives[ $key ] );
+				$protected_count++;
 			}
 		}
+		$logger->add( 'Number of protected archives found: ' . $protected_count );
 		$archives = array_values( $archives );
 
 		// Get the archives file count.
@@ -2959,11 +2967,9 @@ class Boldgrid_Backup_Admin_Core {
 
 		// If the archive count is not beyond the set retention count, then return.
 		if ( empty( $settings['retention_count'] ) || $archives_count <= $settings['retention_count'] ) {
+			$logger->add( 'No backups to delete at this time due to retention settings.' );
 			return;
 		}
-
-		// Connect to the WordPress Filesystem API.
-		global $wp_filesystem;
 
 		// Initialize $counter.
 		$counter = $archives_count - 1;
@@ -2978,25 +2984,30 @@ class Boldgrid_Backup_Admin_Core {
 
 			// Delete the specified archive file.
 			$deleted = $this->archive->delete( $filepath );
-			if ( ! $deleted ) {
-				// Something went wrong.
-				break;
-			}
-
-			/**
-			 * Take action after a backup has been deleted due to retention.
-			 *
-			 * @since 1.5.3
-			 *
-			 * @param string $filepath
-			 */
-			do_action( 'boldgrid_backup_retention_deleted', $filepath );
 
 			// Decrease the archive count.
 			$archives_count --;
 
 			// Increment the counter.
 			$counter --;
+
+			if ( $deleted ) {
+				$logger->add( 'Deleted ' . $filepath );
+
+				/**
+				 * Take action after a backup has been deleted due to retention.
+				 *
+				 * @since 1.5.3
+				 *
+				 * @param string $filepath
+				 */
+				do_action( 'boldgrid_backup_retention_deleted', $filepath );
+			} else {
+				$logger->add( 'Failed to delete ' . $filepath );
+			}
 		}
+
+		$logger->add( 'Completed core::enforce_retention.' );
+		$logger->add_separator();
 	}
 }
