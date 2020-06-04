@@ -154,6 +154,15 @@ class Boldgrid_Backup_Admin_Log {
 	}
 
 	/**
+	 * Add a separator in the log.
+	 *
+	 * @since 1.13.7
+	 */
+	public function add_separator() {
+		$this->add( '--------------------------------------------------------------------------------' );
+	}
+
+	/**
 	 * Delete old log files.
 	 *
 	 * @since 1.12.5
@@ -199,13 +208,17 @@ class Boldgrid_Backup_Admin_Log {
 
 		$this->init_signal_handler();
 
-		$log_created = $this->core->wp_filesystem->touch( $this->filepath );
+		$log_exists = $this->core->wp_filesystem->exists( $this->filepath );
 
-		if ( $log_created ) {
-			$this->add_generic();
+		if ( ! $log_exists ) {
+			$log_created = $this->core->wp_filesystem->touch( $this->filepath );
+
+			if ( $log_created ) {
+				$this->add_generic();
+			}
 		}
 
-		return $log_created;
+		return $log_exists || $log_created;
 	}
 
 	/**
