@@ -390,6 +390,11 @@ class Boldgrid_Backup_Admin_Upload {
 	 * @uses $_POST['url'] URL address.
 	 */
 	public function ajax_url_import() {
+		$logger = new Boldgrid_Backup_Admin_Log( $this->core );
+		$logger->init( 'transfer-archive.log' );
+		$logger->add_separator();
+		$logger->add( 'Beginning ajax_url_import...' );
+
 		// Check user permissions.
 		if ( ! current_user_can( 'update_plugins' ) ) {
 			wp_send_json_error(
@@ -450,8 +455,11 @@ class Boldgrid_Backup_Admin_Upload {
 
 		if ( is_array( $response ) && ! is_wp_error( $response ) &&
 			in_array( $response['headers']['content-type'], $allowed_content_types, true ) ) {
-				// Determine the archive log file path.
-				$log_filepath = $filepath;
+			$logger->add( 'Archive downloaded successfully.' );
+			$logger->add( 'Headers: ' . ( empty( $response['headers'] ) ? 'Empty' : print_r( $response['headers'], 1 ) ) ); // phpcs:ignore
+
+			// Determine the archive log file path.
+			$log_filepath = $filepath;
 
 			if ( ! empty( $response['headers']['content-disposition'] ) ) {
 				$log_filepath = trim(
@@ -467,7 +475,8 @@ class Boldgrid_Backup_Admin_Upload {
 			$filename     = basename( $filepath );
 
 			// Restore the log file from the archive.
-			$this->core->archive_log->restore_by_zip( $filepath, basename( $log_filepath ) );
+			$restored = $this->core->archive_log->restore_by_zip( $filepath, basename( $log_filepath ) );
+			$logger->add( 'Log restored from zip: ' . ( $restored ? 'Success' : 'Fail' ) );
 
 			// Update the archive file modification time, based on the log file contents.
 			$this->core->remote->post_download( $filepath );
@@ -487,6 +496,7 @@ class Boldgrid_Backup_Admin_Upload {
 				]
 			);
 		} else {
+			$logger->add( 'Failed to download archive. $response = ' . print_r( $response, 1 ) ); // phpcs:ignore
 			$this->core->wp_filesystem->delete( $filepath );
 		}
 
