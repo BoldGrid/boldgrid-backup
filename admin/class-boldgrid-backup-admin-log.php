@@ -196,9 +196,11 @@ class Boldgrid_Backup_Admin_Log {
 	 * @since 1.12.5
 	 *
 	 * @param  string $filename The filename of the log to create.
+	 * @param  string $header   An optional string to add to the top of the log file. Introduced in 1.13.8,
+	 *                          this allows for a log file to have a helpful header.
 	 * @return bool             Whether or not the log file was created successfully.
 	 */
-	public function init( $filename ) {
+	public function init( $filename, $header = null ) {
 		// Purging of old log files is done here, when we're creating a new one.
 		$this->clean_up();
 
@@ -214,6 +216,10 @@ class Boldgrid_Backup_Admin_Log {
 			$log_created = $this->core->wp_filesystem->touch( $this->filepath );
 
 			if ( $log_created ) {
+				if ( ! empty( $header ) ) {
+					$this->add( $header );
+				}
+
 				$this->add_generic();
 			}
 		}
