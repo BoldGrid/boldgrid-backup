@@ -6,7 +6,7 @@
  * @since      1.13.8
  *
  * @package    Boldgrid\Backup
- * @subpackage Boldgrid\Backup\Cron
+ * @subpackage Boldgrid\Backup\Admin
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
  */
@@ -60,7 +60,7 @@ class Finder {
 	 * @param  array $file An array of file information as received from a WP_Filesystm::dirlist call.
 	 * @return bool
 	 */
-	public function is_file_old( $file ) {
+	public function is_file_old( array $file ) {
 		// Any possible orphan over 2 hours old will be considered an orphan.
 		$threshold = 60 * 60 * 2;
 

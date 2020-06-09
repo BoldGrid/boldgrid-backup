@@ -6,7 +6,7 @@
  * @since      1.13.8
  *
  * @package    Boldgrid\Backup
- * @subpackage Boldgrid\Backup\Cron
+ * @subpackage Boldgrid\Backup\Admin
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
  */
@@ -63,7 +63,11 @@ class Cleanup {
 
 		if ( $orphans ) {
 			$logger = new \Boldgrid_Backup_Admin_Log( $this->core );
-			$logger->init( 'orphaned-files.log', $this->header );
+			$logger->init( 'orphaned-files.log' );
+
+			if ( $logger->is_new ) {
+				$logger->add( $this->header );
+			}
 
 			foreach ( $orphans as $filepath => $data ) {
 				$this->core->wp_filesystem->delete( $filepath );

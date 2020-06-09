@@ -212,15 +212,15 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 		// Find all the files including $search in their filename.
 		foreach ( $dirlist as $filename => $filedata ) {
 			switch ( $search_type ) {
-				case 'contain':
-					// Default behaviour, find files containing.
-					if ( false !== strpos( $filename, $search ) ) {
-						$matches[ $filename ] = $filedata;
-					}
-					break;
 				case 'end':
 					// As of 1.13.8, find files ending with string.
 					if ( substr( $filename, -strlen( $search ) ) === $search ) {
+						$matches[ $filename ] = $filedata;
+					}
+					break;
+				default:
+					// Default behaviour, find files containing.
+					if ( false !== strpos( $filename, $search ) ) {
 						$matches[ $filename ] = $filedata;
 					}
 					break;

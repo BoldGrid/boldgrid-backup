@@ -19,6 +19,20 @@
  */
 class Boldgrid_Backup_Admin_Log {
 	/**
+	 * Whether or not this log file was just created within this instance.
+	 *
+	 * Not all log files are recording info for one process, like a backup. There could be a general
+	 * log that has stuff added to it on a regular basis.
+	 *
+	 * Knowing if this log file was just created can be useful, for example, if you wanted to add a
+	 * heading to the log file to describe what the file is for.
+	 *
+	 * @since 1.13.8
+	 * @var bool
+	 */
+	public $is_new = false;
+
+	/**
 	 * The core class object.
 	 *
 	 * @since  1.10.0
@@ -196,11 +210,9 @@ class Boldgrid_Backup_Admin_Log {
 	 * @since 1.12.5
 	 *
 	 * @param  string $filename The filename of the log to create.
-	 * @param  string $header   An optional string to add to the top of the log file. Introduced in 1.13.8,
-	 *                          this allows for a log file to have a helpful header.
 	 * @return bool             Whether or not the log file was created successfully.
 	 */
-	public function init( $filename, $header = null ) {
+	public function init( $filename ) {
 		// Purging of old log files is done here, when we're creating a new one.
 		$this->clean_up();
 
@@ -216,10 +228,7 @@ class Boldgrid_Backup_Admin_Log {
 			$log_created = $this->core->wp_filesystem->touch( $this->filepath );
 
 			if ( $log_created ) {
-				if ( ! empty( $header ) ) {
-					$this->add( $header );
-				}
-
+				$this->is_new = true;
 				$this->add_generic();
 			}
 		}
