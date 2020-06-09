@@ -496,16 +496,30 @@ class Boldgrid_Backup_Admin_Upload {
 				]
 			);
 		} else {
-			$logger->add( 'Failed to download archive. $response = ' . print_r( $response, 1 ) ); // phpcs:ignore
+			// Get the data from the $response that we want to print to the log.
+			$log_data = array();
+			if ( ! empty( $response['body'] ) ) {
+				$log_data['body'] = $response['body'];
+			}
+			if ( ! empty( $response['response'] ) ) {
+				$log_data['response'] = $response['response'];
+			}
+
+			$logger->add( 'Failed to download archive. Additional info: ' . print_r( $log_data, 1 ) ); // phpcs:ignore
 			$this->core->wp_filesystem->delete( $filepath );
 		}
 
 		// Determine the error message the user will see and return it.
 		$error_message = __( 'Could not retrieve the remote file.', 'boldgrid-backup' );
 		if ( is_wp_error( $response ) ) {
+			// Example: cURL error 28: Connection timed out after 100001 milliseconds.
 			$error_message .= ' ' . $response->get_error_message();
+		} elseif ( ! empty( $response['response']['code'] && ! empty( $response['response']['message'] ) ) ) {
+			// Example: 403 Forbidden
+			$error_message .= ' ' . $response['response']['code'] . ' ' . $response['response']['message'];
 		} else {
-			$error_message .= ' ' . __( 'It may not be a ZIP file, or the link is no longer valid.', 'boldgrid-backup' );
+			// Unkown error.
+			$error_message .= ' ' . __( 'Unknown error. It may not be a ZIP file, or the link is no longer valid.', 'boldgrid-backup' );
 		}
 
 		wp_send_json_error(
