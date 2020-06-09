@@ -497,12 +497,18 @@ class Boldgrid_Backup_Admin_Upload {
 			);
 		} else {
 			// Get the data from the $response that we want to print to the log.
-			$log_data = array();
-			if ( ! empty( $response['body'] ) ) {
-				$log_data['body'] = $response['body'];
-			}
-			if ( ! empty( $response['response'] ) ) {
-				$log_data['response'] = $response['response'];
+			// @todo simply the below.
+			if ( is_wp_error( $response ) ) {
+				$log_data = $response;
+			} elseif ( is_array( $response ) ) {
+				$log_data = array();
+
+				if ( ! empty( $response['body'] ) ) {
+					$log_data['body'] = $response['body'];
+				}
+				if ( ! empty( $response['response'] ) ) {
+					$log_data['response'] = $response['response'];
+				}
 			}
 
 			$logger->add( 'Failed to download archive. Additional info: ' . print_r( $log_data, 1 ) ); // phpcs:ignore
