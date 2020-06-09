@@ -500,12 +500,17 @@ class Boldgrid_Backup_Admin_Upload {
 			$this->core->wp_filesystem->delete( $filepath );
 		}
 
+		// Determine the error message the user will see and return it.
+		$error_message = __( 'Could not retrieve the remote file.', 'boldgrid-backup' );
+		if ( is_wp_error( $response ) ) {
+			$error_message .= ' ' . $response->get_error_message();
+		} else {
+			$error_message .= ' ' . __( 'It may not be a ZIP file, or the link is no longer valid.', 'boldgrid-backup' );
+		}
+
 		wp_send_json_error(
 			[
-				'error' => __(
-					'Could not retrieve the remote file.  It may not be a ZIP file, or the link is no longer valid.',
-					'boldgrid-backup'
-				),
+				'error' => $error_message,
 			]
 		);
 	}
