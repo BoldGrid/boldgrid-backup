@@ -1651,8 +1651,10 @@ class Boldgrid_Backup_Admin_Core {
 			return [ 'error' => 'No available compressor.' ];
 		}
 
-		// Enforce retention setting.
+		// Cleanup. Enforce retention and delete orphaned files.
 		$this->enforce_retention();
+		$orphan_cleanup = new Boldgrid\Backup\Admin\Orphan\Cleanup();
+		$orphan_cleanup->run();
 
 		// Prevent this script from dying.
 		ignore_user_abort( true );
