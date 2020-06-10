@@ -37,5 +37,12 @@ class Find_Modified_Files extends \Boldgrid\Library\Library\Ui\Card {
 				'Search for all files modified within a certain time period. You can also look for other versions of that file within your backups.',
 			'boldgrid-backup' ) .
 			'</p>';
+
+		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/additional-tools/' );
+
+		$this->links = '
+				<a target="_blank" href=" ' . $url . '">' .
+				esc_html__( 'Setup Guide' ) . '
+				</a>';
 	}
 }

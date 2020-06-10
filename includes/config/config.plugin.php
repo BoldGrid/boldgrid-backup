@@ -99,5 +99,10 @@ return [
 			'page'    => 'boldgrid-backup-premium-features',
 			'version' => '1.13.0',
 		],
+		[
+			'id'      => 'bgbkup_timely_auto_updates',
+			'page'    => 'boldgrid-backup-premium-features',
+			'version' => '1.14.0',
+		],
 	],
 ];
