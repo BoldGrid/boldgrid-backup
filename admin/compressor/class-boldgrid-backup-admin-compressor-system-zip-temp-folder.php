@@ -68,6 +68,48 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip_Temp_Folder {
 	}
 
 	/**
+	 * Determine whether or not the system zip temp folder exists.
+	 *
+	 * @since 1.13.8
+	 *
+	 * @return bool
+	 */
+	public function exists() {
+		$path = self::get_path();
+
+		return $this->core->wp_filesystem->exists( $path );
+	}
+
+	/**
+	 * Return a list of files in the system zip temp folder.
+	 *
+	 * @since 1.13.8
+	 *
+	 * @return array
+	 */
+	public function dirlist() {
+		$dirlist = array();
+
+		if ( $this->exists() ) {
+			$path = trailingslashit( self::get_path() );
+
+			$dirlist = $this->core->wp_filesystem->dirlist( $path );
+			$dirlist = empty( $dirlist ) ? array() : $dirlist;
+
+			/*
+			 * When using WP_Filesystem, the key of each array element is the name of the file. For
+			 * this method, we prefer the keys to be the full path to the file.
+			 */
+			foreach ( $dirlist as $filename => $data ) {
+				$dirlist[ $path . $filename ] = $data;
+				unset( $dirlist[ $filename ] );
+			}
+		}
+
+		return $dirlist;
+	}
+
+	/**
 	 * Get the path to our temp folder.
 	 *
 	 * @since 1.13.0

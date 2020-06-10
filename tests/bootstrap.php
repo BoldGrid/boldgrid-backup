@@ -119,6 +119,9 @@ $files = array(
 	'/cli/class-info.php',
 	'/cli/class-log.php',
 	'/cli/class-email.php',
+	// Orphan.
+	'/admin/orphan/class-cleanup.php',
+	'/admin/orphan/class-finder.php',
 );
 
 foreach ( $files as $file ) {

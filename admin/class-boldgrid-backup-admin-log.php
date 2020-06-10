@@ -19,6 +19,20 @@
  */
 class Boldgrid_Backup_Admin_Log {
 	/**
+	 * Whether or not this log file was just created within this instance.
+	 *
+	 * Not all log files are recording info for one process, like a backup. There could be a general
+	 * log that has stuff added to it on a regular basis.
+	 *
+	 * Knowing if this log file was just created can be useful, for example, if you wanted to add a
+	 * heading to the log file to describe what the file is for.
+	 *
+	 * @since 1.13.8
+	 * @var bool
+	 */
+	public $is_new = false;
+
+	/**
 	 * The core class object.
 	 *
 	 * @since  1.10.0
@@ -154,6 +168,15 @@ class Boldgrid_Backup_Admin_Log {
 	}
 
 	/**
+	 * Add a separator in the log.
+	 *
+	 * @since 1.13.7
+	 */
+	public function add_separator() {
+		$this->add( '--------------------------------------------------------------------------------' );
+	}
+
+	/**
 	 * Delete old log files.
 	 *
 	 * @since 1.12.5
@@ -199,13 +222,18 @@ class Boldgrid_Backup_Admin_Log {
 
 		$this->init_signal_handler();
 
-		$log_created = $this->core->wp_filesystem->touch( $this->filepath );
+		$log_exists = $this->core->wp_filesystem->exists( $this->filepath );
 
-		if ( $log_created ) {
-			$this->add_generic();
+		if ( ! $log_exists ) {
+			$log_created = $this->core->wp_filesystem->touch( $this->filepath );
+
+			if ( $log_created ) {
+				$this->is_new = true;
+				$this->add_generic();
+			}
 		}
 
-		return $log_created;
+		return $log_exists || $log_created;
 	}
 
 	/**
