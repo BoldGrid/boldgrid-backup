@@ -134,9 +134,11 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 = 1.14.0 =
 
-Release date: TBD
+Release date: Jun 11th, 2020
 
 * New feature: Timely Auto Updates - auto update WordPress, Plugins, and Themes after a set number of days.
+* Update:      Added "backup site now" to every admin page.
+* Update:      Updated design on all Total Upkeep admin pages.
 
 = 1.13.8 =
 
