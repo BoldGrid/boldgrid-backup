@@ -63,6 +63,7 @@ class Boldgrid_Backup_Admin_Premium_Features {
 				plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-premium.css', array(),
 				BOLDGRID_BACKUP_VERSION
 			);
+			add_thickbox();
 		}
 	}
 

@@ -525,6 +525,7 @@ class Boldgrid_Backup {
 		$this->loader->add_filter( 'wp_ajax_boldgrid_backup_update_archive_details', $plugin_admin_core->archive_details, 'wp_ajax_update' );
 
 		$this->loader->add_action( 'admin_menu', $plugin_admin_core->local, 'add_submenus' );
+
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_is_setup_local', $plugin_admin_core->local, 'is_setup_ajax' );
 
 		$this->loader->add_filter( 'boldgrid_backup_get_core', $plugin_admin_core, 'get_core' );

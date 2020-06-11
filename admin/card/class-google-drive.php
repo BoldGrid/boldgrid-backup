@@ -14,9 +14,9 @@
 namespace Boldgrid\Backup\Admin\Card;
 
 /**
- * Class: Google Drive
+ * Class: Google Drive.
  *
- * This class is responsible for rendering the "Google drive" card on this
+ * This class is responsible for rendering the "Google drive" card on this.
  * plugin's Premium Features Page.
  *
  * @since 1.13.0
@@ -38,13 +38,18 @@ class Google_Drive extends \Boldgrid\Library\Library\Ui\Card {
 			<p>' .
 			esc_html__(
 				'Keep your backup archives safe and secure with remote, automated backups to Google Drive.',
-			'boldgrid-backup' ) .
+				'boldgrid-backup'
+			) .
 			'</p>';
 
-		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/auto-backup-to-google-drive/?source=google-drive' );
+		$url = 'https://www.boldgrid.com/support/total-upkeep/auto-backup-to-google-drive/?source=google-drive';
+
+		$video = 'https://www.youtube.com/embed/p6I_xxo4TLo?controls=1&autoplay=1&modestbranding=1&width=560&height=315&KeepThis=true&TB_iframe=true';
 
 		$this->links = '
-			<a target="_blank" href=" ' . $url . '">' .
+			<a class="video button thickbox" href=' . esc_url( $video ) . '" data-id="' . $this->id . '" title="Store Backups on Google Drive" ><span class="dashicons dashicons-video-alt3"></span>' .
+			esc_html__( 'Learn More' ) .
+			'<a target="_blank" href="' . esc_url( $url ) . '">' .
 			esc_html__( 'Setup Guide' ) . '
 			</a>';
 	}

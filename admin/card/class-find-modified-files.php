@@ -14,7 +14,7 @@
 namespace Boldgrid\Backup\Admin\Card;
 
 /**
- * Class: Find Modified Files
+ * Class: Find Modified Files.
  *
  * @since 1.13.1
  */
@@ -35,7 +35,8 @@ class Find_Modified_Files extends \Boldgrid\Library\Library\Ui\Card {
 			<p>' .
 			esc_html__(
 				'Search for all files modified within a certain time period. You can also look for other versions of that file within your backups.',
-			'boldgrid-backup' ) .
+				'boldgrid-backup'
+			) .
 			'</p>';
 
 		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/additional-tools/' );
