@@ -114,8 +114,8 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 * @return bool
 	 */
 	public function maybe_update_theme( $stylesheet ) {
-		$days_to_wait         = $this->settings['days'];
-		$theme                = $this->themes->getFromStylesheet( $stylesheet );
+		$days_to_wait = $this->settings['days'];
+		$theme        = $this->themes->getFromStylesheet( $stylesheet );
 		$theme->setUpdateData();
 		$days_since_release   = $theme->updateData->days; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
 		$theme_update_enabled = isset( $this->settings['themes'][ $stylesheet ] ) ? (bool) $this->settings['themes'][ $stylesheet ] : (bool) $this->settings['plugins']['default'];
