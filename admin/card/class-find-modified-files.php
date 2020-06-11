@@ -38,5 +38,12 @@ class Find_Modified_Files extends \Boldgrid\Library\Library\Ui\Card {
 				'boldgrid-backup'
 			) .
 			'</p>';
+
+		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/additional-tools/' );
+
+		$this->links = '
+				<a target="_blank" href=" ' . $url . '">' .
+				esc_html__( 'Setup Guide' ) . '
+				</a>';
 	}
 }

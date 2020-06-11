@@ -84,23 +84,22 @@ class Boldgrid_Backup_Admin_In_Progress_Tmp {
 	 * @return array
 	 */
 	private function get_system_zip() {
-		$dir         = Boldgrid_Backup_Admin_Compressor_System_Zip_Temp_Folder::get_path();
-		$dirlist     = $this->core->wp_filesystem->dirlist( $dir );
-		$dirlist     = is_array( $dirlist ) ? $dirlist : [];
-		$size        = 0;
-		$lastmodunix = 0;
+		$data = [];
 
-		foreach ( $dirlist as $file ) {
-			$size += ! empty( $file['size'] ) ? $file['size'] : 0;
+		$filepath = Boldgrid_Backup_Admin_In_Progress_Data::get_arg( 'filepath' );
+		$filename = basename( $filepath );
 
-			$lastmodunix = ! empty( $file['lastmodunix'] ) ? $file['lastmodunix'] : $lastmodunix;
+		$dirlist = $this->core->backup_dir->dirlist_containing( $filename );
+
+		if ( ! empty( $dirlist[ $filename ] ) ) {
+			$data = [
+				'size'        => $dirlist[ $filename ]['size'],
+				'lastmodunix' => $dirlist[ $filename ]['lastmodunix'],
+				'size_format' => size_format( $dirlist[ $filename ]['size'], 2 ),
+			];
 		}
 
-		return [
-			'size'        => $size,
-			'lastmodunix' => $lastmodunix,
-			'size_format' => size_format( $size, 2 ),
-		];
+		return $data;
 	}
 
 	/**

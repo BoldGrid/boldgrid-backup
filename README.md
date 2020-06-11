@@ -1,7 +1,7 @@
 # Total Upkeep #
 
 [![Build Status](https://travis-ci.org/BoldGrid/boldgrid-backup.svg?branch=master)](https://travis-ci.org/BoldGrid/boldgrid-backup)
-[![Greenkeeper badge](https://badges.greenkeeper.io/BoldGrid/boldgrid-backup.svg)](https://greenkeeper.io/)
+
 
 Total Upkeep provides WordPress backup and restoration with update protection.
 

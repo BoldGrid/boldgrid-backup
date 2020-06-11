@@ -90,11 +90,13 @@ if ( ! empty( $reseller ) ) {
 		$this->core->go_pro->get_premium_url( 'bgbkup-support' )
 	);
 	$premium_markup = '<div class="bgbkup-upgrade-message"><p>' .
-		esc_html__( 'Upgrade to receive premium support from BoldGrid', 'boldgrid-backup' ) .
+		esc_html__( 'Upgrade to receive Premium support from BoldGrid', 'boldgrid-backup' ) .
 		'</p><p>' . $premium_button . '</p></div>';
 }
 
 echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+
+require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
 ?>
 
 <div class="bgbkup-support-page">

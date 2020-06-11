@@ -42,6 +42,7 @@ class Test_Boldgrid_Backup_Admin_Premium_Features_Page extends WP_UnitTestCase {
 			'/admin/card/class-one-click-restoration.php',
 			'/admin/card/class-plugin-editor-tools.php',
 			'/admin/card/class-find-modified-files.php',
+			'/admin/card/class-timely-auto-updates.php',
 		);
 
 		foreach ( $files as $file ) {
@@ -58,7 +59,7 @@ class Test_Boldgrid_Backup_Admin_Premium_Features_Page extends WP_UnitTestCase {
 	public function test_get_cards() {
 		$cards = $this->premium_page->get_cards();
 		$this->assertEquals( count( $cards ), count( $this->card_files ) );
-		$this->premium_page->core->plugin = new \Boldgrid\Library\Library\Plugin\Plugin( 'boldgrid-backup', $this->core->configs );
+		$this->premium_page->core->plugin = \Boldgrid\Library\Library\Plugin\Factory::create( 'boldgrid-backup', $this->core->configs );
 	}
 
 	public function test_admin_enqueue_scripts() {
@@ -74,15 +75,6 @@ class Test_Boldgrid_Backup_Admin_Premium_Features_Page extends WP_UnitTestCase {
 		$this->premium_page->admin_enqueue_scripts( 'boldgrid-backup-admin-premium-features' );
 		$this->assertEquals( false, wp_style_is( 'boldgrid-backup-admin-premium-features' ) );
 
-	}
-
-	public function test_page() {
-		$this->premium_page->core->plugin->pluginData = $this->get_plugin_data( '2.1.1' );
-
-		$page_array = $this->premium_page->page();
-		$this->assertTrue( ! empty( $page_array['nav'] ) );
-		$this->assertTrue( ! empty( $page_array['dashboard'] ) );
-		$this->assertTrue( ! empty( $page_array['premium_box'] ) );
 	}
 
 	public function get_plugin_data( $this_version ) {

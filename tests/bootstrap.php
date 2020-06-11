@@ -31,9 +31,15 @@ $files = array(
 	'/vendor/boldgrid/library/src/Library/Settings.php',
 	'/vendor/boldgrid/library/src/Library/Configs.php',
 	'/vendor/boldgrid/library/src/Util/Version.php',
+	'/vendor/boldgrid/library/src/Library/Plugin/Factory.php',
 	'/vendor/boldgrid/library/src/Library/Plugin/Notice.php',
 	'/vendor/boldgrid/library/src/Library/Plugin/Page.php',
 	'/vendor/boldgrid/library/src/Library/Plugin/Plugin.php',
+	'/vendor/boldgrid/library/src/Library/Plugin/Plugins.php',
+	'/vendor/boldgrid/library/src/Library/Plugin/UpdateData.php',
+	'/vendor/boldgrid/library/src/Library/Theme/Theme.php',
+	'/vendor/boldgrid/library/src/Library/Theme/Themes.php',
+	'/vendor/boldgrid/library/src/Library/Theme/UpdateData.php',
 	'/admin/class-boldgrid-backup-admin-premium-features.php',
 	'/admin/class-boldgrid-backup-admin-core.php',
 	'/admin/class-boldgrid-backup-admin.php',
@@ -52,6 +58,7 @@ $files = array(
 	'/admin/class-boldgrid-backup-admin-backup-dir.php',
 	'/admin/class-boldgrid-backup-admin-home-dir.php',
 	'/admin/class-boldgrid-backup-admin-compressors.php',
+	'/admin/class-boldgrid-backup-admin-auto-updates.php',
 	'/admin/class-boldgrid-backup-admin-archive-browser.php',
 	'/admin/class-boldgrid-backup-admin-archive.php',
 	'/admin/class-boldgrid-backup-admin-archive-actions.php',
@@ -112,6 +119,9 @@ $files = array(
 	'/cli/class-info.php',
 	'/cli/class-log.php',
 	'/cli/class-email.php',
+	// Orphan.
+	'/admin/orphan/class-cleanup.php',
+	'/admin/orphan/class-finder.php',
 );
 
 foreach ( $files as $file ) {

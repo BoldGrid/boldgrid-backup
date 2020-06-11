@@ -355,3 +355,63 @@ p > .bgbkup-remote-logo {
 	width: calc( 100% - 40px ) !important;
 	height: calc( 100% - 60px ) !important;
 }
+
+.bgbkup-transfers-destination .bg-box-bottom.premium .button-success {
+	float: none;
+	margin: 10px;
+}
+
+.page-title-actions {
+	display: inline-block;
+}
+
+.bg-auto-update.dashicons {
+	margin-right: 6px;
+	vertical-align: bottom;
+}
+
+.bg-auto-update.dashicons.dashicons-warning {
+	color: #f56e28;
+}
+
+.bg-auto-update.dashicons.dashicons-yes {
+	color: #79ba49;
+}
+
+#upload-archive-section.wp-upload-form {
+	flex-wrap: wrap;
+}
+.bgbkup-page-container .upload-plugin .wp-upload-form {
+	max-width: 85%;
+	align-items: center;
+}
+
+.bgbkup-page-container .upload-plugin .wp-upload-form p {
+	padding-right: 1em;
+}
+
+.bgbkup-page-container .upload-plugin .wp-upload-form .error_messages p {
+	width: 100%;
+}
+
+.bgbkup-page-container .upload-plugin .wp-upload-form input[type=text] {
+	width: 30%;
+	margin-right:6px;
+}
+
+.bgbkup-page-container .upload-plugin #upload-archive-section {
+	align-items: center;
+}
+
+.bgbkup-page-container .upload-plugin #upload-archive-section form {
+	width: 60%;
+}
+
+.bgbkup-page-container .upload-plugin #upload-archive-section form input[type="file"] {
+	width: 50%;
+}
+
+.bgbkup-page-container .upload-plugin #upload-archive-section .error_messages {
+	width: 100%;
+}
+

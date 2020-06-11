@@ -45,15 +45,10 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 	)
 );
 
-?>
+require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
 
-<div class='wrap'>
-	<h1><?php echo esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'Premium Features', 'boldgrid-backup' ) ); ?></h1>
-	<?php
-	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
-	echo $premium_box; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+echo $premium_box; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
-	$dashboard->printCards();
-	?>
-</div>
+$dashboard->printCards();
