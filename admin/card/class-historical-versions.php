@@ -42,14 +42,14 @@ class Historical_Versions extends \Boldgrid\Library\Library\Ui\Card {
 			) .
 			'</p>';
 
-		$url = esc_url( 'https://www.boldgrid.com/support/total-upkeep/restore-historical-files/?source=historical-versions' );
+		$url = 'https://www.boldgrid.com/support/total-upkeep/restore-historical-files/?source=historical-versions';
 
-		$video = esc_url( 'https://www.youtube.com/embed/wGda86tdScg?controls=1&autoplay=1&modestbranding=1&width=560&height=315&KeepThis=true&TB_iframe=true' );
+		$video = 'https://www.youtube.com/embed/wGda86tdScg?controls=1&autoplay=1&modestbranding=1&width=560&height=315&KeepThis=true&TB_iframe=true';
 
 		$this->links = '
-			<a class="video button thickbox" href=' . $video . '" data-id="' . $this->id . '" title="Restore Historical Versions of Files"><span class="dashicons dashicons-video-alt3"></span>' .
+			<a class="video button thickbox" href=' . esc_url( $video ) . '" data-id="' . $this->id . '" title="Restore Historical Versions of Files"><span class="dashicons dashicons-video-alt3"></span>' .
 			esc_html__( 'Learn More' ) .
-			'<a target="_blank" href="' . $url . '">' .
+			'<a target="_blank" href="' . esc_url( $url ) . '">' .
 			esc_html__( 'Setup Guide' ) . '
 			</a>';
 	}

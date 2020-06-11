@@ -56,7 +56,7 @@ BoldGrid.Settings = function( $ ) {
 	 * @since 1.5.2
 	 */
 	tb_unload_count = 0;
-
+	
 	/**
 	 * Message describing resource usage.
 	 *
