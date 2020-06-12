@@ -75,24 +75,6 @@ class Crontab {
 	}
 
 	/**
-	 * Retrieve the system crontab entries.
-	 *
-	 * @since 1.11.1
-	 *
-	 * @return string|false
-	 */
-	public function read_crontab() {
-		if ( ! $this->core->test->is_crontab_available() ) {
-			return false;
-		}
-
-		$command = 'crontab -l';
-		$crontab = $this->core->execute_command( $command, $success );
-
-		return $success ? $crontab : false;
-	}
-
-	/**
 	 * Write to the system crontab.
 	 *
 	 * The crontab contents will be replaced with the string passed to this method.
