@@ -27,9 +27,6 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 	$( function() {
 		var $urlImportSection = $( 'div#url-import-section' );
 
-		// On click action for the Upload button.
-		$urlImportSection.find( '.button' ).on( 'click', self.uploadButtonClicked );
-
 		$( '.page-title-action.add-new' ).on( 'click', function() {
 			$( '#add_new' ).toggle();
 		} );
@@ -183,27 +180,6 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 		} );
 
 		return false;
-	};
-
-	/**
-	 * Confirm to delete a selected backup archive file.
-	 *
-	 * @since 1.2.2
-	 */
-	self.uploadButtonClicked = function() {
-
-		// Declare variables.
-		var $this = $( this );
-
-		// Disable the Upload button.
-		$this.css( 'pointer-events', 'none' );
-
-		// Show the spinner.
-		$this
-			.parent()
-			.find( '.spinner' )
-			.addClass( 'is-active' )
-			.css( 'display', 'inline-block' );
 	};
 
 	/**

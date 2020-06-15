@@ -19,6 +19,20 @@
  */
 class Boldgrid_Backup_Admin_Log {
 	/**
+	 * Whether or not this log file was just created within this instance.
+	 *
+	 * Not all log files are recording info for one process, like a backup. There could be a general
+	 * log that has stuff added to it on a regular basis.
+	 *
+	 * Knowing if this log file was just created can be useful, for example, if you wanted to add a
+	 * heading to the log file to describe what the file is for.
+	 *
+	 * @since 1.13.8
+	 * @var bool
+	 */
+	public $is_new = false;
+
+	/**
 	 * The core class object.
 	 *
 	 * @since  1.10.0
@@ -46,6 +60,15 @@ class Boldgrid_Backup_Admin_Log {
 	private $filepath;
 
 	/**
+	 * The last error, as per error_get_last().
+	 *
+	 * @since 1.13.5
+	 * @var array
+	 * @access private
+	 */
+	private $last_error;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.10.1
@@ -61,9 +84,20 @@ class Boldgrid_Backup_Admin_Log {
 	 *
 	 * @since 1.12.5
 	 *
-	 * @param string $message The message to add to the log.
+	 * @param string $message        The message to add to the log.
+	 * @param bool   $log_last_error Whether or not to log the last error. Most useful for self::add_last_error
+	 *                               to avoid infinite loop when calling this method.
 	 */
-	public function add( $message ) {
+	public function add( $message, $log_last_error = true ) {
+		/*
+		 * Before we do anything, log the last error. This is important to go first because when looking
+		 * at the log, the error should come first because it was triggered before whatever it is we're
+		 * adding a message about right now.
+		 */
+		if ( $log_last_error ) {
+			$this->add_last_error();
+		}
+
 		// Add a timestamp to the message.
 		$message = date( '[Y-m-d H:i:s e]' ) . ' ' . $message;
 
@@ -92,6 +126,26 @@ class Boldgrid_Backup_Admin_Log {
 	}
 
 	/**
+	 * Add the last error to the log.
+	 *
+	 * The error is only added to the log if it hasn't been logged before.
+	 *
+	 * @since 1.13.5
+	 */
+	public function add_last_error() {
+		$current_error = error_get_last();
+
+		// Only new errors are logged.
+		if ( $current_error !== $this->last_error ) {
+			$this->add( 'Last error: ' . print_r( $current_error, 1 ), false ); // phpcs:ignore
+		}
+
+		// This method will be called often, so keep track of errors to avoid logging duplicates.
+		$this->last_error = $current_error;
+	}
+
+
+	/**
 	 * Add info to the log about memory usage.
 	 *
 	 * @since 1.12.5
@@ -111,6 +165,15 @@ class Boldgrid_Backup_Admin_Log {
 		);
 
 		$this->add( $message );
+	}
+
+	/**
+	 * Add a separator in the log.
+	 *
+	 * @since 1.13.7
+	 */
+	public function add_separator() {
+		$this->add( '--------------------------------------------------------------------------------' );
 	}
 
 	/**
@@ -159,13 +222,18 @@ class Boldgrid_Backup_Admin_Log {
 
 		$this->init_signal_handler();
 
-		$log_created = $this->core->wp_filesystem->touch( $this->filepath );
+		$log_exists = $this->core->wp_filesystem->exists( $this->filepath );
 
-		if ( $log_created ) {
-			$this->add_generic();
+		if ( ! $log_exists ) {
+			$log_created = $this->core->wp_filesystem->touch( $this->filepath );
+
+			if ( $log_created ) {
+				$this->is_new = true;
+				$this->add_generic();
+			}
 		}
 
-		return $log_created;
+		return $log_exists || $log_created;
 	}
 
 	/**
@@ -219,14 +287,30 @@ class Boldgrid_Backup_Admin_Log {
 	}
 
 	/**
+	 * Hook into shutdown.
+	 *
+	 * @since 1.13.5
+	 */
+	public function shutdown() {
+		/*
+		 * This method is always added to the shutdown. Only log errors if we've initialized and are
+		 * using this logging system (IE don't log errors unrelated to this plugin).
+		 */
+		if ( ! empty( $this->filename ) ) {
+			$this->add_last_error();
+		}
+	}
+
+	/**
 	 * Signal handler.
 	 *
 	 * @since 1.12.6
 	 *
-	 * @param int The signal being handled.
+	 * @param int   $signo The signal being handled.
+	 * @param array $signinfo Additional information about signal.
 	 */
-	public function signal_handler( $signo ) {
-		$this->add( 'Signal received: ' . $signo );
+	public function signal_handler( $signo, $signinfo ) {
+		$this->add( 'Signal received: ' . $signo . ' ' . wp_json_encode( $signinfo ) );
 
 		exit;
 	}

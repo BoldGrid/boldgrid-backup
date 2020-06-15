@@ -16,7 +16,7 @@
  *          Plugin Name: Total Upkeep
  *          Plugin URI: https://www.boldgrid.com/boldgrid-backup/
  *          Description: Automated backups, remote backup to Amazon S3 and Google Drive, stop website crashes before they happen and more. Total Upkeep is the backup solution you need.
- *          Version: 1.14.0-rc.1
+ *          Version: 1.14.0-rc.3
  *          Author: BoldGrid
  *          Author URI: https://www.boldgrid.com/
  *          License: GPL-2.0+
@@ -117,6 +117,11 @@ function load_boldgrid_backup() {
 			'licenseActivate' => false,
 		)
 	);
+
+	// Make sure we have necessary library files.
+	if ( ! $support->run_library_tests() ) {
+		return false;
+	}
 
 	register_activation_hook( __FILE__, 'activate_boldgrid_backup' );
 	register_deactivation_hook( __FILE__, 'deactivate_boldgrid_backup' );

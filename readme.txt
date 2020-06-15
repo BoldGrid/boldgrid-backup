@@ -4,7 +4,7 @@ Tags: backup, cloud backup, database backup, restore, wordpress backup
 Requires at least: 4.4
 Tested up to: 5.4
 Requires PHP: 5.4
-Stable tag: 1.13.3
+Stable tag: 1.13.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -137,6 +137,40 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 Release date: TBD
 
 * New feature: Timely Auto Updates - auto update WordPress, Plugins, and Themes after a set number of days.
+
+= 1.13.8 =
+
+Release date: June 9th, 2020
+
+* Update:     Added orphaned file cleanup system.
+
+= 1.13.7 =
+
+Release date: June 4rd, 2020
+
+* Update:     Create log file for local retention.
+
+= 1.13.6 =
+
+Release date: June 1st, 2020
+
+* Bug fix:    Adjust the charset used when dumping database (derived from WordPress DB_CHARSET).
+
+= 1.13.5 =
+
+Release date: May 28th, 2020
+
+* Update:     Create a restore log (like the backup log).
+* Update:     Updated dependencies.
+* Bug fix:    Avoid fatals on library issues.
+* Bug fix:    Be more specific with data-toggle-target attribute.
+
+= 1.13.4 =
+
+Release date: May 21st, 2020
+
+* Update:     If backup email fails, debug info written to log file.
+* Update:     Definition added to allow for skipping email headers.
 
 = 1.13.3 =
 

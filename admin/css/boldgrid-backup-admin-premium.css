@@ -108,3 +108,16 @@
 .bglib-card-title {
 	height: 2em;
 }
+
+.bglib-card-links span.dashicons {
+	vertical-align: text-top;
+	padding-right: 0.25em;
+}
+
+.bglib-card .bglib-card-links {
+	justify-content: flex-end;
+}
+
+.bglib-smaller .bglib-card-links a.button {
+	margin-right: 10px;
+}

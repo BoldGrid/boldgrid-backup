@@ -198,17 +198,32 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	 *
 	 * @since 1.7.0
 	 *
-	 * @param  string $search The search string / needle.
+	 * @param  string $search      The search string / needle.
+	 * @param  string $search_type The type of search to perform. As you can see based on this method's
+	 *                             name, originally we only found files containing a string. As of 1.13.8,
+	 *                             you can pass a $search_type of 'end' to find files ending with a
+	 *                             string.
 	 * @return array
 	 */
-	public function dirlist_containing( $search ) {
+	public function dirlist_containing( $search, $search_type = 'contain' ) {
 		$matches = array();
 		$dirlist = $this->dirlist();
 
 		// Find all the files including $search in their filename.
 		foreach ( $dirlist as $filename => $filedata ) {
-			if ( false !== strpos( $filename, $search ) ) {
-				$matches[ $filename ] = $filedata;
+			switch ( $search_type ) {
+				case 'end':
+					// As of 1.13.8, find files ending with string.
+					if ( substr( $filename, -strlen( $search ) ) === $search ) {
+						$matches[ $filename ] = $filedata;
+					}
+					break;
+				default:
+					// Default behaviour, find files containing.
+					if ( false !== strpos( $filename, $search ) ) {
+						$matches[ $filename ] = $filedata;
+					}
+					break;
 			}
 		}
 

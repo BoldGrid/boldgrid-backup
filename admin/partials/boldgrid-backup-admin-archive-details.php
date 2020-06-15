@@ -76,7 +76,7 @@ if ( ! $archive_found ) {
 	$more_info = empty( $details ) ? '' : sprintf(
 		'
 		<div class="misc-pub-section">
-			More info <a href="" data-toggle-target="#more_info">Show</a>
+			More info <a href="" data-bgbkup-toggle-target="#more_info">Show</a>
 			<div id="more_info" class="hidden">
 				<hr />
 				%1$s
