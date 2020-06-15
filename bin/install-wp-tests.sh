@@ -43,7 +43,7 @@ install_test_suite() {
 	# set up testing suite
 	mkdir -p $WP_TESTS_DIR
 	cd $WP_TESTS_DIR
-		# Temporarily set to 5.2 until this issue is resolved:
+	# Temporarily set to 5.2 until this issue is resolved:
 	# https://core.trac.wordpress.org/ticket/50377
 	svn co --quiet https://develop.svn.wordpress.org/branches/5.2/tests/phpunit/includes/
 	wget -nv -O wp-tests-config.php https://develop.svn.wordpress.org/branches/5.2/wp-tests-config-sample.php

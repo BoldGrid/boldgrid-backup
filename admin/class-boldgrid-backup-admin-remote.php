@@ -43,16 +43,28 @@ class Boldgrid_Backup_Admin_Remote {
 	 *
 	 * @since 1.6.0
 	 *
+	 * @param bool $skip_local Whether or not to skip local storage when determining if any storage
+	 *                         locations are enabled. Initially, this method returned true if any storage
+	 *                         "provider" was enabled. Meaning, if you have local storage enabled only,
+	 *                         this would return true. There are times you need to specifically ask
+	 *                         if a REMOTE storage provider is enabled. To do this, pass true for $skip_local.
+	 *                         This confusion is caused by this class name being "REMOTE" yet us saving
+	 *                         LOCAL storage settings in boldgrid_backup_settings['remote']['local'].
+	 *
 	 * @return bool
 	 */
-	public function any_enabled() {
+	public function any_enabled( $skip_local = false ) {
 		$settings = $this->core->settings->get_settings();
 
 		if ( empty( $settings ) || empty( $settings['remote'] ) ) {
 			return false;
 		}
 
-		foreach ( $settings['remote'] as $remote ) {
+		foreach ( $settings['remote'] as $key => $remote ) {
+			if ( $skip_local && 'local' === $key ) {
+				continue;
+			}
+
 			if ( isset( $remote['enabled'] ) && true === $remote['enabled'] ) {
 				return true;
 			}

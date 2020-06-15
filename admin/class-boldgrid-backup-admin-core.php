@@ -1879,7 +1879,11 @@ class Boldgrid_Backup_Admin_Core {
 		/**
 		 * Actions to take after a backup has been created.
 		 *
-		 * At priority 100, we delete the local backup file if the user does
+		 * At priority 10, we add to the jobs queue the tasks of uploading this backup to our remote
+		 * storage providers. Each remote storage provider individually hooks into this action and adds
+		 * a job to the queue.
+		 *
+		 * At priority 100, we add a job to delete the local backup file if the user does
 		 * not want to keep it.
 		 *
 		 * At priority 200, we send an email to the user with a summary of the
