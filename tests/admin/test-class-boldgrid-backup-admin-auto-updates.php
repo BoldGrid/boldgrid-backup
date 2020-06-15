@@ -206,7 +206,8 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 
 		$themes = new \Boldgrid\Library\Library\Theme\Themes();
 		$theme  = $themes->getFromStylesheet( 'twentytwenty' );
-		$days   = $theme->updateData->days; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
+		$theme->setUpdateData();
+		$days = $theme->updateData->days; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
 
 		// Create mock object to simulate premium plugin being inactive.
 		$mock_auto_updates = $this->getMockBuilder( Boldgrid_backup_Admin_Auto_Updates::class )
