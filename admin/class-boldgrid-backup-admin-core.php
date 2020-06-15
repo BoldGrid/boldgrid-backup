@@ -3089,4 +3089,5 @@ class Boldgrid_Backup_Admin_Core {
 		if ( false !== strpos( $hook_suffix, 'boldgrid-backup' ) ) {
 			add_thickbox();
 		}
+	}
 }
