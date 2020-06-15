@@ -14,7 +14,7 @@
 namespace Boldgrid\Backup\Admin\Orphan;
 
 /**
- * Class: Finder
+ * Class: Cleanup
  *
  * @since 1.13.8
  */

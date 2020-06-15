@@ -477,13 +477,19 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		 * @param object In progress data received from ajax call.
 		 */
 		onStepSaving: function( data ) {
-			var percentage = Math.floor( ( data.tmp.size / data.total_size_archived ) * 100 );
+			var percentage;
 
 			self.setStepActive( 3 );
 
-			self.setPercentage( percentage );
+			if ( data.percent_closed ) {
+				percentage = Math.floor( data.percent_closed * 100 );
+				self.setLabel( ' ' + percentage + '% Complete' );
+			} else {
+				percentage = Math.floor( ( data.tmp.size / data.total_size_archived ) * 100 );
+				self.setLabel( ' ' + self.i18n.archive_file_size + data.tmp.size_format );
+			}
 
-			self.setLabel( ' ' + self.i18n.archive_file_size + data.tmp.size_format );
+			self.setPercentage( percentage );
 
 			self.setSubText( self.i18n.size_before_compression + data.total_size_archived_size_format );
 		},

@@ -70,7 +70,7 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 	</div>',
 	/* 1 */ $premium_inputs,
 	/* 2 */ $this->core->go_pro->get_premium_button( $premium_url ),
-	/* 3 */ __( 'Upgrade to premium for more Storage Locations!', 'boldgrid-backup' )
+	/* 3 */ __( 'Upgrade to Premium for more Storage Locations!', 'boldgrid-backup' )
 );
 
 ?>

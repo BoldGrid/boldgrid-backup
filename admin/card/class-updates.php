@@ -27,6 +27,9 @@ class Updates extends \Boldgrid\Library\Library\Ui\Card {
 	 * @since 1.11.0
 	 */
 	public function init() {
+
+		$core = apply_filters( 'boldgrid_backup_get_core', null );
+
 		$this->id = 'bgbkup_updates';
 
 		$this->title = esc_html__( 'Update Management', 'boldgrid-backup' );
@@ -40,5 +43,8 @@ class Updates extends \Boldgrid\Library\Library\Ui\Card {
 			new Feature\Auto_Rollback(),
 			new Feature\Auto_Update_Backup(),
 		];
+		if ( $core->config->get_is_premium() ) {
+			$this->features[] = new Feature\Timely_Auto_Updates();
+		}
 	}
 }

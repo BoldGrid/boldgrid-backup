@@ -90,7 +90,7 @@ class Boldgrid_Backup_Admin_Go_Pro {
 
 		$is_premium = $this->core->config->get_is_premium();
 
-		$premium_plugin = new \Boldgrid\Library\Library\Plugin\Plugin( 'boldgrid-backup-premium' );
+		$premium_plugin = \Boldgrid\Library\Library\Plugin\Factory::create( 'boldgrid-backup-premium' );
 
 		$notices = [
 			[
