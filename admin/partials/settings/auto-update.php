@@ -427,15 +427,15 @@ if ( $this->core->config->is_premium_done ) {
 	// If the 'boldgrid_backup_premium_timely_auto_updates' filter does not exist, then the $auto_update_settings array will be returned.
 	if ( $auto_update_settings === $timely_auto_update_markup ) {
 		$auto_update_markup .= sprintf(
-		'<div class="bg-box-bottom premium">
-			<p>
-				<a class="button" href="%1$s">%2$s</a>
-				%3$s
-			</p>
-		</div></div></div>',
-		/* 1 */ admin_url( 'update-core.php' ),
-		/* 2 */ __( 'View Updates', 'boldgrid-backup' ),
-		/* 3 */ __( 'Upgrade to the newest version of Premium for the option to configure a delay on updates!', 'boldgrid-backup' )
+			'<div class="bg-box-bottom premium">
+				<p>
+					<a class="button" href="%1$s">%2$s</a>
+					%3$s
+				</p>
+			</div></div></div>',
+			/* 1 */ admin_url( 'update-core.php' ),
+			/* 2 */ __( 'View Updates', 'boldgrid-backup' ),
+			/* 3 */ __( 'Upgrade to the newest version of Premium for the option to configure a delay on updates!', 'boldgrid-backup' )
 		);
 	} else {
 		$auto_update_markup .= $timely_auto_update_markup;

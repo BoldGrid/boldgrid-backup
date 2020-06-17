@@ -174,7 +174,8 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 		$this->assertTrue( $mock_auto_updates->maybe_update_plugin( 'akismet' ) );
 
 		// Test updates will not occur if not within the day's option with premium active.
-		$akismet_test_settings['auto_update']['days'] = (int) $days + 10;
+		$akismet_test_settings['auto_update']['days']                   = (int) $days + 10;
+		$akismet_test_settings['auto_update']['timely-updates-enabled'] = true;
 		update_option( 'boldgrid_backup_settings', $akismet_test_settings );
 		$mock_auto_updates->set_settings();
 		$this->assertFalse( $mock_auto_updates->maybe_update_plugin( 'akismet' ) );
@@ -226,7 +227,8 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 		$this->assertTrue( $mock_auto_updates->maybe_update_theme( 'twentytwenty' ) );
 
 		// Test updates will not occur if not within the day's option with premium active.
-		$twentytwenty_test_settings['auto_update']['days'] = (int) $days + 10;
+		$twentytwenty_test_settings['auto_update']['days']                   = (int) $days + 10;
+		$twentytwenty_test_settings['auto_update']['timely-updates-enabled'] = true;
 		update_option( 'boldgrid_backup_settings', $twentytwenty_test_settings );
 		$mock_auto_updates->set_settings();
 		$this->assertFalse( $mock_auto_updates->maybe_update_theme( 'twentytwenty' ) );
