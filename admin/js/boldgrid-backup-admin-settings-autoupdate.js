@@ -78,6 +78,17 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 					$( '#timely-updates-days-hidden' ).prop( 'disabled', true );
 				}
 			} );
+
+			$( '#timely-updates-days' ).on( 'change', self._validateDays );
+		},
+
+		_validateDays: function( event ) {
+			var value = event.currentTarget.value;
+			if ( isNaN( value ) || ! value || 0 > value || 99 < value ) {
+				$( '#boldgrid-settings-submit' ).prop( 'disabled', true );
+			} else {
+				$( '#boldgrid-settings-submit' ).prop( 'disabled', false );
+			}
 		},
 
 		_onInputChange: function( toggle, input ) {
