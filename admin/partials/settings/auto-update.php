@@ -88,12 +88,7 @@ function get_premium_markup() {
 		/* 2 */ __( 'Upgrade to Premium for the option to configure a delay on updates!', 'boldgrid-backup' )
 	);
 
-	$premium_markup = '<div class="bg-box">
-		<div class="bg-box-top">' .
-			esc_html__( 'Configure When Auto Updates Occur', 'boldgrid-backup' ) . '
-		</div>' . $premium_box . '</div>';
-
-	return $premium_markup;
+	return $premium_box;
 }
 
 /**
@@ -420,11 +415,34 @@ function get_themes_update_markup( $auto_update_settings, $translations ) {
 
 $auto_update_markup = ' ' . get_heading_markup( $boldgrid_backup_settings, $auto_update_settings );
 
+$auto_update_markup .= '
+	<div class="bg-box">
+		<div class="bg-box-top">' .
+			esc_html__( 'Configure When Auto Updates Occur', 'boldgrid-library' ) . '
+		</div>
+	<div class="bg-box-bottom">';
+
 if ( $this->core->config->is_premium_done ) {
-	include_once BOLDGRID_BACKUP_PREMIUM_PATH . '/admin/partials/settings/timely-auto-updates.php';
-	$auto_update_markup .= get_when_update_markup( $auto_update_settings );
+	$timely_auto_update_markup = apply_filters( 'boldgrid_backup_premium_timely_auto_updates', $auto_update_settings );
+	// If the 'boldgrid_backup_premium_timely_auto_updates' filter does not exist, then the $auto_update_settings array will be returned.
+	if ( $auto_update_settings === $timely_auto_update_markup ) {
+		$auto_update_markup .= sprintf(
+		'<div class="bg-box-bottom premium">
+			<p>
+				<a class="button" href="%1$s">%2$s</a>
+				%3$s
+			</p>
+		</div></div></div>',
+		/* 1 */ admin_url( 'update-core.php' ),
+		/* 2 */ __( 'View Updates', 'boldgrid-backup' ),
+		/* 3 */ __( 'Upgrade to the newest version of Premium for the option to configure a delay on updates!', 'boldgrid-backup' )
+		);
+	} else {
+		$auto_update_markup .= $timely_auto_update_markup;
+	}
 } else {
 	$auto_update_markup .= get_premium_markup( $auto_update_settings );
+	$auto_update_markup .= '</div></div>';
 }
 
 $auto_update_markup .= get_wpcore_update_markup( $auto_update_settings, $translations ) .

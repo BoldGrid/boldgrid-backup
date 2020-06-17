@@ -304,6 +304,7 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/orphan/class-finder.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/orphan/class-cleanup.php';
 
+
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
 
