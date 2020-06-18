@@ -86,6 +86,8 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 * Get Days.
 	 *
 	 * @since 1.14.0
+	 *
+	 * @return int
 	 */
 	public function get_days() {
 		if ( empty( $this->settings['timely-updates-enabled'] ) || empty( $this->settings['days'] ) ) {
