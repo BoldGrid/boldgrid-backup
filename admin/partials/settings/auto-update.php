@@ -418,7 +418,7 @@ $auto_update_markup = ' ' . get_heading_markup( $boldgrid_backup_settings, $auto
 $auto_update_markup .= '
 	<div class="bg-box">
 		<div class="bg-box-top">' .
-			esc_html__( 'Configure When Auto Updates Occur', 'boldgrid-library' ) . '
+			esc_html__( 'Configure When Auto Updates Occur', 'boldgrid-backup' ) . '
 		</div>
 	<div class="bg-box-bottom">';
 
