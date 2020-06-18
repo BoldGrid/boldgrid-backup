@@ -423,9 +423,9 @@ $auto_update_markup .= '
 	<div class="bg-box-bottom">';
 
 if ( $this->core->config->is_premium_done ) {
-	$timely_auto_update_markup = apply_filters( 'boldgrid_backup_premium_timely_auto_updates', $auto_update_settings );
+	$timely_update_markup = apply_filters( 'boldgrid_backup_premium_timely_auto_updates', $auto_update_settings );
 	// If the 'boldgrid_backup_premium_timely_auto_updates' filter does not exist, then the $auto_update_settings array will be returned.
-	if ( $auto_update_settings === $timely_auto_update_markup ) {
+	if ( $auto_update_settings === $timely_update_markup ) {
 		$auto_update_markup .= sprintf(
 			'<div class="bg-box-bottom premium">
 				<p>
@@ -438,7 +438,7 @@ if ( $this->core->config->is_premium_done ) {
 			/* 3 */ __( 'Upgrade to the newest version of Premium for the option to configure a delay on updates!', 'boldgrid-backup' )
 		);
 	} else {
-		$auto_update_markup .= $timely_auto_update_markup;
+		$auto_update_markup .= $timely_update_markup;
 	}
 } else {
 	$auto_update_markup .= get_premium_markup( $auto_update_settings );
