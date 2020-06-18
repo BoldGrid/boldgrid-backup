@@ -422,24 +422,29 @@ $auto_update_markup .= '
 		</div>
 	<div class="bg-box-bottom">';
 
-if ( $this->core->config->is_premium_done ) {
-	$timely_update_markup = apply_filters( 'boldgrid_backup_premium_timely_auto_updates', $auto_update_settings );
-	// If the 'boldgrid_backup_premium_timely_auto_updates' filter does not exist, then the $auto_update_settings array will be returned.
-	if ( $auto_update_settings === $timely_update_markup ) {
-		$auto_update_markup .= sprintf(
-			'<div class="bg-box-bottom premium">
-				<p>
-					<a class="button" href="%1$s">%2$s</a>
-					%3$s
-				</p>
-			</div></div></div>',
-			/* 1 */ admin_url( 'update-core.php' ),
-			/* 2 */ __( 'View Updates', 'boldgrid-backup' ),
-			/* 3 */ __( 'Upgrade to the newest version of Premium for the option to configure a delay on updates!', 'boldgrid-backup' )
-		);
-	} else {
-		$auto_update_markup .= $timely_update_markup;
-	}
+// If the 'boldgrid_backup_premium_timely_auto_updates' filter does not exist, then the $auto_update_settings array will be returned.
+$timely_update_markup = apply_filters( 'boldgrid_backup_premium_timely_auto_updates', $auto_update_settings );
+
+/**
+ * This was changed to be sure that there are no errors / issues if Total Upkeep is updated, but Total Upkeep Premium is not.
+ * If Premium IS active and the above filter returns the $auto_update_settings array instead of the markup, then the user will need
+ * to update to the newest version. If the Premium Plugin is active and the markup is returned above, then the timely update markup is
+ * displayed. Lastly, if the premium plugin is not active at all, then the premium upsell is displayed.
+ */
+if ( $this->core->config->is_premium_done && $timely_update_markup === $auto_update_settings ) {
+	$auto_update_markup .= sprintf(
+		'<div class="bg-box-bottom premium">
+			<p>
+				<a class="button" href="%1$s">%2$s</a>
+				%3$s
+			</p>
+		</div></div></div>',
+		/* 1 */ admin_url( 'update-core.php' ),
+		/* 2 */ __( 'View Updates', 'boldgrid-backup' ),
+		/* 3 */ __( 'Upgrade to the newest version of Premium for the option to configure a delay on updates!', 'boldgrid-backup' )
+	);
+} elseif ( $this->core->config->is_premium_done ) {
+	$auto_update_markup .= $timely_update_markup;
 } else {
 	$auto_update_markup .= get_premium_markup( $auto_update_settings );
 	$auto_update_markup .= '</div></div>';
