@@ -715,7 +715,8 @@ class Boldgrid_Backup_Admin_Settings {
 			 * @since 1.14.0
 			 */
 			if ( ! empty( $_POST['auto_update'] ) ) {
-				$settings['auto_update'] = $_POST['auto_update'];
+				$settings['auto_update'] = $this->validate_auto_update( $_POST['auto_update'] );
+				$update_error            = $settings['auto_update'] ? $update_error : true;
 			}
 
 			// Read BoldGrid settings form POST request, sanitize, and merge settings with saved.
@@ -779,6 +780,25 @@ class Boldgrid_Backup_Admin_Settings {
 
 		// Return success.
 		return ! $update_error;
+	}
+
+	/**
+	 * Validates the auto_update submissions.
+	 *
+	 * @since 1.14.0
+	 *
+	 * @param array $posted_update_settings Update settings submitted via POST.
+	 *
+	 * @return array
+	 */
+	public function validate_auto_update( $posted_update_settings ) {
+		$post_days = isset( $posted_update_settings['days'] ) ? $posted_update_settings['days'] : null;
+
+		if ( null === $post_days || ( is_numeric( $post_days ) && 0 <= $post_days && 99 >= $post_days ) ) {
+			return $posted_update_settings;
+		}
+
+		return false;
 	}
 
 	/**

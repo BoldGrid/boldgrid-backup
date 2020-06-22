@@ -83,6 +83,21 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	}
 
 	/**
+	 * Get Days.
+	 *
+	 * @since 1.14.0
+	 *
+	 * @return int
+	 */
+	public function get_days() {
+		if ( empty( $this->settings['timely-updates-enabled'] ) || empty( $this->settings['days'] ) ) {
+			return 0;
+		} else {
+			return $this->settings['days'];
+		}
+	}
+
+	/**
 	 * Maybe Update Plugin.
 	 *
 	 * @since 1.14.0
@@ -91,7 +106,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 * @return bool
 	 */
 	public function maybe_update_plugin( $slug ) {
-		$days_to_wait = $this->settings['days'];
+		$days_to_wait = $this->get_days();
 		$plugin       = \Boldgrid\Library\Library\Plugin\Plugins::getBySlug( $this->plugins, $slug );
 		$plugin->setUpdateData();
 
@@ -114,7 +129,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 * @return bool
 	 */
 	public function maybe_update_theme( $stylesheet ) {
-		$days_to_wait = $this->settings['days'];
+		$days_to_wait = $this->get_days();
 		$theme        = $this->themes->getFromStylesheet( $stylesheet );
 		$theme->setUpdateData();
 		$days_since_release   = $theme->updateData->days; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
