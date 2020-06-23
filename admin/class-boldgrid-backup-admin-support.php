@@ -150,6 +150,7 @@ class Boldgrid_Backup_Admin_Support {
 		foreach ( $classes as $class ) {
 			if ( ! class_exists( $class ) ) {
 				$has_library = false;
+				break;
 			}
 		}
 
