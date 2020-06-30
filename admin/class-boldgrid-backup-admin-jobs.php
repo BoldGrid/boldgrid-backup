@@ -42,6 +42,15 @@ class Boldgrid_Backup_Admin_Jobs {
 	private $core;
 
 	/**
+	 * An instance of our log class.
+	 *
+	 * @since  1.13.11
+	 * @access private
+	 * @var    Boldgrid_Backup_Admin_Log
+	 */
+	private $logger;
+
+	/**
 	 * An array of jobs.
 	 *
 	 * @since 1.5.2
@@ -78,6 +87,11 @@ class Boldgrid_Backup_Admin_Jobs {
 	 *                    this class for more information.
 	 */
 	public function add( $args ) {
+		// Add info to our logs about this even we're adding.
+		$action = empty( $args['action'] ) ? 'Unknown action' : $args['action'];
+		$this->init_logger();
+		$this->logger->add( 'Adding job. Action = ' . $action );
+
 		if ( empty( $args['action'] ) ) {
 			return false;
 		}
@@ -115,6 +129,18 @@ class Boldgrid_Backup_Admin_Jobs {
 
 		$this->jobs = array_values( $this->jobs );
 		$this->save_jobs();
+	}
+
+	/**
+	 * Setup our logger.
+	 *
+	 * @since 1.13.11
+	 */
+	private function init_logger() {
+		if ( is_null( $this->logger ) ) {
+			$this->logger = new Boldgrid_Backup_Admin_Log( $this->core );
+			$this->logger->init( 'jobs.log' );
+		}
 	}
 
 	/**
