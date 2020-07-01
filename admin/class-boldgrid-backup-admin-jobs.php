@@ -101,6 +101,8 @@ class Boldgrid_Backup_Admin_Jobs {
 		$this->set_jobs();
 		$this->jobs[] = $args;
 		$this->save_jobs();
+
+		$this->logger->add( 'Job added. Total number of jobs: ' . count( $this->jobs ) );
 	}
 
 	/**
@@ -267,16 +269,21 @@ class Boldgrid_Backup_Admin_Jobs {
 			wp_die();
 		}
 
+		$this->init_logger();
+		$this->logger->add( 'Running the jobs queue. ' . count( $this->jobs ) . ' job(s) in the queue.' );
+
 		foreach ( $this->jobs as $key => &$job ) {
 			if ( 'pending' !== $job['status'] ) {
 				continue;
 			}
 
+			$this->logger->add( 'Running job: ' . $job['action'] );
 			$job['start_time'] = time();
 			$this->save_jobs();
 
 			$status = apply_filters( $job['action'], $job['action_data'] );
 
+			$this->logger->add( 'Finished job: ' . $job['action'] );
 			$job['end_time'] = time();
 			$job['status']   = $status ? 'success' : 'fail';
 			$this->save_jobs();
