@@ -1,23 +1,23 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "00f1abd158c93ffde8b00cf13e347927",
+    "content-hash": "050b3199623c97d6b10acc9c2ec3c997",
     "packages": [
         {
             "name": "boldgrid/library",
-            "version": "2.12.3",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BoldGrid/library.git",
-                "reference": "89e27be7bc66d175908fa7d405bca479b7fd80a7"
+                "reference": "c191312d7025d79e2552b90b1ac7a33ba634fe1d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BoldGrid/library/zipball/89e27be7bc66d175908fa7d405bca479b7fd80a7",
-                "reference": "89e27be7bc66d175908fa7d405bca479b7fd80a7",
+                "url": "https://api.github.com/repos/BoldGrid/library/zipball/c191312d7025d79e2552b90b1ac7a33ba634fe1d",
+                "reference": "c191312d7025d79e2552b90b1ac7a33ba634fe1d",
                 "shasum": ""
             },
             "type": "library",
@@ -54,7 +54,7 @@
                 }
             ],
             "description": "The BoldGrid Library for shared code used in official BoldGrid plugins and themes.",
-            "time": "2020-06-23T20:00:26+00:00"
+            "time": "2020-06-24T14:35:19+00:00"
         },
         {
             "name": "chland/tdcron",
@@ -214,20 +214,6 @@
                 "x.509",
                 "x509"
             ],
-            "funding": [
-                {
-                    "url": "https://github.com/terrafrost",
-                    "type": "github"
-                },
-                {
-                    "url": "https://www.patreon.com/phpseclib",
-                    "type": "patreon"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/phpseclib/phpseclib",
-                    "type": "tidelift"
-                }
-            ],
             "time": "2020-04-04T23:17:33+00:00"
         }
     ],
@@ -272,9 +258,17 @@
             "time": "2015-08-31T22:07:48+00:00"
         }
     ],
-    "aliases": [],
+    "aliases": [
+        {
+            "alias": "2.12.3",
+            "alias_normalized": "2.12.3.0",
+            "version": "9999999-dev",
+            "package": "boldgrid/library"
+        }
+    ],
     "minimum-stability": "stable",
     "stability-flags": {
+        "boldgrid/library": 20,
         "ifsnop/mysqldump-php": 20,
         "chland/tdcron": 20,
         "lox/xhprof": 20
@@ -282,6 +276,5 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
-    "platform-dev": [],
-    "plugin-api-version": "1.1.0"
+    "platform-dev": []
 }

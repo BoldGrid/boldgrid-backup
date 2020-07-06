@@ -306,10 +306,11 @@ class Boldgrid_Backup_Admin_Log {
 	 *
 	 * @since 1.12.6
 	 *
-	 * @param int The signal being handled.
+	 * @param int   $signo The signal being handled.
+	 * @param array $signinfo Additional information about signal.
 	 */
-	public function signal_handler( $signo ) {
-		$this->add( 'Signal received: ' . $signo );
+	public function signal_handler( $signo, $signinfo ) {
+		$this->add( 'Signal received: ' . $signo . ' ' . wp_json_encode( $signinfo ) );
 
 		exit;
 	}
