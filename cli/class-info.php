@@ -361,7 +361,7 @@ class Info {
 	 */
 	public static function get_notify_flag() {
 		if ( ! isset( self::$info['notify'] ) ) {
-			self::$info['notify'] = self::has_arg_flag( 'notify' );
+			self::$info['notify'] = (bool) self::get_arg_value( 'notify' );
 		}
 
 		return self::$info['notify'];

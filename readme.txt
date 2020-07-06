@@ -132,6 +132,12 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
+= 1.13.12 =
+
+Release date: July 6th, 2020
+
+* Bug fix:    Site check emails sent regardless of user preference.
+
 = 1.13.11 =
 
 Release date: July 1st, 2020
