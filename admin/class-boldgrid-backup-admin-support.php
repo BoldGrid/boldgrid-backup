@@ -139,8 +139,22 @@ class Boldgrid_Backup_Admin_Support {
 	 * @return bool
 	 */
 	public function has_library() {
-		// This can be updated to the newest library classes to check for a more recent version.
-		return class_exists( 'Boldgrid\Library\Library\Usage\Notice' );
+		$has_library = true;
+
+		$classes = array(
+			'Boldgrid\Library\Library\Usage\Notice',
+			// Needed on the dashboard.
+			'Boldgrid\Library\Library\Ui\Card',
+		);
+
+		foreach ( $classes as $class ) {
+			if ( ! class_exists( $class ) ) {
+				$has_library = false;
+				break;
+			}
+		}
+
+		return $has_library;
 	}
 
 	/**
