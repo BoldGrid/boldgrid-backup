@@ -37,21 +37,18 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 	</div>',
 	/* 1 */ esc_html__( 'Total Upkeep Premium', 'boldgrid-backup' ),
 	/* 2 */ $this->core->go_pro->get_premium_button( $this->core->go_pro->get_premium_url( 'bgbkup-premium-features' ) ),
-	/* 3 */ esc_html__( 'Give your website data the protection it deserves with Total Upkeep Premium.
-						 Enjoy automated remote backups to Google Drive and Amazon S3, individual file restoration,
-						 the ability to restore from historical versions, premium support and more.', 'boldgrid-backup' )
+	/* 3 */ esc_html__(
+		'Give your website data the protection it deserves with Total Upkeep Premium.
+	Enjoy automated remote backups to Google Drive and Amazon S3, individual file restoration,
+	the ability to restore from historical versions, premium support and more.',
+		'boldgrid-backup'
+	)
 );
 
-?>
+require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
 
-<div class='wrap'>
-	<h1><?php echo esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'Dashboard', 'boldgrid-backup' ) ); ?></h1>
+echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
-	<?php
-	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+echo $premium_box; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
-	echo $premium_box; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
-
-	$dashboard->printCards();
-	?>
-</div>
+$dashboard->printCards();

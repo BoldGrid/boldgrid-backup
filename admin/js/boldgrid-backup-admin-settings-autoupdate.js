@@ -10,6 +10,8 @@ var BOLDGRID = BOLDGRID || {};
 BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 
 ( function( $ ) {
+	var self;
+
 	BOLDGRID.SETTINGS.AutoUpdate = {
 
 		/**
@@ -48,10 +50,43 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 				.not( '.toggle-group' )
 				.on( 'click swipe contextmenu', self._setMasterToggles );
 
-			$bgBox.find( '.dashicons-editor-help' ).on( 'click', self._toggleHelp );
+			$bgBox
+				.find( '.table-help td p' )
+				.attr( 'style', 'height: 0em; opacity: 0%; position: relative; z-index:-1' );
+			$bgBox
+				.find( '.div-table-body .dashicons-editor-help, .help-icon' )
+				.on( 'click', self._toggleHelp );
+			$bgBox.find( '.help-icon' ).css( 'cursor', 'pointer' );
 
 			$bgBox.find( '.bglib-collapsible-control' ).on( 'click', function() {
+				var target = $( this ).attr( 'data-target' );
+				$( target ).animate( { height: 'toggle', opacity: 'toggle' }, 'slow' );
 				$( this ).toggleClass( 'bglib-collapsible-open' );
+			} );
+
+			if ( true === $( '#timely-updates-disabled' ).prop( 'checked' ) ) {
+				$( '#timely-updates-days' ).prop( 'disabled', true );
+				$( '#timely-updates-days-hidden' ).prop( 'disabled', false );
+			}
+
+			$( 'input[name="auto_update[timely-updates-enabled]"]' ).change( function() {
+				if ( true === $( '#timely-updates-disabled' ).prop( 'checked' ) ) {
+					$( '#timely-updates-days' ).prop( 'disabled', true );
+					$( '#timely-updates-days-hidden' ).prop( 'disabled', false );
+				} else {
+					$( '#timely-updates-days' ).prop( 'disabled', false );
+					$( '#timely-updates-days-hidden' ).prop( 'disabled', true );
+				}
+			} );
+		},
+
+		_onInputChange: function( toggle, input ) {
+			toggle.change( function() {
+				if ( true == $this.prop( 'checked' ) ) {
+					input.val( '1' );
+				} else {
+					input.val( '0' );
+				}
 			} );
 		},
 
@@ -66,7 +101,10 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 				$pluginToggles = $bgBox.find( '.plugin-toggle' ),
 				$themeToggles = $bgBox.find( '.theme-toggle' ),
 				$pluginsDefault = $bgBox.find( '#toggle-default-plugins' ),
-				$themesDefault = $bgBox.find( '#toggle-default-themes' );
+				$themesDefault = $bgBox.find( '#toggle-default-themes' ),
+				$timelyUpdatesEnabled = $bgBox.find( '#timely-updates-enabled' ),
+				$timelyUpdatesDisabled = $bgBox.find( '#timely-updates-disabled' ),
+				$timelyUpdatesDays = $bgBox.find( '#timely-updates-days' );
 
 			// If the updates section is not in use, then just return.
 			if ( ! $pluginsDefault.data( 'toggles' ) ) {
@@ -76,41 +114,36 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 			$wpcoreToggles.each( function() {
 				var $this = $( this );
 
-				$this
+				var $thisInput = $this
 					.next( 'input' )
-					.attr( 'name', 'autoupdate[wpcore][' + $this.data( 'wpcore' ) + ']' )
+					.attr( 'name', 'auto_update[wpcore][' + $this.data( 'wpcore' ) + ']' )
 					.val( $this.data( 'toggles' ).active ? 1 : 0 );
+				self._onInputChange( $this, $thisInput );
 			} );
 
 			$pluginToggles.each( function() {
 				var $this = $( this );
 
-				$this
-					.parent()
+				var $thisInput = $this
 					.next( 'input' )
-					.attr( 'name', 'autoupdate[plugins][' + $this.data( 'plugin' ) + ']' )
+					.attr( 'name', 'auto_update[plugins][' + $this.data( 'plugin' ) + ']' )
 					.val( $this.data( 'toggles' ).active ? 1 : 0 );
+				self._onInputChange( $this, $thisInput );
 			} );
 
 			$themeToggles.each( function() {
 				var $this = $( this );
 
-				$this
-					.parent()
+				var $thisInput = $this
 					.next( 'input' )
-					.attr( 'name', 'autoupdate[themes][' + $this.data( 'stylesheet' ) + ']' )
+					.attr( 'name', 'auto_update[themes][' + $this.data( 'stylesheet' ) + ']' )
 					.val( $this.data( 'toggles' ).active ? 1 : 0 );
+				self._onInputChange( $this, $thisInput );
 			} );
 
-			$pluginsDefault
-				.parent()
-				.next( 'input' )
-				.val( $pluginsDefault.data( 'toggles' ).active ? 1 : 0 );
+			$pluginsDefault.next( 'input' ).val( $pluginsDefault.data( 'toggles' ).active ? 1 : 0 );
 
-			$themesDefault
-				.parent()
-				.next( 'input' )
-				.val( $themesDefault.data( 'toggles' ).active ? 1 : 0 );
+			$themesDefault.next( 'input' ).val( $themesDefault.data( 'toggles' ).active ? 1 : 0 );
 		},
 
 		/**
@@ -182,20 +215,30 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 		 * @since 1.7.0
 		 */
 		_toggleHelp: function( e ) {
-			var id = $( this ).attr( 'data-id' );
-
+			var id = $( this ).attr( 'data-id' ),
+				target = $( '.table-help[data-id="' + id + '"]' );
 			e.preventDefault();
 
 			if ( id === undefined ) {
 				return false;
 			}
 
-			$( '.help[data-id="' + id + '"]' ).slideToggle();
+			$( target ).toggleClass( 'show-help hide-help' );
+			$( '.table-help.show-help[data-id="' + id + '"] td p' ).animate(
+				{ height: '3em', opacity: '100%', 'z-index': 0 },
+				400
+			);
+			$( '.table-help.hide-help[data-id="' + id + '"] td p' ).animate(
+				{ height: '0em', opacity: '0%', 'z-index': -1 },
+				400
+			);
 
 			return false;
 		}
 	};
 
+	// eslint-disable-next-line vars-on-top
 	var self = BOLDGRID.SETTINGS.AutoUpdate;
+
 	BOLDGRID.SETTINGS.AutoUpdate.init();
 } )( jQuery );
