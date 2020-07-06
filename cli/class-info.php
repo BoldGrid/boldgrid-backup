@@ -300,7 +300,7 @@ class Info {
 	 */
 	public static function get_log_flag() {
 		if ( ! isset( self::$info['log'] ) ) {
-			self::$info['log'] = (bool) self::get_arg_flag( 'log' );
+			self::$info['log'] = (bool) self::get_arg_value( 'log' );
 		}
 
 		return self::$info['log'];
