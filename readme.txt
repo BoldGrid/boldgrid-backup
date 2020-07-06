@@ -136,8 +136,7 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 Release date: TBD
 
-* New feature: Timely Auto Updates - auto update WordPress, Plugins, and
-* Themes after a set number of days.
+* New feature: Timely Auto Updates - auto update WordPress, Plugins, and Themes after a set number of days.
 
 = 1.13.12 =
 
