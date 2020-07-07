@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "050b3199623c97d6b10acc9c2ec3c997",
+    "content-hash": "a5c3b9226ad05a728cfce378a4adab27",
     "packages": [
         {
             "name": "boldgrid/library",
-            "version": "dev-master",
+            "version": "2.13.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BoldGrid/library.git",
-                "reference": "c191312d7025d79e2552b90b1ac7a33ba634fe1d"
+                "reference": "5eac0d3f4b318479d6b762dcd92f913377ba4d03"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BoldGrid/library/zipball/c191312d7025d79e2552b90b1ac7a33ba634fe1d",
-                "reference": "c191312d7025d79e2552b90b1ac7a33ba634fe1d",
+                "url": "https://api.github.com/repos/BoldGrid/library/zipball/5eac0d3f4b318479d6b762dcd92f913377ba4d03",
+                "reference": "5eac0d3f4b318479d6b762dcd92f913377ba4d03",
                 "shasum": ""
             },
             "type": "library",
@@ -54,7 +54,7 @@
                 }
             ],
             "description": "The BoldGrid Library for shared code used in official BoldGrid plugins and themes.",
-            "time": "2020-06-24T14:35:19+00:00"
+            "time": "2020-07-07T14:32:25+00:00"
         },
         {
             "name": "chland/tdcron",
@@ -258,17 +258,9 @@
             "time": "2015-08-31T22:07:48+00:00"
         }
     ],
-    "aliases": [
-        {
-            "alias": "2.12.3",
-            "alias_normalized": "2.12.3.0",
-            "version": "9999999-dev",
-            "package": "boldgrid/library"
-        }
-    ],
+    "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "boldgrid/library": 20,
         "ifsnop/mysqldump-php": 20,
         "chland/tdcron": 20,
         "lox/xhprof": 20
