@@ -240,7 +240,7 @@ class Boldgrid_Backup_Admin_Notice {
 			( apply_filters( 'allow_major_auto_core_updates', false ) ) ? 'Major' : false,
 			( apply_filters( 'allow_minor_auto_core_updates', false ) ) ? 'Minor' : false,
 			( apply_filters( 'allow_dev_auto_core_updates', false ) ) ? 'Development' : false,
-			( apply_filters( 'auto_update_translation', false ) ) ? 'Translation' : false,
+			( apply_filters( 'auto_update_translation', false, wp_get_translation_updates() ) ) ? 'Translation' : false,
 		];
 		$auto_update_array = array_filter( $auto_update_array );
 		$update_msg        = '';
