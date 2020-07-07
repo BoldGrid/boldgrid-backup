@@ -134,9 +134,14 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 = 1.14.0 =
 
-Release date: TBD
+Release date: July 7th, 2020
 
 * New feature: Timely Auto Updates - auto update WordPress, Plugins, and Themes after a set number of days.
+* New feature: SystemZip Compression ratio - Modify System Zip process to address issues with exceeding php memory_limit and add option to set compression ratio.
+* New feature: Added 'Backup Now' and 'Upload Backup' buttons to each Total Upkeep page.
+* New feature: Added video guides to Premium Features page.
+* Bug fix: Non Backup files should not be uploaded.
+* Bug fix: Ensure user can CREATE VIEWS before restoring views.
 
 = 1.13.12 =
 
