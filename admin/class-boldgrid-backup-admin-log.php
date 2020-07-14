@@ -287,6 +287,43 @@ class Boldgrid_Backup_Admin_Log {
 	}
 
 	/**
+	 * Remove an extension from the log filename.
+	 *
+	 * This is essentially a find and replace on the log's filename. Current plan is to only use it
+	 * to remove extensions, but leaving it open for possibilities.
+	 *
+	 * For example, when a backup is in progress we may name the log file backup.in-progress.log. When
+	 * the backup is complete, we'll want to remove the ".in-progress" extension to show the backup
+	 * has completed.
+	 *
+	 * Example:
+	 * # backup.in-progress.log
+	 * # backup.log
+	 *
+	 * @since 1.14.2
+	 *
+	 * @param  string $extension An extension to be removed, such as ".in-progress".
+	 * @return bool              Whether or not the extension was removed successfully.
+	 */
+	public function remove_extension( $find, $replace = '' ) {
+		$new_filename = str_replace( $find, $replace, $this->filename );
+		$new_path     = trailingslashit( dirname( $this->filepath ) ) . $new_filename;
+
+		$renamed = $this->core->wp_filesystem->move( $this->filepath, $new_path );
+
+		/*
+		 * Generally renaming a file is the last thing we do to the file. To be safe however, but sure
+		 * to update the filename and filepath just in case the log file is used again.
+		 */
+		if ( $renamed ) {
+			$this->filename = $new_filename;
+			$this->filepath = $new_path;
+		}
+
+		return $renamed;
+	}
+
+	/**
 	 * Hook into shutdown.
 	 *
 	 * @since 1.13.5

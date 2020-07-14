@@ -1564,7 +1564,7 @@ class Boldgrid_Backup_Admin_Core {
 	public function archive_files( $save = false, $dryrun = false ) {
 		$this->archiving_files = true;
 
-		$this->logger->init( 'archive-' . time() . '.log' );
+		$this->logger->init( 'archive-' . time() . '.in-progress.log' );
 		$this->logger->add( 'Backup process initialized.' );
 
 		$this->utility->bump_memory_limit( '1G' );
@@ -1954,6 +1954,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->logger->add( 'Backup complete!' );
 		$this->logger->add_memory();
+		$this->logger->remove_extension( '.in-progress' );
 
 		$this->archiving_files = false;
 
