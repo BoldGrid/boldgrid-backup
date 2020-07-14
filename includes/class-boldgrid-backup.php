@@ -297,6 +297,7 @@ class Boldgrid_Backup {
 		// Logs system.
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-log.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-log-page.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-log-finder.php';
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-plugin-notices.php';
 
