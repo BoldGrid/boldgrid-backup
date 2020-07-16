@@ -86,6 +86,35 @@ class Boldgrid_Backup_Admin_Db_Get {
 	}
 
 	/**
+	 * Get our database prefix, as defined in wp-config.php
+	 *
+	 * Prior to 1.14.2, this code lived within Boldgrid_Backup_Admin_Core and was ran prior to restoring
+	 * a database. It has been moved here for reusability.
+	 *
+	 * @since 1.14.2
+	 *
+	 * @return string
+	 */
+	public function get_prefix() {
+		$db_prefix = null;
+
+		// Get the database table prefix from the new "wp-config.php" file, if exists.
+		if ( $this->core->wp_filesystem->exists( ABSPATH . 'wp-config.php' ) ) {
+			$wpcfg_contents = $this->core->wp_filesystem->get_contents( ABSPATH . 'wp-config.php' );
+		}
+
+		if ( ! empty( $wpcfg_contents ) ) {
+			preg_match( '#\$table_prefix.*?=.*?' . "'" . '(.*?)' . "'" . ';#', $wpcfg_contents, $matches );
+
+			if ( ! empty( $matches[1] ) ) {
+				$db_prefix = $matches[1];
+			}
+		}
+
+		return $db_prefix;
+	}
+
+	/**
 	 * Filter an array of table names by table type.
 	 *
 	 * For example, pass in an array of tables that include both "tables" and "views", and this method
@@ -119,17 +148,20 @@ class Boldgrid_Backup_Admin_Db_Get {
 	 *
 	 * @global wpdb $wpdb The WordPress database class object.
 	 *
+	 * @param string $prefix Table prefix.
 	 * @return array
 	 */
-	public function prefixed() {
+	public function prefixed( $prefix = null ) {
 		global $wpdb;
+
+		$prefix = is_null( $prefix ) ? $wpdb->prefix : $prefix;
 
 		$prefix_tables = array();
 
 		$results = $wpdb->get_results(
 			$wpdb->prepare(
 				'SHOW TABLES LIKE %s;',
-				$wpdb->esc_like( $wpdb->prefix ) . '%'
+				$wpdb->esc_like( $prefix ) . '%'
 			),
 			ARRAY_N
 		);
@@ -153,12 +185,14 @@ class Boldgrid_Backup_Admin_Db_Get {
 	 *
 	 * @return array
 	 */
-	public function prefixed_count() {
+	public function prefixed_count( $prefix ) {
 		global $wpdb;
+
+		$prefix = is_null( $prefix ) ? $wpdb->prefix : $prefix;
 
 		$return = array();
 
-		$tables = $this->prefixed();
+		$tables = $this->prefixed( $prefix );
 
 		foreach ( $tables as $table ) {
 			$num = $wpdb->get_var( 'SELECT COUNT(*) FROM `' . $table . '`;' ); // phpcs:ignore WordPress.WP.PreparedSQL.NotPrepared

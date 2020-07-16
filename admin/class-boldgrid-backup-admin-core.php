@@ -1309,6 +1309,14 @@ class Boldgrid_Backup_Admin_Core {
 		$restored_wp_siteurl = get_option( 'siteurl' );
 		$restored_wp_home    = get_option( 'home' );
 
+		$this->logger->add_separator();
+		$this->logger->add( 'Settings as read from db using get_option():' );
+		$this->logger->add( 'Original siteurl: ' . $wp_siteurl );
+		$this->logger->add( 'New siteurl     : ' . $restored_wp_siteurl );
+		$this->logger->add( 'Original home   : ' . $wp_home );
+		$this->logger->add( 'New home        : ' . $restored_wp_home );
+		$this->logger->add_separator();
+
 		// If changed, then update the siteurl in the database.
 		if ( $restored_wp_siteurl !== $wp_siteurl ) {
 			$update_siteurl_success =
@@ -2384,11 +2392,23 @@ class Boldgrid_Backup_Admin_Core {
 			$this->logger->add( 'ZipArchive not available. Unable to set_writable_permissions. Trying restore anyways...' );
 		}
 
+		// Take note of things before files are restored.
+		$original_prefix = $this->db_get->get_prefix();
+
 		$this->logger->add( 'Unzipping archive... filepath / ABSPATH: ' . $info['filepath'] . ' / ' . ABSPATH );
 		$this->logger->add_memory();
 		$unzip_status = ! $dryrun ? unzip_file( $info['filepath'], ABSPATH ) : null;
 		$this->logger->add( 'Unzip complete! Status: ' . print_r( $unzip_status, 1 ) ); // phpcs:ignore
 		$this->logger->add_memory();
+
+		// Take note of things after files are restored.
+		$new_prefix = $this->db_get->get_prefix();
+
+		$this->logger->add_separator();
+		$this->logger->add( 'Settings as read from wp-config.php:' );
+		$this->logger->add( 'Original DB prefix: ' . $original_prefix );
+		$this->logger->add( 'New DB prefix     : ' . $new_prefix );
+		$this->logger->add_separator();
 
 		if ( is_wp_error( $unzip_status ) ) {
 			$error = false;
@@ -2415,6 +2435,8 @@ class Boldgrid_Backup_Admin_Core {
 		/**
 		 * Action to take after restoring an archive.
 		 *
+		 * This includes things such as fixing .htaccess and wp-config files.
+		 *
 		 * @since 1.5.1
 		 *
 		 * @param array $info
@@ -2431,28 +2453,17 @@ class Boldgrid_Backup_Admin_Core {
 		$db_dump_filepath = $this->get_dump_file( $filepath );
 		$this->logger->add( 'Attempting database restoration... $db_dump_filepath = ' . $db_dump_filepath );
 		$this->logger->add_memory();
+
+		// Take a count of our tables before restoring the database. Useful for seeing scope of change.
+		$original_table_counts = $this->db_get->prefixed_count( $original_prefix );
+
 		if ( ! $dryrun && ! empty( $db_dump_filepath ) ) {
-			$db_prefix = null;
-
-			// Get the database table prefix from the new "wp-config.php" file, if exists.
-			if ( $this->wp_filesystem->exists( ABSPATH . 'wp-config.php' ) ) {
-				$wpcfg_contents = $this->wp_filesystem->get_contents( ABSPATH . 'wp-config.php' );
-			}
-
-			if ( ! empty( $wpcfg_contents ) ) {
-				preg_match( '#\$table_prefix.*?=.*?' . "'" . '(.*?)' . "'" . ';#', $wpcfg_contents, $matches );
-
-				if ( ! empty( $matches[1] ) ) {
-					$db_prefix = $matches[1];
-				}
-			}
-
 			// Determine if the dump file is encrypted.
 			$this->archive->init( $filepath );
 			$db_encrypted = $this->archive->get_attribute( 'encrypt_db' );
 
 			// Restore the database and then delete the dump.
-			$restore_ok = $this->restore_database( $db_dump_filepath, $db_prefix, $db_encrypted );
+			$restore_ok = $this->restore_database( $db_dump_filepath, $new_prefix, $db_encrypted );
 			$this->wp_filesystem->delete( $db_dump_filepath, false, 'f' );
 
 			// Display notice of deletion status.
@@ -2462,8 +2473,17 @@ class Boldgrid_Backup_Admin_Core {
 				return [ 'error' => $error_message ];
 			}
 		}
+
+		// Take count of tables after restoring database. Similar call was made before restoring above.
+		$new_table_counts = $this->db_get->prefixed_count( $new_prefix );
+
 		$this->logger->add( 'Database restoration complete.' );
 		$this->logger->add_memory();
+
+		$this->logger->add_separator();
+		$this->logger->add( 'Original table counts: ' . print_r( $original_table_counts, 1 ) ); // phpcs:ignore
+		$this->logger->add( 'New table counts: ' . print_r( $new_table_counts, 1 ) ); // phpcs:ignore
+		$this->logger->add_separator();
 
 		// Clear rollback information and restoration cron jobs that may be present.
 		$this->auto_rollback->cancel();
