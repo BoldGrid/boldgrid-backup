@@ -77,7 +77,13 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 			$this->settings = $boldgrid_backup_settings['auto_update'];
 		} else {
 			$this->settings = array(
-				'days' => 0,
+				'days'    => 0,
+				'plugins' => array(
+					'default' => false,
+				),
+				'themes'  => array(
+					'default' => false,
+				),
 			);
 		}
 	}
@@ -133,7 +139,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		$theme        = $this->themes->getFromStylesheet( $stylesheet );
 		$theme->setUpdateData();
 		$days_since_release   = $theme->updateData->days; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
-		$theme_update_enabled = isset( $this->settings['themes'][ $stylesheet ] ) ? (bool) $this->settings['themes'][ $stylesheet ] : (bool) $this->settings['plugins']['default'];
+		$theme_update_enabled = isset( $this->settings['themes'][ $stylesheet ] ) ? (bool) $this->settings['themes'][ $stylesheet ] : (bool) $this->settings['themes']['default'];
 		$is_update_time       = ( $days_since_release >= $days_to_wait );
 
 		if ( $is_update_time && true === $theme_update_enabled ) {
