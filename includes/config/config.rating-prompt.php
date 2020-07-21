@@ -76,15 +76,15 @@ $default_prompt = [
 		'thanks'      => [
 			'text' => sprintf(
 				wp_kses(
-					// translators: 1: Plugin title, 2: The URL to the boldgrid-backup plugin in the plugin repo.
+					// translators: 1: Plugin title, 2: An open and closed anchor tag linking to the boldgrid-backup plugin in the repo.
 					esc_html__(
-						'Thanks! A new page should have opened to the %1$s ratings page on WordPress.org. You will need to log in to your WordPress.org account before you can post a review. If the page didn\'t open, please click the following link: <a href="%2$s" target="_blank">%2$s</a>',
+						'Thanks! A new page should have opened to the %1$s ratings page on WordPress.org. You will need to log in to your WordPress.org account before you can post a review. If the page didn\'t open, please click the following link: %2$s',
 						'boldgrid-backup'
 					),
 					$allowed_tags
 				),
 				BOLDGRID_BACKUP_TITLE,
-				'https://wordpress.org/support/plugin/boldgrid-backup/reviews/'
+				'<a href="https://wordpress.org/support/plugin/boldgrid-backup/reviews/" target="_blank">https://wordpress.org/support/plugin/boldgrid-backup/reviews/</a>',
 			),
 		],
 		'maybe_later' => [
