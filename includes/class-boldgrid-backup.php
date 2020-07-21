@@ -528,8 +528,6 @@ class Boldgrid_Backup {
 
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_is_setup_local', $plugin_admin_core->local, 'is_setup_ajax' );
 
-		$this->loader->add_filter( 'boldgrid_backup_get_core', $plugin_admin_core, 'get_core' );
-
 		$this->loader->add_filter( 'Boldgrid\Library\Notifications\DashboardWidget\getFeaturePlugin\boldgrid-backup', $plugin_admin_core->dashboard_widget, 'filter_feature', 10, 2 );
 
 		$this->loader->add_action( 'admin_init', $plugin_admin_core->auto_updates, 'auto_update_core' );

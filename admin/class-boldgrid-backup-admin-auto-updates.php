@@ -72,20 +72,8 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 * @since 1.14.0
 	 */
 	public function set_settings() {
-		$boldgrid_backup_settings = get_site_option( 'boldgrid_backup_settings', array() );
-		if ( isset( $boldgrid_backup_settings['auto_update'] ) ) {
-			$this->settings = $boldgrid_backup_settings['auto_update'];
-		} else {
-			$this->settings = array(
-				'days'    => 0,
-				'plugins' => array(
-					'default' => false,
-				),
-				'themes'  => array(
-					'default' => false,
-				),
-			);
-		}
+		$core           = apply_filters( 'boldgrid_backup_get_core', null );
+		$this->settings = $core->settings->get_setting( 'auto_update' );
 	}
 
 	/**
