@@ -125,7 +125,11 @@ if ( empty( $settings ) ) {
 	);
 }
 
-wp_nonce_field( 'boldgrid_backup_settings' );
+/*
+ * This nonce is used for various things on the settings page, such as refreshing "configure" links
+ * for a remote storage provider after a user updates settings.
+ */
+wp_nonce_field( 'boldgrid_backup_settings', 'bgbkup_settings_nonce' );
 
 	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
