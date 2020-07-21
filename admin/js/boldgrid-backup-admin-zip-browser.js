@@ -44,7 +44,7 @@ BoldGrid.ZipBrowser = function( $ ) {
 			$dummyTr = $( '<tr></tr>' ),
 			data = {
 				action: 'boldgrid_backup_browse_archive_file_actions',
-				security: $( '#_wpnonce' ).val(),
+				security: $( '#bgbkup_archive_details_nonce' ).val(),
 				filename: $( '#filename' ).val(),
 				file: $tr.attr( 'data-dir' )
 			};
@@ -111,7 +111,7 @@ BoldGrid.ZipBrowser = function( $ ) {
 			$spinner = $a.next(),
 			data = {
 				action: 'boldgrid_backup_browse_archive_restore_db',
-				security: $( '#_wpnonce' ).val(),
+				security: $( '#bgbkup_archive_details_nonce' ).val(),
 				filename: $( '#filename' ).val(),
 				file: $a.attr( 'data-file' )
 			},
@@ -164,7 +164,7 @@ BoldGrid.ZipBrowser = function( $ ) {
 		var $a = $( this ),
 			data = {
 				action: 'boldgrid_backup_browse_archive_view_db',
-				security: $( '#_wpnonce' ).val(),
+				security: $( '#bgbkup_archive_details_nonce' ).val(),
 				filename: $( '#filename' ).val(),
 				file: $( '#dump_filename' ).val()
 			},
@@ -244,7 +244,7 @@ BoldGrid.ZipBrowser = function( $ ) {
 
 		data = {
 			action: 'boldgrid_backup_browse_archive',
-			security: $( '#_wpnonce' ).val(),
+			security: $( '#bgbkup_archive_details_nonce' ).val(),
 			filename: $( '#filename' ).val(),
 			dir: dir
 		};
