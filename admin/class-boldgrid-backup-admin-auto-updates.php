@@ -72,14 +72,8 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 * @since 1.14.0
 	 */
 	public function set_settings() {
-		$boldgrid_backup_settings = get_site_option( 'boldgrid_backup_settings', array() );
-		if ( isset( $boldgrid_backup_settings['auto_update'] ) ) {
-			$this->settings = $boldgrid_backup_settings['auto_update'];
-		} else {
-			$this->settings = array(
-				'days' => 0,
-			);
-		}
+		$core           = apply_filters( 'boldgrid_backup_get_core', null );
+		$this->settings = $core->settings->get_setting( 'auto_update' );
 	}
 
 	/**
@@ -133,7 +127,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		$theme        = $this->themes->getFromStylesheet( $stylesheet );
 		$theme->setUpdateData();
 		$days_since_release   = $theme->updateData->days; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
-		$theme_update_enabled = isset( $this->settings['themes'][ $stylesheet ] ) ? (bool) $this->settings['themes'][ $stylesheet ] : (bool) $this->settings['plugins']['default'];
+		$theme_update_enabled = isset( $this->settings['themes'][ $stylesheet ] ) ? (bool) $this->settings['themes'][ $stylesheet ] : (bool) $this->settings['themes']['default'];
 		$is_update_time       = ( $days_since_release >= $days_to_wait );
 
 		if ( $is_update_time && true === $theme_update_enabled ) {
