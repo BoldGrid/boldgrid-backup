@@ -56,7 +56,6 @@ $this->core->folder_exclusion->enqueue_scripts();
 $this->core->db_omit->enqueue_scripts();
 $this->core->auto_rollback->enqueue_home_scripts();
 $this->core->auto_rollback->enqueue_backup_scripts();
-$this->core->archive_actions->enqueue_scripts();
 
 if ( ! $archive_found ) {
 	$file_size     = '';
