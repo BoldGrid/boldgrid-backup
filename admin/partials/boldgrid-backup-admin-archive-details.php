@@ -63,6 +63,12 @@ $download_button = $this->core->archive_actions->get_download_button( $archive['
 $restore_button  = $this->core->archive_actions->get_restore_button( $archive['filename'] );
 $download_link   = $this->core->archive_actions->get_download_link_button( $archive['filename'] );
 
+// Enqueue the scripts needed for the Backup Site Now and Upload Backups to work.
+$this->core->folder_exclusion->enqueue_scripts();
+$this->core->db_omit->enqueue_scripts();
+$this->core->auto_rollback->enqueue_home_scripts();
+$this->core->auto_rollback->enqueue_backup_scripts();
+
 if ( ! $archive_found ) {
 	$file_size     = '';
 	$backup_date   = '';
