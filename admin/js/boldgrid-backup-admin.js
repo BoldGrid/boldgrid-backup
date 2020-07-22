@@ -112,6 +112,13 @@ BoldGrid.Backup = function( $ ) {
 		} );
 	};
 
+	/**
+	 * Auto Update Links
+	 *
+	 * Adds functionality for WP >= 5.5 update links.
+	 *
+	 * @since SINCEVERSION
+	 */
 	self.autoUpdateLinks = function() {
 		$enableUpdateLinks = $( '.boldgrid-backup-enable-auto-update' );
 		$enableUpdateLinks.click( function( e ) {
@@ -133,6 +140,8 @@ BoldGrid.Backup = function( $ ) {
 		self.bindHelpClick();
 		self.hideBackupNotice();
 		self.updatePremiumLink();
+
+		// fire function for auto update links.
 		self.autoUpdateLinks();
 
 		$( 'body' ).on( 'click', '[data-bgbkup-toggle-target]', self.onClickToggle );

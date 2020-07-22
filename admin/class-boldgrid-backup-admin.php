@@ -129,6 +129,7 @@ class Boldgrid_Backup_Admin {
 			'spinner_loading'   => $spinner . __( 'Loading', 'boldgrid-backup' ) . $dots,
 			'spinner'           => $spinner,
 			'get_premium_url'   => Boldgrid_Backup_Admin_Go_Pro::$url,
+			// This nonce was added to handle ajax requests when enabling / disabling auto updates for specific plugins.
 			'auto_update_nonce' => wp_create_nonce( 'boldgrid_backup_auto_update' ),
 		);
 

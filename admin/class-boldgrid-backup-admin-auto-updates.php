@@ -73,33 +73,48 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 *
 	 * @param string $html Original HTML Markup.
 	 * @param string $plugin_file Path to main plugin file.
-	 * @param array $plugin_data An array of plugin data.
+	 * @param array  $plugin_data An array of plugin data.
 	 */
 	public function auto_update_markup( $html, $plugin_file, $plugin_data ) {
 		$doc = new DOMDocument();
 
+		// Loads the original html markup into a DOMDocument object.
 		$doc->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NOEMPTYTAG );
 
+		// URL to use in href.
 		$enable_link = 'plugins.php';
 		$link        = $doc->getElementsByTagName( 'a' );
+
+		// This sets the attributes for the <a> within the markup to work with our own ajax call instead of the default one.
 		$link->item( 0 )->setAttribute( 'class', 'boldgrid-backup-enable-auto-update' );
 		$link->item( 0 )->setAttribute( 'data-update_type', 'plugin' );
 		$link->item( 0 )->setAttribute( 'data-update_name', $plugin_file );
 
+		// If the auto update is currently enabled, display markup to disable auto updates.
 		if ( '1' === $this->settings['plugins'][ $plugin_file ] ) {
-			$divs        = $doc->getElementsByTagName( 'div' );
-			$div         = $divs->item( 0 );
+			$divs = $doc->getElementsByTagName( 'div' );
+			$div  = $divs->item( 0 );
+
+			/*
+			 * DOMDocument doesn't put the <div> element in the right place.
+			 * So we have to remove it here, and re-add it below.
+			 */
 			$div->parentNode->removeChild( $div );
 
 			$link->item( 0 )->setAttribute( 'data-update_enable', false );
 			$doc->normalizeDocument();
 
+			// Re-Add the <div> element.
 			$doc->appendChild( $div );
 
+			// Export the modified HTML markup as a string.
 			return $doc->saveHTML();
 		} else {
+
+			// If the auto update is currently disabled, display markup to enable auto updates.
 			$link->item( 0 )->setAttribute( 'data-update_enable', true );
 
+			// Export the modified HTML markup as a string.
 			return $doc->saveHTML();
 		}
 	}
@@ -110,6 +125,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 * @since SINCEVERSION
 	 */
 	public function wp_ajax_boldgrid_backup_auto_update() {
+		// he nonce for this is created in Boldgrid_Backup_Admin::enqueue_styles.
 		if ( ! check_admin_referer( 'boldgrid_backup_auto_update' ) ) {
 			echo wp_json_encode(
 				array(
@@ -121,8 +137,10 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 			wp_die();
 		}
 
+		// Get Update Data from $_POST array.
 		$update_data = isset( $_POST['data'] ) ? $_POST['data'] : array();
 
+		// If this is called without the update_data, die.
 		if ( empty( $update_data ) ) {
 			echo wp_json_encode(
 				array(
@@ -134,11 +152,13 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		}
 		$core = apply_filters( 'boldgrid_backup_get_core', null );
 
+		// If the update type is 'plugin' update the auto_update settings for plugins.
 		if ( isset( $update_data['update_type'] ) && $update_data['update_type'] == 'plugin' ) {
 			$settings = $core->settings->get_settings();
 			$settings['auto_update']['plugins'][ $update_data['update_name'] ] = $update_data['update_enable'] ? '1' : '0';
 			$settings_updated = $core->settings->save( $settings );
 
+			// Even though we have updated the option in our settings, it must be updated in the WordPress options table.
 			$core->settings->set_autoupdate_options( $settings['auto_update'] );
 
 			echo wp_json_encode(
