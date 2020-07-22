@@ -28,7 +28,7 @@ BoldGrid.ArchiveDetails = function( $ ) {
 			data = {
 				action: 'boldgrid_backup_remote_storage_upload_' + provider,
 				filename: $( '#filename' ).val(),
-				security: $( '#_wpnonce' ).val()
+				security: $( '#bgbkup_remote_upload_nonce' ).val()
 			},
 			failUpload;
 
