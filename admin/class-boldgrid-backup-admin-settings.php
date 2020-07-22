@@ -256,8 +256,28 @@ class Boldgrid_Backup_Admin_Settings {
 		$settings['encrypt_db'] = isset( $settings['encrypt_db'] ) ? (bool) $settings['encrypt_db'] : false;
 
 		// Auto Updates.
+		$settings['auto_update'] = $this->auto_update_settings( $settings );
+
+		// Return the settings array.
+		return $settings;
+	}
+
+	/**
+	 * Get the Auto Update Settings.
+	 *
+	 * With the new changes of wp5.5, there are new changes to the auto update settings.
+	 * Moving this to it's own method allows us to isolate that logic from the get_settings() method.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param array $settings The Settings array.
+	 *
+	 * @return array
+	 */
+	public function auto_update_settings( $settings ) {
+		global $wp_version;
 		if ( empty( $settings['auto_update'] ) ) {
-			$settings['auto_update'] = array(
+			$auto_update_settings = array(
 				'days'    => 0,
 				'plugins' => array(
 					'default' => false,
@@ -266,10 +286,72 @@ class Boldgrid_Backup_Admin_Settings {
 					'default' => false,
 				),
 			);
+		} else {
+			$auto_update_settings = $settings['auto_update'];
 		}
 
-		// Return the settings array.
-		return $settings;
+		if ( version_compare( $wp_version, '5.4.3', 'gt' ) ) {
+			$auto_update_plugins = get_option( 'auto_update_plugins', array() );
+
+			// If the plugin is listed in wp's auto_update_plugin option, then enable it in our settings.
+			foreach ( $auto_update_plugins as $plugin ) {
+				$auto_update_settings['plugins'][ $plugin ] = '1';
+			}
+
+			foreach ( $auto_update_settings['plugins'] as $plugin => $enabled ) {
+				$plugin_in_option = array_search( $plugin, $auto_update_plugins, true );
+				if ( '1' === $enabled && false === $plugin_in_option ) {
+					/*
+					* If auto updates for the plugin are enabled in our settings, but not enabled in
+					* wp option, enable it in the wp option.
+					*/
+					$auto_update_plugins[] = $plugin;
+				} elseif ( '0' === $enabled && false !== $plugin_in_option ) {
+					/*
+					 * If auto updates for the plugin are disabled in our settings, but not disabled in
+					 * the wp option, disable it in the wp option.
+					 */
+					unset( $auto_update_plugins[ $plugin_in_option ] );
+				} 
+			}
+
+			update_option( 'auto_update_plugins', $auto_update_plugins );
+		}
+
+		return $auto_update_settings;
+	}
+
+	/**
+	 * Updates the Wordpress auto_update options.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param array $new_settings New settings.
+	 */
+	public function set_autoupdate_options( $new_settings ) {
+		global $wp_version;
+		if ( version_compare( $wp_version, '5.4.3', 'gt' ) ) {
+			$auto_update_plugins = get_option( 'auto_update_plugins', array() );
+
+			foreach ( $new_settings['plugins'] as $plugin => $enabled ) {
+				$plugin_in_option = array_search( $plugin, $auto_update_plugins, true );
+				if ( '1' === $enabled && false === $plugin_in_option ) {
+					/*
+					* If auto updates for the plugin are enabled in our settings, but not enabled in
+					* wp option, enable it in the wp option.
+					*/
+					$auto_update_plugins[] = $plugin;
+				} elseif ( '0' === $enabled && false !== $plugin_in_option ) {
+					/*
+					 * If auto updates for the plugin are disabled in our settings, but not disabled in
+					 * the wp option, disable it in the wp option.
+					 */
+					unset( $auto_update_plugins[ $plugin_in_option ] );
+				}
+			}
+
+			update_option( 'auto_update_plugins', $auto_update_plugins );
+		}
 	}
 
 	/**
@@ -729,7 +811,8 @@ class Boldgrid_Backup_Admin_Settings {
 			 */
 			if ( ! empty( $_POST['auto_update'] ) ) {
 				$settings['auto_update'] = $this->validate_auto_update( $_POST['auto_update'] );
-				$update_error            = $settings['auto_update'] ? $update_error : true;
+				$this->set_autoupdate_options( $_POST['auto_update'] );
+				$update_error = $settings['auto_update'] ? $update_error : true;
 			}
 
 			// Read BoldGrid settings form POST request, sanitize, and merge settings with saved.
