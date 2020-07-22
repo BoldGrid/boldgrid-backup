@@ -91,21 +91,21 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		$link->item( 0 )->setAttribute( 'data-update_name', $plugin_file );
 
 		// If the auto update is currently enabled, display markup to disable auto updates.
-		if ( '1' === $this->settings['plugins'][ $plugin_file ] ) {
+		if ( isset( $this->settings['plugins'][ $plugin_file ] ) && '1' === $this->settings['plugins'][ $plugin_file ] ) {
 			$divs = $doc->getElementsByTagName( 'div' );
 			$div  = $divs->item( 0 );
 
-			/*
-			 * DOMDocument doesn't put the <div> element in the right place.
-			 * So we have to remove it here, and re-add it below.
-			 */
-			$div->parentNode->removeChild( $div ); //phpcs:ignore WordPress.NamingConventions.ValidVariableName
-
 			$link->item( 0 )->setAttribute( 'data-update_enable', false );
-			$doc->normalizeDocument();
 
-			// Re-Add the <div> element.
-			$doc->appendChild( $div );
+			if ( $div ) {
+				/*
+				* DOMDocument doesn't put the <div> element in the right place.
+				* So we have to remove it here, and re-add it below.
+				*/
+				$div->parentNode->removeChild( $div ); //phpcs:ignore WordPress.NamingConventions.ValidVariableName
+				// Re-Add the <div> element.
+				$doc->appendChild( $div );
+			}
 
 			// Export the modified HTML markup as a string.
 			return $doc->saveHTML();
