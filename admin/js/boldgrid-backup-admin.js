@@ -123,9 +123,9 @@ BoldGrid.Backup = function( $ ) {
 		$enableUpdateLinks = $( '.boldgrid-backup-enable-auto-update' );
 		$enableUpdateLinks.click( function( e ) {
 			var data = {
-				'action': 'boldgrid_backup_auto_update',
-				'_wpnonce': BoldGridBackupAdmin.auto_update_nonce,
-				'data': this.dataset
+				action: 'boldgrid_backup_auto_update',
+				_wpnonce: BoldGridBackupAdmin.auto_update_nonce,
+				data: this.dataset
 			};
 			e.preventDefault();
 			$.post( ajaxurl, data, function( response ) {

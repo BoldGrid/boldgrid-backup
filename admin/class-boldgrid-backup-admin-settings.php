@@ -297,32 +297,13 @@ class Boldgrid_Backup_Admin_Settings {
 			foreach ( $auto_update_plugins as $plugin ) {
 				$auto_update_settings['plugins'][ $plugin ] = '1';
 			}
-
-			foreach ( $auto_update_settings['plugins'] as $plugin => $enabled ) {
-				$plugin_in_option = array_search( $plugin, $auto_update_plugins, true );
-				if ( '1' === $enabled && false === $plugin_in_option ) {
-					/*
-					* If auto updates for the plugin are enabled in our settings, but not enabled in
-					* wp option, enable it in the wp option.
-					*/
-					$auto_update_plugins[] = $plugin;
-				} elseif ( '0' === $enabled && false !== $plugin_in_option ) {
-					/*
-					 * If auto updates for the plugin are disabled in our settings, but not disabled in
-					 * the wp option, disable it in the wp option.
-					 */
-					unset( $auto_update_plugins[ $plugin_in_option ] );
-				} 
-			}
-
-			update_option( 'auto_update_plugins', $auto_update_plugins );
 		}
 
 		return $auto_update_settings;
 	}
 
 	/**
-	 * Updates the Wordpress auto_update options.
+	 * Updates the WordPress auto_update options.
 	 *
 	 * @since SINCEVERSION
 	 *
@@ -811,6 +792,7 @@ class Boldgrid_Backup_Admin_Settings {
 			 */
 			if ( ! empty( $_POST['auto_update'] ) ) {
 				$settings['auto_update'] = $this->validate_auto_update( $_POST['auto_update'] );
+				// as of WordPress 5.5 We also have to update the option in the WordPress auto update option as well.
 				$this->set_autoupdate_options( $_POST['auto_update'] );
 				$update_error = $settings['auto_update'] ? $update_error : true;
 			}

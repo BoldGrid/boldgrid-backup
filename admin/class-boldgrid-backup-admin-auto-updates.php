@@ -99,7 +99,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 			 * DOMDocument doesn't put the <div> element in the right place.
 			 * So we have to remove it here, and re-add it below.
 			 */
-			$div->parentNode->removeChild( $div );
+			$div->parentNode->removeChild( $div ); //phpcs:ignore WordPress.NamingConventions.ValidVariableName
 
 			$link->item( 0 )->setAttribute( 'data-update_enable', false );
 			$doc->normalizeDocument();
@@ -153,7 +153,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		$core = apply_filters( 'boldgrid_backup_get_core', null );
 
 		// If the update type is 'plugin' update the auto_update settings for plugins.
-		if ( isset( $update_data['update_type'] ) && $update_data['update_type'] == 'plugin' ) {
+		if ( isset( $update_data['update_type'] ) && 'plugin' === $update_data['update_type'] ) {
 			$settings = $core->settings->get_settings();
 			$settings['auto_update']['plugins'][ $update_data['update_name'] ] = $update_data['update_enable'] ? '1' : '0';
 			$settings_updated = $core->settings->save( $settings );
