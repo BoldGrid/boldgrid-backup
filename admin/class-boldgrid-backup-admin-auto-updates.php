@@ -67,6 +67,92 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	}
 
 	/**
+	 * Filters auto update markup on plugin page.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param string $html Original HTML Markup.
+	 * @param string $plugin_file Path to main plugin file.
+	 * @param array $plugin_data An array of plugin data.
+	 */
+	public function auto_update_markup( $html, $plugin_file, $plugin_data ) {
+		$doc = new DOMDocument();
+
+		$doc->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NOEMPTYTAG );
+
+		$enable_link = 'plugins.php';
+		$link        = $doc->getElementsByTagName( 'a' );
+		$link->item( 0 )->setAttribute( 'class', 'boldgrid-backup-enable-auto-update' );
+		$link->item( 0 )->setAttribute( 'data-update_type', 'plugin' );
+		$link->item( 0 )->setAttribute( 'data-update_name', $plugin_file );
+
+		if ( '1' === $this->settings['plugins'][ $plugin_file ] ) {
+			$divs        = $doc->getElementsByTagName( 'div' );
+			$div         = $divs->item( 0 );
+			$div->parentNode->removeChild( $div );
+
+			$link->item( 0 )->setAttribute( 'data-update_enable', false );
+			$doc->normalizeDocument();
+
+			$doc->appendChild( $div );
+
+			return $doc->saveHTML();
+		} else {
+			$link->item( 0 )->setAttribute( 'data-update_enable', true );
+
+			return $doc->saveHTML();
+		}
+	}
+
+	/**
+	 * Ajax Callback to enable auto updates for a given plugin or theme.
+	 *
+	 * @since SINCEVERSION
+	 */
+	public function wp_ajax_boldgrid_backup_auto_update() {
+		if ( ! check_admin_referer( 'boldgrid_backup_auto_update' ) ) {
+			echo wp_json_encode(
+				array(
+					'settings_updated' => false,
+					'error'            => 'Nonce Verification Failed',
+				)
+			);
+
+			wp_die();
+		}
+
+		$update_data = isset( $_POST['data'] ) ? $_POST['data'] : array();
+
+		if ( empty( $update_data ) ) {
+			echo wp_json_encode(
+				array(
+					'settings_updated' => false,
+					'error'            => 'Invalid Request',
+				)
+			);
+			wp_die();
+		}
+		$core = apply_filters( 'boldgrid_backup_get_core', null );
+
+		if ( isset( $update_data['update_type'] ) && $update_data['update_type'] == 'plugin' ) {
+			$settings = $core->settings->get_settings();
+			$settings['auto_update']['plugins'][ $update_data['update_name'] ] = $update_data['update_enable'] ? '1' : '0';
+			$settings_updated = $core->settings->save( $settings );
+
+			$core->settings->set_autoupdate_options( $settings['auto_update'] );
+
+			echo wp_json_encode(
+				array(
+					'settings_updated' => $settings_updated,
+					'error'            => $settings_updated ? '' : 'Settings Failed to Save',
+				)
+			);
+
+			wp_die();
+		}
+	}
+
+	/**
 	 * Set Settings.
 	 *
 	 * @since 1.14.0

@@ -6,7 +6,7 @@
  * @since 1.3.1
  */
 
-/* global jQuery,pagenow */
+/* global jQuery,pagenow, BoldGridBackupAdmin */
 
 var BoldGrid = BoldGrid || {};
 
@@ -112,10 +112,28 @@ BoldGrid.Backup = function( $ ) {
 		} );
 	};
 
+	self.autoUpdateLinks = function() {
+		$enableUpdateLinks = $( '.boldgrid-backup-enable-auto-update' );
+		$enableUpdateLinks.click( function( e ) {
+			var data = {
+				'action': 'boldgrid_backup_auto_update',
+				'_wpnonce': BoldGridBackupAdmin.auto_update_nonce,
+				'data': this.dataset
+			};
+			e.preventDefault();
+			$.post( ajaxurl, data, function( response ) {
+				if ( JSON.parse( response ).settings_updated ) {
+					location.reload();
+				}
+			} );
+		} );
+	};
+
 	$( function() {
 		self.bindHelpClick();
 		self.hideBackupNotice();
 		self.updatePremiumLink();
+		self.autoUpdateLinks();
 
 		$( 'body' ).on( 'click', '[data-bgbkup-toggle-target]', self.onClickToggle );
 		$( 'body' ).on( 'make_notices_dismissible', self.makeNoticesDismissible );

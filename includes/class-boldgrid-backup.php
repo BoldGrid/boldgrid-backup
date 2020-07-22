@@ -530,6 +530,8 @@ class Boldgrid_Backup {
 
 		$this->loader->add_filter( 'Boldgrid\Library\Notifications\DashboardWidget\getFeaturePlugin\boldgrid-backup', $plugin_admin_core->dashboard_widget, 'filter_feature', 10, 2 );
 
+		$this->loader->add_filter( 'plugin_auto_update_setting_html', $plugin_admin_core->auto_updates, 'auto_update_markup', 10, 3 );
+		$this->loader->add_action( 'wp_ajax_boldgrid_backup_auto_update', $plugin_admin_core->auto_updates, 'wp_ajax_boldgrid_backup_auto_update' );
 		$this->loader->add_action( 'admin_init', $plugin_admin_core->auto_updates, 'auto_update_core' );
 		$this->loader->add_action( 'wp_maybe_auto_update', $plugin_admin_core->auto_updates, 'auto_update_core' );
 		$this->loader->add_filter( 'auto_update_plugin', $plugin_admin_core->auto_updates, 'auto_update_plugins', 10, 2 );
