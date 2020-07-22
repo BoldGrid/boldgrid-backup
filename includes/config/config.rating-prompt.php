@@ -84,7 +84,7 @@ $default_prompt = [
 					$allowed_tags
 				),
 				BOLDGRID_BACKUP_TITLE,
-				'<a href="https://wordpress.org/support/plugin/boldgrid-backup/reviews/" target="_blank">https://wordpress.org/support/plugin/boldgrid-backup/reviews/</a>',
+				'<a href="https://wordpress.org/support/plugin/boldgrid-backup/reviews/" target="_blank">https://wordpress.org/support/plugin/boldgrid-backup/reviews/</a>'
 			),
 		],
 		'maybe_later' => [
