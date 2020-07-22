@@ -87,6 +87,8 @@ BoldGrid.Backup = function( $ ) {
 	 * add a notice and it includess the is-dismissible class, then we'll need
 	 * to actually make it dismissible.
 	 *
+	 * As of WordPress 5.5, this function is no longer included in wp-admin/js/common.js
+	 *
 	 * @since 1.6.0
 	 */
 	self.makeNoticesDismissible = function() {
@@ -95,7 +97,7 @@ BoldGrid.Backup = function( $ ) {
 				$button = $(
 					'<button type="button" class="notice-dismiss"><span class="screen-reader-text"></span></button>'
 				),
-				btnText = 'undefined' !== typeof commonL10n ? commonL10n.dismiss : wp.customize.l10n.close;
+				btnText = 'undefined' !== typeof commonL10n ? commonL10n.dismiss : wp.i18n.__( 'dismiss' );
 
 			// Ensure plain text
 			$button.find( '.screen-reader-text' ).text( btnText );
