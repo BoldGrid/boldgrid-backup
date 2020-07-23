@@ -67,7 +67,8 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		 *
 		 * In the list below, it is important that $include_tables is processed last.
 		 */
-		$include_views  = $this->core->db_get->filter_by_type( $include_tables, 'VIEW' );
+		$include_views = $this->core->db_get->filter_by_type( $include_tables, 'VIEW' );
+
 		$include_tables = $this->core->db_get->filter_by_type( $include_tables, 'BASE TABLE' );
 
 		Boldgrid_Backup_Admin_In_Progress_Data::set_args(
@@ -104,6 +105,19 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		 */
 		if ( ! empty( $wpdb->charset ) ) {
 			$settings['default-character-set'] = $wpdb->charset;
+		}
+
+		if ( ! empty( $include_views ) ) {
+			$db_import           = new Boldgrid_Backup_Admin_Db_Import();
+			$user_has_privileges = $db_import->has_db_privileges( array( 'SHOW VIEW' ) );
+			if ( false === $user_has_privileges ) {
+				return array(
+					'error' => esc_html__(
+						'The database contains VIEWS, but the database user does not have the permissions needed to create a backup.',
+						'boldgrid-backup'
+					),
+				);
+			}
 		}
 
 		try {

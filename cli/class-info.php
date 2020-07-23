@@ -189,7 +189,7 @@ class Info {
 					break;
 			}
 
-			$usage = 'Usage: php bgbkup-cli.php <check|restore> [log] [notify] [email=<email_address>] [method=<ajax|cli|pclzip|ziparchive>] [zip=<path/to/backup.zip>] [log_level=<(LOG_EMERG|LOG_ALERT|LOG_CRIT|LOG_ERR|LOG_WARNING|LOG_NOTICE|LOG_INFO|LOG_DEBUG)|(0-7)>]';
+			$usage = 'Usage: php bgbkup-cli.php <check|restore> [log=<0|1>] [notify=<0|1>] [email=<email_address>] [method=<ajax|cli|pclzip|ziparchive>] [zip=<path/to/backup.zip>] [log_level=<(LOG_EMERG|LOG_ALERT|LOG_CRIT|LOG_ERR|LOG_WARNING|LOG_NOTICE|LOG_INFO|LOG_DEBUG)|(0-7)>]';
 
 			if ( 'help' === self::$info['operation'] ) {
 				self::$info['errors']['help'] = $usage;
@@ -300,7 +300,7 @@ class Info {
 	 */
 	public static function get_log_flag() {
 		if ( ! isset( self::$info['log'] ) ) {
-			self::$info['log'] = self::has_arg_flag( 'log' );
+			self::$info['log'] = (bool) self::get_arg_value( 'log' );
 		}
 
 		return self::$info['log'];
@@ -361,7 +361,7 @@ class Info {
 	 */
 	public static function get_notify_flag() {
 		if ( ! isset( self::$info['notify'] ) ) {
-			self::$info['notify'] = self::has_arg_flag( 'notify' );
+			self::$info['notify'] = (bool) self::get_arg_value( 'notify' );
 		}
 
 		return self::$info['notify'];

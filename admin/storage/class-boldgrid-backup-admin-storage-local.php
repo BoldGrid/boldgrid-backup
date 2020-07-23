@@ -59,8 +59,13 @@ class Boldgrid_Backup_Admin_Storage_Local {
 	/**
 	 * Action to take after a backup file has been created.
 	 *
-	 * If the user has not chosen to keep local copies, this method adds the
-	 * "delete local copy" to the jobs queue.
+	 * While this method's name is vague, "post_archive_files", it has a very specific purpose:
+	 * If the user has not chosen to keep local copies, this method adds the "delete local copy" to
+	 * the jobs queue.
+	 *
+	 * This method is ran after every single backup is made. Because of its very specific purpose, we
+	 * have several checks in the beginning of the method to ensure we actually need to schedule the
+	 * job to delete the backup.
 	 *
 	 * @since 1.5.2
 	 *
@@ -70,21 +75,48 @@ class Boldgrid_Backup_Admin_Storage_Local {
 	 */
 	public function post_archive_files( $info ) {
 		/*
-		 * Do not "delete local copy" in the following scenarios:
+		 * Do not add a job to delete this local backup if this is not an automated backup.
 		 *
-		 * We only want to add this to the jobs queue if we're in the middle of
-		 * an automatic backup. If the user simply clicked on "Backup site now",
-		 * we don't want to automatically delete the backup, there's a button
-		 * for that.
-		 *
-		 * If we're doing a backup immediately before WordPress does an auto
-		 * update, we want to make sure this backup is not deleted.
+		 * We only want to add this to the jobs queue if we're in the middle of an automatic backup.
+		 * If the user simply clicked on "Backup site now", we don't want to automatically delete the
+		 * backup, there's a button for that.
 		 */
-		if ( ! $this->core->doing_cron || $this->core->pre_auto_update ) {
+		if ( ! $this->core->doing_cron ) {
 			return;
 		}
 
+		/*
+		 * If the user wants to keep backups locally, there's no need to delete it via a job. It will
+		 * get deleted in time during the retention process.
+		 */
 		if ( $this->core->remote->is_enabled( 'local' ) ) {
+			return;
+		}
+
+		/*
+		 * At this point, we know they don't have local storage enabled, so we need to delete ths backup
+		 * via a job to respect those settings.
+		 *
+		 * HOWEVER, if the user ALSO doesn't have any REMOTE storage providers enabled, then in essence
+		 * we've created a local backup only to delete it right away.
+		 *
+		 * To protect users from themselves, in the following scenario:
+		 *
+		 * 1. If the user DOES NOT have local storage enabled (which is true as we've progressed this
+		 *    far into the method) AND
+		 * 2. They DO NOT have a remote storage provider enabled...
+		 *
+		 * ... Abort and do not add the job to remove the local backup. Doing so will mean that we
+		 * creating a backup before an auto update, but we never uploaded it remotely and we deleted
+		 * it locally, which seems pointless.
+		 *
+		 * INSTEAD, we'll have this case (the lesser of 2 evils):
+		 *
+		 * 1. The user will have enabled backups before auto updates.
+		 * 2. The user will have disabled local storage.
+		 * 3. The user will not have any remote storage enabled.
+		 */
+		if ( ! $this->core->remote->any_enabled( true ) ) {
 			return;
 		}
 

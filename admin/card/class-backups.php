@@ -14,7 +14,7 @@
 namespace Boldgrid\Backup\Admin\Card;
 
 /**
- * Class: Backups
+ * Class: Backups.
  *
  * This class is responsible for rendering the "Backups" card on this plugin's dashboard.
  *
@@ -31,14 +31,14 @@ class Backups extends \Boldgrid\Library\Library\Ui\Card {
 
 		$this->title = esc_html__( 'Backups', 'boldgrid-backup' );
 
-		$this->subTitle = esc_html__( 'It\'s website insurance. Make sure you have a backup.', 'boldgrid-backup' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
+		$this->subTitle = esc_html__( 'It\'s website insurance. Make sure you have a backup.', 'boldgrid-backup' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName
 
 		$this->icon = '<span class="dashicons dashicons-vault"></span>';
 
-		$this->features = [
+		$this->features = array(
 			new Feature\Scheduled_Backups(),
 			new Feature\Remote_Storage(),
-		];
+		);
 		if ( ! get_option( 'boldgrid_backup_settings' )['encrypt_db'] ) {
 			$this->features[] = new Feature\Database_Encryption();
 		}

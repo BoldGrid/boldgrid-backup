@@ -141,6 +141,17 @@ class Boldgrid_Backup_Admin_Upload {
 			return false;
 		}
 
+		if ( ! preg_match( '/boldgrid-backup-.*-\d{8}-\d{6}/', $_FILES['file']['name'] ) ) {
+			// Display an error notice.
+			do_action(
+				'boldgrid_backup_notice',
+				esc_html__( 'Uploaded File is not a Total Upkeep backup file.', 'boldgrid-backup' ),
+				'notice notice-error is-dismissible'
+			);
+
+			return false;
+		}
+
 		return true;
 	}
 
@@ -533,5 +544,17 @@ class Boldgrid_Backup_Admin_Upload {
 				'error' => $error_message,
 			]
 		);
+	}
+
+	/**
+	 * Archive Upload Action
+	 *
+	 * @since 1.14.0
+	 */
+	public function archive_upload_action() {
+		$page_is_bgbkup = apply_filters( 'is_boldgrid_backup_page', null );
+		if ( $page_is_bgbkup && ! empty( $_FILES['file'] ) ) {
+			$this->core->upload->upload_archive_file();
+		}
 	}
 }

@@ -53,37 +53,42 @@ $in_modal = true;
 $modal    = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-modal.php';
 $in_modal = false;
 
-?>
-<div class='wrap'>
+echo '
+	<div class="wrap">
+		<div id="bglib-page-container" class="bgbkup-page-container">
+			<div id="bglib-page-top">
+				<div id="bglib-page-header" class="bglib-has-logo">
+					<h1>' . esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'Backup Archives', 'boldgrid-backup' ) ) . '</h1>
 
-	<h1 class="wp-heading-inline"><?php echo esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'Backup Archives', 'boldgrid-backup' ) ); ?></h1>
+					<div class="page-title-actions">
+						<a href="#TB_inline?width=800&amp;height=600&amp;inlineId=backup_now_content" class="thickbox page-title-action page-title-action-primary">' .
+							esc_html__( 'Backup Site Now', 'boldgrid-backup' ) . '
+						</a>
+						<a class="page-title-action add-new">' . esc_html__( 'Upload Backup', 'boldgrid-backup' ) . '</a>
+					</div>
+				</div>
+			</div>
+			<div id="bglib-page-content">
+				<div class="wp-header-end"></div>';
+echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
-	<div class="page-title-actions">
+require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
 
-		<a href="#TB_inline?width=800&amp;height=600&amp;inlineId=backup_now_content" class="thickbox page-title-action page-title-action-primary"><?php esc_html_e( 'Backup Site Now', 'boldgrid-backup' ); ?></a>
+echo $table; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
-		<a class="page-title-action add-new"><?php esc_html_e( 'Upload Backup', 'boldgrid-backup' ); ?></a>
+echo $modal; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
-	</div>
+/*
+ * @todo Revisit the usefulness of this notice in this location. Commented out @since 1.10.1
+ * require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/note-pre-backup.php';
+ */
 
-	<?php
-	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+// Bombard the user with an ad before they've even made their first backup. I mean, don't.
+if ( ! empty( $this->archives_all->all ) ) {
+	echo $ad; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+}
 
-	require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
-
-	echo $table; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
-
-	echo $modal; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
-
-	/*
-	 * @todo Revisit the usefulness of this notice in this location. Commented out @since 1.10.1
-	 * require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/note-pre-backup.php';
-	 */
-
-	// Bombard the user with an ad before they've even made their first backup. I mean, don't.
-	if ( ! empty( $this->archives_all->all ) ) {
-		echo $ad; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
-	}
-	?>
-
-</div>
+echo '
+			</div>
+		</div>
+	</div>';

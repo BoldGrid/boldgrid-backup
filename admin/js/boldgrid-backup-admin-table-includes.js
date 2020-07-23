@@ -16,7 +16,7 @@ BoldGrid.TableInclude = function( $ ) {
 	'use strict';
 
 	var self = this,
-		$container = $( '#table_inclusion' ),
+		$container = $( 'div#table_inclusion' ),
 		$includeTables = $container.find( '.include-tables [type="checkbox"]' ),
 		$type = $container.find( '[name="table_inclusion_type"]' ),
 		$configContainer = $container.find( '#table_inclusion_config' ),
@@ -33,9 +33,11 @@ BoldGrid.TableInclude = function( $ ) {
 	 * @summary Action to take when the type (full / custom) has been changed.
 	 *
 	 * @since 1.6.0
+	 *
+	 * @param typeInput The type input element clicked in the toggle.
 	 */
-	self.onChangeType = function() {
-		self.toggleConfig();
+	self.onChangeType = function( typeInput ) {
+		self.toggleConfig( typeInput );
 	};
 
 	/**
@@ -55,13 +57,17 @@ BoldGrid.TableInclude = function( $ ) {
 	 * @summary Toggle the area that allows you to choose which tables to backup.
 	 *
 	 * @since 1.6.0
+	 *
+	 * @param typeInput The type input element clicked in the toggle.
 	 */
-	self.toggleConfig = function() {
-		var type = $type.filter( ':checked' ).val();
+	self.toggleConfig = function( typeInput ) {
+		var type = $( typeInput )
+			.filter( ':checked' )
+			.val();
 
 		if ( 'full' === type ) {
 			$configContainer.hide();
-		} else {
+		} else if ( 'custom' === type ) {
 			$configContainer.show();
 		}
 	};
@@ -77,6 +83,27 @@ BoldGrid.TableInclude = function( $ ) {
 		self.toggleStatus();
 
 		return false;
+	};
+
+	/**
+	 * Update Values
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param eventTarget The target of the triggering event.
+	 * @param $container The set of container divs.
+	 */
+	self.updateValues = function( eventTarget, $container ) {
+		var name = $( eventTarget ).attr( 'name' ),
+			value = $( eventTarget ).val(),
+			type = $( eventTarget ).attr( 'type' );
+		if ( 'radio' == type || 'checkbox' == type ) {
+			$container
+				.find( 'input[name="' + name + '"][value="' + value + '"]' )
+				.prop( 'checked', $( eventTarget ).prop( 'checked' ) );
+		} else {
+			$container.find( 'input[name=' + name + ']' ).val( value );
+		}
 	};
 
 	/**
@@ -101,9 +128,19 @@ BoldGrid.TableInclude = function( $ ) {
 		$buttonNone.on( 'click', self.toggleNone );
 
 		self.toggleStatus();
-		self.toggleConfig();
+		$type.each( function() {
+			self.toggleConfig( this );
+		} );
 
-		$type.on( 'change', self.onChangeType );
+		$type.on( 'change', function() {
+			self.onChangeType( this );
+		} );
+
+		$container.find( 'input' ).each( function() {
+			$( this ).on( 'input', function() {
+				self.updateValues( this, $container );
+			} );
+		} );
 
 		$includeTables.on( 'change', self.toggleStatus );
 	} );
