@@ -67,6 +67,31 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	}
 
 	/**
+	 * Filters auto update markup on themes page.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param string $template The unfiltered javascript template for themes page.
+	 *
+	 * @return string
+	 */
+	public function theme_update_markup( $template ) {
+		$patterns     = array(
+			'/class="toggle-auto-update/',
+			'/class="auto-update-time/',
+		);
+		// add onclick event and prepend the classes with boldgrid-backup.
+		$replacements = array(
+			'onclick="BoldGrid.autoUpdateThemes(this)" class="boldgrid-backup-toggle-auto-update',
+			'class="boldgrid-backup-auto-update-time',
+		);
+
+		$filtered_template = preg_replace( $patterns, $replacements, $template );
+
+		return $filtered_template;
+	}
+
+	/**
 	 * Filters auto update markup on plugin page.
 	 *
 	 * @since SINCEVERSION
@@ -160,6 +185,23 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 
 			// Even though we have updated the option in our settings, it must be updated in the WordPress options table.
 			$core->settings->set_autoupdate_options( $settings['auto_update'] );
+
+			echo wp_json_encode(
+				array(
+					'settings_updated' => $settings_updated,
+					'error'            => $settings_updated ? '' : 'Settings Failed to Save',
+				)
+			);
+
+			wp_die();
+		} elseif ( isset( $update_data['slug'] ) ) {
+			// if data-slug is set, this is a theme being updated.
+			$settings = $core->settings->get_settings();
+			$settings['auto_update']['themes'][ $update_data['slug'] ] = 'enable' === $update_data['wpAction'] ? '1' : '0';
+			$settings_updated = $core->settings->save( $settings );
+
+			// Even though we have updated the option in our settings, it must be updated in the WordPress options table.
+			$core->settings->set_autoupdate_options( $settings['auto_update'], true );
 
 			echo wp_json_encode(
 				array(

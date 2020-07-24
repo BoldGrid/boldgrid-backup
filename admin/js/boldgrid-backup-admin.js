@@ -115,6 +115,26 @@ BoldGrid.Backup = function( $ ) {
 	};
 
 	/**
+	 * Auto Update Themes
+	 *
+	 * Add functionality for WP >= 5.5 theme update links.\
+	 *
+	 * @since SINCEVERSION
+	 */
+	self.autoUpdateThemes = function( link ) {
+		var data = {
+			action: 'boldgrid_backup_auto_update',
+			_wpnonce: BoldGridBackupAdmin.auto_update_nonce,
+			data: link.dataset
+		};
+		$.post( ajaxurl, data, function( response ) {
+			if ( JSON.parse( response ).settings_updated ) {
+				location.reload();
+			}
+		} );
+	};
+
+	/**
 	 * Auto Update Links
 	 *
 	 * Adds functionality for WP >= 5.5 update links.
@@ -122,8 +142,7 @@ BoldGrid.Backup = function( $ ) {
 	 * @since SINCEVERSION
 	 */
 	self.autoUpdateLinks = function() {
-		$enableUpdateLinks = $( '.boldgrid-backup-enable-auto-update' );
-		$enableUpdateLinks.click( function( e ) {
+		$( '.boldgrid-backup-enable-auto-update' ).click( function( e ) {
 			var data = {
 				action: 'boldgrid_backup_auto_update',
 				_wpnonce: BoldGridBackupAdmin.auto_update_nonce,

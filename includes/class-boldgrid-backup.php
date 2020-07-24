@@ -532,6 +532,7 @@ class Boldgrid_Backup {
 
 		// Auto Update Actions & Filters.
 		$this->loader->add_filter( 'plugin_auto_update_setting_html', $plugin_admin_core->auto_updates, 'auto_update_markup', 10, 3 );
+		$this->loader->add_filter( 'theme_auto_update_setting_template', $plugin_admin_core->auto_updates, 'theme_update_markup', 10, 1 );
 		// The nonce for this is created in Boldgrid_Backup_Admin::enqueue_styles.
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_auto_update', $plugin_admin_core->auto_updates, 'wp_ajax_boldgrid_backup_auto_update' );
 		$this->loader->add_action( 'admin_init', $plugin_admin_core->auto_updates, 'auto_update_core' );
