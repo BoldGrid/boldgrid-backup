@@ -76,7 +76,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 * @return string
 	 */
 	public function theme_update_markup( $template ) {
-		$patterns     = array(
+		$patterns = array(
 			'/class="toggle-auto-update/',
 			'/class="auto-update-time/',
 		);
