@@ -316,7 +316,6 @@ class Boldgrid_Backup_Admin_Settings {
 		if ( version_compare( $wp_version, '5.4.3', 'gt' ) ) {
 			// Depending on whether this is being run for themes or plugins, get the correct option table.
 			$auto_update_field = get_option( $is_theme ? 'auto_update_themes' : 'auto_update_plugins', array() );
-
 			// For each offer ( theme or plugin ) passed to this function.
 			foreach ( $new_settings[ $is_theme ? 'themes' : 'plugins' ] as $offer => $enabled ) {
 				$offer_in_option = array_search( $offer, $auto_update_field, true );
@@ -797,11 +796,12 @@ class Boldgrid_Backup_Admin_Settings {
 			if ( ! empty( $_POST['auto_update'] ) ) {
 				$settings['auto_update'] = $this->validate_auto_update( $_POST['auto_update'] );
 				// as of WordPress 5.5 We also have to update the option in the WordPress auto update option as well.
-				if ( isset( $_post['auto_update']['plugins'] ) ) {
+				if ( isset( $_POST['auto_update']['plugins'] ) ) {
 					$this->set_autoupdate_options( $_POST['auto_update'] );
 				}
+
 				// This updates the options field for themes as well.
-				if ( isset( $_post['auto_update']['themes'] ) ) {
+				if ( isset( $_POST['auto_update']['themes'] ) ) {
 					$this->set_autoupdate_options( $_POST['auto_update'], true );
 				}
 				$update_error = $settings['auto_update'] ? $update_error : true;

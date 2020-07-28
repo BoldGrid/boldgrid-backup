@@ -67,6 +67,26 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	}
 
 	/**
+	 * Get update schedule strings.
+	 *
+	 * Converts the unix timestamp of each theme update.
+	 * into a 'xx {days|months|years}' string.
+	 *
+	 * @return array An associative array of stylesheet => string.
+	 */
+	public function update_schedule_strings() {
+		$update_schedule_strings = array();
+		foreach ( $this->themes->get() as $theme ) {
+			$theme->setUpdateData();
+			$days_till_update = apply_filters( 'boldgrid_backup_premium_days_till_update', $theme );
+			if ( 1 <= $days_till_update ) {
+				$update_schedule_strings[ $theme->stylesheet ] = human_time_diff( $days_till_update );
+			}
+		}
+		return $update_schedule_strings;
+	}
+
+	/**
 	 * Filters auto update markup on themes page.
 	 *
 	 * @since SINCEVERSION
@@ -87,6 +107,11 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		);
 
 		$filtered_template = preg_replace( $patterns, $replacements, $template );
+
+		$time_pattern = '/(Automatic update scheduled in )(\d+)(\s\S+)(<\/span>)/';
+		$time_replace = '<# if ( BoldGridBackupAdmin.theme_update_strings[data.id] ) { #>\1{{ BoldGridBackupAdmin.theme_update_strings[data.id] }}\4<# } else { #>\1\2\3\4<# } #>';
+
+		$filtered_template = preg_replace( $time_pattern, $time_replace, $filtered_template );
 
 		return $filtered_template;
 	}

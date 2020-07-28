@@ -123,15 +123,21 @@ class Boldgrid_Backup_Admin {
 
 		$spinner     = '<span class="spinner inline"></span> ';
 		$dots        = ' ...';
+
 		$translation = array(
-			'is_premium'        => ( true === $this->config->get_is_premium() ? 'true' : 'false' ),
-			'lang'              => $this->config->lang,
-			'spinner_loading'   => $spinner . __( 'Loading', 'boldgrid-backup' ) . $dots,
-			'spinner'           => $spinner,
-			'get_premium_url'   => Boldgrid_Backup_Admin_Go_Pro::$url,
+			'is_premium'           => ( true === $this->config->get_is_premium() ? 'true' : 'false' ),
+			'lang'                 => $this->config->lang,
+			'spinner_loading'      => $spinner . __( 'Loading', 'boldgrid-backup' ) . $dots,
+			'spinner'              => $spinner,
+			'get_premium_url'      => Boldgrid_Backup_Admin_Go_Pro::$url,
 			// This nonce was added to handle ajax requests when enabling / disabling auto updates for specific plugins.
-			'auto_update_nonce' => wp_create_nonce( 'boldgrid_backup_auto_update' ),
+			'auto_update_nonce'    => wp_create_nonce( 'boldgrid_backup_auto_update' ),
+			'theme_update_strings' => array(),
 		);
+
+		if ( 'themes' === get_current_screen()->base ) {
+			$translation['theme_update_strings'] = $core->auto_updates->update_schedule_strings();
+		}
 
 		wp_localize_script( 'boldgrid-backup-admin', 'BoldGridBackupAdmin', $translation );
 
