@@ -101,6 +101,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 * @param array  $plugin_data An array of plugin data.
 	 */
 	public function auto_update_markup( $html, $plugin_file, $plugin_data ) {
+
 		$doc = new DOMDocument();
 
 		// Loads the original html markup into a DOMDocument object.
@@ -128,7 +129,17 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 				* So we have to remove it here, and re-add it below.
 				*/
 				$div->parentNode->removeChild( $div ); //phpcs:ignore WordPress.NamingConventions.ValidVariableName
-				// Re-Add the <div> element.
+
+				$days_till_update = false;
+				if ( false !== strpos( $html, 'auto-update-time' ) ) {
+					$plugin           = \Boldgrid\Library\Library\Plugin\Factory::create( $plugin_data['slug'] );
+					$days_till_update = apply_filters( 'boldgrid_backup_premium_days_till_update', $plugin );
+				}
+
+				if ( $days_till_update ) {
+					$div->nodeValue = 'Automatic update scheduled in ' . human_time_diff( $days_till_update ) . '.'; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
+				}
+
 				$doc->appendChild( $div );
 			}
 
