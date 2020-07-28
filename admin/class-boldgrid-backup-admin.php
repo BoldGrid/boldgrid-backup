@@ -121,8 +121,8 @@ class Boldgrid_Backup_Admin {
 			false
 		);
 
-		$spinner     = '<span class="spinner inline"></span> ';
-		$dots        = ' ...';
+		$spinner = '<span class="spinner inline"></span> ';
+		$dots    = ' ...';
 
 		$translation = array(
 			'is_premium'           => ( true === $this->config->get_is_premium() ? 'true' : 'false' ),
