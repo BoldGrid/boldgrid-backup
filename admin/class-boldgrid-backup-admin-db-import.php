@@ -76,6 +76,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 */
 	public function import( $file ) {
 		$lines = $this->get_lines( $file );
+		$this->logger_add( __METHOD__ . ' lines found: ' . count( $lines ) );
 
 		if ( false === $lines ) {
 			return array(
@@ -88,6 +89,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 		}
 
 		$lines = $this->fix_view_statements( $lines );
+		$this->logger_add( __METHOD__ . ' lines found after fixing view statements: ' . count( $lines ) );
 
 		if ( true === empty( $lines ) ) {
 			return array(
@@ -158,6 +160,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 		foreach ( $lines as $line ) {
 			// Skip comments and empty lines.
 			if ( substr( $line, 0, 2 ) === '--' || empty( $line ) ) {
+				$this->logger_add( __METHOD__ . ' skipping line (either comment or empty line).' );
 				continue;
 			}
 
@@ -166,6 +169,8 @@ class Boldgrid_Backup_Admin_Db_Import {
 			// Check if this is the end of the query.
 			if ( substr( trim( $line ), -1, 1 ) === ';' ) {
 				$affected_rows = $this->exec_import( $db, $templine );
+				$this->logger_add( __METHOD__ . 'Line imported. Affected rows: ' . print_r( $affected_rows, 1 ) ); // phpcs:ignore
+
 				if ( false === $affected_rows ) {
 					return false;
 				}
@@ -200,6 +205,26 @@ class Boldgrid_Backup_Admin_Db_Import {
 		$success = $this->import_lines( $lines );
 
 		return $success;
+	}
+
+	/**
+	 * Add a message to the logger.
+	 *
+	 * This class is usually used by Boldgrid_Backup_Admin_Core, but as you can see from the constructor,
+	 * core does not have to be passed in to use this class.
+	 *
+	 * This method will add a message to the logger, if the logger exists. Otherwise, it will silently
+	 * do nothing.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param string $message The message to add to the log.
+	 */
+	public function logger_add( $message ) {
+		if ( ! empty( $this->core->logger ) ) {
+			$message = __CLASS__ . ' ' . $message;
+			$this->core->logger->add( $message );
+		}
 	}
 
 	/**
