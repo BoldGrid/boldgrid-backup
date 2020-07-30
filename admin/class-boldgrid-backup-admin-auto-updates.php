@@ -127,57 +127,34 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 */
 	public function auto_update_markup( $html, $plugin_file, $plugin_data ) {
 
-		$doc = new DOMDocument();
-
-		// Loads the original html markup into a DOMDocument object.
-		$doc->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NOEMPTYTAG );
-
-		// URL to use in href.
-		$enable_link = 'plugins.php';
-		$link        = $doc->getElementsByTagName( 'a' );
-
 		// This sets the attributes for the <a> within the markup to work with our own ajax call instead of the default one.
-		$link->item( 0 )->setAttribute( 'class', 'boldgrid-backup-enable-auto-update' );
-		$link->item( 0 )->setAttribute( 'data-update_type', 'plugin' );
-		$link->item( 0 )->setAttribute( 'data-update_name', $plugin_file );
+
+		$auto_updates_disabled = $plugin_data['auto-update-forced'] ? '0' : '1';
+		$link_text             = 'Auto-updates ' . ( $auto_updates_disabled ? 'disabled' : 'enabled' );
+
+		$html = '<a class="boldgrid-backup-enable-auto-update" data-update_type="plugin" data-update_name="' . $plugin_file . '" data-update_enable="' . $auto_updates_disabled . '">' . $link_text . '</a>';
 
 		// If the auto update is currently enabled, display markup to disable auto updates.
-		if ( isset( $this->settings['plugins'][ $plugin_file ] ) && '1' === $this->settings['plugins'][ $plugin_file ] ) {
-			$divs = $doc->getElementsByTagName( 'div' );
-			$div  = $divs->item( 0 );
+		if ( ! $auto_updates_disabled ) {
+			$plugin           = \Boldgrid\Library\Library\Plugin\Factory::create( $plugin_data['slug'] );
+			$days_till_update = apply_filters( 'boldgrid_backup_premium_days_till_update', $plugin );
 
-			$link->item( 0 )->setAttribute( 'data-update_enable', false );
-
-			if ( $div ) {
-				/*
-				* DOMDocument doesn't put the <div> element in the right place.
-				* So we have to remove it here, and re-add it below.
-				*/
-				$div->parentNode->removeChild( $div ); //phpcs:ignore WordPress.NamingConventions.ValidVariableName
-
-				$days_till_update = false;
-				if ( false !== strpos( $html, 'auto-update-time' ) ) {
-					$plugin           = \Boldgrid\Library\Library\Plugin\Factory::create( $plugin_data['slug'] );
-					$days_till_update = apply_filters( 'boldgrid_backup_premium_days_till_update', $plugin );
-				}
-
-				if ( $days_till_update ) {
-					$div->nodeValue = 'Automatic update scheduled in ' . human_time_diff( $days_till_update ) . '.'; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
-				}
-
-				$doc->appendChild( $div );
+			if ( is_int( $days_till_update ) && 0 < $days_till_update ) {
+				$update_schedule_string = sprintf(
+					'<div class="boldgrid-backup-auto-update-time">%s %s.</div>',
+					esc_html__( 'Automatic update scheduled in', 'boldgrid-backup' ),
+					human_time_diff( $days_till_update )
+				);
+			} else {
+				$update_schedule_string = sprintf(
+					'<div class="boldgrid-backup-auto-update-time">%s</div>',
+					wp_get_auto_update_message()
+				);
 			}
-
-			// Export the modified HTML markup as a string.
-			return $doc->saveHTML();
-		} else {
-
-			// If the auto update is currently disabled, display markup to enable auto updates.
-			$link->item( 0 )->setAttribute( 'data-update_enable', true );
-
-			// Export the modified HTML markup as a string.
-			return $doc->saveHTML();
+			$html .= $update_schedule_string;
 		}
+
+		return $html;
 	}
 
 	/**
@@ -218,6 +195,8 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 			$settings = $core->settings->get_settings();
 			$settings['auto_update']['plugins'][ $update_data['update_name'] ] = $update_data['update_enable'] ? '1' : '0';
 			$settings_updated = $core->settings->save( $settings );
+
+			error_log( json_encode( $settings_updated ) );
 
 			// Even though we have updated the option in our settings, it must be updated in the WordPress options table.
 			$core->settings->set_autoupdate_options( $settings['auto_update'] );
