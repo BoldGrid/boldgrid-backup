@@ -182,7 +182,12 @@ class Boldgrid_Backup_Admin_Db_Import {
 				$stats['affected_rows_count'] += $affected_rows;
 
 				if ( false === $affected_rows ) {
-					$this->logger_add( __METHOD__ . ' failed at line ' . ( $line_count + 1 ) );
+					$this->logger_add( __METHOD__ . ' failed. Info: ' . print_r( array( // phpcs:ignore
+						'line cont' => $line_count + 1,
+						'line'      => $templine,
+						'errorInfo' => $db->errorInfo(),
+					), 1 ) );
+
 					return false;
 				}
 

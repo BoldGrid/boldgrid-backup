@@ -1293,9 +1293,15 @@ class Boldgrid_Backup_Admin_Core {
 		$importer = new Boldgrid_Backup_Admin_Db_Import( $this );
 		$status   = $importer->import( $db_dump_filepath );
 
-		if ( ! empty( $status['error'] ) ) {
-			$this->db_restore_error = $status['error'];
-			do_action( 'boldgrid_backup_notice', $status['error'], 'notice notice-error is-dismissible' );
+		/*
+		 * Take action on failed imports.
+		 *
+		 * The importer doesn't always return an array on error. Sometimes we'll get false. In that
+		 * case, $importer->import will need to be reviewed.
+		 */
+		if ( ! empty( $status['error'] ) || false === $status ) {
+			$this->db_restore_error = empty( $status['error'] ) ? __( 'Unknown error', 'boldgrid-backup' ) : $status['error'];
+			do_action( 'boldgrid_backup_notice', $this->db_restore_error, 'notice notice-error is-dismissible' );
 			return false;
 		}
 
