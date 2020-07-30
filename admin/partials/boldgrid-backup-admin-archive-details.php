@@ -22,7 +22,19 @@ defined( 'WPINC' ) || die;
 
 wp_enqueue_style( 'editor-buttons' );
 
-wp_nonce_field( 'boldgrid_backup_remote_storage_upload' );
+/*
+ * On the archive details page, the user can click "upload" to upload this backup to any number of available
+ * remote storage providers. This nonce is used for those uploads.
+ */
+wp_nonce_field( 'boldgrid_backup_remote_storage_upload', 'bgbkup_remote_upload_nonce' );
+
+/*
+ * This nonce is used for several of the actions on the Archive details page, specific to the browser.
+ * For example, it is used to on the "browser archive" and "browse database" features.
+ *
+ * @see Boldgrid_Backup_Admin_Archive_Browser::authorize to see it being used in authorization.
+ */
+wp_nonce_field( 'bgbkup_archive_details_page', 'bgbkup_archive_details_nonce' );
 
 $separator = '<hr class="separator">';
 
@@ -50,6 +62,12 @@ $delete_link     = $this->core->archive_actions->get_delete_link( $archive['file
 $download_button = $this->core->archive_actions->get_download_button( $archive['filename'] );
 $restore_button  = $this->core->archive_actions->get_restore_button( $archive['filename'] );
 $download_link   = $this->core->archive_actions->get_download_link_button( $archive['filename'] );
+
+// Enqueue the scripts needed for the Backup Site Now and Upload Backups to work.
+$this->core->folder_exclusion->enqueue_scripts();
+$this->core->db_omit->enqueue_scripts();
+$this->core->auto_rollback->enqueue_home_scripts();
+$this->core->auto_rollback->enqueue_backup_scripts();
 
 if ( ! $archive_found ) {
 	$file_size     = '';

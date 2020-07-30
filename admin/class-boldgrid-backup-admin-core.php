@@ -598,6 +598,12 @@ class Boldgrid_Backup_Admin_Core {
 	 * @global $wp_filesystem
 	 */
 	public function __construct() {
+		/*
+		 * Moves the definition of 'boldgrid_backup_get_core' from Boldgrid_Backup here.
+		 * This should help prevent issues where this filter doesn't work in some places.
+		 */
+		add_filter( 'boldgrid_backup_get_core', array( $this, 'get_core' ), 10, 1 );
+
 		WP_Filesystem();
 		global $wp_filesystem;
 		global $pagenow;

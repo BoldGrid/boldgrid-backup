@@ -165,10 +165,9 @@ BoldGrid.Settings = function( $ ) {
 	self.refresh_storage_configuration = function() {
 		var $tr = $( '#storage_locations tr.active:not(.refreshing)' ),
 			$td_configure = $tr.find( 'td.configure' ),
-			$nonce = $( '#_wpnonce' ),
 			data = {
 				action: 'boldgrid_backup_is_setup_' + $tr.attr( 'data-key' ),
-				security: $nonce.val()
+				security: $( '#bgbkup_settings_nonce' ).val()
 			},
 			$new_tr;
 

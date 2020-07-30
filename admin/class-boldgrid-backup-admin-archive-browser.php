@@ -57,9 +57,16 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 			wp_send_json_error( __( 'Permission denied.', 'boldgrid-backup' ) );
 		}
 
-		// With Recent UI changes, sometimes this ajax call can be for one of either actions.
-		if ( ! check_ajax_referer( 'boldgrid_backup_remote_storage_upload', 'security', false ) &&
-			! check_ajax_referer( 'boldgrid_backup_browse_archive', 'security', false ) ) {
+		/*
+		 * The "bgbkup_archive_details_page" nonce secures several functions on the arhive details page,
+		 * such as browsing the files in the backup and browsing the database in the backup.
+		 *
+		 * @see self::wp_ajax_* methods in this class for additional ajax calls using this nonce.
+		 * @see admin/partials/boldgrid-backup-admin-archive-details.php for definition this nonce.
+		 * @see BoldGrid.ZipBrowser in /js/boldgrid-backup-admin-zip-browser.js for ajax calls passing
+		 *      this nonce.
+		 */
+		if ( ! check_ajax_referer( 'bgbkup_archive_details_page', 'security', false ) ) {
 			wp_send_json_error( __( 'Invalid nonce; security check failed.', 'boldgrid-backup' ) );
 		}
 	}
