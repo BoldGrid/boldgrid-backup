@@ -157,10 +157,16 @@ class Boldgrid_Backup_Admin_Db_Import {
 
 		$templine = '';
 
+		$stats = array(
+			'skip_count'          => 0,
+			'exec_count'          => 0,
+			'affected_rows_count' => 0,
+		);
+
 		foreach ( $lines as $line ) {
 			// Skip comments and empty lines.
 			if ( substr( $line, 0, 2 ) === '--' || empty( $line ) ) {
-				$this->logger_add( __METHOD__ . ' skipping line (either comment or empty line).' );
+				$stats['skip_count']++;
 				continue;
 			}
 
@@ -169,7 +175,9 @@ class Boldgrid_Backup_Admin_Db_Import {
 			// Check if this is the end of the query.
 			if ( substr( trim( $line ), -1, 1 ) === ';' ) {
 				$affected_rows = $this->exec_import( $db, $templine );
-				$this->logger_add( __METHOD__ . 'Line imported. Affected rows: ' . print_r( $affected_rows, 1 ) ); // phpcs:ignore
+
+				$stats['exec_count']++;
+				$stats['affected_rows_count'] += $affected_rows;
 
 				if ( false === $affected_rows ) {
 					return false;
@@ -178,6 +186,8 @@ class Boldgrid_Backup_Admin_Db_Import {
 				$templine = '';
 			}
 		}
+
+		$this->logger_add( __METHOD__ . ' stats: ' . print_r( $stats, 1 ) ); // phpcs:ignore
 
 		return true;
 	}
@@ -222,7 +232,6 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 */
 	public function logger_add( $message ) {
 		if ( ! empty( $this->core->logger ) ) {
-			$message = __CLASS__ . ' ' . $message;
 			$this->core->logger->add( $message );
 		}
 	}
