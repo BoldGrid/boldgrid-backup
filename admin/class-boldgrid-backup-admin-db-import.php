@@ -148,6 +148,8 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * @return bool
 	 */
 	public function import_lines( $lines ) {
+		$this->logger_add( __METHOD__ . ' Method starting...' );
+
 		if ( empty( $lines ) ) {
 			return false;
 		}
@@ -163,7 +165,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 			'affected_rows_count' => 0,
 		);
 
-		foreach ( $lines as $line ) {
+		foreach ( $lines as $line_count => $line ) {
 			// Skip comments and empty lines.
 			if ( substr( $line, 0, 2 ) === '--' || empty( $line ) ) {
 				$stats['skip_count']++;
@@ -180,6 +182,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 				$stats['affected_rows_count'] += $affected_rows;
 
 				if ( false === $affected_rows ) {
+					$this->logger_add( __METHOD__ . ' failed at line ' . ( $line_count + 1 ) );
 					return false;
 				}
 
