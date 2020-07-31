@@ -186,7 +186,14 @@ class Boldgrid_Backup_Admin_Db_Import {
 
 			// Check if this is the end of the query.
 			if ( substr( trim( $line ), -1, 1 ) === ';' ) {
+				// Run the import query.
 				$affected_rows = $this->exec_import( $db, $templine );
+
+				// If the import failed, try to fix the sql and run once more.
+				if ( false === $affected_rows ) {
+					$newline       = $this->fix_line( $db, $templine );
+					$affected_rows = $newline !== $templine ? $this->exec_import( $db, $newline ) : $affected_rows;
+				}
 
 				// Update stats for the log file.
 				$stats['exec_count']++;
@@ -346,6 +353,40 @@ class Boldgrid_Backup_Admin_Db_Import {
 		}
 
 		return $line_fixed_definer;
+	}
+
+	/**
+	 * Fix our line to import.
+	 *
+	 * Sometimes, when executing a command in self::import_lines(), a (1) known and (2) fixable error
+	 * occurs. This methd attempts to find and fix those errors so the command can be tried again.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param  pdo    $db
+	 * @param  string $line An sql command.
+	 * @return string The updated sql command.
+	 */
+	public function fix_line( $db, $line ) {
+		// Array format not guaranteed, convert to string for searchability. See self::import_lines comment.
+		$error_info = implode( ' ', $db->errorInfo() );
+
+		$is_syntax_error   = strpos( $error_info, '1064' ) !== false;
+		$is_checksum_error = strpos( $error_info, 'PAGE_CHECKSUM=1' ) !== false;
+
+		/*
+		 * Fix PAGE_CHECKSUM=1 issues.
+		 *
+		 *  This is a syntax error caused by lack of feature support. Can happen when source / destination
+		 *  sql servers are different.
+		 */
+		if ( $is_syntax_error && $is_checksum_error ) {
+			$line = str_replace( 'PAGE_CHECKSUM=1', 'CHECKSUM=1', $line );
+			$this->logger_add( __METHOD__ . ' Replacing PAGE_CHECKSUM=1 with CHECKSUM=1' );
+		}
+
+		return $line;
+
 	}
 
 	/**
