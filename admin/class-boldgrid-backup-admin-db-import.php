@@ -145,7 +145,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * @since 1.6.0
 	 *
 	 * @param  array $lines MySQL dump file lines.
-	 * @return bool         Ture on success, An array with an 'error' on failure.
+	 * @return bool         True on success, An array with an 'error' on failure.
 	 */
 	public function import_lines( $lines ) {
 		$this->logger_add( __METHOD__ . ' Method starting...' );

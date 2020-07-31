@@ -110,16 +110,18 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 		/*
 		 * @todo Review and reimplement these tests.
 		 *
-		 * The import_lines() method was updated to were true on success, and an array with an error
+		 * The import_lines() method was updated to return true on success, and an array with an error
 		 * message on failure. Before, it would return false, but this was changed so it would return
 		 * an error message to help with troubleshooting.
 		 */
-// 		$mock_db_import = $this->getMockBuilder( \Boldgrid_Backup_Admin_Db_Import::class )
-// 			->setMethods( array( 'exec_import' ) )
-// 			->getMock();
-// 		$mock_db_import->method( 'exec_import' )
-// 			->willReturn( false );
-// 		$this->assertFalse( $db_import->import_lines( $this->original_view_lines ) );
+		/*
+		$mock_db_import = $this->getMockBuilder( \Boldgrid_Backup_Admin_Db_Import::class )
+			->setMethods( array( 'exec_import' ) )
+			->getMock();
+		$mock_db_import->method( 'exec_import' )
+			->willReturn( false );
+		$this->assertFalse( $db_import->import_lines( $this->original_view_lines ) );
+		*/
 	}
 
 	/**
