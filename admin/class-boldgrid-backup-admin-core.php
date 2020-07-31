@@ -2987,7 +2987,6 @@ class Boldgrid_Backup_Admin_Core {
 	public function boldgrid_backup_now_auto( $type ) {
 		// Get backup settings.
 		$settings = $this->settings->get_settings();
-
 		// Abort if auto-backup is not enabled.
 		if ( empty( $settings['auto_backup'] ) ) {
 			return;

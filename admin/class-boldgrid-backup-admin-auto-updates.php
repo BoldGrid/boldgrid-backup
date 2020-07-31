@@ -79,7 +79,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		foreach ( $this->themes->get() as $theme ) {
 			$theme->setUpdateData();
 			$days_till_update = apply_filters( 'boldgrid_backup_premium_days_till_update', $theme );
-			if ( 1 <= $days_till_update ) {
+			if ( is_int( $days_till_update ) && 1 <= $days_till_update ) {
 				$update_schedule_strings[ $theme->stylesheet ] = human_time_diff( $days_till_update );
 			}
 		}
@@ -96,6 +96,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 * @return string
 	 */
 	public function theme_update_markup( $template ) {
+
 		$patterns = array(
 			'/class="toggle-auto-update/',
 			'/class="auto-update-time/',
@@ -106,13 +107,12 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 			'class="boldgrid-backup-auto-update-time',
 		);
 
-		$filtered_template = preg_replace( $patterns, $replacements, $template );
+		$filtered_template = '<# data.autoupdate.forced = "" #>' . preg_replace( $patterns, $replacements, $template );
 
 		$time_pattern = '/(Automatic update scheduled in )(\d+)(\s\S+)(<\/span>)/';
 		$time_replace = '<# if ( BoldGridBackupAdmin.theme_update_strings[data.id] ) { #>\1{{ BoldGridBackupAdmin.theme_update_strings[data.id] }}\4<# } else { #>\1\2\3\4<# } #>';
 
 		$filtered_template = preg_replace( $time_pattern, $time_replace, $filtered_template );
-
 		return $filtered_template;
 	}
 
@@ -128,24 +128,39 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	public function auto_update_markup( $html, $plugin_file, $plugin_data ) {
 
 		// This sets the attributes for the <a> within the markup to work with our own ajax call instead of the default one.
+		$plugins_with_updates = array_keys( get_site_transient( 'update_plugins' )->response );
 
 		$auto_updates_disabled = $plugin_data['auto-update-forced'] ? '0' : '1';
-		$link_text             = 'Auto-updates ' . ( $auto_updates_disabled ? 'disabled' : 'enabled' );
+		$auto_update_status    = sprintf(
+			// Translators: 1. Whether auto-updates are currently enabled or disabled.
+			esc_html__( 'Auto-updates %s', 'boldgrid-backup' ),
+			$auto_updates_disabled ? esc_html__( 'disabled', 'boldgrid-backup' ) : esc_html__( 'enabled', 'boldgrid-backup' )
+		);
+		$link_text = sprintf(
+			// Translators: 1. Whether or not to enable or disable auto-updates.
+			esc_html__( '%s Auto-updates', 'boldgrid-backup' ),
+			$auto_updates_disabled ? esc_html__( 'Enable ', 'boldgrid-backup' ) : esc_html__( 'Disable ', 'boldgrid-backup' )
+		);
 
-		$html = '<a class="boldgrid-backup-enable-auto-update" data-update_type="plugin" data-update_name="' . $plugin_file . '" data-update_enable="' . $auto_updates_disabled . '">' . $link_text . '</a>';
+		$html = '
+			<span class="boldgrid-backup-auto-update-status">' . $auto_update_status . '</span>
+			<br />
+			<a class="boldgrid-backup-enable-auto-update" data-update_type="plugin"
+			data-update_name="' . $plugin_file . '" data-update_enable="' . $auto_updates_disabled . '">' . $link_text . '</a>';
 
 		// If the auto update is currently enabled, display markup to disable auto updates.
 		if ( ! $auto_updates_disabled ) {
 			$plugin           = \Boldgrid\Library\Library\Plugin\Factory::create( $plugin_data['slug'] );
 			$days_till_update = apply_filters( 'boldgrid_backup_premium_days_till_update', $plugin );
 
-			if ( is_int( $days_till_update ) && 0 < $days_till_update ) {
+			$update_schedule_string = '';
+			if ( in_array( $plugin_file, $plugins_with_updates, true ) && is_int( $days_till_update ) && 0 < $days_till_update ) {
 				$update_schedule_string = sprintf(
 					'<div class="boldgrid-backup-auto-update-time">%s %s.</div>',
 					esc_html__( 'Automatic update scheduled in', 'boldgrid-backup' ),
 					human_time_diff( $days_till_update )
 				);
-			} else {
+			} elseif ( in_array( $plugin_file, $plugins_with_updates, true ) ) {
 				$update_schedule_string = sprintf(
 					'<div class="boldgrid-backup-auto-update-time">%s</div>',
 					wp_get_auto_update_message()
@@ -195,8 +210,6 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 			$settings = $core->settings->get_settings();
 			$settings['auto_update']['plugins'][ $update_data['update_name'] ] = $update_data['update_enable'] ? '1' : '0';
 			$settings_updated = $core->settings->save( $settings );
-
-			error_log( json_encode( $settings_updated ) );
 
 			// Even though we have updated the option in our settings, it must be updated in the WordPress options table.
 			$core->settings->set_autoupdate_options( $settings['auto_update'] );
