@@ -157,8 +157,16 @@ class Boldgrid_Backup_Admin_Db_Import {
 		/* phpcs:disable WordPress.DB.RestrictedClasses */
 		$db = new PDO( sprintf( 'mysql:host=%1$s;dbname=%2$s;', DB_HOST, DB_NAME ), DB_USER, DB_PASSWORD );
 
+		/*
+		 * Build a single sql command to run. There will be many, but we'll build and execute them one
+		 * at a time.
+		 *
+		 * A sql command may span more than one line. As we loop through each line, we add it to $templine
+		 * until we've reached the end of the command, a ';'.
+		 */
 		$templine = '';
 
+		// Stats for our log file. Added to the log at the end of method.
 		$stats = array(
 			'skip_count'          => 0,
 			'exec_count'          => 0,
@@ -176,19 +184,43 @@ class Boldgrid_Backup_Admin_Db_Import {
 
 			// Check if this is the end of the query.
 			if ( substr( trim( $line ), -1, 1 ) === ';' ) {
+				$templine = 'do something very fun with everytone;';
+
 				$affected_rows = $this->exec_import( $db, $templine );
 
+				// Update stats for the log file.
 				$stats['exec_count']++;
 				$stats['affected_rows_count'] += $affected_rows;
 
+				// Take action if there was an error running the import query.
 				if ( false === $affected_rows ) {
+					// Get our error info.
+					$error_info = $db->errorInfo();
+
+					// Save it to the log file.
 					$this->logger_add( __METHOD__ . ' failed. Info: ' . print_r( array( // phpcs:ignore
 						'line cont' => $line_count + 1,
 						'line'      => $templine,
 						'errorInfo' => $db->errorInfo(),
 					), 1 ) );
 
-					return false;
+					/*
+					 * Show the error to the user.
+					 *
+					 * Over the years, it's been an edge case for the sql command to fail. Also, the
+					 * format of the $db->errorInfo() array sounds like it varies. Comments in the php
+					 * documentation indicate SQL Server returns 5 items in the array instead of 3.
+					 *
+					 * Because of the above, we'll simply print_r the $db->errorInfo() info rather than
+					 * parse it and try to make it look nice.
+					 */
+					return array(
+						'error' => sprintf(
+							/* translators: 1: Error info as to why the db restore failed. */
+							__( 'Error restoring database: %1$s', 'boldgrid-backup' ),
+							'<pre style="white-space:break-spaces;">' . print_r( $db->errorInfo(), 1 ) . '</pre>' // phpcs:ignore
+						),
+					);
 				}
 
 				$templine = '';
