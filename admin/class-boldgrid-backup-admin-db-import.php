@@ -145,13 +145,15 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * @since 1.6.0
 	 *
 	 * @param  array $lines MySQL dump file lines.
-	 * @return bool
+	 * @return bool         Ture on success, An array with an 'error' on failure.
 	 */
 	public function import_lines( $lines ) {
 		$this->logger_add( __METHOD__ . ' Method starting...' );
 
 		if ( empty( $lines ) ) {
-			return false;
+			return array(
+				'error' => ( __( 'Empty data passed to db restore.', 'boldgrid-backup' ) ),
+			);
 		}
 
 		/* phpcs:disable WordPress.DB.RestrictedClasses */
