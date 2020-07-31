@@ -184,8 +184,6 @@ class Boldgrid_Backup_Admin_Db_Import {
 
 			// Check if this is the end of the query.
 			if ( substr( trim( $line ), -1, 1 ) === ';' ) {
-				$templine = 'do something very fun with everytone;';
-
 				$affected_rows = $this->exec_import( $db, $templine );
 
 				// Update stats for the log file.
