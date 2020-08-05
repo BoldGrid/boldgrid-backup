@@ -415,3 +415,7 @@ p > .bgbkup-remote-logo {
 	width: 100%;
 }
 
+.boldgrid-backup-enable-auto-update {
+	cursor: pointer;
+}
+

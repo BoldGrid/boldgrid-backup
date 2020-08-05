@@ -131,7 +131,18 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		$plugins_with_updates = array_keys( get_site_transient( 'update_plugins' )->response );
 
 		$auto_updates_disabled = $plugin_data['auto-update-forced'] ? '0' : '1';
-		$auto_update_status    = sprintf(
+
+		/*
+		 * With WP5.5, auto-update-forced is set to false when delayed by timely auto updates.
+		 * So we have to defer to using the information in our own settings to determine what to display.
+		 */
+		if ( apply_filters( 'boldgrid_backup_is_timely_updates', false ) ) {
+			$core                  = apply_filters( 'boldgrid_backup_get_core', null );
+			$auto_update_settings  = $core->settings->get_setting( 'auto_update' );
+			$auto_updates_disabled = $auto_update_settings['plugins'][ $plugin_file ] ? '0' : '1';
+		}
+
+		$auto_update_status = sprintf(
 			// Translators: 1. Whether auto-updates are currently enabled or disabled.
 			esc_html__( 'Auto-updates %s', 'boldgrid-backup' ),
 			$auto_updates_disabled ? esc_html__( 'disabled', 'boldgrid-backup' ) : esc_html__( 'enabled', 'boldgrid-backup' )
