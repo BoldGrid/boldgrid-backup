@@ -179,13 +179,17 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 * Fires wehen the auto_update_plugins option is updated.
 	 *
 	 * @since SINCEVERSION
+	 *
+	 * @param array  $old_value Old Value.
+	 * @param array  $new_value New Value
+	 * @param string $option Name of option.
 	 */
 	public function wordpress_option_updated( $old_value, $new_value, $option ) {
-		$update_type = 'auto_update_plugins' === $option ? 'plugins' : 'themes';
-		$core                 = apply_filters( 'boldgrid_backup_get_core', null );
-		$settings = $core->settings->get_settings();
+		$update_type    = 'auto_update_plugins' === $option ? 'plugins' : 'themes';
+		$core           = apply_filters( 'boldgrid_backup_get_core', null );
+		$settings       = $core->settings->get_settings();
 		$enabled_offers = $new_value;
-		foreach( $settings['auto_update'][ $update_type ] as $offer => $enabled ) {
+		foreach ( $settings['auto_update'][ $update_type ] as $offer => $enabled ) {
 			if ( 'default' === $offer ) {
 				continue;
 			}
@@ -237,7 +241,6 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 			$settings = $core->settings->get_settings();
 			$settings['auto_update']['plugins'][ $update_data['update_name'] ] = $update_data['update_enable'] ? '1' : '0';
 
-			error_log( json_encode( $settings['auto_update']['plugins'] ) );
 			$settings_updated = $core->settings->save( $settings );
 
 			// Even though we have updated the option in our settings, it must be updated in the WordPress options table.
