@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "a5c3b9226ad05a728cfce378a4adab27",
+    "content-hash": "5d6e0fb183f1e2555b61aecd7ef15c5d",
     "packages": [
         {
             "name": "boldgrid/library",
-            "version": "2.13.0",
+            "version": "dev-55update",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BoldGrid/library.git",
-                "reference": "5eac0d3f4b318479d6b762dcd92f913377ba4d03"
+                "reference": "50038ff0cf99aa14bfd7d859e77f2d48185665fc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BoldGrid/library/zipball/5eac0d3f4b318479d6b762dcd92f913377ba4d03",
-                "reference": "5eac0d3f4b318479d6b762dcd92f913377ba4d03",
+                "url": "https://api.github.com/repos/BoldGrid/library/zipball/50038ff0cf99aa14bfd7d859e77f2d48185665fc",
+                "reference": "50038ff0cf99aa14bfd7d859e77f2d48185665fc",
                 "shasum": ""
             },
             "type": "library",
@@ -54,7 +54,7 @@
                 }
             ],
             "description": "The BoldGrid Library for shared code used in official BoldGrid plugins and themes.",
-            "time": "2020-07-07T14:32:25+00:00"
+            "time": "2020-08-05T16:46:06+00:00"
         },
         {
             "name": "chland/tdcron",
@@ -126,16 +126,16 @@
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "2.0.27",
+            "version": "2.0.28",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "34620af4df7d1988d8f0d7e91f6c8a3bf931d8dc"
+                "reference": "d1ca58cf33cb21046d702ae3a7b14fdacd9f3260"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/34620af4df7d1988d8f0d7e91f6c8a3bf931d8dc",
-                "reference": "34620af4df7d1988d8f0d7e91f6c8a3bf931d8dc",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/d1ca58cf33cb21046d702ae3a7b14fdacd9f3260",
+                "reference": "d1ca58cf33cb21046d702ae3a7b14fdacd9f3260",
                 "shasum": ""
             },
             "require": {
@@ -214,7 +214,7 @@
                 "x.509",
                 "x509"
             ],
-            "time": "2020-04-04T23:17:33+00:00"
+            "time": "2020-07-08T09:08:33+00:00"
         }
     ],
     "packages-dev": [
@@ -261,6 +261,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "boldgrid/library": 20,
         "ifsnop/mysqldump-php": 20,
         "chland/tdcron": 20,
         "lox/xhprof": 20

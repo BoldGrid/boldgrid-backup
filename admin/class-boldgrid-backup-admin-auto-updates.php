@@ -130,17 +130,9 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		// This sets the attributes for the <a> within the markup to work with our own ajax call instead of the default one.
 		$plugins_with_updates = array_keys( get_site_transient( 'update_plugins' )->response );
 
-		$auto_updates_disabled = $plugin_data['auto-update-forced'] ? '0' : '1';
-
-		/*
-		 * With WP5.5, auto-update-forced is set to false when delayed by timely auto updates.
-		 * So we have to defer to using the information in our own settings to determine what to display.
-		 */
-		if ( apply_filters( 'boldgrid_backup_is_timely_updates', false ) ) {
-			$core                  = apply_filters( 'boldgrid_backup_get_core', null );
-			$auto_update_settings  = $core->settings->get_setting( 'auto_update' );
-			$auto_updates_disabled = $auto_update_settings['plugins'][ $plugin_file ] ? '0' : '1';
-		}
+		$core                  = apply_filters( 'boldgrid_backup_get_core', null );
+		$auto_update_settings  = $core->settings->get_setting( 'auto_update' );
+		$auto_updates_disabled = $auto_update_settings['plugins'][ $plugin_file ] ? '0' : '1';
 
 		$auto_update_status = sprintf(
 			// Translators: 1. Whether auto-updates are currently enabled or disabled.
@@ -161,7 +153,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 
 		// If the auto update is currently enabled, display markup to disable auto updates.
 		if ( ! $auto_updates_disabled ) {
-			$plugin           = \Boldgrid\Library\Library\Plugin\Factory::create( $plugin_data['slug'] );
+			$plugin           = \Boldgrid\Library\Library\Plugin\Factory::create( $plugin_file );
 			$days_till_update = apply_filters( 'boldgrid_backup_premium_days_till_update', $plugin );
 
 			$update_schedule_string = '';
@@ -184,12 +176,36 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	}
 
 	/**
+	 * Fires wehen the auto_update_plugins option is updated.
+	 *
+	 * @since SINCEVERSION
+	 */
+	public function wordpress_option_updated( $old_value, $new_value, $option ) {
+		$update_type = 'auto_update_plugins' === $option ? 'plugins' : 'themes';
+		$core                 = apply_filters( 'boldgrid_backup_get_core', null );
+		$settings = $core->settings->get_settings();
+		$enabled_offers = $new_value;
+		foreach( $settings['auto_update'][ $update_type ] as $offer => $enabled ) {
+			if ( 'default' === $offer ) {
+				continue;
+			}
+			if ( in_array( $offer, $enabled_offers, true ) ) {
+				$settings['auto_update'][ $update_type ][ $offer ] = '1';
+			} else {
+				$settings['auto_update'][ $update_type ][ $offer ] = '0';
+			}
+		}
+
+		$core->settings->save( $settings );
+	}
+
+	/**
 	 * Ajax Callback to enable auto updates for a given plugin or theme.
 	 *
 	 * @since SINCEVERSION
 	 */
 	public function wp_ajax_boldgrid_backup_auto_update() {
-		// he nonce for this is created in Boldgrid_Backup_Admin::enqueue_styles.
+		// the nonce for this is created in Boldgrid_Backup_Admin::enqueue_styles.
 		if ( ! check_admin_referer( 'boldgrid_backup_auto_update' ) ) {
 			echo wp_json_encode(
 				array(
@@ -220,6 +236,8 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		if ( isset( $update_data['update_type'] ) && 'plugin' === $update_data['update_type'] ) {
 			$settings = $core->settings->get_settings();
 			$settings['auto_update']['plugins'][ $update_data['update_name'] ] = $update_data['update_enable'] ? '1' : '0';
+
+			error_log( json_encode( $settings['auto_update']['plugins'] ) );
 			$settings_updated = $core->settings->save( $settings );
 
 			// Even though we have updated the option in our settings, it must be updated in the WordPress options table.

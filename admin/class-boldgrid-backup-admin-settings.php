@@ -280,10 +280,10 @@ class Boldgrid_Backup_Admin_Settings {
 			$auto_update_settings = array(
 				'days'    => 0,
 				'plugins' => array(
-					'default' => false,
+					'default' => '0',
 				),
 				'themes'  => array(
-					'default' => false,
+					'default' => '0',
 				),
 			);
 		} else {
