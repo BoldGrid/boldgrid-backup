@@ -91,25 +91,25 @@ class Boldgrid_Backup_Activator {
 	 */
 	public static function on_post_activate() {
 		/*
-			 * On Plugin activation, we need to read the auto_update_plugins.
-			 * and auto_update_themes options, and sync our settings to those.
-			 * This ensures that when the plugin is not active, any changes made to those settings.
-			 * is reflected accurately in Total Upkeep.
-			 */
-			$updates = array( 'themes', 'plugins' );
-			foreach ( $updates as $type ) {
-				$auto_update_type = get_option( 'auto_update_' . $type, false );
-				/*
-				 * If the user still uses WP < 5.5, then the auto_update_$type option will not be set yet
-				 * and this can therefore be ignored. However if it has been set, and all updates are disabled,
-				 * then this option will return an empty array.
-				 */
-				if ( false === $auto_update_type ) {
-					continue;
-				}
-				$core = apply_filters( 'boldgrid_backup_get_core', null );
-				$core->auto_updates->wordpress_option_updated( array(), $auto_update_type, 'auto_update_' . $type );
+		* On Plugin activation, we need to read the auto_update_plugins.
+		* and auto_update_themes options, and sync our settings to those.
+		* This ensures that when the plugin is not active, any changes made to those settings.
+		* is reflected accurately in Total Upkeep.
+		*/
+		$updates = array( 'themes', 'plugins' );
+		foreach ( $updates as $type ) {
+			$auto_update_type = get_option( 'auto_update_' . $type, false );
+			/*
+				* If the user still uses WP < 5.5, then the auto_update_$type option will not be set yet
+				* and this can therefore be ignored. However if it has been set, and all updates are disabled,
+				* then this option will return an empty array.
+				*/
+			if ( false === $auto_update_type ) {
+				continue;
 			}
+			$core = apply_filters( 'boldgrid_backup_get_core', null );
+			$core->auto_updates->wordpress_option_updated( array(), $auto_update_type, 'auto_update_' . $type );
+		}
 
 		return ! self::$just_activated && '1' === get_option( self::$option );
 	}
