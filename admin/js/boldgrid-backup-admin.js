@@ -158,6 +158,7 @@ BoldGrid.Backup = function( $ ) {
 	};
 
 	$( function() {
+		var noDivider;
 		self.bindHelpClick();
 		self.hideBackupNotice();
 		self.updatePremiumLink();
@@ -167,6 +168,17 @@ BoldGrid.Backup = function( $ ) {
 
 		$( 'body' ).on( 'click', '[data-bgbkup-toggle-target]', self.onClickToggle );
 		$( 'body' ).on( 'make_notices_dismissible', self.makeNoticesDismissible );
+
+		/*
+		 * Removes non-working auto-update- filters from the top of the plugins page.
+		 * Wordpress 5.5+ doesn't correctly see our auto updates as enabled / disabled when
+		 * Timely Auto Updates are used. Therefore these filters should be removed to avoid confusion.
+		 */
+		$( '.subsubsub li[class*="auto-update-"]' ).remove();
+		if ( 0 < $( '.subsubsub li ' ).last().length ) {
+			noDivider = $( '.subsubsub li ' ).last().html().replace( /\|/, '' );
+			$( '.subsubsub li ' ).last().html( noDivider );
+		}
 
 		/*
 		 * Remove temporary "page loading" messages.

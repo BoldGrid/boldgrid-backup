@@ -419,3 +419,9 @@ p > .bgbkup-remote-logo {
 	cursor: pointer;
 }
 
+/* Hides the auto-update-enabled and disabled table filters */
+.subsubsub .auto-update-enabled,
+.subsubsub .auto-update-disabled {
+	display: none;
+}
+
