@@ -176,8 +176,13 @@ BoldGrid.Backup = function( $ ) {
 		 */
 		$( '.subsubsub li[class*="auto-update-"]' ).remove();
 		if ( 0 < $( '.subsubsub li ' ).last().length ) {
-			noDivider = $( '.subsubsub li ' ).last().html().replace( /\|/, '' );
-			$( '.subsubsub li ' ).last().html( noDivider );
+			noDivider = $( '.subsubsub li ' )
+				.last()
+				.html()
+				.replace( /\|/, '' );
+			$( '.subsubsub li ' )
+				.last()
+				.html( noDivider );
 		}
 
 		/*
