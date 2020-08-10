@@ -289,8 +289,8 @@ class Boldgrid_Backup_Admin_Settings {
 		} else {
 			$auto_update_settings = $settings['auto_update'];
 		}
-
-		if ( version_compare( $wp_version, '5.4.3', 'gt' ) ) {
+		// If version is wp_version is greater than 5.4.99 then it must be 5.5.
+		if ( version_compare( $wp_version, '5.4.99', 'gt' ) ) {
 			$auto_update_plugins = get_option( 'auto_update_plugins', array() );
 
 			// If the plugin is listed in wp's auto_update_plugin option, then enable it in our settings.
@@ -312,8 +312,8 @@ class Boldgrid_Backup_Admin_Settings {
 	 */
 	public function set_autoupdate_options( $new_settings, $is_theme = false ) {
 		global $wp_version;
-		// As of now, the last version of 5.4.x is 5.4.3. Anything greater than that must be 5.5.
-		if ( version_compare( $wp_version, '5.4.3', 'gt' ) ) {
+		// If version is wp_version is greater than 5.4.99 then it must be 5.5.
+		if ( version_compare( $wp_version, '5.4.99', 'gt' ) ) {
 			// Depending on whether this is being run for themes or plugins, get the correct option table.
 			$auto_update_field = get_option( $is_theme ? 'auto_update_themes' : 'auto_update_plugins', array() );
 			// For each offer ( theme or plugin ) passed to this function.
