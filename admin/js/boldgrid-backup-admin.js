@@ -87,7 +87,9 @@ BoldGrid.Backup = function( $ ) {
 	 * add a notice and it includess the is-dismissible class, then we'll need
 	 * to actually make it dismissible.
 	 *
-	 * As of WordPress 5.5, this function is no longer included in wp-admin/js/common.js
+	 * As of WordPress 5.5, automatically included l10n classes have been removed
+	 * Therefore we have to defer to using i18n. Additionally this function is no
+	 * longer included in wp-admin/js/common.js
 	 *
 	 * @since 1.6.0
 	 */
@@ -117,9 +119,13 @@ BoldGrid.Backup = function( $ ) {
 	/**
 	 * Auto Update Themes
 	 *
-	 * Add functionality for WP >= 5.5 theme update links.\
+	 * Due to the UI changes in WP 5.5 for auto updates we are
+	 * overriding the default action of the links to enable or
+	 * disable the auto updates.
+	 * The AJAX Handler for this is:
+	 *     Boldgrid_Backup_Admin_Auto_Updates::wp_ajax_boldgrid_backup_auto_update().
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.3
 	 */
 	self.autoUpdateThemes = function( link ) {
 		var data = {
@@ -135,11 +141,15 @@ BoldGrid.Backup = function( $ ) {
 	};
 
 	/**
-	 * Auto Update Links
+	 * Plugin Auto Update Links.
 	 *
-	 * Adds functionality for WP >= 5.5 update links.
+	 * Due to the UI changes in WP 5.5 for auto updates we are
+	 * overriding the default action of the links to enable or
+	 * disable the auto updates.
+	 * The AJAX Handler for this is:
+	 *     Boldgrid_Backup_Admin_Auto_Updates::wp_ajax_boldgrid_backup_auto_update().
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.3
 	 */
 	self.autoUpdateLinks = function() {
 		$( '.boldgrid-backup-enable-auto-update' ).click( function( e ) {
