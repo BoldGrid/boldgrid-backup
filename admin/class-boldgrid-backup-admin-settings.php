@@ -300,11 +300,14 @@ class Boldgrid_Backup_Admin_Settings {
 	/**
 	 * Updates the WordPress auto_update options.
 	 *
-	 * This is somewhat the opposite of auto_update_settings. This is used as necessary
+	 * This is somewhat the opposite of set_update_settings. This is used as necessary
 	 * to update the new options added to WP5.5, auto_update_plugins and auto_update_themes
-	 * to make sure that all the settings play nicely together.
+	 * to make sure that all the settings play nicely together. Anytime we change the update settings
+	 * in Total Upkeep, This should run once for themes, and once for plugins to make sure that
+	 * the WordPress Options are kept up to date.
 	 *
 	 * @since 1.4.3
+	 * @global string $wp_version WordPress Version Number.
 	 *
 	 * @param array $new_settings New settings.
 	 * @param bool  $is_theme     Whether or not the settings being updated are for a theme.
@@ -798,7 +801,7 @@ class Boldgrid_Backup_Admin_Settings {
 			 */
 			if ( ! empty( $_POST['auto_update'] ) ) {
 				$settings['auto_update'] = $this->validate_auto_update( $_POST['auto_update'] );
-				// as of WordPress 5.5 We also have to update the option in the WordPress auto update option as well.
+				// As of WordPress 5.5 we also have to update the option in the WordPress auto update option as well.
 				if ( isset( $_POST['auto_update']['plugins'] ) ) {
 					$this->set_autoupdate_options( $_POST['auto_update'] );
 				}
