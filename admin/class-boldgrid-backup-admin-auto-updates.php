@@ -217,10 +217,11 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 * @since 1.14.0
 	 *
 	 * @param bool     $update Whether or not to update.
-	 * @param stdClass $item The item class passed to callback.
+	 * @param mixed    $item The item class passed to callback.
+	 * 
 	 * @return bool
 	 */
-	public function auto_update_themes( $update, stdClass $item ) {
+	public function auto_update_themes( $update, $item ) {
 		if ( is_null( $update ) ) {
 			return null;
 		}
