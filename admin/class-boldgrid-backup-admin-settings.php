@@ -312,7 +312,7 @@ class Boldgrid_Backup_Admin_Settings {
 	 * @param array $new_settings New settings.
 	 * @param bool  $is_theme     Whether or not the settings being updated are for a theme.
 	 */
-	public function set_autoupdate_options( $new_settings, $is_theme = false ) {
+	public function update_autoupdate_options( $new_settings, $is_theme = false ) {
 		global $wp_version;
 		// If version is wp_version is greater than 5.4.99 then it must be 5.5.
 		if ( version_compare( $wp_version, '5.4.99', 'gt' ) ) {
@@ -803,12 +803,12 @@ class Boldgrid_Backup_Admin_Settings {
 				$settings['auto_update'] = $this->validate_auto_update( $_POST['auto_update'] );
 				// As of WordPress 5.5 we also have to update the option in the WordPress auto update option as well.
 				if ( isset( $_POST['auto_update']['plugins'] ) ) {
-					$this->set_autoupdate_options( $_POST['auto_update'] );
+					$this->update_autoupdate_options( $_POST['auto_update'] );
 				}
 
 				// This updates the options field for themes as well.
 				if ( isset( $_POST['auto_update']['themes'] ) ) {
-					$this->set_autoupdate_options( $_POST['auto_update'], true );
+					$this->update_autoupdate_options( $_POST['auto_update'], true );
 				}
 				$update_error = $settings['auto_update'] ? $update_error : true;
 			}
