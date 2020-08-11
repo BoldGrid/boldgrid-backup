@@ -271,7 +271,8 @@ class Boldgrid_Backup_Admin_Settings {
 	 *
 	 * @since 1.14.3
 	 *
-	 * @param array $settings The Settings array.
+	 * @param  array  $settings The Settings array.
+	 * @global string $wp_version The current version of WordPress.
 	 *
 	 * @return array
 	 */

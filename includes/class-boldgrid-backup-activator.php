@@ -87,6 +87,8 @@ class Boldgrid_Backup_Activator {
 	 *
 	 * @since 1.10.1
 	 *
+	 * @global string $wp_version WordPress Version Number.
+	 *
 	 * @return bool
 	 */
 	public static function on_post_activate() {
