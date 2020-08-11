@@ -221,7 +221,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 * @return bool
 	 */
 	public function auto_update_themes( $update, stdClass $item ) {
-		if( is_null( $update ) ) {
+		if ( is_null( $update ) ) {
 			return null;
 		}
 		// Array of theme stylesheets to always auto-update.
