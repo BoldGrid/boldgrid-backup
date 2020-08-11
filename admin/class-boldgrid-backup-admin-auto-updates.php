@@ -67,122 +67,6 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	}
 
 	/**
-	 * Get update schedule strings.
-	 *
-	 * Converts the unix timestamp of each theme update.
-	 * into a 'xx {days|months|years}' string.
-	 *
-	 * @since 1.14.3
-	 *
-	 * @return array An associative array of stylesheet => string.
-	 */
-	public function update_schedule_strings() {
-		$update_schedule_strings = array();
-		foreach ( $this->themes->get() as $theme ) {
-			$theme->setUpdateData();
-			$days_till_update = apply_filters( 'boldgrid_backup_premium_days_till_update', $theme );
-			if ( is_int( $days_till_update ) && 1 <= $days_till_update ) {
-				$update_schedule_strings[ $theme->stylesheet ] = human_time_diff( $days_till_update );
-			}
-		}
-		return $update_schedule_strings;
-	}
-
-	/**
-	 * Filters auto update markup on themes page.
-	 *
-	 * @since 1.14.3
-	 *
-	 * @param string $template The unfiltered javascript template for themes page.
-	 *
-	 * @return string
-	 */
-	public function theme_update_markup( $template ) {
-
-		$patterns = array(
-			'/class="toggle-auto-update/',
-			'/class="auto-update-time/',
-		);
-		// add onclick event and prepend the classes with boldgrid-backup.
-		$replacements = array(
-			'onclick="BoldGrid.autoUpdateThemes(this)" class="boldgrid-backup-toggle-auto-update',
-			'class="boldgrid-backup-auto-update-time',
-		);
-
-		$filtered_template = '<# data.autoupdate.forced = "" #>' . preg_replace( $patterns, $replacements, $template );
-
-		$time_pattern = '/(Automatic update scheduled in )(\d+)(\s\S+)(<\/span>)/';
-		$time_replace = '<# if ( BoldGridBackupAdmin.theme_update_strings[data.id] ) { #>\1{{ BoldGridBackupAdmin.theme_update_strings[data.id] }}\4<# } else { #>\1\2\3\4<# } #>';
-
-		$filtered_template = preg_replace( $time_pattern, $time_replace, $filtered_template );
-		return $filtered_template;
-	}
-
-	/**
-	 * Filters auto update markup on plugin page.
-	 *
-	 * @since 1.14.3
-	 *
-	 * @param string $html Original HTML Markup.
-	 * @param string $plugin_file Path to main plugin file.
-	 * @param array  $plugin_data An array of plugin data.
-	 */
-	public function auto_update_markup( $html, $plugin_file, $plugin_data ) {
-
-		// This sets the attributes for the <a> within the markup to work with our own ajax call instead of the default one.
-		$plugins_with_updates  = array_keys( get_site_transient( 'update_plugins' )->response );
-		$core                  = apply_filters( 'boldgrid_backup_get_core', null );
-		$auto_update_settings  = $core->settings->get_setting( 'auto_update' );
-		$auto_updates_disabled = $auto_update_settings['plugins'][ $plugin_file ] ? '0' : '1';
-
-		$auto_update_status = sprintf(
-			// Translators: 1. Whether auto-updates are currently enabled or disabled.
-			esc_html__( 'Auto-updates %s', 'boldgrid-backup' ),
-			$auto_updates_disabled ? esc_html__( 'disabled', 'boldgrid-backup' ) : esc_html__( 'enabled', 'boldgrid-backup' )
-		);
-		$link_text = sprintf(
-			// Translators: 1. Whether or not to enable or disable auto-updates.
-			esc_html__( '%s Auto-updates', 'boldgrid-backup' ),
-			$auto_updates_disabled ? esc_html__( 'Enable ', 'boldgrid-backup' ) : esc_html__( 'Disable ', 'boldgrid-backup' )
-		);
-
-		$html = '
-			<span class="boldgrid-backup-auto-update-status">' . $auto_update_status . '</span>
-			<br />
-			<a class="boldgrid-backup-enable-auto-update" data-update_type="plugin"
-			data-update_name="' . $plugin_file . '" data-update_enable="' . $auto_updates_disabled . '">' . $link_text . '</a>';
-
-		// If the auto update are not currently disabled, display markup to disable auto updates.
-		if ( ! $auto_updates_disabled ) {
-			$plugin           = \Boldgrid\Library\Library\Plugin\Factory::create( $plugin_file );
-			$days_till_update = apply_filters( 'boldgrid_backup_premium_days_till_update', $plugin );
-
-			$update_schedule_string = '';
-			/*
-			 * If the plugin is listed in the auto_update_plugins option then auto updates are enabled for that plugin.
-			 * We have to test that $days_till_update is an integer because the 'boldgrid_backup_premium_days_till_update' filter
-			 * will return a Plugin object if that filter does not exist. If the $days_till_update is greater than 0, then display the
-			 * human readable time difference, otherwise display the standard wp_get_auto_update_message().
-			*/
-			if ( in_array( $plugin_file, $plugins_with_updates, true ) && is_int( $days_till_update ) && 0 < $days_till_update ) {
-				$update_schedule_string = sprintf(
-					'<div class="boldgrid-backup-auto-update-time">%s %s.</div>',
-					esc_html__( 'Automatic update scheduled in', 'boldgrid-backup' ),
-					human_time_diff( $days_till_update )
-				);
-			} elseif ( in_array( $plugin_file, $plugins_with_updates, true ) ) {
-				$update_schedule_string = sprintf(
-					'<div class="boldgrid-backup-auto-update-time">%s</div>',
-					wp_get_auto_update_message()
-				);
-			}
-			$html .= $update_schedule_string;
-		}
-
-		return $html;
-	}
-
-	/**
 	 * Updates the WordPress Options table.
 	 *
 	 * This is fired by the "update_option_{$option}" hook when the option is
@@ -221,80 +105,6 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 
 		// Save the settings.
 		$core->settings->save( $settings );
-	}
-
-	/**
-	 * Ajax Callback to enable auto updates for a given plugin or theme.
-	 *
-	 * This is fired whenever someone clicks on 'Enable(Disable) Auto Updates'
-	 * to be sure that our method is called instead of WordPress' method.
-	 *
-	 * @since 1.14.3
-	 */
-	public function wp_ajax_boldgrid_backup_auto_update() {
-		// the nonce for this is created in Boldgrid_Backup_Admin::enqueue_styles.
-		if ( ! check_admin_referer( 'boldgrid_backup_auto_update' ) ) {
-			echo wp_json_encode(
-				array(
-					'settings_updated' => false,
-					'error'            => 'Nonce Verification Failed',
-				)
-			);
-
-			wp_die();
-		}
-
-		// Get Update Data from $_POST array.
-		$update_data = isset( $_POST['data'] ) ? $_POST['data'] : array();
-
-		// If this is called without the update_data, die.
-		if ( empty( $update_data ) ) {
-			echo wp_json_encode(
-				array(
-					'settings_updated' => false,
-					'error'            => 'Invalid Request',
-				)
-			);
-			wp_die();
-		}
-		$core = apply_filters( 'boldgrid_backup_get_core', null );
-
-		// If the update type is 'plugin' update the auto_update settings for plugins.
-		if ( isset( $update_data['update_type'] ) && 'plugin' === $update_data['update_type'] ) {
-			$settings = $core->settings->get_settings();
-			$settings['auto_update']['plugins'][ $update_data['update_name'] ] = $update_data['update_enable'] ? '1' : '0';
-
-			$settings_updated = $core->settings->save( $settings );
-
-			// Even though we have updated the option in our settings, it must be updated in the WordPress options table.
-			$core->settings->set_autoupdate_options( $settings['auto_update'] );
-
-			echo wp_json_encode(
-				array(
-					'settings_updated' => $settings_updated,
-					'error'            => $settings_updated ? '' : 'Settings Failed to Save',
-				)
-			);
-
-			wp_die();
-		} elseif ( isset( $update_data['slug'] ) ) {
-			// if data-slug is set, this is a theme being updated.
-			$settings = $core->settings->get_settings();
-			$settings['auto_update']['themes'][ $update_data['slug'] ] = 'enable' === $update_data['wpAction'] ? '1' : '0';
-			$settings_updated = $core->settings->save( $settings );
-
-			// Even though we have updated the option in our settings, it must be updated in the WordPress options table.
-			$core->settings->set_autoupdate_options( $settings['auto_update'], true );
-
-			echo wp_json_encode(
-				array(
-					'settings_updated' => $settings_updated,
-					'error'            => $settings_updated ? '' : 'Settings Failed to Save',
-				)
-			);
-
-			wp_die();
-		}
 	}
 
 	/**
@@ -376,11 +186,14 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 * @since 1.14.0
 	 *
 	 * @param  bool     $update Whether or not to update.
-	 * @param  stdClass $item The item class passed to callback.
+	 * @param  mixed    $item The item class passed to callback.
 	 * @return bool
 	 */
-	public function auto_update_plugins( $update, stdClass $item ) {
+	public function auto_update_plugins( $update, $item ) {
 		// Array of plugin slugs to always auto-update.
+		if ( is_null( $update ) ) {
+			return null;
+		}
 		$plugins = array();
 		foreach ( $this->plugins as $plugin ) {
 			if ( $this->maybe_update_plugin( $plugin->getSlug() ) ) {
@@ -408,6 +221,9 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 * @return bool
 	 */
 	public function auto_update_themes( $update, stdClass $item ) {
+		if( is_null( $update ) ) {
+			return null;
+		}
 		// Array of theme stylesheets to always auto-update.
 		$themes = array();
 		foreach ( $this->themes->get() as $theme ) {

@@ -130,16 +130,7 @@ class Boldgrid_Backup_Admin {
 			'spinner_loading'      => $spinner . __( 'Loading', 'boldgrid-backup' ) . $dots,
 			'spinner'              => $spinner,
 			'get_premium_url'      => Boldgrid_Backup_Admin_Go_Pro::$url,
-			// This nonce was added to handle ajax requests when enabling / disabling auto updates for specific plugins.
-			'auto_update_nonce'    => wp_create_nonce( 'boldgrid_backup_auto_update' ),
-			// This is used to pass formatted update strings to the WP Themes JS Templates.
-			'theme_update_strings' => array(),
 		);
-
-		// Get the formatted update strings for the themes page.
-		if ( 'themes' === get_current_screen()->base ) {
-			$translation['theme_update_strings'] = $core->auto_updates->update_schedule_strings();
-		}
 
 		wp_localize_script( 'boldgrid-backup-admin', 'BoldGridBackupAdmin', $translation );
 
