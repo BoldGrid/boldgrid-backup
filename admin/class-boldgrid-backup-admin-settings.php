@@ -256,7 +256,7 @@ class Boldgrid_Backup_Admin_Settings {
 		$settings['encrypt_db'] = isset( $settings['encrypt_db'] ) ? (bool) $settings['encrypt_db'] : false;
 
 		// Auto Updates.
-		$settings['auto_update'] = $this->auto_update_settings( $settings );
+		$settings['auto_update'] = $this->set_update_settings( $settings );
 
 		// Return the settings array.
 		return $settings;
