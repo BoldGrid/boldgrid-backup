@@ -275,7 +275,7 @@ class Boldgrid_Backup_Admin_Settings {
 	 *
 	 * @return array
 	 */
-	public function auto_update_settings( $settings ) {
+	public function set_update_settings( $settings ) {
 		global $wp_version;
 
 		// If the 'auto_update' settings are not set, add default values, otherwise use values from $settings array..

@@ -116,84 +116,14 @@ BoldGrid.Backup = function( $ ) {
 		} );
 	};
 
-	/**
-	 * Auto Update Themes
-	 *
-	 * Due to the UI changes in WP 5.5 for auto updates we are
-	 * overriding the default action of the links to enable or
-	 * disable the auto updates.
-	 * The AJAX Handler for this is:
-	 *     Boldgrid_Backup_Admin_Auto_Updates::wp_ajax_boldgrid_backup_auto_update().
-	 *
-	 * @since 1.14.3
-	 */
-	self.autoUpdateThemes = function( link ) {
-		var data = {
-			action: 'boldgrid_backup_auto_update',
-			_wpnonce: BoldGridBackupAdmin.auto_update_nonce,
-			data: link.dataset
-		};
-		$.post( ajaxurl, data, function( response ) {
-			if ( JSON.parse( response ).settings_updated ) {
-				location.reload();
-			}
-		} );
-	};
-
-	/**
-	 * Plugin Auto Update Links.
-	 *
-	 * Due to the UI changes in WP 5.5 for auto updates we are
-	 * overriding the default action of the links to enable or
-	 * disable the auto updates.
-	 * The AJAX Handler for this is:
-	 *     Boldgrid_Backup_Admin_Auto_Updates::wp_ajax_boldgrid_backup_auto_update().
-	 *
-	 * @since 1.14.3
-	 */
-	self.autoUpdateLinks = function() {
-		$( '.boldgrid-backup-enable-auto-update' ).click( function( e ) {
-			var data = {
-				action: 'boldgrid_backup_auto_update',
-				_wpnonce: BoldGridBackupAdmin.auto_update_nonce,
-				data: this.dataset
-			};
-			e.preventDefault();
-			$.post( ajaxurl, data, function( response ) {
-				if ( JSON.parse( response ).settings_updated ) {
-					location.reload();
-				}
-			} );
-		} );
-	};
-
 	$( function() {
 		var noDivider;
 		self.bindHelpClick();
 		self.hideBackupNotice();
 		self.updatePremiumLink();
 
-		// fire function for auto update links.
-		self.autoUpdateLinks();
-
 		$( 'body' ).on( 'click', '[data-bgbkup-toggle-target]', self.onClickToggle );
 		$( 'body' ).on( 'make_notices_dismissible', self.makeNoticesDismissible );
-
-		/*
-		 * Removes non-working auto-update- filters from the top of the plugins page.
-		 * Wordpress 5.5+ doesn't correctly see our auto updates as enabled / disabled when
-		 * Timely Auto Updates are used. Therefore these filters should be removed to avoid confusion.
-		 */
-		$( '.subsubsub li[class*="auto-update-"]' ).remove();
-		if ( 0 < $( '.subsubsub li ' ).last().length ) {
-			noDivider = $( '.subsubsub li ' )
-				.last()
-				.html()
-				.replace( /\|/, '' );
-			$( '.subsubsub li ' )
-				.last()
-				.html( noDivider );
-		}
 
 		/*
 		 * Remove temporary "page loading" messages.
