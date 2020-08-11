@@ -294,20 +294,6 @@ class Boldgrid_Backup_Admin_Settings {
 			$auto_update_settings = $settings['auto_update'];
 		}
 
-		/*
-		 * If the use has WP5.5+, we have to make sure to check the auto_update_plugins table
-		 * for any plugins that have auto_updates enabled. If they have WP < 5.5, this shoul not be run.
-		 * If version is wp_version is greater than 5.4.99 then it must be 5.5.
-		 */
-		if ( version_compare( $wp_version, '5.4.99', 'gt' ) ) {
-			$auto_update_plugins = get_option( 'auto_update_plugins', array() );
-
-			// If the plugin is listed in wp's auto_update_plugin option, then enable it in our settings.
-			foreach ( $auto_update_plugins as $plugin ) {
-				$auto_update_settings['plugins'][ $plugin ] = '1';
-			}
-		}
-
 		return $auto_update_settings;
 	}
 
