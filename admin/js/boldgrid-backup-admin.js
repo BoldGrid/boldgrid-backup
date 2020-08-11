@@ -117,7 +117,6 @@ BoldGrid.Backup = function( $ ) {
 	};
 
 	$( function() {
-		var noDivider;
 		self.bindHelpClick();
 		self.hideBackupNotice();
 		self.updatePremiumLink();
