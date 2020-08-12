@@ -194,7 +194,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 */
 	public function auto_update_plugins( $update, $item ) {
 		/*
-		 * In WP5.5 , Wordpress uses the auto_update_${type} hook to
+		 * In WP5.5 , WordPress uses the auto_update_${type} hook to
 		 * determine if auto updates is forced or not, in order to disable the
 		 * Enable / Disable action links on the plugin / theme pages. When it checks the filter in those cases
 		 * it provides null as the $update parameter. If we return $null in those cases
@@ -233,7 +233,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 */
 	public function auto_update_themes( $update, $item ) {
 		/*
-		 * In WP5.5 , Wordpress uses the auto_update_${type} hook to
+		 * In WP5.5 , WordPress uses the auto_update_${type} hook to
 		 * determine if auto updates is forced or not, in order to disable the
 		 * Enable / Disable action links on the plugin / theme pages. When it checks the filter in those cases
 		 * it provides null as the $update parameter. If we return $null in those cases
