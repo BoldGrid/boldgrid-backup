@@ -72,6 +72,12 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 * This is fired by the "update_option_{$option}" hook when the option is
 	 * either auto_update_plugins or auto_update_themes.
 	 *
+	 * Prior to WordPress 5.5, Total Upkeep managed auto updates per plugin / theme and saved the
+	 * settings in $settings['auto_update']. As of WordPress 5.5, WordPress handles auto updates
+	 * per plugin / theme and saves this info to auto_update_plugins and auto_update_themes options.
+	 * This method is here to ensure the two record systems stay in sync. Whenever the official options
+	 * are updated, this method will apply the same settings to the Total Upkeep settings.
+	 *
 	 * @see Boldgrid_Backup::define_admin_hooks() add_action definition.
 	 *
 	 * @see https://developer.wordpress.org/reference/hooks/update_option_option/ WP Hook Documentation
@@ -96,11 +102,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 				continue;
 			}
 			// If the theme / plugin is found in the $enabled_offers array, enable in our settings, otherwise disable.
-			if ( in_array( $offer, $enabled_offers, true ) ) {
-				$settings['auto_update'][ $update_type ][ $offer ] = '1';
-			} else {
-				$settings['auto_update'][ $update_type ][ $offer ] = '0';
-			}
+			$settings['auto_update'][ $update_type ][ $offer ] = in_array( $offer, $enabled_offers, true ) ? '1' : '0';
 		}
 
 		// Save the settings.
@@ -185,15 +187,23 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 *
 	 * @since 1.14.0
 	 *
-	 * @param  bool     $update Whether or not to update.
-	 * @param  mixed    $item The item class passed to callback.
+	 * @param  mixed    $update Whether or not to update.
+	 * @param  stdClass $item The item class passed to callback.
+	 *
 	 * @return bool
 	 */
 	public function auto_update_plugins( $update, $item ) {
-		// Array of plugin slugs to always auto-update.
+		/*
+		 * In WP5.5 , Wordpress uses the auto_update_${type} hook to
+		 * determine if auto updates is forced or not, in order to disable the
+		 * Enable / Disable action links on the plugin / theme pages. When it checks the filter in those cases
+		 * it provides null as the $update parameter. If we return $null in those cases
+		 * WP will not think that the auto updates are 'forced'.
+		 */
 		if ( is_null( $update ) ) {
 			return null;
 		}
+		// Array of plugin slugs to always auto-update.
 		$plugins = array();
 		foreach ( $this->plugins as $plugin ) {
 			if ( $this->maybe_update_plugin( $plugin->getSlug() ) ) {
@@ -216,12 +226,19 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 *
 	 * @since 1.14.0
 	 *
-	 * @param bool     $update Whether or not to update.
-	 * @param mixed    $item The item class passed to callback.
+	 * @param  mixed    $update Whether or not to update.
+	 * @param  stdClass $item The item class passed to callback.
 	 *
 	 * @return bool
 	 */
 	public function auto_update_themes( $update, $item ) {
+		/*
+		 * In WP5.5 , Wordpress uses the auto_update_${type} hook to
+		 * determine if auto updates is forced or not, in order to disable the
+		 * Enable / Disable action links on the plugin / theme pages. When it checks the filter in those cases
+		 * it provides null as the $update parameter. If we return $null in those cases
+		 * WP will not think that the auto updates are 'forced'.
+		 */
 		if ( is_null( $update ) ) {
 			return null;
 		}
