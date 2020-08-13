@@ -90,7 +90,51 @@ class Boldgrid_Backup_Activator {
 	 * @return bool
 	 */
 	public static function on_post_activate() {
-		return ! self::$just_activated && '1' === get_option( self::$option );
+		$just_activated = ( ! self::$just_activated && '1' === get_option( self::$option ) );
+
+		/*
+		* On Plugin activation, we need to read the auto_update_plugins.
+		* and auto_update_themes options, and sync our settings to those.
+		* This ensures that when the plugin is not active, any changes made to those settings.
+		* is reflected accurately in Total Upkeep.
+		*/
+		self::maybe_sync_options( $just_activated );
+
+		return $just_activated;
+	}
+
+	/**
+	 * Maybe Sync Options.
+	 *
+	 * With WP5.5, we need to check the auto_update_options table and make
+	 * sure that any changes made wheile this plugin is not active
+	 * are updated in our settings upon activation.
+	 *
+	 * @since 1.14.3
+	 *
+	 * @global string $wp_version Current version of WordPress
+	 *
+	 * @param bool $just_activated Whether or not the plugin has just now activated.
+	 */
+	public function maybe_sync_options( $just_activated ) {
+		global $wp_version;
+
+		$updates = array( 'themes', 'plugins' );
+
+		foreach ( $updates as $type ) {
+			$auto_update_type = get_option( 'auto_update_' . $type, false );
+			/*
+				* If the user still uses WP < 5.5 and not activated any auto-updates,
+				* then the auto_update_$type option will not be set yet
+				* and this can therefore be ignored. However if it has been set, and all updates are disabled,
+				* then this option will return an empty array.
+				*/
+			if ( ! $just_activated || version_compare( '5.4.99', $wp_version, 'gt' ) || false === $auto_update_type ) {
+				continue;
+			}
+			$core = apply_filters( 'boldgrid_backup_get_core', null );
+			$core->auto_updates->wordpress_option_updated( array(), $auto_update_type, 'auto_update_' . $type );
+		}
 	}
 
 	/**

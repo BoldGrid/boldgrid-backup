@@ -109,7 +109,7 @@ if ( ! $is_premium ) {
 		// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag, 3: Premium plugin title.
 		esc_html__( 'The %3$s plugin is not active.  Encryption features are not available.  Please go to the %1$sPlugins%2$s page to activate it.', 'boldgrid-backup' ),
 		'<a href="' .
-			esc_url( admin_url( 'plugins.php?s=Boldgrid%20Backup%20Premium&plugin_status=inactive' ) ) .
+			esc_url( admin_url( 'plugins.php?s=Total%20Upkeep%20Premium&plugin_status=inactive' ) ) .
 			'">',
 		'</a>',
 		esc_html( BOLDGRID_BACKUP_TITLE . ' Premium' )

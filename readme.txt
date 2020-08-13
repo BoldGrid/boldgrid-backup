@@ -1,10 +1,10 @@
 === Total Upkeep – WordPress Backup Plugin plus Restore & Migrate by BoldGrid ===
-Contributors: boldgrid, joemoto, imh_brad, rramo012, bgnicolepaschen
+Contributors: boldgrid, joemoto, imh_brad, rramo012, bgnicolepaschen, jamesros161
 Tags: backup, cloud backup, database backup, restore, wordpress backup
 Requires at least: 4.4
-Tested up to: 5.4
+Tested up to: 5.5
 Requires PHP: 5.4
-Stable tag: 1.14.2
+Stable tag: 1.14.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -131,6 +131,12 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 1. Activate the plugin through the Plugins menu in WordPress.
 
 == Changelog ==
+
+= 1.14.3 =
+
+Release date: August 12th, 2020
+
+* Update: Updated Auto Update features to utilize the WordPress 5.5+ Auto Update UI.
 
 = 1.14.2 =
 
