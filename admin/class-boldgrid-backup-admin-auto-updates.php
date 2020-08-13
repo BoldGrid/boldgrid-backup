@@ -67,6 +67,49 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	}
 
 	/**
+	 * Updates the WordPress Options table.
+	 *
+	 * This is fired by the "update_option_{$option}" hook when the option is
+	 * either auto_update_plugins or auto_update_themes.
+	 *
+	 * Prior to WordPress 5.5, Total Upkeep managed auto updates per plugin / theme and saved the
+	 * settings in $settings['auto_update']. As of WordPress 5.5, WordPress handles auto updates
+	 * per plugin / theme and saves this info to auto_update_plugins and auto_update_themes options.
+	 * This method is here to ensure the two record systems stay in sync. Whenever the official options
+	 * are updated, this method will apply the same settings to the Total Upkeep settings.
+	 *
+	 * @see Boldgrid_Backup::define_admin_hooks() add_action definition.
+	 *
+	 * @see https://developer.wordpress.org/reference/hooks/update_option_option/ WP Hook Documentation
+	 *
+	 * @since 1.14.3
+	 *
+	 * @param array  $old_value Value of the option before updating.
+	 * @param array  $new_value Value of the option after updating.
+	 * @param string $option Name of option being updated.
+	 */
+	public function wordpress_option_updated( $old_value, $new_value, $option ) {
+		// Determines if this is being fired for a theme or plugin update
+		$update_type = 'auto_update_plugins' === $option ? 'plugins' : 'themes';
+		$core        = apply_filters( 'boldgrid_backup_get_core', null );
+		$settings    = $core->settings->get_settings();
+
+		// The plugins / themes listed in $new_value will only be those that have auto updates enabled.
+		$enabled_offers = $new_value;
+		foreach ( $settings['auto_update'][ $update_type ] as $offer => $enabled ) {
+			// Do not modify the 'default' setting. This is used to define the default for new themes / plugins.
+			if ( 'default' === $offer ) {
+				continue;
+			}
+			// If the theme / plugin is found in the $enabled_offers array, enable in our settings, otherwise disable.
+			$settings['auto_update'][ $update_type ][ $offer ] = in_array( $offer, $enabled_offers, true ) ? '1' : '0';
+		}
+
+		// Save the settings.
+		$core->settings->save( $settings );
+	}
+
+	/**
 	 * Set Settings.
 	 *
 	 * @since 1.14.0
@@ -144,11 +187,22 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 *
 	 * @since 1.14.0
 	 *
-	 * @param  bool     $update Whether or not to update.
+	 * @param  mixed    $update Whether or not to update.
 	 * @param  stdClass $item The item class passed to callback.
+	 *
 	 * @return bool
 	 */
-	public function auto_update_plugins( $update, stdClass $item ) {
+	public function auto_update_plugins( $update, $item ) {
+		/*
+		 * In WP5.5 , WordPress uses the auto_update_${type} hook to
+		 * determine if auto updates is forced or not, in order to disable the
+		 * Enable / Disable action links on the plugin / theme pages. When it checks the filter in those cases
+		 * it provides null as the $update parameter. If we return $null in those cases
+		 * WP will not think that the auto updates are 'forced'.
+		 */
+		if ( is_null( $update ) ) {
+			return null;
+		}
 		// Array of plugin slugs to always auto-update.
 		$plugins = array();
 		foreach ( $this->plugins as $plugin ) {
@@ -172,11 +226,22 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 *
 	 * @since 1.14.0
 	 *
-	 * @param bool     $update Whether or not to update.
-	 * @param stdClass $item The item class passed to callback.
+	 * @param  mixed    $update Whether or not to update.
+	 * @param  stdClass $item The item class passed to callback.
+	 *
 	 * @return bool
 	 */
-	public function auto_update_themes( $update, stdClass $item ) {
+	public function auto_update_themes( $update, $item ) {
+		/*
+		 * In WP5.5 , WordPress uses the auto_update_${type} hook to
+		 * determine if auto updates is forced or not, in order to disable the
+		 * Enable / Disable action links on the plugin / theme pages. When it checks the filter in those cases
+		 * it provides null as the $update parameter. If we return $null in those cases
+		 * WP will not think that the auto updates are 'forced'.
+		 */
+		if ( is_null( $update ) ) {
+			return null;
+		}
 		// Array of theme stylesheets to always auto-update.
 		$themes = array();
 		foreach ( $this->themes->get() as $theme ) {

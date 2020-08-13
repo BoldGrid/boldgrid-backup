@@ -179,7 +179,7 @@ if ( ! $archive_found ) {
 					'<div class="premium">%1$s</div>
 					<div><p>%2$s</p></div>',
 					esc_html__(
-						'Secure your sesitive data with the Premium plugin!',
+						'Secure your sensitive data with the Premium plugin!',
 						'boldgrid-backup'
 					),
 					'<form action="' . $premium_url . '" target="_blank"><button class="button button-success" type="submit">' .
