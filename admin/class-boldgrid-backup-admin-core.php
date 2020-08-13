@@ -1160,8 +1160,18 @@ class Boldgrid_Backup_Admin_Core {
 		 * database.
 		 */
 		if ( $this->db_omit->is_omit_all() ) {
+			$this->logger->add( 'No database tables selected to backup. A database export will not be in this backup.' );
 			return true;
 		}
+
+		/*
+		 * Log generic info about database.
+		 *
+		 * Before we begin to backup the database, let's log how big it is. While troubleshooting, it
+		 * will be helpful to know how many tables we're seeing that COULD be backed up, as well as
+		 * how large they are.
+		 */
+		$this->logger->add( 'Database info: ' . print_r( $this->db_get->prefixed_count(), 1 ) ); // phpcs:ignore
 
 		// Check if functional.
 		if ( ! $this->test->run_functionality_tests() ) {
@@ -1699,6 +1709,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Backup the database, if saving an archive file and not a dry run.
 		if ( $save && ! $dryrun ) {
+			$this->logger->add_separator();
 			$this->logger->add( 'Starting dump of database...' );
 			$this->logger->add_memory();
 
@@ -1706,6 +1717,7 @@ class Boldgrid_Backup_Admin_Core {
 
 			$this->logger->add( 'Dump of database complete! $status = ' . print_r( $status, 1 ) ); // phpcs:ignore
 			$this->logger->add_memory();
+			$this->logger->add_separator();
 
 			if ( false === $status || ! empty( $status['error'] ) ) {
 				return [
