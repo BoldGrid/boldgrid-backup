@@ -105,6 +105,20 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 			$settings['auto_update'][ $update_type ][ $offer ] = in_array( $offer, $enabled_offers, true ) ? '1' : '0';
 		}
 
+		/*
+		 * The above loop cannot account for the presence of a plugin or theme in the $enabled_offers
+		 * array, that does not yet exist in the auto update settings. This will be the case if a new plugin or theme is installed
+		 * before they settings for that theme or plugin have been set in the Total Upkeep settings page. This will ensure that
+		 * scenario is covered.
+		 */
+		foreach ( $enabled_offers as $enabled_offer ) {
+			if ( isset( $settings['auto_update'][ $update_type ][ $enabled_offer ] ) ) {
+				continue;
+			} else {
+				$settings['auto_update'][ $update_type ][ $enabled_offer ] = '1';
+			}
+		}
+
 		// Save the settings.
 		$core->settings->save( $settings );
 	}
