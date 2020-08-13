@@ -116,7 +116,7 @@ class Boldgrid_Backup_Activator {
 	 *
 	 * @param bool $just_activated Whether or not the plugin has just now activated.
 	 */
-	public function maybe_sync_options( $just_activated ) {
+	public static function maybe_sync_options( $just_activated ) {
 		global $wp_version;
 
 		$updates = array( 'themes', 'plugins' );
