@@ -112,11 +112,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		 * scenario is covered.
 		 */
 		foreach ( $enabled_offers as $enabled_offer ) {
-			if ( isset( $settings['auto_update'][ $update_type ][ $enabled_offer ] ) ) {
-				continue;
-			} else {
-				$settings['auto_update'][ $update_type ][ $enabled_offer ] = '1';
-			}
+			$settings['auto_update'][ $update_type ][ $enabled_offer ] = '1';
 		}
 
 		// Save the settings.
