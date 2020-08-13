@@ -198,16 +198,15 @@ class Boldgrid_Backup_Admin_Archive_Details {
 	 * Validate the nonce on the Backup Archive Details page.
 	 *
 	 * On the backup archive page, there is a nonce used by several different
-	 * methods, boldgrid_backup_remote_storage_upload. This method is an easy
+	 * methods, bgbkup_archive_details_page. This method is an easy
 	 * way to validate the nonce.
 	 *
-	 * The nonce can be added to an ajax request's data via:
-	 * 'security' : $( '#_wpnonce' ).val()
-	 *
 	 * @since 1.6.0
+	 *
+	 * @see Boldgrid_Backup_Admin_Archive_Browser::authorize()
 	 */
 	public function validate_nonce() {
-		return check_ajax_referer( 'boldgrid_backup_remote_storage_upload', 'security', false );
+		return check_ajax_referer( 'bgbkup_archive_details_page', 'security', false );
 	}
 
 	/**
