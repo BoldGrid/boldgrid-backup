@@ -38,6 +38,7 @@ class Boldgrid_Backup_Admin_Environment {
 	 *
 	 * @since SINCEVERSION
 	 *
+	 * @access private
 	 * @see self::option_name
 	 *
 	 * @param  string $key     The name of the value to get.
@@ -55,6 +56,7 @@ class Boldgrid_Backup_Admin_Environment {
 	 *
 	 * @since SINCEVERSION
 	 *
+	 * @access private
 	 * @see self::option_name
 	 *
 	 * @return array
@@ -68,6 +70,7 @@ class Boldgrid_Backup_Admin_Environment {
 	 *
 	 * @since SINCEVERSION
 	 *
+	 * @access private
 	 * @see self::option_name
 	 *
 	 * @param string $key   The environment key, like "hostname".
@@ -86,6 +89,7 @@ class Boldgrid_Backup_Admin_Environment {
 	 *
 	 * @since SINCEVERSION
 	 *
+	 * @access private
 	 * @see self::option_name
 	 *
 	 * @param array $values All of our environment values.
@@ -148,7 +152,7 @@ class Boldgrid_Backup_Admin_Environment {
 	 *
 	 * @since SINCEVERSION
 	 *
-	 * @bool
+	 * @return bool
 	 */
 	public function has_phpversion_changed() {
 		$key = 'phpversion';
@@ -172,7 +176,7 @@ class Boldgrid_Backup_Admin_Environment {
 	 *
 	 * @global string $wp_version';
 	 *
-	 * @bool
+	 * @return bool
 	 */
 	public function has_wpversion_changed() {
 		$key = 'wpversion';
