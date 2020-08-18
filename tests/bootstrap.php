@@ -96,6 +96,7 @@ $files = array(
 	'/admin/class-boldgrid-backup-admin-compressor.php',
 	'/admin/class-boldgrid-backup-admin-log.php',
 	'/admin/class-boldgrid-backup-admin-log-page.php',
+	'/admin/class-boldgrid-backup-admin-environment.php',
 	// Compressors.
 	'/admin/compressor/class-boldgrid-backup-admin-compressor-php-zip.php',
 	'/admin/compressor/class-boldgrid-backup-admin-compressor-pcl-zip.php',
