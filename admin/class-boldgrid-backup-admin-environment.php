@@ -28,75 +28,9 @@ class Boldgrid_Backup_Admin_Environment {
 	 * old values and the new values. The old values will be stored in this option.
 	 *
 	 * @since SINCEVERSION
-	 * @access private
-	 * @var array
+	 * @var string
 	 */
-	private $option_name = 'boldgrid_backup_environment';
-
-	/**
-	 * Get a saved environment value.
-	 *
-	 * @since SINCEVERSION
-	 *
-	 * @access private
-	 * @see self::option_name
-	 *
-	 * @param  string $key     The name of the value to get.
-	 * @param  mixed  $default The default value to return.
-	 * @return mixed
-	 */
-	private function get_saved_value( $key, $default = false ) {
-		$saved_values = $this->get_saved_values();
-
-		return isset( $saved_values[ $key ] ) ? $saved_values[ $key ] : $default;
-	}
-
-	/**
-	 * Get all of our saved values.
-	 *
-	 * @since SINCEVERSION
-	 *
-	 * @access private
-	 * @see self::option_name
-	 *
-	 * @return array
-	 */
-	private function get_saved_values() {
-		return get_option( $this->option_name, array() );
-	}
-
-	/**
-	 * Save a specific environment value.
-	 *
-	 * @since SINCEVERSION
-	 *
-	 * @access private
-	 * @see self::option_name
-	 *
-	 * @param string $key   The environment key, like "hostname".
-	 * @param mixed  $value The value, such as "domain.com".
-	 */
-	private function save_value( $key, $value ) {
-		$saved_values = $this->get_saved_values();
-
-		$saved_values[ $key ] = $value;
-
-		$this->save_values( $saved_values );
-	}
-
-	/**
-	 * Save all of our environment values.
-	 *
-	 * @since SINCEVERSION
-	 *
-	 * @access private
-	 * @see self::option_name
-	 *
-	 * @param array $values All of our environment values.
-	 */
-	private function save_values( $values ) {
-		update_option( $this->option_name, $values );
-	}
+	const OPTION_NAME = 'boldgrid_backup_environment';
 
 	/**
 	 * Determine whether or not our environment has changed.
@@ -121,8 +55,8 @@ class Boldgrid_Backup_Admin_Environment {
 		$has_wpversion_changed  = $this->has_wpversion_changed();
 
 		return $has_hostname_changed ||
-			$has_phpversion_changed ||
-			$has_wpversion_changed;
+		$has_phpversion_changed ||
+		$has_wpversion_changed;
 	}
 
 	/**
@@ -174,7 +108,7 @@ class Boldgrid_Backup_Admin_Environment {
 	 *
 	 * @since SINCEVERSION
 	 *
-	 * @global string $wp_version';
+	 * @global string $wp_version The current WordPress version.
 	 *
 	 * @return bool
 	 */
@@ -183,15 +117,79 @@ class Boldgrid_Backup_Admin_Environment {
 
 		global $wp_version;
 
-		$current_wpversion  = $wp_version;
 		$previous_wpversion = $this->get_saved_value( $key );
 
 		/*
 		 * We took the time to get the current wpversion, so save it. We need to know our previous wpversion,
 		 * so it's important to only save AFTER we've retrieved the previous wpversion.
 		 */
-		$this->save_value( $key, $current_wpversion );
+		$this->save_value( $key, $wp_version );
 
-		return $current_wpversion !== $previous_wpversion;
+		return $wp_version !== $previous_wpversion;
+	}
+
+	/**
+	 * Get a saved environment value.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @access private
+	 * @see self::OPTION_NAME
+	 *
+	 * @param  string $key     The name of the value to get.
+	 * @param  mixed  $default The default value to return.
+	 * @return mixed
+	 */
+	private function get_saved_value( $key, $default = false ) {
+		$saved_values = $this->get_saved_values();
+
+		return isset( $saved_values[ $key ] ) ? $saved_values[ $key ] : $default;
+	}
+
+	/**
+	 * Get all of our saved values.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @access private
+	 * @see self::OPTION_NAME
+	 *
+	 * @return array
+	 */
+	private function get_saved_values() {
+		return get_option( self::OPTION_NAME, array() );
+	}
+
+	/**
+	 * Save a specific environment value.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @access private
+	 * @see self::OPTION_NAME
+	 *
+	 * @param string $key   The environment key, like "hostname".
+	 * @param mixed  $value The value, such as "domain.com".
+	 */
+	private function save_value( $key, $value ) {
+		$saved_values = $this->get_saved_values();
+
+		$saved_values[ $key ] = $value;
+
+		$this->save_values( $saved_values );
+	}
+
+	/**
+	 * Save all of our environment values.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @access private
+	 * @see self::OPTION_NAME
+	 *
+	 * @param array $values All of our environment values.
+	 */
+	private function save_values( array $values ) {
+		update_option( self::OPTION_NAME, $values );
 	}
 }
