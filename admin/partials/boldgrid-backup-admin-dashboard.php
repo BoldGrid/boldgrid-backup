@@ -21,14 +21,9 @@ $nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav
 $dashboard = new \Boldgrid\Library\Library\Ui\Dashboard();
 
 $dashboard->cards = $this->get_cards();
-?>
 
-<div class='wrap'>
-	<h1><?php echo esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'Dashboard', 'boldgrid-backup' ) ); ?></h1>
+echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
-	<?php
-	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
 
-	$dashboard->printCards();
-	?>
-</div>
+$dashboard->printCards();

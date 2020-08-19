@@ -90,75 +90,70 @@ if ( ! empty( $reseller ) ) {
 		$this->core->go_pro->get_premium_url( 'bgbkup-support' )
 	);
 	$premium_markup = '<div class="bgbkup-upgrade-message"><p>' .
-		esc_html__( 'Upgrade to receive premium support from BoldGrid', 'boldgrid-backup' ) .
+		esc_html__( 'Upgrade to receive Premium support from BoldGrid', 'boldgrid-backup' ) .
 		'</p><p>' . $premium_button . '</p></div>';
 }
 
+echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+
+require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
 ?>
 
-<div class='wrap'>
-	<h1><?php esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'Support', 'boldgrid-backup' ) ); ?></h1>
+<div class="bgbkup-support-page">
 
-	<?php
-	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
-	?>
-	<div class="bgbkup-support-page">
-	<?php
-	printf(
-		'<div class="bgbkup-free-support bg-box">
+<?php
+printf(
+	'<div class="bgbkup-free-support bg-box">
 		<div class="bg-box-top">
-		%1$s
+			%1$s
 		</div>
 		<div class="bg-box-bottom">
-		<ul>
-		<li>%2$s</li>
-		<li>%3$s</li>
-		<li>%4$s</li>
-		</ul>
+			<ul>
+				<li>%2$s</li>
+				<li>%3$s</li>
+				<li>%4$s</li>
+			</ul>
 		</div>
-		</div>',
-		esc_html__( 'Free Support', 'boldgrid-backup' ),
-		sprintf(
-			wp_kses(
-				/* translators: URL address for the WordPress.org boldgrid-backup plugin support forum. */
-				__( 'Ask on <a href="%1$s" target="_blank">WordPress.org</a>', 'boldgrid-backup' ),
-				$allowed_tags
-			),
-			'https://wordpress.org/support/plugin/boldgrid-backup/'
+	</div>',
+	esc_html__( 'Free Support', 'boldgrid-backup' ),
+	sprintf(
+		wp_kses(
+			/* translators: URL address for the WordPress.org boldgrid-backup plugin support forum. */
+			__( 'Ask on <a href="%1$s" target="_blank">WordPress.org</a>', 'boldgrid-backup' ),
+			$allowed_tags
 		),
-		sprintf(
-			wp_kses(
-				/* translators: URL address for the WordPress.org boldgrid-backup plugin support forum. */
-				__( 'Browse our <a href="%1$s" target="_blank">Support Guides</a>', 'boldgrid-backup' ),
-				$allowed_tags
-			),
-			'https://www.boldgrid.com/support/boldgrid-backup/'
+		'https://wordpress.org/support/plugin/boldgrid-backup/'
+	),
+	sprintf(
+		wp_kses(
+			/* translators: URL address for the WordPress.org boldgrid-backup plugin support forum. */
+			__( 'Browse our <a href="%1$s" target="_blank">Support Guides</a>', 'boldgrid-backup' ),
+			$allowed_tags
 		),
-		sprintf(
-			wp_kses(
-				/* translators: URL address for the WordPress.org boldgrid-backup plugin support forum. */
-				__( 'Join <a href="%1$s" target="_blank">Team Orange User Group</a> on Facebook', 'boldgrid-backup' ),
-				$allowed_tags
-			),
-			'https://www.facebook.com/groups/BGTeamOrange'
-		)
-	);
+		'https://www.boldgrid.com/support/boldgrid-backup/'
+	),
+	sprintf(
+		wp_kses(
+			/* translators: URL address for the WordPress.org boldgrid-backup plugin support forum. */
+			__( 'Join <a href="%1$s" target="_blank">Team Orange User Group</a> on Facebook', 'boldgrid-backup' ),
+			$allowed_tags
+		),
+		'https://www.facebook.com/groups/BGTeamOrange'
+	)
+);
 
-	printf(
-		'<div class="bgbkup-premium-support bg-box">
+printf(
+	'<div class="bgbkup-premium-support bg-box">
 		<div class="bg-box-top">
-		%1$s
+			%1$s
 		</div>
 		<div class="bg-box-bottom">
-		%2$s
+			%2$s
 		</div>
-		</div>',
-		esc_html__( 'Premium Support', 'boldgrid-backup' ),
-		$premium_markup // phpcs:ignore WordPress.XSS.EscapeOutput
-	);
-	?>
-	</div>
-	<?php
-	echo '<hr />';
-	?>
+	</div>',
+	esc_html__( 'Premium Support', 'boldgrid-backup' ),
+	$premium_markup // phpcs:ignore WordPress.XSS.EscapeOutput
+);
+?>
+
 </div>

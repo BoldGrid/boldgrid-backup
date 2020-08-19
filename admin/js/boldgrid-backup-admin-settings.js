@@ -165,10 +165,9 @@ BoldGrid.Settings = function( $ ) {
 	self.refresh_storage_configuration = function() {
 		var $tr = $( '#storage_locations tr.active:not(.refreshing)' ),
 			$td_configure = $tr.find( 'td.configure' ),
-			$nonce = $( '#_wpnonce' ),
 			data = {
 				action: 'boldgrid_backup_is_setup_' + $tr.attr( 'data-key' ),
-				security: $nonce.val()
+				security: $( '#bgbkup_settings_nonce' ).val()
 			},
 			$new_tr;
 
@@ -282,6 +281,19 @@ BoldGrid.Settings = function( $ ) {
 		}
 	};
 
+	self.toggleCompressionInfo = function() {
+		var isSystemZip = false,
+			compressorSelector = $( 'select[name="compressor"]' );
+
+		isSystemZip = 'system_zip' === $( compressorSelector ).val();
+
+		if ( isSystemZip ) {
+			$( '.compression-level' ).show();
+		} else {
+			$( '.compression-level' ).hide();
+		}
+	};
+
 	// Onload event listener.
 	$( function() {
 
@@ -289,6 +301,9 @@ BoldGrid.Settings = function( $ ) {
 		self.toggleNoBackupDays();
 
 		self.toggleNoStorage();
+
+		self.toggleCompressionInfo();
+
 		$body.on( 'click', '#storage_locations input[type="checkbox"]', self.toggleNoStorage );
 
 		$backupDir.on( 'input', self.toggleMoveBackups );
@@ -306,6 +321,8 @@ BoldGrid.Settings = function( $ ) {
 		$siteCheck = $( 'input[name="site_check"]' );
 		self.toggleSiteCheck();
 		$body.on( 'click', $siteCheck, self.toggleSiteCheck );
+
+		$( 'select[name="compressor"]' ).change( self.toggleCompressionInfo );
 	} );
 };
 

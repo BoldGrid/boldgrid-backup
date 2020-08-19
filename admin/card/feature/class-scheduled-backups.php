@@ -71,7 +71,7 @@ class Scheduled_Backups extends \Boldgrid\Library\Library\Ui\Feature {
 			$this->content .= '<div class="notice notice-error inline"><p>' . wp_kses(
 				sprintf(
 					// translators: 1 An opening anchor tag to the settings page, 2 its closing tag.
-					__( 'Scheduled backups not configured. %1$sFix this%2$s.', 'boldgrid-backup' ),
+					__( 'Scheduled Backups not configured. %1$sFix this%2$s.', 'boldgrid-backup' ),
 					'<a href="' . esc_url( $core->settings->get_settings_url() ) . '">',
 					'</a>'
 				),

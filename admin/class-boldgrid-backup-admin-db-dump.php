@@ -45,10 +45,14 @@ class Boldgrid_Backup_Admin_Db_Dump {
 	 *
 	 * @since 1.5.1
 	 *
+	 * @global wpdb $wpdb
+	 *
 	 * @param  string $file The filepath to our file.
 	 * @return bool   True on success.
 	 */
 	public function dump( $file ) {
+		global $wpdb;
+
 		$include_tables = $this->core->db_omit->get_filtered_tables();
 		if ( empty( $include_tables ) ) {
 			return array( 'error' => esc_html__( 'No tables selected to backup.', 'boldgrid-backup' ) );
@@ -63,7 +67,8 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		 *
 		 * In the list below, it is important that $include_tables is processed last.
 		 */
-		$include_views  = $this->core->db_get->filter_by_type( $include_tables, 'VIEW' );
+		$include_views = $this->core->db_get->filter_by_type( $include_tables, 'VIEW' );
+
 		$include_tables = $this->core->db_get->filter_by_type( $include_tables, 'BASE TABLE' );
 
 		Boldgrid_Backup_Admin_In_Progress_Data::set_args(
@@ -81,20 +86,46 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		 */
 		do_action( 'boldgrid_backup_pre_dump', $file );
 
-		// Some hosts may configure the DB_HOST as localhost:3306. Strip out the port.
-		$db_host = explode( ':', DB_HOST );
+		$settings = array(
+			'include-tables' => $include_tables,
+			'include-views'  => $include_views,
+			'add-drop-table' => true,
+			'no-autocommit'  => false,
+		);
+
+		/*
+		 * Set default character set.
+		 *
+		 * By default, IMysqldump\Mysqldump uses utf8.
+		 *
+		 * By default, WordPress sets CHARSET to utf8 in wp-config but will default to utf8mb4
+		 * if it's available.
+		 *
+		 * @see wpdb::determine_charset
+		 */
+		if ( ! empty( $wpdb->charset ) ) {
+			$settings['default-character-set'] = $wpdb->charset;
+		}
+
+		if ( ! empty( $include_views ) ) {
+			$db_import           = new Boldgrid_Backup_Admin_Db_Import();
+			$user_has_privileges = $db_import->has_db_privileges( array( 'SHOW VIEW' ) );
+			if ( false === $user_has_privileges ) {
+				return array(
+					'error' => esc_html__(
+						'The database contains VIEWS, but the database user does not have the permissions needed to create a backup.',
+						'boldgrid-backup'
+					),
+				);
+			}
+		}
 
 		try {
 			$dump = new IMysqldump\Mysqldump(
-				sprintf( 'mysql:host=%1$s;dbname=%2$s', $db_host[0], DB_NAME ),
+				$this->get_connection_string(),
 				DB_USER,
 				DB_PASSWORD,
-				array(
-					'include-tables' => $include_tables,
-					'include-views'  => $include_views,
-					'add-drop-table' => true,
-					'no-autocommit'  => false,
-				)
+				$settings
 			);
 			$dump->start( $file );
 		} catch ( \Exception $e ) {
@@ -109,6 +140,71 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		do_action( 'boldgrid_backup_post_dump', $file );
 
 		return true;
+	}
+
+	/**
+	 * Get our PDO DSN connection string.
+	 *
+	 * @since 1.13.3
+	 *
+	 * @param  string $db_host DB hostname.
+	 * @param  string $db_name DB name.
+	 * @return string
+	 */
+	public function get_connection_string( $db_host = null, $db_name = null ) {
+		$params = array();
+
+		// Configure parameters passed in.
+		$db_name = empty( $db_name ) ? DB_NAME : $db_name;
+		$db_host = empty( $db_host ) ? DB_HOST : $db_host;
+		$db_host = explode( ':', $db_host );
+
+		// Parse info and get hostname, port, and socket. Not all required. See comments below.
+		switch ( count( $db_host ) ) {
+			/*
+			 * Examples:
+			 *
+			 * # localhost
+			 * # /var/lib/mysql/mysql.sock
+			 */
+			case 1:
+				$has_socket = 'sock' === pathinfo( $db_host[0], PATHINFO_EXTENSION );
+
+				if ( $has_socket ) {
+					$params['unix_socket'] = $db_host[0];
+				} else {
+					$params['host'] = $db_host[0];
+				}
+
+				break;
+			/*
+			 * Examples:
+			 *
+			 * # localhost:/var/lib/mysql/mysql.sock
+			 * # localhost:3306
+			 */
+			case 2:
+				$has_socket = 'sock' === pathinfo( $db_host[1], PATHINFO_EXTENSION );
+				$has_port   = is_numeric( $db_host[1] );
+
+				$params['host'] = $db_host[0];
+
+				if ( $has_socket ) {
+					$params['unix_socket'] = $db_host[1];
+				} elseif ( $has_port ) {
+					$params['port'] = $db_host[1];
+				}
+
+				break;
+		}
+
+		$connection_string = 'mysql:';
+		foreach ( $params as $key => $value ) {
+			$connection_string .= $key . '=' . $value . ';';
+		}
+		$connection_string .= 'dbname=' . $db_name;
+
+		return $connection_string;
 	}
 
 	/**

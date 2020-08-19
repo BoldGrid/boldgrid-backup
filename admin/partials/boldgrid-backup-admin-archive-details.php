@@ -22,7 +22,19 @@ defined( 'WPINC' ) || die;
 
 wp_enqueue_style( 'editor-buttons' );
 
-wp_nonce_field( 'boldgrid_backup_remote_storage_upload' );
+/*
+ * On the archive details page, the user can click "upload" to upload this backup to any number of available
+ * remote storage providers. This nonce is used for those uploads.
+ */
+wp_nonce_field( 'boldgrid_backup_remote_storage_upload', 'bgbkup_remote_upload_nonce' );
+
+/*
+ * This nonce is used for several of the actions on the Archive details page, specific to the browser.
+ * For example, it is used to on the "browser archive" and "browse database" features.
+ *
+ * @see Boldgrid_Backup_Admin_Archive_Browser::authorize to see it being used in authorization.
+ */
+wp_nonce_field( 'bgbkup_archive_details_page', 'bgbkup_archive_details_nonce' );
 
 $separator = '<hr class="separator">';
 
@@ -51,6 +63,12 @@ $download_button = $this->core->archive_actions->get_download_button( $archive['
 $restore_button  = $this->core->archive_actions->get_restore_button( $archive['filename'] );
 $download_link   = $this->core->archive_actions->get_download_link_button( $archive['filename'] );
 
+// Enqueue the scripts needed for the Backup Site Now and Upload Backups to work.
+$this->core->folder_exclusion->enqueue_scripts();
+$this->core->db_omit->enqueue_scripts();
+$this->core->auto_rollback->enqueue_home_scripts();
+$this->core->auto_rollback->enqueue_backup_scripts();
+
 if ( ! $archive_found ) {
 	$file_size     = '';
 	$backup_date   = '';
@@ -76,7 +94,7 @@ if ( ! $archive_found ) {
 	$more_info = empty( $details ) ? '' : sprintf(
 		'
 		<div class="misc-pub-section">
-			More info <a href="" data-toggle-target="#more_info">Show</a>
+			More info <a href="" data-bgbkup-toggle-target="#more_info">Show</a>
 			<div id="more_info" class="hidden">
 				<hr />
 				%1$s
@@ -161,7 +179,7 @@ if ( ! $archive_found ) {
 					'<div class="premium">%1$s</div>
 					<div><p>%2$s</p></div>',
 					esc_html__(
-						'Secure your sesitive data with the Premium plugin!',
+						'Secure your sensitive data with the Premium plugin!',
 						'boldgrid-backup'
 					),
 					'<form action="' . $premium_url . '" target="_blank"><button class="button button-success" type="submit">' .
@@ -384,36 +402,41 @@ if ( ! $this->core->archive->is_stored_locally() ) {
 		$remote_meta_box = '';
 	}
 }
+$pre_page = sprintf(
+	'
+	<input type="hidden" id="filename" value="%1$s" />
+	%2$s
+	',
+	/* 1 */ $archive['filename'],
+	/* 2 */ require BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php'
+);
 
 $page = sprintf(
 	'
-	<input type="hidden" id="filename" value="%1$s" />
-	<div class="wrap">
-		<h1 class="wp-heading-inline">%2$s</h1>
-		%3$s
-		<div id="poststuff">
-			<div id="post-body" class="metabox-holder columns-2">
-				<div id="post-body-content" style="position: relative">
+	<div id="poststuff">
+		<div id="post-body" class="metabox-holder columns-2">
+			<div id="post-body-content" style="position: relative">
+				%3$s
+			</div>
+			<div id="postbox-container-1" class="postbox-container">
+				<div id="side-sortables" class="meta-box-sortables ui-sortable" style="">
+
 					%4$s
-				</div>
-				<div id="postbox-container-1" class="postbox-container">
-					<div id="side-sortables" class="meta-box-sortables ui-sortable" style="">
 
-						%5$s
-
-						%6$s
-					</div>
+					%5$s
 				</div>
 			</div>
 		</div>
 	</div>
 	',
 	/* 1 */ $archive['filename'],
-	/* 2 */ esc_html__( 'Backup Archive Details', 'boldgrid-backup' ),
-	/* 3 */ require BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php',
-	/* 4 */ $main_content,
-	/* 5 */ $main_meta_box,
-	/* 6 */ $remote_meta_box
+	/* 2 */ require BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php',
+	/* 3 */ $main_content,
+	/* 4 */ $main_meta_box,
+	/* 5 */ $remote_meta_box
 );
+echo $pre_page; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+
+require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
 
 echo $page; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped

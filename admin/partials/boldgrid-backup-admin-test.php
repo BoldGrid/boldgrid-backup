@@ -273,9 +273,12 @@ $tests[] = array(
 	'v' => ( $this->config->is_compressor_available( 'system_tar' ) ? 'Yes' : 'No' ),
 );
 
-$tests[] = array(
+$system_zip_test = new Boldgrid_Backup_Admin_Compressor_System_Zip_Test( $this );
+$tests[]         = array(
 	'k' => __( 'System ZIP available?', 'boldgrid-backup' ),
-	'v' => ( $this->config->is_compressor_available( 'system_zip' ) ? 'Yes' : 'No' ),
+	'v' => $system_zip_test->run() ?
+		'Yes' :
+		sprintf( $warning_span, $lang['no'], $system_zip_test->get_error() ),
 );
 
 $tests[] = array(
@@ -439,13 +442,13 @@ foreach ( $tests as $test ) {
 $table .= '</table>';
 
 ?>
-<div class="functionality-test-section wrap">
+<div class="functionality-test-section">
 
 	<?php
-	printf( '<h1>%1$s</h1>', esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'Preflight Check', 'boldgrid-backup' ) ) );
-
 	$nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
 	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+
+	require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
 
 	echo $fail_tips; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 

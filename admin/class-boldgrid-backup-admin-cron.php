@@ -497,7 +497,6 @@ class Boldgrid_Backup_Admin_Cron {
 	 *
 	 * @since 1.2
 	 *
-	 * @see \Boldgrid\Backup\Admin\Cron\Crontab::read_crontab()
 	 * @see \Boldgrid_Backup_Admin_Cron::get_mode_pattern()
 	 * @see \Boldgrid_Backup_Admin_Cron::filter_crontab()
 	 * @see \Boldgrid\Backup\Admin\Cron\Crontab::write_crontab()
@@ -516,7 +515,7 @@ class Boldgrid_Backup_Admin_Cron {
 
 		$crontab_helper = new \Boldgrid\Backup\Admin\Cron\Crontab();
 
-		$crontab = $crontab_helper->read_crontab();
+		$crontab = $this->get_all( true );
 
 		if ( false === $crontab ) {
 			return false;
@@ -630,6 +629,14 @@ class Boldgrid_Backup_Admin_Cron {
 
 	/**
 	 * Get all entries in cron.
+	 *
+	 * Prior to 1.13.9, the Boldgrid\Backup\Admin\Cron\Crontab class had a read_crontab() method that
+	 * aimed to do the same thing as this method. However, it only executed "crontab -l" and returned
+	 * the results. It did not take into account that not all lines of the crontab may be returned (this
+	 * method does and has a conditional for it, so is better).
+	 *
+	 * @todo Migrate this method to the Boldgrid\Backup\Admin\Cron\Crontab. This method currently called
+	 * 9+ times, and will need some good testing.
 	 *
 	 * @since 1.5.2
 	 *

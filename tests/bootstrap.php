@@ -28,8 +28,21 @@ if ( ! defined( 'BOLDGRID_BACKUP_TITLE' ) ) {
 
 // Require necessary files.
 $files = array(
-	'/admin/class-boldgrid-backup-admin.php',
+	'/vendor/boldgrid/library/src/Library/Settings.php',
+	'/vendor/boldgrid/library/src/Library/Configs.php',
+	'/vendor/boldgrid/library/src/Util/Version.php',
+	'/vendor/boldgrid/library/src/Library/Plugin/Factory.php',
+	'/vendor/boldgrid/library/src/Library/Plugin/Notice.php',
+	'/vendor/boldgrid/library/src/Library/Plugin/Page.php',
+	'/vendor/boldgrid/library/src/Library/Plugin/Plugin.php',
+	'/vendor/boldgrid/library/src/Library/Plugin/Plugins.php',
+	'/vendor/boldgrid/library/src/Library/Plugin/UpdateData.php',
+	'/vendor/boldgrid/library/src/Library/Theme/Theme.php',
+	'/vendor/boldgrid/library/src/Library/Theme/Themes.php',
+	'/vendor/boldgrid/library/src/Library/Theme/UpdateData.php',
+	'/admin/class-boldgrid-backup-admin-premium-features.php',
 	'/admin/class-boldgrid-backup-admin-core.php',
+	'/admin/class-boldgrid-backup-admin.php',
 	'/admin/class-boldgrid-backup-admin-settings.php',
 	'/admin/class-boldgrid-backup-admin-config.php',
 	'/admin/class-boldgrid-backup-admin-test.php',
@@ -45,6 +58,7 @@ $files = array(
 	'/admin/class-boldgrid-backup-admin-backup-dir.php',
 	'/admin/class-boldgrid-backup-admin-home-dir.php',
 	'/admin/class-boldgrid-backup-admin-compressors.php',
+	'/admin/class-boldgrid-backup-admin-auto-updates.php',
 	'/admin/class-boldgrid-backup-admin-archive-browser.php',
 	'/admin/class-boldgrid-backup-admin-archive.php',
 	'/admin/class-boldgrid-backup-admin-archive-actions.php',
@@ -70,6 +84,7 @@ $files = array(
 	'/admin/class-boldgrid-backup-admin-folder-exclusion.php',
 	'/admin/class-boldgrid-backup-admin-core-files.php',
 	'/admin/class-boldgrid-backup-admin-in-progress.php',
+	'/admin/class-boldgrid-backup-admin-in-progress-tmp.php',
 	'/admin/class-boldgrid-backup-admin-go-pro.php',
 	'/admin/class-boldgrid-backup-admin-support.php',
 	'/admin/class-boldgrid-backup-admin-tools.php',
@@ -81,10 +96,15 @@ $files = array(
 	'/admin/class-boldgrid-backup-admin-compressor.php',
 	'/admin/class-boldgrid-backup-admin-log.php',
 	'/admin/class-boldgrid-backup-admin-log-page.php',
+	// Tasks.
 	'/admin/class-boldgrid-backup-admin-task.php',
 	'/admin/class-boldgrid-backup-admin-task-helper.php',
+	// Compressors.
 	'/admin/compressor/class-boldgrid-backup-admin-compressor-php-zip.php',
 	'/admin/compressor/class-boldgrid-backup-admin-compressor-pcl-zip.php',
+	'/admin/compressor/class-boldgrid-backup-admin-compressor-system-zip.php',
+	'/admin/compressor/class-boldgrid-backup-admin-compressor-system-zip-temp-folder.php',
+	'/admin/compressor/class-boldgrid-backup-admin-compressor-system-zip-test.php',
 	'/admin/cron/class-crontab.php',
 	'/includes/class-boldgrid-backup-authentication.php',
 	'/includes/class-boldgrid-backup-download.php',
@@ -93,15 +113,21 @@ $files = array(
 	'/includes/archive/class-factory.php',
 	'/includes/archive/class-option.php',
 	'/admin/storage/class-boldgrid-backup-admin-storage-local.php',
+	// Remote storage providers.
 	'/admin/remote/class-boldgrid-backup-admin-ftp.php',
 	'/admin/remote/class-boldgrid-backup-admin-ftp-hooks.php',
 	'/admin/remote/class-boldgrid-backup-admin-ftp-page.php',
 	'/admin/remote/class-boldgrid-backup-admin-remote-settings.php',
+	// Vendor.
 	'/vendor/phpseclib/phpseclib/phpseclib/Net/SSH2.php',
 	'/vendor/ifsnop/mysqldump-php/src/Ifsnop/Mysqldump/Mysqldump.php',
+	// Cli.
 	'/cli/class-info.php',
 	'/cli/class-log.php',
 	'/cli/class-email.php',
+	// Orphan.
+	'/admin/orphan/class-cleanup.php',
+	'/admin/orphan/class-finder.php',
 );
 
 foreach ( $files as $file ) {

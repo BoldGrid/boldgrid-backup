@@ -1,10 +1,10 @@
 === Total Upkeep – WordPress Backup Plugin plus Restore & Migrate by BoldGrid ===
-Contributors: boldgrid, joemoto, imh_brad, rramo012, bgnicolepaschen
+Contributors: boldgrid, joemoto, imh_brad, rramo012, bgnicolepaschen, jamesros161
 Tags: backup, cloud backup, database backup, restore, wordpress backup
 Requires at least: 4.4
-Tested up to: 5.3
+Tested up to: 5.5
 Requires PHP: 5.4
-Stable tag: 1.12.6
+Stable tag: 1.14.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -131,6 +131,126 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 1. Activate the plugin through the Plugins menu in WordPress.
 
 == Changelog ==
+
+= 1.14.3 =
+
+Release date: August 12th, 2020
+
+* Update: Updated Auto Update features to utilize the WordPress 5.5+ Auto Update UI.
+
+= 1.14.2 =
+
+Release date: July 22nd, 2020
+
+* Bug fix: Fixed array_key_exists() warings from auto-updates class.
+* Bug fix: Fixed several invalid nonce errors.
+* Bug fix: Fixed markup escaping in rating prompt.
+* Bug fix: Fixed "backup site now" on archive page.
+
+= 1.14.1 =
+
+Release date: July 7th, 2020
+
+* Bug fix: Auto Update Translation filter causes fatal error with JetPack active [#50]((https://github.com/BoldGrid/boldgrid-backup-premium/issues/50)
+
+= 1.14.0 =
+
+Release date: July 7th, 2020
+
+* New feature: Timely Auto Updates - auto update WordPress, Plugins, and Themes after a set number of days.
+* New feature: SystemZip Compression ratio - Modify System Zip process to address issues with exceeding php memory_limit and add option to set compression ratio.
+* New feature: Added 'Backup Now' and 'Upload Backup' buttons to each Total Upkeep page.
+* New feature: Added video guides to Premium Features page.
+* Bug fix: Non Backup files should not be uploaded.
+* Bug fix: Ensure user can CREATE VIEWS before restoring views.
+
+= 1.13.12 =
+
+Release date: July 6th, 2020
+
+* Bug fix:    Site check emails sent regardless of user preference.
+
+= 1.13.11 =
+
+Release date: July 1st, 2020
+
+* Bug fix:    Resolved file name conflict with certain security plugins.
+
+= 1.13.10 =
+
+Release date: June 23rd, 2020
+
+* Update:     Updated dependencies.
+* Bug fix:    Avoid fatal Boldgrid\Library\Library\Ui\Card on dashboard.
+
+= 1.13.9 =
+
+Release date: June 15th, 2020
+
+* Update:     Updated retention logic for pre auto update backups.
+* Bug fix:    Fixed "get all cron jobs" call for large crontabs.
+
+= 1.13.8 =
+
+Release date: June 9th, 2020
+
+* Update:     Added orphaned file cleanup system.
+
+= 1.13.7 =
+
+Release date: June 4rd, 2020
+
+* Update:     Create log file for local retention.
+
+= 1.13.6 =
+
+Release date: June 1st, 2020
+
+* Bug fix:    Adjust the charset used when dumping database (derived from WordPress DB_CHARSET).
+
+= 1.13.5 =
+
+Release date: May 28th, 2020
+
+* Update:     Create a restore log (like the backup log).
+* Update:     Updated dependencies.
+* Bug fix:    Avoid fatals on library issues.
+* Bug fix:    Be more specific with data-toggle-target attribute.
+
+= 1.13.4 =
+
+Release date: May 21st, 2020
+
+* Update:     If backup email fails, debug info written to log file.
+* Update:     Definition added to allow for skipping email headers.
+
+= 1.13.3 =
+
+Release date: April 2nd, 2020
+
+* Bug fix:    Database backups not working when using port other than 3306 (the Robert bug).
+
+= 1.13.2 =
+
+Release date: Februrary 21st, 2020
+
+* Bug fix:    Resolved activation bug during BoldGrid Inspirations deployment.
+
+= 1.13.1 =
+
+Release date: February 18th, 2020
+
+* Update:      Added "Find modified files" card to Premium Features page.
+* Update:      Allow error messages to be shown for remote storage providers.
+* Update:      Updated dependencies.
+
+= 1.13.0 =
+
+Release date: February 6th, 2020
+
+* Update:      Added new "Premium Features" dashboard page.
+* Update:      Added support for system zip for generating backups.
+* Update:      Updated dependencies.
 
 = 1.12.6 =
 

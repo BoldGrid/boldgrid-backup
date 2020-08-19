@@ -6,7 +6,7 @@
  * @since 1.3.1
  */
 
-/* global jQuery,pagenow */
+/* global jQuery,pagenow, BoldGridBackupAdmin */
 
 var BoldGrid = BoldGrid || {};
 
@@ -52,9 +52,9 @@ BoldGrid.Backup = function( $ ) {
 	/**
 	 * @summary Handle the clicking of a show / hide toggle.
 	 *
-	 * In the example below, the show / hide link has a data-toggle-target attr
+	 * In the example below, the show / hide link has a data-bgbkup-toggle-target attr
 	 * that helps to identify the element to toggle.
-	 * # <a href="" data-toggle-target="#more_info">Show</a>
+	 * # <a href="" data-bgbkup-toggle-target="#more_info">Show</a>
 	 * # <div id="more_info" class="hidden">
 	 *
 	 * @since 1.6.0
@@ -63,7 +63,7 @@ BoldGrid.Backup = function( $ ) {
 		var $e = $( this ),
 			show = 'Show',
 			hide = 'Hide',
-			target = $e.attr( 'data-toggle-target' ),
+			target = $e.attr( 'data-bgbkup-toggle-target' ),
 			$target = $( target ),
 			isVisible = $target.is( ':visible' );
 
@@ -87,6 +87,10 @@ BoldGrid.Backup = function( $ ) {
 	 * add a notice and it includess the is-dismissible class, then we'll need
 	 * to actually make it dismissible.
 	 *
+	 * As of WordPress 5.5, automatically included l10n classes have been removed
+	 * Therefore we have to defer to using i18n. Additionally this function is no
+	 * longer included in wp-admin/js/common.js
+	 *
 	 * @since 1.6.0
 	 */
 	self.makeNoticesDismissible = function() {
@@ -95,7 +99,7 @@ BoldGrid.Backup = function( $ ) {
 				$button = $(
 					'<button type="button" class="notice-dismiss"><span class="screen-reader-text"></span></button>'
 				),
-				btnText = 'undefined' !== typeof commonL10n ? commonL10n.dismiss : wp.customize.l10n.close;
+				btnText = 'undefined' !== typeof commonL10n ? commonL10n.dismiss : wp.i18n.__( 'dismiss' );
 
 			// Ensure plain text
 			$button.find( '.screen-reader-text' ).text( btnText );
@@ -117,7 +121,7 @@ BoldGrid.Backup = function( $ ) {
 		self.hideBackupNotice();
 		self.updatePremiumLink();
 
-		$( 'body' ).on( 'click', '[data-toggle-target]', self.onClickToggle );
+		$( 'body' ).on( 'click', '[data-bgbkup-toggle-target]', self.onClickToggle );
 		$( 'body' ).on( 'make_notices_dismissible', self.makeNoticesDismissible );
 
 		/*

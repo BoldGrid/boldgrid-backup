@@ -74,4 +74,54 @@ class Boldgrid_Backup_Admin_Compressor {
 	public function archive_files( $filelist, &$info ) {
 		return false;
 	}
+
+	/**
+	 * Determine whether or not this compressor is available.
+	 *
+	 * @since 1.13.0
+	 *
+	 * @param  string $compressor A compressor.
+	 * @return bool               True if is available.
+	 */
+	public function is_available() {
+		return in_array( $this->key, $this->core->compressors->get_available(), true );
+	}
+
+	/**
+	 * Determine whether or not the given compressor is the default.
+	 *
+	 * @since 1.13.0
+	 *
+	 * @param  string $compressor A compressor.
+	 * @return bool               True if is default compressor.
+	 */
+	public function is_default() {
+		return $this->key === $this->core->compressors->get_default();
+	}
+
+	/**
+	 * Determine whether or not the given compressor is the one saved in the settings.
+	 *
+	 * @since 1.13.0
+	 *
+	 * @param  string $compressor A compressor.
+	 * @return bool               True if compressor is saved in settings.
+	 */
+	public function is_saved_compressor() {
+		return $this->key === $this->core->settings->get_setting( 'compressor' );
+	}
+
+	/**
+	 * Whether or not this compressor should be selected if it is in an array of available compressors.
+	 *
+	 * Used in a <select> element.
+	 *
+	 * @return bool
+	 */
+	public function maybe_selected_compressor() {
+		$setting = $this->core->settings->get_setting( 'compressor' );
+
+		return $this->is_saved_compressor() ||
+			( empty( $setting ) && $this->is_default() );
+	}
 }

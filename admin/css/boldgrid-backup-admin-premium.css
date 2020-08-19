@@ -1,0 +1,123 @@
+/**
+ * Style for specific premium feature cards.
+ */
+
+#bgbkup_amazon_s3 .bglib-card-icon {
+	border-top-color: #feb424;
+}
+
+#bgbkup_database_encryption .bglib-card-icon {
+	border-top-color: #aaa;
+}
+
+#bgbkup_dream_objects .bglib-card-icon {
+	border-top-color: #3e95be;
+}
+
+#bgbkup_backups .bglib-card-icon {
+	border-top-color: #0073aa;
+}
+
+#bgbkup_google_drive .bglib-card-icon {
+	border-top-color: #1ba160;
+}
+
+#bgbkup_amazon .bglib-card-icon {
+	border-top-color: #feb424;
+}
+
+#bgbkup_dream_objects .bglib-card-icon {
+	border-top-color: #3e95be;
+}
+
+#bgbkup_history .bglib-card-icon {
+	color: #f04207;
+	border-top-color: #f04207;
+}
+
+#bgbkup_historical_versions .bglib-card-icon {
+	color: #9ebaa0;
+	border-top-color: #9ebaa0;
+}
+
+#bgbkup_plugin_editor_tools .bglib-card-icon {
+	color: #5d824b;
+	border-top-color: #5d824b;
+}
+
+#bgbkup_backups .bglib-card-icon .dashicons {
+	color: #0073aa;
+}
+
+#bgbkup_updates .bglib-card-icon {
+	border-top-color: #aa0073;
+}
+
+#bgbkup_updates .bglib-card-icon .dashicons {
+	color: #aa0073;
+}
+
+#bgbkup_one_click_restoration .bglib-card-icon {
+	color: #c604c6;
+	border-top-color: #c604c6;
+}
+
+#bgbkup_get_premium .bglib-card-icon {
+	border-top-color: #f95b26;
+}
+
+#bgbkup_get_premium .bglib-card-icon .dashicons {
+	color: #f95b26;
+}
+
+/**
+ * Misc.
+ */
+
+/* The get premium button in the top notice. */
+.bglib-card {
+	display: flex;
+	flex-direction: column;
+}
+
+.bglib-card-icon {
+	height: 60px;
+}
+
+.bg-box-bottom.premium .button-success {
+	float: none;
+}
+
+.bglib-card-footer {
+	flex-grow: 10;
+}
+
+.bglib-card-links {
+	flex-grow: 1;
+}
+
+.bglib-card-links a {
+	margin: 1em;
+}
+
+.bg-box-title {
+	font-size: 1.25em;
+	font-weight: 600;
+}
+
+.bglib-card-title {
+	height: 2em;
+}
+
+.bglib-card-links span.dashicons {
+	vertical-align: text-top;
+	padding-right: 0.25em;
+}
+
+.bglib-card .bglib-card-links {
+	justify-content: flex-end;
+}
+
+.bglib-smaller .bglib-card-links a.button {
+	margin-right: 10px;
+}

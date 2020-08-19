@@ -209,19 +209,15 @@ if ( ! $this->core->config->is_premium_done ) {
 	printf(
 		'
 		<div class="bg-box-bottom premium wp-clearfix">
-			%1$s
-			%2$s
+			<p>%2$s</p>
+			<p>%1$s</p>
 		</div>',
-		$this->core->go_pro->get_premium_button( $premium_url, esc_html__( 'Unlock Feature', 'boldgrid-backup' ) ), // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
-		esc_html(
-			sprintf(
-				// translators: 1: Plugin title.
-				__(
-					'Changed a file and now your site isn’t working properly? With %1$s, you can browse through past backup archives and restore individual files with a single click.',
-					'boldgrid-backup'
-				),
-				BOLDGRID_BACKUP_TITLE . ' Premium'
-			)
+		$this->core->go_pro->get_premium_button( $premium_url, esc_html__( 'Unlock Feature', 'boldgrid-backup' ) ), // phpcs:ignore WordPress.XSS.EscapeOutput, WordPress.Security.EscapeOutput
+		sprintf(
+			// translators: 1 Markup showing a "Google Drive" logo, 2 Markup showing an "Amazon S3" logo.
+			esc_html__( 'Catastrophic data loss can happen at any time. Storing your archives in multiple secure locations will keep your website data safe and put your mind at ease. Upgrade now to enable automated remote backups to %1$s and %2$s', 'boldgrid-backup' ),
+			'<span class="bgbkup-remote-logo bgbkup-gdrive-logo" title="Google Drive"></span>',
+			'<span class="bgbkup-remote-logo amazon-s3-logo" title="Amazon S3"></span>'
 		)
 	);
 }

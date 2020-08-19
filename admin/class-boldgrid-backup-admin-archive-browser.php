@@ -57,7 +57,16 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 			wp_send_json_error( __( 'Permission denied.', 'boldgrid-backup' ) );
 		}
 
-		if ( ! check_ajax_referer( 'boldgrid_backup_remote_storage_upload', 'security', false ) ) {
+		/*
+		 * The "bgbkup_archive_details_page" nonce secures several functions on the arhive details page,
+		 * such as browsing the files in the backup and browsing the database in the backup.
+		 *
+		 * @see self::wp_ajax_* methods in this class for additional ajax calls using this nonce.
+		 * @see admin/partials/boldgrid-backup-admin-archive-details.php for definition this nonce.
+		 * @see BoldGrid.ZipBrowser in /js/boldgrid-backup-admin-zip-browser.js for ajax calls passing
+		 *      this nonce.
+		 */
+		if ( ! check_ajax_referer( 'bgbkup_archive_details_page', 'security', false ) ) {
 			wp_send_json_error( __( 'Invalid nonce; security check failed.', 'boldgrid-backup' ) );
 		}
 	}
@@ -180,7 +189,7 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 			$this->core->go_pro->get_premium_button( $get_plugins_url, __( 'Unlock Feature', 'boldgrid-backup' ) ) .
 			sprintf(
 				// translators: 1: Premium plugin title.
-				esc_html__( 'Secure your sesitive data with the %1$s plugin.', 'boldgrid-backup' ),
+				esc_html__( 'Secure your sensitive data with the %1$s plugin.', 'boldgrid-backup' ),
 				BOLDGRID_BACKUP_TITLE . ' Premium'
 			) . '</div></div></td></tr>';
 		}
@@ -322,17 +331,19 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 		$importer = new Boldgrid_Backup_Admin_Db_Import( $this->core );
 		$success  = $importer->import_from_archive( $filepath, $file );
 
-		if ( ! $success ) {
-			$this->core->notice->add_user_notice(
-				// translators: 1: Filename 2: File path.
-				sprintf( __( 'Error, unable to import database %1$s from %2$s.', 'boldgrid-backup' ), $file, $filepath ),
-				$this->core->notice->lang['dis_error']
-			);
-		} else {
+		if ( true === $success ) {
 			$this->core->notice->add_user_notice(
 				// translators: 1: Filename 2: File path.
 				sprintf( __( 'Success! Database %1$s imported from %2$s.', 'boldgrid-backup' ), $file, $filepath ),
 				$this->core->notice->lang['dis_success']
+			);
+		} elseif ( false !== $success ) {
+			$this->core->notice->add_user_notice( $success, $this->core->notice->lang['dis_error'] );
+		} else {
+			$this->core->notice->add_user_notice(
+				// translators: 1: Filename 2: File path.
+				sprintf( __( 'Error, unable to import database %1$s from %2$s.', 'boldgrid-backup' ), $file, $filepath ),
+				$this->core->notice->lang['dis_error']
 			);
 		}
 	}

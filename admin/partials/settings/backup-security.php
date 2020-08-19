@@ -71,10 +71,15 @@ if ( ! $is_premium ) {
 	<?php
 	$get_premium_url = 'https://www.boldgrid.com/update-backup?source=bgbkup-settings-security';
 	printf(
-		// translators: 1: Get premium button/link, 2: Premium plugin title.
-		esc_html__( '%1$sA %2$s license is required for encryption features.', 'boldgrid-backup' ),
+		// translators: 1: Get premium button/link, 2: Opening <a> tag, 3: Closing </a> tag.
+		esc_html__(
+			'%1$sDatabase Encryption provides another level of protection by preventing unauthorized access to your database backup archives.
+			%2$sLearn More%3$s',
+			'boldgrid-backup'
+		),
 		$this->core->go_pro->get_premium_button( $get_premium_url, __( 'Get Premium', 'boldgrid-backup' ) ), // phpcs:ignore
-		esc_html( BOLDGRID_BACKUP_TITLE . ' Premium' )
+		'<a target="_blank" href="https://www.boldgrid.com/support/total-upkeep/encrypt-database-backups/?source=encrypt-database-backups">',
+		'</a>'
 	);
 	?>
 				</div>
@@ -104,7 +109,7 @@ if ( ! $is_premium ) {
 		// translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag, 3: Premium plugin title.
 		esc_html__( 'The %3$s plugin is not active.  Encryption features are not available.  Please go to the %1$sPlugins%2$s page to activate it.', 'boldgrid-backup' ),
 		'<a href="' .
-			esc_url( admin_url( 'plugins.php?s=Boldgrid%20Backup%20Premium&plugin_status=inactive' ) ) .
+			esc_url( admin_url( 'plugins.php?s=Total%20Upkeep%20Premium&plugin_status=inactive' ) ) .
 			'">',
 		'</a>',
 		esc_html( BOLDGRID_BACKUP_TITLE . ' Premium' )

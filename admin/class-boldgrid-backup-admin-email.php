@@ -214,8 +214,22 @@ class Boldgrid_Backup_Admin_Email {
 		$headers = 'From: ' . $site_title . ' <' . $admin_email . '>' . "\r\n" . 'X-Mailer: PHP/' .
 			phpversion() . "\r\n";
 
-		// Send mail.
-		$status = wp_mail( $admin_email, $subject, $body, $headers );
+		/*
+		 * Send mail.
+		 *
+		 * The default behaviour is to include $headers in our call to wp_mail. In very rare circumstances,
+		 * this will cause the following error:
+		 *
+		 * # Could not instantiate mail function.
+		 * # phpmailer_exception_code 2
+		 *
+		 * In those rare cases, the user can define BGBKUP_SKIP_EMAIL_HEADERS to skip adding the headers.
+		 */
+		if ( defined( 'BGBKUP_SKIP_EMAIL_HEADERS' ) ) {
+			$status = wp_mail( $admin_email, $subject, $body );
+		} else {
+			$status = wp_mail( $admin_email, $subject, $body, $headers );
+		}
 
 		// Return status.
 		return $status;
@@ -232,5 +246,24 @@ class Boldgrid_Backup_Admin_Email {
 		$settings = $this->core->settings->get_settings();
 
 		return ! empty( $settings['notifications'][ $task ] );
+	}
+
+	/**
+	 * Hook into the wp_mail_failed action.
+	 *
+	 * @since 1.13.4
+	 *
+	 * @param WP_Error $wp_error A WP error object.
+	 */
+	public function wp_mail_failed( $wp_error ) {
+		// If in the middle of archiving files and an email failed, add info about it to the log.
+		if ( $this->core->archiving_files || $this->core->restoring_archive_file ) {
+			$errors = array(
+				'wp_error'   => $wp_error,
+				'last_error' => error_get_last(),
+			);
+
+			$this->core->logger->add( 'wp_mail_failed: ' . print_r( $errors, 1 ) ); // phpcs:ignore
+		}
 	}
 }

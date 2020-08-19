@@ -127,6 +127,8 @@ class Boldgrid_Backup {
 		 */
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-notice.php';
 
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-auto-updates.php';
+
 		/**
 		 * The class responsible for the cron functionality in the admin area.
 		 */
@@ -164,6 +166,9 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-compressors.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/compressor/class-boldgrid-backup-admin-compressor-php-zip.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/compressor/class-boldgrid-backup-admin-compressor-pcl-zip.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/compressor/class-boldgrid-backup-admin-compressor-system-zip.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/compressor/class-boldgrid-backup-admin-compressor-system-zip-test.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/compressor/class-boldgrid-backup-admin-compressor-system-zip-temp-folder.php';
 
 		require_once BOLDGRID_BACKUP_PATH . '/vendor/ifsnop/mysqldump-php/src/Ifsnop/Mysqldump/Mysqldump.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-db-dump.php';
@@ -205,6 +210,7 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-in-progress.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-in-progress-data.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-in-progress-tmp.php';
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/remote/class-boldgrid-backup-admin-ftp.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/remote/class-boldgrid-backup-admin-ftp-hooks.php';
@@ -240,12 +246,23 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-plugins.php';
 
+		// Premium Features Page.
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-premium-features.php';
+
 		// Cards.
-		if ( class_exists( '\Boldgrid\Library\Library\Ui\Card' ) ) {
-			require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-backups.php';
-			require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-updates.php';
-			require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-premium.php';
-		}
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-amazon-s3.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-backups.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-dream-objects.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-google-drive.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-database-encryption.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-historical-versions.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-history.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-one-click-restoration.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-plugin-editor-tools.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-premium.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-updates.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-find-modified-files.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/card/class-timely-auto-updates.php';
 
 		// Features.
 		if ( class_exists( '\Boldgrid\Library\Library\Ui\Feature' ) ) {
@@ -254,6 +271,7 @@ class Boldgrid_Backup {
 			require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-versions.php';
 			require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-auto-rollback.php';
 			require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-auto-update-backup.php';
+			require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-timely-auto-updates.php';
 			// Features - Sign up for BoldGrid Central.
 			require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-cloud-wordpress.php';
 			require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-speed-coach.php';
@@ -262,6 +280,7 @@ class Boldgrid_Backup {
 			require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-more-backup.php';
 			require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-more-boldgrid.php';
 			require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-more-central.php';
+			require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-database-encryption.php';
 			// Feature - Pro.
 			require_once BOLDGRID_BACKUP_PATH . '/admin/card/feature/class-central.php';
 		}
@@ -301,6 +320,12 @@ class Boldgrid_Backup {
 		// Archive namespace.
 		require_once BOLDGRID_BACKUP_PATH . '/includes/archive/class-factory.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/archive/class-option.php';
+
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-plugin-notices.php';
+
+		// Orphaned files.
+		require_once BOLDGRID_BACKUP_PATH . '/admin/orphan/class-finder.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/orphan/class-cleanup.php';
 
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
@@ -432,6 +457,7 @@ class Boldgrid_Backup {
 		$this->loader->add_action( 'boldgrid_backup_wp_cron_restore', $plugin_admin_core->wp_cron, 'restore' );
 
 		$this->loader->add_action( 'boldgrid_backup_archive_files_init', $plugin_admin_core->archive_fail, 'archive_files_init' );
+		$this->loader->add_action( 'wp_mail_failed', $plugin_admin_core->email, 'wp_mail_failed' );
 
 		$this->loader->add_action( 'boldgrid_backup_wp_cron_run_jobs', $plugin_admin_core->jobs, 'run' );
 
@@ -522,14 +548,18 @@ class Boldgrid_Backup {
 		$this->loader->add_filter( 'wp_ajax_boldgrid_backup_update_archive_details', $plugin_admin_core->archive_details, 'wp_ajax_update' );
 
 		$this->loader->add_action( 'admin_menu', $plugin_admin_core->local, 'add_submenus' );
-		$this->loader->add_action( 'wp_ajax_boldgrid_backup_is_setup_local', $plugin_admin_core->local, 'is_setup_ajax' );
 
-		$this->loader->add_filter( 'boldgrid_backup_get_core', $plugin_admin_core, 'get_core' );
+		$this->loader->add_action( 'wp_ajax_boldgrid_backup_is_setup_local', $plugin_admin_core->local, 'is_setup_ajax' );
 
 		$this->loader->add_filter( 'Boldgrid\Library\Notifications\DashboardWidget\getFeaturePlugin\boldgrid-backup', $plugin_admin_core->dashboard_widget, 'filter_feature', 10, 2 );
 
-		$plugins = new Boldgrid_Backup_Admin_Plugins();
-		$this->loader->add_filter( 'plugin_action_links_boldgrid-backup/boldgrid-backup.php', $plugins, 'plugin_action_links', 10, 4 );
+		// Auto Update Actions & Filters.
+		$this->loader->add_action( 'admin_init', $plugin_admin_core->auto_updates, 'auto_update_core' );
+		$this->loader->add_action( 'wp_maybe_auto_update', $plugin_admin_core->auto_updates, 'auto_update_core' );
+		$this->loader->add_filter( 'auto_update_plugin', $plugin_admin_core->auto_updates, 'auto_update_plugins', 10, 2 );
+		$this->loader->add_filter( 'auto_update_theme', $plugin_admin_core->auto_updates, 'auto_update_themes', 10, 2 );
+		$this->loader->add_action( 'update_option_auto_update_plugins', $plugin_admin_core->auto_updates, 'wordpress_option_updated', 10, 3 );
+		$this->loader->add_action( 'update_option_auto_update_themes', $plugin_admin_core->auto_updates, 'wordpress_option_updated', 10, 3 );
 
 		// This plugin's Dashboard.
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core->dashboard, 'admin_enqueue_scripts' );
@@ -554,17 +584,35 @@ class Boldgrid_Backup {
 		} );
 
 		$usage = new Boldgrid_Backup_Admin_Usage();
+
 		$this->loader->add_action( 'admin_init', $usage, 'admin_init' );
 		$this->loader->add_filter( 'Boldgrid\Library\Usage\Notice\admin_notices', $usage, 'filter_notice' );
 		$this->loader->add_filter( 'Boldgrid\Library\Usage\Notice\maybeShow', $usage, 'maybe_show_notice' );
 		$this->loader->add_filter( 'Boldgrid\Library\Usage\getPrefixes', $usage, 'filter_prefixes' );
+		$this->loader->add_filter( 'is_boldgrid_backup_page', $usage, 'has_screen_prefix' );
+		$this->loader->add_action( 'in_admin_header', $plugin_admin_core->upload, 'archive_upload_action' );
 
 		// Log system.
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core->log_page, 'admin_enqueue_scripts' );
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_view_log', $plugin_admin_core->log_page, 'wp_ajax_boldgrid_backup_view_log' );
+		$this->loader->add_action( 'shutdown', $plugin_admin_core->logger, 'shutdown' );
 
 		// Tools page.
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core->tools, 'admin_enqueue_scripts' );
+
+		/*
+		 * Plugin notices.
+		 *
+		 * The library's plugin notices class is instantiated below in order to add necessary filters.
+		 */
+		if ( class_exists( '\Boldgrid\Library\Library\Plugin\Notices' ) ) {
+			new \Boldgrid\Library\Library\Plugin\Notices();
+		}
+
+		$plugin_notices = new Boldgrid_Backup_Admin_Plugin_Notices();
+		$this->loader->add_filter( 'Boldgrid\Library\Plugin\Notices\admin_enqueue_scripts', $plugin_notices, 'filter' );
+
+		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core, 'add_thickbox' );
 	}
 
 	/**

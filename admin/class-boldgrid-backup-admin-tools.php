@@ -51,8 +51,6 @@ class Boldgrid_Backup_Admin_Tools {
 		wp_enqueue_script( 'bglib-ui-js' );
 		wp_enqueue_script( 'bglib-sticky' );
 
-		// Add thickbox functionality. Initially added to support viewing log files.
-		add_thickbox();
 	}
 
 	/**
@@ -61,6 +59,42 @@ class Boldgrid_Backup_Admin_Tools {
 	 * @since 1.6.0
 	 */
 	public function page() {
+
+		$settings = $this->core->settings->get_settings();
+		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
+
+		$this->core->auto_rollback->enqueue_home_scripts();
+		$this->core->auto_rollback->enqueue_backup_scripts();
+		$this->core->archive_actions->enqueue_scripts();
+
+		$this->core->folder_exclusion->enqueue_scripts();
+		$this->core->db_omit->enqueue_scripts();
+
+		$in_modal = true;
+		$modal    = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-modal.php';
+		$in_modal = false;
+
+		echo '
+		<div class="wrap">
+			<div id="bglib-page-container" class="bgbkup-page-container">
+				<div id="bglib-page-top">
+					<div id="bglib-page-header" class="bglib-has-logo">
+						<h1>' . esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'Total Upkeep Tools', 'boldgrid-backup' ) ) . '</h1>
+						<div class="page-title-actions">
+						<a href="#TB_inline?width=800&amp;height=600&amp;inlineId=backup_now_content" class="thickbox page-title-action page-title-action-primary">' .
+							esc_html__( 'Backup Site Now', 'boldgrid-backup' ) . '
+						</a>
+						<a class="page-title-action add-new">' . esc_html__( 'Upload Backup', 'boldgrid-backup' ) . '</a>
+					</div>
+					</div>
+				</div>
+				<div id="bglib-page-content">
+					<div class="wp-header-end"></div>';
+		echo $modal; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.XSS.EscapeOutput.OutputNotEscaped
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-tools.php';
+		echo '
+				</div>
+			</div>
+		</div>';
 	}
 }

@@ -255,8 +255,90 @@ class Boldgrid_Backup_Admin_Settings {
 		// Encryption.
 		$settings['encrypt_db'] = isset( $settings['encrypt_db'] ) ? (bool) $settings['encrypt_db'] : false;
 
+		// Auto Updates.
+		$settings['auto_update'] = $this->set_update_settings( $settings );
+
 		// Return the settings array.
 		return $settings;
+	}
+
+	/**
+	 * Get the Auto Update Settings.
+	 *
+	 * With the new changes of wp5.5, there are new changes to the auto update settings.
+	 * Moving this to it's own method allows us to isolate that logic from the get_settings() method
+	 * and ensure that the Auto Update Settings retrieved are accurate.
+	 *
+	 * @since 1.14.3
+	 *
+	 * @param  array  $settings The Settings array.
+	 * @global string $wp_version The current version of WordPress.
+	 *
+	 * @return array
+	 */
+	public function set_update_settings( $settings ) {
+		global $wp_version;
+
+		// If the 'auto_update' settings are not set, add default values, otherwise use values from $settings array..
+		if ( empty( $settings['auto_update'] ) ) {
+			// The value for 'default' was changed from false, to '0' for data type consistency.
+			$auto_update_settings = array(
+				'days'    => 0,
+				'plugins' => array(
+					'default' => '0',
+				),
+				'themes'  => array(
+					'default' => '0',
+				),
+			);
+		} else {
+			$auto_update_settings = $settings['auto_update'];
+		}
+
+		return $auto_update_settings;
+	}
+
+	/**
+	 * Updates the WordPress auto_update options.
+	 *
+	 * This is somewhat the opposite of set_update_settings. This is used as necessary
+	 * to update the new options added to WP5.5, auto_update_plugins and auto_update_themes
+	 * to make sure that all the settings play nicely together. Anytime we change the update settings
+	 * in Total Upkeep, This should run once for themes, and once for plugins to make sure that
+	 * the WordPress Options are kept up to date.
+	 *
+	 * @since 1.4.3
+	 * @global string $wp_version WordPress Version Number.
+	 *
+	 * @param array $new_settings New settings.
+	 * @param bool  $is_theme     Whether or not the settings being updated are for a theme.
+	 */
+	public function update_autoupdate_options( $new_settings, $is_theme = false ) {
+		global $wp_version;
+		// If version is wp_version is greater than 5.4.99 then it must be 5.5.
+		if ( version_compare( $wp_version, '5.4.99', 'gt' ) ) {
+			// Depending on whether this is being run for themes or plugins, get the correct option table.
+			$auto_update_field = get_option( $is_theme ? 'auto_update_themes' : 'auto_update_plugins', array() );
+			// For each offer ( theme or plugin ) passed to this function.
+			foreach ( $new_settings[ $is_theme ? 'themes' : 'plugins' ] as $offer => $enabled ) {
+				$offer_in_option = array_search( $offer, $auto_update_field, true );
+				if ( '1' === $enabled && false === $offer_in_option ) {
+					/*
+					* If auto updates for the plugin / theme are enabled in our settings, but not enabled in
+					* wp option, enable it in the wp option.
+					*/
+					$auto_update_field[] = $offer;
+				} elseif ( '0' === $enabled && false !== $offer_in_option ) {
+					/*
+					 * If auto updates for the plugin / theme are disabled in our settings, but not disabled in
+					 * the wp option, disable it in the wp option.
+					 */
+					unset( $auto_update_field[ $offer_in_option ] );
+				}
+			}
+			// Update the WordPress option with the settings passed to this function.
+			update_option( $is_theme ? 'auto_update_themes' : 'auto_update_plugins', $auto_update_field );
+		}
 	}
 
 	/**
@@ -402,7 +484,7 @@ class Boldgrid_Backup_Admin_Settings {
 	 * @param string $new_dir Destination directory.
 	 * @return bool TRUE on success / no backups needed to be moved.
 	 */
-	private function move_backups( $old_dir, $new_dir ) {
+	public function move_backups( $old_dir, $new_dir ) {
 		$fail_count = 0;
 
 		$old_dir = Boldgrid_Backup_Admin_Utility::trailingslashit( $old_dir );
@@ -610,7 +692,18 @@ class Boldgrid_Backup_Admin_Settings {
 			}
 
 			/*
+			 * Save Compression Level Settings.
+			 *
+			 * @since 1.14.0
+			 */
+			if ( isset( $_POST['compression_level'] ) ) {
+				$settings['compression_level'] = $_POST['compression_level'];
+			}
+
+			/*
 			 * Save extractor settings.
+			 *
+			 * At this time, the extractor cannot be selected within the settings.
 			 *
 			 * @since 1.5.1
 			 */
@@ -698,6 +791,29 @@ class Boldgrid_Backup_Admin_Settings {
 			$settings['folder_exclusion_exclude'] = $this->core->folder_exclusion->from_post( 'exclude' );
 			$settings['folder_exclusion_type']    = $this->core->folder_exclusion->from_post( 'type' );
 
+			/*
+			 * Save Auto Update options.
+			 *
+			 * As of WP5.5 , a new UI for auto updates ws added.
+			 * Therefore we have to make sure the 'auto_update_plugins' and
+			 * 'auto_update_themes' option tables are also updated.
+			 *
+			 * @since 1.14.0
+			 */
+			if ( ! empty( $_POST['auto_update'] ) ) {
+				$settings['auto_update'] = $this->validate_auto_update( $_POST['auto_update'] );
+				// As of WordPress 5.5 we also have to update the option in the WordPress auto update option as well.
+				if ( isset( $_POST['auto_update']['plugins'] ) ) {
+					$this->update_autoupdate_options( $_POST['auto_update'] );
+				}
+
+				// This updates the options field for themes as well.
+				if ( isset( $_POST['auto_update']['themes'] ) ) {
+					$this->update_autoupdate_options( $_POST['auto_update'], true );
+				}
+				$update_error = $settings['auto_update'] ? $update_error : true;
+			}
+
 			// Read BoldGrid settings form POST request, sanitize, and merge settings with saved.
 			$boldgrid_settings = array_merge(
 				get_option( 'boldgrid_settings' ),
@@ -762,6 +878,25 @@ class Boldgrid_Backup_Admin_Settings {
 	}
 
 	/**
+	 * Validates the auto_update submissions.
+	 *
+	 * @since 1.14.0
+	 *
+	 * @param array $posted_update_settings Update settings submitted via POST.
+	 *
+	 * @return array
+	 */
+	public function validate_auto_update( $posted_update_settings ) {
+		$post_days = isset( $posted_update_settings['days'] ) ? $posted_update_settings['days'] : null;
+
+		if ( null === $post_days || ( is_numeric( $post_days ) && 0 <= $post_days && 99 >= $post_days ) ) {
+			return $posted_update_settings;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Delete the boldgrid_backup_pending_rollback option.
 	 *
 	 * @since 1.0.1
@@ -779,16 +914,20 @@ class Boldgrid_Backup_Admin_Settings {
 	 * @see Boldgrid_Backup_Admin_Config::is_premium_active
 	 */
 	public function page_backup_settings() {
+
 		$is_premium           = $this->core->config->get_is_premium();
 		$is_premium_installed = $this->core->config->is_premium_installed;
 		$is_premium_active    = $this->core->config->is_premium_active;
 
-		add_thickbox();
 		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
 		wp_enqueue_style( 'bglib-ui-css' );
 		wp_enqueue_script( 'bglib-ui-js' );
 		wp_enqueue_script( 'bglib-sticky' );
 		wp_enqueue_script( 'bglib-license' );
+
+		$this->core->auto_rollback->enqueue_home_scripts();
+		$this->core->auto_rollback->enqueue_backup_scripts();
+		$this->core->archive_actions->enqueue_scripts();
 
 		if ( ! $this->is_saving_settings ) {
 			$is_functional = $this->core->test->run_functionality_tests();
@@ -916,8 +1055,32 @@ class Boldgrid_Backup_Admin_Settings {
 			$settings['encrypt_db'] = false;
 		}
 
-		// Include the page template.
+		$in_modal = true;
+		$modal    = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-modal.php';
+		$in_modal = false;
+
+		echo '
+		<div class="wrap">
+			<div id="bglib-page-container" class="bgbkup-page-container">
+				<div id="bglib-page-top">
+					<div id="bglib-page-header" class="bglib-has-logo">
+						<h1>' . esc_html__( 'Total Upkeep Backup and Restore Settings', 'boldgrid-backup' ) . '</h1>
+						<div class="page-title-actions">
+						<a href="#TB_inline?width=800&amp;height=600&amp;inlineId=backup_now_content" class="thickbox page-title-action page-title-action-primary">' .
+							esc_html__( 'Backup Site Now', 'boldgrid-backup' ) . '
+						</a>
+						<a class="page-title-action add-new">' . esc_html__( 'Upload Backup', 'boldgrid-backup' ) . '</a>
+					</div>
+					</div>
+				</div>
+				<div id="bglib-page-content">
+					<div class="wp-header-end"></div>';
+		echo $modal; //phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-settings.php';
+		echo '
+				</div>
+			</div>
+		</div>';
 	}
 
 	/**
