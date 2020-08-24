@@ -1098,6 +1098,11 @@ class Boldgrid_Backup_Admin_Ftp {
 	 * @return bool
 	 */
 	public function upload( $filepath ) {
+		$logger = new Boldgrid_Backup_Admin_Log( $this->core );
+		$logger->init( 'ftp.log' );
+		$logger->add_separator();
+		$logger->add( 'Beginning ' . __METHOD__ . '...' );
+
 		// Make sure our backup file exists.
 		if ( ! $this->core->wp_filesystem->exists( $filepath ) ) {
 			$this->last_error = sprintf(
@@ -1105,24 +1110,35 @@ class Boldgrid_Backup_Admin_Ftp {
 				__( 'Archive does not exist: $1$s', 'boldgrid-backup' ),
 				$filepath
 			);
+			$logger->add( $this->last_error );
 			return false;
 		}
 
 		$remote_file = $this->get_folder_name() . '/' . basename( $filepath );
 
+		$logger->add( 'Local path: ' . $filepath . ' / ' . $this->core->wp_filesystem->size( $filepath ) );
+		$logger->add( 'Remote path: ' . $remote_file );
+
 		$timestamp = filemtime( $filepath );
 
+		$logger->add( 'Connecting...' );
 		$this->connect();
+		$logger->add( 'Logging in...' );
 		$this->log_in();
 		if ( ! $this->logged_in ) {
-			$this->errors[] = __( 'Unable to log in to ftp server.', 'boldgrid-backup' );
+			$error          = __( 'Unable to log in to ftp server.', 'boldgrid-backup' );
+			$this->errors[] = $error;
+			$logger->add( $error );
 			return false;
 		}
 
 		$has_remote_dir = $this->create_backup_dir();
 		if ( ! $has_remote_dir ) {
+			$logger->add( 'Unable to create backup directory on remote host.' );
 			return false;
 		}
+
+		$logger->add( 'Beginning upload...' );
 
 		switch ( $this->type ) {
 			case 'ftp':
@@ -1148,6 +1164,8 @@ class Boldgrid_Backup_Admin_Ftp {
 				break;
 		}
 
+		$logger->add( 'Upload status: ' . print_r( $uploaded,1 ) ); //phpcs:ignore
+
 		if ( ! $uploaded ) {
 			$last_error = error_get_last();
 
@@ -1165,8 +1183,15 @@ class Boldgrid_Backup_Admin_Ftp {
 			return false;
 		}
 
+		$logger->add( 'Enforcing retention...' );
 		$this->enforce_retention();
+		$logger->add( 'Retention enforcement complete!' );
 
+		$logger->add( 'Getting remote contents...' );
+		$contents = $this->get_contents( true, $this->get_folder_name() );
+		$logger->add( 'Remote contents: ' . print_r( $contents, 1 ) ); // phpcs:ignore
+
+		$logger->add( 'Completed ' . __METHOD__ . '!' );
 		return true;
 	}
 }

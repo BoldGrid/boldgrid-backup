@@ -206,7 +206,8 @@ class Boldgrid_Backup_Admin_Archive_Details {
 	 * @see Boldgrid_Backup_Admin_Archive_Browser::authorize()
 	 */
 	public function validate_nonce() {
-		return check_ajax_referer( 'bgbkup_archive_details_page', 'security', false );
+		return check_ajax_referer( 'bgbkup_archive_details_page', 'security', false ) ||
+			check_ajax_referer( 'boldgrid_backup_remote_storage_upload', 'security', false );
 	}
 
 	/**
