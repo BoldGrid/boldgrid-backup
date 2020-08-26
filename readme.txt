@@ -132,6 +132,12 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
+= 1.14.4 =
+
+Release date: August 26th, 2020
+
+* Bug fix: Invalid nonce when one click uploading to remote storage providers.
+
 = 1.14.3 =
 
 Release date: August 12th, 2020
