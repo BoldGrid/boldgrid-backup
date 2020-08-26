@@ -137,6 +137,7 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 Release date: August 26th, 2020
 
 * Bug fix: Invalid nonce when one click uploading to remote storage providers.
+* Bug fix: Escaping / translation of "Remote Storage" help text on Archive Details page.
 * Update: Allow auto update notice on updates page to be permanently dismissible.
 
 = 1.14.3 =

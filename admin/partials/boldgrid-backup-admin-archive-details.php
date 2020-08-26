@@ -301,7 +301,19 @@ $remote_meta_box = sprintf(
 			BOLDGRID_BACKUP_TITLE . ' Premium'
 		)
 	),
-	/* 4 */ esc_html__( 'Secure your backups by keeping copies of them on <a href="admin.php?page=boldgrid-backup-tools&section=section_locations">remote storage</a>.', 'boldgrid-backup' )
+	/* 4 */ wp_kses(
+		sprintf(
+			// translators: 1 An opening anchor tag linking to the remote storate settings, 2 its closing anchor tag.
+			__( 'Secure your backups by keeping copies of them on %1$sremote storage%2$s.', 'boldgrid-backup' ),
+			'<a href="admin.php?page=boldgrid-backup-tools&section=section_locations">',
+			'</a>'
+		),
+		array(
+			'a' => array(
+				'href' => array(),
+			),
+		)
+	)
 );
 
 $editor_tools = sprintf(
