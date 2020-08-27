@@ -532,8 +532,24 @@ class Boldgrid_Backup_Admin_Test {
 	 * @return bool
 	 */
 	public function run_functionality_tests() {
+		// If we've already run the logic in this method, we can return right now.
 		if ( null !== $this->is_functional ) {
 			return $this->is_functional;
+		}
+
+		$transient = 'boldgrid_backup_is_functional';
+
+		/*
+		 * If we've already run these tests:
+		 * # If we are functional and our environment has not changed, assume everything is still functional.
+		 * # If we are not functional, or the transient is false, we'll run the tests again. We will
+		 *   assume that if false, the user is doing everything they can to get the environment functional,
+		 *   and we want to be able to return true as soon as that's done. Basically, benefits of using
+		 *   the transient will only come when the environment is functional, which is most cases.
+		 */
+		$environment = new Boldgrid_Backup_Admin_Environment();
+		if ( get_transient( $transient ) && ! $environment->has_changed() ) {
+			return true;
 		}
 
 		$available_compressors = $this->core->config->get_available_compressors();
@@ -558,6 +574,9 @@ class Boldgrid_Backup_Admin_Test {
 		} else {
 			$this->is_functional = true;
 		}
+
+		// Transient expiration is up for debate. This is better than every admin page load.
+		set_transient( $transient, $this->is_functional, DAY_IN_SECONDS );
 
 		return $this->is_functional;
 	}
