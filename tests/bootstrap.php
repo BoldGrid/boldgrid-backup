@@ -96,6 +96,7 @@ $files = array(
 	'/admin/class-boldgrid-backup-admin-compressor.php',
 	'/admin/class-boldgrid-backup-admin-log.php',
 	'/admin/class-boldgrid-backup-admin-log-page.php',
+  '/admin/class-boldgrid-backup-admin-environment.php',
 	// Tasks.
 	'/admin/class-boldgrid-backup-admin-task.php',
 	'/admin/class-boldgrid-backup-admin-task-helper.php',
