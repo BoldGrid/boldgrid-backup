@@ -37,6 +37,7 @@ class Boldgrid_Backup_Admin_Nopriv {
 	 * }
 	 * @return mixed The results of the wp_remote_post call. An array of data on success, or a WP_Error
 	 *               on fail.
+	 *               Example return data when creating a backup via rest: https://pastebin.com/BeACwA2k
 	 */
 	public function do_backup( $args = [] ) {
 		$url = $this->get_backup_url();

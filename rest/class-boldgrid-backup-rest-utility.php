@@ -31,6 +31,23 @@ class Boldgrid_Backup_Rest_Utility {
 	}
 
 	/**
+	 * Echo a wp_rest nonce to the screen.
+	 *
+	 * This method is only using for testing, and is only called in a dev environment.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @see Boldgrid_Backup::define_admin_hooks() For more info on how this method is used within a
+	 *                                            dev environment.
+	 * @see rest/README.MD                        For a list of example rest calls that depend on this
+	 *                                            method.
+	 */
+	public static function insert_nonce() {
+		wp_nonce_field( 'wp_rest', 'wp_rest' );
+		echo '<input type="hidden" id="bgbkup_site_url" value="' . esc_attr( get_site_url() ) . '" />';
+	}
+
+	/**
 	 * Whether or not we're in a REST call.
 	 *
 	 * @since SINCEVERSION

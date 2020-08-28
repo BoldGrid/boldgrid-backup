@@ -3,7 +3,7 @@
  * File: class-boldgrid-backup-archiver.php
  *
  * @link https://www.boldgrid.com
- * @since 1.0
+ * @since SINCEVERSION
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/includes
@@ -49,7 +49,9 @@ class Boldgrid_Backup_Archiver {
 	private $task;
 
 	/**
+	 * Constructor.
 	 *
+	 * @since SINCEVERSION
 	 */
 	public function __construct() {
 		$this->core = apply_filters( 'boldgrid_backup_get_core', null );
@@ -106,11 +108,9 @@ class Boldgrid_Backup_Archiver {
 	 * @since SINCEVERSION
 	 */
 	public function run() {
-		$core = apply_filters( 'boldgrid_backup_get_core', null );
-
 		$this->init();
 
-		$this->info = $core->archive_files( true );
+		$this->info = $this->core->archive_files( true );
 
 		$this->complete();
 	}

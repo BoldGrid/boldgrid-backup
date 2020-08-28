@@ -171,10 +171,12 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 	/**
 	 * Create a new archive.
 	 *
-	 * Example call to trigger this endpoint:
-	 * jQuery.post( 'https://domain.com/wp-json/bgbkup/v1/archives' );
+	 * For examples, please see rest/README.MD
 	 *
-	 * @since X.X.X
+	 * @since SINCEVERSION
+	 *
+	 * @see Boldgrid_Backup_Rest_Controller::permission_check for more information if you are getting
+	 *                                                        a 401 unauthorized error.
 	 *
 	 * @param WP_REST_Request $request Full data about the request.
 	 * @return array                   Job Resource.
@@ -196,8 +198,7 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 	/**
 	 * Get all archives for a WordPress.
 	 *
-	 * Example call:
-	 * jQuery.get( 'https://domain.com/wp-json/bgbkup/v1/archives/' );
+	 * For examples, please see rest/README.MD
 	 *
 	 * @since X.X.X
 	 *
@@ -236,13 +237,9 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 	/**
 	 * Restore an archive.
 	 *
-	 * Example call:
-	 * jQuery.ajax({
-	 *     url: 'https://domain.com/wp-json/bgbkup/v1/archives/?url=' + encodeURIComponent( <URL> ),
-	 *     type: 'put'
-	 * });
+	 * For examples, please see rest/README.MD
 	 *
-	 * @since X.X.X
+	 * @since SINCEVERSION
 	 *
 	 * @param WP_REST_Request $request Full data about the request.
 	 * @return array                   Job Resource.

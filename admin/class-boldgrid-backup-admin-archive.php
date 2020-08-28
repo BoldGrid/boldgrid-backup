@@ -109,18 +109,30 @@ class Boldgrid_Backup_Admin_Archive {
 	/**
 	 * Archive id.
 	 *
+	 * The archive id is the archive's id as found in the boldgrid_backup_backups option.
+	 *
+	 * This class includes the self::set_id() method to set the actual id, but this class doesn't actually
+	 * call that method to set the id. The id is generally set within Boldgrid\Backup\Archive\Factory.
+	 *
 	 * @since SINCEVERSION
 	 * @access private
 	 * @var int
+	 *
+	 * @see Boldgrid\Backup\Archive\Option for more information about the boldgrid_backup_backups option.
 	 */
 	private $id;
 
 	/**
 	 * The archive key.
 	 *
+	 * When retrieving a list of archives, you'll get an array, and this is the archives location in
+	 * the array.
+	 *
 	 * @since SINCEVERSION
 	 * @access private
 	 * @var int
+	 *
+	 * @see self::init() To see this property initialized.
 	 */
 	private $key;
 
@@ -325,7 +337,6 @@ class Boldgrid_Backup_Admin_Archive {
 		// Set our key.
 		$details   = $this->get_by_name( $this->filename );
 		$this->key = isset( $details['key'] ) ? $details['key'] : null;
-
 	}
 
 	/**

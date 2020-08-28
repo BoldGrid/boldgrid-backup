@@ -51,7 +51,7 @@ class Boldgrid_Backup_Rest_Controller extends WP_REST_Controller {
 	/**
 	 * Ensure user has access to any of the archive endpoints.
 	 *
-	 * @since X.X.X
+	 * @since SINCEVERSION
 	 *
 	 * @return boolean Has Access?
 	 */

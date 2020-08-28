@@ -613,6 +613,15 @@ class Boldgrid_Backup {
 		$this->loader->add_filter( 'Boldgrid\Library\Plugin\Notices\admin_enqueue_scripts', $plugin_notices, 'filter' );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core, 'add_thickbox' );
+
+		/*
+		 * Things to do in a dev environment.
+		 *
+		 * @link https://make.wordpress.org/core/2020/07/24/new-wp_get_environment_type-function-in-wordpress-5-5/
+		 */
+		if ( defined( 'WP_ENVIRONMENT_TYPE' ) && 'development' === WP_ENVIRONMENT_TYPE ) {
+			$this->loader->add_action( 'admin_footer', 'Boldgrid_Backup_Rest_Utility', 'insert_nonce' );
+		}
 	}
 
 	/**

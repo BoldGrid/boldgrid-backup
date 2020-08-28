@@ -19,7 +19,7 @@ namespace Boldgrid\Backup\Archive;
  * This class is used to manage the boldgrid_backup_backups option.
  *
  * In it's first implementation, each entry in the array represents a single backup, and has an id and
- * a filename.
+ * a filename. For examples, please see: https://pastebin.com/Wuey2zvP
  *
  * @since SINCEVERSION
  */
