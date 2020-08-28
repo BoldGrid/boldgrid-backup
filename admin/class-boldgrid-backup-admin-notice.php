@@ -236,6 +236,17 @@ class Boldgrid_Backup_Admin_Notice {
 	 * @since 1.7.0
 	 */
 	public function display_autoupdate_notice() {
+		$notice_id = 'bgbkup_autoupdate_notice';
+
+		/*
+		 * This notice is dismissible per user.
+		 *
+		 * @link https://wordpress.org/support/topic/how-do-i-remove-this-notificatio/
+		 */
+		if ( Notice::isDismissed( $notice_id ) ) {
+			return;
+		}
+
 		$auto_update_array = [
 			( apply_filters( 'allow_major_auto_core_updates', false ) ) ? 'Major' : false,
 			( apply_filters( 'allow_minor_auto_core_updates', false ) ) ? 'Minor' : false,
@@ -275,7 +286,7 @@ class Boldgrid_Backup_Admin_Notice {
 				break;
 		}
 
-		$message = sprintf(
+		$message = '<p>' . sprintf(
 			// translators: 1: HTML anchor opening tag, 2: HTML anchor closing tag, 3: Plugin title.
 			esc_html__(
 				'Auto Updates are %4$s WordPress Core Updates. This can be configured in the %1$s%3$s Settings%2$s.',
@@ -285,9 +296,9 @@ class Boldgrid_Backup_Admin_Notice {
 			'</a>',
 			BOLDGRID_BACKUP_TITLE,
 			$update_msg
-		);
+		) . '</p>';
 
-		do_action( 'boldgrid_backup_notice', $message, 'notice notice-info is-dismissible' );
+		Notice::show( $message, $notice_id, 'notice notice-info' );
 	}
 
 	/**
