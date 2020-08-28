@@ -1,3 +1,14 @@
+# PLEASE READ
+
+Before testing the jQuery calls on this page, be sure to add the following to your wp-config.php:
+
+`define( 'WP_ENVIRONMENT_TYPE', 'development' );`
+
+This will:
+
+1. Add the `wp_rest` nonce to all your admin pages
+1. Add your site url as `bgbkup_site_url`
+
 # Archives
 
 ## Get a list of archives
