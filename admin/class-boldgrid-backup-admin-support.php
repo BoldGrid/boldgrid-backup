@@ -154,6 +154,17 @@ class Boldgrid_Backup_Admin_Support {
 			}
 		}
 
+		$methods = array(
+			'Boldgrid\Library\Library\Plugin\Plugins' => 'getAllPlugins',
+		);
+
+		foreach ( $methods as $class => $method ) {
+			if ( ! method_exists( $class, $method ) ) {
+				$has_library = false;
+				break;
+			}
+		}
+
 		return $has_library;
 	}
 

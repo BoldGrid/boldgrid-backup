@@ -189,7 +189,7 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 			$this->core->go_pro->get_premium_button( $get_plugins_url, __( 'Unlock Feature', 'boldgrid-backup' ) ) .
 			sprintf(
 				// translators: 1: Premium plugin title.
-				esc_html__( 'Secure your sesitive data with the %1$s plugin.', 'boldgrid-backup' ),
+				esc_html__( 'Secure your sensitive data with the %1$s plugin.', 'boldgrid-backup' ),
 				BOLDGRID_BACKUP_TITLE . ' Premium'
 			) . '</div></div></td></tr>';
 		}
