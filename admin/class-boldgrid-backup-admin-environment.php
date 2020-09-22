@@ -3,7 +3,7 @@
  * File: class-boldgrid-backup-admin-environment.php
  *
  * @link https://www.boldgrid.com
- * @since SINCEVERSION
+ * @since 1.14.5
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
@@ -18,7 +18,7 @@
  * The purpose of this class is to help us get more information about our environment. It should also
  * help answer questions, such as, has our environment changed?
  *
- * @since SINCEVERSION
+ * @since 1.14.5
  */
 class Boldgrid_Backup_Admin_Environment {
 	/**
@@ -27,7 +27,7 @@ class Boldgrid_Backup_Admin_Environment {
 	 * For example, to know if something has changed in the environment, we'll need to know both the
 	 * old values and the new values. The old values will be stored in this option.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.5
 	 * @var string
 	 */
 	const OPTION_NAME = 'boldgrid_backup_environment';
@@ -35,7 +35,7 @@ class Boldgrid_Backup_Admin_Environment {
 	/**
 	 * Determine whether or not our environment has changed.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.5
 	 *
 	 * @return bool
 	 */
@@ -62,7 +62,7 @@ class Boldgrid_Backup_Admin_Environment {
 	/**
 	 * Determine whether or not our hostname has changed.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.5
 	 *
 	 * @return bool
 	 */
@@ -84,7 +84,7 @@ class Boldgrid_Backup_Admin_Environment {
 	/**
 	 * Determine whether or not our php version has changed.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.5
 	 *
 	 * @return bool
 	 */
@@ -106,7 +106,7 @@ class Boldgrid_Backup_Admin_Environment {
 	/**
 	 * Determine whether or not our WordPress version has changed.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.5
 	 *
 	 * @global string $wp_version The current WordPress version.
 	 *
@@ -131,7 +131,7 @@ class Boldgrid_Backup_Admin_Environment {
 	/**
 	 * Get a saved environment value.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.5
 	 *
 	 * @access private
 	 * @see self::OPTION_NAME
@@ -149,7 +149,7 @@ class Boldgrid_Backup_Admin_Environment {
 	/**
 	 * Get all of our saved values.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.5
 	 *
 	 * @access private
 	 * @see self::OPTION_NAME
@@ -163,7 +163,7 @@ class Boldgrid_Backup_Admin_Environment {
 	/**
 	 * Save a specific environment value.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.5
 	 *
 	 * @access private
 	 * @see self::OPTION_NAME
@@ -182,7 +182,7 @@ class Boldgrid_Backup_Admin_Environment {
 	/**
 	 * Save all of our environment values.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.5
 	 *
 	 * @access private
 	 * @see self::OPTION_NAME
