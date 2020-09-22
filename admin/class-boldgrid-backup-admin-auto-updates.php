@@ -306,7 +306,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 * resources, self::plugins is now initialized within this method, which much be called prior to
 	 * using self::plugins.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.5
 	 */
 	private function init_plugins() {
 		if ( ! empty( $this->plugins ) ) {
@@ -320,7 +320,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	/**
 	 * Initialize our themes.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.5
 	 *
 	 * @see self::init_plugins() for additional info on this method.
 	 */
