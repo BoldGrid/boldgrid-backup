@@ -58,11 +58,8 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 * @since 1.14.0
 	 */
 	public function __construct() {
-
 		$this->set_settings();
-		$plugins       = new \Boldgrid\Library\Library\Plugin\Plugins();
-		$this->plugins = $plugins->getAllPlugins();
-		$this->themes  = new \Boldgrid\Library\Library\Theme\Themes();
+
 		add_filter( 'automatic_updater_disabled', '__return_false' );
 	}
 
@@ -143,6 +140,8 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 * @return bool
 	 */
 	public function maybe_update_plugin( $slug ) {
+		$this->init_plugins();
+
 		$days_to_wait = $this->get_days();
 		$plugin       = \Boldgrid\Library\Library\Plugin\Plugins::getBySlug( $this->plugins, $slug );
 		$plugin->setUpdateData();
@@ -166,6 +165,8 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 * @return bool
 	 */
 	public function maybe_update_theme( $stylesheet ) {
+		$this->init_themes();
+
 		$days_to_wait = $this->get_days();
 		$theme        = $this->themes->getFromStylesheet( $stylesheet );
 		$theme->setUpdateData();
@@ -203,6 +204,9 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		if ( is_null( $update ) ) {
 			return null;
 		}
+
+		$this->init_plugins();
+
 		// Array of plugin slugs to always auto-update.
 		$plugins = array();
 		foreach ( $this->plugins as $plugin ) {
@@ -242,6 +246,9 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		if ( is_null( $update ) ) {
 			return null;
 		}
+
+		$this->init_themes();
+
 		// Array of theme stylesheets to always auto-update.
 		$themes = array();
 		foreach ( $this->themes->get() as $theme ) {
@@ -288,5 +295,40 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		add_filter( 'allow_minor_auto_core_updates', '__return_' . $minor );
 		add_filter( 'auto_update_translation', '__return_' . $translation );
 		add_filter( 'allow_dev_auto_core_updates', '__return_' . $dev );
+	}
+
+	/**
+	 * Initialize our plugins.
+	 *
+	 * Initially, self::plugins was initialized in the constructor, which was ran on every admin page.
+	 * Some xhprof investigation showed the constructor was adding 0.19s  / 282kb memory to each page.
+	 * During optimization, it was noticed that only two methods utilzed self::plugins. To save a few
+	 * resources, self::plugins is now initialized within this method, which much be called prior to
+	 * using self::plugins.
+	 *
+	 * @since 1.14.5
+	 */
+	private function init_plugins() {
+		if ( ! empty( $this->plugins ) ) {
+			return;
+		}
+
+		$plugins       = new \Boldgrid\Library\Library\Plugin\Plugins();
+		$this->plugins = $plugins->getAllPlugins();
+	}
+
+	/**
+	 * Initialize our themes.
+	 *
+	 * @since 1.14.5
+	 *
+	 * @see self::init_plugins() for additional info on this method.
+	 */
+	private function init_themes() {
+		if ( ! empty( $this->themes ) ) {
+			return;
+		}
+
+		$this->themes = new \Boldgrid\Library\Library\Theme\Themes();
 	}
 }

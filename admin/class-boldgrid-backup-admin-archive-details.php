@@ -201,6 +201,10 @@ class Boldgrid_Backup_Admin_Archive_Details {
 	 * methods, bgbkup_archive_details_page. This method is an easy
 	 * way to validate the nonce.
 	 *
+	 * The boldgrid_backup_remote_storage_upload nonce is also used on this page. If ever consolidating
+	 * these two nonces into one, remember backwards compatibility + premium plugin. One click Google
+	 * Drive / etc uploads uses this nonce.
+	 *
 	 * @since 1.6.0
 	 *
 	 * @see Boldgrid_Backup_Admin_Archive_Browser::authorize()
