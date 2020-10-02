@@ -301,7 +301,7 @@ class Boldgrid_Backup_Admin_Ftp {
 		}
 
 		$contents = $this->get_contents();
-		if ( ! $contents || ! is_array( $contents ) ) {
+		if ( ! is_array( $contents ) ) {
 			$this->errors[] = __( 'Unable to get a directory listing from FTP server.', 'boldgrid-backup' );
 			return false;
 		} elseif ( in_array( $this->get_folder_name(), $contents, true ) ) {
