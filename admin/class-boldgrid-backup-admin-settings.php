@@ -692,6 +692,14 @@ class Boldgrid_Backup_Admin_Settings {
 			}
 
 			/*
+			 * Save "backup filelist analysis" setting.
+			 *
+			 * @since SINCEVERSION
+			 */
+			$tmp_key              = Boldgrid_Backup_Admin_Filelist_Analyzer::$settings_key;
+			$settings[ $tmp_key ] = ! empty( $_POST[ $tmp_key ] ) ? 1 : 0;
+
+			/*
 			 * Save Compression Level Settings.
 			 *
 			 * @since 1.14.0

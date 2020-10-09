@@ -1580,7 +1580,8 @@ class Boldgrid_Backup_Admin_Core {
 	public function archive_files( $save = false, $dryrun = false ) {
 		$this->archiving_files = true;
 
-		$this->logger->init( 'archive-' . time() . '.log' );
+		$log_time = time();
+		$this->logger->init( 'archive-' . $log_time . '.log' );
 		$this->logger->add( 'Backup process initialized.' );
 
 		$this->utility->bump_memory_limit( '1G' );
@@ -1803,6 +1804,18 @@ class Boldgrid_Backup_Admin_Core {
 				'compressor'       => $info['compressor'],
 			]
 		);
+
+		if ( Boldgrid_Backup_Admin_Filelist_Analyzer::is_enabled() ) {
+			$this->logger->add_separator();
+			$this->logger->add( 'Starting to analyze filelist...' );
+			$this->logger->add_memory();
+
+			$filelist_analyzer = new Boldgrid_Backup_Admin_Filelist_Analyzer( $filelist, $log_time );
+			$filelist_analyzer->run();
+
+			$this->logger->add( 'Finished analyzing filelist!' );
+			$this->logger->add_memory();
+		}
 
 		/*
 		 * Use the chosen compressor to build an archive.
