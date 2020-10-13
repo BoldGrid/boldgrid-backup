@@ -31,7 +31,7 @@ ob_start();
 				<th>
 					<strong><?php esc_html_e( 'Filelist Analysis', 'boldgrid-backup' ); ?></strong>
 					<p style="font-weight: normal;">
-						<?php esc_html_e( 'Include a filelist analysis log file with each backup. This log file will show you the largest files and directories that were added to your backup, and can be useful for troubleshooting failed backups.', 'boldgrid-backup' ); ?>
+						<?php esc_html_e( 'Include a filelist analysis log file with each backup. This log file will show you the largest files and directories that were added to your backup, and can be useful in troubleshooting.', 'boldgrid-backup' ); ?>
 					</p>
 				</th>
 				<td>

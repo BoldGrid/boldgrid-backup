@@ -107,13 +107,17 @@ class Boldgrid_Backup_Admin_Filelist_Analyzer {
 		}
 
 		// Display top 100 files.
+		$limit   = 100;
+		$to_show = count( $size_by_extension ) >= $limit ? $limit : count( $size_by_extension );
+		$key     = 1;
+
 		$logger->add_separator();
 		$logger->add( 'LARGEST FILES' );
+
 		usort( $this->filelist, function ( $item1, $item2 ) {
 			return $item1[2] <= $item2[2] ? 1 : -1;
 		} );
-		$to_show = count( $size_by_extension ) >= 100 ? 100 : count( $size_by_extension );
-		$key     = 1;
+
 		foreach ( $this->filelist as $file ) {
 			$logger->add( '(' . $key . ') ' . $file[1] . ' - ' . size_format( $file[2], 2 ) );
 
@@ -124,11 +128,15 @@ class Boldgrid_Backup_Admin_Filelist_Analyzer {
 		}
 
 		// Display size by extension.
+		$limit   = 30;
+		$to_show = count( $size_by_extension ) >= $limit ? $limit : count( $size_by_extension );
+		$key     = 1;
+
 		$logger->add_separator();
 		$logger->add( 'SIZE BY EXTENSION' );
+
 		arsort( $size_by_extension );
-		$to_show = count( $size_by_extension ) >= 30 ? 30 : count( $size_by_extension );
-		$key     = 1;
+
 		foreach ( $size_by_extension as $extension => $size ) {
 			$logger->add( '(' . $key . ') .' . $extension . ' - ' . number_format( $count_by_extension[ $extension ] ) . ' files totaling ' . size_format( $size, 2 ) );
 
@@ -139,11 +147,15 @@ class Boldgrid_Backup_Admin_Filelist_Analyzer {
 		}
 
 		// Display size by directory.
+		$limit   = 30;
+		$to_show = count( $size_by_dir ) >= $limit ? $limit : count( $size_by_dir );
+		$key     = 1;
+
 		$logger->add_separator();
 		$logger->add( 'SIZE BY DIRECTORY' );
+
 		arsort( $size_by_dir );
-		$to_show = count( $size_by_dir ) >= 30 ? 30 : count( $size_by_dir );
-		$key     = 1;
+
 		foreach ( $size_by_dir as $directory => $size ) {
 			$logger->add( '(' . $key . ') ' . $directory . ' - ' . size_format( $size, 2 ) );
 
