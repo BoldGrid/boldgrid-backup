@@ -1620,6 +1620,7 @@ class Boldgrid_Backup_Admin_Core {
 		if ( $this->is_scheduled_backup && ! $this->remote->any_enabled() ) {
 			$error = esc_html__( 'No backup locations selected! While we could create a backup archive, you have not selected where the backup archive should be saved. Please choose a storage location in your settings for where to save this backup archive.', 'boldgrid-backup' );
 			$this->archive_fail->schedule_fail_email( $error );
+			$this->logger->add( $error );
 			return [ 'error' => $error ];
 		}
 
@@ -1630,8 +1631,9 @@ class Boldgrid_Backup_Admin_Core {
 				// Display an error notice.
 				$this->notice->functionality_fail_notice();
 			}
-
-			return [ 'error' => 'Functionality tests fail.' ];
+			$error = __( 'Functionality tests fail.', 'boldgrid-backup' );
+			$this->logger->add( $error );
+			return [ 'error' => $error ];
 		}
 
 		// Close any PHP session, so that another session can open during the backup operation.
@@ -1720,10 +1722,9 @@ class Boldgrid_Backup_Admin_Core {
 			$this->logger->add_separator();
 
 			if ( false === $status || ! empty( $status['error'] ) ) {
-				return [
-					'error' => ! empty( $status['error'] ) ? $status['error'] :
-						__( 'An unknown error occurred when backing up the database.', 'boldgrid-backup' ),
-				];
+				$error = ! empty( $status['error'] ) ? $status['error'] : __( 'An unknown error occurred when backing up the database.', 'boldgrid-backup' );
+				$this->logger->add( $error );
+				return array( 'error' => $error );
 			}
 		}
 
@@ -1751,6 +1752,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Check if the backup directory is writable.
 		if ( ! $this->wp_filesystem->is_writable( $backup_directory ) ) {
+			$this->logger->add( 'Backup directory is not writable.' );
 			return false;
 		}
 
@@ -1870,6 +1872,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		if ( ! empty( $status['error'] ) ) {
+			$this->logger->add( $status['error'] );
 			return $status;
 		}
 
