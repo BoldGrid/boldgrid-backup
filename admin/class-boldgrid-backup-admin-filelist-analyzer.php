@@ -24,7 +24,7 @@ class Boldgrid_Backup_Admin_Filelist_Analyzer {
 	 * @since SINCEVERSION
 	 * @var string
 	 */
-	public static $settings_key = 'backup_filelist_analysis';
+	public static $settings_key = 'filelist_analysis';
 
 	/**
 	 * The unix timestamp used for the parent backup's log file.

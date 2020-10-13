@@ -694,14 +694,10 @@ class Boldgrid_Backup_Admin_Settings {
 			/*
 			 * Save "backup filelist analysis" setting.
 			 *
-			 * The $key var is temporary. It's shorter than the static var is represents, and is used
-			 * to help keep us DRY.
-			 *
 			 * @since SINCEVERSION
 			 */
-			$key              = Boldgrid_Backup_Admin_Filelist_Analyzer::$settings_key;
-			$settings[ $key ] = ! empty( $_POST[ $key ] ) ? 1 : 0;
-			unset( $key );
+			$settings[ 'filelist_analysis' ] = ! empty( $_POST[ 'filelist_analysis' ] ) ? 1 : 0;
+
 
 			/*
 			 * Save Compression Level Settings.

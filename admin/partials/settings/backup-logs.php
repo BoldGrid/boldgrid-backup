@@ -35,7 +35,7 @@ ob_start();
 					</p>
 				</th>
 				<td>
-					<input type="checkbox" name="<?php echo esc_attr( Boldgrid_Backup_Admin_Filelist_Analyzer::$settings_key ); ?>" value="1" <?php echo esc_attr( $checked ); ?>>
+					<input type="checkbox" name="filelist_analysis" value="1" <?php echo esc_attr( $checked ); ?>>
 				</td>
 			</tr>
 		</table>
