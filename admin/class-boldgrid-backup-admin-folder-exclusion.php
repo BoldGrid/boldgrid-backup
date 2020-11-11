@@ -141,6 +141,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	 * @return bool
 	 */
 	public function allow_file( $file ) {
+
 		// If this file is in our backup directory, do not allow it.
 		if ( $this->core->backup_dir->file_in_dir( ABSPATH . $file, true ) ) {
 			return false;
@@ -148,6 +149,10 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 
 		// Do not allow the "cron/restore-info.json" file used for emergency restorations.
 		if ( $this->is_match( 'cron/restore-info.json', $file ) ) {
+			return false;
+		}
+
+		if ( $this->is_banned( $file ) ) {
 			return false;
 		}
 
@@ -388,6 +393,40 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 		}
 
 		return $this->$type;
+	}
+
+	/**
+	 * Whether or not a file is banned.
+	 *
+	 * Some files are just bad for business. Files in this list won't be backed up, and the user has
+	 * no control at this time to modify. Only files we're certain should be banned, should be.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param string $file A filepath. Not absolute, but relative to ABSPATH, such as wp-admin/css/about.css
+	 *
+	 * @return bool
+	 */
+	public function is_banned( $filepath ) {
+		$banned = array(
+			/*
+			 * The ea-php-cli cache symlink. This one has appeared several times, and therefore is now
+			 * banned. The following description has been taken from the cPanel website:
+			 *
+			 * The first time you call one of the ea-php-cli binaries, the system creates the .ea-php-cli.cache
+			 * symlink to the PHP version that the directory requires. This symlink provides a quick
+			 * way for the system to determine the proper version of PHP and reads as broken by design.
+			 * For example, if the PHP script requires PHP 7.0, then the symlink will point to ea-php70.
+			 * cPanel creates broken symlinks by design and will recreate any removed symlinks the next
+			 * time that you run the script. You can safely ignore them.
+			 *
+			 * @link https://wordpress.org/support/topic/total-upkeep-error-creating-backup/
+			 */
+			'.ea-php-cli.cache',
+		);
+
+		// @todo Allow for regular expressions in the future.
+		return in_array( basename( $filepath ), $banned, true );
 	}
 
 	/**
