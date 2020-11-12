@@ -408,22 +408,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	 * @return bool
 	 */
 	public function is_banned( $filepath ) {
-		$banned = array(
-			/*
-			 * The ea-php-cli cache symlink. This one has appeared several times, and therefore is now
-			 * banned. The following description has been taken from the cPanel website:
-			 *
-			 * The first time you call one of the ea-php-cli binaries, the system creates the .ea-php-cli.cache
-			 * symlink to the PHP version that the directory requires. This symlink provides a quick
-			 * way for the system to determine the proper version of PHP and reads as broken by design.
-			 * For example, if the PHP script requires PHP 7.0, then the symlink will point to ea-php70.
-			 * cPanel creates broken symlinks by design and will recreate any removed symlinks the next
-			 * time that you run the script. You can safely ignore them.
-			 *
-			 * @link https://wordpress.org/support/topic/total-upkeep-error-creating-backup/
-			 */
-			'.ea-php-cli.cache',
-		);
+		$banned = Boldgrid_Backup_Admin::get_configs()['banned'];
 
 		// @todo Allow for regular expressions in the future.
 		return in_array( basename( $filepath ), $banned, true );
