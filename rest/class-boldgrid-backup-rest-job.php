@@ -3,7 +3,7 @@
  * File: class-boldgrid-backup-rest-job.php
  *
  * @link       https://www.boldgrid.com
- * @since      X.X.X
+ * @since      SINCEVERSION
  *
  * @package    Boldgrid_Backup
  * @copyright  BoldGrid
@@ -16,14 +16,14 @@
  *
  * REST endpoints to perform get jobs.
  *
- * @since X.X.X
+ * @since SINCEVERSION
  */
 class Boldgrid_Backup_Rest_Job extends Boldgrid_Backup_Rest_Controller {
 
 	/**
 	 * Resource name.
 	 *
-	 * @since  X.X.X
+	 * @since  SINCEVERSION
 	 * @access private
 	 * @var    string
 	 */
@@ -32,7 +32,7 @@ class Boldgrid_Backup_Rest_Job extends Boldgrid_Backup_Rest_Controller {
 	/**
 	 * Register the routes for the objects of the controller.
 	 *
-	 * @since X.X.X
+	 * @since SINCEVERSION
 	 */
 	public function register_routes() {
 		register_rest_route( $this->namespace, '/' . $this->resource . '/(?P<id>[\w-]+)', [
@@ -56,7 +56,7 @@ class Boldgrid_Backup_Rest_Job extends Boldgrid_Backup_Rest_Controller {
 	/**
 	 * Get our sample schema for comments.
 	 *
-	 * @since X.X.X
+	 * @since SINCEVERSION
 	 *
 	 * @return array Schema Format.
 	 */
@@ -104,7 +104,7 @@ class Boldgrid_Backup_Rest_Job extends Boldgrid_Backup_Rest_Controller {
 	/**
 	 * Prepare the item for the REST response.
 	 *
-	 * @since X.X.X
+	 * @since SINCEVERSION
 	 *
 	 * @param mixed $item WordPress representation of the item.
 	 * @param WP_REST_Request $request Request object.
@@ -120,7 +120,7 @@ class Boldgrid_Backup_Rest_Job extends Boldgrid_Backup_Rest_Controller {
 	 * Example call:
 	 * jQuery.get( 'https://domain/wp-json/bgbkup/v1/jobs/<JOB-ID>' );
 	 *
-	 * @since X.X.X
+	 * @since SINCEVERSION
 	 *
 	 * @param WP_REST_Request $request Full data about the request.
 	 * @return WP_Error|WP_REST_Response
