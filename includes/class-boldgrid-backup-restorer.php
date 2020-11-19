@@ -76,7 +76,11 @@ class Boldgrid_Backup_Restorer {
 	}
 
 	/**
+	 * Get our error message.
 	 *
+	 * @since SINCEVERSION
+	 *
+	 * @return string
 	 */
 	private function get_error() {
 		return ! empty( $this->info['error'] ) ? $this->info['error'] : __( 'Unknown error', 'boldgrid-backup' );
@@ -94,7 +98,11 @@ class Boldgrid_Backup_Restorer {
 	}
 
 	/**
+	 * Whether or not we have an error.
 	 *
+	 * @since SINCEVERSION
+	 *
+	 * @return bool
 	 */
 	private function has_error() {
 		return ! empty( $this->info['error'] );
