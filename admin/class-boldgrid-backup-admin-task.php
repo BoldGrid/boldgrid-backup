@@ -273,7 +273,12 @@ class Boldgrid_Backup_Admin_Task {
 	}
 
 	/**
+	 * Update data for a task.
 	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param string key The key to update.
+	 * @param mixed $value The value to assign to the key.
 	 */
 	public function update_data( $key, $value ) {
 		$this->data[ $key ] = $value;
