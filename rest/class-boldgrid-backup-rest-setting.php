@@ -3,7 +3,7 @@
  * File: class-boldgrid-backup-rest-setting.php
  *
  * @link       https://www.boldgrid.com
- * @since      X.X.X
+ * @since      SINCEVERSION
  *
  * @package    Boldgrid_Backup
  * @copyright  BoldGrid
@@ -16,14 +16,14 @@
  *
  * REST endpoints to access the backup settings.
  *
- * @since X.X.X
+ * @since SINCEVERSION
  */
 class Boldgrid_Backup_Rest_Setting extends Boldgrid_Backup_Rest_Controller {
 
 	/**
 	 * Resource name.
 	 *
-	 * @since  X.X.X
+	 * @since  SINCEVERSION
 	 * @access private
 	 * @var    string
 	 */
@@ -32,7 +32,7 @@ class Boldgrid_Backup_Rest_Setting extends Boldgrid_Backup_Rest_Controller {
 	/**
 	 * Register the routes for the objects of the controller.
 	 *
-	 * @since X.X.X
+	 * @since SINCEVERSION
 	 */
 	public function register_routes() {
 		$this->register_get();
@@ -42,7 +42,7 @@ class Boldgrid_Backup_Rest_Setting extends Boldgrid_Backup_Rest_Controller {
 	/**
 	 * Register the route for creating a backup.
 	 *
-	 * @since X.X.X
+	 * @since SINCEVERSION
 	 */
 	public function register_get() {
 		register_rest_route( $this->namespace, '/' . $this->resource, [
@@ -58,7 +58,7 @@ class Boldgrid_Backup_Rest_Setting extends Boldgrid_Backup_Rest_Controller {
 	/**
 	 * Register router for updating settings.
 	 *
-	 * @since X.X.X
+	 * @since SINCEVERSION
 	 */
 	public function register_update() {
 		register_rest_route( $this->namespace, '/' . $this->resource, [
@@ -74,7 +74,7 @@ class Boldgrid_Backup_Rest_Setting extends Boldgrid_Backup_Rest_Controller {
 	/**
 	 * Prepare the item for the REST response.
 	 *
-	 * @since X.X.X
+	 * @since SINCEVERSION
 	 *
 	 * @param mixed $item WordPress representation of the item.
 	 * @param WP_REST_Request $request Request object.
@@ -87,7 +87,7 @@ class Boldgrid_Backup_Rest_Setting extends Boldgrid_Backup_Rest_Controller {
 	/**
 	 * Get schema for settings.
 	 *
-	 * @since X.X.X
+	 * @since SINCEVERSION
 	 *
 	 * @return array Schema Format.
 	 */
@@ -141,7 +141,7 @@ class Boldgrid_Backup_Rest_Setting extends Boldgrid_Backup_Rest_Controller {
 	/**
 	 * Get the users plugin settings.
 	 *
-	 * @since X.X.X
+	 * @since SINCEVERSION
 	 *
 	 * @param WP_REST_Request $request Request object.
 	 * @return array                   Plugin settings.
@@ -158,7 +158,7 @@ class Boldgrid_Backup_Rest_Setting extends Boldgrid_Backup_Rest_Controller {
 	/**
 	 * Update settings through API.
 	 *
-	 * @since X.X.X
+	 * @since SINCEVERSION
 	 *
 	 * @param WP_REST_Request $request Request object.
 	 * @return array                   Updated Settings.
