@@ -3,7 +3,7 @@
  * File: class-boldgrid-backup-rest-controller.php
  *
  * @link       https://www.boldgrid.com
- * @since      X.X.X
+ * @since      SINCEVERSION
  *
  * @package    Boldgrid_Backup
  * @copyright  BoldGrid
@@ -16,14 +16,14 @@
  *
  * A base class for the wp rest controller.
  *
- * @since X.X.X
+ * @since SINCEVERSION
  */
 class Boldgrid_Backup_Rest_Controller extends WP_REST_Controller {
 
 	/**
 	 * The core class object.
 	 *
-	 * @since  X.X.X
+	 * @since  SINCEVERSION
 	 * @access private
 	 * @var    Boldgrid_Backup_Admin_Core
 	 */
@@ -32,7 +32,7 @@ class Boldgrid_Backup_Rest_Controller extends WP_REST_Controller {
 	/**
 	 * Namespace of the class.
 	 *
-	 * @since  X.X.X
+	 * @since  SINCEVERSION
 	 * @access private
 	 * @var    string
 	 */
@@ -41,7 +41,7 @@ class Boldgrid_Backup_Rest_Controller extends WP_REST_Controller {
 	/**
 	 * Setup the core backup class.
 	 *
-	 * @since X.X.X
+	 * @since SINCEVERSION
 	 * @param Boldgrid_Backup_Admin_Core $core Core Backup class.
 	 */
 	public function __construct( $core ) {
@@ -62,7 +62,7 @@ class Boldgrid_Backup_Rest_Controller extends WP_REST_Controller {
 	/**
 	 * Make sure that an item only has the items present in the schema.
 	 *
-	 * @since X.X.X
+	 * @since SINCEVERSION
 	 *
 	 * @param array $item Resource Item.
 	 * @return array      Updated resource item.
