@@ -2304,9 +2304,23 @@ class Boldgrid_Backup_Admin_Core {
 
 		$restore_ok = true;
 
+		/*
+		 * This is a generic method to restore an archive. Do not assume the request to restore is coming
+		 * from a user directly via $_POST.
+		 *
+		 * Refer to check_ajax_referer usage below to help protect ajax requests.
+		 */
+		$is_post_restore = isset( $_POST['action'] ) && 'boldgrid_backup_restore_archive' === $_POST['action']; // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+
 		// If a restoration was not requested, then abort.
 		if ( empty( $_POST['restore_now'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			$error_message = esc_html__( 'Invalid restore_now value.', 'boldgrid-backup' );
+			$this->logger->add( $error_message );
+			return [ 'error' => $error_message ];
+		}
+
+		if ( $is_post_restore && ! check_ajax_referer( 'boldgrid_backup_restore_archive', 'archive_auth', false ) ) {
+			$error_message = esc_html__( 'Invalid nonce.', 'boldgrid-backup' );
 			$this->logger->add( $error_message );
 			return [ 'error' => $error_message ];
 		}
