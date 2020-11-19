@@ -114,6 +114,4 @@ class Boldgrid_Backup_Archiver {
 
 		$this->complete();
 	}
-
-
 }
