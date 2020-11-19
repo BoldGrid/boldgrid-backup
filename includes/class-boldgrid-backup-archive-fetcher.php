@@ -149,7 +149,7 @@ class Boldgrid_Backup_Archive_Fetcher {
 			]
 		);
 
-		if ( $this->is_successful_download() ) {
+		if ( $this->is_call_successful() ) {
 			$this->post_successful_download();
 
 			return true;
@@ -208,7 +208,7 @@ class Boldgrid_Backup_Archive_Fetcher {
 	 *
 	 * @return bool True on success.
 	 */
-	private function is_successful_download() {
+	private function is_call_successful() {
 		return is_array( $this->response ) &&
 			! is_wp_error( $this->response ) &&
 			in_array( $this->response['headers']['content-type'], $this->allowed_content_types, true );
