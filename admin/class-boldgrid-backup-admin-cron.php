@@ -1110,7 +1110,9 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @return array An array of archive file information.
 	 */
 	public function restore() {
-		$task_id = ! empty( $_POST['task_id'] ) ? $_POST['task_id'] : null; // phpcs:ignore
+		// phpcs:disable WordPress.CSRF.NonceVerification.NoNonceVerification
+		$task_id = ! empty( $_POST['task_id'] ) ? $_POST['task_id'] : null;
+		// phpcs:enable WordPress.CSRF.NonceVerification.NoNonceVerification
 
 		if ( ! $this->is_valid_call() ) {
 			wp_die( esc_html__( 'Error: Invalid request.', 'boldgrid-backup' ) );
