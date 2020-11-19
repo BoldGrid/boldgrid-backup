@@ -3,7 +3,7 @@
  * File: class-boldgrid-backup-rest-archive.php
  *
  * @link       https://www.boldgrid.com
- * @since      X.X.X
+ * @since      SINCEVERSION
  *
  * @package    Boldgrid_Backup
  * @copyright  BoldGrid
@@ -16,14 +16,14 @@
  *
  * REST endpoints to perform simple archive manipulation.
  *
- * @since X.X.X
+ * @since SINCEVERSION
  */
 class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 
 	/**
 	 * Resource name.
 	 *
-	 * @since  X.X.X
+	 * @since  SINCEVERSION
 	 * @access private
 	 * @var    string
 	 */
@@ -32,7 +32,7 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 	/**
 	 * Register all routes.
 	 *
-	 * @since X.X.X
+	 * @since SINCEVERSION
 	 */
 	public function register_routes() {
 		$this->register_creation();
@@ -43,7 +43,7 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 	/**
 	 * Register the route for creating an archive.
 	 *
-	 * @since X.X.X
+	 * @since SINCEVERSION
 	 */
 	public function register_creation() {
 		register_rest_route( $this->namespace, '/' . $this->resource, [
@@ -59,7 +59,7 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 	/**
 	 * Register the route for restoring a backup.
 	 *
-	 * @since X.X.X
+	 * @since SINCEVERSION
 	 */
 	public function register_restore() {
 		register_rest_route( $this->namespace, '/' . $this->resource, [
@@ -93,7 +93,7 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 	/**
 	 * Register the route for viewing a list of backups.
 	 *
-	 * @since X.X.X
+	 * @since SINCEVERSION
 	 */
 	public function register_list() {
 		register_rest_route( $this->namespace, '/' . $this->resource, [
@@ -109,7 +109,7 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 	/**
 	 * Get our sample schema for an archive.
 	 *
-	 * @since X.X.X
+	 * @since SINCEVERSION
 	 *
 	 * @return array Schema Format.
 	 */
@@ -158,7 +158,7 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 	/**
 	 * Prepare the item for the REST response.
 	 *
-	 * @since X.X.X
+	 * @since SINCEVERSION
 	 *
 	 * @param mixed $item WordPress representation of the item.
 	 * @param WP_REST_Request $request Request object.
@@ -200,7 +200,7 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 	 *
 	 * For examples, please see rest/README.MD
 	 *
-	 * @since X.X.X
+	 * @since SINCEVERSION
 	 *
 	 * @param WP_REST_Request $request Full data about the request.
 	 * @return array                   A collection of archive resources.
