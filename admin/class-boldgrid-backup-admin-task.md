@@ -63,3 +63,67 @@ an action, and have things like a start time, a status, etc.
 
 Jobs are a wordpress action/hook and belong to the jobs queue. Tasks are independent and could potentially
 float around the system. Tasks are really just a tracking system for things to do.
+
+# Example tasks
+
+```
+wp option get boldgrid_backup_tasks
+array (
+	0 => array (
+		'id'           => '1597861098-2e90c6',
+		'type'         => 'backup',
+		'created_at'   => 1597861098,
+		'started_at'   => 1597861098,
+		'completed_at' => 1597861109,
+		'status'       => 'done',
+		'data'         => array (),
+	),
+	1 => array (
+		'id'           => '1597861521-1b2848',
+		'type'         => 'backup',
+		'created_at'   => 1597861521,
+		'started_at'   => 1597861522,
+		'completed_at' => 1597861527,
+		'status'       => 'done',
+		'data'         => array(),
+	),
+	2 => array (
+		'id'           => '1598616953-986059',
+		'type'         => 'backup',
+		'created_at'   => 1598616953,
+		'started_at'   => 1598616954,
+		'completed_at' => 1598616959,
+		'status'       => 'done',
+		'data'         => array(),
+	),
+	3 => array (
+		'id'           => '1598617517-e6f0a3',
+		'type'         => 'backup',
+		'created_at'   => 1598617517,
+		'started_at'   => 1598617518,
+		'completed_at' => 1598617523,
+		'status'       => 'done',
+		'data'         => array(),
+	),
+	4 => array (
+		'id'           => '1598619019-8d3da6',
+		'type'         => 'backup',
+		'created_at'   => 1598619019,
+		'started_at'   => 1598619020,
+		'completed_at' => NULL,
+		'status'       => 'in_progress',
+		'data'         => array(),
+	),
+	5 => array (
+		'id'           => '1598619948-985ee2',
+		'type'         => 'restore',
+		'created_at'   => '2020-08-28T13:05:48+00:00',
+		'started_at'   => 1598619949,
+		'completed_at' => 1598619951,
+		'status'       => 'done',
+		'data'         => array (
+			'backup_id' => '4',
+		),
+	),
+)
+```

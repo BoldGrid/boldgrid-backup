@@ -17,7 +17,7 @@
  *
  * This class is a helper class for the Boldgrid_Backup_Admin_Task class.
  *
- * An example of tasks can be found here: https://pastebin.com/U7puwarG
+ * An example of tasks can be found here: admin/class-boldgrid-backup-admin-task.md#example-tasks
  *
  * @since SINCEVERSION
  */
