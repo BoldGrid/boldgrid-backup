@@ -15,7 +15,7 @@
 /**
  * Class: Boldgrid_Backup_Admin_Task
  *
- * Tasks are similar to the jobs queue, but not quite the same.
+ * Tasks are similar to the jobs queue, but not quite the same. Please see class-boldgrid-backup-admin-task.md
  *
  * @since SINCEVERSION
  *
