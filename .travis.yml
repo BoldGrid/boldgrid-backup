@@ -18,7 +18,7 @@ before_script:
   - nvm use 10
   - yarn install
   - composer self-update --1
-  - composer install -o --no-dev
+  # - composer install -o --no-dev
   - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
 
 script:
