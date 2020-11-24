@@ -32,7 +32,7 @@ after_success:
 
 deploy:
   - provider: script
-    script: chmod +x ./node_modules/@boldgrid/wordpress-tag-sync/release.sh && ./node_modules/@boldgrid/wordpress-tag-sync/release.sh
+    script: chmod +x ./bin/release.sh && ./bin/release.sh
     skip_cleanup: true
     on:
       tags: true
