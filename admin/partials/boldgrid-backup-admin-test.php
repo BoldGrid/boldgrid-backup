@@ -397,6 +397,25 @@ if ( $is_functional ) {
 			'v' => $db_collate,
 		);
 	}
+
+	// Show table info to help troubleshoot database issues.
+	$prefixed_tables = $this->db_get->prefixed();
+	$excluded_tables = $this->db_omit->get_excluded_tables();
+
+	$tests[] = array(
+		'k' => __( 'Prefixed tables found:', 'boldgrid-backup' ),
+		'v' => implode( ', ', $prefixed_tables ),
+	);
+
+	$tests[] = array(
+		'k' => __( 'Excluded tables:', 'boldgrid-backup' ),
+		'v' => implode( ', ', $excluded_tables ),
+	);
+
+	$tests[] = array(
+		'k' => __( 'Will the database be omitted?', 'boldgrid-backup' ),
+		'v' => $this->db_omit->is_omit_all() ? $lang['yes'] : $lang['no'],
+	);
 }
 
 // If server is not compatible, create fail message.
