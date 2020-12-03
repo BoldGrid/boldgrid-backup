@@ -349,6 +349,7 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	 * @since 1.5.1
 	 */
 	public function backup() {
-		$archive_info = $this->core->archive_files( true );
+		$archiver = new Boldgrid_Backup_Archiver();
+		$archiver->run();
 	}
 }

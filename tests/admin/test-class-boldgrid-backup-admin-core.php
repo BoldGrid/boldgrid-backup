@@ -275,7 +275,10 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 		$views = $this->core->db_get->get_by_type( 'VIEW' );
 		$this->assertTrue( 1 === count( $views ) );
 
-		$this->info = $this->core->archive_files( true );
+		$archiver = new Boldgrid_Backup_Archiver();
+		$archiver->run();
+
+		$this->info = $archiver->get_info();
 
 		// Ensure a backup was made and we have a filepath.
 		$this->assertTrue( ! empty( $this->info['filepath'] ) );
@@ -308,7 +311,10 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 
 		// Create a backup if don't already have one.
 		if ( empty( $this->info ) ) {
-			$this->info = $this->core->archive_files( true );
+			$archiver = new Boldgrid_Backup_Archiver();
+			$archiver->run();
+
+			$this->info = $archiver->get_info();
 		}
 
 		$this->deleteBasic( 'delete' );
@@ -335,7 +341,10 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 		$this->createWpconfig();
 
 		if ( empty( $this->info ) ) {
-			$this->info = $this->core->archive_files( true );
+			$archiver = new Boldgrid_Backup_Archiver();
+			$archiver->run();
+
+			$this->info = $archiver->get_info();
 		}
 
 		$this->deleteBasic( 'delete' );
