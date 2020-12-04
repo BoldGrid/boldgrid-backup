@@ -221,6 +221,13 @@ BoldGrid.FolderExclude = function( $ ) {
 	 * @todo Possibly move this toward a template system. For now, it works.
 	 *
 	 * @param int page The page of results to render.
+	 *                 The way this method was initially written, you could pass in a page number or
+	 *                 leave it blank to show the first page. PLEASE NOTE however that this method was
+	 *                 also added onload via --- $filter.on( 'keyup', self.renderList ); --- meaning
+	 *                 that "page" could also be an event. We can use this to our advantage because on
+	 *                 the settings page the filelist filter is shown BOTH within the settings AND when
+	 *                 the user clicks "Backup Site Now", and if this method is sent an event, then
+	 *                 we can pinpoint which item specfically is being interacted with.
 	 */
 	self.renderList = function( page ) {
 		var startKey,
@@ -229,9 +236,20 @@ BoldGrid.FolderExclude = function( $ ) {
 			lastAvailableKey = exclusionList.length - 1,
 			markup = '',
 			x,
-			filterVal = $filter.val(),
+			filterVal,
 			filteredNoResults,
-			file;
+			file,
+			// See docblock definition of "page" var to know more about checking if this is an event.
+			isEvent = 'object' === typeof page && page.target !== undefined;
+
+		/*
+		 * The filelist preview can be filtered by typing in a search string. If this is an event, the
+		 * user is typing in text to use as a filter.
+		 *
+		 * @todo this is still buggy on the settings page, but this will do for now. Please see the
+		 * "page" var's docblock for more info.
+		 */
+		filterVal = isEvent ? $( page.target ).val() : $filter.val();
 
 		page = isNaN( page ) ? 1 : page;
 
