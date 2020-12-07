@@ -48,10 +48,14 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 			$mineCountHelp.bgbuDrawAttention();
 		} );
 
+		/*
+		 * When importing an archive via url, it can be done by (1) clicking the submit button, or by
+		 * (2) having your mouse in the input box and pressing enter. This handles the latter.
+		 */
 		$urlImportSection
 			.find( 'input' )
 			.first()
-			.keypress( function( e ) {
+			.on( 'keypress', function( e ) {
 				if ( 13 === e.which ) {
 					self.urlUpload( e );
 				}
@@ -200,9 +204,13 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 	 */
 	self.urlUpload = function( e ) {
 		var jqxhr,
-			$this = $( this ),
+			/*
+			 * Get the target / $this. It will be a "click" if user clicked submit, and an "event" if
+			 * the user's mouse is in the text input and they hit enter.
+			 */
+			$this = 'object' === typeof e && e.type !== undefined && 'click' === e.type ? $( this ) : $( e.target ),
 			$spinner = $this.next(),
-			$notice = $( this )
+			$notice = $this
 				.parent()
 				.find( 'div#url-import-notice' ),
 			wpnonce = $( this )
