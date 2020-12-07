@@ -80,16 +80,6 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 			} );
 		},
 
-		_onInputChange: function( toggle, input ) {
-			toggle.change( function() {
-				if ( true == $this.prop( 'checked' ) ) {
-					input.val( '1' );
-				} else {
-					input.val( '0' );
-				}
-			} );
-		},
-
 		/**
 		 * Set inputs for toggles.
 		 *
@@ -118,7 +108,6 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 					.next( 'input' )
 					.attr( 'name', 'auto_update[wpcore][' + $this.data( 'wpcore' ) + ']' )
 					.val( $this.data( 'toggles' ).active ? 1 : 0 );
-				self._onInputChange( $this, $thisInput );
 			} );
 
 			$pluginToggles.each( function() {
@@ -128,7 +117,6 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 					.next( 'input' )
 					.attr( 'name', 'auto_update[plugins][' + $this.data( 'plugin' ) + ']' )
 					.val( $this.data( 'toggles' ).active ? 1 : 0 );
-				self._onInputChange( $this, $thisInput );
 			} );
 
 			$themeToggles.each( function() {
@@ -138,7 +126,6 @@ BOLDGRID.SETTINGS = BOLDGRID.SETTINGS || {};
 					.next( 'input' )
 					.attr( 'name', 'auto_update[themes][' + $this.data( 'stylesheet' ) + ']' )
 					.val( $this.data( 'toggles' ).active ? 1 : 0 );
-				self._onInputChange( $this, $thisInput );
 			} );
 
 			$pluginsDefault.next( 'input' ).val( $pluginsDefault.data( 'toggles' ).active ? 1 : 0 );
