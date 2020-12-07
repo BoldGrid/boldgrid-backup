@@ -204,15 +204,15 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 	 */
 	self.urlUpload = function( e ) {
 		var jqxhr,
+
 			/*
 			 * Get the target / $this. It will be a "click" if user clicked submit, and an "event" if
 			 * the user's mouse is in the text input and they hit enter.
 			 */
-			$this = 'object' === typeof e && e.type !== undefined && 'click' === e.type ? $( this ) : $( e.target ),
+			$this =
+				'object' === typeof e && e.type !== undefined && 'click' === e.type ? $( this ) : $( e.target ),
 			$spinner = $this.next(),
-			$notice = $this
-				.parent()
-				.find( 'div#url-import-notice' ),
+			$notice = $this.parent().find( 'div#url-import-notice' ),
 			wpnonce = $( this )
 				.parent()
 				.find( 'input#_wpnonce' )
