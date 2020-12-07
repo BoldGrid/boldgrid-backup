@@ -322,7 +322,7 @@ BoldGrid.Settings = function( $ ) {
 		self.toggleSiteCheck();
 		$body.on( 'click', $siteCheck, self.toggleSiteCheck );
 
-		$( 'select[name="compressor"]' ).change( self.toggleCompressionInfo );
+		$( 'select[name="compressor"]' ).on( 'change', self.toggleCompressionInfo );
 	} );
 };
 
