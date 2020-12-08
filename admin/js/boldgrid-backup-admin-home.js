@@ -283,14 +283,14 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 					.addClass( 'notice-error' )
 					.html( response.data.error );
 
-				$this.removeAttr( 'disabled' );
+				$this.prop( 'disabled', false );
 			} else {
 				$notice
 					.removeClass( 'notice-success' )
 					.addClass( 'notice-error' )
 					.html( lang.unknownError );
 
-				$this.removeAttr( 'disabled' );
+				$this.prop( 'disabled', false );
 			}
 		} )
 			.error( function() {
@@ -299,7 +299,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 					.addClass( 'notice-error' )
 					.html( lang.ajaxError + jqxhr.status + ' (' + jqxhr.statusText + ')' );
 
-				$this.removeAttr( 'disabled' );
+				$this.prop( 'disabled', false );
 			} )
 			.always( function() {
 				$notice.wrapInner( '<p></p>' ).show();
