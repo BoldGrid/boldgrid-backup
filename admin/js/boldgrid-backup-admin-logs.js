@@ -73,7 +73,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 
 			$.post( ajaxurl, data, function( response ) {
 				$( '#TB_ajaxContent' ).html( response.data );
-			} ).error( function( jqXHR ) {
+			} ).fail( function( jqXHR ) {
 
 				/*
 				 * @todo This error message could use some work. For 500 errors, WordPress will return
