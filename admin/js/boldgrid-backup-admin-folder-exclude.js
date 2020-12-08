@@ -171,7 +171,7 @@ BoldGrid.FolderExclude = function( $ ) {
 	 * @summary Process any key downs.
 	 *
 	 * The preview area's pagination has in input box where you can specify a
-	 * page to jump to. When you enter a number and hit enter, it the browser is
+	 * page to jump to. When you enter a number and hit enter, the browser is
 	 * actually clicking the preview button (which we don't want it to do). This
 	 * seems like a stange approach to take, but what we're doing in this
 	 * function is listening to all key downs on the page. If you're not in the
@@ -181,10 +181,12 @@ BoldGrid.FolderExclude = function( $ ) {
 	 * @since 1.6.0
 	 */
 	self.onKeyDown = function( e ) {
-		var isCurrentPage = $( e.target ).hasClass( 'current-page' );
+		var isCurrentPage = $( e.target ).hasClass( 'current-page' ),
+			page;
 
 		if ( isCurrentPage && 13 === e.keyCode ) {
-			self.onSubmitPagination();
+			page = $( e.target ).val();
+			self.onSubmitPagination( page );
 			e.preventDefault();
 			return false;
 		}
@@ -196,9 +198,11 @@ BoldGrid.FolderExclude = function( $ ) {
 	 * @summary Handle pagination.
 	 *
 	 * @since 1.6.0
+	 *
+	 * @param int page The page of results to render.
 	 */
-	self.onSubmitPagination = function() {
-		var page = parseInt( $excludeFoldersPreview.find( '.current-page' ).val() ),
+	self.onSubmitPagination = function( page ) {
+		var page = parseInt( page ),
 			totalPages = parseInt( $container.find( '.total-pages' ).html() );
 
 		page = 1 > page || page > totalPages ? 1 : page;
@@ -323,15 +327,15 @@ BoldGrid.FolderExclude = function( $ ) {
 			'<span class="pagination-links">';
 
 		if ( 1 >= page ) {
-			markup += '<span class="tablenav-pages-navspan">«</span> ';
+			markup += '<span class="tablenav-pages-navspan button disabled">«</span> ';
 		} else {
-			markup += '<a class="first" href="#"><span>«</span></a> ';
+			markup += '<a class="first button" href="#"><span>«</span></a> ';
 		}
 
 		if ( 1 >= page ) {
-			markup += '<span class="tablenav-pages-navspan">‹</span> ';
+			markup += '<span class="tablenav-pages-navspan button disabled">‹</span> ';
 		} else {
-			markup += '<a class="prev" href="#"><span>‹</span></a> ';
+			markup += '<a class="prev button" href="#"><span>‹</span></a> ';
 		}
 
 		markup +=
@@ -347,15 +351,15 @@ BoldGrid.FolderExclude = function( $ ) {
 			'</span> ';
 
 		if ( page < totalPages ) {
-			markup += '<a class="next" href="#"><span>›</span></a> ';
+			markup += '<a class="next button" href="#"><span>›</span></a> ';
 		} else {
-			markup += '<span class="tablenav-pages-navspan">›</span> ';
+			markup += '<span class="tablenav-pages-navspan button disabled">›</span> ';
 		}
 
 		if ( page < totalPages ) {
-			markup += '<a class="last" href="#"><span>»</span></a> ';
+			markup += '<a class="last button" href="#"><span>»</span></a> ';
 		} else {
-			markup += '<span class="tablenav-pages-navspan">»</span> ';
+			markup += '<span class="tablenav-pages-navspan button disabled">»</span> ';
 		}
 
 		markup += '</span>';
