@@ -161,6 +161,7 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-restore-git.php';
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-filelist.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-filelist-analyzer.php';
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-compressor.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-compressors.php';
@@ -303,6 +304,8 @@ class Boldgrid_Backup {
 		// Orphaned files.
 		require_once BOLDGRID_BACKUP_PATH . '/admin/orphan/class-finder.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/orphan/class-cleanup.php';
+
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-environment.php';
 
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
@@ -530,10 +533,13 @@ class Boldgrid_Backup {
 
 		$this->loader->add_filter( 'Boldgrid\Library\Notifications\DashboardWidget\getFeaturePlugin\boldgrid-backup', $plugin_admin_core->dashboard_widget, 'filter_feature', 10, 2 );
 
+		// Auto Update Actions & Filters.
 		$this->loader->add_action( 'admin_init', $plugin_admin_core->auto_updates, 'auto_update_core' );
 		$this->loader->add_action( 'wp_maybe_auto_update', $plugin_admin_core->auto_updates, 'auto_update_core' );
 		$this->loader->add_filter( 'auto_update_plugin', $plugin_admin_core->auto_updates, 'auto_update_plugins', 10, 2 );
 		$this->loader->add_filter( 'auto_update_theme', $plugin_admin_core->auto_updates, 'auto_update_themes', 10, 2 );
+		$this->loader->add_action( 'update_option_auto_update_plugins', $plugin_admin_core->auto_updates, 'wordpress_option_updated', 10, 3 );
+		$this->loader->add_action( 'update_option_auto_update_themes', $plugin_admin_core->auto_updates, 'wordpress_option_updated', 10, 3 );
 
 		// This plugin's Dashboard.
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core->dashboard, 'admin_enqueue_scripts' );

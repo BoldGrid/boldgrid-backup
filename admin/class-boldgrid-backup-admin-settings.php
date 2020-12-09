@@ -256,20 +256,89 @@ class Boldgrid_Backup_Admin_Settings {
 		$settings['encrypt_db'] = isset( $settings['encrypt_db'] ) ? (bool) $settings['encrypt_db'] : false;
 
 		// Auto Updates.
-		if ( empty( $settings['auto_update'] ) ) {
-			$settings['auto_update'] = array(
-				'days'    => 0,
-				'plugins' => array(
-					'default' => false,
-				),
-				'themes'  => array(
-					'default' => false,
-				),
-			);
-		}
+		$settings['auto_update'] = $this->set_update_settings( $settings );
 
 		// Return the settings array.
 		return $settings;
+	}
+
+	/**
+	 * Get the Auto Update Settings.
+	 *
+	 * With the new changes of wp5.5, there are new changes to the auto update settings.
+	 * Moving this to it's own method allows us to isolate that logic from the get_settings() method
+	 * and ensure that the Auto Update Settings retrieved are accurate.
+	 *
+	 * @since 1.14.3
+	 *
+	 * @param  array  $settings The Settings array.
+	 * @global string $wp_version The current version of WordPress.
+	 *
+	 * @return array
+	 */
+	public function set_update_settings( $settings ) {
+		global $wp_version;
+
+		// If the 'auto_update' settings are not set, add default values, otherwise use values from $settings array..
+		if ( empty( $settings['auto_update'] ) ) {
+			// The value for 'default' was changed from false, to '0' for data type consistency.
+			$auto_update_settings = array(
+				'days'    => 0,
+				'plugins' => array(
+					'default' => '0',
+				),
+				'themes'  => array(
+					'default' => '0',
+				),
+			);
+		} else {
+			$auto_update_settings = $settings['auto_update'];
+		}
+
+		return $auto_update_settings;
+	}
+
+	/**
+	 * Updates the WordPress auto_update options.
+	 *
+	 * This is somewhat the opposite of set_update_settings. This is used as necessary
+	 * to update the new options added to WP5.5, auto_update_plugins and auto_update_themes
+	 * to make sure that all the settings play nicely together. Anytime we change the update settings
+	 * in Total Upkeep, This should run once for themes, and once for plugins to make sure that
+	 * the WordPress Options are kept up to date.
+	 *
+	 * @since 1.4.3
+	 * @global string $wp_version WordPress Version Number.
+	 *
+	 * @param array $new_settings New settings.
+	 * @param bool  $is_theme     Whether or not the settings being updated are for a theme.
+	 */
+	public function update_autoupdate_options( $new_settings, $is_theme = false ) {
+		global $wp_version;
+		// If version is wp_version is greater than 5.4.99 then it must be 5.5.
+		if ( version_compare( $wp_version, '5.4.99', 'gt' ) ) {
+			// Depending on whether this is being run for themes or plugins, get the correct option table.
+			$auto_update_field = get_option( $is_theme ? 'auto_update_themes' : 'auto_update_plugins', array() );
+			// For each offer ( theme or plugin ) passed to this function.
+			foreach ( $new_settings[ $is_theme ? 'themes' : 'plugins' ] as $offer => $enabled ) {
+				$offer_in_option = array_search( $offer, $auto_update_field, true );
+				if ( '1' === $enabled && false === $offer_in_option ) {
+					/*
+					* If auto updates for the plugin / theme are enabled in our settings, but not enabled in
+					* wp option, enable it in the wp option.
+					*/
+					$auto_update_field[] = $offer;
+				} elseif ( '0' === $enabled && false !== $offer_in_option ) {
+					/*
+					 * If auto updates for the plugin / theme are disabled in our settings, but not disabled in
+					 * the wp option, disable it in the wp option.
+					 */
+					unset( $auto_update_field[ $offer_in_option ] );
+				}
+			}
+			// Update the WordPress option with the settings passed to this function.
+			update_option( $is_theme ? 'auto_update_themes' : 'auto_update_plugins', $auto_update_field );
+		}
 	}
 
 	/**
@@ -623,6 +692,13 @@ class Boldgrid_Backup_Admin_Settings {
 			}
 
 			/*
+			 * Save "backup filelist analysis" setting.
+			 *
+			 * @since SINCEVERSION
+			 */
+			$settings['filelist_analysis'] = ! empty( $_POST['filelist_analysis'] ) ? 1 : 0;
+
+			/*
 			 * Save Compression Level Settings.
 			 *
 			 * @since 1.14.0
@@ -723,13 +799,26 @@ class Boldgrid_Backup_Admin_Settings {
 			$settings['folder_exclusion_type']    = $this->core->folder_exclusion->from_post( 'type' );
 
 			/*
-			 * Save Auto Backup options
+			 * Save Auto Update options.
+			 *
+			 * As of WP5.5 , a new UI for auto updates ws added.
+			 * Therefore we have to make sure the 'auto_update_plugins' and
+			 * 'auto_update_themes' option tables are also updated.
 			 *
 			 * @since 1.14.0
 			 */
 			if ( ! empty( $_POST['auto_update'] ) ) {
 				$settings['auto_update'] = $this->validate_auto_update( $_POST['auto_update'] );
-				$update_error            = $settings['auto_update'] ? $update_error : true;
+				// As of WordPress 5.5 we also have to update the option in the WordPress auto update option as well.
+				if ( isset( $_POST['auto_update']['plugins'] ) ) {
+					$this->update_autoupdate_options( $_POST['auto_update'] );
+				}
+
+				// This updates the options field for themes as well.
+				if ( isset( $_POST['auto_update']['themes'] ) ) {
+					$this->update_autoupdate_options( $_POST['auto_update'], true );
+				}
+				$update_error = $settings['auto_update'] ? $update_error : true;
 			}
 
 			// Read BoldGrid settings form POST request, sanitize, and merge settings with saved.

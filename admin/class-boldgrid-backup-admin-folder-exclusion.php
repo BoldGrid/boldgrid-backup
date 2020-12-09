@@ -151,6 +151,10 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 			return false;
 		}
 
+		if ( $this->is_banned( $file ) ) {
+			return false;
+		}
+
 		// Get comma-delimited lists from user input or settings.  Sanitizing is done below.
 		$include = $this->in_ajax_preview ? $_POST['include'] : $this->from_settings( 'include' );
 		$exclude = $this->in_ajax_preview ? $_POST['exclude'] : $this->from_settings( 'exclude' );
@@ -388,6 +392,25 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 		}
 
 		return $this->$type;
+	}
+
+	/**
+	 * Whether or not a file is banned.
+	 *
+	 * Some files are just bad for business. Files in this list won't be backed up, and the user has
+	 * no control at this time to modify. Only files we're certain should be banned, should be.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param string $file A filepath. Not absolute, but relative to ABSPATH, such as wp-admin/css/about.css
+	 *
+	 * @return bool
+	 */
+	public function is_banned( $filepath ) {
+		$banned = Boldgrid_Backup_Admin::get_configs()['banned'];
+
+		// @todo Allow for regular expressions in the future.
+		return in_array( basename( $filepath ), $banned, true );
 	}
 
 	/**

@@ -1160,8 +1160,18 @@ class Boldgrid_Backup_Admin_Core {
 		 * database.
 		 */
 		if ( $this->db_omit->is_omit_all() ) {
+			$this->logger->add( 'No database tables selected to backup. A database export will not be in this backup.' );
 			return true;
 		}
+
+		/*
+		 * Log generic info about database.
+		 *
+		 * Before we begin to backup the database, let's log how big it is. While troubleshooting, it
+		 * will be helpful to know how many tables we're seeing that COULD be backed up, as well as
+		 * how large they are.
+		 */
+		$this->logger->add( 'Database info: ' . print_r( $this->db_get->prefixed_count(), 1 ) ); // phpcs:ignore
 
 		// Check if functional.
 		if ( ! $this->test->run_functionality_tests() ) {
@@ -1584,7 +1594,8 @@ class Boldgrid_Backup_Admin_Core {
 	public function archive_files( $save = false, $dryrun = false ) {
 		$this->archiving_files = true;
 
-		$this->logger->init( 'archive-' . time() . '.log' );
+		$log_time = time();
+		$this->logger->init( 'archive-' . $log_time . '.log' );
 		$this->logger->add( 'Backup process initialized.' );
 
 		$this->utility->bump_memory_limit( '1G' );
@@ -1624,6 +1635,7 @@ class Boldgrid_Backup_Admin_Core {
 		if ( $this->is_scheduled_backup && ! $this->remote->any_enabled() ) {
 			$error = esc_html__( 'No backup locations selected! While we could create a backup archive, you have not selected where the backup archive should be saved. Please choose a storage location in your settings for where to save this backup archive.', 'boldgrid-backup' );
 			$this->archive_fail->schedule_fail_email( $error );
+			$this->logger->add( $error );
 			return [ 'error' => $error ];
 		}
 
@@ -1634,8 +1646,9 @@ class Boldgrid_Backup_Admin_Core {
 				// Display an error notice.
 				$this->notice->functionality_fail_notice();
 			}
-
-			return [ 'error' => 'Functionality tests fail.' ];
+			$error = __( 'Functionality tests fail.', 'boldgrid-backup' );
+			$this->logger->add( $error );
+			return [ 'error' => $error ];
 		}
 
 		// Close any PHP session, so that another session can open during the backup operation.
@@ -1713,6 +1726,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Backup the database, if saving an archive file and not a dry run.
 		if ( $save && ! $dryrun ) {
+			$this->logger->add_separator();
 			$this->logger->add( 'Starting dump of database...' );
 			$this->logger->add_memory();
 
@@ -1720,12 +1734,12 @@ class Boldgrid_Backup_Admin_Core {
 
 			$this->logger->add( 'Dump of database complete! $status = ' . print_r( $status, 1 ) ); // phpcs:ignore
 			$this->logger->add_memory();
+			$this->logger->add_separator();
 
 			if ( false === $status || ! empty( $status['error'] ) ) {
-				return [
-					'error' => ! empty( $status['error'] ) ? $status['error'] :
-						__( 'An unknown error occurred when backing up the database.', 'boldgrid-backup' ),
-				];
+				$error = ! empty( $status['error'] ) ? $status['error'] : __( 'An unknown error occurred when backing up the database.', 'boldgrid-backup' );
+				$this->logger->add( $error );
+				return array( 'error' => $error );
 			}
 		}
 
@@ -1753,6 +1767,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Check if the backup directory is writable.
 		if ( ! $this->wp_filesystem->is_writable( $backup_directory ) ) {
+			$this->logger->add( 'Backup directory is not writable.' );
 			return false;
 		}
 
@@ -1805,6 +1820,18 @@ class Boldgrid_Backup_Admin_Core {
 				'compressor'       => $info['compressor'],
 			]
 		);
+
+		if ( Boldgrid_Backup_Admin_Filelist_Analyzer::is_enabled() ) {
+			$this->logger->add_separator();
+			$this->logger->add( 'Starting to analyze filelist...' );
+			$this->logger->add_memory();
+
+			$filelist_analyzer = new Boldgrid_Backup_Admin_Filelist_Analyzer( $filelist, $log_time );
+			$filelist_analyzer->run();
+
+			$this->logger->add( 'Finished analyzing filelist!' );
+			$this->logger->add_memory();
+		}
 
 		/*
 		 * Use the chosen compressor to build an archive.
@@ -1872,6 +1899,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		if ( ! empty( $status['error'] ) ) {
+			$this->logger->add( $status['error'] );
 			return $status;
 		}
 
@@ -3013,7 +3041,6 @@ class Boldgrid_Backup_Admin_Core {
 	public function boldgrid_backup_now_auto( $type ) {
 		// Get backup settings.
 		$settings = $this->settings->get_settings();
-
 		// Abort if auto-backup is not enabled.
 		if ( empty( $settings['auto_backup'] ) ) {
 			return;

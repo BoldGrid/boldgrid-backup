@@ -78,7 +78,7 @@ BoldGrid.ArchiveDetails = function( $ ) {
 			data = {
 				action: 'boldgrid_backup_remote_storage_download_' + provider,
 				filename: $( '#filename' ).val(),
-				security: $( '#_wpnonce' ).val()
+				security: $( '#bgbkup_archive_details_nonce' ).val()
 			},
 			$spinner = $button.next( '.spinner' ),
 			$wpbody = $body.find( '#wpbody' );
@@ -161,7 +161,7 @@ BoldGrid.ArchiveDetails = function( $ ) {
 			data = {
 				action: 'boldgrid_backup_update_archive_details',
 				filename: $( '#filename' ).val(),
-				security: $( '#_wpnonce' ).val(),
+				security: $( '#bgbkup_archive_details_nonce' ).val(),
 				attributes: {
 					title: $( 'input#title' ).val(),
 					description: $( 'textarea#backup-description' ).val(),

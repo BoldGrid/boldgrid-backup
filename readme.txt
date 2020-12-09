@@ -1,10 +1,10 @@
 === Total Upkeep – WordPress Backup Plugin plus Restore & Migrate by BoldGrid ===
-Contributors: boldgrid, joemoto, imh_brad, rramo012, bgnicolepaschen
+Contributors: boldgrid, joemoto, imh_brad, rramo012, bgnicolepaschen, jamesros161
 Tags: backup, cloud backup, database backup, restore, wordpress backup
 Requires at least: 4.4
-Tested up to: 5.4
+Tested up to: 5.6
 Requires PHP: 5.4
-Stable tag: 1.14.2
+Stable tag: 1.14.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -131,6 +131,58 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 1. Activate the plugin through the Plugins menu in WordPress.
 
 == Changelog ==
+
+= 1.14.9 =
+
+Release date: December 8th, 2020
+
+* Bug fix: Fixed reset link for backup all tables.
+* Bug fix: Fixed pagination buttons for file exclusion tool.
+* Bug fix: Fixed several html escaping issues.
+* Bug fix: Fixed file exclusion preview filter input.
+* Bug fix: Fixed various jqmigrate warnings.
+
+= 1.14.8 =
+
+Release date: November 13th, 2020
+
+* Update: Rebuild with composer 1.
+
+= 1.14.7 =
+
+Release date: November 12th, 2020
+
+* Update: Prevent easy apache cache files in backups.
+* Bug fix: Fixed nonce errors when downloading remote archives.
+
+= 1.14.6 =
+
+Release date: October 13th, 2020
+
+* Update: Updated dependencies.
+* Update: Added additional logged and filesystem analysis log.
+* Bug fix: Fixed ftp bug.
+
+= 1.14.5 =
+
+Release date: September 22nd, 2020
+
+* Update: Optimized functionality tests.
+* Update: Optimized plugins and themes init in auto updates.
+
+= 1.14.4 =
+
+Release date: August 26th, 2020
+
+* Bug fix: Invalid nonce when one click uploading to remote storage providers.
+* Bug fix: Escaping / translation of "Remote Storage" help text on Archive Details page.
+* Update: Allow auto update notice on updates page to be permanently dismissible.
+
+= 1.14.3 =
+
+Release date: August 12th, 2020
+
+* Update: Updated Auto Update features to utilize the WordPress 5.5+ Auto Update UI.
 
 = 1.14.2 =
 

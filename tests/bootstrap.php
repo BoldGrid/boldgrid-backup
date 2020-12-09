@@ -55,6 +55,7 @@ $files = array(
 	'/admin/class-boldgrid-backup-admin-restore-helper.php',
 	'/admin/class-boldgrid-backup-admin-restore-git.php',
 	'/admin/class-boldgrid-backup-admin-filelist.php',
+	'/admin/class-boldgrid-backup-admin-filelist-analyzer.php',
 	'/admin/class-boldgrid-backup-admin-backup-dir.php',
 	'/admin/class-boldgrid-backup-admin-home-dir.php',
 	'/admin/class-boldgrid-backup-admin-compressors.php',
@@ -96,6 +97,7 @@ $files = array(
 	'/admin/class-boldgrid-backup-admin-compressor.php',
 	'/admin/class-boldgrid-backup-admin-log.php',
 	'/admin/class-boldgrid-backup-admin-log-page.php',
+	'/admin/class-boldgrid-backup-admin-environment.php',
 	// Compressors.
 	'/admin/compressor/class-boldgrid-backup-admin-compressor-php-zip.php',
 	'/admin/compressor/class-boldgrid-backup-admin-compressor-pcl-zip.php',
