@@ -21,7 +21,7 @@ defined( 'WPINC' ) || die;
 $logs_dir = $this->core->backup_dir->get_logs_dir();
 $list     = $this->core->wp_filesystem->dirlist( $logs_dir );
 uasort( $list, function( $a, $b ) {
-	return $a['lastmodunix'] > $b['lastmodunix'];
+	return $a['lastmodunix'] > $b['lastmodunix'] ? 1 : -1;
 });
 
 ob_start();
