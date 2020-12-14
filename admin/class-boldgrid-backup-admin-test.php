@@ -554,8 +554,23 @@ class Boldgrid_Backup_Admin_Test {
 
 		$available_compressors = $this->core->config->get_available_compressors();
 		$compressor            = $this->core->compressors->get();
+		$execution_functions   = Boldgrid_Backup_Admin_Cli::get_execution_functions();
 
-		if ( ! self::is_filesystem_supported() ) {
+		if ( empty( $execution_functions ) ) {
+			/*
+			 * The first test is to determine if we have any execution functions available. Some of
+			 * the other tests may require them. Before this test was added, a variety of warnings would
+			 * appear due to trying to run commands such as the following:
+			 *
+			 * # echo "This file is safe to delete." > /home/user/boldgrid_backup/safe-to-delete.txt 2>/dev/null
+			 * # crontab -l 2>/dev/null
+			 * # crontab /home/user/boldgrid_backup/crontab.1607956270.549.tmp 2>/dev/null
+			 *
+			 * Technically, we may be able to be fully functional without being able to execute commands,
+			 * but for the moment, let's say we're not funtional. Only two reports of this ever.
+			 */
+			$this->is_functional = false;
+		} elseif ( ! self::is_filesystem_supported() ) {
 			$this->is_functional = false;
 		} elseif ( ! $this->get_is_abspath_writable() ) {
 			$this->is_functional = false;
