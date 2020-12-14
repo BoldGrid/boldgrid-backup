@@ -89,7 +89,8 @@ class Info {
 		// If we don't have a secret, make one.
 		if ( empty( $secret ) ) {
 			$secret = md5( self::get_random_string( 100 ) );
-			touch( __DIR__ . '/verify-' . $secret . '.php' );
+			$filepath = __DIR__ . '/verify-' . $secret . '.php';
+			file_put_contents( $filepath, '<?php // phpcs:disable' );
 		}
 
 		return $secret;
