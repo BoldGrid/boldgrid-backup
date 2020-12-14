@@ -13,8 +13,10 @@
  * phpcs:disable WordPress.WP.AlternativeFunctions
  */
 
+require_once 'class-info.php';
+
 // Protect access to this script.
-if ( empty( $_REQUEST['secret'] ) || md5( get_current_user() . getmyuid() ) !== $_REQUEST['secret'] ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+if ( empty( $_REQUEST['secret'] ) || \Boldgrid\Backup\Cli\Info::get_secret() !== $_REQUEST['secret'] ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 	header( 'HTTP/1.1 403 Unauthorized' );
 	exit;
 }

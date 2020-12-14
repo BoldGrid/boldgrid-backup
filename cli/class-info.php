@@ -55,10 +55,44 @@ class Info {
 	 */
 	public static function get_results_filepath() {
 		if ( null === self::$results_file_path ) {
-			self::$results_file_path = dirname( __DIR__ ) . '/cron/restore-info.json';
+			self::$results_file_path = dirname( __DIR__ ) . '/cron/restore-info-' . self::get_secret() . '.json';
 		}
 
 		return self::$results_file_path;
+	}
+
+	/**
+	 * Get secret.
+	 *
+	 * Used to secure scripts used outside of WordPress.
+	 *
+	 * @since 1.14.10
+	 *
+	 * @return string
+	 */
+	public static function get_secret() {
+		$secret = null;
+
+		// First, attempt to get our secret.
+		$files   = scandir( __DIR__ );
+		$pattern = '/^verify-[0-9a-f]{32}\.php/i';
+		$matches = preg_grep( $pattern, $files );
+		if ( ! empty( $matches ) ) {
+			$matches = array_values( $matches );
+			preg_match( '/^verify-(.*).php/', $matches[0], $match );
+
+			if ( ! empty( $match[1] ) ) {
+				$secret = $match[1];
+			}
+		}
+
+		// If we don't have a secret, make one.
+		if ( empty( $secret ) ) {
+			$secret = md5( self::get_random_string( 100 ) );
+			touch( __DIR__ . '/verify-' . $secret . '.php' );
+		}
+
+		return $secret;
 	}
 
 	/**
@@ -368,6 +402,26 @@ class Info {
 	}
 
 	/**
+	 * Generate a random string.
+	 *
+	 * @since 1.14.10
+	 *
+	 * @param int $length Length of random string.
+	 * @return string Random string.
+	 */
+	public static function get_random_string( $length ) {
+		$characters    = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		$strlen        = strlen( $characters );
+		$random_string = '';
+
+		for ( $i = 0; $i < $length; $i++ ) {
+			$random_string .= $characters[ rand( 0, $strlen - 1 ) ];
+		}
+
+		return $random_string;
+	}
+
+	/**
 	 * Get the notification email address spcified in CLI arguments.
 	 *
 	 * This method triggers reading the CLI arguments and appends to the self:$info array.
@@ -515,7 +569,7 @@ class Info {
 		if ( empty( self::$info['env'] ) ) {
 			require_once dirname( __DIR__ ) . '/cron/class-boldgrid-backup-url-helper.php';
 			$url_helper        = new \Boldgrid_Backup_Url_Helper();
-			$url               = self::$info['siteurl'] . '/wp-content/plugins/boldgrid-backup/cli/env-info.php?secret=' . md5( get_current_user() . getmyuid() );
+			$url               = self::$info['siteurl'] . '/wp-content/plugins/boldgrid-backup/cli/env-info.php?secret=' . self::get_secret();
 			self::$info['env'] = json_decode( $url_helper->call_url( $url ), true );
 		}
 
