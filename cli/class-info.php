@@ -75,7 +75,7 @@ class Info {
 
 		// First, attempt to get our secret.
 		$files   = scandir( __DIR__ );
-		$pattern = '/^verify-[0-9a-f]{32}\.php/i';
+		$pattern = '/^verify-[0-9a-f]{32}\.php/';
 		$matches = preg_grep( $pattern, $files );
 		if ( ! empty( $matches ) ) {
 			$matches = array_values( $matches );
@@ -88,7 +88,7 @@ class Info {
 
 		// If we don't have a secret, make one.
 		if ( empty( $secret ) ) {
-			$secret = md5( self::get_random_string( 100 ) );
+			$secret = md5( openssl_random_pseudo_bytes( 32 ) );
 			$filepath = __DIR__ . '/verify-' . $secret . '.php';
 			file_put_contents( $filepath, '<?php // phpcs:disable' );
 		}
@@ -400,26 +400,6 @@ class Info {
 		}
 
 		return self::$info['notify'];
-	}
-
-	/**
-	 * Generate a random string.
-	 *
-	 * @since 1.14.10
-	 *
-	 * @param int $length Length of random string.
-	 * @return string Random string.
-	 */
-	public static function get_random_string( $length ) {
-		$characters    = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-		$strlen        = strlen( $characters );
-		$random_string = '';
-
-		for ( $i = 0; $i < $length; $i++ ) {
-			$random_string .= $characters[ rand( 0, $strlen - 1 ) ];
-		}
-
-		return $random_string;
 	}
 
 	/**
