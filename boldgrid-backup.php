@@ -147,3 +147,15 @@ if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) || defined( 'WP_CLI
 		run_boldgrid_backup();
 	}
 }
+
+/*
+ * Fix added as of 1.14.10.
+ *
+ * @todo This fix can be removed in the future.
+ */
+$oldname = BOLDGRID_BACKUP_PATH . '/cron/restore-info.json';
+if ( file_exists( $oldname ) ) {
+	require_once 'cli/class-info.php';
+	$newname = BOLDGRID_BACKUP_PATH . '/cron/' . basename( \Boldgrid\Backup\Cli\Info::get_results_filepath() );
+	rename( $oldname, $newname );
+}
