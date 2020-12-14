@@ -88,7 +88,7 @@ class Info {
 
 		// If we don't have a secret, make one.
 		if ( empty( $secret ) ) {
-			$secret = md5( openssl_random_pseudo_bytes( 32 ) );
+			$secret   = md5( openssl_random_pseudo_bytes( 32 ) );
 			$filepath = __DIR__ . '/verify-' . $secret . '.php';
 			file_put_contents( $filepath, '<?php // phpcs:disable' );
 		}
