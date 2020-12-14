@@ -73,10 +73,17 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 
 			$.post( ajaxurl, data, function( response ) {
 				$( '#TB_ajaxContent' ).html( response.data );
-			} ).error( function() {
-				$( '#TB_ajaxConent' ).html(
-					'<div class="notice notice-error"><p>' + unknownError + '<p></div>'
-				);
+			} ).fail( function( jqXHR ) {
+
+				/*
+				 * @todo This error message could use some work. For 500 errors, WordPress will return
+				 * "There has been a critical error on this website. Learn more about debugging in WordPress."
+				 * Show an "unknown error" and have the user contact BoldGrid for help rather than send
+				 * the user off learning about debugging.
+				 */
+				var error = jqXHR.status + ' ' + jqXHR.statusText + ': ' + self.i18n.unknownError;
+
+				$( '#TB_ajaxContent' ).html( '<div class="notice notice-error"><p>' + error + '</p></div>' );
 			} );
 		},
 

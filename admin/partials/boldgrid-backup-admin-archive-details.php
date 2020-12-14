@@ -39,9 +39,10 @@ wp_nonce_field( 'bgbkup_archive_details_page', 'bgbkup_archive_details_nonce' );
 $separator = '<hr class="separator">';
 
 $allowed_html = array(
-	'a' => array(
+	'a'      => array(
 		'href' => array(),
 	),
+	'strong' => array(),
 );
 
 $is_premium           = $this->core->config->get_is_premium();
@@ -364,9 +365,27 @@ $main_content = '
 			</h2>
 			<p class="help" data-id="download_and_restore">
 				<strong>' . esc_html__( 'Download to Local Machine', 'boldgrid-backup' ) . '</strong><br />
-				' . esc_html__( 'Backup archives generally should be stored in more locations than just your <strong>web server</strong>. Be sure to keep copies on your <strong>local machine</strong> and / or a <strong>remote storage</strong> provider. Learn more about these different locations <a href="admin.php?page=boldgrid-backup-tools&section=section_locations">here</a>.', 'boldgrid-backup' ) . '<br /><br />
+				' . wp_kses(
+					sprintf(
+						// translators: 1 the opening anchor tag linking to the locations page, 2 its closing anchor tag, 3 opening strong tag, 4 its closing strong tag.
+						__( 'Backup archives generally should be stored in more locations than just your %3$sweb server%4$s. Be sure to keep copies on your %3$slocal machine%4$s and / or a %3$sremote storage%4$s provider. Learn more about these different locations %1$shere%2$s.', 'boldgrid-backup' ),
+						'<a href="admin.php?page=boldgrid-backup-tools&section=section_locations">',
+						'</a>',
+						'<strong>',
+						'</strong>'
+					),
+					$allowed_html
+				) . '<br /><br />
 				<strong>' . esc_html__( 'Restore', 'boldgrid-backup' ) . '</strong><br />
-				' . esc_html__( 'Restore this backup. This will restore all the files and the database in this backup. Use the <strong>Backup Browser</strong> below to look at the backup archive and see what will be restored.', 'boldgrid-backup' ) . '<br /><br />
+				' . wp_kses(
+					sprintf(
+						// translators: 1 an opening strong tag, 2 its closing strong tag.
+						__( 'Restore this backup. This will restore all the files and the database in this backup. Use the %1$sBackup Browser%2$s below to look at the backup archive and see what will be restored.', 'boldgrid-backup' ),
+						'<strong>',
+						'</strong>'
+					),
+					$allowed_html
+				) . '<br /><br />
 				<strong>' . esc_html__( 'Download Link', 'boldgrid-backup' ) . '</strong><br />
 				' . esc_html__( 'A public link that is used to download a backup archive file.  You can use it to migrate your website to another WordPress installation.  Please keep download links private, as the download files contains sensitive data.', 'boldgrid-backup' ) . '
 			</p>
