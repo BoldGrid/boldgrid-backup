@@ -13,6 +13,12 @@
  * phpcs:disable WordPress.WP.AlternativeFunctions
  */
 
+// Protect access to this script.
+if ( empty( $_REQUEST['secret'] ) || md5( get_current_user() . getmyuid() ) !== $_REQUEST['secret'] ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+	header( 'HTTP/1.1 403 Unauthorized' );
+	exit;
+}
+
 echo json_encode( array(
 	'gateway_interface' => getenv( 'GATEWAY_INTERFACE' ),
 	'http_host'         => getenv( 'HTTP_HOST' ),

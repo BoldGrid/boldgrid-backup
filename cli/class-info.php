@@ -514,14 +514,9 @@ class Info {
 	public static function get_env_info() {
 		if ( empty( self::$info['env'] ) ) {
 			require_once dirname( __DIR__ ) . '/cron/class-boldgrid-backup-url-helper.php';
-			$url_helper = new \Boldgrid_Backup_Url_Helper();
-
-			self::$info['env'] = json_decode(
-				$url_helper->call_url(
-					self::$info['siteurl'] . '/wp-content/plugins/boldgrid-backup/cli/env-info.php'
-				),
-				true
-			);
+			$url_helper        = new \Boldgrid_Backup_Url_Helper();
+			$url               = self::$info['siteurl'] . '/wp-content/plugins/boldgrid-backup/cli/env-info.php?secret=' . md5( get_current_user() . getmyuid() );
+			self::$info['env'] = json_decode( $url_helper->call_url( $url ), true );
 		}
 
 		return self::$info['env'];
