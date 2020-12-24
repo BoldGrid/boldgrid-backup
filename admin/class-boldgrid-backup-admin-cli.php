@@ -109,7 +109,7 @@ class Boldgrid_Backup_Admin_Cli {
 						break 2;
 					}
 
-					break 2;
+					break;
 
 				case 'passthru':
 					// If output buffering is enabled, then use passthru.
@@ -127,10 +127,13 @@ class Boldgrid_Backup_Admin_Cli {
 						}
 					}
 
-					break 2;
+					break;
 
 				case 'popen':
 					$handle = popen( $command, 'r' );
+					if ( false === $handle ) {
+						break;
+					}
 
 					$output = fread( $handle, 4096 );
 
@@ -149,7 +152,7 @@ class Boldgrid_Backup_Admin_Cli {
 						}
 					}
 
-					break 2;
+					break;
 
 				case 'proc_open':
 					// Create the descriptor spec array.
@@ -195,7 +198,7 @@ class Boldgrid_Backup_Admin_Cli {
 						}
 					}
 
-					break 2;
+					break;
 
 				case 'shell_exec':
 					$output = shell_exec( $command );
@@ -206,7 +209,7 @@ class Boldgrid_Backup_Admin_Cli {
 						break 2;
 					}
 
-					break 2;
+					break;
 
 				case 'system':
 					// If output buffering is enabled, then use system.
@@ -224,7 +227,7 @@ class Boldgrid_Backup_Admin_Cli {
 						}
 					}
 
-					break 2;
+					break;
 
 				default:
 					break;

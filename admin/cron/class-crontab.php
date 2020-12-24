@@ -54,6 +54,8 @@ class Crontab {
 	 */
 	public function find_crons( array $patterns = [] ) {
 		$all_crons = $this->core->cron->get_all( false );
+		// Ensure we have an array. Failure to get crons could give us false.
+		$all_crons = empty( $all_crons ) ? array() : $all_crons;
 
 		$matched_crons = [];
 
