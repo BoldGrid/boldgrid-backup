@@ -324,6 +324,19 @@ class Boldgrid_Backup_Admin_Utility {
 	}
 
 	/**
+	 * Whether or not a string starts with another.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param string $string The string we're checking as a whole.
+	 * @param string $search The string we're checking to see if starts with.
+	 * @return bool
+	 */
+	public static function starts_with( $string, $search ) {
+		return substr( $string, 0, strlen( $search ) ) === $search;
+	}
+
+	/**
 	 * Increase the PHP max execution time.
 	 *
 	 * @since 1.2.2

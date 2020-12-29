@@ -53,31 +53,21 @@ class Boldgrid_Backup_Admin_Db_Dump {
 	public function dump( $file ) {
 		global $wpdb;
 
-		$include_tables = $this->core->db_omit->get_filtered_tables();
-		if ( empty( $include_tables ) ) {
+		$table_list = $this->get_table_list();
+
+		if ( empty( $table_list['tables'] ) && empty( $table_list['views'] ) ) {
 			return array( 'error' => esc_html__( 'No tables selected to backup.', 'boldgrid-backup' ) );
 		}
-
-		/*
-		 * Create separate arrays for the "tables" and "views" that we want to dump.
-		 *
-		 * When dumping our database, we need to send a separate list of tables to dump, and a separate
-		 * one for views to dump. $include_tables is an array possibly containing both tables and views,
-		 * so we'll split it up now.
-		 *
-		 * In the list below, it is important that $include_tables is processed last.
-		 */
-		$include_views = $this->core->db_get->filter_by_type( $include_tables, 'VIEW' );
-
-		$include_tables = $this->core->db_get->filter_by_type( $include_tables, 'BASE TABLE' );
 
 		Boldgrid_Backup_Admin_In_Progress_Data::set_args(
 			array(
 				'status' => __( 'Backing up database...', 'boldgrid-backup' ),
-				'tables' => $include_tables,
+				'tables' => $table_list['tables'],
 				'step'   => 1,
 			)
 		);
+
+		// BEGIN V2 COPY
 
 		/**
 		 * Take action before a database is dumped.
@@ -87,8 +77,8 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		do_action( 'boldgrid_backup_pre_dump', $file );
 
 		$settings = array(
-			'include-tables' => $include_tables,
-			'include-views'  => $include_views,
+			'include-tables' => $table_list['tables'],
+			'include-views'  => $table_list['views'],
 			'add-drop-table' => true,
 			'no-autocommit'  => false,
 		);
@@ -107,7 +97,7 @@ class Boldgrid_Backup_Admin_Db_Dump {
 			$settings['default-character-set'] = $wpdb->charset;
 		}
 
-		if ( ! empty( $include_views ) ) {
+		if ( ! empty( $table_list['views'] ) ) {
 			$db_import           = new Boldgrid_Backup_Admin_Db_Import();
 			$user_has_privileges = $db_import->has_db_privileges( array( 'SHOW VIEW' ) );
 			if ( false === $user_has_privileges ) {
@@ -138,6 +128,8 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		 * @since 1.6.0
 		 */
 		do_action( 'boldgrid_backup_post_dump', $file );
+
+		// END V2 COPY
 
 		return true;
 	}
@@ -205,6 +197,37 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		$connection_string .= 'dbname=' . $db_name;
 
 		return $connection_string;
+	}
+
+	/**
+	 * Get a list of tables and views we will backup.
+	 *
+	 * We may not backup all tables, so this is a selective list based on the user's settings.
+	 *
+	 * This code originally lived in self::dump, and has been moved here for reusability in v2.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @return array
+	 */
+	public function get_table_list() {
+		$table_list = array();
+
+		$include_tables = $this->core->db_omit->get_filtered_tables();
+
+		/*
+		 * Create separate arrays for the "tables" and "views" that we want to dump.
+		 *
+		 * When dumping our database, we need to send a separate list of tables to dump, and a separate
+		 * one for views to dump. $include_tables is an array possibly containing both tables and views,
+		 * so we'll split it up now.
+		 *
+		 * In the list below, it is important that $include_tables is processed last.
+		 */
+		$table_list['views']  = $this->core->db_get->filter_by_type( $include_tables, 'VIEW' );
+		$table_list['tables'] = $this->core->db_get->filter_by_type( $include_tables, 'BASE TABLE' );
+
+		return $table_list;
 	}
 
 	/**

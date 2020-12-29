@@ -329,6 +329,22 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-environment.php';
 
+		/*
+		 * Include v2 files.
+		 *
+		 * V2 is the beginning of split / resumable backups.
+		 */
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/filelist/class-create.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/step/class-step.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/step/class-data.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/archiver/class-factory.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/archiver/class-archiver.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/archiver/steps/class-discovery.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/archiver/steps/class-archive-database.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/archiver/steps/class-archive-files.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/archiver/steps/archive_files/class-part.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/archiver/steps/archive_files/class-parts.php';
+
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
 
