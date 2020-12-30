@@ -110,7 +110,12 @@ class Boldgrid_Backup_Archiver {
 	public function run() {
 		$this->init();
 
-		$this->info = $this->core->archive_files( true );
+		if ( 'one' === $this->core->settings->get_setting( 'format' ) ) {
+			$this->info = $this->core->archive_files( true );
+		} else {
+			$backup_process = \BoldGrid\Backup\V2\Archiver\Factory::run();
+			$backup_process->run();
+		}
 
 		$this->complete();
 	}

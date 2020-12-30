@@ -79,9 +79,6 @@ class Boldgrid_Backup_Admin_Dashboard {
 	 * @since 1.11.0
 	 */
 	public function page() {
-		$backup_process = \BoldGrid\Backup\V2\Archiver\Factory::run();
-		$backup_process->run();
-
 		$settings = $this->core->settings->get_settings();
 		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
 		wp_enqueue_style( 'bglib-ui-css' );
