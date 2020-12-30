@@ -19,6 +19,7 @@ defined( 'WPINC' ) || die;
 $nav             = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
 $scheduler       = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/scheduler.php';
 $compressor      = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/compressor.php';
+$format          = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/format.php';
 $folders_include = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/folders.php';
 $db              = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/db.php';
 $auto_backup     = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/auto-backup.php';
@@ -57,7 +58,7 @@ $sections = [
 		[
 			'id'      => 'section_process',
 			'title'   => __( 'Backup Process', 'boldgrid-backup' ),
-			'content' => $compressor,
+			'content' => $compressor . $format,
 		],
 		[
 			'id'      => 'connect_key',

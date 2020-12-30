@@ -84,6 +84,9 @@ class Boldgrid_Backup_Admin_Settings {
 	/**
 	 * Get a setting from the settings.
 	 *
+	 * A default parameter doesn't exist for this method. It was going to be added in 2.0.0, however
+	 * the first call to get_settings() includes default settings. @todo Does this need to change?
+	 *
 	 * @since 1.9.0
 	 *
 	 * @param  string $key The setting name.
@@ -257,6 +260,11 @@ class Boldgrid_Backup_Admin_Settings {
 
 		// Auto Updates.
 		$settings['auto_update'] = $this->set_update_settings( $settings );
+
+		// Format. Should be either "one" or "many" (v2). Refers to how many zips we create.
+		if ( empty( $settings['format'] ) ) {
+			$settings['format'] = 'one';
+		}
 
 		// Return the settings array.
 		return $settings;
@@ -812,6 +820,16 @@ class Boldgrid_Backup_Admin_Settings {
 					$this->update_autoupdate_options( $_POST['auto_update'], true );
 				}
 				$update_error = $settings['auto_update'] ? $update_error : true;
+			}
+
+			/*
+			 * Save format options.
+			 *
+			 * @since SINCEVERSION
+			 */
+			$valid_formats = array( 'one', 'many' );
+			if ( ! empty( $_POST['format'] ) && in_array( $_POST['format'], $valid_formats, true ) ) {
+				$settings['format'] = $_POST['format'];
 			}
 
 			// Read BoldGrid settings form POST request, sanitize, and merge settings with saved.
