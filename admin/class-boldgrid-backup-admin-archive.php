@@ -28,6 +28,16 @@ class Boldgrid_Backup_Admin_Archive {
 	private $core;
 
 	/**
+	 * The basename of this archive.
+	 *
+	 * IE if we are looking at "backup-1234.zip", the basename is "backup-1234".
+	 *
+	 * @since SINCEVERSION
+	 * @var   string
+	 */
+	public $basename;
+
+	/**
 	 * Compressor used when creating archive.
 	 *
 	 * @since  1.6.0
@@ -55,6 +65,19 @@ class Boldgrid_Backup_Admin_Archive {
 	 * @var    string
 	 */
 	public $filepath = null;
+
+	/**
+	 * Whether or not this is a virtual archive.
+	 *
+	 * A "virtual archive" is an empty archive, like
+	 * backup-1234.zip
+	 * That actually refers to a folder, like
+	 * backup-1234/
+	 *
+	 * @since SINCEVERSION
+	 * @var bool
+	 */
+	public $is_virtual;
 
 	/**
 	 * The contents of the archive's log file.
@@ -265,7 +288,11 @@ class Boldgrid_Backup_Admin_Archive {
 	 * @since 1.11.0
 	 */
 	public function get_filesize() {
-		return $this->core->wp_filesystem->size( $this->filepath );
+		if ( $this->is_virtual ) {
+			return get_dirsize( $this->core->backup_dir->get_path_to( $this->basename ) );
+		} else {
+			return $this->core->wp_filesystem->size( $this->filepath );
+		}
 	}
 
 	/**
@@ -277,6 +304,29 @@ class Boldgrid_Backup_Admin_Archive {
 	 */
 	public function get_id() {
 		return $this->id;
+	}
+
+	/**
+	 * Get the index of this backup.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @return mixed Int on success, false on failure.
+	 */
+	public function get_index() {
+		$index = null;
+
+		$indexes = $this->core->backup_dir->get_indexed_backups();
+
+		foreach ( $indexes as $key => $filename ) {
+			if ( $filename === $this->filename ) {
+				$index = $key;
+				break;
+			}
+		}
+
+		return $index;
+
 	}
 
 	/**
@@ -309,6 +359,9 @@ class Boldgrid_Backup_Admin_Archive {
 		$this->filepath = $filepath;
 		$this->filename = basename( $this->filepath );
 
+		$this->basename   = wp_basename( $this->filename, '.zip' );
+		$this->is_virtual = $this->core->backup_dir->exists( $this->basename );
+
 		$this->log_filepath = $this->core->archive_log->path_from_zip( $this->filepath );
 		$this->log_filename = basename( $this->log_filepath );
 
@@ -334,9 +387,7 @@ class Boldgrid_Backup_Admin_Archive {
 
 		$this->view_details_url = admin_url( 'admin.php?page=boldgrid-backup-archive-details&filename=' . $this->filename );
 
-		// Set our key.
-		$details   = $this->get_by_name( $this->filename );
-		$this->key = isset( $details['key'] ) ? $details['key'] : null;
+		$this->key = $this->get_index();
 	}
 
 	/**
@@ -408,19 +459,18 @@ class Boldgrid_Backup_Admin_Archive {
 	 * @return bool
 	 */
 	public function is_archive( $filepath ) {
-		$archives = $this->core->get_archive_list();
-
-		if ( empty( $archives ) ) {
-			return false;
-		}
+		$is_archive = false;
+		$basename   = wp_basename( $filepath );
+		$archives   = $this->core->backup_dir->get_indexed_backups();
 
 		foreach ( $archives as $archive ) {
-			if ( $filepath === $archive['filepath'] ) {
-				return true;
+			if ( $basename === $archive ) {
+				$is_archive = true;
+				break;
 			}
 		}
 
-		return false;
+		return $is_archive;
 	}
 
 	/**

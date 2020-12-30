@@ -30,10 +30,18 @@ class Factory {
 			$id = substr( md5( time() ), -16 );
 		}
 
+		$name = 'boldgrid-backup-' . $core->get_backup_identifier() . '-' . $id;
+
 		// Create the folder if it does not exist.
-		$backup_folder_path = $core->backup_dir->get() . '/backup-' . $core->get_backup_identifier() . '-' . $id . '/';
+		$backup_folder_path = $core->backup_dir->get_path_to( $name );
 		if ( ! $core->wp_filesystem->exists( $backup_folder_path ) ) {
 			$core->wp_filesystem->mkdir( $backup_folder_path );
+		}
+
+		// Create the zip placeholder.
+		$zip_filepath = $core->backup_dir->get_path_to( $name . '.zip' );
+		if ( ! $core->wp_filesystem->exists( $zip_filepath ) ) {
+			$core->wp_filesystem->touch( $zip_filepath );
 		}
 
 		return new \Boldgrid\Backup\V2\Archiver\Archiver( 'archiver', $backup_folder_path );

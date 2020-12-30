@@ -2052,6 +2052,9 @@ class Boldgrid_Backup_Admin_Core {
 					continue;
 				}
 
+				$archive = new Boldgrid_Backup_Admin_Archive();
+				$archive->init_by_filename( $fileinfo['name'] );
+
 				// Create the return array.
 				// @todo Should we use the data and time from the filename, or rely on lastmodunix?
 				$archive_files[ $index ] = [
@@ -2060,7 +2063,7 @@ class Boldgrid_Backup_Admin_Core {
 					'filedate'    => get_date_from_gmt(
 						date( 'Y-m-d H:i:s', $fileinfo['lastmodunix'] ), 'n/j/Y g:i A'
 					),
-					'filesize'    => $fileinfo['size'],
+					'filesize'    => $archive->get_filesize(),
 					'lastmodunix' => $fileinfo['lastmodunix'],
 				];
 

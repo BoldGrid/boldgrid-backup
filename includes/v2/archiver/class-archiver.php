@@ -29,9 +29,9 @@ class Archiver extends \Boldgrid\Backup\V2\Step\Step {
 
 		$file_types = array(
 			'plugins',
-			'themes',
-			'uploads',
-			'other',
+			// 'themes',
+			// 'uploads',
+			// 'other',
 		);
 
 		$steps = array(

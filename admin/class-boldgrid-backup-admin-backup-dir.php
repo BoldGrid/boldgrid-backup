@@ -231,6 +231,18 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 	}
 
 	/**
+	 * Determine whether or not the given file / folder exists in the backup dir.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param string $filename The name of a file or folder.
+	 * @return bool True if the file exists.
+	 */
+	public function exists( $filename ) {
+		return $this->core->wp_filesystem->exists( $this->get_path_to( $filename ) );
+	}
+
+	/**
 	 * Get and return the backup directory path.
 	 *
 	 * @since 1.0
@@ -254,6 +266,49 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 		}
 
 		return $this->guess_and_set();
+	}
+
+	/**
+	 * Get an array of indexed backups.
+	 *
+	 * Backups can sometimes be refered to by their index / key in the array.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @return array
+	 */
+	public function get_indexed_backups() {
+		$index = array();
+
+		$dirlist = $this->dirlist();
+		if ( empty( $dirlist ) ) {
+			return array();
+		}
+
+		// Sort the dirlist array by "lastmodunix" descending.
+		uasort(
+			$dirlist,
+			function ( $a, $b ) {
+				if ( $a['lastmodunix'] < $b['lastmodunix'] ) {
+					return 1;
+				}
+
+				if ( $a['lastmodunix'] > $b['lastmodunix'] ) {
+					return - 1;
+				}
+
+				return 0;
+			}
+		);
+
+		// Filter the array.
+		foreach ( $dirlist as $fileinfo ) {
+			if ( $this->core->archive->is_site_archive( $fileinfo['name'] ) ) {
+				$index[] = $fileinfo['name'];
+			}
+		}
+
+		return $index;
 	}
 
 	/**

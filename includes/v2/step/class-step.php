@@ -147,10 +147,6 @@ class Step {
 
 		$this->get_data_type( 'run' )->set_key( 'memory_peak_end', $memory_peak_end );
 		$this->get_data_type( 'run' )->set_key( 'memory_peak_change', $memory_peak_change );
-
-		// DEBUG
-		$contents = $this->get_contents();
-		echo '<pre>STEP ' . $this->id . ' = ' . print_r( $contents,1 ) . '</pre>'; // phpcs:ignore
 	}
 
 	/**
