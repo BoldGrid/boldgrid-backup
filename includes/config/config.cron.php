@@ -45,6 +45,15 @@ $config = [
 				],
 			],
 		],
+		'resume' => [
+			'search' => [
+				'cron' => [
+					'mode=resume',
+					'siteurl=' . $site_url . ' ',
+				],
+				// todo add wp-cron
+			],
+		],
 	],
 ];
 

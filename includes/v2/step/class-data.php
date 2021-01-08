@@ -94,6 +94,6 @@ class Data {
 		$data         = $this->get_data();
 		$data[ $key ] = $value;
 
-		$this->step->write_key( $this->id, $data );
+		return $this->step->write_key( $this->id, $data );
 	}
 }

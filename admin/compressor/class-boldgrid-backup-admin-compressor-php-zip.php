@@ -126,10 +126,6 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 		$number_files_todo     = count( $filelist );
 		$last_x_files          = array();
 
-		if ( $info['dryrun'] ) {
-			return true;
-		}
-
 		// Prevent this process from ending; allow the archive to be completed.
 		ignore_user_abort( true );
 		set_time_limit( 0 );

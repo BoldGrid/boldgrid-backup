@@ -58,6 +58,8 @@ class Step {
 	 */
 	private $dir;
 
+	private $filename;
+
 	/**
 	 * The filepath to this step's json file.
 	 *
@@ -77,13 +79,27 @@ class Step {
 	private $max_attempts = 5;
 
 	/**
+	 *
+	 */
+	private $parent_id;
+
+	/**
+	 * Our persistent info class.
+	 *
+	 * @since SINCEVERSION
+	 * @access protected
+	 * @var \Boldgrid\Backup\V2\Step\Json_file
+	 */
+	protected $info;
+
+	/**
 	 * The number of seconds until a step is seen as unresonsive.
 	 *
 	 * @since SINCEVERSION
 	 * @access private
 	 * @var int
 	 */
-	private $unresponsive_time = 15;
+	protected $unresponsive_time = 15;
 
 	/**
 	 * Constructor.
@@ -93,15 +109,21 @@ class Step {
 	 * @param string $id  The id of this step.
 	 * @param string $dir The directory where this step's data is saved.
 	 */
-	public function __construct( $id, $dir ) {
+	public function __construct( $id, $parent_id, $dir ) {
 		$this->core = apply_filters( 'boldgrid_backup_get_core', false );
 
-		$this->id       = $id;
-		$this->dir      = trailingslashit( $dir );
-		$this->filepath = $this->dir . 'step-' . $this->id . '.json';
+		$this->id        = $id;
+		$this->parent_id = $parent_id;
+		$this->dir       = trailingslashit( $dir );
+		$this->filename  = 'step-' . $this->id . '.json';
+		$this->filepath  = $this->dir . $this->filename;
 
 		$this->data['run']  = new \Boldgrid\Backup\V2\Step\Data( $this, 'run_data' );
 		$this->data['step'] = new \Boldgrid\Backup\V2\Step\Data( $this, 'step_data' );
+
+		$this->info = new \Boldgrid\Backup\V2\Step\Json_file( $this->get_path_to( 'info.json' ) );
+
+		add_filter( 'boldgrid_backup_get_step_' . $this->id, array( $this, 'get_this' ) );
 	}
 
 	/**
@@ -128,6 +150,12 @@ class Step {
 	 */
 	public function check_in() {
 		$this->get_data_type( 'run' )->set_key( 'last_check_in', time() );
+
+		// Whenever this step checks in, the parent should check in as well.
+		$parent = $this->get_parent();
+		if ( ! empty( $parent ) ) {
+			$parent->check_in();
+		}
 	}
 
 	/**
@@ -147,6 +175,18 @@ class Step {
 
 		$this->get_data_type( 'run' )->set_key( 'memory_peak_end', $memory_peak_end );
 		$this->get_data_type( 'run' )->set_key( 'memory_peak_change', $memory_peak_change );
+	}
+
+	/**
+	 *
+	 */
+	public function fail( $message ) {
+		$this->get_data_type( 'run' )->set_key( 'fail_time', time() );
+		$this->get_data_type( 'run' )->set_key( 'fail_message', $message );
+
+		$this->info->set_key( 'error', $message );
+
+		$this->complete();
 	}
 
 	/**
@@ -205,6 +245,20 @@ class Step {
 	}
 
 	/**
+	 *
+	 */
+	public function get_info() {
+		return $this->info;
+	}
+
+	/**
+	 *
+	 */
+	public function get_parent() {
+		return $this->get_step( $this->parent_id );
+	}
+
+	/**
 	 * Get the path to a file in our data directory.
 	 *
 	 * @since SINCEVERSION
@@ -214,6 +268,20 @@ class Step {
 	 */
 	public function get_path_to( $filename ) {
 		return $this->get_dir() . $filename;
+	}
+
+	/**
+	 *
+	 */
+	public function get_this() {
+		return $this;
+	}
+
+	/**
+	 *
+	 */
+	public function get_step( $id ) {
+		return apply_filters( 'boldgrid_backup_get_step_' . $id, false );
 	}
 
 	/**
@@ -227,6 +295,19 @@ class Step {
 		$data = $this->get_data_type( 'run' )->get_data();
 
 		return ! empty( $data['complete_time'] );
+	}
+
+	/**
+	 * Whether or not this step has failed.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @return bool
+	 */
+	public function is_fail() {
+		$data = $this->get_data_type( 'run' )->get_data();
+
+		return ! empty( $data['fail_time'] );
 	}
 
 	/**
@@ -284,11 +365,30 @@ class Step {
 			return false;
 		}
 
+		if ( $this->is_fail() ) {
+			return false;
+		}
+
 		if ( $this->is_in_progress() && ! $this->is_unresponsive() ) {
 			return false;
 		}
 
 		return true;
+	}
+
+	/**
+	 * Write a file to the step's directory.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param string $filename The filename to write to.
+	 * @param string $contents The contents to write to the file.
+	 * @return bool True on success.
+	 */
+	public function write_contents( $filename, $contents ) {
+		$written = $this->core->wp_filesystem->put_contents( $this->dir . $filename, $contents );
+
+		return $written;
 	}
 
 	/**
@@ -303,19 +403,10 @@ class Step {
 		$contents         = $this->get_contents();
 		$contents[ $key ] = $value;
 
-		$this->core->wp_filesystem->put_contents( $this->filepath, wp_json_encode( $contents ) );
-	}
+		// old
+		// return $this->core->wp_filesystem->put_contents( $this->filename, wp_json_encode( $contents ) );
+		$this->write_contents( $this->filename, wp_json_encode( $contents ) );
 
-	/**
-	 * Write a file to the step's directory.
-	 *
-	 * @since SINCEVERSION
-	 *
-	 * @param string $filename The filename to write to.
-	 * @param string $contents The contents to write to the file.
-	 * @return bool True on success.
-	 */
-	public function write_contents( $filename, $contents ) {
-		return $this->core->wp_filesystem->put_contents( $this->dir . $filename, $contents );
+		// $this->check_in();
 	}
 }

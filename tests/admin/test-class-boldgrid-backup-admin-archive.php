@@ -28,7 +28,7 @@ class Test_Boldgrid_Backup_Admin_Archive extends WP_UnitTestCase {
 
 		$latest_backup = get_option( 'boldgrid_backup_latest_backup' );
 		if ( empty( $latest_backup ) ) {
-			$core->archive_files( true );
+			$core->archive_files();
 		}
 	}
 

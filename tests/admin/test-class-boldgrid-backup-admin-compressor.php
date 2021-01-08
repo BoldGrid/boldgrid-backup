@@ -59,7 +59,7 @@ class Test_Boldgrid_Backup_Admin_Compressor extends WP_UnitTestCase {
 		foreach ( $compressors as $compressor => $compressor_data ) {
 			update_option( 'boldgrid_backup_settings', [ 'compressor' => $compressor ] );
 
-			$compressors[ $compressor ] = $this->core->archive_files( true );
+			$compressors[ $compressor ] = $this->core->archive_files();
 
 			// Ensure the proper compressor was used.
 			$this->assertTrue( $compressors[ $compressor ]['compressor'] === $compressor );

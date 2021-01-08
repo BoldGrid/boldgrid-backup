@@ -329,6 +329,8 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-environment.php';
 
+		require_once BOLDGRID_BACKUP_PATH . '/includes/archiver/class-info.php';
+
 		/*
 		 * Include v2 files.
 		 *
@@ -337,8 +339,10 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/filelist/class-create.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/step/class-step.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/step/class-data.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/step/class-json-file.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/archiver/class-factory.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/archiver/class-archiver.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/archiver/class-resumer.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/archiver/steps/class-discovery.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/archiver/steps/class-archive-database.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/archiver/steps/class-archive-files.php';
@@ -377,6 +381,7 @@ class Boldgrid_Backup {
 
 		// Instantiate the admin core.
 		$plugin_admin_core = new Boldgrid_Backup_Admin_Core();
+		$resumer           = new \Boldgrid\Backup\V2\Archiver\Resumer( $plugin_admin_core );
 
 		// WP-CLI support.
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
@@ -546,6 +551,7 @@ class Boldgrid_Backup {
 		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_jobs', $plugin_admin_core->jobs, 'run' );
 		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_backup', $plugin_admin_core->cron, 'backup' );
 		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_restore', $plugin_admin_core->cron, 'restore' );
+		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_resume', $resumer, 'run' );
 
 		// For public downloads.
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_download', $plugin_admin_core->download, 'public_download' );

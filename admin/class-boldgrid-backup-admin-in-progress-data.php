@@ -70,6 +70,22 @@ class Boldgrid_Backup_Admin_In_Progress_Data {
 	}
 
 	/**
+	 *
+	 */
+	public static function get_backup_id() {
+		/*
+		 * boldgrid-backup-2cc84b67-c0952649a8c78a20
+		 */
+		$dir = self::get_arg( 'dir' );
+		if ( empty( $dir ) ) {
+			return false;
+		}
+
+		preg_match( '/boldgrid-backup-2cc84b67-(.{16})/', $dir, $matches );
+		return ! empty( $matches[1] ) ? $matches[1] : false;
+	}
+
+	/**
 	 * Get required markup to show the progress bar.
 	 *
 	 * Generally displayed under a "Backup Now" button.

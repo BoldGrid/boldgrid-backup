@@ -53,6 +53,7 @@ $details        = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-detail
 $remote_storage = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/remote-storage.php';
 $browser        = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/browser.php';
 $db             = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/db.php';
+$dir            = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/dir.php';
 
 // Special situations where the backup file is not local and/or remote.
 $only_remote = include BOLDGRID_BACKUP_PATH . '/admin/partials/archive-details/only-remote.php';
@@ -325,6 +326,7 @@ $editor_tools = sprintf(
 		<div class="wp-editor-tabs">
 			<button type="button" id="content-tmce" class="wp-switch-editor switch-tmce" data-wp-editor-id="content">%2$s</button>
 			<button type="button" id="content-html" class="wp-switch-editor switch-html" data-wp-editor-id="content">%3$s</button>
+			<button type="button" class="wp-switch-editor switch-dir">Backup Directory</button>
 		</div>
 	</div>
 	',
@@ -379,7 +381,7 @@ $main_content = '
 			<p>
 				' . esc_html__( 'Use the File & Folders and Database tools below to browse the contents of this backup file.', 'boldgrid-backup' ) . '
 			</p>
-			' . $intro . $editor_tools . $browser . $db['browser'] . '
+			' . $intro . $editor_tools . $browser . $db['browser'] . $dir . '
 		</div>
 	</div>
 ';

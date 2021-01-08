@@ -80,10 +80,8 @@ class Archive_Files extends \Boldgrid\Backup\V2\Step\Step {
 	 * @param string $dir    The backup directory.
 	 * @param array  $configs An array of configs.
 	 */
-	public function __construct( $id, $dir, $configs ) {
-		$this->configs = $configs;
-
-		parent::__construct( $id, $dir );
+	public function __construct( $id, $parent_id, $dir ) {
+		parent::__construct( $id, $parent_id, $dir );
 
 		$this->parts = new \Boldgrid\Backup\V2\Archiver\Steps\Archive_Files\Parts( $this );
 	}
@@ -108,6 +106,10 @@ class Archive_Files extends \Boldgrid\Backup\V2\Step\Step {
 		$files_added = 0;
 
 		$part = $this->parts->get_next();
+
+		if ( ! empty( $this->configs['part_configs'] ) ) {
+			$part->set_configs( $this->configs['part_configs'] );
+		}
 
 		// Determine the max size to archive during this batch.
 		$max_batch_size = min( $part->get_remaining_size(), $this->max_batch_size );
@@ -135,7 +137,7 @@ class Archive_Files extends \Boldgrid\Backup\V2\Step\Step {
 			$allow_in_batch = ! $too_big || ( 0 === $files_added && $is_part_empty );
 
 			if ( $allow_in_batch ) {
-				$batch_filelist[]        = $file[1];
+				$batch_filelist[]        = $this->configs['use_full_filepath'] ? $file[0] : $file[1];
 				$remaining_size         -= $file[2];
 				$this->last_archived_key = $key;
 				$files_added++;
@@ -147,7 +149,13 @@ class Archive_Files extends \Boldgrid\Backup\V2\Step\Step {
 		// Write the batch file.
 		$batch_filelist_filename = 'filelist-' . $this->configs['type'] . '-' . $start_key . '.txt';
 		$batch_filelist_filepath = $this->get_path_to( $batch_filelist_filename );
-		$success                 = $this->get_core()->wp_filesystem->put_contents( $batch_filelist_filepath, implode( PHP_EOL, $batch_filelist ) );
+
+		if ( empty( $batch_filelist ) ) {
+			$this->fail( 'Something went wrong. Empty batch filelist ' . $batch_filelist_filename . ' was almost written.' );
+			return false;
+		}
+
+		$success = $this->get_core()->wp_filesystem->put_contents( $batch_filelist_filepath, implode( PHP_EOL, $batch_filelist ) );
 
 		$batch_info = array(
 			'batch_filelist_filepath' => $batch_filelist_filepath,
@@ -174,20 +182,56 @@ class Archive_Files extends \Boldgrid\Backup\V2\Step\Step {
 	 * @since SINCEVERSION
 	 */
 	public function run() {
+		// error_log( 'archive files configs = ' . print_r( $this->configs,1) );
+
+		\Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'step', 3 );
+
 		$this->add_attempt();
+
+		/*
+		 * Get our filelist.
+		 *
+		 * If we don't have any files, complete and return right now. For example, if we are filtering
+		 * by "*.txt", we may not find any txt files in the uploads folder.
+		 */
 		$this->set_filelist();
+		if ( empty( $this->filelist ) ) {
+			$this->complete();
+			return;
+		}
 
 		$last_key                = count( $this->filelist ) - 1;
 		$this->last_archived_key = $this->get_data_type( 'step' )->get_key( 'last_archived_key', 0 );
-		$attempts                = 1;
+		$archived_all_keys       = false;
 
-		while ( $this->last_archived_key < $last_key ) {
+		while ( ! $archived_all_keys ) {
 			$batch_info = $this->get_next_batch();
 
 			if ( false !== $batch_info ) {
-				$success = $batch_info['part']->add_batch( $batch_info['batch_filelist_filepath'] );
 
-				if ( $success ) {
+				/*
+				 * If a sysadmin kills the zip command but not this main process, we'll try again. If
+				 * it was killed, sleep before the next attepmt.
+				 */
+				$zip_attempts     = 0;
+				$zip_max_attempts = 3;
+				$zip_success      = false;
+				$zip_sleep        = 10;
+
+				while ( ! $zip_success && ( $zip_attempts < $zip_max_attempts ) ) {
+					$zip_attempts++;
+
+					error_log( 'Zip attempt ' . $zip_attempts ); // phpcs:ignore
+
+					$zip_success = $batch_info['part']->add_batch( $batch_info['batch_filelist_filepath'] );
+
+					if ( ! $zip_success ) {
+						error_log( 'Zipping failed. Sleeping...' ); // phpcs:ignore
+						sleep( $zip_sleep );
+					}
+				}
+
+				if ( $zip_success ) {
 					// Save the last key we successfully archived.
 					$this->get_data_type( 'step' )->set_key( 'last_archived_key', $this->last_archived_key );
 
@@ -195,13 +239,32 @@ class Archive_Files extends \Boldgrid\Backup\V2\Step\Step {
 					if ( $this->last_archived_key === $last_key ) {
 						$batch_info['part']->complete();
 					}
+				} else {
+					$this->fail( 'Failed ' . $zip_max_attempts . ' times to add ' . $batch_info['batch_filelist_filepath'] . ' to archive.' );
+					return false;
 				}
+			} else {
+				$this->fail( 'Error getting last batch.' );
+				return false;
 			}
 
-			$attempts++;
+			$archived_all_keys = $this->last_archived_key === $last_key;
 		}
 
 		$this->complete();
+
+		return true;
+	}
+
+	/**
+	 *
+	 */
+	public function set_configs( $configs ) {
+		$default_configs = array(
+			'use_full_filepath' => false,
+		);
+
+		$this->configs = wp_parse_args( $configs, $default_configs );
 	}
 
 	/**

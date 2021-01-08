@@ -19,48 +19,69 @@ namespace Boldgrid\Backup\V2\Archiver;
  * @since SINCEVERSION
  */
 class Archiver extends \Boldgrid\Backup\V2\Step\Step {
+
+	/**
+	 *
+	 */
+	protected $unresponsive_time = 60;
+
 	/**
 	 * Run the archive process.
 	 *
 	 * @since SINCEVERSION
 	 */
 	public function run() {
+		\Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'dir', $this->get_dir() );
+
 		$this->add_attempt();
 
 		$file_types = array(
-			'plugins',
-			// 'themes',
-			// 'uploads',
-			// 'other',
+			'plugins' => array(),
+			'themes'  => array(),
+			'uploads' => array(),
+			'other'   => array(),
+			'sql'     => array(
+				'use_full_filepath' => true,
+				'part_configs'      => array(
+					'junk_paths' => true,
+				),
+			),
 		);
 
 		$steps = array(
-			new \Boldgrid\Backup\V2\Archiver\Steps\Discovery( 'discovery', $this->get_dir() ),
-			new \Boldgrid\Backup\V2\Archiver\Steps\Archive_Database( 'archive_database', $this->get_dir() ),
+			new \Boldgrid\Backup\V2\Archiver\Steps\Discovery( 'discovery', $this->id, $this->get_dir() ),
+			new \Boldgrid\Backup\V2\Archiver\Steps\Archive_Database( 'archive_database', $this->id, $this->get_dir() ),
 		);
 
-		foreach ( $file_types as  $type ) {
-			$configs = array(
+		foreach ( $file_types as $type => $type_configs ) {
+			$default_type_configs = array(
 				'id'   => 'archive_' . $type,
 				'type' => $type,
 			);
 
-			$steps[] = new \Boldgrid\Backup\V2\Archiver\Steps\Archive_Files( 'archive_' . $type, $this->get_dir(), $configs );
+			$configs = wp_parse_args( $type_configs, $default_type_configs );
+
+			$step = new \Boldgrid\Backup\V2\Archiver\Steps\Archive_Files( 'archive_' . $type, $this->id, $this->get_dir() );
+			$step->set_configs( $configs );
+
+			$steps[] = $step;
 		}
 
 		foreach ( $steps as $step ) {
-			if ( $step->maybe_run() ) {
-				$step->run();
-			}
+			$this->check_in();
 
-			// DEBUG.
-			$contents = $step->get_contents();
-			echo '<pre>contents = ' . print_r( $contents, 1 ) . '</pre>'; // phpcs:ignore
+			if ( $step->maybe_run() ) {
+				$step_success = $step->run();
+
+				if ( ! $step_success ) {
+					// Failed to create zip. todo: cleanup?
+					return false;
+				}
+			}
 		}
 
-		// DEBUG.
-		$files = array();
-		exec( 'ls -al ' . $this->get_dir(), $files ); // phpcs:ignore
-		echo '<pre>$files = ' . print_r( $files, 1 ) . '</pre>'; // phpcs:ignore
+		$this->info->set_key( 'lastmodunix', $this->get_core()->wp_filesystem->mtime( $this->info->get_key( 'filepath' ) ) );
+
+		$this->complete();
 	}
 }

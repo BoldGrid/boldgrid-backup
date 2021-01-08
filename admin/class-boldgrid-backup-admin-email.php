@@ -120,10 +120,6 @@ class Boldgrid_Backup_Admin_Email {
 
 		$parts['body']['main'] = esc_html__( 'Hello', 'boldgrid-backup' ) . ",\n\n";
 
-		if ( $info['dryrun'] ) {
-			$body['main'] .= esc_html__( 'THIS OPERATION WAS A DRY-RUN TEST', 'boldgrid-backup' ) . ".\n\n";
-		}
-
 		$parts['body']['main'] .= sprintf(
 			// translators: 1: Site identifier/name.
 			esc_html__( 'A backup archive has been created for %1$s', 'boldgrid-backup' ),

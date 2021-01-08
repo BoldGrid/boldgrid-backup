@@ -124,17 +124,29 @@ BoldGrid.ArchiveDetails = function( $ ) {
 	 * @since 1.6.0
 	 */
 	self.onClickTab = function() {
-		var $dbElements = $( '[data-view-type="db"]' ),
+		var $tab = $( this ),
+			$dbElements = $( '[data-view-type="db"]' ),
+			$dirElements = $( '[data-view-type="dir"]' ),
 			$fileElements = $( '[data-view-type="file"]' ),
 			view;
 
-		$contentWrap.toggleClass( 'html-active tmce-active' );
+		console.log( $tab );
 
-		view = $contentWrap.hasClass( 'html-active' ) ? 'db' : 'file';
+		// $contentWrap.toggleClass( 'html-active tmce-active' );
+		// view = $contentWrap.hasClass( 'html-active' ) ? 'db' : 'file';
+
+		if ( $tab.hasClass( 'switch-tmce' ) ) {
+			view = 'db';
+		} else if ( $tab.hasClass( 'switch-html' ) ) {
+			view = 'file';
+		} else if ( $tab.hasClass( 'switch-dir' ) ) {
+			view = 'dir';
+		}
 
 		switch ( view ) {
 			case 'file':
 				$dbElements.hide();
+				$dirElements.hide();
 				$fileElements.show();
 
 				break;
@@ -142,6 +154,13 @@ BoldGrid.ArchiveDetails = function( $ ) {
 				BoldGrid.ZipBrowser.onClickViewDb();
 
 				$dbElements.show();
+				$dirElements.hide();
+				$fileElements.hide();
+
+				break;
+			case 'dir':
+				$dbElements.hide();
+				$dirElements.show();
 				$fileElements.hide();
 
 				break;

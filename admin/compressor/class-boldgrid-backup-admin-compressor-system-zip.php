@@ -127,10 +127,6 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	 * }
 	 */
 	public function archive_files( $filelist, &$info ) {
-		if ( $info['dryrun'] ) {
-			return true;
-		}
-
 		// Prevent this process from ending; allow the archive to be completed.
 		ignore_user_abort( true );
 		set_time_limit( 0 );

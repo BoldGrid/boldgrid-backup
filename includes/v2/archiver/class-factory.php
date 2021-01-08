@@ -44,6 +44,9 @@ class Factory {
 			$core->wp_filesystem->touch( $zip_filepath );
 		}
 
-		return new \Boldgrid\Backup\V2\Archiver\Archiver( 'archiver', $backup_folder_path );
+		$archiver = new \Boldgrid\Backup\V2\Archiver\Archiver( 'archiver', false, $backup_folder_path );
+		$archiver->get_info()->set_key( 'filepath', $zip_filepath );
+
+		return $archiver;
 	}
 }

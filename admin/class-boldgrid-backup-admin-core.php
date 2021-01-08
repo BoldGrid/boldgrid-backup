@@ -1142,7 +1142,7 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @return bool Status of the operation.
 	 */
-	private function backup_database() {
+	private function backup_database( &$info ) {
 		/*
 		 * If we're omitting all the tables, we can skip trying to backup the
 		 * database.
@@ -1168,61 +1168,42 @@ class Boldgrid_Backup_Admin_Core {
 			return [ 'error' => esc_html__( 'Unable to create backup, functionality test failed.', 'boldgrid_backup' ) ];
 		}
 
-		// Get the backup directory path.
-		$backup_directory = $this->backup_dir->get();
-
-		// Connect to the WordPress Filesystem API.
-		global $wp_filesystem;
-
-		// Check if the backup directory is writable.
-		if ( ! $wp_filesystem->is_writable( $backup_directory ) ) {
-			return [
-				'error' => sprintf(
-					// translators: 1: Backup directory path.
-					__( 'The backup directory is not writable: %1$s.', 'boldgrid-backup' ),
-					$backup_directory
-				),
-			];
-		}
-
 		// Create a file path for the dump file.
-		$db_dump_filepath = $backup_directory . DIRECTORY_SEPARATOR . DB_NAME . '.' . date( 'Ymd-His' ) . '.sql';
-
-		// Save the file path.
-		$this->db_dump_filepath = $db_dump_filepath;
+		$this->db_dump_filepath = $this->backup_dir->get_path_to( DB_NAME . '.' . date( 'Ymd-His' ) . '.sql' );
+		$info['db_filename']    = basename( $this->db_dump_filepath );
 
 		$this->set_time_limit();
 
 		// Create a dump of our database.
-		$status = $this->db_dump->dump( $db_dump_filepath );
+		$status = $this->db_dump->dump( $this->db_dump_filepath );
 		if ( ! empty( $status['error'] ) ) {
 			return [ 'error' => $status['error'] ];
 		}
 
 		// Ensure file is written and is over 100 bytes.
-		$exists = $this->test->exists( $db_dump_filepath );
+		$exists = $this->test->exists( $this->db_dump_filepath );
 		if ( ! $exists ) {
 			return [
 				'error' => sprintf(
 					// translators: 1: MySQL dump file path.
 					__( 'mysqldump file does not exist: %1$s', 'boldgrid-backup' ),
-					$db_dump_filepath
+					$this->db_dump_filepath
 				),
 			];
 		}
-		$dump_file_size = $this->wp_filesystem->size( $db_dump_filepath );
+		$dump_file_size = $this->wp_filesystem->size( $this->db_dump_filepath );
 		if ( 100 > $dump_file_size ) {
 			return [
 				'error' => sprintf(
 					// translators: 1: MySQL dump file path.
 					__( 'mysqldump file was not written to: %1$s', 'boldgrid-backup' ),
-					$db_dump_filepath
+					$this->db_dump_filepath
 				),
 			];
 		}
 
 		// Limit file permissions to the dump file.
-		$wp_filesystem->chmod( $db_dump_filepath, 0600 );
+		$this->wp_filesystem->chmod( $this->db_dump_filepath, 0600 );
 
 		// Return success.
 		return true;
@@ -1561,176 +1542,35 @@ class Boldgrid_Backup_Admin_Core {
 	 * @see Boldgrid_Backup_Admin_Core::backup_database()
 	 * @see Boldgrid_Backup_Admin_Archive::write_results_file()
 	 *
-	 * @param bool $save A switch to save the archive file. Default is FALSE.
-	 * @param bool $dryrun An optional switch to perform a dry run test.
 	 * @return array An array of archive file information.
 	 */
-	public function archive_files( $save = false, $dryrun = false ) {
-		$this->logger->init( 'archive-' . time() . '.log' );
-		$this->logger->add( 'Backup process initialized.' );
-
-		$this->utility->bump_memory_limit( '1G' );
-
-		$this->pre_auto_update = 'pre_auto_update' === current_filter();
-
-		/*
-		 * A scheduled backup is a backup triggered by the user's Settings > Backup Schedule.  If the user clicked
-		 * "Backup Site Now" or this is a backup before an auto update occurs, this is not a scheduled backup.
-		 */
-		$this->is_scheduled_backup = $this->doing_cron && ! $this->pre_auto_update;
-
-		Boldgrid_Backup_Admin_In_Progress_Data::set_args(
-			[ 'status' => esc_html__( 'Initializing backup', 'boldgrid-backup' ) ]
-		);
-
-		/**
-		 * Actions to take before any archiving begins.
-		 *
-		 * @since 1.5.2
-		 */
-		do_action( 'boldgrid_backup_archive_files_init' );
-
-		if ( $save && ! $dryrun ) {
-			$this->in_progress->set();
-		}
-
-		/*
-		 * If this is a scheduled backup and no location is selected to save the
-		 * backup to, abort.
-		 *
-		 * While we could prevent he user from setting this up in the first place,
-		 * at the moment the settings page saves all settings. So, if the user
-		 * wanted to change their retention settings but did not want to schedule
-		 * backups, validating storage locations would be problematic.
-		 */
-		if ( $this->is_scheduled_backup && ! $this->remote->any_enabled() ) {
-			$error = esc_html__( 'No backup locations selected! While we could create a backup archive, you have not selected where the backup archive should be saved. Please choose a storage location in your settings for where to save this backup archive.', 'boldgrid-backup' );
-			$this->archive_fail->schedule_fail_email( $error );
-			return [ 'error' => $error ];
-		}
-
-		// Check if functional.
-		if ( ! $this->test->run_functionality_tests() ) {
-			// Display an error notice, if not already on the test page.
-			if ( ! isset( $_GET['page'] ) || 'boldgrid-backup-test' !== $_GET['page'] ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
-				// Display an error notice.
-				$this->notice->functionality_fail_notice();
-			}
-
-			return [ 'error' => 'Functionality tests fail.' ];
-		}
-
-		// Close any PHP session, so that another session can open during the backup operation.
-		session_write_close();
-
-		/*
-		 * Initialize return array and add "compressor" and "save" keys.
-		 * Since 1.6.0, the folder include and exclude settings below are
-		 * for informational purposes only. This array cannot be filtered to
-		 * adjust which folders are actually included / excluded.
-		 */
-		$info = [
-			'mode'              => 'backup',
-			'dryrun'            => $dryrun,
-			'compressor'        => null,
-			'filesize'          => 0,
-			'save'              => $save,
-			'total_size'        => 0,
-			'folder_include'    => $this->folder_exclusion->from_settings( 'include' ),
-			'folder_exclude'    => $this->folder_exclusion->from_settings( 'exclude' ),
-			'table_exclude'     => $this->db_omit->get_excluded_tables(),
-			'title'             => ! empty( $_POST['backup_title'] ) ? stripslashes( $_POST['backup_title'] ) : null, // phpcs:ignore WordPress.CSRF.NonceVerification,WordPress.Arrays.ArrayDeclarationSpacing.ArrayItemNoNewLine
-			'description'       => ! empty( $_POST['backup_description'] ) ? stripslashes( $_POST['backup_description'] ) : null, // phpcs:ignore WordPress.CSRF.NonceVerification,WordPress.Arrays.ArrayDeclarationSpacing.ArrayItemNoNewLine
-			// Information used for the emergency restoration process.
-			'ABSPATH'           => ABSPATH,
-			'backup_id'         => $this->get_backup_identifier(),
-			'siteurl'           => site_url(),
-			'timestamp'         => time(), // @todo Is this a duplicate value? $info['lastmodunix'] is added below.
-			// Environment information.
-			'gateway_interface' => getenv( 'GATEWAY_INTERFACE' ),
-			'http_host'         => getenv( 'HTTP_HOST' ),
-			'php_sapi_name'     => php_sapi_name(),
-			'php_uname'         => php_uname(),
-			'php_version'       => phpversion(),
-			'server_addr'       => getenv( 'SERVER_ADDR' ) ? getenv( 'SERVER_ADDR' ) : getenv( 'LOCAL_ADDR' ),
-			'server_name'       => getenv( 'SERVER_NAME' ),
-			'server_protocol'   => getenv( 'SERVER_PROTOCOL' ),
-			'server_software'   => getenv( 'SERVER_SOFTWARE' ),
-			'uid'               => getmyuid(),
-			'username'          => get_current_user(),
-			'encrypt_db'        => false,
-		];
-
-		// Determine how this backup was triggered.
-		if ( $this->pre_auto_update ) {
-			$info['trigger'] = esc_html__( 'Auto update', 'boldgrid-bakcup' );
-		} elseif ( $this->doing_ajax && is_user_logged_in() ) {
-			$current_user    = wp_get_current_user();
-			$info['trigger'] = $current_user->user_login . ' (' . $current_user->user_email . ')';
-		} elseif ( $this->doing_wp_cron ) {
-			$info['trigger'] = 'WP cron';
-		} elseif ( $this->doing_cron ) {
-			$info['trigger'] = 'Cron';
-		} else {
-			$info['trigger'] = esc_html__( 'Unknown', 'boldgrid-backup' );
-		}
-
-		$info['compressor'] = $this->compressors->get();
-
-		// If there is no available compressor, then fail.
-		if ( null === $info['compressor'] ) {
-			return [ 'error' => 'No available compressor.' ];
-		}
-
-		// Cleanup. Enforce retention and delete orphaned files.
-		$this->enforce_retention();
-		$orphan_cleanup = new Boldgrid\Backup\Admin\Orphan\Cleanup();
-		$orphan_cleanup->run();
-
-		// Prevent this script from dying.
-		ignore_user_abort( true );
-
-		// Start timer.
-		$time_start = microtime( true );
-
+	public function archive_files( &$info ) {
 		// Backup the database, if saving an archive file and not a dry run.
-		if ( $save && ! $dryrun ) {
-			$this->logger->add_separator();
-			$this->logger->add( 'Starting dump of database...' );
-			$this->logger->add_memory();
+		$this->logger->add_separator();
+		$this->logger->add( 'Starting dump of database...' );
+		$this->logger->add_memory();
 
-			$status = $this->backup_database();
+		$status = $this->backup_database( $info );
 
-			$this->logger->add( 'Dump of database complete! $status = ' . print_r( $status, 1 ) ); // phpcs:ignore
-			$this->logger->add_memory();
-			$this->logger->add_separator();
+		$this->logger->add( 'Dump of database complete! $status = ' . print_r( $status, 1 ) ); // phpcs:ignore
+		$this->logger->add_memory();
+		$this->logger->add_separator();
 
-			if ( false === $status || ! empty( $status['error'] ) ) {
-				return [
-					'error' => ! empty( $status['error'] ) ? $status['error'] :
-						__( 'An unknown error occurred when backing up the database.', 'boldgrid-backup' ),
-				];
-			}
+		if ( false === $status || ! empty( $status['error'] ) ) {
+			return [
+				'error' => ! empty( $status['error'] ) ? $status['error'] :
+					__( 'An unknown error occurred when backing up the database.', 'boldgrid-backup' ),
+			];
 		}
 
 		// Keep track of how long the site was paused for / the time to backup the database.
-		$db_time_stop = microtime( true );
+		$info['db_time_stop'] = microtime( true );
 
 		// Get the file list.
 		$filelist = $this->get_filtered_filelist( ABSPATH );
 
 		// Initialize total_size.
 		$info['total_size'] = 0;
-
-		// If not saving, then just return info.
-		if ( ! $save ) {
-			foreach ( $filelist as $fileinfo ) {
-				// Add the file size to the total.
-				$info['total_size'] += $fileinfo[2];
-			}
-
-			return $info;
-		}
 
 		// Get the backup directory path.
 		$backup_directory = $this->backup_dir->get();
@@ -1861,105 +1701,15 @@ class Boldgrid_Backup_Admin_Core {
 
 		$info['lastmodunix'] = $this->wp_filesystem->mtime( $info['filepath'] );
 
-		if ( $save && ! $dryrun ) {
-			// Modify the archive file permissions to help protect from public access.
-			$this->wp_filesystem->chmod( $info['filepath'], 0600 );
+		// Modify the archive file permissions to help protect from public access.
+		$this->wp_filesystem->chmod( $info['filepath'], 0600 );
 
-			// Add some statistics to the return.
-			$info['filesize'] = $this->wp_filesystem->size( $info['filepath'] );
+		// Add some statistics to the return.
+		$info['filesize'] = $this->wp_filesystem->size( $info['filepath'] );
 
-			// Delete the temporary database dump file.
-			$this->wp_filesystem->delete( $this->db_dump_filepath, false, 'f' );
-		}
+		// Delete the temporary database dump file.
+		$this->wp_filesystem->delete( $this->db_dump_filepath, false, 'f' );
 
-		// Stop timer.
-		$time_stop = microtime( true );
-
-		// Calculate duration.
-		$info['duration']    = number_format( ( $time_stop - $time_start ), 2, '.', '' );
-		$info['db_duration'] = number_format( ( $db_time_stop - $time_start ), 2, '.', '' );
-		$info['db_filename'] = basename( $this->db_dump_filepath );
-
-		/**
-		 * Actions to take after a backup has been created.
-		 *
-		 * At priority 10, we add to the jobs queue the tasks of uploading this backup to our remote
-		 * storage providers. Each remote storage provider individually hooks into this action and adds
-		 * a job to the queue.
-		 *
-		 * At priority 100, we add a job to delete the local backup file if the user does
-		 * not want to keep it.
-		 *
-		 * At priority 200, we send an email to the user with a summary of the
-		 * backup and the jobs.
-		 *
-		 * @since 1.5.2
-		 *
-		 * @param array $info {
-		 *     An array of info about the backup just created.
-		 *
-		 *     @type string $mode         backup
-		 *     @type bool   $dryrun
-		 *     @type string $compressor   pcl_zip
-		 *     @type int    $filesize     30992482
-		 *     @type bool   $save
-		 *     @type int    $total_size
-		 *     @type string $filepath     C:\file.zip
-		 *     @type int    $lastmodunix  1506602959
-		 *     @type int    $duration     57.08
-		 *     @type int    $db_duration  0.35
-		 *     @type bool   $mail_success
-		 * }
-		 */
-		do_action( 'boldgrid_backup_post_archive_files', $info );
-
-		/*
-		 * Send an email to the user, RIGHT NOW.
-		 *
-		 * Only send an email to the user now IF they are manually creating a backup. If this backup
-		 * was created during a scheduled backup, the user will get an email from the jobs queue.
-		 * Scheduled backups receive email notifications from the jobs queue because that email will
-		 * not only include the standard info about the backup (which we're sending now), it will
-		 * also include info about other jobs that were run (such as uploading the backup remotely).
-		 */
-		if ( $this->email->user_wants_notification( 'backup' ) && ! $this->is_scheduled_backup ) {
-			$this->logger->add( 'Starting sending of email...' );
-
-			$email_parts          = $this->email->post_archive_parts( $info );
-			$email_body           = $email_parts['body']['main'] . $email_parts['body']['signature'];
-			$info['mail_success'] = $this->email->send( $email_parts['subject'], $email_body );
-
-			$this->logger->add( 'Sending of email complete! Status: ' . $info['mail_success'] );
-		}
-
-		// If not a dry-run test, update the last backup option and enforce retention.
-		if ( ! $dryrun ) {
-			// Update WP option for "boldgrid_backup_last_backup".
-			update_site_option( 'boldgrid_backup_last_backup', time() );
-
-			$this->archive_log->write( $info );
-
-			// Enforce retention setting.
-			$this->enforce_retention();
-
-			update_option( 'boldgrid_backup_latest_backup', $info );
-		}
-
-		// Actions to take if we're creating a full site backup.
-		if ( ! $dryrun && $this->archiver_utility->is_full_backup() ) {
-			$this->archive->write_results_file( $info );
-		}
-
-		Boldgrid_Backup_Admin_In_Progress_Data::set_args( [ 'status' => esc_html__( 'Backup complete!', 'boldgrid-backup' ) ] );
-
-		if ( isset( $this->activity ) ) {
-			$this->activity->add( 'any_backup_created', 1, $this->rating_prompt_config );
-		}
-
-		$this->logger->add( 'Backup complete!' );
-		$this->logger->add_memory();
-
-		// Return the array of archive information.
 		return $info;
 	}
 

@@ -17,9 +17,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 BOLDGRID.BACKUP.BackupNow = function( $ ) {
 	'use strict';
 
-	var self = this,
-		$backupNowType = $( '[name="folder_exclusion_type"]' ),
-		$tablesType = $( '[name="table_inclusion_type"]' );
+	var self = this;
 
 	$( function() {
 		$( 'body' ).on( 'click', '#backup-site-now', self.backupNow );
@@ -39,12 +37,20 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 			wpHttpReferer,
 			isUpdating,
 			data,
-			$folderExclude = $( '[name="folder_exclusion_exclude"]' ),
-			$folderInclude = $( '[name="folder_exclusion_include"]' ),
-			$tableInclude = $( '[name="include_tables[]"]' ),
-			includeTables = [],
-			type = 'full',
-			tablesType = null;
+			/*
+			 * As of @SINCEVERSION, the selectors below were updated to include #TB_ajaxContent. This
+			 * is because if we are on the settings page, the [name] selectors will exist twice and
+			 * will therefore cause problems. As we're in "backup site now", we know we're specifically
+			 * looking for data in the modal.
+			 */
+			$backupNowType = $( '#TB_ajaxContent [name="folder_exclusion_type"]' ),
+			$tablesType    = $( '#TB_ajaxContent [name="table_inclusion_type"]' ),
+			$folderExclude = $( '#TB_ajaxContent [name="folder_exclusion_exclude"]' ),
+			$folderInclude = $( '#TB_ajaxContent [name="folder_exclusion_include"]' ),
+			$tableInclude  = $( '#TB_ajaxContent [name="include_tables[]"]' ),
+			includeTables  = [],
+			type           = 'full',
+			tablesType     = null;
 
 		/*
 		 * If we are in a Backup Site Now modal and there is a "type" value set,

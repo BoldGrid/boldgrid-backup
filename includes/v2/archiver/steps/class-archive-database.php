@@ -31,6 +31,23 @@ class Archive_Database extends \Boldgrid\Backup\V2\Step\Step {
 	private $dump_filepath;
 
 	/**
+	 *
+	 */
+	private function add_to_filelist() {
+		$sql_filepath = $this->get_path_to( 'filelist-sql.json' );
+
+		$filelist = array(
+			array(
+				$this->dump_filepath,
+				basename( $this->dump_filepath ),
+				$this->get_core()->wp_filesystem->size( $this->dump_filepath ),
+			),
+		);
+
+		$this->get_core()->wp_filesystem->put_contents( $sql_filepath, wp_json_encode( $filelist ) );
+	}
+
+	/**
 	 * Dump the database.
 	 *
 	 * @since SINCEVERSION
@@ -40,8 +57,12 @@ class Archive_Database extends \Boldgrid\Backup\V2\Step\Step {
 	private function dump() {
 		global $wpdb;
 
-		$discovery  = new \Boldgrid\Backup\V2\Archiver\Steps\Discovery( 'discovery', $this->get_dir() );
+		$discovery  = new \Boldgrid\Backup\V2\Archiver\Steps\Discovery( 'discovery', $this->id, $this->get_dir() );
 		$table_list = $discovery->get_data_type( 'step' )->get_key( 'tables' );
+
+		\Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'status', __( 'Backing up database...', 'boldgrid-backup' ) );
+		\Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'tables', $table_list['tables'] );
+		\Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'step', 1 );
 
 		$settings = array(
 			'include-tables' => $table_list['tables'],
@@ -101,16 +122,21 @@ class Archive_Database extends \Boldgrid\Backup\V2\Step\Step {
 		$this->add_attempt();
 
 		$this->dump_filepath = $this->get_path_to( DB_NAME . '.' . date( 'Ymd-His' ) . '.sql' );
+		$this->info->set_key( 'db_filename', basename( $this->dump_filepath ) );
 
 		$this->pre();
 
 		$success = $this->dump();
+
+		$this->info->set_key( 'db_time_stop', microtime( true ) );
 
 		$this->post();
 
 		if ( true === $success ) {
 			$this->complete();
 		}
+
+		return $success;
 	}
 
 	/**
@@ -119,6 +145,8 @@ class Archive_Database extends \Boldgrid\Backup\V2\Step\Step {
 	 * @since SINCEVERSION
 	 */
 	private function post() {
+		$this->add_to_filelist();
+
 		/**
 		 * Take action after a database is dumped.
 		 *

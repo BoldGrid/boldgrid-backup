@@ -57,6 +57,21 @@ class Boldgrid_Backup_Admin_In_Progress_Tmp {
 	 * @return array
 	 */
 	public function get() {
+		$dir = Boldgrid_Backup_Admin_In_Progress_Data::get_arg( 'dir' );
+		// Steps to take if this is a v2 backup.
+		if ( ! empty( $dir ) ) {
+			// GET THE DIRSIZE CORRECTLY.
+			// $dirsize = get_dirsize( $dir );
+			exec( 'du -b ' . $dir . ' | cut -f1', $dirsize ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.system_calls_exec
+			$dirsize = $dirsize[0];
+
+			return array(
+				'size'        => $dirsize,
+				// 'lastmodunix' => $dirlist[ $filename ]['lastmodunix'],
+				'size_format' => size_format( $dirsize, 2 ),
+			);
+		}
+
 		$data = [];
 
 		$compressor = Boldgrid_Backup_Admin_In_Progress_Data::get_arg( 'compressor' );

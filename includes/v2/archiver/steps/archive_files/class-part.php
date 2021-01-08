@@ -36,6 +36,11 @@ class Part {
 	private $archive_files;
 
 	/**
+	 *
+	 */
+	private $configs;
+
+	/**
 	 * The filepath to this part.
 	 *
 	 * For example, /home/user/backups/1234/plugins-1.zip
@@ -108,15 +113,22 @@ class Part {
 	 * @return bool True on success
 	 */
 	public function add_batch( $batch_filelist_filepath ) {
+		$success = false;
+		$return  = 'unknown';
+
 		$original_size = $this->get_size();
 
-		$archive_command = 'cd ' . ABSPATH . '; zip ' . $this->filepath . ' -@ < ' . $batch_filelist_filepath;
+		$j = empty( $this->configs['junk_paths'] ) ? '' : '-j';
 
-		$this->archive_files->get_core()->execute_command( $archive_command );
+		$archive_command = 'cd ' . ABSPATH . '; zip ' . $this->filepath . ' ' . $j . ' -@ < ' . $batch_filelist_filepath;
+
+		// error_log( '$archive_command = ' . getmypid() . ' ' . $archive_command );
+
+		$this->archive_files->get_core()->execute_command( $archive_command, $success, $return );
 
 		$new_size = $this->get_size();
 
-		return $original_size !== $new_size;
+		return ( $original_size !== $new_size ) && $success;
 	}
 
 	/**
@@ -193,6 +205,17 @@ class Part {
 		$size = $this->get_size();
 
 		return empty( $size );
+	}
+
+	/**
+	 *
+	 */
+	public function set_configs( $configs ) {
+		$defaults = array(
+			'junk_paths' => false,
+		);
+
+		$this->configs = wp_parse_args( $configs, $defaults );
 	}
 
 	/**

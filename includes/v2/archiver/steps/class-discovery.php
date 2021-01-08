@@ -33,6 +33,8 @@ class Discovery extends \Boldgrid\Backup\V2\Step\Step {
 		$this->files();
 
 		$this->complete();
+
+		return true;
 	}
 
 	/**
@@ -54,6 +56,9 @@ class Discovery extends \Boldgrid\Backup\V2\Step\Step {
 	private function files() {
 		$filelist_creator = new \Boldgrid\Backup\V2\Filelist\Create();
 		$files            = $filelist_creator->run();
+
+		\Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'total_size_archived', $filelist_creator->get_total_size() );
+		\Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'total_size_archived_size_format', size_format( $filelist_creator->get_total_size(), 2 ) );
 
 		$filelists = array();
 

@@ -38,6 +38,15 @@ class Create {
 	private $list = array();
 
 	/**
+	 * Total size of all files in the list.
+	 *
+	 * @since SINCEVERSION
+	 * @access private
+	 * @var int
+	 */
+	private $total_size = 0;
+
+	/**
 	 * Construct.
 	 *
 	 * @since SINCEVERSION
@@ -60,9 +69,22 @@ class Create {
 		foreach ( $filelist as $file ) {
 			$type                  = $this->get_type( $file[1] );
 			$this->list[ $type ][] = $file;
+
+			$this->total_size += empty( $file[2] ) ? 0 : $file[2];
 		}
 
 		return $this->list;
+	}
+
+	/**
+	 * Get the total size of all files to archive (uncompressed).
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @return int
+	 */
+	public function get_total_size() {
+		return $this->total_size;
 	}
 
 	/**
