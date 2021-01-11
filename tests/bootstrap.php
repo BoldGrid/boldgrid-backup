@@ -113,6 +113,7 @@ $files = array(
 	'/includes/class-boldgrid-backup-archiver.php',
 	'/includes/archive/class-factory.php',
 	'/includes/archive/class-option.php',
+	'/includes/archiver/class-info.php',
 	'/admin/storage/class-boldgrid-backup-admin-storage-local.php',
 	// Remote storage providers.
 	'/admin/remote/class-boldgrid-backup-admin-ftp.php',
