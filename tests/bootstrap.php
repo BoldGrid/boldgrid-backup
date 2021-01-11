@@ -97,6 +97,12 @@ $files = array(
 	'/admin/class-boldgrid-backup-admin-log.php',
 	'/admin/class-boldgrid-backup-admin-log-page.php',
 	'/admin/class-boldgrid-backup-admin-environment.php',
+	// Cron
+	'/admin/cron/entry/class-entry.php',
+	'/admin/class-cron.php',
+	'/admin/cron/entry/class-base.php',
+	'/admin/cron/entry/class-crontab.php',
+	'/admin/cron/entry/class-wpcron.php',
 	// Tasks.
 	'/admin/class-boldgrid-backup-admin-task.php',
 	'/admin/class-boldgrid-backup-admin-task-helper.php',
@@ -130,6 +136,21 @@ $files = array(
 	// Orphan.
 	'/admin/orphan/class-cleanup.php',
 	'/admin/orphan/class-finder.php',
+	// V2 Filelist.
+	'/includes/v2/filelist/class-create.php',
+	// V2 Step.
+	'/includes/v2/step/class-step.php',
+	'/includes/v2/step/class-data.php',
+	'/includes/v2/step/class-json-file.php',
+	// V2 Archiver.
+	'/includes/v2/archiver/class-factory.php',
+	'/includes/v2/archiver/class-archiver.php',
+	'/includes/v2/archiver/class-resumer.php',
+	'/includes/v2/archiver/steps/class-discovery.php',
+	'/includes/v2/archiver/steps/class-archive-database.php',
+	'/includes/v2/archiver/steps/class-archive-files.php',
+	'/includes/v2/archiver/steps/archive_files/class-part.php',
+	'/includes/v2/archiver/steps/archive_files/class-parts.php',
 );
 
 foreach ( $files as $file ) {

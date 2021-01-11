@@ -285,6 +285,7 @@ class Boldgrid_Backup_Archiver {
 		$this->info->set_keys( array(
 			'mode'              => 'backup',
 			'compressor'        => null,
+			'format'            => $this->format,
 			'filesize'          => 0,
 			'total_size'        => 0,
 			'folder_include'    => $this->core->folder_exclusion->from_settings( 'include' ),
@@ -387,5 +388,7 @@ class Boldgrid_Backup_Archiver {
 		}
 
 		$this->complete();
+
+		return $this->get_info();
 	}
 }

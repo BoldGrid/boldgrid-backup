@@ -168,10 +168,6 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 	 * }
 	 */
 	public function archive_files( $filelist, &$info ) {
-		if ( $info['dryrun'] ) {
-			return true;
-		}
-
 		$cwd = $this->wp_filesystem->cwd();
 
 		$archive = new PclZip( $info['filepath'] );
@@ -336,6 +332,10 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 		}
 
 		$file_contents = $this->get_file( $filepath, $file );
+		if ( ! is_array( $file_contents ) ) {
+			$this->errors[] = __( 'Unable to extract file from archive.', 'boldgrid-backup' );
+			return false;
+		}
 
 		// Make sure the file's dir exists, write the file, and adjust the timestamp.
 		$file_abspath = ABSPATH . $file;

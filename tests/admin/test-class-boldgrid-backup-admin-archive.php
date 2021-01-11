@@ -24,11 +24,11 @@ class Test_Boldgrid_Backup_Admin_Archive extends WP_UnitTestCase {
 	 * @since SINCEVERSION
 	 */
 	public function maybe_create_backup() {
-		$core = apply_filters( 'boldgrid_backup_get_core', null );
-
 		$latest_backup = get_option( 'boldgrid_backup_latest_backup' );
+
 		if ( empty( $latest_backup ) ) {
-			$core->archive_files();
+			$archiver = new Boldgrid_Backup_Archiver();
+			$archiver->run();
 		}
 	}
 

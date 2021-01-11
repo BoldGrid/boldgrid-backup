@@ -188,8 +188,20 @@ class Boldgrid_Backup_Admin_Archive_Log {
 			require_once ABSPATH . 'wp-admin/includes/class-pclzip.php';
 		}
 
+		/*
+		 * Determine which archive file to add our log to.
+		 *
+		 * # One:  /home/user/boldgrid_backup/boldgrid-backup-example.org-213c1637-20210111-181725.zip
+		 * # Many: /home/user/boldgrid_backup/boldgrid-backup-213c1637-ed5c1123168c8eb0/zip-other-1.zip
+		 */
+		if ( 'one' === $info['format'] ) {
+			$filepath = $info['filepath'];
+		} else {
+			$filepath = dirname( $info['filepath'] ) . '/' . wp_basename( $info['filepath'], '.zip' ) . '/zip-other-1.zip';
+		}
+
 		// Open the archive.
-		$archive = new \PclZip( $info['filepath'] );
+		$archive = new \PclZip( $filepath );
 		if ( 0 === $archive ) {
 			return false;
 		}

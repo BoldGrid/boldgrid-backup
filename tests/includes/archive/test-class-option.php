@@ -27,8 +27,8 @@ class Test_Option extends WP_UnitTestCase {
 		$latest_backup = get_option( 'boldgrid_backup_latest_backup' );
 
 		if ( empty( $latest_backup ) ) {
-			$core = apply_filters( 'boldgrid_backup_get_core', null );
-			$core->archive_files();
+			$archiver = new Boldgrid_Backup_Archiver();
+			$archiver->run();
 
 			$latest_backup = get_option( 'boldgrid_backup_latest_backup' );
 		}

@@ -55,14 +55,42 @@ class Test_Boldgrid_Backup_Admin_Compressor extends WP_UnitTestCase {
 			'system_zip' => [],
 		];
 
-		// First, create a backup using each compressor.
-		foreach ( $compressors as $compressor => $compressor_data ) {
-			update_option( 'boldgrid_backup_settings', [ 'compressor' => $compressor ] );
+		$compressors = [
+			'pcl_zip_one'     => array(
+				'settings' => array(
+					'compressor' => 'pcl_zip',
+					'format'     => 'one',
+				),
+			),
+			'php_zip_one'     => array(
+				'settings' => array(
+					'compressor' => 'php_zip',
+					'format'     => 'one',
+				),
+			),
+			'system_zip_one'  => array(
+				'settings' => array(
+					'compressor' => 'system_zip',
+					'format'     => 'one',
+				),
+			),
+			'system_zip_many' => array(
+				'settings' => array(
+					'compressor' => 'system_zip',
+					'format'     => 'many',
+				),
+			),
+		];
 
-			$compressors[ $compressor ] = $this->core->archive_files();
+		// First, create a backup using each compressor.
+		foreach ( $compressors as $key => &$data ) {
+			update_option( 'boldgrid_backup_settings', $data['settings'] );
+
+			$archiver     = new Boldgrid_Backup_Archiver();
+			$data['info'] = $archiver->run();
 
 			// Ensure the proper compressor was used.
-			$this->assertTrue( $compressors[ $compressor ]['compressor'] === $compressor );
+			$this->assertTrue( $data['info']['compressor'] === $data['settings']['compressor'] );
 		}
 
 		// Create a directory where we'll do our testing.
@@ -77,21 +105,35 @@ class Test_Boldgrid_Backup_Admin_Compressor extends WP_UnitTestCase {
 		 * * backup_dir/test_archive_files/php_zip
 		 * * backup_dir/test_archive_files/system_zip
 		 */
-		foreach ( $compressors as $compressor => $info ) {
-			$compressor_dir                             = $testing_dir . '/' . $compressor;
-			$compressors[ $compressor ]['extracted_to'] = $compressor_dir;
+		foreach ( $compressors as $key => &$data ) {
+			$compressor_dir       = $testing_dir . '/' . $key;
+			$data['extracted_to'] = $compressor_dir;
 
 			// Make a directory for this compressor.
 			$this->core->execute_command( 'mkdir ' . $compressor_dir );
 
-			// Copy our zip there.
-			$this->core->execute_command( 'cp ' . $info['filepath'] . ' ' . $compressor_dir . '/' );
+			if ( 'one' === $data['settings']['format'] ) {
+				// Copy our zip there.
+				$this->core->execute_command( 'cp ' . $data['info']['filepath'] . ' ' . $compressor_dir . '/' );
 
-			// Extract the backup.
-			$this->core->execute_command( 'cd ' . $compressor_dir . '; unzip ' . basename( $info['filepath'] ) );
+				// Extract the backup.
+				$this->core->execute_command( 'cd ' . $compressor_dir . '; unzip ' . basename( $data['info']['filepath'] ) );
 
-			// Delete the backup.
-			$this->core->execute_command( 'rm -f ' . $compressor_dir . '/' . basename( $info['filepath'] ) );
+				// Delete the backup.
+				$this->core->execute_command( 'rm -f ' . $compressor_dir . '/' . basename( $data['info']['filepath'] ) );
+			} else {
+				// This is the directory where all the separate zip files are.
+				$backup_dir = dirname( $data['info']['filepath'] ) . '/' . wp_basename( $data['info']['filepath'], '.zip' );
+
+				// Copy our zips.
+				$this->core->execute_command( 'cp ' . $backup_dir . '/*.zip ' . $compressor_dir . '/' );
+
+				// Extract the backups.
+				$this->core->execute_command( 'cd ' . $compressor_dir . '; unzip \*.zip' );
+
+				// Delete the backups.
+				$this->core->execute_command( 'rm -f ' . $compressor_dir . '/*.zip' );
+			}
 		}
 
 		/*
@@ -104,27 +146,32 @@ class Test_Boldgrid_Backup_Admin_Compressor extends WP_UnitTestCase {
 		 * [3] => Only in php_zip: bradm_wp_test.20200204-163545.sql
 		 */
 		// Compare pcl_zip folder and php_zip folder.
-		$output = shell_exec( 'diff -rq ' . $compressors['pcl_zip']['extracted_to'] . ' ' . $compressors['php_zip']['extracted_to'] ); // phpcs:ignore
+		$output = shell_exec( 'diff -rq ' . $compressors['pcl_zip_one']['extracted_to'] . ' ' . $compressors['php_zip_one']['extracted_to'] ); // phpcs:ignore
 		$pclzip_phpzip_diff = explode( PHP_EOL, trim( $output ) );
 		$this->assertTrue( 4 === count( $pclzip_phpzip_diff ) );
 
 		// Compare pcl_zip folder and system_zip folder.
-		$output = shell_exec( 'diff -rq ' . $compressors['pcl_zip']['extracted_to'] . ' ' . $compressors['system_zip']['extracted_to'] ); // phpcs:ignore
+		$output = shell_exec( 'diff -rq ' . $compressors['pcl_zip_one']['extracted_to'] . ' ' . $compressors['system_zip_one']['extracted_to'] ); // phpcs:ignore
 		$pclzip_systemzip_diff = explode( PHP_EOL, trim( $output ) );
 		$this->assertTrue( 4 === count( $pclzip_systemzip_diff ) );
+
+		// Compare pcl_zip folder and system_zip folder.
+		$output = shell_exec( 'diff -rq ' . $compressors['system_zip_one']['extracted_to'] . ' ' . $compressors['system_zip_many']['extracted_to'] ); // phpcs:ignore
+		$systemzip_one_many_diff = explode( PHP_EOL, trim( $output ) );
+		$this->assertTrue( 4 === count( $systemzip_one_many_diff ) );
 
 		/*
 		 * To make sure everything above worked as expected, (1) edit a file, (2) add a blank
 		 * directory, and (3) make sure these differences are caught by diff.
 		 */
 		// (1) Append to a file.
-		$file = fopen( $compressors['system_zip']['extracted_to'] . '/wp-admin/about.php', 'a') or die( 'Unable to open file!' ); // phpcs:ignore
+		$file = fopen( $compressors['system_zip_one']['extracted_to'] . '/wp-admin/about.php', 'a') or die( 'Unable to open file!' ); // phpcs:ignore
 		fwrite( $file, "\n" . 'This is a test' ); // phpcs:ignore
 		fclose( $file ); // phpcs:ignore
 		// (2) Create a dummy folder.
-		mkdir( $compressors['system_zip']['extracted_to'] . '/test-folder' );
+		mkdir( $compressors['system_zip_one']['extracted_to'] . '/test-folder' );
 		// (3) Review the diff.
-		$output = shell_exec( 'diff -rq ' . $compressors['pcl_zip']['extracted_to'] . ' ' . $compressors['system_zip']['extracted_to'] ); // phpcs:ignore
+		$output = shell_exec( 'diff -rq ' . $compressors['pcl_zip_one']['extracted_to'] . ' ' . $compressors['system_zip_one']['extracted_to'] ); // phpcs:ignore
 		$pclzip_systemzip_diff = explode( PHP_EOL, trim( $output ) );
 		$this->assertTrue( 6 === count( $pclzip_systemzip_diff ) );
 	}
