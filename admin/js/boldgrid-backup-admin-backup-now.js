@@ -37,6 +37,7 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 			wpHttpReferer,
 			isUpdating,
 			data,
+
 			/*
 			 * As of @SINCEVERSION, the selectors below were updated to include #TB_ajaxContent. This
 			 * is because if we are on the settings page, the [name] selectors will exist twice and
@@ -44,13 +45,13 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 			 * looking for data in the modal.
 			 */
 			$backupNowType = $( '#TB_ajaxContent [name="folder_exclusion_type"]' ),
-			$tablesType    = $( '#TB_ajaxContent [name="table_inclusion_type"]' ),
+			$tablesType = $( '#TB_ajaxContent [name="table_inclusion_type"]' ),
 			$folderExclude = $( '#TB_ajaxContent [name="folder_exclusion_exclude"]' ),
 			$folderInclude = $( '#TB_ajaxContent [name="folder_exclusion_include"]' ),
-			$tableInclude  = $( '#TB_ajaxContent [name="include_tables[]"]' ),
-			includeTables  = [],
-			type           = 'full',
-			tablesType     = null;
+			$tableInclude = $( '#TB_ajaxContent [name="include_tables[]"]' ),
+			includeTables = [],
+			type = 'full',
+			tablesType = null;
 
 		/*
 		 * If we are in a Backup Site Now modal and there is a "type" value set,
