@@ -401,6 +401,11 @@ class Boldgrid_Backup_Admin_Upload {
 	 * @uses $_POST['url'] URL address.
 	 */
 	public function ajax_url_import() {
+		$logger = new Boldgrid_Backup_Admin_Log( $this->core );
+		$logger->init( 'transfer-archive.log' );
+		$logger->add_separator();
+		$logger->add( 'Beginning ajax_url_import...' );
+
 		// Check user permissions.
 		if ( ! current_user_can( 'update_plugins' ) ) {
 			wp_send_json_error(

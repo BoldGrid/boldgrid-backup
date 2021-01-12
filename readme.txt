@@ -2,9 +2,9 @@
 Contributors: boldgrid, joemoto, imh_brad, rramo012, bgnicolepaschen, jamesros161
 Tags: backup, cloud backup, database backup, restore, wordpress backup
 Requires at least: 4.4
-Tested up to: 5.5
+Tested up to: 5.6
 Requires PHP: 5.4
-Stable tag: 1.14.4
+Stable tag: 1.14.10
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -131,6 +131,51 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 1. Activate the plugin through the Plugins menu in WordPress.
 
 == Changelog ==
+
+= 1.14.10 =
+
+Release date: December 14th, 2020
+
+* Update: Added transfer log.
+* Security fix: Fixes for restore-info.json file and cli/env-info.php script.
+
+= 1.14.9 =
+
+Release date: December 8th, 2020
+
+* Bug fix: Fixed reset link for backup all tables.
+* Bug fix: Fixed pagination buttons for file exclusion tool.
+* Bug fix: Fixed several html escaping issues.
+* Bug fix: Fixed file exclusion preview filter input.
+* Bug fix: Fixed various jqmigrate warnings.
+
+= 1.14.8 =
+
+Release date: November 13th, 2020
+
+* Update: Rebuild with composer 1.
+
+= 1.14.7 =
+
+Release date: November 12th, 2020
+
+* Update: Prevent easy apache cache files in backups.
+* Bug fix: Fixed nonce errors when downloading remote archives.
+
+= 1.14.6 =
+
+Release date: October 13th, 2020
+
+* Update: Updated dependencies.
+* Update: Added additional logged and filesystem analysis log.
+* Bug fix: Fixed ftp bug.
+
+= 1.14.5 =
+
+Release date: September 22nd, 2020
+
+* Update: Optimized functionality tests.
+* Update: Optimized plugins and themes init in auto updates.
 
 = 1.14.4 =
 
@@ -753,5 +798,10 @@ Release Date: June 21st, 2016
 * Initial public release.
 
 == Upgrade Notice ==
+
 = 1.12.0 =
 BoldGrid Backup has become Total Upkeep.  Different name with the same great features.
+
+= 1.14.10 =
+Updating to Total Upkeep 1.14.10 will fix possible security issues related to the restore-info.json file and cli/env-info.php script.
+

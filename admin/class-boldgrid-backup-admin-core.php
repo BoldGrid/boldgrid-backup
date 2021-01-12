@@ -1557,10 +1557,9 @@ class Boldgrid_Backup_Admin_Core {
 		$this->logger->add_separator();
 
 		if ( false === $status || ! empty( $status['error'] ) ) {
-			return [
-				'error' => ! empty( $status['error'] ) ? $status['error'] :
-					__( 'An unknown error occurred when backing up the database.', 'boldgrid-backup' ),
-			];
+			$error = ! empty( $status['error'] ) ? $status['error'] : __( 'An unknown error occurred when backing up the database.', 'boldgrid-backup' );
+			$this->logger->add( $error );
+			return array( 'error' => $error );
 		}
 
 		// Keep track of how long the site was paused for / the time to backup the database.
@@ -1577,6 +1576,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Check if the backup directory is writable.
 		if ( ! $this->wp_filesystem->is_writable( $backup_directory ) ) {
+			$this->logger->add( 'Backup directory is not writable.' );
 			return false;
 		}
 
@@ -1629,6 +1629,18 @@ class Boldgrid_Backup_Admin_Core {
 				'compressor'       => $info['compressor'],
 			]
 		);
+
+		if ( Boldgrid_Backup_Admin_Filelist_Analyzer::is_enabled() ) {
+			$this->logger->add_separator();
+			$this->logger->add( 'Starting to analyze filelist...' );
+			$this->logger->add_memory();
+
+			$filelist_analyzer = new Boldgrid_Backup_Admin_Filelist_Analyzer( $filelist, $log_time );
+			$filelist_analyzer->run();
+
+			$this->logger->add( 'Finished analyzing filelist!' );
+			$this->logger->add_memory();
+		}
 
 		/*
 		 * Use the chosen compressor to build an archive.
@@ -1696,6 +1708,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		if ( ! empty( $status['error'] ) ) {
+			$this->logger->add( $status['error'] );
 			return $status;
 		}
 

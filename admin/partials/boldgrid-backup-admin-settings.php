@@ -20,6 +20,7 @@ $nav             = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-back
 $scheduler       = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/scheduler.php';
 $compressor      = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/compressor.php';
 $format          = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/format.php';
+$backup_logs     = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/backup-logs.php';
 $folders_include = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/folders.php';
 $db              = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/db.php';
 $auto_backup     = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/auto-backup.php';
@@ -58,7 +59,7 @@ $sections = [
 		[
 			'id'      => 'section_process',
 			'title'   => __( 'Backup Process', 'boldgrid-backup' ),
-			'content' => $compressor . $format,
+			'content' => $compressor . $backup_logs . $format,
 		],
 		[
 			'id'      => 'connect_key',

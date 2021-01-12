@@ -13,9 +13,10 @@ reports/
 package-lock.json
 yarn-error.log
 cli/bgbkup-cli.log
+cli/verify-*
 cron/cron-test.config
 cron/cron-test.result
-cron/restore-info.json
+cron/restore-info-*
 boldgrid-backup-cron.log
 .ea-php-cli.cache
 .vscode

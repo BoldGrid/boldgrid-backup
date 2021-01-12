@@ -69,6 +69,14 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	public $in_ajax_preview = false;
 
 	/**
+	 * Filename of our restore-info.json file.
+	 *
+	 * @since 1.14.10
+	 * @var string
+	 */
+	public $restore_info_filename;
+
+	/**
 	 * Determine the type of backup we are performing.
 	 *
 	 * Usually it will be 'full' or 'custom'.
@@ -130,6 +138,9 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 		 */
 		$this->default_include = apply_filters( 'boldgrid_backup_default_folder_include', $this->default_include );
 		$this->default_exclude = apply_filters( 'boldgrid_backup_default_folder_exclude', $this->default_exclude );
+
+		// Set in the constructor so as to prevent excessive calls in self::allow_file.
+		$this->restore_info_filename = basename( \Boldgrid\Backup\Cli\Info::get_results_filepath() );
 	}
 
 	/**
@@ -147,7 +158,11 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 		}
 
 		// Do not allow the "cron/restore-info.json" file used for emergency restorations.
-		if ( $this->is_match( 'cron/restore-info.json', $file ) ) {
+		if ( $this->is_match( 'cron/' . $this->restore_info_filename, $file ) ) {
+			return false;
+		}
+
+		if ( $this->is_banned( $file ) ) {
 			return false;
 		}
 
@@ -388,6 +403,25 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 		}
 
 		return $this->$type;
+	}
+
+	/**
+	 * Whether or not a file is banned.
+	 *
+	 * Some files are just bad for business. Files in this list won't be backed up, and the user has
+	 * no control at this time to modify. Only files we're certain should be banned, should be.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param string $file A filepath. Not absolute, but relative to ABSPATH, such as wp-admin/css/about.css
+	 *
+	 * @return bool
+	 */
+	public function is_banned( $filepath ) {
+		$banned = Boldgrid_Backup_Admin::get_configs()['banned'];
+
+		// @todo Allow for regular expressions in the future.
+		return in_array( basename( $filepath ), $banned, true );
 	}
 
 	/**

@@ -700,6 +700,13 @@ class Boldgrid_Backup_Admin_Settings {
 			}
 
 			/*
+			 * Save "backup filelist analysis" setting.
+			 *
+			 * @since SINCEVERSION
+			 */
+			$settings['filelist_analysis'] = ! empty( $_POST['filelist_analysis'] ) ? 1 : 0;
+
+			/*
 			 * Save Compression Level Settings.
 			 *
 			 * @since 1.14.0
