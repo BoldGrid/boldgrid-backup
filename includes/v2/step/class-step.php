@@ -112,6 +112,10 @@ class Step {
 	public function __construct( $id, $parent_id, $dir ) {
 		$this->core = apply_filters( 'boldgrid_backup_get_core', false );
 
+		if ( ! $this->core->wp_filesystem->exists( $dir ) ) {
+			$this->core->wp_filesystem->mkdir( $dir );
+		}
+
 		$this->id        = $id;
 		$this->parent_id = $parent_id;
 		$this->dir       = trailingslashit( $dir );

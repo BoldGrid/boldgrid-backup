@@ -32,11 +32,7 @@ class Factory {
 
 		$name = 'boldgrid-backup-' . $core->get_backup_identifier() . '-' . $id;
 
-		// Create the folder if it does not exist.
 		$backup_folder_path = $core->backup_dir->get_path_to( $name );
-		if ( ! $core->wp_filesystem->exists( $backup_folder_path ) ) {
-			$core->wp_filesystem->mkdir( $backup_folder_path );
-		}
 
 		// Create the zip placeholder.
 		$zip_filepath = $core->backup_dir->get_path_to( $name . '.zip' );

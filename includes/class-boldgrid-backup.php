@@ -340,9 +340,13 @@ class Boldgrid_Backup {
 		 * V2 is the beginning of split / resumable backups.
 		 */
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/filelist/class-create.php';
+
+		// V2 Step.
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/step/class-step.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/step/class-data.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/step/class-json-file.php';
+
+		// V2 Archiver.
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/archiver/class-factory.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/archiver/class-archiver.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/archiver/class-resumer.php';
@@ -351,6 +355,16 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/archiver/steps/class-archive-files.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/archiver/steps/archive_files/class-part.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/archiver/steps/archive_files/class-parts.php';
+
+		// V2 Restorer.
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/restorer/class-restorer.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/restorer/class-factory.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/restorer/steps/class-unzip.php';
+
+		// V2 Archive.
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/archive/class-archive.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/archive/class-dirlist.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/archive/class-factory.php';
 
 		$this->loader = new Boldgrid_Backup_Loader();
 	}

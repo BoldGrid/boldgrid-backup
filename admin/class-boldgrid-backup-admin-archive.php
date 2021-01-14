@@ -130,6 +130,11 @@ class Boldgrid_Backup_Admin_Archive {
 	public $view_details_url = '';
 
 	/**
+	 * @var \Boldgrid\Backup\V2\Archive\Archive
+	 */
+	public $virtual;
+
+	/**
 	 * Archive id.
 	 *
 	 * The archive id is the archive's id as found in the boldgrid_backup_backups option.
@@ -361,6 +366,9 @@ class Boldgrid_Backup_Admin_Archive {
 
 		$this->basename   = wp_basename( $this->filename, '.zip' );
 		$this->is_virtual = $this->core->backup_dir->exists( $this->basename );
+		if ( $this->is_virtual ) {
+			$this->virtual = \Boldgrid\Backup\V2\Archive\Factory::run_by_filename( $this->filename );
+		}
 
 		$this->log_filepath = $this->core->archive_log->path_from_zip( $this->filepath );
 		$this->log_filename = basename( $this->log_filepath );

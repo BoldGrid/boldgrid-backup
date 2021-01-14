@@ -22,6 +22,15 @@ namespace Boldgrid\Backup\Archive;
  */
 class Factory {
 	/**
+	 * The dir of a virtual archive.
+	 */
+	public static function get_by_dir( $dir ) {
+		$filename = untrailingslashit( $dir ) . '.zip';
+
+		return self::get_by_filename( $filename );
+	}
+
+	/**
 	 * Get an archive by filename.
 	 *
 	 * @since SINCEVERSION

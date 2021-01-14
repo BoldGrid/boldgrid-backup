@@ -22,6 +22,13 @@
  */
 class Boldgrid_Backup_Restorer {
 	/**
+	 * @since SINCEVERSION
+	 * @access private
+	 * @var Boldgrid_Backup_Admin_Archive
+	 */
+	private $archive;
+
+	/**
 	 * Admin core.
 	 *
 	 * @since SINCEVERSION
@@ -112,8 +119,15 @@ class Boldgrid_Backup_Restorer {
 	 * Steps to take before an archive is started.
 	 *
 	 * @since SINCEVERSION
+	 *
+	 * @param  array $args {
+	 *     An optional array of args.
+	 *
+	 *     @type int    $archive_key      An archive key.
+	 *     @type string $archive_filename An archive filename.
+	 * }
 	 */
-	public function init() {
+	public function init( $args = array() ) {
 		// Init our logger.
 		$this->core->logger->init( 'restore-' . time() . '.log' );
 		$this->core->logger->add( 'Restore process initialized.' );
@@ -131,6 +145,129 @@ class Boldgrid_Backup_Restorer {
 			$this->task->init( [ 'type' => 'restore' ] );
 		}
 		$this->task->start();
+
+		$this->core->restoring_archive_file = true;
+
+		// Using pcl_zip (ZipArchive unavailable), a 400MB+ zip used over 500MB+ of memory to restore.
+		Boldgrid_Backup_Admin_Utility::bump_memory_limit( '1G' );
+
+		// Close any PHP session, so that another session can open during this restore operation.
+		session_write_close();
+
+		// Prevent this script from dying.
+		ignore_user_abort( true );
+
+		$this->core->set_time_limit();
+
+		/*
+		 * This is a generic method to restore an archive. Do not assume the request to restore is coming
+		 * from a user directly via $_POST.
+		 *
+		 * Refer to check_ajax_referer usage below to help protect ajax requests.
+		 */
+		$is_post_restore = isset( $_POST['action'] ) && 'boldgrid_backup_restore_archive' === $_POST['action']; // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+
+		// If a restoration was not requested, then abort.
+		if ( empty( $_POST['restore_now'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+			$error_message = esc_html__( 'Invalid restore_now value.', 'boldgrid-backup' );
+			$this->core->logger->add( $error_message );
+			return [ 'error' => $error_message ];
+		}
+
+		if ( $is_post_restore && ! check_ajax_referer( 'boldgrid_backup_restore_archive', 'archive_auth', false ) ) {
+			$error_message = esc_html__( 'Invalid nonce.', 'boldgrid-backup' );
+			$this->core->logger->add( $error_message );
+			return [ 'error' => $error_message ];
+		}
+
+		// Check if functional.
+		if ( ! $this->core->test->run_functionality_tests() ) {
+			$error_message = esc_html__( 'Functionality tests fail.', 'boldgrid-backup' );
+			$this->core->logger->add( $error_message );
+			return [ 'error' => $error_message ];
+		}
+
+		/*
+		 * Get our archive key.
+		 *
+		 * It can be passed in via $args or $_POST.
+		 */
+		$archive_key = false;
+		if ( isset( $args['archive_key'] ) ) {
+			$archive_key = (int) $args['archive_key'];
+		} elseif ( isset( $_POST['archive_key'] ) && is_numeric( $_POST['archive_key'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+			$archive_key = (int) $_POST['archive_key'];
+		} else {
+			$error_message = esc_html__( 'Invalid key for the selected archive file.', 'boldgrid-backup' );
+			$this->core->logger->add( $error_message );
+			return [ 'error' => $error_message ];
+		}
+
+		/*
+		 * Get our archive filename.
+		 *
+		 * It can be passed in via $args or $_POST.
+		 */
+		$archive_filename = false;
+		if ( ! empty( $args['archive_filename'] ) ) {
+			$archive_filename = sanitize_file_name( $args['archive_filename'] );
+		} elseif ( ! empty( $_POST['archive_filename'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+			$archive_filename = sanitize_file_name( $_POST['archive_filename'] );
+		} else {
+			$error_message = esc_html__( 'Invalid filename for the selected archive file.', 'boldgrid-backup' );
+			$this->core->logger->add( $error_message );
+			return [ 'error' => $error_message ];
+		}
+
+		$archives = $this->core->get_archive_list( $archive_filename );
+		if ( empty( $archives ) ) {
+			$error_message = esc_html__( 'No archive files were found.', 'boldgrid-backup' );
+			$this->core->logger->add( $error_message );
+			return [ 'error' => $error_message ];
+		}
+
+		$filename = ! empty( $archives[ $archive_key ]['filename'] ) ? $archives[ $archive_key ]['filename'] : null;
+
+		if ( $archive_filename !== $filename ) {
+			$error_message = esc_html__( 'The selected archive file was not found.', 'boldgrid-backup' );
+			$this->core->logger->add( $error_message );
+			return [ 'error' => $error_message ];
+		}
+
+		$filepath = ! empty( $archives[ $archive_key ]['filepath'] ) ? $archives[ $archive_key ]['filepath'] : null;
+
+		if ( ! empty( $filepath ) && $this->core->wp_filesystem->exists( $filepath ) ) {
+			$filesize = $this->core->wp_filesystem->size( $filepath );
+		} else {
+			$error_message = esc_html__( 'The selected archive file is empty.', 'boldgrid-backup' );
+			$this->core->logger->add( $error_message );
+			return [ 'error' => $error_message ];
+		}
+
+		// Populate $info.
+		$info = [
+			'mode'        => 'restore',
+			'filename'    => $archive_filename,
+			'filepath'    => $filepath,
+			'filesize'    => $filesize,
+			'archive_key' => $archive_key,
+			'restore_ok'  => true,
+		];
+		$this->core->logger->add( 'Restore info: ' . print_r( $info, 1 ) ); // phpcs:ignore
+
+		error_log( 'restore info = ' . print_r( $info,1));
+
+		$this->archive = \Boldgrid\Backup\Archive\Factory::get_by_filename( $info['filename'] );
+		if ( empty( $this->archive ) ) {
+			$error_message = esc_html__( 'Unable to get archive by filename.', 'boldgrid-backup' );
+			$this->core->logger->add( $error_message );
+			return [ 'error' => $error_message ];
+		}
+
+// 		error_log( 'is virtual = ' . $archive->is_virtual );
+// 		$zips = $archive->virtual->get_dirlist()->get_by_extension( 'zip' );
+// 		error_log( 'zips = ' . print_r( $zips,1 ) );
+// 		die();
 	}
 
 	/**
@@ -197,7 +334,12 @@ class Boldgrid_Backup_Restorer {
 	public function run() {
 		$this->init();
 
-		$this->info = $this->core->restore_archive_file();
+		if ( $this->archive->is_virtual ) {
+			$restorer = \Boldgrid\Backup\V2\Restorer\Factory::run( $this->archive->virtual->get_id(), null );
+			$restorer->run();
+		} else {
+			$this->info = $this->core->restore_archive_file();
+		}
 
 		$this->complete();
 	}
