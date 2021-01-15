@@ -324,7 +324,9 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 		$_POST['archive_key']      = 0;
 		$_POST['archive_filename'] = basename( $this->info['filepath'] );
 
-		$this->core->restore_archive_file();
+		$restorer = new Boldgrid_Backup_Restorer();
+		$restorer->run();
+		// $this->core->restore_archive_file();
 
 		$this->deleteBasic( 'restore' );
 	}

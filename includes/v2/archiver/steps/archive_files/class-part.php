@@ -71,7 +71,7 @@ class Part {
 	 * @access private
 	 * @var int
 	 */
-	private $max_size = 100 * 1000000;
+	private $max_size = 100 * 1024 * 1024;
 
 	/**
 	 * This part's number.
@@ -144,6 +144,13 @@ class Part {
 	}
 
 	/**
+	 *
+	 */
+	public function get_filename() {
+		return basename( $this->filepath );
+	}
+
+	/**
 	 * Get the max size for this part.
 	 *
 	 * @since SINCEVERSION
@@ -189,7 +196,12 @@ class Part {
 		// PHP will cache the size. Clear the cache.
 		clearstatcache();
 
-		return $this->archive_files->get_core()->wp_filesystem->size( $this->filepath );
+		$size = 0;
+		if ( $this->archive_files->get_core()->wp_filesystem->exists( $this->filepath ) ) {
+			$size = $this->archive_files->get_core()->wp_filesystem->size( $this->filepath );
+		}
+
+		return $size;
 	}
 
 	/**

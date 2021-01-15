@@ -1210,122 +1210,6 @@ class Boldgrid_Backup_Admin_Core {
 	}
 
 	/**
-	 * Restore the WordPress database from a dump file.
-	 *
-	 * @since 1.0
-	 * @access private
-	 *
-	 * @see Boldgrid_Backup_Admin_Test::run_functionality_tests()
-	 * @see Boldgrid_Backup_Admin_Backup_Dir::get()
-	 * @see Boldgrid_Backup_Admin_Utility::update_siteurl()
-	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
-	 * @global wpdb $wpdb The WordPress database class object.
-	 *
-	 * @param  string $db_dump_filepath File path to the mysql dump file.
-	 * @param  string $db_prefix        The database prefix to use, if restoring and it changed.
-	 * @param  bool   $db_encrypted     Is the database dump file encrypted.
-	 * @return bool Status of the operation.
-	 */
-	private function restore_database( $db_dump_filepath, $db_prefix = null, $db_encrypted = false ) {
-		// Check input.
-		if ( empty( $db_dump_filepath ) ) {
-			// Display an error notice.
-			do_action(
-				'boldgrid_backup_notice',
-				esc_html__( 'The database dump file was not found.', 'boldgrid-backup' ),
-				'notice notice-error is-dismissible'
-			);
-
-			return false;
-		}
-
-		// Check if functional.
-		if ( ! $this->test->run_functionality_tests() ) {
-			// Display an error notice.
-			$this->notice->functionality_fail_notice();
-
-			return false;
-		}
-
-		// Connect to the WordPress Filesystem API.
-		global $wp_filesystem;
-
-		// Save the file path.
-		$this->db_dump_filepath = $db_dump_filepath;
-
-		// Get the WP Options for "siteurl" and "home", to restore later.
-		$wp_siteurl = get_option( 'siteurl' );
-		$wp_home    = get_option( 'home' );
-
-		$this->set_time_limit();
-
-		if ( $db_encrypted ) {
-			/**
-			 * If BGBP is activated, then check for encryption and decrypt the file.
-			 *
-			 * @since 1.12.0
-			 */
-			do_Action( 'boldgrid_backup_crypt_file', $db_dump_filepath, 'd' );
-		}
-
-		// Import the dump file.
-		$importer = new Boldgrid_Backup_Admin_Db_Import();
-		$status   = $importer->import( $db_dump_filepath );
-
-		if ( ! empty( $status['error'] ) ) {
-			$this->db_restore_error = $status['error'];
-			do_action( 'boldgrid_backup_notice', $status['error'], 'notice notice-error is-dismissible' );
-			return false;
-		}
-
-		// Set the database prefix, if supplied/changed.
-		if ( ! empty( $db_prefix ) ) {
-			// Connect to the WordPress database via $wpdb.
-			global $wpdb;
-
-			// Set the database table prefix.
-			$wpdb->set_prefix( $db_prefix );
-		}
-
-		// Clear the WordPress cache.
-		wp_cache_flush();
-
-		// Get the restored "siteurl" and "home".
-		$restored_wp_siteurl = get_option( 'siteurl' );
-		$restored_wp_home    = get_option( 'home' );
-
-		// If changed, then update the siteurl in the database.
-		if ( $restored_wp_siteurl !== $wp_siteurl ) {
-			$update_siteurl_success =
-				Boldgrid_Backup_Admin_Utility::update_siteurl( $restored_wp_siteurl, $wp_siteurl );
-
-			if ( ! $update_siteurl_success ) {
-				// Display an error notice.
-				do_action(
-					'boldgrid_backup_notice',
-					esc_html__(
-						'The WordPress siteurl has changed.  There was an issue changing it back.  You will have to fix the siteurl manually in the database, or use an override in your wp-config.php file.',
-						'boldgrid-backup'
-					),
-					'notice notice-error is-dismissible'
-				);
-			}
-		}
-
-		// If changed, then restore the WP Option for "home".
-		if ( $restored_wp_home !== $wp_home ) {
-
-			// There may be a filter, so remove it.
-			remove_all_filters( 'pre_update_option_home' );
-
-			update_option( 'home', untrailingslashit( $wp_home ) );
-		}
-
-		// Return success.
-		return true;
-	}
-
-	/**
 	 * Get a single-dimension filelist array from a directory path.
 	 *
 	 * @since 1.0
@@ -1955,7 +1839,6 @@ class Boldgrid_Backup_Admin_Core {
 	 * @return string File path to the database dump file.
 	 */
 	public function get_dump_file( $filepath ) {
-
 		if ( empty( $filepath ) || ! $this->wp_filesystem->exists( $filepath ) ) {
 			return '';
 		}
@@ -2042,37 +1925,15 @@ class Boldgrid_Backup_Admin_Core {
 	 * }
 	 * @return array An array of archive file information.
 	 */
-	public function restore_archive_file( $dryrun = false, $args = [] ) {
-		$restore_ok = true;
+	public function restore_archive_file( $info, $args = [] ) {
+		$logger = apply_filters( 'boldgrid_backup_get_restore_logger', null );
 
-		/**
-		 * Action to take before restoring an archive.
-		 *
-		 * @since 1.5.1
-		 *
-		 * @param array $info
-		 */
-		do_action( 'boldgrid_backup_pre_restore', $info );
-
-		/*
-		 * Attempt to fix any permissions related issues before the restoration begins. If we're
-		 * unable to, the restoration may not continue.
-		 */
-		if ( class_exists( 'ZipArchive' ) ) {
-			if ( ! $this->restore_helper->set_writable_permissions( $info['filepath'] ) ) {
-				$error_message = $this->restore_helper->get_last_error();
-				$this->logger->add( $error_message );
-				return [ 'error' => $error_message ];
-			}
-		} else {
-			$this->logger->add( 'ZipArchive not available. Unable to set_writable_permissions. Trying restore anyways...' );
-		}
-
-		$this->logger->add( 'Unzipping archive... filepath / ABSPATH: ' . $info['filepath'] . ' / ' . ABSPATH );
-		$this->logger->add_memory();
-		$unzip_status = ! $dryrun ? unzip_file( $info['filepath'], ABSPATH ) : null;
-		$this->logger->add( 'Unzip complete! Status: ' . print_r( $unzip_status, 1 ) ); // phpcs:ignore
-		$this->logger->add_memory();
+		// Unzip handled in v2.
+		$logger->add( 'Unzipping archive... filepath / ABSPATH: ' . $info->get_key( 'filepath' ) . ' / ' . ABSPATH );
+		$logger->add_memory();
+		$unzip_status = unzip_file( $info->get_key( 'filepath' ), ABSPATH );
+		$logger->add( 'Unzip complete! Status: ' . print_r( $unzip_status, 1 ) ); // phpcs:ignore
+		$logger->add_memory();
 
 		if ( is_wp_error( $unzip_status ) ) {
 			$error = false;
@@ -2095,7 +1956,9 @@ class Boldgrid_Backup_Admin_Core {
 
 			return [ 'error' => $error ];
 		}
+		// unzip handled in v2.
 
+		// Added in v2.
 		/**
 		 * Action to take after restoring an archive.
 		 *
@@ -2103,7 +1966,7 @@ class Boldgrid_Backup_Admin_Core {
 		 *
 		 * @param array $info
 		 */
-		do_action( 'boldgrid_backup_post_restore', $info );
+		do_action( 'boldgrid_backup_post_restore', $info->get() );
 
 		/*
 		 * Restore database.
@@ -2112,75 +1975,15 @@ class Boldgrid_Backup_Admin_Core {
 		 * database dump before running the below conditional. Not all archives
 		 * will contain a database dump, so we may be able to skip this step.
 		 */
-		$db_dump_filepath = $this->get_dump_file( $filepath );
-		$this->logger->add( 'Attempting database restoration... $db_dump_filepath = ' . $db_dump_filepath );
-		$this->logger->add_memory();
-		if ( ! $dryrun && ! empty( $db_dump_filepath ) ) {
-			$db_prefix = null;
-
-			// Get the database table prefix from the new "wp-config.php" file, if exists.
-			if ( $this->wp_filesystem->exists( ABSPATH . 'wp-config.php' ) ) {
-				$wpcfg_contents = $this->wp_filesystem->get_contents( ABSPATH . 'wp-config.php' );
-			}
-
-			if ( ! empty( $wpcfg_contents ) ) {
-				preg_match( '#\$table_prefix.*?=.*?' . "'" . '(.*?)' . "'" . ';#', $wpcfg_contents, $matches );
-
-				if ( ! empty( $matches[1] ) ) {
-					$db_prefix = $matches[1];
-				}
-			}
-
-			// Determine if the dump file is encrypted.
-			$this->archive->init( $filepath );
-			$db_encrypted = $this->archive->get_attribute( 'encrypt_db' );
-
-			// Restore the database and then delete the dump.
-			$restore_ok = $this->restore_database( $db_dump_filepath, $db_prefix, $db_encrypted );
-			$this->wp_filesystem->delete( $db_dump_filepath, false, 'f' );
-
-			// Display notice of deletion status.
-			if ( ! $restore_ok ) {
-				$error_message = $this->db_restore_error ? $this->db_restore_error : esc_html__( 'Could not restore database.', 'boldgrid-backup' );
-				$this->logger->add( $error_message );
-				return [ 'error' => $error_message ];
-			}
+		$db_dump_filepath = $this->get_dump_file( $info->get_key( 'filepath' ) );
+		$logger->add( 'Attempting database restoration... $db_dump_filepath = ' . $db_dump_filepath );
+		$logger->add_memory();
+		if ( ! empty( $db_dump_filepath ) ) {
+			$db_restorer = new \Boldgrid\Backup\Restorer\Db( $info->get_key( 'filepath' ), $db_dump_filepath );
+			$db_restorer->run();
 		}
-		$this->logger->add( 'Database restoration complete.' );
-		$this->logger->add_memory();
-
-		// Clear rollback information and restoration cron jobs that may be present.
-		$this->auto_rollback->cancel();
-
-		// Get settings.
-		$settings = $this->settings->get_settings();
-
-		// If enabled, send email notification for restoration completed.
-		if ( ! empty( $settings['notifications']['restore'] ) ) {
-			$this->logger->add( 'Sending "restoration complete" email notification...' );
-
-			// Include the mail template.
-			include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-mail-restore.php';
-
-			// Send the notification.
-			// Parameters come from the included mail template file.
-			$info['mail_success'] = $this->email->send( $subject, $body );
-
-			$this->logger->add( 'Email sent. Status: ' . ( empty( $info['mail_success'] ) ? 'Fail' : 'Success' ) );
-		}
-
-		// Update status.
-		$info['restore_ok'] = $restore_ok;
-
-		// Check backup directory.
-		$info['backup_directory_set'] = $this->backup_dir->get();
-
-		$this->logger->add( 'Restoration complete!' );
-
-		$this->restoring_archive_file = false;
-
-		// Return info array.
-		return $info;
+		$logger->add( 'Database restoration complete.' );
+		$logger->add_memory();
 	}
 
 	/**

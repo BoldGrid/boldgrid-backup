@@ -92,6 +92,8 @@ class Step {
 	 */
 	protected $info;
 
+	protected $logger;
+
 	/**
 	 * The number of seconds until a step is seen as unresonsive.
 	 *
@@ -139,6 +141,8 @@ class Step {
 		$attempts = $this->get_data_type( 'run' )->get_key( 'attempts', 0 );
 		$attempts++;
 
+		$this->log( 'Beginning attempt ' . $attempts . '...' );
+
 		$this->get_data_type( 'run' )->set_key( 'attempts', $attempts );
 		$this->get_data_type( 'run' )->set_key( 'start_time', time() );
 		$this->get_data_type( 'run' )->set_key( 'memory_peak_start', memory_get_peak_usage() );
@@ -179,6 +183,8 @@ class Step {
 
 		$this->get_data_type( 'run' )->set_key( 'memory_peak_end', $memory_peak_end );
 		$this->get_data_type( 'run' )->set_key( 'memory_peak_change', $memory_peak_change );
+
+		$this->log( 'Attempt completed.' );
 	}
 
 	/**
@@ -189,6 +195,8 @@ class Step {
 		$this->get_data_type( 'run' )->set_key( 'fail_message', $message );
 
 		$this->info->set_key( 'error', $message );
+
+		$this->log( 'Attempt failed: ' . $message );
 
 		$this->complete();
 	}
@@ -350,6 +358,24 @@ class Step {
 		$time_since_checkin = time() - $this->get_data_type( 'run' )->get_key( 'last_check_in', 0 );
 
 		return ! $this->is_complete() && $time_since_checkin >= $this->unresponsive_time;
+	}
+
+	/**
+	 *
+	 */
+	public function log( $message ) {
+		if ( is_null( $this->logger ) ) {
+			$log_filename = $this->info->get_key( 'log_filename' );
+
+			if ( empty( $log_filename ) ) {
+				return false;
+			}
+
+			$this->logger = new \Boldgrid_Backup_Admin_Log( $this->get_core() );
+			$this->logger->init( $log_filename );
+		}
+
+		$this->logger->add( 'pid:' . getmypid() . ' step:' . $this->id . ' ' . $message );
 	}
 
 	/**

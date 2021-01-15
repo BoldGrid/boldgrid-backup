@@ -60,6 +60,7 @@ $valid_modes = array(
 	'backup',
 	'restore',
 	'resume',
+	'resume_restore',
 );
 
 if ( ! in_array( $input['mode'], $valid_modes, true ) ) {

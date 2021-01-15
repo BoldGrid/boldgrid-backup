@@ -53,6 +53,8 @@ class Archive_Files extends \Boldgrid\Backup\V2\Step\Step {
 	 */
 	private $last_archived_key;
 
+	private $last_key;
+
 	/**
 	 * The max batch size.
 	 *
@@ -60,7 +62,7 @@ class Archive_Files extends \Boldgrid\Backup\V2\Step\Step {
 	 * @access private
 	 * @var int
 	 */
-	private $max_batch_size = 25 * 1000000;
+	private $max_batch_size = 25 * 1024 * 1024;
 
 	/**
 	 * Our parts class.
@@ -111,7 +113,14 @@ class Archive_Files extends \Boldgrid\Backup\V2\Step\Step {
 			$part->set_configs( $this->configs['part_configs'] );
 		}
 
-		// Determine the max size to archive during this batch.
+		/*
+		 * Determine the max size to archive during this batch.
+		 *
+		 * When determining how large to make this batch:
+		 * If we're trying to add 10MB to the part and we loop through and find 10MB of files, after
+		 * compression it may only be 3MB. So instead of adding 10MB to the file, we only added 3MB.
+		 * This can account for more itterations than needed. @todo Account for this in logic below.
+		 */
 		$max_batch_size = min( $part->get_remaining_size(), $this->max_batch_size );
 		$remaining_size = $max_batch_size;
 		$is_part_empty  = $part->is_empty();
@@ -162,6 +171,26 @@ class Archive_Files extends \Boldgrid\Backup\V2\Step\Step {
 			'part'                    => $part,
 		);
 
+		/*
+		 * Log data.
+		 *
+		 * The additional spacing added to make it easier to read in the log.
+		 */
+		$part_size  = $part->get_size();
+		$batch_zize = $max_batch_size - $remaining_size;
+		$this->log( 'New batch created and needs processing: ' . print_r( array(
+			'$batch_filelist_filename' => $batch_filelist_filename,
+			'$start_key              ' => $start_key,
+			'$files_added            ' => $files_added,
+			'$last_archived_key      ' => $this->last_archived_key,
+			'last key                ' => $this->last_key,
+			'batch size              ' => size_format( $batch_zize, 2 ) . ' / ' . $batch_zize,
+			'batch size max          ' => size_format( $max_batch_size, 2 ) . ' / ' . $max_batch_size,
+			'part filename           ' => $part->get_filename(),
+			'part size               ' => size_format( $part_size, 2 ) . ' / ' . $part_size,
+			'part remaining size     ' => size_format( $remaining_size, 2 ) . ' / ' . $remaining_size,
+		), 1 ) );
+
 		return $success ? $batch_info : false;
 	}
 
@@ -182,8 +211,6 @@ class Archive_Files extends \Boldgrid\Backup\V2\Step\Step {
 	 * @since SINCEVERSION
 	 */
 	public function run() {
-		// error_log( 'archive files configs = ' . print_r( $this->configs,1) );
-
 		\Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'step', 3 );
 
 		$this->add_attempt();
@@ -196,11 +223,12 @@ class Archive_Files extends \Boldgrid\Backup\V2\Step\Step {
 		 */
 		$this->set_filelist();
 		if ( empty( $this->filelist ) ) {
+			$this->log( 'No files in filelist.' );
 			$this->complete();
 			return;
 		}
 
-		$last_key                = count( $this->filelist ) - 1;
+		$this->last_key          = count( $this->filelist ) - 1;
 		$this->last_archived_key = $this->get_data_type( 'step' )->get_key( 'last_archived_key', 0 );
 		$archived_all_keys       = false;
 
@@ -221,12 +249,10 @@ class Archive_Files extends \Boldgrid\Backup\V2\Step\Step {
 				while ( ! $zip_success && ( $zip_attempts < $zip_max_attempts ) ) {
 					$zip_attempts++;
 
-					error_log( 'Zip attempt ' . $zip_attempts ); // phpcs:ignore
-
 					$zip_success = $batch_info['part']->add_batch( $batch_info['batch_filelist_filepath'] );
 
 					if ( ! $zip_success ) {
-						error_log( 'Zipping failed. Sleeping...' ); // phpcs:ignore
+						$this->log( 'Zipping failed.' );
 						sleep( $zip_sleep );
 					}
 				}
@@ -236,7 +262,7 @@ class Archive_Files extends \Boldgrid\Backup\V2\Step\Step {
 					$this->get_data_type( 'step' )->set_key( 'last_archived_key', $this->last_archived_key );
 
 					// If we've archived all the files, flag the last part as complete.
-					if ( $this->last_archived_key === $last_key ) {
+					if ( $this->last_archived_key === $this->last_key ) {
 						$batch_info['part']->complete();
 					}
 				} else {
@@ -248,7 +274,7 @@ class Archive_Files extends \Boldgrid\Backup\V2\Step\Step {
 				return false;
 			}
 
-			$archived_all_keys = $this->last_archived_key === $last_key;
+			$archived_all_keys = $this->last_archived_key === $this->last_key;
 		}
 
 		$this->complete();

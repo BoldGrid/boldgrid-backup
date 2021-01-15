@@ -36,6 +36,11 @@ class Json_File {
 		$this->filepath = $filepath;
 
 		$this->core = apply_filters( 'boldgrid_backup_get_core', null );
+
+		// If the info.json file does not exist, create it.
+		if ( ! $this->core->wp_filesystem->exists( $this->filepath ) ) {
+			$this->core->wp_filesystem->touch( $this->filepath );
+		}
 	}
 
 	/**

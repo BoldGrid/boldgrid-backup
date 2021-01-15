@@ -21,11 +21,13 @@ defined( 'WPINC' ) || die;
  *
  * @see Boldgrid_Backup_Admin_Utility::create_site_id()
  *
- * @param bool $dryrun Whether or not is a dry run.
  * @param bool $restore_ok Success of the restoration.
  * @param string $info['filepath'] The file path restored.
  */
 $site_id = Boldgrid_Backup_Admin_Utility::create_site_id();
+
+// todo. fix this. Just hard coded for now.
+$restore_ok = true;
 
 $subject = sprintf(
 	// translators: 1: Site identifier.
@@ -34,10 +36,6 @@ $subject = sprintf(
 );
 
 $body = esc_html__( 'Hello', 'boldgrid-backup' ) . ",\n\n";
-
-if ( $dryrun ) {
-	$body .= esc_html__( 'THIS OPERATION WAS A DRY-RUN TEST', 'boldgrid-backup' ) . ".\n\n";
-}
 
 if ( $restore_ok ) {
 	$body .= esc_html__( 'A backup archive has been restored', 'boldgrid-backup' );

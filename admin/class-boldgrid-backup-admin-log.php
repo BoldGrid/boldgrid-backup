@@ -62,11 +62,14 @@ class Boldgrid_Backup_Admin_Log {
 	/**
 	 * The last error, as per error_get_last().
 	 *
+	 * This is a static var because several different scripts could all be writing to the same log file.
+	 * If this wasn't static, the same last_error would continually be written to the log.
+	 *
 	 * @since 1.13.5
 	 * @var array
 	 * @access private
 	 */
-	private $last_error;
+	private static $last_error;
 
 	/**
 	 * Constructor.
@@ -136,13 +139,33 @@ class Boldgrid_Backup_Admin_Log {
 	public function add_last_error() {
 		$current_error = error_get_last();
 
+		/*
+		 * Is this the 'mkdir(): File exists' error?
+		 *
+		 * Typically seen as:
+		 *     [type] => 2
+		 *     [message] => mkdir(): File exists
+		 *     [file] => wp-admin/includes/class-wp-filesystem-direct.php
+		 *
+		 * This error occurs because the mkdir() method in class-wp-filesystem-direct.php doesn't check
+		 * to see if a directory exists before created it. It simply calls @mkdir( $path ).
+		 */
+		$is_mkdir_error = is_array( $current_error ) && 2 === $current_error['type'] &&
+			'mkdir(): File exists' === $current_error['message'] &&
+			'class-wp-filesystem-direct.php' === basename( $current_error['file'] );
+
+		// The logging of this warning is unhelpful. Don't do it.
+		if ( $is_mkdir_error ) {
+			return;
+		}
+
 		// Only new errors are logged.
-		if ( $current_error !== $this->last_error ) {
+		if ( $current_error !== self::$last_error ) {
 			$this->add( 'Last error: ' . print_r( $current_error, 1 ), false ); // phpcs:ignore
 		}
 
 		// This method will be called often, so keep track of errors to avoid logging duplicates.
-		$this->last_error = $current_error;
+		self::$last_error = $current_error;
 	}
 
 

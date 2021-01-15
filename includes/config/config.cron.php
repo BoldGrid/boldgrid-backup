@@ -37,7 +37,7 @@ $config = [
 		'backup' => [
 			'search' => [
 				'cron'    => [
-					'mode=backup',
+					'mode=backup ',
 					'siteurl=' . $site_url . ' ',
 				],
 				'wp-cron' => [
@@ -48,7 +48,16 @@ $config = [
 		'resume' => [
 			'search' => [
 				'cron' => [
-					'mode=resume',
+					'mode=resume ',
+					'siteurl=' . $site_url . ' ',
+				],
+				// todo add wp-cron
+			],
+		],
+		'resume_restore' => [
+			'search' => [
+				'cron' => [
+					'mode=resume_restore ',
 					'siteurl=' . $site_url . ' ',
 				],
 				// todo add wp-cron

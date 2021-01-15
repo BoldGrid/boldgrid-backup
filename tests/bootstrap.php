@@ -118,9 +118,11 @@ $files = array(
 	'/includes/class-boldgrid-backup-download.php',
 	'/includes/class-boldgrid-backup-file.php',
 	'/includes/class-boldgrid-backup-archiver.php',
+	'/includes/class-boldgrid-backup-restorer.php',
 	'/includes/archive/class-factory.php',
 	'/includes/archive/class-option.php',
 	'/includes/archiver/class-info.php',
+	'/includes/restorer/class-db.php',
 	'/admin/storage/class-boldgrid-backup-admin-storage-local.php',
 	// Remote storage providers.
 	'/admin/remote/class-boldgrid-backup-admin-ftp.php',
@@ -137,6 +139,10 @@ $files = array(
 	// Orphan.
 	'/admin/orphan/class-cleanup.php',
 	'/admin/orphan/class-finder.php',
+	// V2 Archive.
+	'/includes/v2/archive/class-factory.php',
+	'/includes/v2/archive/class-archive.php',
+	'/includes/v2/archive/class-dirlist.php',
 	// V2 Filelist.
 	'/includes/v2/filelist/class-create.php',
 	// V2 Step.

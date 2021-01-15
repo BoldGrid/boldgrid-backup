@@ -315,6 +315,7 @@ class Boldgrid_Backup {
 		// Archiver and Restorer classes.
 		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-archiver.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-restorer.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/restorer/class-db.php';
 
 		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-archive-fetcher.php';
 
@@ -359,7 +360,9 @@ class Boldgrid_Backup {
 		// V2 Restorer.
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/restorer/class-restorer.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/restorer/class-factory.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/restorer/class-resumer.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/restorer/steps/class-unzip.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/restorer/steps/class-db.php';
 
 		// V2 Archive.
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/archive/class-archive.php';

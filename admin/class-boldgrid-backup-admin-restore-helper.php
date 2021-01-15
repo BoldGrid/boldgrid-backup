@@ -125,10 +125,6 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 	 * @param array $info Archive information.
 	 */
 	public function post_restore( $info ) {
-		if ( $info['dryrun'] ) {
-			return;
-		}
-
 		global $wp_filesystem;
 
 		foreach ( $this->monitor_files as $key => $file ) {
@@ -168,10 +164,6 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 	 * @param array $info Archive information.
 	 */
 	public function pre_restore( $info ) {
-		if ( $info['dryrun'] ) {
-			return;
-		}
-
 		global $wp_filesystem;
 
 		foreach ( $this->monitor_files as $key => $file ) {

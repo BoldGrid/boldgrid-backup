@@ -47,6 +47,11 @@ class Boldgrid_Backup_Restorer {
 	private $info;
 
 	/**
+	 * @var \Boldgrid\Backup\V2\Restorer\Resumer
+	 */
+	private $resumer;
+
+	/**
 	 * An instance of Boldgrid_Backup_Admin_Task.
 	 *
 	 * @since SINCEVERSION
@@ -61,7 +66,10 @@ class Boldgrid_Backup_Restorer {
 	 * @since SINCEVERSION
 	 */
 	public function __construct() {
-		$this->core = apply_filters( 'boldgrid_backup_get_core', null );
+		$this->core   = apply_filters( 'boldgrid_backup_get_core', null );
+		$this->logger = new Boldgrid_Backup_Admin_Log( $this->core );
+
+		add_filter( 'boldgrid_backup_get_restore_logger', array( $this, 'get_logger' ) );
 	}
 
 	/**
@@ -70,16 +78,47 @@ class Boldgrid_Backup_Restorer {
 	 * @since SINCEVERSION
 	 */
 	public function complete() {
+		// Clear rollback information and restoration cron jobs that may be present.
+		$this->core->auto_rollback->cancel();
+
+		// Get settings.
+		$settings = $this->core->settings->get_settings();
+
+		// If enabled, send email notification for restoration completed.
+		if ( ! empty( $settings['notifications']['restore'] ) ) {
+			$this->logger->add( 'Sending "restoration complete" email notification...' );
+
+			// Include the mail template - it requires $info.
+			$info = $this->info->get();
+			include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-mail-restore.php';
+
+			// Send the notification.
+			// Parameters come from the included mail template file.
+			$mail_success = $this->core->email->send( $subject, $body );
+			$this->info->set_key( 'mail_success', $mail_success );
+
+			$this->logger->add( 'Email sent. Status: ' . ( empty( $mail_success ) ? 'Fail' : 'Success' ) );
+		}
+
+		// Check backup directory.
+		$this->info->set_key( 'backup_directory_set', $this->core->backup_dir->get() );
+
+		$this->core->restoring_archive_file = false;
+
 		// Update the log.
-		$this->core->logger->add( 'Restoration complete!' );
-		$this->core->logger->add_memory();
+		$this->logger->add( 'Restoration complete!' );
+		$this->logger->add_memory();
 
 		if ( $this->has_error() ) {
-			$this->core->logger->add( 'Error during restoration: ' . $this->get_error() );
+			$this->logger->add( 'Error during restoration: ' . $this->get_error() );
 		}
 
 		// End the task.
 		$this->task->end();
+
+		if ( $this->archive->is_virtual ) {
+			$this->resumer->remove_cron();
+		}
 	}
 
 	/**
@@ -101,7 +140,14 @@ class Boldgrid_Backup_Restorer {
 	 * @return array
 	 */
 	public function get_info() {
-		return $this->info;
+		return $this->info->get();
+	}
+
+	/**
+	 *
+	 */
+	public function get_logger() {
+		return $this->logger;
 	}
 
 	/**
@@ -112,7 +158,8 @@ class Boldgrid_Backup_Restorer {
 	 * @return bool
 	 */
 	private function has_error() {
-		return ! empty( $this->info['error'] );
+		$error = $this->info->get_key( 'error' );
+		return ! empty( $error );
 	}
 
 	/**
@@ -129,9 +176,10 @@ class Boldgrid_Backup_Restorer {
 	 */
 	public function init( $args = array() ) {
 		// Init our logger.
-		$this->core->logger->init( 'restore-' . time() . '.log' );
-		$this->core->logger->add( 'Restore process initialized.' );
-		$this->core->logger->add_memory();
+		$log_filename = 'restore-' . time() . '.log';
+		$this->logger->init( $log_filename );
+		$this->logger->add( 'Restore process initialized.' );
+		$this->logger->add_memory();
 
 		/*
 		 * Setup our task.
@@ -170,20 +218,20 @@ class Boldgrid_Backup_Restorer {
 		// If a restoration was not requested, then abort.
 		if ( empty( $_POST['restore_now'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			$error_message = esc_html__( 'Invalid restore_now value.', 'boldgrid-backup' );
-			$this->core->logger->add( $error_message );
+			$this->logger->add( $error_message );
 			return [ 'error' => $error_message ];
 		}
 
 		if ( $is_post_restore && ! check_ajax_referer( 'boldgrid_backup_restore_archive', 'archive_auth', false ) ) {
 			$error_message = esc_html__( 'Invalid nonce.', 'boldgrid-backup' );
-			$this->core->logger->add( $error_message );
+			$this->logger->add( $error_message );
 			return [ 'error' => $error_message ];
 		}
 
 		// Check if functional.
 		if ( ! $this->core->test->run_functionality_tests() ) {
 			$error_message = esc_html__( 'Functionality tests fail.', 'boldgrid-backup' );
-			$this->core->logger->add( $error_message );
+			$this->logger->add( $error_message );
 			return [ 'error' => $error_message ];
 		}
 
@@ -199,7 +247,7 @@ class Boldgrid_Backup_Restorer {
 			$archive_key = (int) $_POST['archive_key'];
 		} else {
 			$error_message = esc_html__( 'Invalid key for the selected archive file.', 'boldgrid-backup' );
-			$this->core->logger->add( $error_message );
+			$this->logger->add( $error_message );
 			return [ 'error' => $error_message ];
 		}
 
@@ -215,14 +263,14 @@ class Boldgrid_Backup_Restorer {
 			$archive_filename = sanitize_file_name( $_POST['archive_filename'] );
 		} else {
 			$error_message = esc_html__( 'Invalid filename for the selected archive file.', 'boldgrid-backup' );
-			$this->core->logger->add( $error_message );
+			$this->logger->add( $error_message );
 			return [ 'error' => $error_message ];
 		}
 
 		$archives = $this->core->get_archive_list( $archive_filename );
 		if ( empty( $archives ) ) {
 			$error_message = esc_html__( 'No archive files were found.', 'boldgrid-backup' );
-			$this->core->logger->add( $error_message );
+			$this->logger->add( $error_message );
 			return [ 'error' => $error_message ];
 		}
 
@@ -230,7 +278,7 @@ class Boldgrid_Backup_Restorer {
 
 		if ( $archive_filename !== $filename ) {
 			$error_message = esc_html__( 'The selected archive file was not found.', 'boldgrid-backup' );
-			$this->core->logger->add( $error_message );
+			$this->logger->add( $error_message );
 			return [ 'error' => $error_message ];
 		}
 
@@ -240,34 +288,52 @@ class Boldgrid_Backup_Restorer {
 			$filesize = $this->core->wp_filesystem->size( $filepath );
 		} else {
 			$error_message = esc_html__( 'The selected archive file is empty.', 'boldgrid-backup' );
-			$this->core->logger->add( $error_message );
+			$this->logger->add( $error_message );
 			return [ 'error' => $error_message ];
 		}
 
 		// Populate $info.
 		$info = [
-			'mode'        => 'restore',
-			'filename'    => $archive_filename,
-			'filepath'    => $filepath,
-			'filesize'    => $filesize,
-			'archive_key' => $archive_key,
-			'restore_ok'  => true,
+			'mode'         => 'restore',
+			'filename'     => $archive_filename,
+			'filepath'     => $filepath,
+			'filesize'     => $filesize,
+			'archive_key'  => $archive_key,
+			'restore_ok'   => true,
+			'log_filename' => $log_filename,
 		];
-		$this->core->logger->add( 'Restore info: ' . print_r( $info, 1 ) ); // phpcs:ignore
-
-		error_log( 'restore info = ' . print_r( $info,1));
 
 		$this->archive = \Boldgrid\Backup\Archive\Factory::get_by_filename( $info['filename'] );
 		if ( empty( $this->archive ) ) {
 			$error_message = esc_html__( 'Unable to get archive by filename.', 'boldgrid-backup' );
-			$this->core->logger->add( $error_message );
+			$this->logger->add( $error_message );
 			return [ 'error' => $error_message ];
 		}
 
-// 		error_log( 'is virtual = ' . $archive->is_virtual );
-// 		$zips = $archive->virtual->get_dirlist()->get_by_extension( 'zip' );
-// 		error_log( 'zips = ' . print_r( $zips,1 ) );
-// 		die();
+		/**
+		 * Action to take before restoring an archive.
+		 *
+		 * @since 1.5.1
+		 *
+		 * @param array $info
+		 */
+		do_action( 'boldgrid_backup_pre_restore', $info );
+
+		/*
+		 * Attempt to fix any permissions related issues before the restoration begins. If we're
+		 * unable to, the restoration may not continue.
+		 */
+		if ( class_exists( 'ZipArchive' ) ) {
+			if ( ! $this->core->restore_helper->set_writable_permissions( $info['filepath'] ) ) {
+				$error_message = $this->core->restore_helper->get_last_error();
+				$this->logger->add( $error_message );
+				return [ 'error' => $error_message ];
+			}
+		} else {
+			$this->logger->add( 'ZipArchive not available. Unable to set_writable_permissions. Trying restore anyways...' );
+		}
+
+		return $info;
 	}
 
 	/**
@@ -332,13 +398,22 @@ class Boldgrid_Backup_Restorer {
 	 * @since SINCEVERSION
 	 */
 	public function run() {
-		$this->init();
+		$info = $this->init();
 
 		if ( $this->archive->is_virtual ) {
-			$restorer = \Boldgrid\Backup\V2\Restorer\Factory::run( $this->archive->virtual->get_id(), null );
+			$restorer   = \Boldgrid\Backup\V2\Restorer\Factory::run( $this->archive->virtual->get_id(), null );
+
+			$this->resumer = new \Boldgrid\Backup\V2\Restorer\Resumer();
+			$this->resumer->maybe_add_cron();
+
+			$this->info = new \Boldgrid\Backup\Archiver\Info( 'many', $restorer );
+			$this->info->set_keys( $info );
+
 			$restorer->run();
 		} else {
-			$this->info = $this->core->restore_archive_file();
+			$this->info = new \Boldgrid\Backup\Archiver\Info( 'one', array() );
+			$this->info->set_keys( $info );
+			$this->core->restore_archive_file( $this->info );
 		}
 
 		$this->complete();
