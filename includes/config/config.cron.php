@@ -34,7 +34,7 @@ $site_url = site_url();
 // Only defined cron entries can be found.
 $config = [
 	'entries' => [
-		'backup' => [
+		'backup'         => [
 			'search' => [
 				'cron'    => [
 					'mode=backup ',
@@ -45,7 +45,7 @@ $config = [
 				],
 			],
 		],
-		'resume' => [
+		'resume'         => [
 			'search' => [
 				'cron' => [
 					'mode=resume ',

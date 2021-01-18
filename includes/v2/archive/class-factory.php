@@ -27,14 +27,12 @@ class Factory {
 
 		// Make sure the .zip exists.
 		if ( ! $core->backup_dir->exists( $filename ) ) {
-			error_log( 'filename not exist' );
 			return false;
 		}
 
 		// Make sure the folder exists.
 		$dir = $core->backup_dir->get_path_to( wp_basename( $filename, '.zip' ) );
 		if ( ! $core->wp_filesystem->exists( $dir ) ) {
-			error_log( 'dirname not exist = ' . $dir );
 			return false;
 		}
 

@@ -335,6 +335,9 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/cli/class-info.php';
 
+		// Options.
+		require_once BOLDGRID_BACKUP_PATH . '/includes/option/class-option.php';
+
 		/*
 		 * Include v2 files.
 		 *
@@ -361,6 +364,7 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/restorer/class-restorer.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/restorer/class-factory.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/restorer/class-resumer.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/restorer/class-utility.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/restorer/steps/class-unzip.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/restorer/steps/class-db.php';
 
@@ -402,6 +406,7 @@ class Boldgrid_Backup {
 		// Instantiate the admin core.
 		$plugin_admin_core = new Boldgrid_Backup_Admin_Core();
 		$resumer           = new \Boldgrid\Backup\V2\Archiver\Resumer( $plugin_admin_core );
+		$restore_resumer   = new \Boldgrid\Backup\V2\Restorer\Resumer( $plugin_admin_core );
 
 		// WP-CLI support.
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
@@ -572,6 +577,7 @@ class Boldgrid_Backup {
 		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_backup', $plugin_admin_core->cron, 'backup' );
 		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_restore', $plugin_admin_core->cron, 'restore' );
 		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_resume', $resumer, 'run' );
+		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_resume_restore', $restore_resumer, 'run' );
 
 		// For public downloads.
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_download', $plugin_admin_core->download, 'public_download' );

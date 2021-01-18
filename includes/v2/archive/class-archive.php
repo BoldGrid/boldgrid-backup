@@ -42,8 +42,6 @@ class Archive {
 	 *
 	 */
 	public function __construct() {
-
-
 		$this->dirlist = new \Boldgrid\Backup\V2\Archive\Dirlist( $this );
 	}
 

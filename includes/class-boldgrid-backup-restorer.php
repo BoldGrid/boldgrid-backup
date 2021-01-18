@@ -28,6 +28,8 @@ class Boldgrid_Backup_Restorer {
 	 */
 	private $archive;
 
+	private $backup_id;
+
 	/**
 	 * Admin core.
 	 *
@@ -45,6 +47,13 @@ class Boldgrid_Backup_Restorer {
 	 * @var array
 	 */
 	private $info;
+
+	/**
+	 * @var \Boldgrid\Backup\Option\Option
+	 */
+	private $option;
+
+	private $restore_id;
 
 	/**
 	 * @var \Boldgrid\Backup\V2\Restorer\Resumer
@@ -65,9 +74,14 @@ class Boldgrid_Backup_Restorer {
 	 *
 	 * @since SINCEVERSION
 	 */
-	public function __construct() {
-		$this->core   = apply_filters( 'boldgrid_backup_get_core', null );
-		$this->logger = new Boldgrid_Backup_Admin_Log( $this->core );
+	public function __construct( $backup_id = null, $restore_id = null ) {
+		$this->backup_id  = $backup_id;
+		$this->restore_id = $restore_id;
+
+		$this->core        = apply_filters( 'boldgrid_backup_get_core', null );
+		$this->logger      = new Boldgrid_Backup_Admin_Log( $this->core );
+		$this->option      = \Boldgrid\Backup\V2\Restorer\Utility::get_option();
+		$this->is_resuming = ! empty( $this->backup_id ) && ! empty( $this->restore_id );
 
 		add_filter( 'boldgrid_backup_get_restore_logger', array( $this, 'get_logger' ) );
 	}
@@ -116,9 +130,11 @@ class Boldgrid_Backup_Restorer {
 		// End the task.
 		$this->task->end();
 
-		if ( $this->archive->is_virtual ) {
+		if ( ! empty( $this->resumer ) ) {
 			$this->resumer->remove_cron();
 		}
+
+		$this->option->delete();
 	}
 
 	/**
@@ -301,6 +317,7 @@ class Boldgrid_Backup_Restorer {
 			'archive_key'  => $archive_key,
 			'restore_ok'   => true,
 			'log_filename' => $log_filename,
+			'task_id'      => $this->task->get_id(),
 		];
 
 		$this->archive = \Boldgrid\Backup\Archive\Factory::get_by_filename( $info['filename'] );
@@ -398,22 +415,43 @@ class Boldgrid_Backup_Restorer {
 	 * @since SINCEVERSION
 	 */
 	public function run() {
-		$info = $this->init();
-
-		if ( $this->archive->is_virtual ) {
-			$restorer   = \Boldgrid\Backup\V2\Restorer\Factory::run( $this->archive->virtual->get_id(), null );
-
-			$this->resumer = new \Boldgrid\Backup\V2\Restorer\Resumer();
-			$this->resumer->maybe_add_cron();
+		if ( $this->is_resuming ) {
+			$restorer = \Boldgrid\Backup\V2\Restorer\Factory::run( $this->backup_id, $this->restore_id );
 
 			$this->info = new \Boldgrid\Backup\Archiver\Info( 'many', $restorer );
-			$this->info->set_keys( $info );
+
+			$this->task = new Boldgrid_Backup_Admin_Task();
+			$this->task->init_by_id( $this->info->get_key( 'task_id' ) ); // phpcs:ignore
+
+			$this->logger->init( $this->info->get_key( 'log_filename' ) );
+
+			$this->resumer = new \Boldgrid\Backup\V2\Restorer\Resumer();
 
 			$restorer->run();
 		} else {
-			$this->info = new \Boldgrid\Backup\Archiver\Info( 'one', array() );
-			$this->info->set_keys( $info );
-			$this->core->restore_archive_file( $this->info );
+			$info = $this->init();
+
+			if ( $this->archive->is_virtual ) {
+				$backup_id  = $this->archive->virtual->get_id();
+				$restorer   = \Boldgrid\Backup\V2\Restorer\Factory::run( $backup_id, null );
+				$restore_id = $restorer->get_data_type( 'step' )->get_key( 'restore_id' );
+
+				// Save some in progress data. This is for our restore resumer.
+				$this->option->set_key( 'backup_id', $backup_id );
+				$this->option->set_key( 'restore_id', $restore_id );
+
+				$this->resumer = new \Boldgrid\Backup\V2\Restorer\Resumer();
+				$this->resumer->maybe_add_cron();
+
+				$this->info = new \Boldgrid\Backup\Archiver\Info( 'many', $restorer );
+				$this->info->set_keys( $info );
+
+				$restorer->run();
+			} else {
+				$this->info = new \Boldgrid\Backup\Archiver\Info( 'one', array() );
+				$this->info->set_keys( $info );
+				$this->core->restore_archive_file( $this->info );
+			}
 		}
 
 		$this->complete();

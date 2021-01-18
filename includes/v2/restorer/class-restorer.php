@@ -76,7 +76,7 @@ class Restorer extends \Boldgrid\Backup\V2\Step\Step {
 		$this->get_data_type( 'step' )->set_key( 'is_post_restore', true );
 
 		// After unzipping all the files, find the sql file and restore it.
-		$db_step          = new \Boldgrid\Backup\V2\Restorer\Steps\Db( 'step_restore_db', $this->id, $this->get_dir());
+		$db_step          = new \Boldgrid\Backup\V2\Restorer\Steps\Db( 'step_restore_db', $this->id, $this->get_dir() );
 		$zip_filepath     = trailingslashit( $this->get_data_type( 'step' )->get_key( 'backup_folder_path' ) ) . 'zip-sql-1.zip';
 		$db_dump_filepath = $this->get_core()->get_dump_file( $zip_filepath );
 		if ( ! empty( $db_dump_filepath ) && $db_step->maybe_run() ) {

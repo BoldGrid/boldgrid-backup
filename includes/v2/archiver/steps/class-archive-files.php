@@ -178,7 +178,7 @@ class Archive_Files extends \Boldgrid\Backup\V2\Step\Step {
 		 */
 		$part_size  = $part->get_size();
 		$batch_zize = $max_batch_size - $remaining_size;
-		$this->log( 'New batch created and needs processing: ' . print_r( array(
+		$log_data   = array(
 			'$batch_filelist_filename' => $batch_filelist_filename,
 			'$start_key              ' => $start_key,
 			'$files_added            ' => $files_added,
@@ -189,7 +189,8 @@ class Archive_Files extends \Boldgrid\Backup\V2\Step\Step {
 			'part filename           ' => $part->get_filename(),
 			'part size               ' => size_format( $part_size, 2 ) . ' / ' . $part_size,
 			'part remaining size     ' => size_format( $remaining_size, 2 ) . ' / ' . $remaining_size,
-		), 1 ) );
+		);
+		$this->log( 'New batch created and needs processing: ' . print_r( $log_data, 1 ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
 
 		return $success ? $batch_info : false;
 	}
@@ -253,6 +254,7 @@ class Archive_Files extends \Boldgrid\Backup\V2\Step\Step {
 
 					if ( ! $zip_success ) {
 						$this->log( 'Zipping failed.' );
+						$this->unresponsive_time += $this->unresponsive_time;
 						sleep( $zip_sleep );
 					}
 				}

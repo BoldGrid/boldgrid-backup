@@ -36,7 +36,7 @@ class Unzip extends \Boldgrid\Backup\V2\Step\Step {
 		// Log our success.
 		$zip_filesize = $this->get_core()->wp_filesystem->size( $zip_filepath );
 		$this->log( 'Archive: ' . $zip_filepath . ' / ' . size_format( $zip_filesize ) );
-		$this->log( 'Unzip status: ' . print_r( $unzip_status, 1 ) );
+		$this->log( 'Unzip status: ' . print_r( $unzip_status, 1 ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
 
 		if ( is_wp_error( $unzip_status ) ) {
 			$error = false;

@@ -58,7 +58,7 @@ class Resumer {
 	 *
 	 */
 	public function maybe_add_cron() {
-		$cron         = new \Boldgrid\Backup\Admin\Cron();
+		$cron  = new \Boldgrid\Backup\Admin\Cron();
 		$entry = $cron->get_entry( 'resume_restore' );
 
 		if ( ! $entry->is_set() ) {
@@ -81,22 +81,26 @@ class Resumer {
 	public function run() {
 		error_log( 'RUNNING RESTORE RESUMER...' ); // phpcs:ignore
 
-		error_log( 'DIE. Need to get resume id.' );
-		die();
+		$option              = \Boldgrid\Backup\V2\Restorer\Utility::get_option();
+		$backup_id           = $option->get_key( 'backup_id' );
+		$restore_id          = $option->get_key( 'restore_id' );
+		$restore_in_progress = ! empty( $backup_id ) && ! empty( $restore_id );
 
-		$id = \Boldgrid_Backup_Admin_In_Progress_Data::get_backup_id();
-		if ( ! empty( $id ) ) {
-			$backup_process = \BoldGrid\Backup\V2\Archiver\Factory::run( $id );
-			if ( $backup_process->is_unresponsive() ) {
+		if ( $restore_in_progress ) {
+			$step = \BoldGrid\Backup\V2\Restorer\Factory::run( $backup_id, $restore_id );
+			if ( $step->is_unresponsive() ) {
 				error_log( 'RESUMING RESTORE!' ); // phpcs:ignore
-				$archiver = new \Boldgrid_Backup_Archiver( $id );
-				$archiver->run();
+				$step->log( 'Resuming restoration...' );
+
+				$restorer = new \Boldgrid_Backup_Restorer( $backup_id, $restore_id );
+				$restorer->run();
 			} else {
+				$step->log( 'Not resuming restoration. Not unresponsive.' );
 				error_log( 'NOT RESUMING RESTORE - NOT UNRESONSIVE' ); // phpcs:ignore
 			}
 		} else {
 			$this->remove_cron();
-			error_log( 'NOT RESUMING - NO ID FOUND' ); // phpcs:ignore
+			error_log( 'NOT RESUMING - NO backup_id and restore_id FOUND' ); // phpcs:ignore
 		}
 	}
 }

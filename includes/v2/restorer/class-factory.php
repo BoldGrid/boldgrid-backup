@@ -27,7 +27,6 @@ class Factory {
 
 		// This is the id of the backup.
 		if ( empty( $backup_id ) ) {
-			error_log( 'empty backup id' );
 			return false;
 		}
 
@@ -47,6 +46,7 @@ class Factory {
 		$restorer = new \Boldgrid\Backup\V2\Restorer\Restorer( 'restorer', false, $restore_folder_path );
 
 		$restorer->get_data_type( 'step' )->set_key( 'backup_folder_path', $backup_folder_path );
+		$restorer->get_data_type( 'step' )->set_key( 'restore_id', $id );
 
 		return $restorer;
 	}

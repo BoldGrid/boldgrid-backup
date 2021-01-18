@@ -66,8 +66,9 @@ class Db {
 		// todo. Fix this. We have the sql.zip filepath, but not the main zip.
 		return false;
 
-		$this->core->archive->init( $this->filepath );
-		return $this->core->archive->get_attribute( 'encrypt_db' );
+		// remove ignore statements when we update this method.
+		$this->core->archive->init( $this->filepath ); // phpcs:ignore Squiz.PHP.NonExecutableCode.Unreachable
+		return $this->core->archive->get_attribute( 'encrypt_db' ); // phpcs:ignore Squiz.PHP.NonExecutableCode.Unreachable
 	}
 
 	/**

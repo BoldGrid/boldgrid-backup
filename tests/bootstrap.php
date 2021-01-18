@@ -139,6 +139,8 @@ $files = array(
 	// Orphan.
 	'/admin/orphan/class-cleanup.php',
 	'/admin/orphan/class-finder.php',
+	// Option
+	'/includes/option/class-option.php',
 	// V2 Archive.
 	'/includes/v2/archive/class-factory.php',
 	'/includes/v2/archive/class-archive.php',
@@ -158,6 +160,8 @@ $files = array(
 	'/includes/v2/archiver/steps/class-archive-files.php',
 	'/includes/v2/archiver/steps/archive_files/class-part.php',
 	'/includes/v2/archiver/steps/archive_files/class-parts.php',
+	// V2 Restorer.
+	'/includes/v2/restorer/class-utility.php',
 );
 
 foreach ( $files as $file ) {
