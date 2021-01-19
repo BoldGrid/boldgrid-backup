@@ -122,13 +122,15 @@ class Part {
 
 		$archive_command = 'cd ' . ABSPATH . '; zip ' . $this->filepath . ' ' . $j . ' -@ < ' . $batch_filelist_filepath;
 
-		// error_log( '$archive_command = ' . getmypid() . ' ' . $archive_command );
-
 		$this->archive_files->get_core()->execute_command( $archive_command, $success, $return );
 
 		$new_size = $this->get_size();
 
-		return ( $original_size !== $new_size ) && $success;
+		if ( $success && $original_size === $new_size ) {
+			$this->archive_files->log( 'WARNING: Archive filesize did not change after adding files. It could be that this is not the first attempt, but the first attempt DID finish archiving but DID NOT finish completing the step.' );
+		}
+
+		return $success;
 	}
 
 	/**

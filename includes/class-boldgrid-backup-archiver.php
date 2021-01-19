@@ -56,6 +56,11 @@ class Boldgrid_Backup_Archiver {
 	private static $is_archiving = false;
 
 	/**
+	 *
+	 */
+	private $is_resuming = false;
+
+	/**
 	 * An instance of Boldgrid_Backup_Admin_Task.
 	 *
 	 * @since SINCEVERSION
@@ -75,8 +80,9 @@ class Boldgrid_Backup_Archiver {
 	 * @since SINCEVERSION
 	 */
 	public function __construct( $id = null ) {
-		$this->core   = apply_filters( 'boldgrid_backup_get_core', null );
-		$this->format = $this->core->settings->get_setting( 'format' );
+		$this->is_resuming = ! is_null( $id );
+		$this->core        = apply_filters( 'boldgrid_backup_get_core', null );
+		$this->format      = $this->core->settings->get_setting( 'format' );
 
 		if ( 'one' === $this->format ) {
 			$this->info = new \Boldgrid\Backup\Archiver\Info( 'one', array() );
@@ -84,6 +90,15 @@ class Boldgrid_Backup_Archiver {
 			$this->backup_process = \BoldGrid\Backup\V2\Archiver\Factory::run( $id );
 			$this->info           = new \Boldgrid\Backup\Archiver\Info( 'many', $this->backup_process );
 			$this->resumer        = new \Boldgrid\Backup\V2\Archiver\Resumer();
+
+			if ( $this->is_resuming ) {
+				// Normally, task is initialized in init(). Initialize task now as init() won't be ran.
+				$this->task = new Boldgrid_Backup_Admin_Task();
+				$this->task->init_by_id( $this->info->get_key( 'task_id' ) );
+
+				// Initialize the logger. Mainly for logging done within self::complete().
+				$this->core->logger->init( $this->info->get_key( 'log_filename' ) );
+			}
 		}
 	}
 
@@ -93,6 +108,21 @@ class Boldgrid_Backup_Archiver {
 	 * @since SINCEVERSION
 	 */
 	public function complete() {
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'status', esc_html__( 'Wrapping things up...', 'boldgrid-backup' ) );
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'percentage', 100 );
+
+		$filepath = $this->info->get_key( 'filepath' );
+
+		// Add some statistics to the return.
+		$this->info->set_key( 'lastmodunix', $this->core->wp_filesystem->mtime( $filepath ) );
+		$this->info->set_key( 'filesize', $this->core->wp_filesystem->size( $filepath ) );
+
+		// Modify the archive file permissions to help protect from public access.
+		$this->core->wp_filesystem->chmod( $filepath, 0600 );
+
+		// Delete the temporary database dump file.
+		$this->core->wp_filesystem->delete( $this->info->get_key( 'db_dump_filepath' ), false, 'f' );
+
 		// Calculate duration.
 		$this->info->set_key( 'duration', number_format( ( microtime( true ) - $this->info->get_key( 'time_start' ) ), 2, '.', '' ) );
 		$this->info->set_key( 'db_duration', number_format( ( $this->info->get_key( 'db_time_stop' ) - $this->info->get_key( 'time_start' ) ), 2, '.', '' ) );
@@ -218,6 +248,7 @@ class Boldgrid_Backup_Archiver {
 			$this->task->init( [ 'type' => 'backup' ] );
 		}
 		$this->task->start();
+		$this->info->set_key( 'task_id', $this->task->get_id() );
 
 		self::$is_archiving = true;
 
@@ -355,11 +386,11 @@ class Boldgrid_Backup_Archiver {
 	/**
 	 *
 	 */
-	public function is_init_incomplete() {
+	public function is_init_complete() {
 		$start = $this->info->get_key( 'time_start' );
 		$end   = $this->info->get_key( 'init_time_end' );
 
-		return ! empty( $start ) && empty( $end );
+		return ! empty( $start ) && ! empty( $end );
 	}
 
 	/**
@@ -370,11 +401,10 @@ class Boldgrid_Backup_Archiver {
 	 * @since SINCEVERSION
 	 */
 	public function run() {
-		// Todo. If resuming, do we run init again?
-		if ( $this->is_init_incomplete() ) {
-			$this->info->set_key( 'error', __( 'Unable to initialize backup. Previous init was incomplete.', 'boldgrid-backup' ) );
-		} else {
+		if ( ! $this->is_resuming ) {
 			$this->init();
+		} elseif ( ! $this->is_init_complete() ) {
+			$this->info->set_key( 'error', __( 'Unable to initialize backup. Previous init was incomplete.', 'boldgrid-backup' ) );
 		}
 
 		if ( empty( $this->info->get_key( 'error' ) ) ) {

@@ -75,6 +75,7 @@ class Archiver extends \Boldgrid\Backup\V2\Step\Step {
 
 				if ( ! $step_success ) {
 					// Failed to create zip. todo: cleanup?
+					$this->log( 'ERROR: Step failed.' );
 					return false;
 				}
 			}

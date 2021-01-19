@@ -176,6 +176,8 @@ class Archive_Files extends \Boldgrid\Backup\V2\Step\Step {
 		 *
 		 * The additional spacing added to make it easier to read in the log.
 		 */
+		// Additional log data availalbe if needed.
+		/*
 		$part_size  = $part->get_size();
 		$batch_zize = $max_batch_size - $remaining_size;
 		$log_data   = array(
@@ -191,6 +193,7 @@ class Archive_Files extends \Boldgrid\Backup\V2\Step\Step {
 			'part remaining size     ' => size_format( $remaining_size, 2 ) . ' / ' . $remaining_size,
 		);
 		$this->log( 'New batch created and needs processing: ' . print_r( $log_data, 1 ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
+		*/
 
 		return $success ? $batch_info : false;
 	}

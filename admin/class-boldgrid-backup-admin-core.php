@@ -1582,9 +1582,7 @@ class Boldgrid_Backup_Admin_Core {
 		);
 		$this->logger->add_memory();
 
-		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'status', esc_html__( 'Wrapping things up...', 'boldgrid-backup' ) );
-		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'percentage', 100 );
-
+		// Log size of all files archived. Also handled in V2\Archiver\Steps\Discovery::files().
 		$info['total_size'] += $this->filelist->get_total_size( $filelist );
 
 		if ( true === $status && ! $archive_exists ) {
@@ -1595,17 +1593,6 @@ class Boldgrid_Backup_Admin_Core {
 			$this->logger->add( $status['error'] );
 			return $status;
 		}
-
-		$info['lastmodunix'] = $this->wp_filesystem->mtime( $info['filepath'] );
-
-		// Modify the archive file permissions to help protect from public access.
-		$this->wp_filesystem->chmod( $info['filepath'], 0600 );
-
-		// Add some statistics to the return.
-		$info['filesize'] = $this->wp_filesystem->size( $info['filepath'] );
-
-		// Delete the temporary database dump file.
-		$this->wp_filesystem->delete( $this->db_dump_filepath, false, 'f' );
 
 		return $info;
 	}
