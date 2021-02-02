@@ -91,8 +91,8 @@ class Boldgrid_Backup_Download {
 			}
 
 			$return = array(
-				'folder' => $archive->virtual->get_folder(),
-				'zips'   => $zips,
+				'id'   => $archive->virtual->get_id(),
+				'zips' => $zips,
 			);
 
 			wp_send_json_success( $return );

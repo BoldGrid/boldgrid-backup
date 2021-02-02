@@ -19,6 +19,24 @@ namespace Boldgrid\Backup\V2\Fetcher;
  * @since SINCEVERSION
  */
 class Fetcher extends \Boldgrid\Backup\V2\Step\Step {
+	/**
+	 * Get info for this process to return via ajax.
+	 *
+	 * Version 1 of the fetcher returns some info via get_info(), but it conflicts with our pre-existing
+	 * get_info() method. This method simply returns some info to help render the admin notice.
+	 */
+	public function get_ajax_info() {
+		$filename = \Boldgrid\Backup\Utility\Virtual_Folder::filename_by_folder( $this->info->get_key( 'backup_folder' ) );
+
+		$archive = \Boldgrid\Backup\Archive\Factory::get_by_filename( $filename );
+
+		return array(
+			'filepath'        => $archive->filepath,
+			'detailsUrl'      => admin_url( 'admin.php?page=boldgrid-backup-archive-details&filename=' . $archive->filename ),
+			'archiveFilename' => $archive->filename,
+			'archiveKey'      => $archive->get_key(),
+		);
+	}
 
 	/**
 	 * Run the fetching process..

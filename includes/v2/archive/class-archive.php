@@ -98,12 +98,10 @@ class Archive {
 	 *
 	 */
 	public function set_filename( $filename ) {
-		// Grab our id from the filename.
-		preg_match( '/boldgrid-backup-(.+)-(.{16})/', $filename, $matches );
-		if ( empty( $matches[2] ) ) {
+		$this->id = \Boldgrid\Backup\Utility\Virtual_Folder::id_by_folder( $filename );
+		if ( empty( $this->id ) ) {
 			return false;
 		}
-		$this->id = $matches[2];
 
 		$this->filename = $filename;
 	}

@@ -31,6 +31,22 @@ class Virtual_Folder {
 	}
 
 	/**
+	 *
+	 */
+	public static function id_by_folder( $folder ) {
+		preg_match( '/boldgrid-backup-(.+)-(.{16})/', $folder, $matches );
+
+		return empty( $matches[2] ) ? false : $matches[2];
+	}
+
+	/**
+	 *
+	 */
+	public static function filename_by_folder( $folder ) {
+		return $folder . '.zip';
+	}
+
+	/**
 	 * Pass in a zip filename, either:
 	 * # /home/user/boldgrid_backup/boldgrid-backup-1234-abcd.zip
 	 * # boldgrid-backup-1234-abcd.zip

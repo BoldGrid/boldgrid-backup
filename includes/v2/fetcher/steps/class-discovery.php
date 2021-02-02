@@ -35,7 +35,7 @@ class Discovery extends \Boldgrid\Backup\V2\Step\Step {
 		$data = \Boldgrid\Backup\Utility\Remote::get_json( $download_url );
 		if ( is_wp_error( $data ) ) {
 			return false;
-		} elseif ( empty( $data ) ) {
+		} elseif ( empty( $data['data']['id'] ) || empty( $data['data']['zips'] ) ) {
 			return false;
 		}
 
