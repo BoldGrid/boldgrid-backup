@@ -324,6 +324,58 @@ class Boldgrid_Backup_Admin_Utility {
 	}
 
 	/**
+	 *
+	 */
+	public static function move_dir( $source_dir, $destination_dir, $level = 0 ) {
+		$level++;
+
+		$core = apply_filters( 'boldgrid_backup_get_core', null );
+
+		if ( ! $core->wp_filesystem->exists( $source_dir ) ) {
+			return false;
+		}
+
+		if ( ! $core->wp_filesystem->exists( $destination_dir ) ) {
+			$made = $core->wp_filesystem->mkdir( $destination_dir );
+			if ( ! $made ) {
+				return false;
+			}
+		}
+
+		$source_dir      = trailingslashit( $source_dir );
+		$destination_dir = trailingslashit( $destination_dir );
+
+		$dirlist = $core->wp_filesystem->dirlist( $source_dir );
+
+		foreach ( $dirlist as $data ) {
+			if ( 'f' === $data['type'] ) {
+				$source_file      = $source_dir . $data['name'];
+				$destination_file = $destination_dir . $data['name'];
+
+				// Try to copy the file. If we can't, abort.
+				if ( ! $core->wp_filesystem->copy( $source_file, $destination_file ) ) {
+					return false;
+				}
+			} elseif ( 'd' === $data['type'] ) {
+				// Recursion. Try to move this sub folder.
+				if ( ! self::move_dir( $source_dir . $data['name'], $destination_dir . $data['name'], $level ) ) {
+					return false;
+				}
+			}
+		}
+
+		/*
+		 * We're moving directories, not copying, so delete the source directory. Only do this if this
+		 * is the highest level. If something went wrong, leave the original directory intact.
+		 */
+		if ( 1 === $level ) {
+			$core->wp_filesystem->rmdir( $source_dir );
+		}
+
+		return true;
+	}
+
+	/**
 	 * Whether or not a string starts with another.
 	 *
 	 * @since SINCEVERSION
@@ -420,6 +472,24 @@ class Boldgrid_Backup_Admin_Utility {
 
 		// Return the resulting minimum value (int in bytes).
 		return $min;
+	}
+
+	/**
+	 * Get url params from a full url.
+	 *
+	 * A shortcut, uses both parse_url and parse_str.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param string $url A full url.
+	 * @return array
+	 */
+	public static function get_url_params( $url ) {
+		$url_query = wp_parse_url( $url, PHP_URL_QUERY );
+
+		parse_str( $url_query, $query_params );
+
+		return $query_params;
 	}
 
 	/**

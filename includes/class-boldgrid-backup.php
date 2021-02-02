@@ -107,10 +107,10 @@ class Boldgrid_Backup {
 		 */
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin.php';
 
-		/**
-		 * Include a utility class.
-		 */
+		// Utility classes.
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-utility.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/utility/class-remote.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/utility/class-virtual-folder.php';
 
 		/**
 		 * The class responsible for the configuration of the plugin.
@@ -372,6 +372,14 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/archive/class-archive.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/archive/class-dirlist.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/archive/class-factory.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/archive/class-file.php';
+
+		// V2 Fetcher.
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/fetcher/class-fetcher.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/fetcher/class-factory.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/fetcher/steps/class-discovery.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/fetcher/steps/class-fetch.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/fetcher/steps/class-complete.php';
 
 		$this->loader = new Boldgrid_Backup_Loader();
 	}

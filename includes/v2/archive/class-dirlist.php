@@ -39,7 +39,15 @@ class Dirlist {
 	 *
 	 */
 	public function get() {
-		return $this->core->wp_filesystem->dirlist( $this->archive->get_dir() );
+		$dir = trailingslashit( $this->archive->get_dir() );
+
+		$dirlist = $this->core->wp_filesystem->dirlist( $dir );
+
+		foreach ( $dirlist as &$file ) {
+			$file['path'] = $dir . $file['name'];
+		}
+
+		return $dirlist;
 	}
 
 	public function get_by_extension( $extension ) {
@@ -48,6 +56,22 @@ class Dirlist {
 		$dirlist = $this->get();
 		foreach ( $dirlist as $key => $data ) {
 			if ( pathinfo( $key, PATHINFO_EXTENSION ) === $extension ) {
+				$files[] = $data;
+			}
+		}
+
+		return $files;
+	}
+
+	/**
+	 *
+	 */
+	public function get_by_key( $key, $value ) {
+		$files = array();
+
+		$dirlist = $this->get();
+		foreach ( $dirlist as $data ) {
+			if ( isset( $data[ $key ] ) && $data[ $key ] === $value ) {
 				$files[] = $data;
 			}
 		}

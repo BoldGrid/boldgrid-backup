@@ -426,11 +426,33 @@ class Boldgrid_Backup_Admin_Upload {
 
 		$url = ! empty( $_POST['url'] ) ? esc_url_raw( $_POST['url'] ) : null;
 
-		$archive_fetcher = new Boldgrid_Backup_Archive_Fetcher( $url );
-		$archive_fetcher->download();
+		$url_params = Boldgrid_Backup_Admin_Utility::get_url_params( $url );
 
-		if ( $archive_fetcher->has_error() ) {
-			wp_send_json_error( [ 'error' => $archive_fetcher->get_error() ] );
+		if ( isset( $url_params['type'] ) && 'many' === $url_params['type'] ) {
+			$archive_fetcher = \Boldgrid\Backup\V2\Fetcher\Factory::run();
+			$archive_fetcher->get_info()->set_key( 'download_url', $url );
+			$archive_fetcher->run();
+
+			// Set our success status and any possible error messages.
+			$error   = '';
+			$success = ! $archive_fetcher->is_fail();
+			if ( ! $success ) {
+				$error = $archive_fetcher->info->get_key( 'error' );
+			}
+		} else {
+			$archive_fetcher = new Boldgrid_Backup_Archive_Fetcher( $url );
+			$archive_fetcher->download();
+
+			// Set our success status and any possible error messages.
+			$error   = '';
+			$success = ! $archive_fetcher->has_error();
+			if ( ! $success ) {
+				$error = $archive_fetcher->get_error();
+			}
+		}
+
+		if ( ! $success ) {
+			wp_send_json_error( [ 'error' => $error ] );
 		} else {
 			wp_send_json_success( $archive_fetcher->get_info() );
 		}

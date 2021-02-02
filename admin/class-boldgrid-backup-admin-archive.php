@@ -188,9 +188,21 @@ class Boldgrid_Backup_Admin_Archive {
 	 * @return bool
 	 */
 	public function delete( $filepath ) {
+		// Delete the .zip.
 		$deleted = $this->core->wp_filesystem->delete( $filepath, false, 'f' );
 
+		// Delete the .log.
 		$this->core->archive_log->delete_by_zip( $filepath );
+
+		/*
+		 * Delete the folder.
+		 *
+		 * Introduced in SINCEVERSION - virtual backups.
+		 */
+		$folder_path = \Boldgrid\Backup\Utility\Virtual_Folder::folder_by_zip( $filepath );
+		if ( $this->core->wp_filesystem->exists( $folder_path ) ) {
+			$this->core->wp_filesystem->delete( $folder_path, true, 'd' );
+		}
 
 		return $deleted;
 	}
@@ -561,6 +573,10 @@ class Boldgrid_Backup_Admin_Archive {
 		$this->log_filename = null;
 		$this->log          = array();
 		$this->compressor   = null;
+
+		// Virtual.
+		$this->is_virtual = null;
+		$this->virtual    = null;
 	}
 
 	/**
@@ -701,12 +717,16 @@ class Boldgrid_Backup_Admin_Archive {
 		$validation_results = $this->validate_link_request( $filename );
 
 		if ( $validation_results['is_valid'] ) {
+			// Initialize this backup so we have access to properties (like is_virtual).
+			$this->init_by_filename( $filename );
+
 			$expires = strtotime( '+' . $this->core->configs['public_link_lifetime'] );
 			$token   = Boldgrid_Backup_Authentication::create_token( $filename, $expires );
+			$type    = $this->is_virtual ? 'many' : 'one';
 
 			$response['download_url'] = get_site_url(
 				null,
-				'wp-admin/admin-ajax.php?action=boldgrid_backup_download&t=' . $token
+				'wp-admin/admin-ajax.php?action=boldgrid_backup_download&t=' . $token . '&type=' . $type
 			);
 
 			$response['expires_when'] = human_time_diff(

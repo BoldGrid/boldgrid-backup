@@ -19,6 +19,9 @@ namespace Boldgrid\Backup\V2\Archive;
  * @since SINCEVERSION
  */
 class Archive {
+	/**
+	 * IE /home/user/boldgrid_backup/boldgrid-backup-2cc84b67-8476bbfc0a3f4c5c
+	 */
 	private $dir;
 
 	/**
@@ -28,6 +31,8 @@ class Archive {
 	private $dirlist;
 
 	private $filename;
+
+	private $folder;
 
 	/**
 	 * The id of this backup.
@@ -46,7 +51,7 @@ class Archive {
 	}
 
 	/**
-	 *
+	 * The full path to the directory.
 	 */
 	public function get_dir() {
 		return $this->dir;
@@ -62,6 +67,20 @@ class Archive {
 	/**
 	 *
 	 */
+	public function get_file( $filename ) {
+		return new \Boldgrid\Backup\V2\Archive\File( $this, $filename );
+	}
+
+	/**
+	 *
+	 */
+	public function get_folder() {
+		return $this->folder;
+	}
+
+	/**
+	 *
+	 */
 	public function get_id() {
 		return $this->id;
 	}
@@ -71,6 +90,8 @@ class Archive {
 	 */
 	public function set_dir( $dir ) {
 		$this->dir = $dir;
+
+		$this->folder = pathinfo( $dir, PATHINFO_FILENAME );
 	}
 
 	/**

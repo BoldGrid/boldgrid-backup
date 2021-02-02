@@ -32,19 +32,6 @@ class Boldgrid_Backup_Archive_Fetcher {
 	public $url;
 
 	/**
-	 * Allowed content types.
-	 *
-	 * @since SINCVERSION
-	 * @access private
-	 * @var array
-	 */
-	private $allowed_content_types = [
-		'application/octet-stream',
-		'binary/octet-stream',
-		'application/zip',
-	];
-
-	/**
 	 * The core class object.
 	 *
 	 * @since SINCEVERSION
@@ -115,7 +102,8 @@ class Boldgrid_Backup_Archive_Fetcher {
 	public function __construct( $url ) {
 		$this->core = apply_filters( 'boldgrid_backup_get_core', null );
 
-		$this->url = $url;
+		$this->url      = $url;
+		$this->filepath = $this->core->upload->get_save_path( basename( $this->url ) );
 	}
 
 	/**
@@ -126,36 +114,14 @@ class Boldgrid_Backup_Archive_Fetcher {
 	 * @return bool True on success.
 	 */
 	public function download() {
-		if ( ! $this->is_valid_url() ) {
-			$this->error = __( 'Invalid URL address.', 'boldgrid-backup' );
-			return false;
-		}
+		// Try to download and save the file.
+		$file_saved = Boldgrid\Backup\Utility\Remote::save_file( $this->url, $this->filepath, $this->response );
 
-		if ( ! $this->is_valid_backupdir() ) {
-			$this->error = implode( '<br />', $this->core->backup_dir->errors );
-			return false;
-		}
-
-		$this->filepath = $this->core->upload->get_save_path( basename( $this->url ) );
-
-		$this->response = wp_remote_get(
-			$this->url,
-			[
-				'filename'  => $this->filepath,
-				'headers'   => 'Accept: ' . implode( ', ', $this->allowed_content_types ),
-				'sslverify' => false,
-				'stream'    => true,
-				'timeout'   => MINUTE_IN_SECONDS * 20,
-			]
-		);
-
-		if ( $this->is_call_successful() ) {
+		if ( true === $file_saved ) {
 			$this->post_successful_download();
 
 			return true;
 		} else {
-			$this->core->wp_filesystem->delete( $this->filepath );
-
 			$this->error = __(
 				'Could not retrieve the remote file.  It may not be a ZIP file, or the link is no longer valid.',
 				'boldgrid-backup'
@@ -199,22 +165,6 @@ class Boldgrid_Backup_Archive_Fetcher {
 	}
 
 	/**
-	 * Whether or not the call to download the file was successful.
-	 *
-	 * This does not represent the success of the download() method, but instead the state of the
-	 * wp_remote_get call.
-	 *
-	 * @since SINCEVERSION
-	 *
-	 * @return bool True on success.
-	 */
-	private function is_call_successful() {
-		return is_array( $this->response ) &&
-			! is_wp_error( $this->response ) &&
-			in_array( $this->response['headers']['content-type'], $this->allowed_content_types, true );
-	}
-
-	/**
 	 * Validate our backup directory.
 	 *
 	 * @since SINCEVERSION
@@ -225,19 +175,6 @@ class Boldgrid_Backup_Archive_Fetcher {
 		$backup_directory = $this->core->backup_dir->get();
 
 		return $this->core->backup_dir->is_valid( $backup_directory ) && empty( $this->core->backup_dir->errors );
-	}
-
-	/**
-	 * Validate our download url.
-	 *
-	 * @since SINCEVERSION
-	 *
-	 * @return bool True if valid.
-	 */
-	private function is_valid_url() {
-		$url_regex = '/' . $this->core->configs['url_regex'] . '/i';
-
-		return preg_match( $url_regex, $this->url );
 	}
 
 	/**

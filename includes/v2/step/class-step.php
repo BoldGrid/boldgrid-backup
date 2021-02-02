@@ -34,7 +34,7 @@ class Step {
 	 * @access private
 	 * @var    Boldgrid_Backup_Admin_Core
 	 */
-	private $core;
+	protected $core;
 
 	/**
 	 * Data stored for this step.
@@ -68,6 +68,8 @@ class Step {
 	 * @var string
 	 */
 	private $filepath;
+
+	private $folder;
 
 	/**
 	 * The max attempts to execute this step before giving up.
@@ -114,20 +116,14 @@ class Step {
 	public function __construct( $id, $parent_id, $dir ) {
 		$this->core = apply_filters( 'boldgrid_backup_get_core', false );
 
-		if ( ! $this->core->wp_filesystem->exists( $dir ) ) {
-			$this->core->wp_filesystem->mkdir( $dir );
-		}
-
-		$this->id        = $id;
+		$this->id        = sanitize_file_name( $id );
 		$this->parent_id = $parent_id;
-		$this->dir       = trailingslashit( $dir );
 		$this->filename  = 'step-' . $this->id . '.json';
-		$this->filepath  = $this->dir . $this->filename;
+
+		$this->set_dir( $dir );
 
 		$this->data['run']  = new \Boldgrid\Backup\V2\Step\Data( $this, 'run_data' );
 		$this->data['step'] = new \Boldgrid\Backup\V2\Step\Data( $this, 'step_data' );
-
-		$this->info = new \Boldgrid\Backup\V2\Step\Json_file( $this->get_path_to( 'info.json' ) );
 
 		add_filter( 'boldgrid_backup_get_step_' . $this->id, array( $this, 'get_this' ) );
 	}
@@ -259,6 +255,13 @@ class Step {
 	/**
 	 *
 	 */
+	public function get_folder() {
+		return $this->folder;
+	}
+
+	/**
+	 *
+	 */
 	public function get_info() {
 		return $this->info;
 	}
@@ -379,6 +382,30 @@ class Step {
 	}
 
 	/**
+	 * Maybe init our logger.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param string $filename The filename of our log. IE backup.log
+	 */
+	protected function maybe_init_logger( $filename ) {
+		// If we already have a logger, abort.
+		if ( ! is_null( $this->logger ) ) {
+			return;
+		}
+
+		// If this step already have a log filename, abort.
+		$log_filename = $this->info->get_key( 'log_filename' );
+		if ( ! empty( $log_filename ) ) {
+			return;
+		}
+
+		$this->logger = new \Boldgrid_Backup_Admin_Log( $this->core );
+		$this->logger->init( $filename );
+		$this->info->set_key( 'log_filename', $filename );
+	}
+
+	/**
 	 * Determine whether or not we should run this step.
 	 *
 	 * @since SINCEVERSION
@@ -404,6 +431,51 @@ class Step {
 		}
 
 		return true;
+	}
+
+	/**
+	 *
+	 */
+	public function move_dir( $new_path ) {
+		// If the directories are the same, abort.
+		if ( $new_path === $this->dir ) {
+			return true;
+		}
+
+		$moved = \Boldgrid_Backup_Admin_Utility::move_dir( $this->dir, $new_path );
+		if ( ! $moved ) {
+			return false;
+		}
+
+		$this->set_dir( $new_path );
+
+		/*
+		 * Update the directory of the parent.
+		 *
+		 * Be careful when using this method. It will update the working directory of this step plus
+		 * the parent step, but that's it. If there are 20 other steps, they won't be updated. This
+		 * move method is used rarely, and generally would be used the first step.
+		 */
+		$parent = $this->get_parent();
+		if ( ! empty( $parent ) ) {
+			$parent->set_dir( $new_path );
+		}
+
+		return true;
+	}
+
+	/**
+	 *
+	 */
+	private function set_dir( $dir ) {
+		if ( ! $this->core->wp_filesystem->exists( $dir ) ) {
+			$this->core->wp_filesystem->mkdir( $dir );
+		}
+
+		$this->dir      = trailingslashit( $dir );
+		$this->folder   = basename( $dir );
+		$this->filepath = $this->dir . $this->filename;
+		$this->info     = new \Boldgrid\Backup\V2\Step\Json_file( $this->get_path_to( 'info.json' ) );
 	}
 
 	/**
