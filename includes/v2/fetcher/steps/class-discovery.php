@@ -50,6 +50,11 @@ class Discovery extends \Boldgrid\Backup\V2\Step\Step {
 		$this->info->set_key( 'backup_folder', $backup_folder );
 		$this->info->set_key( 'backup_id', $data['data']['id'] );
 
+		// Save some in progress data. This is for our fetcher resumer.
+		$option = \Boldgrid\Backup\V2\Fetcher\Utility::get_option();
+		$option->set_key( 'backup_id', $data['data']['id'] );
+		$option->set_key( 'fetcher_id', $this->info->get_key( 'fetcher_id' ) );
+
 		$this->complete();
 
 		return true;

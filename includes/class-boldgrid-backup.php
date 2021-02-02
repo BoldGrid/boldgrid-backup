@@ -377,6 +377,8 @@ class Boldgrid_Backup {
 		// V2 Fetcher.
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/fetcher/class-fetcher.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/fetcher/class-factory.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/fetcher/class-utility.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/fetcher/class-resumer.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/fetcher/steps/class-discovery.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/fetcher/steps/class-fetch.php';
 		require_once BOLDGRID_BACKUP_PATH . '/includes/v2/fetcher/steps/class-complete.php';
@@ -415,6 +417,7 @@ class Boldgrid_Backup {
 		$plugin_admin_core = new Boldgrid_Backup_Admin_Core();
 		$resumer           = new \Boldgrid\Backup\V2\Archiver\Resumer( $plugin_admin_core );
 		$restore_resumer   = new \Boldgrid\Backup\V2\Restorer\Resumer( $plugin_admin_core );
+		$fetch_resumer     = new \Boldgrid\Backup\V2\Fetcher\Resumer( $plugin_admin_core );
 
 		// WP-CLI support.
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
@@ -586,6 +589,7 @@ class Boldgrid_Backup {
 		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_restore', $plugin_admin_core->cron, 'restore' );
 		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_resume', $resumer, 'run' );
 		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_resume_restore', $restore_resumer, 'run' );
+		$this->loader->add_action( 'wp_ajax_nopriv_boldgrid_backup_run_resume_fetch', $fetch_resumer, 'run' );
 
 		// For public downloads.
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_download', $plugin_admin_core->download, 'public_download' );

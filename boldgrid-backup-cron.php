@@ -60,6 +60,7 @@ $valid_modes = array(
 	'backup',
 	'restore',
 	'resume',
+	'resume_fetch',
 	'resume_restore',
 );
 

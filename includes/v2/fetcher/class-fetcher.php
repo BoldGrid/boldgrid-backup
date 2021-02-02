@@ -30,6 +30,9 @@ class Fetcher extends \Boldgrid\Backup\V2\Step\Step {
 
 		$this->add_attempt();
 
+		$resumer = new \Boldgrid\Backup\V2\Fetcher\Resumer();
+		$resumer->maybe_add_cron();
+
 		$steps = array(
 			new \Boldgrid\Backup\V2\Fetcher\Steps\Discovery( 'discovery', $this->id, $this->get_dir() ),
 		);
@@ -80,6 +83,8 @@ class Fetcher extends \Boldgrid\Backup\V2\Step\Step {
 		}
 
 		$this->complete();
+
+		$resumer->remove_cron();
 
 		return true;
 	}

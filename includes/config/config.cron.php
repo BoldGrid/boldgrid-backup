@@ -63,6 +63,15 @@ $config = [
 				// todo add wp-cron
 			],
 		],
+		'resume_fetch'   => [
+			'search' => [
+				'cron' => [
+					'mode=resume_fetch ',
+					'siteurl=' . $site_url . ' ',
+				],
+				// todo add wp-cron
+			],
+		],
 	],
 ];
 

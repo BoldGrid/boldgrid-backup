@@ -47,6 +47,21 @@ class Virtual_Folder {
 	}
 
 	/**
+	 * Pass a backup id, such as:
+	 * # 12345678
+	 *
+	 * Get
+	 * # /home/user/boldgrid_backup/boldgrid-backup-1234-12345678/
+	 */
+	public static function path_by_id( $id ) {
+		$core = apply_filters( 'boldgrid_backup_get_core', null );
+
+		$folder_name = self::get_by_id( $id );
+
+		return trailingslashit( $core->backup_dir->get_path_to( $folder_name ) );
+	}
+
+	/**
 	 * Create empty zip file based on folder.
 	 *
 	 * If you pass in:
