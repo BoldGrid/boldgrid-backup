@@ -139,8 +139,10 @@ $files = array(
 	// Orphan.
 	'/admin/orphan/class-cleanup.php',
 	'/admin/orphan/class-finder.php',
-	// Option
+	// Option.
 	'/includes/option/class-option.php',
+	// Utility.
+	'/includes/utility/class-virtual-folder.php',
 	// V2 Archive.
 	'/includes/v2/archive/class-factory.php',
 	'/includes/v2/archive/class-archive.php',
