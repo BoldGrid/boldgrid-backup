@@ -55,10 +55,45 @@ class Info {
 	 */
 	public static function get_results_filepath() {
 		if ( null === self::$results_file_path ) {
-			self::$results_file_path = dirname( __DIR__ ) . '/cron/restore-info.json';
+			self::$results_file_path = dirname( __DIR__ ) . '/cron/restore-info-' . self::get_secret() . '.json';
 		}
 
 		return self::$results_file_path;
+	}
+
+	/**
+	 * Get secret.
+	 *
+	 * Used to secure scripts used outside of WordPress.
+	 *
+	 * @since 1.14.10
+	 *
+	 * @return string
+	 */
+	public static function get_secret() {
+		$secret = null;
+
+		// First, attempt to get our secret.
+		$files   = scandir( __DIR__ );
+		$pattern = '/^verify-[0-9a-f]{32}\.php/';
+		$matches = preg_grep( $pattern, $files );
+		if ( ! empty( $matches ) ) {
+			$matches = array_values( $matches );
+			preg_match( '/^verify-(.*).php/', $matches[0], $match );
+
+			if ( ! empty( $match[1] ) ) {
+				$secret = $match[1];
+			}
+		}
+
+		// If we don't have a secret, make one.
+		if ( empty( $secret ) ) {
+			$secret   = md5( openssl_random_pseudo_bytes( 32 ) );
+			$filepath = __DIR__ . '/verify-' . $secret . '.php';
+			file_put_contents( $filepath, '<?php // phpcs:disable' );
+		}
+
+		return $secret;
 	}
 
 	/**
@@ -514,14 +549,9 @@ class Info {
 	public static function get_env_info() {
 		if ( empty( self::$info['env'] ) ) {
 			require_once dirname( __DIR__ ) . '/cron/class-boldgrid-backup-url-helper.php';
-			$url_helper = new \Boldgrid_Backup_Url_Helper();
-
-			self::$info['env'] = json_decode(
-				$url_helper->call_url(
-					self::$info['siteurl'] . '/wp-content/plugins/boldgrid-backup/cli/env-info.php'
-				),
-				true
-			);
+			$url_helper        = new \Boldgrid_Backup_Url_Helper();
+			$url               = self::$info['siteurl'] . '/wp-content/plugins/boldgrid-backup/cli/env-info.php?secret=' . self::get_secret();
+			self::$info['env'] = json_decode( $url_helper->call_url( $url ), true );
 		}
 
 		return self::$info['env'];
