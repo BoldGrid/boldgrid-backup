@@ -33,7 +33,6 @@ class Boldgrid_Backup_File {
 		WP_Filesystem();
 		global $wp_filesystem;
 
-		// phpcs:disable WordPress.VIP
 		if ( empty( $filepath ) || ! $wp_filesystem->exists( $filepath ) ) {
 			wp_redirect( get_site_url(), 404 );
 		}
@@ -55,16 +54,41 @@ class Boldgrid_Backup_File {
 			ob_end_flush();
 		}
 
+		/*
+		 * Implicit flushing will result in a flush operation after every output call, so that explicit
+		 * calls to flush() will no longer be needed.
+		 */
+		ob_implicit_flush( true );
+
 		// Close any PHP session, so another session can open during the download.
 		session_write_close();
 
-		// Send the file.  Not finding a replacement in $wp_filesystem.
-		// phpcs:disable
-		readfile( $filepath );
-		// phpcs:enable
+		/*
+		 * Begin code to send the file, chunked.
+		 *
+		 * Unable to find a replacement in $wp_filesystem.
+		 *
+		 * Inspired by https://stackoverflow.com/questions/6914912/streaming-a-large-file-using-php
+		 *
+		 * This method was needed because some users couldn't download large files using readfile() alone.
+		 * They were able to download small backup files, but not larger ones.
+		 */
+		$buffer = '';
+
+		// If we can't open the file, abort.
+		$handle = fopen( $filepath, 'rb' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fopen
+		if ( false === $handle ) {
+			wp_die();
+		}
+
+		// Loop through the file and send it 1MB at a time.
+		while ( ! feof( $handle ) ) {
+			$buffer = fread( $handle, 1024 * 1024 ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fread
+			echo $buffer; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+		}
+
+		fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fclose
 
 		wp_die();
-
-		// phpcs:enable WordPress.VIP
 	}
 }
