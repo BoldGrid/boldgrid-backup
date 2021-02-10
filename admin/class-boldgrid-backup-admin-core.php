@@ -2405,14 +2405,16 @@ class Boldgrid_Backup_Admin_Core {
 		do_action( 'boldgrid_backup_pre_restore', $info );
 
 		/*
-		 * Attempt to fix any permissions related issues before the restoration begins. If we're
-		 * unable to, the restoration may not continue.
+		 * Attempt to fix any permissions related issues before the restoration begins.
+		 *
+		 * Historically, we'd abort the restoration if we couldn't set writable permissions. Now, we'll
+		 * add a line to the logs and try anyways. A bug was encountered where we couldn't set writable
+		 * permissions and yet the restore completed. Voodoo.
 		 */
 		if ( class_exists( 'ZipArchive' ) ) {
 			if ( ! $this->restore_helper->set_writable_permissions( $info['filepath'] ) ) {
 				$error_message = $this->restore_helper->get_last_error();
 				$this->logger->add( $error_message );
-				return [ 'error' => $error_message ];
 			}
 		} else {
 			$this->logger->add( 'ZipArchive not available. Unable to set_writable_permissions. Trying restore anyways...' );
