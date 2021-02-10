@@ -307,6 +307,8 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-environment.php';
 
+		require_once BOLDGRID_BACKUP_PATH . '/cli/class-info.php';
+
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
 
