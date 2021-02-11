@@ -70,7 +70,7 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 			includeTables = [],
 
 			/*
-			 * By default, we will create a "full" backup of all files.
+			 * By default, we will create a "full" backup of all files and database tables.
 			 *
 			 * # If the user is within a backup modal, they will have the choice to configure "custom"
 			 *   settings so they can include / exclude specific files and folders.
@@ -78,7 +78,7 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 			 *   be a "full" backup.
 			 */
 			type = 1 === $radioFolderType.length ? $radioFolderType.val() : 'full',
-			tablesType = null,
+			tablesType = 1 === $radioTableType.length ? $radioTableType.val() : 'full',
 
 			/*
 			 * Configure our "backup site now" section and the values found within.
@@ -108,6 +108,7 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 			is_updating: $this.data( 'updating' ),
 			backup_now: '1',
 			folder_exclusion_type: type,
+			table_inclusion_type: tablesType,
 			backup_title: $( '[name="backup_title"]' ).val(),
 			backup_description: $( '[name="backup_description"]' ).val()
 		};
@@ -123,16 +124,11 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 		}
 
 		// Configure our custom database tables include / exclude rules.
-		if ( 1 === $radioTableType.length ) {
-			tablesType = $radioTableType.val();
-			data.table_inclusion_type = tablesType;
-
-			if ( 'custom' === tablesType && $tableInclude.length ) {
-				$tableInclude.filter( ':checked' ).each( function() {
-					includeTables.push( $( this ).val() );
-				} );
-				data.include_tables = includeTables;
-			}
+		if ( 'custom' === tablesType && $tableInclude.length ) {
+			$tableInclude.filter( ':checked' ).each( function() {
+				includeTables.push( $( this ).val() );
+			} );
+			data.include_tables = includeTables;
 		}
 
 		if ( undefined !== BOLDGRID.BACKUP.UpdateSelectors ) {
