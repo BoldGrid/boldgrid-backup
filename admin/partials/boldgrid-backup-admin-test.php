@@ -22,6 +22,7 @@ defined( 'WPINC' ) || die;
 $lang = array(
 	'yes'                  => __( 'Yes', 'boldgrid-backup' ),
 	'no'                   => __( 'No', 'boldgrid-backup' ),
+	'none'                 => __( 'None', 'boldgrid-backup' ),
 	'untested'             => __( 'untested', 'boldgrid-backup' ),
 	'PASS'                 => __( 'PASS', 'boldgrid-backup' ),
 	'FAIL'                 => __( 'FAIL', 'boldgrid-backup' ),
@@ -90,6 +91,8 @@ $pcl_zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this );
 
 $filesystem_method = get_filesystem_method();
 
+$execution_functions = Boldgrid_Backup_Admin_Cli::get_execution_functions();
+
 $valid_backup_dir = $backup_dir_perms['exists'] && $backup_dir_perms['read'] && $backup_dir_perms['write'] && $backup_dir_perms['rename'] && $backup_dir_perms['delete'] && $backup_dir_perms['dirlist'];
 
 $timezone = $this->time->get_server_timezone();
@@ -140,6 +143,10 @@ $tests = array(
 				$error_span,
 				$filesystem_method, __( 'Only "direct" filesystem supported.', 'boldgrid-backup' )
 			),
+	),
+	array(
+		'k' => __( 'Execution functions available', 'boldgrid-backup' ),
+		'v' => empty( $execution_functions ) ? sprintf( $error_span, $lang['none'], '' ) : implode( ', ', $execution_functions ),
 	),
 	array(
 		'k' => __( 'WordPress version:', 'boldgrid-backup' ),
