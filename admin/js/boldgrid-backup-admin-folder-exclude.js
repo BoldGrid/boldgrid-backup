@@ -243,6 +243,7 @@ BoldGrid.FolderExclude = function( $ ) {
 			filterVal,
 			filteredNoResults,
 			file,
+
 			// See docblock definition of "page" var to know more about checking if this is an event.
 			isEvent = 'object' === typeof page && page.target !== undefined;
 
