@@ -50,8 +50,10 @@ class Boldgrid_Backup_Admin_Cli {
 		}
 
 		// Get the PHP disable_functions list.
-		$disabled = str_replace( ' ', '', ini_get( 'disable_functions' ) );
-		$disabled = explode( ',', $disabled );
+		$disabled = explode( ',', ini_get( 'disable_functions' ) );
+		array_walk( $disabled, function( &$function ) {
+			$function = trim( $function );
+		} );
 
 		// Make an array of execution functions.
 		$exec_functions = array(
