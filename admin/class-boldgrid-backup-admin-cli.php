@@ -89,6 +89,7 @@ class Boldgrid_Backup_Admin_Cli {
 	 */
 	public static function call_command( $command, &$success = false, &$return_var = 0 ) {
 		$success = false;
+		$output  = false;
 
 		// phpcs:disable WordPress.PHP.DiscouragedPHPFunctions, WordPress.WP.AlternativeFunctions
 
