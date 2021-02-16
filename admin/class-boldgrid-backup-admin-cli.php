@@ -40,7 +40,7 @@ class Boldgrid_Backup_Admin_Cli {
 	 */
 	public static function get_execution_functions() {
 		// If the array already has elements, then return the array.
-		if ( self::$available_exec_functions ) {
+		if ( ! is_null( self::$available_exec_functions ) ) {
 			return self::$available_exec_functions;
 		}
 
@@ -50,7 +50,8 @@ class Boldgrid_Backup_Admin_Cli {
 		}
 
 		// Get the PHP disable_functions list.
-		$disabled = explode( ',', ini_get( 'disable_functions' ) );
+		$disabled = str_replace( ' ', '', ini_get( 'disable_functions' ) );
+		$disabled = explode( ',', $disabled );
 
 		// Make an array of execution functions.
 		$exec_functions = array(
