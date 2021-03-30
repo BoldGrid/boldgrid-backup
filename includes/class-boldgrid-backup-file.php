@@ -53,12 +53,12 @@ class Boldgrid_Backup_File {
 		header( 'Content-Type: binary/octet-stream' );
 		header( 'Content-Length: ' . $filesize );
 
-		// Check and flush output buffer if needed.
-		$ob_level = ob_get_level();
-		$log->add( 'Output buffering level: ' . $ob_level );
-		if ( 0 !== $ob_level ) {
-			$log->add( 'Calling ob_end_flush().' );
-			ob_end_flush();
+		// Clean up output buffering.
+		while ( $ob_level = ob_get_level() ) { // phpcs:ignore WordPress.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
+			$buffer_contents = ob_get_contents();
+			$log->add( 'ob level ' . $ob_level . ' contents preview: ' . substr( $buffer_contents, 0, 100 ) );
+
+			$log->add( 'Calling ob_end_clean()... ' . ( ob_end_clean() ? 'Success' : 'Fail' ) );
 		}
 
 		/*
@@ -93,17 +93,15 @@ class Boldgrid_Backup_File {
 		$buffer_size = 1024 * 1024;
 		$log->add( 'Beginnig to send file... Buffer size: ' . size_format( $buffer_size, 2 ) );
 		while ( ! feof( $handle ) ) {
-			$log->add( 'Reading buffer...' );
-			$time_start = microtime( true );
-			$buffer     = fread( $handle, $buffer_size ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fread
-			$duration   = microtime( true ) - $time_start;
-			$log->add( 'Buffer read in ' . round( $duration, 4 ) . ' seconds.' );
+			$time_start_read = microtime( true );
+			$buffer          = fread( $handle, $buffer_size ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fread
+			$duration_read   = microtime( true ) - $time_start_read;
 
-			$log->add( 'Sending buffer...' );
-			$time_start = microtime( true );
+			$time_start_send = microtime( true );
 			echo $buffer; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
-			$duration = microtime( true ) - $time_start;
-			$log->add( 'Buffer sent in ' . round( $duration, 4 ) . ' seconds.' );
+			$duration_send = microtime( true ) - $time_start_send;
+
+			$log->add( 'Buffer read in ' . round( $duration_read, 4 ) . ' seconds and sent in ' . round( $duration_send, 4 ) . ' seconds.' );
 		}
 		$log->add( 'Finished sending file.' );
 
