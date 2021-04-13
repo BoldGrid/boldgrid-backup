@@ -2670,12 +2670,19 @@ class Boldgrid_Backup_Admin_Core {
 	 * @see Boldgrid_Backup_File::send_file()
 	 */
 	public function download_archive_file_callback() {
+		$log = new Boldgrid_Backup_Admin_Log( $this );
+		$log->init( 'backup-download.log' );
+		$log->add_separator();
+		$log->add( 'Attempting ajax download...' );
+
 		// Verify nonce, or die.
 		check_ajax_referer( 'archive_auth', 'wpnonce' );
 
 		// Check user capabilities.
 		if ( ! current_user_can( 'update_plugins' ) ) {
-			esc_html_e( 'Security violation (not authorized).', 'boldgrid-backup' );
+			$error = __( 'Security violation (not authorized).', 'boldgrid-backup' );
+			echo esc_html( $error );
+			$log->add( $error );
 			wp_die();
 		}
 
@@ -2683,7 +2690,9 @@ class Boldgrid_Backup_Admin_Core {
 		if ( isset( $_POST['download_key'] ) && is_numeric( $_POST['download_key'] ) ) {
 			$download_key = (int) $_POST['download_key'];
 		} else {
-			esc_html_e( 'INVALID DOWNLOAD KEY', 'boldgrid-backup' );
+			$error = __( 'INVALID DOWNLOAD KEY', 'boldgrid-backup' );
+			echo esc_html( $error );
+			$log->add( $error );
 			wp_die();
 		}
 
@@ -2691,7 +2700,9 @@ class Boldgrid_Backup_Admin_Core {
 		if ( ! empty( $_POST['download_filename'] ) ) {
 			$download_filename = sanitize_file_name( $_POST['download_filename'] );
 		} else {
-			esc_html_e( 'INVALID DOWNLOAD FILENAME', 'boldgrid-backup' );
+			$error = __( 'INVALID DOWNLOAD FILENAME', 'boldgrid-backup' );
+			echo esc_html( $error );
+			$log->add( $error );
 			wp_die();
 		}
 
@@ -2700,7 +2711,9 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Check WP_Filesystem method; ensure it is "direct".
 		if ( 'direct' !== $access_type ) {
-			esc_html_e( 'WP_Filesystem method is not "direct"', 'boldgrid-backup' );
+			$error = __( 'WP_Filesystem method is not "direct"', 'boldgrid-backup' );
+			echo esc_html( $error );
+			$log->add( $error );
 			wp_die();
 		}
 
@@ -2709,7 +2722,9 @@ class Boldgrid_Backup_Admin_Core {
 
 		// If no files were found, then abort.
 		if ( empty( $archives ) ) {
-			esc_html_e( 'NO BACKUP ARCHIVES FOUND', 'boldgrid-backup' );
+			$error = __( 'NO BACKUP ARCHIVES FOUND', 'boldgrid-backup' );
+			echo esc_html( $error );
+			$log->add( $error );
 			wp_die();
 		}
 
@@ -2721,7 +2736,9 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Verify filename.
 		if ( $download_filename !== $filename ) {
-			esc_html_e( 'FILE NOT FOUND', 'boldgrid-backup' );
+			$error = __( 'FILE NOT FOUND', 'boldgrid-backup' );
+			echo esc_html( $error );
+			$log->add( $error );
 			wp_die();
 		}
 
@@ -2734,6 +2751,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Send the file and die nicely.
+		$log->add( 'Request validated successfully. Now on to sending the file...' );
 		Boldgrid_Backup_File::send_file( $filepath, $filesize );
 	}
 
