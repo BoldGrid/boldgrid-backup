@@ -40,7 +40,7 @@ class Boldgrid_Backup_Admin_Cli {
 	 */
 	public static function get_execution_functions() {
 		// If the array already has elements, then return the array.
-		if ( self::$available_exec_functions ) {
+		if ( ! is_null( self::$available_exec_functions ) ) {
 			return self::$available_exec_functions;
 		}
 
@@ -51,6 +51,9 @@ class Boldgrid_Backup_Admin_Cli {
 
 		// Get the PHP disable_functions list.
 		$disabled = explode( ',', ini_get( 'disable_functions' ) );
+		array_walk( $disabled, function( &$function ) {
+			$function = trim( $function );
+		} );
 
 		// Make an array of execution functions.
 		$exec_functions = array(
@@ -89,6 +92,7 @@ class Boldgrid_Backup_Admin_Cli {
 	 */
 	public static function call_command( $command, &$success = false, &$return_var = 0 ) {
 		$success = false;
+		$output  = false;
 
 		// phpcs:disable WordPress.PHP.DiscouragedPHPFunctions, WordPress.WP.AlternativeFunctions
 

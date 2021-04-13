@@ -17,9 +17,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 BOLDGRID.BACKUP.BackupNow = function( $ ) {
 	'use strict';
 
-	var self = this,
-		$backupNowType = $( '[name="folder_exclusion_type"]' ),
-		$tablesType = $( '[name="table_inclusion_type"]' );
+	var self = this;
 
 	$( function() {
 		$( 'body' ).on( 'click', '#backup-site-now', self.backupNow );
@@ -28,94 +26,104 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 	/**
 	 * Perform a backup now.
 	 *
+	 * The "backup site now" button could be the button in the header of our admin pages. However, it
+	 * could also be the "backup site now" button on any dashboard page where you can create a backup
+	 * before performing updates.
+	 *
 	 * @since 1.0
 	 */
 	self.backupNow = function( e ) {
-
-		// Declare variables.
-		var $this,
-			$backupSiteSection,
-			backupNonce,
-			wpHttpReferer,
-			isUpdating,
+		var $this = $( this ),
 			data,
-			$folderExclude = $( '[name="folder_exclusion_exclude"]' ),
-			$folderInclude = $( '[name="folder_exclusion_include"]' ),
-			$tableInclude = $( '[name="include_tables[]"]' ),
+
+			/*
+			 * Define our "Backup Site Now" parent.
+			 *
+			 * The parent is needed because on some pages, the backup settings will appear twice, and
+			 * we need to be specific to which ones we are targeting. For example, on the settings page
+			 * there are two identical settings for files and database settings - one set of settings
+			 * for scheduled backups, and one set for the one time "backup site now" backup.
+			 */
+			$parent = $this.closest( '#TB_ajaxContent' ),
+
+			/*
+			 * Configure all of our file and table include/exclude settings.
+			 *
+			 * Again, these are only available within the "backup site now" modal.
+			 */
+			// A radio input for which files to include, either a "full" or "custom" backup.
+			$radioFolderType = $parent.find( '[name="folder_exclusion_type"]' ).filter( ':checked' ),
+
+			// A radio input for which tables to include, either a "full" or "custom" backup.
+			$radioTableType = $parent.find( '[name="table_inclusion_type"]' ).filter( ':checked' ),
+
+			// The input for files to exclude, such as, ".git,node_modules".
+			$folderExclude = $parent.find( '[name="folder_exclusion_exclude"]' ),
+
+			// The input for files to include, such as, "WPCORE,/wp-content".
+			$folderInclude = $parent.find( '[name="folder_exclusion_include"]' ),
+
+			// The individual checkboxes for each table to include / exclude.
+			$tableInclude = $parent.find( '[name="include_tables[]"]' ),
+
+			// An array of tables to include. If the user chose "custom", will be populated below.
 			includeTables = [],
-			type = 'full',
-			tablesType = null;
+
+			/*
+			 * By default, we will create a "full" backup of all files and database tables.
+			 *
+			 * # If the user is within a backup modal, they will have the choice to configure "custom"
+			 *   settings so they can include / exclude specific files and folders.
+			 * # If outside of a modal, such as a "backup site now" before plugin upgrades, it will
+			 *   be a "full" backup.
+			 */
+			type = 1 === $radioFolderType.length ? $radioFolderType.val() : 'full',
+			tablesType = 1 === $radioTableType.length ? $radioTableType.val() : 'full',
+
+			/*
+			 * Configure our "backup site now" section and the values found within.
+			 *
+			 * Within the modal, this is at the bottom of the modal where the "backup site now" button
+			 * is. This is where the auth / nonce info is, and it's also where we'll add the spinner
+			 * once clicked.
+			 */
+			$backupSiteSection = $( '#backup-site-now-section' );
 
 		/*
-		 * If we are in a Backup Site Now modal and there is a "type" value set,
-		 * grab it.
+		 * Generate ajax settings for our "backup site now" call.
+		 *
+		 * Custom file and table settings will be added after this declaration.
 		 */
-		if ( 1 === $backupNowType.filter( ':checked' ).length ) {
-			type = $backupNowType.filter( ':checked' ).val();
-		}
-
-		if ( 1 === $tablesType.filter( ':checked' ).length ) {
-			tablesType = $tablesType.filter( ':checked' ).val();
-		}
-
-		// Assign the current jQuery object.
-		$this = $( this );
-
-		// Disable the Backup Site Now link button.
-		$this.attr( 'disabled', 'disabled' ).css( 'pointer-events', 'none' );
-
-		// Create a context selector for the Backup Site Now section.
-		$backupSiteSection = $( '#backup-site-now-section' );
-
-		$( '#TB_ajaxContent' )
-			.find( 'input' )
-			.attr( 'disabled', true )
-			.end()
-			.find( 'button' )
-			.attr( 'disabled', true )
-			.end();
-
-		$( '#you_may_leave' ).fadeIn();
-
-		// Get the wpnonce and referer values.
-		backupNonce = $backupSiteSection.find( '#backup_auth' ).val();
-
-		wpHttpReferer = $backupSiteSection.find( '[name="_wp_http_referer"]' ).val();
-
-		// Get the backup archive file key.
-		isUpdating = $this.data( 'updating' );
-
-		$backupSiteSection.find( '.spinner' ).addClass( 'inline' );
-
-		// Generate the data array.
 		data = {
 			action: 'boldgrid_backup_now',
-			backup_auth: backupNonce,
-			_wp_http_referer: wpHttpReferer,
-			is_updating: isUpdating,
+			backup_auth: $backupSiteSection.find( '#backup_auth' ).val(),
+			_wp_http_referer: $backupSiteSection.find( '[name="_wp_http_referer"]' ).val(),
+
+			/*
+			 * Determine whether or not we are backing up before an update.
+			 *
+			 * On pages where we are creating a backup before an update, such as on the Dashboard >
+			 * Updates page, the "backup site now" button will have an data-updating="true" attribute.
+			 */
+			is_updating: $this.data( 'updating' ),
 			backup_now: '1',
 			folder_exclusion_type: type,
+			table_inclusion_type: tablesType,
 			backup_title: $( '[name="backup_title"]' ).val(),
 			backup_description: $( '[name="backup_description"]' ).val()
 		};
 
-		/*
-		 * The next few conditionals are used in the Backup Site Now modal. If we
-		 * are doing a customized backup, send appropriate "include / exclude"
-		 * settings for "folder / database".
-		 */
-		if ( 'custom' === type && 1 === $folderInclude.length ) {
-			data.folder_exclusion_include = $folderInclude.val();
+		// Configure our custom file and folder include / exclude rules.
+		if ( 'custom' === type ) {
+			if ( 1 === $folderInclude.length ) {
+				data.folder_exclusion_include = $folderInclude.val();
+			}
+			if ( 1 === $folderExclude.length ) {
+				data.folder_exclusion_exclude = $folderExclude.val();
+			}
 		}
 
-		if ( 'custom' === type && 1 === $folderExclude.length ) {
-			data.folder_exclusion_exclude = $folderExclude.val();
-		}
-
-		if ( tablesType ) {
-			data.table_inclusion_type = tablesType;
-		}
-
+		// Configure our custom database tables include / exclude rules.
 		if ( 'custom' === tablesType && $tableInclude.length ) {
 			$tableInclude.filter( ':checked' ).each( function() {
 				includeTables.push( $( this ).val() );
@@ -126,6 +134,25 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 		if ( undefined !== BOLDGRID.BACKUP.UpdateSelectors ) {
 			BOLDGRID.BACKUP.UpdateSelectors.disable();
 		}
+
+		/*
+		 * UI/UX changes.
+		 *
+		 * The next few lines handle disabling buttons and showing notices.
+		 */
+		$this.attr( 'disabled', 'disabled' ).css( 'pointer-events', 'none' );
+
+		$parent
+			.find( 'input' )
+			.attr( 'disabled', true )
+			.end()
+			.find( 'button' )
+			.attr( 'disabled', true )
+			.end();
+
+		$( '#you_may_leave' ).fadeIn();
+
+		$backupSiteSection.find( '.spinner' ).addClass( 'inline' );
 
 		/*
 		 * Make the ajax call to "Backup Site Now".

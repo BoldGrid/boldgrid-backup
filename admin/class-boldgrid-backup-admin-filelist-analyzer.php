@@ -59,7 +59,7 @@ class Boldgrid_Backup_Admin_Filelist_Analyzer {
 	 * @param array $filelist
 	 * @param int   $log_time
 	 */
-	public function __construct( $filelist = array(), $log_time ) {
+	public function __construct( $filelist = array(), $log_time = 0 ) {
 		$this->filelist = is_array( $filelist ) ? $filelist : array();
 		$this->log_time = ! empty( $log_time ) ? $log_time : time();
 	}
