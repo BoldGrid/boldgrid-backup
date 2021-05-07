@@ -28,9 +28,6 @@ script:
 # Temp. Different results in wpbex2 vs travix.
 #  - yarn run js-lint
 
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
-
 deploy:
   - provider: script
     script: chmod +x ./bin/release.sh && ./bin/release.sh
