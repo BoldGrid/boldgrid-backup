@@ -49,13 +49,14 @@ class Boldgrid_Backup_Admin_In_Progress_Data {
 	 *
 	 * @since 1.7.0
 	 *
-	 * @param  string $key Index/key.
+	 * @param  string $key     Index/key.
+	 * @param  mixed  $default The default value to return if key is not set.
 	 * @return mixed
 	 */
-	public static function get_arg( $key ) {
+	public static function get_arg( $key, $default = false ) {
 		$args = get_option( self::$option_name );
 
-		return isset( $args[ $key ] ) ? $args[ $key ] : false;
+		return isset( $args[ $key ] ) ? $args[ $key ] : $default;
 	}
 
 	/**
@@ -67,32 +68,6 @@ class Boldgrid_Backup_Admin_In_Progress_Data {
 	 */
 	public static function get_args() {
 		return get_option( self::$option_name );
-	}
-
-	/**
-	 * Get required markup to show the progress bar.
-	 *
-	 * Generally displayed under a "Backup Now" button.
-	 *
-	 * @since 1.7.0
-	 *
-	 * @param string $label Progress label.
-	 */
-	public static function get_markup( $label = null ) {
-		$label = ! empty( $label ) ? $label : __( 'Initializing backup...', 'boldgrid-backup' );
-
-		$steps = '<div id="boldgrid_backup_in_progress_steps">
-			<div class="step" data-step="1">' . esc_html__( 'Backing up database...', 'boldgrid-backup' ) . '</div>
-			<div class="step" data-step="2">' . esc_html__( 'Adding files to archive...', 'boldgrid-backup' ) . '</div>
-			<div class="step" data-step="3">' . esc_html__( 'Saving archive to disk...', 'boldgrid-backup' ) . '</div>
-		</div>';
-
-		$progress_bar = '<div id="boldgrid-backup-in-progress-bar">
-			<div class="progress-label">' . esc_html( $label ) . '</div>
-			<div id="last_file_archived"></div>
-		</div>';
-
-		return '<div id="boldgrid_backup_in_progress_container" class="hidden">' . $steps . $progress_bar . '</div>';
 	}
 
 	/**
@@ -112,13 +87,30 @@ class Boldgrid_Backup_Admin_In_Progress_Data {
 	}
 
 	/**
-	 * Set arguments.
+	 * Set an array of data.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param string $arg   The key.
+	 * @param string $value The value.
+	 */
+	public static function set_args( $data ) {
+		foreach ( $data as $key => $value ) {
+			self::set_arg( $key, $value );
+		}
+	}
+
+	/**
+	 * Init data.
+	 *
+	 * This removes all other in progress data and adds fresh data. This should only be used when a
+	 * backup is initially started.
 	 *
 	 * @since 1.7.0
 	 *
 	 * @param array $args Arguments.
 	 */
-	public static function set_args( $args ) {
+	public static function init( $args ) {
 		update_option( self::$option_name, $args );
 	}
 }

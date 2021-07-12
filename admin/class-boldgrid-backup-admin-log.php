@@ -107,8 +107,7 @@ class Boldgrid_Backup_Admin_Log {
 		 * WP_Filesystem does not have a way to append to a file, so we're rewriting the file each
 		 * time. Best route would be to fopen the file and append. This may need to be revisited.
 		 */
-		$file_content  = $this->core->wp_filesystem->get_contents( $this->filepath );
-		$file_content .= PHP_EOL . $message;
+		$file_content = $this->get_contents() . PHP_EOL . $message;
 		$this->core->wp_filesystem->put_contents( $this->filepath, $file_content );
 	}
 
@@ -123,6 +122,9 @@ class Boldgrid_Backup_Admin_Log {
 		$this->add( 'WordPress Version: ' . get_bloginfo( 'version' ) );
 
 		$this->add( 'Total Upkeep version: ' . BOLDGRID_BACKUP_VERSION );
+
+		$pgid_support = Boldgrid_Backup_Admin_Test::is_getpgid_supported();
+		$this->add( 'getpgid support: ' . ( $pgid_support ? 'Available' : 'Unavailable' ) );
 	}
 
 	/**
@@ -202,6 +204,17 @@ class Boldgrid_Backup_Admin_Log {
 
 			$this->core->wp_filesystem->delete( $filepath );
 		}
+	}
+
+	/**
+	 * Return the contents of the log file.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @return string
+	 */
+	public function get_contents() {
+		return $this->core->wp_filesystem->get_contents( $this->filepath );
 	}
 
 	/**

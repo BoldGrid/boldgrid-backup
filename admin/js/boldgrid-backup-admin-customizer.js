@@ -46,14 +46,16 @@ BOLDGRID.BACKUP.CUSTOMIZER = function( $ ) {
 							true === response.success &&
 							false !== response.data
 						) {
-							$( '.customize-themes-notifications' ).prepend( response.data );
 							$( 'body' ).trigger( 'boldgrid_backup_progress_notice_added' );
 
 							self.protectNoticeShow = true;
 						}
 					};
 
-					// Make a call to see if we have an "in progress" notice to show.
+					/*
+					 * Make a call to see if we have a backup currenty in progress. If we do, this ajax
+					 * call will give us markup to help show the status of the backup.
+					 */
 					$.ajax( {
 						url: ajaxurl,
 						data: data,

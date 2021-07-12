@@ -76,6 +76,15 @@ class Boldgrid_Backup_Admin_Test {
 	private $is_crontab_available = null;
 
 	/**
+	 * A cached value of whether or not posix_getpgid() is supported.
+	 *
+	 * @since SINCEVERSION
+	 * @access private
+	 * @var bool
+	 */
+	private static $is_getpgid_supported;
+
+	/**
 	 * Is WP-CRON enabled?
 	 *
 	 * @since 1.0
@@ -492,6 +501,34 @@ class Boldgrid_Backup_Admin_Test {
 		$php_zip = new Boldgrid_Backup_Admin_Compressor_Php_Zip( $this->core );
 
 		return $php_zip->test( false );
+	}
+
+	/**
+	 * Determine whether or not we can get our group process id.
+	 *
+	 * This is often used to determine if a backup process is still running.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @link https://www.win.tue.nl/~aeb/linux/lk/lk-10.html
+	 *
+	 * @return bool
+	 */
+	public static function is_getpgid_supported() {
+		if ( ! is_null( self::$is_getpgid_supported ) ) {
+			return self::$is_getpgid_supported;
+		}
+
+		// Ensure we can get our process id.
+		$pid = getmypid();
+		if ( false === $pid ) {
+			self::$is_getpgid_supported = false;
+			return false;
+		}
+
+		self::$is_getpgid_supported = false !== posix_getpgid( $pid );
+
+		return self::$is_getpgid_supported;
 	}
 
 	/**

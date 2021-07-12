@@ -1580,9 +1580,13 @@ class Boldgrid_Backup_Admin_Core {
 	public function archive_files( $save = false, $dryrun = false ) {
 		$this->archiving_files = true;
 
-		$log_time = time();
-		$this->logger->init( 'archive-' . $log_time . '.log' );
+		$pid = getmypid();
+
+		$log_time     = time();
+		$log_filename = 'archive-' . $log_time . '.log';
+		$this->logger->init( $log_filename );
 		$this->logger->add( 'Backup process initialized.' );
+		$this->logger->add( 'Process id: ' . $pid );
 
 		$this->utility->bump_memory_limit( '1G' );
 
@@ -1594,9 +1598,11 @@ class Boldgrid_Backup_Admin_Core {
 		 */
 		$this->is_scheduled_backup = $this->doing_cron && ! $this->pre_auto_update;
 
-		Boldgrid_Backup_Admin_In_Progress_Data::set_args(
-			[ 'status' => esc_html__( 'Initializing backup', 'boldgrid-backup' ) ]
-		);
+		Boldgrid_Backup_Admin_In_Progress_Data::init( array(
+			'status'       => esc_html__( 'Initializing backup', 'boldgrid-backup' ),
+			'log_filename' => $log_filename,
+			'pid'          => $pid,
+		) );
 
 		/**
 		 * Actions to take before any archiving begins.
@@ -1691,6 +1697,7 @@ class Boldgrid_Backup_Admin_Core {
 		} else {
 			$info['trigger'] = esc_html__( 'Unknown', 'boldgrid-backup' );
 		}
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'trigger', $info['trigger'] );
 
 		$info['compressor'] = $this->compressors->get();
 
@@ -1799,13 +1806,11 @@ class Boldgrid_Backup_Admin_Core {
 		// Determine the path to our zip file.
 		$info['filepath'] = $this->generate_archive_path( 'zip' );
 
-		Boldgrid_Backup_Admin_In_Progress_Data::set_args(
-			[
-				'total_files_todo' => count( $filelist ),
-				'filepath'         => $info['filepath'],
-				'compressor'       => $info['compressor'],
-			]
-		);
+		Boldgrid_Backup_Admin_In_Progress_Data::set_args( array(
+			'total_files_todo' => count( $filelist ),
+			'filepath'         => $info['filepath'],
+			'compressor'       => $info['compressor'],
+		) );
 
 		if ( Boldgrid_Backup_Admin_Filelist_Analyzer::is_enabled() ) {
 			$this->logger->add_separator();
@@ -1980,8 +1985,6 @@ class Boldgrid_Backup_Admin_Core {
 			$this->archive->write_results_file( $info );
 		}
 
-		Boldgrid_Backup_Admin_In_Progress_Data::set_args( [ 'status' => esc_html__( 'Backup complete!', 'boldgrid-backup' ) ] );
-
 		if ( isset( $this->activity ) ) {
 			$this->activity->add( 'any_backup_created', 1, $this->rating_prompt_config );
 		}
@@ -1990,6 +1993,11 @@ class Boldgrid_Backup_Admin_Core {
 		$this->logger->add_memory();
 
 		$this->archiving_files = false;
+
+		Boldgrid_Backup_Admin_In_Progress_Data::set_args( array(
+			'status'  => esc_html__( 'Backup complete!', 'boldgrid-backup' ),
+			'success' => true,
+		) );
 
 		// Return the array of archive information.
 		return $info;
@@ -2638,6 +2646,7 @@ class Boldgrid_Backup_Admin_Core {
 		// If there were any errors encountered during the backup, save them to the In Progress data.
 		if ( ! empty( $archive_info['error'] ) ) {
 			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'error', $archive_info['error'] );
+			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'success', false );
 			$this->notice->add_user_notice(
 				'<p>' . $archive_info['error'] . '</p>',
 				'notice notice-error is-dismissible',

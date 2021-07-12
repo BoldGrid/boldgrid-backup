@@ -140,7 +140,8 @@ class Boldgrid_Backup_Admin_Notice {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @return mixed String (html markup) of admin notice on success, false on failure.
+	 * @return mixed False on failure, an array on success. Prior to @SINCEVERSION, we returned a string
+	 *               containing the markup of the admin notice.
 	 */
 	public function get_backup_complete() {
 		// Assume that this "backup complete!" notice is for the last backup made.
@@ -151,9 +152,7 @@ class Boldgrid_Backup_Admin_Notice {
 
 		$message = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup.php';
 
-		$markup = $this->get_notice_markup( $message['class'], $message['message'] );
-
-		return $markup;
+		return $message;
 	}
 
 	/**

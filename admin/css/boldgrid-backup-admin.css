@@ -242,6 +242,34 @@ input:invalid {
 	font-weight: bold;
 }
 
+nav[class*="bgbkup-nav-tab-wrapper"] .nav-tab {
+	cursor: pointer;
+}
+
+/* A table showing when the backup started and how. */
+#bgbkup_progress_status table th {
+	padding-right: 10px;
+	font-weight: 500;
+	text-align: left;
+}
+
+
+/**
+ * Custom "smaller" nav tab wrapper.
+ *
+ * For example, having nav tabs in an admin notice.
+ */
+.bgbkup-nav-tab-wrapper-small {
+	margin-bottom: 10px;
+}
+
+.bgbkup-nav-tab-wrapper-small .nav-tab {
+	font-size: 13px;
+	font-weight: normal;
+	padding: 2px 6px;
+}
+
+
 /*
 * Backup Archive Details: title and description.
 *

@@ -167,6 +167,9 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 			$last_error['line']
 		);
 
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'shutdown_fatal_error', $error_message );
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'success', false );
+
 		$this->schedule_fail_email( $error_message );
 
 		if ( ! $this->core->doing_cron ) {
