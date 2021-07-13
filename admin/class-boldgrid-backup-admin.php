@@ -131,6 +131,7 @@ class Boldgrid_Backup_Admin {
 			'spinner'             => $spinner,
 			'get_premium_url'     => Boldgrid_Backup_Admin_Go_Pro::$url,
 			'in_progress_success' => Boldgrid_Backup_Admin_In_Progress_Data::get_arg( 'success', null ),
+			'is_quick_fail'       => Boldgrid_Backup_Admin_In_Progress::is_quick_fail(),
 		);
 
 		wp_localize_script( 'boldgrid-backup-admin', 'BoldGridBackupAdmin', $translation );

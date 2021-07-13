@@ -129,7 +129,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 					 * If there is, we need to begin listenting to the heartbeat to find out when it
 					 * completes (so we can adjust the message).
 					 */
-					if ( null === BoldGridBackupAdmin.in_progress_success ) {
+					if ( null === BoldGridBackupAdmin.in_progress_success || BoldGridBackupAdmin.is_quick_fail ) {
 						setTimeout( self.start, 1000 );
 					}
 

@@ -82,7 +82,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 		}
 
 		// If there's not a backup in progress, do not show the notice.
-		if ( empty( $in_progress ) ) {
+		if ( empty( $in_progress ) && ! self::is_quick_fail() ) {
 			return $notices;
 		}
 
@@ -95,25 +95,24 @@ class Boldgrid_Backup_Admin_In_Progress {
 
 		wp_enqueue_script( 'jquery-ui-progressbar' );
 
-		$elapsed = time() - $in_progress;
-		$limit   = 15 * MINUTE_IN_SECONDS;
-
-		$notice = self::get_notice();
+		$notice = self::get_notice( true );
 		if ( false === $notice ) {
 			return $notices;
 		}
 
-		/*
-		 * @todo If the backup takes longer than 15 minutes, the user needs more
-		 * help with troubleshooting.
-		 */
-		if ( $elapsed > $limit ) {
-			$notice['message'] .= __(
-				' Most backups usually finish before this amount of time, so we will stop displaying this notice.',
-				'boldgrid-backup'
-			);
+		// If there's a backup in progress that started more than 15 minutes ago, something's awry.
+		if ( $in_progress ) {
+			$elapsed = time() - $in_progress;
+			$limit   = 15 * MINUTE_IN_SECONDS;
 
-			$this->end();
+			if ( $elapsed > $limit ) {
+				$notice['message'] .= __(
+					' Most backups usually finish before this amount of time, so we will stop displaying this notice.',
+					'boldgrid-backup'
+				);
+
+				$this->end();
+			}
 		}
 
 		$notices[] = $notice;
@@ -155,6 +154,31 @@ class Boldgrid_Backup_Admin_In_Progress {
 		$in_progress = ! empty( $settings['in_progress'] ) ? $settings['in_progress'] : null;
 
 		return $in_progress;
+	}
+
+	/**
+	 * Get our backup's error message.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @return mixed False if no error message, else error message string.
+	 */
+	public static function get_error_message() {
+		$error = false;
+		$data  = Boldgrid_Backup_Admin_In_Progress_Data::get_args();
+		$keys  = array(
+			'shutdown_fatal_error',
+			'process_error',
+		);
+
+		foreach ( $keys as $key ) {
+			if ( isset( $data[ $key ] ) ) {
+				$error = $data[ $key ];
+				break;
+			}
+		}
+
+		return $error;
 	}
 
 	/**
@@ -266,6 +290,22 @@ class Boldgrid_Backup_Admin_In_Progress {
 	}
 
 	/**
+	 * Return how many seconds ago the backup started.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @return mixed False if we cannot determine, otherwise an int to show how many seconds ago.
+	 */
+	public static function get_start_ago() {
+		$time_start = Boldgrid_Backup_Admin_In_Progress_Data::get_arg( 'start_time' );
+		if ( false === $time_start ) {
+			return false;
+		}
+
+		return time() - $time_start;
+	}
+
+	/**
 	 * Get our backup process' pgid.
 	 *
 	 * @since SINCEVERSION
@@ -312,6 +352,37 @@ class Boldgrid_Backup_Admin_In_Progress {
 		}
 
 		return false;
+	}
+
+	/**
+	 * A "quick fail" is when a backup fails within the first 5 - 10 seconds of starting.
+	 *
+	 * This causes a problem with the in progress toolbar because (1) the user clicks "backup now",
+	 * (2) the backup pretty much fails right away, and (3) by the time the page refreshes there's no
+	 * longer a backup in progress. This means the user clicks "backup now", the page refreshes, but
+	 * they never see an in progress bar.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @return bool
+	 */
+	public static function is_quick_fail() {
+		// If there's a backup in progress, then it can't be a quick fail.
+		$in_progress = self::get();
+		if ( ! empty( $in_progress ) ) {
+			return false;
+		}
+
+		/*
+		 * If we can't determine when the backup started, or it started more than 20 seconds ago, it
+		 * wasn't a "quick" fail.
+		 */
+		$start_ago = self::get_start_ago();
+		if ( false === $start_ago || 20 <= $start_ago ) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -391,21 +462,21 @@ class Boldgrid_Backup_Admin_In_Progress {
 
 		$response['is_success'] = self::is_success();
 
-		// Return an error message if we have it.
-		$response['is_fatal_error']        = false;
 		$response['boldgrid_backup_error'] = array();
-		if ( ! empty( $response['in_progress_data']['shutdown_fatal_error'] ) ) {
+
+		// If we have an error message (either a shutdown fatal error, or a process error), return it.
+		if ( false !== self::get_error_message() ) {
+			$style                             = ! empty( $response['in_progress_data']['shutdown_fatal_error'] ) ?
+				' style="white-space:pre;font-family:\'Courier New\';overflow:auto"' : '';
 			$response['boldgrid_backup_error'] = array(
 				'class'   => 'notice notice-error boldgrid-backup-in-progress',
 				'message' => '
-					<p style="white-space:pre;font-family:\'Courier New\';overflow:auto">' . wp_kses(
-					$response['in_progress_data']['shutdown_fatal_error'],
+					<p' . $style . '>' . wp_kses(
+					self::get_error_message(),
 					array( 'strong' => array() ),
 				) . '</p>',
 				'header'  => BOLDGRID_BACKUP_TITLE . ' - ' . __( 'Error creating backup', 'boldgrid-backup' ),
 			);
-
-			$response['is_fatal_error'] = true;
 		}
 
 		// Steps to take if we're on the last step, step 3, closing the archive.

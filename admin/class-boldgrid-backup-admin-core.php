@@ -1602,6 +1602,7 @@ class Boldgrid_Backup_Admin_Core {
 			'status'       => esc_html__( 'Initializing backup', 'boldgrid-backup' ),
 			'log_filename' => $log_filename,
 			'pid'          => $pid,
+			'start_time'   => $log_time,
 		) );
 
 		/**
@@ -1824,6 +1825,8 @@ class Boldgrid_Backup_Admin_Core {
 			$this->logger->add_memory();
 		}
 
+		// return [ 'error' => 'Some random error.' ];
+
 		/*
 		 * Use the chosen compressor to build an archive.
 		 * If the is no available compressor, then return an error.
@@ -1861,6 +1864,8 @@ class Boldgrid_Backup_Admin_Core {
 				$status = [ 'error' => 'No available compressor' ];
 				break;
 		}
+
+		noSuchFunction();
 
 		$archive_exists = ! empty( $info['filepath'] ) && $this->wp_filesystem->exists( $info['filepath'] );
 		$archive_size   = ! $archive_exists ? 0 : $this->wp_filesystem->size( $info['filepath'] );
@@ -2643,15 +2648,15 @@ class Boldgrid_Backup_Admin_Core {
 
 		$archive_info = $this->archive_files( true );
 
-		// If there were any errors encountered during the backup, save them to the In Progress data.
+		/*
+		 * If there were any errors encountered during the backup, save them to the In Progress data.
+		 *
+		 * A "process error" is when the archive_files() method successfully returns info, and it includes
+		 * an error.
+		 */
 		if ( ! empty( $archive_info['error'] ) ) {
-			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'error', $archive_info['error'] );
+			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'process_error', $archive_info['error'] );
 			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'success', false );
-			$this->notice->add_user_notice(
-				'<p>' . $archive_info['error'] . '</p>',
-				'notice notice-error is-dismissible',
-				'Backup Failed'
-			);
 		}
 
 		if ( $this->is_archiving_update_protection ) {
