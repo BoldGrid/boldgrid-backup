@@ -508,6 +508,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 			 * process has ended.
 			 */
 			$this->end();
+			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'success', false );
 
 			$response['boldgrid_backup_error'] = array(
 				'class'   => 'notice notice-error',

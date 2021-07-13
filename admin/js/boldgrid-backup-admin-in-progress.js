@@ -611,6 +611,18 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			$( '#boldgrid_backup_in_progress_container' ).slideDown();
 			self.$label = $( '.progress-label' );
 			self.setPercentage( 0 );
+
+			/*
+			 * Additional UX changes.
+			 *
+			 * IE, disable "backup now" buttons if they're shown (IE within protection notices).
+			 *
+			 * @todo This set of code is somewhat copied from backup-now.js, within the backupNow method.
+			 * If need be one day, combine into a reusable method.
+			 */
+			$( '#backup-site-now' ).attr( 'disabled', 'disabled' ).css( 'pointer-events', 'none' );
+			$( '#you_may_leave' ).fadeIn();
+			$( '#backup-site-now-form' ).find( '.spinner' ).addClass( 'inline' );
 		},
 		
 		/**

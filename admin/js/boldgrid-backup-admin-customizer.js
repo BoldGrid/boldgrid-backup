@@ -15,58 +15,6 @@ BOLDGRID.BACKUP.CUSTOMIZER = function( $ ) {
 	var self = this;
 
 	self.protectNoticeShow = false;
-	self.progressNoticeShow = false;
-
-	/**
-	 * @summary If applicable, show a "Backup in progress" notice when the user
-	 * clicks on themes.
-	 *
-	 * @since 1.6.0
-	 */
-	self.showProgressNotice = function() {
-		wp.customize.section( 'installed_themes', function( section ) {
-
-			// Actions to take when installed_themes section is opened.
-			section.expanded.bind( function() {
-				if ( ! self.progressNoticeShow ) {
-					var data = {
-							action: 'boldgrid_backup_get_progress_notice',
-							nonce: boldgridBackupCustomizer.nonce
-						},
-						successCallback;
-
-					/**
-					 * @summary Success callback.
-					 *
-					 * @since 1.6.0
-					 */
-					successCallback = function( response ) {
-						if (
-							response.success !== undefined &&
-							true === response.success &&
-							false !== response.data
-						) {
-							$( 'body' ).trigger( 'boldgrid_backup_progress_notice_added' );
-
-							self.protectNoticeShow = true;
-						}
-					};
-
-					/*
-					 * Make a call to see if we have a backup currenty in progress. If we do, this ajax
-					 * call will give us markup to help show the status of the backup.
-					 */
-					$.ajax( {
-						url: ajaxurl,
-						data: data,
-						type: 'post',
-						dataType: 'json',
-						success: successCallback
-					} );
-				}
-			} );
-		} );
-	};
 
 	/**
 	 * Show the "protect" notice.
@@ -88,7 +36,14 @@ BOLDGRID.BACKUP.CUSTOMIZER = function( $ ) {
 
 					$.post( ajaxurl, data, function( response ) {
 						if ( response.success !== undefined && true === response.success ) {
-							$( '.customize-themes-notifications' ).append( response.data );
+							// Show the notice.
+							$( '.customize-themes-notifications' ).append( response.data.notice );
+
+							// If we have a backup in progress, trigger the in progress bar.
+							if ( ! response.data.is_done ) {
+								$( 'body' ).trigger( 'boldgrid_backup_progress_notice_added' );
+							}
+
 							self.protectNoticeShow = true;
 						}
 					} );
@@ -103,8 +58,6 @@ BOLDGRID.BACKUP.CUSTOMIZER = function( $ ) {
 		if ( boldgridBackupCustomizer.is_rollback_enabled ) {
 			deadline = BOLDGRID.BACKUP.RollbackTimer.getUpdatedDeadline();
 		}
-
-		self.showProgressNotice();
 
 		// Wait until we have the deadline.
 		$( 'body' ).on( 'boldgrid-backup-have-deadline', function() {

@@ -84,6 +84,15 @@ class Boldgrid_Backup_Admin_In_Progress_Data {
 		$args[ $arg ] = $value;
 
 		update_option( self::$option_name, $args );
+
+		/*
+		 * If we're setting step 2 or 3, the status will always be a number for the progress bar. Any
+		 * old status can be removed. This will prevent a random, "Backing up database" when that's not
+		 * what we're actually doing.
+		 */
+		if ( 'step' === $arg && $value >= 2 ) {
+			self::delete_arg( 'status' );
+		}
 	}
 
 	/**

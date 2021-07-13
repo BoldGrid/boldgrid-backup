@@ -1145,6 +1145,8 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 * @since 1.6.0
 	 */
 	public function wp_ajax_get_protect_notice() {
+		$response = array();
+
 		if ( ! current_user_can( 'update_plugins' ) || ! $this->core->test->run_functionality_tests() ) {
 			wp_send_json_error();
 		}
@@ -1152,17 +1154,19 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
 		if ( ! empty( $pending_rollback ) ) {
 			// You're protected, go ahead and update.
-			$message = $this->notice_activated_get();
-			$notice  = sprintf( '<div class="%1$s">%2$s</div>', $message['class'], $message['html'] );
+			$message            = $this->notice_activated_get();
+			$response['notice'] = sprintf( '<div class="%1$s">%2$s</div>', $message['class'], $message['html'] );
 		} else {
 			// You're not protected, make a backup first.
-			$notice        = $this->notice_backup_get();
-			$backup_button = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-button.php';
-			$in_progress   = Boldgrid_Backup_Admin_In_Progress::get_notice( true );
-			$notice        = '<div class="notice notice-warning is-dismissible boldgrid-backup-protect-now">' . $notice . $backup_button . $in_progress['message'] . '</div>';
+			$notice             = $this->notice_backup_get();
+			$backup_button      = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-button.php';
+			$in_progress        = Boldgrid_Backup_Admin_In_Progress::get_notice( true );
+			$response['notice'] = '<div class="notice notice-warning is-dismissible boldgrid-backup-protect-now">' . $notice . $backup_button . $in_progress['message'] . '</div>';
 		}
 
-		wp_send_json_success( $notice );
+		$response['is_done'] = Boldgrid_Backup_Admin_In_Progress::is_done();
+
+		wp_send_json_success( $response );
 	}
 
 	/**

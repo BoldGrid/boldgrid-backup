@@ -1825,8 +1825,6 @@ class Boldgrid_Backup_Admin_Core {
 			$this->logger->add_memory();
 		}
 
-		// return [ 'error' => 'Some random error.' ];
-
 		/*
 		 * Use the chosen compressor to build an archive.
 		 * If the is no available compressor, then return an error.
@@ -1865,7 +1863,7 @@ class Boldgrid_Backup_Admin_Core {
 				break;
 		}
 
-		noSuchFunction();
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'status', 'Wrapping things up...' );
 
 		$archive_exists = ! empty( $info['filepath'] ) && $this->wp_filesystem->exists( $info['filepath'] );
 		$archive_size   = ! $archive_exists ? 0 : $this->wp_filesystem->size( $info['filepath'] );
@@ -1884,9 +1882,6 @@ class Boldgrid_Backup_Admin_Core {
 			)
 		);
 		$this->logger->add_memory();
-
-		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'status', esc_html__( 'Wrapping things up...', 'boldgrid-backup' ) );
-		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'percentage', 100 );
 
 		$info['total_size'] += $this->filelist->get_total_size( $filelist );
 
@@ -1964,6 +1959,7 @@ class Boldgrid_Backup_Admin_Core {
 		 */
 		if ( $this->email->user_wants_notification( 'backup' ) && ! $this->is_scheduled_backup ) {
 			$this->logger->add( 'Starting sending of email...' );
+			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'status', 'Sending email...' );
 
 			$email_parts          = $this->email->post_archive_parts( $info );
 			$email_body           = $email_parts['body']['main'] . $email_parts['body']['signature'];
