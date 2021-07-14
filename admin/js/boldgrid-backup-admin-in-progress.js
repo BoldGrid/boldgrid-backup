@@ -370,7 +370,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			if ( data.is_done ) {
 				self.isDoneCount++;
 
-				// race condition. Give it 5 more seconds.
+				// Race condition. Give it one more heartbeat (5 more seconds).
 				if ( data.is_success || 1 < self.isDoneCount ) {
 					self.onComplete( data );
 				}

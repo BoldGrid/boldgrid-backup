@@ -406,20 +406,6 @@ class Boldgrid_Backup_Admin_In_Progress {
 	}
 
 	/**
-	 * Whether or not the backup was successful.
-	 *
-	 * This doesn't mean the backup failed. When the backup is complete, we set this flag. We're simply
-	 * checking to see if the flag has been set.
-	 *
-	 * @since SINCEVERSION
-	 *
-	 * return bool
-	 */
-	public static function is_success() {
-		return true === Boldgrid_Backup_Admin_In_Progress_Data::get_arg( 'success' );
-	}
-
-	/**
 	 * Take action when the heartbeat is received.
 	 *
 	 * Include data in the heartbeat to let the user know if their backup is
@@ -460,7 +446,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 
 		$response['in_progress_data'] = Boldgrid_Backup_Admin_In_Progress_Data::get_args();
 
-		$response['is_success'] = self::is_success();
+		$response['is_success'] = Boldgrid_Backup_Admin_In_Progress_Data::get_arg( 'success', null );
 
 		$response['boldgrid_backup_error'] = array();
 
@@ -501,7 +487,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 			$log->add( 'Backup process running: ' . ( ! $response['is_running'] ? 'No' : 'Yes (pgid = ' . self::getpgid() . ')' ) );
 		}
 
-		$response['is_killed'] = false === $response['is_running'] && ! $response['is_success'] && empty( $response['boldgrid_backup_error'] );
+		$response['is_killed'] = false === $response['is_running'] && ! is_bool( $response['is_success'] ) && empty( $response['boldgrid_backup_error'] );
 		if ( $response['is_killed'] ) {
 			/*
 			 * If the backup process crashed (was killed), we may have not been able to flag that the

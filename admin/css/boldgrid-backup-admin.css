@@ -246,7 +246,15 @@ nav[class*="bgbkup-nav-tab-wrapper"] .nav-tab {
 	cursor: pointer;
 }
 
-/* A table showing when the backup started and how. */
+
+/**
+ * A table showing when the backup started and how.
+ */
+
+#bgbkup_progress_status table {
+	margin-bottom: 10px;
+}
+
 #bgbkup_progress_status table th {
 	padding-right: 10px;
 	font-weight: 500;
