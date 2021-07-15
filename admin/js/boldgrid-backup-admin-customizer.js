@@ -36,6 +36,7 @@ BOLDGRID.BACKUP.CUSTOMIZER = function( $ ) {
 
 					$.post( ajaxurl, data, function( response ) {
 						if ( response.success !== undefined && true === response.success ) {
+
 							// Show the notice.
 							$( '.customize-themes-notifications' ).append( response.data.notice );
 

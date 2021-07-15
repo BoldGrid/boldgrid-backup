@@ -120,6 +120,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		_onReady: function() {
 			$( function() {
 				if ( 'undefined' !== typeof wp.heartbeat ) {
+
 					/*
 					 * Check for a backup in progress.
 					 *
@@ -154,7 +155,11 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 					self.hasProtectionNotice = 1 === self.$protectionNotice.length;
 
 					// Take action when a tab within the in progress notice is clicked.
-					$( document ).on( 'click', '.notice .bgbkup-nav-tab-wrapper-in-progress .nav-tab', self.onNavClick );
+					$( document ).on(
+						'click',
+						'.notice .bgbkup-nav-tab-wrapper-in-progress .nav-tab',
+						self.onNavClick
+					);
 				} else {
 
 					// Something's gone wrong.
@@ -187,6 +192,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		 * @param object data The data object received from the WordPress Heartbeat.
 		 */
 		onComplete: function( data ) {
+
 			// Bail out of the heartbeat.
 			$( document ).off( 'heartbeat-tick', self.onHeartbeatTick );
 			$( document ).off( 'heartbeat-send', self.heartbeatModify );
@@ -238,7 +244,9 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 					.remove()
 					.end();
 
-				$( '<p>' + self.i18n.backup_error + '</p><p>' + self.i18n.get_support + '</p>' ).insertBefore( '#boldgrid_backup_in_progress_container' );
+				$( '<p>' + self.i18n.backup_error + '</p><p>' + self.i18n.get_support + '</p>' ).insertBefore(
+					'#boldgrid_backup_in_progress_container'
+				);
 
 				self.updateStatus( { message: data.boldgrid_backup_error.message } );
 			} else {
@@ -320,6 +328,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		 * @since 1.7.0
 		 */
 		onHeartbeatTick: function( e, data ) {
+
 			/*
 			 * This class deals with backups in progress. If our in progress class didn't give us
 			 * any information, abort.
@@ -355,6 +364,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 				self.setStepActive();
 				self.setLabel( data.in_progress_data.status );
 				self.setSubText();
+
 				/*
 				 * Set the percentage to 100 so that the text doesn't look funny with a half colored
 				 * background. This was done because we would show, "Complete" yet the progress bar
@@ -620,9 +630,13 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			 * @todo This set of code is somewhat copied from backup-now.js, within the backupNow method.
 			 * If need be one day, combine into a reusable method.
 			 */
-			$( '#backup-site-now' ).attr( 'disabled', 'disabled' ).css( 'pointer-events', 'none' );
+			$( '#backup-site-now' )
+				.attr( 'disabled', 'disabled' )
+				.css( 'pointer-events', 'none' );
 			$( '#you_may_leave' ).fadeIn();
-			$( '#backup-site-now-form' ).find( '.spinner' ).addClass( 'inline' );
+			$( '#backup-site-now-form' )
+				.find( '.spinner' )
+				.addClass( 'inline' );
 		},
 
 		/**
@@ -650,9 +664,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			if ( undefined !== data.message ) {
 				$status.slideUp( {
 					complete: function() {
-						$status
-							.html( data.message )
-							.slideDown();
+						$status.html( data.message ).slideDown();
 					}
 				} );
 			}
