@@ -462,7 +462,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 				'message' => '
 					<p' . $style . '>' . wp_kses(
 					self::get_error_message(),
-					array( 'strong' => array() ),
+					array( 'strong' => array() )
 				) . '</p>',
 				'header'  => BOLDGRID_BACKUP_TITLE . ' - ' . __( 'Error creating backup', 'boldgrid-backup' ),
 			);
