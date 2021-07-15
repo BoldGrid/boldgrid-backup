@@ -44,13 +44,13 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 
 		/**
 		 * The number of times our ajax call has said yes, is done.
-		 * 
+		 *
 		 * This is used to help prevent a race condition. Before showing results, we let the is done
 		 * count reach 2 so that all processes can finish and we ensure we have the appropriate error
 		 * message, if any.
-		 * 
+		 *
 		 * @since SINCEVERSION
-		 * 
+		 *
 		 * @type int
 		 */
 		isDoneCount: 0,
@@ -122,14 +122,14 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 				if ( 'undefined' !== typeof wp.heartbeat ) {
 					/*
 					 * Check for a backup in progress.
-					 * 
-					 * If the success var is neither true or false (but null), then the backup is still
-					 * in progress.
 					 *
 					 * If there is, we need to begin listenting to the heartbeat to find out when it
 					 * completes (so we can adjust the message).
+					 *
+					 * If there is a quick fail, we still need to load the in progress system so we
+					 * can show the user the error.
 					 */
-					if ( null === BoldGridBackupAdmin.in_progress_success || BoldGridBackupAdmin.is_quick_fail ) {
+					if ( ! BoldGridBackupAdmin.is_done || BoldGridBackupAdmin.is_quick_fail ) {
 						setTimeout( self.start, 1000 );
 					}
 
@@ -186,7 +186,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		 *
 		 * @param object data The data object received from the WordPress Heartbeat.
 		 */
-		onComplete: function( data ) {	
+		onComplete: function( data ) {
 			// Bail out of the heartbeat.
 			$( document ).off( 'heartbeat-tick', self.onHeartbeatTick );
 			$( document ).off( 'heartbeat-send', self.heartbeatModify );
@@ -218,7 +218,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		onError: function( data ) {
 			var $notice;
 
-			// Init "protection notice" values if in the customizer. Please see that init method. 
+			// Init "protection notice" values if in the customizer. Please see that init method.
 			if ( typeof pagenow !== undefined && 'customize' === pagenow ) {
 				self.initProtectionNotice();
 			}
@@ -241,11 +241,11 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 				$( '<p>' + self.i18n.backup_error + '</p><p>' + self.i18n.get_support + '</p>' ).insertBefore( '#boldgrid_backup_in_progress_container' );
 
 				self.updateStatus( { message: data.boldgrid_backup_error.message } );
-			} else {				
+			} else {
 				self.updateStatus( data.boldgrid_backup_error );
 			}
 		},
-		
+
 		/**
 		 * Steps to take when a user clicks on a nav element.
 		 *
@@ -606,7 +606,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 					$body.addClass( body_class );
 				}
 			}, 5000 );
-			
+
 			// Show and initialize our progress bar.
 			$( '#boldgrid_backup_in_progress_container' ).slideDown();
 			self.$label = $( '.progress-label' );
@@ -624,7 +624,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			$( '#you_may_leave' ).fadeIn();
 			$( '#backup-site-now-form' ).find( '.spinner' ).addClass( 'inline' );
 		},
-		
+
 		/**
 		 * Update the status of an in progress notice.
 		 *

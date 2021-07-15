@@ -125,13 +125,13 @@ class Boldgrid_Backup_Admin {
 		$dots    = ' ...';
 
 		$translation = array(
-			'is_premium'          => ( true === $this->config->get_is_premium() ? 'true' : 'false' ),
-			'lang'                => $this->config->lang,
-			'spinner_loading'     => $spinner . __( 'Loading', 'boldgrid-backup' ) . $dots,
-			'spinner'             => $spinner,
-			'get_premium_url'     => Boldgrid_Backup_Admin_Go_Pro::$url,
-			'in_progress_success' => Boldgrid_Backup_Admin_In_Progress_Data::get_arg( 'success', null ),
-			'is_quick_fail'       => Boldgrid_Backup_Admin_In_Progress::is_quick_fail(),
+			'is_premium'      => ( true === $this->config->get_is_premium() ? 'true' : 'false' ),
+			'lang'            => $this->config->lang,
+			'spinner_loading' => $spinner . __( 'Loading', 'boldgrid-backup' ) . $dots,
+			'spinner'         => $spinner,
+			'get_premium_url' => Boldgrid_Backup_Admin_Go_Pro::$url,
+			'is_done'         => Boldgrid_Backup_Admin_In_Progress::is_done(),
+			'is_quick_fail'   => Boldgrid_Backup_Admin_In_Progress::is_quick_fail(),
 		);
 
 		wp_localize_script( 'boldgrid-backup-admin', 'BoldGridBackupAdmin', $translation );

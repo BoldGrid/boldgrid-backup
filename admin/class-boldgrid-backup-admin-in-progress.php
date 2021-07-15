@@ -388,6 +388,9 @@ class Boldgrid_Backup_Admin_In_Progress {
 	/**
 	 * Determine whether or not the backup is running.
 	 *
+	 * This method relies on getpgid support. If this method returns null, then we don't know for sure
+	 * if the backup is running or not. An alternative is to use the is_done() method.
+	 *
 	 * @since SINCEVERSION
 	 *
 	 * @return mixed null if support for this is not available. Otherwise, bool.
@@ -490,11 +493,11 @@ class Boldgrid_Backup_Admin_In_Progress {
 		$response['is_killed'] = false === $response['is_running'] && ! is_bool( $response['is_success'] ) && empty( $response['boldgrid_backup_error'] );
 		if ( $response['is_killed'] ) {
 			/*
-			 * If the backup process crashed (was killed), we may have not been able to flag that the
-			 * process has ended.
+			 * If the backup process was killed, we may have not been able to flag that the process
+			 * has ended. Also note: do not set the success value as false because we are expecting
+			 * a killed backup to not have been able to flag a backup with a status.
 			 */
 			$this->end();
-			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'success', false );
 
 			$response['boldgrid_backup_error'] = array(
 				'class'   => 'notice notice-error',
