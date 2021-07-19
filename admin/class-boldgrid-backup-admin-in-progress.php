@@ -236,8 +236,12 @@ class Boldgrid_Backup_Admin_In_Progress {
 						<td>' . $core->time->get_span() . ' / ' . human_time_diff( $in_progress, time() ) . ' ' . esc_html__( 'ago', 'boldgrid-backup' ) . '</td>
 					</tr>
 					<tr>
-						<th>Triggered by:</th>
+						<th>' . esc_html__( 'Triggered by:', 'boldgrid-backup' ) . '</th>
 						<td>' . esc_html( Boldgrid_Backup_Admin_In_Progress_Data::get_arg( 'trigger' ) ) . '</td>
+					</tr>
+					<tr>
+						<th>' . esc_html__( 'Actions:', 'boldgrid-backup' ) . '</th>
+						<td id="bgbkup_progress_actions">' . Boldgrid_Backup_Admin_Archiver_Cancel::get_button() . '</td>
 					</tr>
 				</table>
 

@@ -160,6 +160,9 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 						'.notice .bgbkup-nav-tab-wrapper-in-progress .nav-tab',
 						self.onNavClick
 					);
+
+					// Take action when the user clicks cancel backup.
+					$( document ).on( 'click', '#bgbkup_cancel_backup', self.onClickCancel );
 				} else {
 
 					// Something's gone wrong.
@@ -180,6 +183,31 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 			return $( '#boldgrid_backup_in_progress_steps' )
 				.find( '[data-step="' + step + '"]' )
 				.hasClass( 'active' );
+		},
+
+		/**
+		 * Action to take when a user clicks to cancel a backup.
+		 *
+		 * @since SINCEVERSION
+		 */
+		onClickCancel: function() {
+			/*
+			* Make the ajax call to cancel the backup.
+			*
+			* No success, error, or complete callback is passed to the ajax call. Status updates will
+			* be handled naturally by the in progress system.
+			*/
+			$.ajax( {
+				url: ajaxurl,
+				data: {
+					action: 'boldgrid_backup_cancel',
+					cancel_auth: $( '#bgbkup-cancel' ).val()
+				},
+				type: 'post'
+			} );
+
+			$( '#bgbkup_progress_actions' ).html( wp.i18n.__( 'Canceling backup', 'boldgrid-backup' ) +
+				' <span class="spinner inline"></span>' );
 		},
 
 		/**

@@ -343,6 +343,18 @@ class Boldgrid_Backup_Admin_Core {
 	public $archive_fail;
 
 	/**
+	 * Archive filepath.
+	 *
+	 * This is similar to $db_dump_filepath, but holds the path to the archive instead of the .sql file.
+	 * This is being added in SINCEVERSION to handle the scenario of a user canceling a backup. If the
+	 * user does cancel the backup, we need to delete it (which is handled in archive-fail).
+	 *
+	 * @since SINCEVERSION
+	 * @var   string
+	 */
+	public $archive_filepath;
+
+	/**
 	 * Whether or not we're in the middle of archiving files.
 	 *
 	 * This is set at the beginning and end of self::archive_files().
@@ -1805,7 +1817,8 @@ class Boldgrid_Backup_Admin_Core {
 		$this->logger->add_memory();
 
 		// Determine the path to our zip file.
-		$info['filepath'] = $this->generate_archive_path( 'zip' );
+		$info['filepath']       = $this->generate_archive_path( 'zip' );
+		$this->archive_filepath = $info['filepath'];
 
 		Boldgrid_Backup_Admin_In_Progress_Data::set_args( array(
 			'total_files_todo' => count( $filelist ),

@@ -252,7 +252,7 @@ class Boldgrid_Backup_Admin_Log {
 	/**
 	 * Add signal handlers.
 	 *
-	 * The one signal we can't handle is SIGFILL (kill -9).
+	 * The one signal we can't handle is SIGKILL (kill -9).
 	 *
 	 * @since 1.12.6
 	 */
@@ -292,6 +292,8 @@ class Boldgrid_Backup_Admin_Log {
 			 * @link https://stackoverflow.com/questions/780853/what-is-in-apache-2-a-caught-sigwinch-error
 			 */
 			SIGWINCH,
+			// The user requested to cancel (kill) the backup.
+			SIGUSR1,
 		];
 
 		foreach ( $signals as $signal ) {
