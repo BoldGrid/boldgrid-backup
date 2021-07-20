@@ -25,6 +25,7 @@ class Boldgrid_Backup_Admin_Archiver_Cancel {
 	public static function add_progress_data() {
 		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'process_error', __( 'This backup has been successfully canceled by the user.', 'boldgrid-backup' ) );
 		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'success', false );
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'is_user_killed', true );
 	}
 
 	/**
@@ -61,6 +62,14 @@ class Boldgrid_Backup_Admin_Archiver_Cancel {
 
 		if ( ! self::can_cancel() ) {
 			return false;
+		}
+
+		/*
+		 * Kill signals may not always be defined. When defined, the numbers don't always match from
+		 * machine to machine. 10 is our best guess for SIGUSR1 if it is not defined.
+		 */
+		if ( ! defined( 'SIGUSR1' ) ) {
+			define( 'SIGUSR1', 10 );
 		}
 
 		return posix_kill( $pid, SIGUSR1 );

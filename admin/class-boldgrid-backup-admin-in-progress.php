@@ -459,8 +459,12 @@ class Boldgrid_Backup_Admin_In_Progress {
 
 		// If we have an error message (either a shutdown fatal error, or a process error), return it.
 		if ( false !== self::get_error_message() ) {
-			$style                             = ! empty( $response['in_progress_data']['shutdown_fatal_error'] ) ?
+			$style = ! empty( $response['in_progress_data']['shutdown_fatal_error'] ) ?
 				' style="white-space:pre;font-family:\'Courier New\';overflow:auto"' : '';
+
+			$header = Boldgrid_Backup_Admin_In_Progress_Data::get_arg( 'is_user_killed' ) ?
+				__( 'Backup Canceled', 'boldgrid-backup' ) : __( 'Error creating backup', 'boldgrid-backup' );
+
 			$response['boldgrid_backup_error'] = array(
 				'class'   => 'notice notice-error boldgrid-backup-in-progress',
 				'message' => '
@@ -468,7 +472,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 					self::get_error_message(),
 					array( 'strong' => array() )
 				) . '</p>',
-				'header'  => BOLDGRID_BACKUP_TITLE . ' - ' . __( 'Error creating backup', 'boldgrid-backup' ),
+				'header'  => BOLDGRID_BACKUP_TITLE . ' - ' . $header,
 			);
 		}
 
