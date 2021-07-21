@@ -121,15 +121,13 @@ if ( ! empty( $archive_info ) ) {
 			'class'   => 'notice notice-success is-dismissible boldgrid-backup-complete',
 			'message' => sprintf(
 				'
-					<h2 class="header-notice">%1$s - %2$s</h2>
-					<p>%3$s <a href="%4$s">%5$s</a></p>
+					<p>%1$s <a href="%2$s">%3$s</a></p>
 				',
-				/* 1 */ BOLDGRID_BACKUP_TITLE,
-				/* 2 */ esc_html__( 'Backup complete', 'boldgrid-backup' ),
-				/* 3 */ esc_html__( 'A backup archive file has been created successfully!', 'boldgrid-backup' ),
-				/* 4 */ $core->archive->view_details_url,
-				/* 5 */ esc_html__( 'View details', 'boldgrid-backup' )
+				/* 1 */ esc_html__( 'A backup archive file has been created successfully!', 'boldgrid-backup' ),
+				/* 2 */ $core->archive->view_details_url,
+				/* 3 */ esc_html__( 'View details', 'boldgrid-backup' )
 			),
+			'header'  => BOLDGRID_BACKUP_TITLE . ' - ' . esc_html__( 'Backup complete', 'boldgrid-backup' ),
 		];
 	} else {
 		$message = [

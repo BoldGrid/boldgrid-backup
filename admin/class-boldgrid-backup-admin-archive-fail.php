@@ -140,13 +140,7 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 		// If we had a fatal error, tell the system we're no longer backing up.
 		$this->core->in_progress->end();
 
-		/*
-		 * If an archive fails, there may be a rogue db dump sitting out there.
-		 * If it exists, delete it, it should be in the archive file.
-		 */
-		if ( $this->core->wp_filesystem->exists( $this->core->db_dump_filepath ) ) {
-			$this->core->wp_filesystem->delete( $this->core->db_dump_filepath );
-		}
+		Boldgrid_Backup_Admin_Archiver_Cancel::delete_files();
 
 		$last_error = error_get_last();
 
@@ -166,6 +160,9 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 			$last_error['file'],
 			$last_error['line']
 		);
+
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'shutdown_fatal_error', $error_message );
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'success', false );
 
 		$this->schedule_fail_email( $error_message );
 
