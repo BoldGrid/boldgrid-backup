@@ -336,6 +336,10 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 		}
 
 		$file_contents = $this->get_file( $filepath, $file );
+		if ( empty( $file_contents ) ) {
+			$this->errors[] = __( 'Unable to extract single file from archive.', 'boldgrid-backup' );
+			return false;
+		}
 
 		// Make sure the file's dir exists, write the file, and adjust the timestamp.
 		$file_abspath = ABSPATH . $file;

@@ -343,6 +343,18 @@ class Boldgrid_Backup_Admin_Core {
 	public $archive_fail;
 
 	/**
+	 * Archive filepath.
+	 *
+	 * This is similar to $db_dump_filepath, but holds the path to the archive instead of the .sql file.
+	 * This is being added in SINCEVERSION to handle the scenario of a user canceling a backup. If the
+	 * user does cancel the backup, we need to delete it (which is handled in archive-fail).
+	 *
+	 * @since SINCEVERSION
+	 * @var   string
+	 */
+	public $archive_filepath;
+
+	/**
 	 * Whether or not we're in the middle of archiving files.
 	 *
 	 * This is set at the beginning and end of self::archive_files().
@@ -1580,9 +1592,13 @@ class Boldgrid_Backup_Admin_Core {
 	public function archive_files( $save = false, $dryrun = false ) {
 		$this->archiving_files = true;
 
-		$log_time = time();
-		$this->logger->init( 'archive-' . $log_time . '.log' );
+		$pid = getmypid();
+
+		$log_time     = time();
+		$log_filename = 'archive-' . $log_time . '.log';
+		$this->logger->init( $log_filename );
 		$this->logger->add( 'Backup process initialized.' );
+		$this->logger->add( 'Process id: ' . $pid );
 
 		$this->utility->bump_memory_limit( '1G' );
 
@@ -1594,9 +1610,12 @@ class Boldgrid_Backup_Admin_Core {
 		 */
 		$this->is_scheduled_backup = $this->doing_cron && ! $this->pre_auto_update;
 
-		Boldgrid_Backup_Admin_In_Progress_Data::set_args(
-			[ 'status' => esc_html__( 'Initializing backup', 'boldgrid-backup' ) ]
-		);
+		Boldgrid_Backup_Admin_In_Progress_Data::init( array(
+			'status'       => esc_html__( 'Initializing backup', 'boldgrid-backup' ),
+			'log_filename' => $log_filename,
+			'pid'          => $pid,
+			'start_time'   => $log_time,
+		) );
 
 		/**
 		 * Actions to take before any archiving begins.
@@ -1691,6 +1710,7 @@ class Boldgrid_Backup_Admin_Core {
 		} else {
 			$info['trigger'] = esc_html__( 'Unknown', 'boldgrid-backup' );
 		}
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'trigger', $info['trigger'] );
 
 		$info['compressor'] = $this->compressors->get();
 
@@ -1797,15 +1817,14 @@ class Boldgrid_Backup_Admin_Core {
 		$this->logger->add_memory();
 
 		// Determine the path to our zip file.
-		$info['filepath'] = $this->generate_archive_path( 'zip' );
+		$info['filepath']       = $this->generate_archive_path( 'zip' );
+		$this->archive_filepath = $info['filepath'];
 
-		Boldgrid_Backup_Admin_In_Progress_Data::set_args(
-			[
-				'total_files_todo' => count( $filelist ),
-				'filepath'         => $info['filepath'],
-				'compressor'       => $info['compressor'],
-			]
-		);
+		Boldgrid_Backup_Admin_In_Progress_Data::set_args( array(
+			'total_files_todo' => count( $filelist ),
+			'filepath'         => $info['filepath'],
+			'compressor'       => $info['compressor'],
+		) );
 
 		if ( Boldgrid_Backup_Admin_Filelist_Analyzer::is_enabled() ) {
 			$this->logger->add_separator();
@@ -1857,6 +1876,8 @@ class Boldgrid_Backup_Admin_Core {
 				break;
 		}
 
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'status', 'Wrapping things up...' );
+
 		$archive_exists = ! empty( $info['filepath'] ) && $this->wp_filesystem->exists( $info['filepath'] );
 		$archive_size   = ! $archive_exists ? 0 : $this->wp_filesystem->size( $info['filepath'] );
 
@@ -1874,9 +1895,6 @@ class Boldgrid_Backup_Admin_Core {
 			)
 		);
 		$this->logger->add_memory();
-
-		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'status', esc_html__( 'Wrapping things up...', 'boldgrid-backup' ) );
-		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'percentage', 100 );
 
 		$info['total_size'] += $this->filelist->get_total_size( $filelist );
 
@@ -1954,6 +1972,7 @@ class Boldgrid_Backup_Admin_Core {
 		 */
 		if ( $this->email->user_wants_notification( 'backup' ) && ! $this->is_scheduled_backup ) {
 			$this->logger->add( 'Starting sending of email...' );
+			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'status', 'Sending email...' );
 
 			$email_parts          = $this->email->post_archive_parts( $info );
 			$email_body           = $email_parts['body']['main'] . $email_parts['body']['signature'];
@@ -1980,8 +1999,6 @@ class Boldgrid_Backup_Admin_Core {
 			$this->archive->write_results_file( $info );
 		}
 
-		Boldgrid_Backup_Admin_In_Progress_Data::set_args( [ 'status' => esc_html__( 'Backup complete!', 'boldgrid-backup' ) ] );
-
 		if ( isset( $this->activity ) ) {
 			$this->activity->add( 'any_backup_created', 1, $this->rating_prompt_config );
 		}
@@ -1990,6 +2007,11 @@ class Boldgrid_Backup_Admin_Core {
 		$this->logger->add_memory();
 
 		$this->archiving_files = false;
+
+		Boldgrid_Backup_Admin_In_Progress_Data::set_args( array(
+			'status'  => esc_html__( 'Backup complete!', 'boldgrid-backup' ),
+			'success' => true,
+		) );
 
 		// Return the array of archive information.
 		return $info;
@@ -2635,14 +2657,15 @@ class Boldgrid_Backup_Admin_Core {
 
 		$archive_info = $this->archive_files( true );
 
-		// If there were any errors encountered during the backup, save them to the In Progress data.
+		/*
+		 * If there were any errors encountered during the backup, save them to the In Progress data.
+		 *
+		 * A "process error" is when the archive_files() method successfully returns info, and it includes
+		 * an error.
+		 */
 		if ( ! empty( $archive_info['error'] ) ) {
-			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'error', $archive_info['error'] );
-			$this->notice->add_user_notice(
-				'<p>' . $archive_info['error'] . '</p>',
-				'notice notice-error is-dismissible',
-				'Backup Failed'
-			);
+			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'process_error', $archive_info['error'] );
+			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'success', false );
 		}
 
 		if ( $this->is_archiving_update_protection ) {

@@ -130,6 +130,8 @@ class Boldgrid_Backup_Admin {
 			'spinner_loading' => $spinner . __( 'Loading', 'boldgrid-backup' ) . $dots,
 			'spinner'         => $spinner,
 			'get_premium_url' => Boldgrid_Backup_Admin_Go_Pro::$url,
+			'is_done'         => Boldgrid_Backup_Admin_In_Progress::is_done(),
+			'is_quick_fail'   => Boldgrid_Backup_Admin_In_Progress::is_quick_fail(),
 		);
 
 		wp_localize_script( 'boldgrid-backup-admin', 'BoldGridBackupAdmin', $translation );
@@ -141,7 +143,7 @@ class Boldgrid_Backup_Admin {
 		wp_register_script(
 			$handle,
 			plugin_dir_url( __FILE__ ) . 'js/' . $handle . '.js',
-			array( 'jquery' ),
+			array( 'jquery', 'wp-i18n' ),
 			BOLDGRID_BACKUP_VERSION,
 			false
 		);
@@ -157,6 +159,7 @@ class Boldgrid_Backup_Admin {
 			'get_support'                 => $core->lang['get_support'],
 		);
 		wp_localize_script( $handle, 'BoldGridBackupAdminInProgress', $translation );
+		wp_set_script_translations( 'handle', 'boldgrid-backup' );
 		wp_enqueue_script( $handle );
 
 		// The "In Progress" script relies on the heartbeat.
