@@ -3,7 +3,7 @@
  * File: class-boldgrid-backup-admin-archiver-cancel.php
  *
  * @link       https://www.boldgrid.com
- * @since      SINCEVERSION
+ * @since      1.14.13
  *
  * @package    Boldgrid_Backup
  * @copyright  BoldGrid
@@ -14,13 +14,13 @@
 /**
  * Class: Boldgrid_Backup_Admin_Archiver_Cancel
  *
- * @since SINCEVERSION
+ * @since 1.14.13
  */
 class Boldgrid_Backup_Admin_Archiver_Cancel {
 	/**
 	 * Add cancelation data to the in progress data.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 */
 	public static function add_progress_data() {
 		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'process_error', __( 'This backup has been successfully canceled by the user.', 'boldgrid-backup' ) );
@@ -31,7 +31,7 @@ class Boldgrid_Backup_Admin_Archiver_Cancel {
 	/**
 	 * Whether or not we can cancel a backup.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 */
 	public static function can_cancel() {
 		$pid = Boldgrid_Backup_Admin_In_Progress_Data::get_arg( 'pid' );
@@ -50,7 +50,7 @@ class Boldgrid_Backup_Admin_Archiver_Cancel {
 	/**
 	 * Cancel a backup.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 *
 	 * @return bool
 	 */
@@ -81,7 +81,7 @@ class Boldgrid_Backup_Admin_Archiver_Cancel {
 	 * If an archive fails or is canceled by the user, handle cleanup of unecessary files. IE, there
 	 * may be a rogue db dump sitting out there.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 */
 	public static function delete_files() {
 		$core = apply_filters( 'boldgrid_backup_get_core', false );
@@ -101,7 +101,7 @@ class Boldgrid_Backup_Admin_Archiver_Cancel {
 	/**
 	 * Get our cancel button.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 *
 	 * @return string
 	 */
@@ -116,7 +116,7 @@ class Boldgrid_Backup_Admin_Archiver_Cancel {
 	/**
 	 * Determine whether or not we have a valid nonce.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 *
 	 * @return bool True on success.
 	 */
@@ -127,7 +127,7 @@ class Boldgrid_Backup_Admin_Archiver_Cancel {
 	/**
 	 * Listener for ajax requests to cancel a backup.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 */
 	public static function wp_ajax_cancel() {
 		if ( ! self::is_valid_nonce() ) {

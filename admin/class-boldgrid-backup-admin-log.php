@@ -209,7 +209,7 @@ class Boldgrid_Backup_Admin_Log {
 	/**
 	 * Return the contents of the log file.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 *
 	 * @return string
 	 */

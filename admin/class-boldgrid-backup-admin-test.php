@@ -78,7 +78,7 @@ class Boldgrid_Backup_Admin_Test {
 	/**
 	 * A cached value of whether or not posix_getpgid() is supported.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 * @access private
 	 * @var bool
 	 */
@@ -508,7 +508,7 @@ class Boldgrid_Backup_Admin_Test {
 	 *
 	 * This is often used to determine if a backup process is still running.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 *
 	 * @link https://www.win.tue.nl/~aeb/linux/lk/lk-10.html
 	 *

@@ -140,7 +140,7 @@ class Boldgrid_Backup_Admin_Notice {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @return mixed False on failure, an array on success. Prior to @SINCEVERSION, we returned a string
+	 * @return mixed False on failure, an array on success. Prior to @1.14.13, we returned a string
 	 *               containing the markup of the admin notice.
 	 */
 	public function get_backup_complete() {
