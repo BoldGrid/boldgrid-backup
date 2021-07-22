@@ -346,10 +346,10 @@ class Boldgrid_Backup_Admin_Core {
 	 * Archive filepath.
 	 *
 	 * This is similar to $db_dump_filepath, but holds the path to the archive instead of the .sql file.
-	 * This is being added in SINCEVERSION to handle the scenario of a user canceling a backup. If the
+	 * This is being added in 1.14.13 to handle the scenario of a user canceling a backup. If the
 	 * user does cancel the backup, we need to delete it (which is handled in archive-fail).
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 * @var   string
 	 */
 	public $archive_filepath;

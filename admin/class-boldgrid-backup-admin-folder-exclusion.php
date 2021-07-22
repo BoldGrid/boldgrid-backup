@@ -411,7 +411,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	 * Some files are just bad for business. Files in this list won't be backed up, and the user has
 	 * no control at this time to modify. Only files we're certain should be banned, should be.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 *
 	 * @param string $file A filepath. Not absolute, but relative to ABSPATH, such as wp-admin/css/about.css
 	 *

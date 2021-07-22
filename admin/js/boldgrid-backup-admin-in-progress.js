@@ -49,7 +49,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		 * count reach 2 so that all processes can finish and we ensure we have the appropriate error
 		 * message, if any.
 		 *
-		 * @since SINCEVERSION
+		 * @since 1.14.13
 		 *
 		 * @type int
 		 */
@@ -103,7 +103,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		/**
 		 * Init our protection notice variables.
 		 *
-		 * Prior to @SINCEVERSION, this code lived within the _onReady. It has since been moved here
+		 * Prior to @1.14.13, this code lived within the _onReady. It has since been moved here
 		 * so that it may be called within the customizer. The Protection notice is added via ajax in
 		 * the Customizer, and we cannot set these values accurately within the _onReady.
 		 */
@@ -188,7 +188,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		/**
 		 * Action to take when a user clicks to cancel a backup.
 		 *
-		 * @since SINCEVERSION
+		 * @since 1.14.13
 		 */
 		onClickCancel: function() {
 			/*
@@ -285,7 +285,7 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		/**
 		 * Steps to take when a user clicks on a nav element.
 		 *
-		 * @since SINCEVERSION
+		 * @since 1.14.13
 		 */
 		onNavClick: function() {
 			var $clickedNav = $( this ),
@@ -670,11 +670,11 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		/**
 		 * Update the status of an in progress notice.
 		 *
-		 * This was introduced as of @SINCEVERSION when tabs were introduced. When the status of a backup
+		 * This was introduced as of @1.14.13 when tabs were introduced. When the status of a backup
 		 * in progress changes, this method will update the display (rather than the legacy method of
 		 * hiding the existing status notice and showing a new one).
 		 *
-		 * @since SINCEVERSION
+		 * @since 1.14.13
 		 *
 		 * @param array data An array of data about the notice.
 		 */
