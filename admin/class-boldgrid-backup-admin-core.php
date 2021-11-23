@@ -1737,7 +1737,7 @@ class Boldgrid_Backup_Admin_Core {
 			$this->logger->add_memory();
 
 			$status = $this->backup_database();
-			
+
 			$this->logger->add( 'Dump of database complete! $status = ' . print_r( $status, 1 ) ); // phpcs:ignore
 			$this->logger->add_memory();
 			$this->logger->add_separator();
