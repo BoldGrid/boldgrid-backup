@@ -1511,7 +1511,7 @@ class Boldgrid_Backup_Admin_Core {
 
 			// @todo The user needs a way to specifiy what to skip in the backups.
 			$this->logger->add( 'before $is_node_modules variable' );
-			$is_node_modules     = false !== strpos( $fileinfo[1], '/node_modules/' );
+			$is_node_modules = false !== strpos( $fileinfo[1], '/node_modules/' );
 			$this->logger->add( 'after $is_node_modules variable' );
 			$this->logger->add( 'before $is_backup_directory variable' );
 			$is_backup_directory = $this->backup_dir->file_in_dir( $fileinfo[1] );
