@@ -137,10 +137,8 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 		// Free up memory so we have enough to complete this method.
 		$this->memory = null;
 
-		// If we had a fatal error, tell the system we're no longer backing up.
+		// Tell the system we're no longer backing up.
 		$this->core->in_progress->end();
-
-		Boldgrid_Backup_Admin_Archiver_Cancel::delete_files();
 
 		$last_error = error_get_last();
 
@@ -163,6 +161,8 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 
 		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'shutdown_fatal_error', $error_message );
 		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'success', false );
+
+		Boldgrid_Backup_Admin_Archiver_Cancel::delete_files();
 
 		$this->schedule_fail_email( $error_message );
 

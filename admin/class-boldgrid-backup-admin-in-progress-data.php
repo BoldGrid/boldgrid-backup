@@ -98,7 +98,7 @@ class Boldgrid_Backup_Admin_In_Progress_Data {
 	/**
 	 * Set an array of data.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 *
 	 * @param string $arg   The key.
 	 * @param string $value The value.

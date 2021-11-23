@@ -5,7 +5,7 @@
  * Backup logs on settings page.
  *
  * @link https://www.boldgrid.com
- * @since SINCEVERSION
+ * @since 1.14.13
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin/partials/settings
