@@ -1737,11 +1737,11 @@ class Boldgrid_Backup_Admin_Core {
 			$this->logger->add_memory();
 
 			$status = $this->backup_database();
-            
+			
 			$this->logger->add( 'Dump of database complete! $status = ' . print_r( $status, 1 ) ); // phpcs:ignore
 			$this->logger->add_memory();
 			$this->logger->add_separator();
-            $this->logger->add( 'after separator' );
+			$this->logger->add( 'after separator' );
 			if ( false === $status || ! empty( $status['error'] ) ) {
 				$error = ! empty( $status['error'] ) ? $status['error'] : __( 'An unknown error occurred when backing up the database.', 'boldgrid-backup' );
 				$this->logger->add( $error );
@@ -1751,15 +1751,15 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Keep track of how long the site was paused for / the time to backup the database.
 		$db_time_stop = microtime( true );
-        $this->logger->add( 'after microtime' );
+		$this->logger->add( 'after microtime' );
 		// Get the file list.
-        $this->logger->add( 'before filelist' );
+		$this->logger->add( 'before filelist' );
 		$filelist = $this->get_filtered_filelist( ABSPATH );
-        $this->logger->add( 'after filelist' );
+		$this->logger->add( 'after filelist' );
 		// Initialize total_size.
-        $this->logger->add( 'before total_size' );
+		$this->logger->add( 'before total_size' );
 		$info['total_size'] = 0;
-        $this->logger->add( 'after total_size' );
+		$this->logger->add( 'after total_size' );
 
 		// If not saving, then just return info.
 		if ( ! $save ) {
