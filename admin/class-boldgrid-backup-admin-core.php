@@ -1485,46 +1485,63 @@ class Boldgrid_Backup_Admin_Core {
 	public function get_filtered_filelist( $dirpath = ABSPATH ) {
 
 		// Validate input.
+		$this->logger->add( 'before validate input' );
 		if ( empty( $dirpath ) || ! $this->wp_filesystem->is_readable( $dirpath ) ) {
 			return [];
 		}
-
+		$this->logger->add( 'after validate input' );
 		// Get the recursive directory listing for the specified path.
+		$this->logger->add( 'before recursive directory listing' );
 		$filelist = $this->get_filelist( $dirpath );
-
+		$this->logger->add( 'after recursive directory listing' );
 		// If no files were found, then return an empty array.
+		$this->logger->add( 'before empty file array' );
 		if ( empty( $filelist ) ) {
 			return [];
 		}
+		$this->logger->add( 'after empty file array' );
 
 		// Initialize $new_filelist.
+		$this->logger->add( 'before $new_filelist initialize' );
 		$new_filelist = [];
-
+		$this->logger->add( 'after $new_filelist initialize' );
 		// Filter the filelist array.
+		$this->logger->add( 'before filter filelist array' );
 		foreach ( $filelist as $fileinfo ) {
 
 			// @todo The user needs a way to specifiy what to skip in the backups.
-			$is_node_modules     = false !== strpos( $fileinfo[1], '/node_modules/' );
+			$this->logger->add( 'before $is_node_modules variable' );
+			$is_node_modules = false !== strpos( $fileinfo[1], '/node_modules/' );
+			$this->logger->add( 'after $is_node_modules variable' );
+			$this->logger->add( 'before $is_backup_directory variable' );
 			$is_backup_directory = $this->backup_dir->file_in_dir( $fileinfo[1] );
-
+			$this->logger->add( 'after $is_backup_directory variable' );
+			$this->logger->add( 'before $is_node_modules $is_backup_directory check' );
 			if ( $is_node_modules || $is_backup_directory ) {
 				continue;
 			}
-
+			$this->logger->add( 'after $is_node_modules $is_backup_directory check' );
+			$this->logger->add( 'before folder exclusion check' );
 			if ( ! $this->folder_exclusion->allow_file( $fileinfo[1] ) ) {
 				continue;
 			}
-
+			$this->logger->add( 'after folder exclusion check' );
+			$this->logger->add( 'before $fileinfo set to $new_filelist' );
 			$new_filelist[] = $fileinfo;
+			$this->logger->add( 'after $fileinfo set to $new_filelist' );
 		}
-
+		$this->logger->add( 'after filter filelist array' );
 		// Replace filelist.
+		$this->logger->add( 'before replace filelist' );
 		$filelist = $new_filelist;
-
+		$this->logger->add( 'after replace filelist' );
 		// Clear filelist_basedir.
+		$this->logger->add( 'before filelist basedir null' );
 		$this->filelist_basedir = null;
+		$this->logger->add( 'after filelist basedir null' );
 
 		// Return the filelist array.
+		$this->logger->add( 'return $filelist' );
 		return $filelist;
 	}
 
