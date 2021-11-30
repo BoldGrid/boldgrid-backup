@@ -1379,31 +1379,45 @@ class Boldgrid_Backup_Admin_Core {
 	public function get_filelist( $dirpath ) {
 
 		// If this is a node_modules folder, do not iterate through it.
+		$this->logger->add( 'before node_modules folder check' );
 		if ( false !== strpos( $dirpath, '/node_modules' ) ) {
 			return [];
 		}
+		$this->logger->add( 'after node_modules folder check' );
 
 		// Connect to the WordPress Filesystem API.
+		$this->logger->add( 'before $wp_filesystem global' );
 		global $wp_filesystem;
+		$this->logger->add( 'after $wp_filesystem global' );
 
 		// Validate input.
+		$this->logger->add( 'before validate input' );
 		if ( empty( $dirpath ) || ! $wp_filesystem->is_readable( $dirpath ) ) {
 			return [];
 		}
+		$this->logger->add( 'after validate input' );
 
 		// Remove any training slash in dirpath.
+		$this->logger->add( 'before remove trailing slash dirpath' );
 		$dirpath = untrailingslashit( $dirpath );
+		$this->logger->add( 'after remove trailing slash dirpath' );
 
 		// Mark the base directory, if not set (the first run).
+		$this->logger->add( 'before mark the base directory' );
 		if ( empty( $this->filelist_basedir ) ) {
 			$this->filelist_basedir = $dirpath;
 		}
+		$this->logger->add( 'after mark the base directory' );
 
 		// Get the non-recursive directory listing for the specified path.
+		$this->logger->add( 'before get-nonrecursive directory listing' );
 		$dirlist = $wp_filesystem->dirlist( $dirpath, true, false );
+		$this->logger->add( 'after get-nonrecursive directory listing' );
 
 		// Initialize $filelist.
+		$this->logger->add( 'before initialize $filelist' );
 		$filelist = [];
+		$this->logger->add( 'after initialize $filelist' );
 
 		/*
 		 * Add empty directory.
@@ -1414,6 +1428,7 @@ class Boldgrid_Backup_Admin_Core {
 		 * Previously we used Boldgrid_Backup_Admin_Compressor_Php_Zip::add_dirs
 		 * to add all empty directories, but that method is no longer needed.
 		 */
+		$this->logger->add( 'before add empty directory' );
 		if ( empty( $dirlist ) ) {
 			$filelist[] = [
 				$dirpath,
@@ -1423,8 +1438,10 @@ class Boldgrid_Backup_Admin_Core {
 				'd',
 			];
 		}
+		$this->logger->add( 'after add empty directory' );
 
 		// Sort the dirlist array by filename.
+		$this->logger->add( 'before sort dirlist array by filename' );
 		uasort(
 			$dirlist,
 			function ( $a, $b ) {
@@ -1439,10 +1456,13 @@ class Boldgrid_Backup_Admin_Core {
 				return 0;
 			}
 		);
+		$this->logger->add( 'after sort dirlist array by filename' );
 
 		// Perform conversion.
+		$this->logger->add( 'before perform conversion' );
 		foreach ( $dirlist as $fileinfo ) {
 			// If item is a directory, then recurse, merge, and continue.
+			$this->logger->add( 'before if item is a directory' );
 			if ( 'd' === $fileinfo['type'] ) {
 				$filelist_add = $this->get_filelist( $dirpath . '/' . $fileinfo['name'] );
 
@@ -1450,22 +1470,31 @@ class Boldgrid_Backup_Admin_Core {
 
 				continue;
 			}
+			$this->logger->add( 'after if item is a directory' );
 
 			// Get the file path.
+			$this->logger->add( 'before get the file path' );
 			$filepath = $dirpath . '/' . $fileinfo['name'];
+			$this->logger->add( 'after get the file path' );
 
 			// The relative path inside the ZIP file.
+			$this->logger->add( 'before relative path in ZIP' );
 			$relative_path = substr( $filepath, strlen( $this->filelist_basedir ) + 1 );
+			$this->logger->add( 'after relative path in ZIP' );
 
 			// For files, add to the filelist array.
+			$this->logger->add( 'before add files to filelist array' );
 			$filelist[] = [
 				$filepath,
 				$relative_path,
 				$fileinfo['size'],
 			];
+			$this->logger->add( 'before add files to filelist array' );
 		}
+		$this->logger->add( 'before perform conversion' );
 
 		// Return the array.
+		$this->logger->add( 'before array return' );
 		return $filelist;
 	}
 
