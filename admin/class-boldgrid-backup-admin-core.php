@@ -1462,20 +1462,20 @@ class Boldgrid_Backup_Admin_Core {
 		$this->logger->add( 'before perform conversion' );
 		foreach ( $dirlist as $fileinfo ) {
 			// If item is a directory, then recurse, merge, and continue.
-						if ( 'd' === $fileinfo['type'] ) {
+			if ( 'd' === $fileinfo['type'] ) {
 				$filelist_add = $this->get_filelist( $dirpath . '/' . $fileinfo['name'] );
 
 				$filelist = array_merge( $filelist, $filelist_add );
 
 				continue;
 			}
-			
+
 			// Get the file path.
 			$filepath = $dirpath . '/' . $fileinfo['name'];
 
 			// The relative path inside the ZIP file.
 			$relative_path = substr( $filepath, strlen( $this->filelist_basedir ) + 1 );
-			
+
 			// For files, add to the filelist array.
 			$filelist[] = [
 				$filepath,
