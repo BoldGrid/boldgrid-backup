@@ -1389,11 +1389,14 @@ class Boldgrid_Backup_Admin_Core {
 		global $wp_filesystem;
 
 		// Validate input.
-		$is_readable_time_start = microtime(true);
+		$is_readable_time_start = microtime( true );
+
 		if ( empty( $dirpath ) || ! $wp_filesystem->is_readable( $dirpath ) ) {
 			return [];
 		}
-		$is_readable_time_end = microtime(true);
+
+		$is_readable_time_end = microtime( true );
+
 		$this->logger->add( 'is_readable Duration: ' . ( $is_readable_time_end - $is_readable_time_start ) );
 
 		// Remove any training slash in dirpath.
@@ -1405,9 +1408,12 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Get the non-recursive directory listing for the specified path.
-		$dirlist_time_start = microtime(true);
+		$dirlist_time_start = microtime( true );
+
 		$dirlist = $wp_filesystem->dirlist( $dirpath, true, false );
-		$dirlist_time_end = microtime(true);
+
+		$dirlist_time_end   = microtime( true );
+
 		$this->logger->add( '$dirlist Duration: ' . ( $dirlist_time_end - $dirlist_time_start ) );
 
 		// Initialize $filelist.
@@ -1512,6 +1518,7 @@ class Boldgrid_Backup_Admin_Core {
 
 			// @todo The user needs a way to specifiy what to skip in the backups.
 			$is_node_modules = false !== strpos( $fileinfo[1], '/node_modules/' );
+
 			$is_backup_directory = $this->backup_dir->file_in_dir( $fileinfo[1] );
 
 			if ( $is_node_modules || $is_backup_directory ) {
