@@ -1412,7 +1412,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		$dirlist = $wp_filesystem->dirlist( $dirpath, true, false );
 
-		$dirlist_time_end   = microtime( true );
+		$dirlist_time_end = microtime( true );
 
 		$this->logger->add( '$dirlist Duration: ' . ( $dirlist_time_end - $dirlist_time_start ) );
 
