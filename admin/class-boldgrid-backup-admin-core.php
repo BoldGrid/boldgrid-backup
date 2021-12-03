@@ -1447,6 +1447,10 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Sort the dirlist array by filename.
+		static $uasort_total_time = 0;
+
+		$uasort_time_start = microtime( true );
+
 		uasort(
 			$dirlist,
 			function ( $a, $b ) {
@@ -1461,6 +1465,12 @@ class Boldgrid_Backup_Admin_Core {
 				return 0;
 			}
 		);
+
+		$uasort_time_end = microtime( true );
+
+		$uasort_total_time += ( $uasort_time_end - $uasort_time_start );
+
+		$this->logger->add( 'uasort Duration: ' . $uasort_total_time );
 
 		// Perform conversion.
 		foreach ( $dirlist as $fileinfo ) {
