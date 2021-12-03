@@ -1389,6 +1389,8 @@ class Boldgrid_Backup_Admin_Core {
 		global $wp_filesystem;
 
 		// Validate input.
+		static $is_readable_total_time = 0;
+
 		$is_readable_time_start = microtime( true );
 
 		if ( empty( $dirpath ) || ! $wp_filesystem->is_readable( $dirpath ) ) {
@@ -1397,7 +1399,9 @@ class Boldgrid_Backup_Admin_Core {
 
 		$is_readable_time_end = microtime( true );
 
-		$this->logger->add( 'is_readable Duration: ' . ( $is_readable_time_end - $is_readable_time_start ) );
+		$is_readable_total_time += ( $is_readable_time_end - $is_readable_time_start );
+
+		$this->logger->add( 'is_readable Duration: ' . $is_readable_total_time );
 
 		// Remove any training slash in dirpath.
 		$dirpath = untrailingslashit( $dirpath );
@@ -1408,13 +1412,17 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Get the non-recursive directory listing for the specified path.
+		static $dirlist_total_time = 0;
+
 		$dirlist_time_start = microtime( true );
 
 		$dirlist = $wp_filesystem->dirlist( $dirpath, true, false );
 
 		$dirlist_time_end = microtime( true );
 
-		$this->logger->add( '$dirlist Duration: ' . ( $dirlist_time_end - $dirlist_time_start ) );
+		$dirlist_total_time += ( $dirlist_time_end - $dirlist_time_start );
+
+		$this->logger->add( '$dirlist Duration: ' . $dirlist_total_time );
 
 		// Initialize $filelist.
 		$filelist = [];
@@ -1755,7 +1763,7 @@ class Boldgrid_Backup_Admin_Core {
 			$this->logger->add( 'Dump of database complete! $status = ' . print_r( $status, 1 ) ); // phpcs:ignore
 			$this->logger->add_memory();
 			$this->logger->add_separator();
-			$this->logger->add( 'after separator' );
+
 			if ( false === $status || ! empty( $status['error'] ) ) {
 				$error = ! empty( $status['error'] ) ? $status['error'] : __( 'An unknown error occurred when backing up the database.', 'boldgrid-backup' );
 				$this->logger->add( $error );
