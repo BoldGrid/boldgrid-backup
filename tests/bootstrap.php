@@ -11,6 +11,13 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
+$_tests_dir = getenv( 'WP_TESTS_DIR' );
+if ( ! $_tests_dir ) {
+	$_tests_dir = '/tmp/wordpress-tests-lib';
+}
+
+require_once $_tests_dir . '/includes/functions.php';
+
 if ( ! defined( 'BOLDGRID_BACKUP_PATH' ) ) {
 	define( 'BOLDGRID_BACKUP_PATH', dirname( dirname( __FILE__ ) ) );
 }
@@ -138,4 +145,6 @@ function phpunit_error_log( $var ) {
 		"\n## ------------------\n\n"
 	);
 }
+
+require $_tests_dir . '/includes/bootstrap.php';
 
