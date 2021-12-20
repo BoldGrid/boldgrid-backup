@@ -46,6 +46,11 @@ $files = array(
 	'/vendor/boldgrid/library/src/Library/Theme/Theme.php',
 	'/vendor/boldgrid/library/src/Library/Theme/Themes.php',
 	'/vendor/boldgrid/library/src/Library/Theme/UpdateData.php',
+	/*
+	 * Changes to the WordPress Core PHP Test Suite
+	 * Please see: https://make.wordpress.org/core/2021/09/27/changes-to-the-wordpress-core-php-test-suite/
+	 */
+	'/vendor/yoast/phpunit-polyfills/phpunitpolyfills-autoload.php',
 	'/admin/class-boldgrid-backup-admin-premium-features.php',
 	'/admin/class-boldgrid-backup-admin-core.php',
 	'/admin/class-boldgrid-backup-admin.php',
