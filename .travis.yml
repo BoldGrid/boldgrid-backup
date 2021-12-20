@@ -18,7 +18,9 @@ before_script:
   - nvm use 10
   - yarn install
   - composer self-update --1
-  - composer install -o --no-dev
+# We are NOT omitting dev scripts just yet. We need them for the phpunit tests below.
+# Composer will be ran again with the --no-dev flag to remove them.
+  - composer install -o
   - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
 
 script:
@@ -27,6 +29,8 @@ script:
   - yarn run php-codesniffer
 # Temp. Different results in wpbex2 vs travix.
 #  - yarn run js-lint
+# Remove our dev scripts.
+  - composer install -o --no-dev
 
 deploy:
   - provider: script
