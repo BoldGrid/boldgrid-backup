@@ -11,13 +11,6 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-$_tests_dir = getenv( 'WP_TESTS_DIR' );
-if ( ! $_tests_dir ) {
-	$_tests_dir = '/tmp/wordpress-tests-lib';
-}
-
-require_once $_tests_dir . '/includes/functions.php';
-
 if ( ! defined( 'BOLDGRID_BACKUP_PATH' ) ) {
 	define( 'BOLDGRID_BACKUP_PATH', dirname( dirname( __FILE__ ) ) );
 }
@@ -40,11 +33,6 @@ $files = array(
 	'/vendor/boldgrid/library/src/Library/Theme/Theme.php',
 	'/vendor/boldgrid/library/src/Library/Theme/Themes.php',
 	'/vendor/boldgrid/library/src/Library/Theme/UpdateData.php',
-	/*
-	 * WordPress Core PHP Test Suite requires phpunit-polyfills.
-	 * Please see: https://make.wordpress.org/core/2021/09/27/changes-to-the-wordpress-core-php-test-suite/
-	 */
-	'/vendor/yoast/phpunit-polyfills/phpunitpolyfills-autoload.php',
 	'/admin/class-boldgrid-backup-admin-premium-features.php',
 	'/admin/class-boldgrid-backup-admin-core.php',
 	'/admin/class-boldgrid-backup-admin.php',
@@ -151,4 +139,3 @@ function phpunit_error_log( $var ) {
 	);
 }
 
-require $_tests_dir . '/includes/bootstrap.php';
