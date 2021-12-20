@@ -526,6 +526,12 @@ class Boldgrid_Backup_Admin_Test {
 			return false;
 		}
 
+		// posix_getpgid() may not be available in all environments. Win 10 user running xampp for example.
+		if ( ! function_exists( 'posix_getpgid' ) ) {
+			self::$is_getpgid_supported = false;
+			return false;
+		}
+
 		self::$is_getpgid_supported = false !== posix_getpgid( $pid );
 
 		return self::$is_getpgid_supported;
