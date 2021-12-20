@@ -18,8 +18,11 @@ before_script:
   - nvm use 10
   - yarn install
   - composer self-update --1
-  # WordPress requires older PHPUnit.
-  - curl -sSfLk -o ~/.phpenv/versions/$TRAVIS_PHP_VERSION/bin/phpunit https://phar.phpunit.de/phpunit-7.phar;
+  - if [ [ ${TRAVIS_PHP_VERSION:0:3} == "5.6" ] ]; then
+      curl -sSfLk -o ~/.phpenv/versions/$TRAVIS_PHP_VERSION/bin/phpunit https://phar.phpunit.de/phpunit-5.phar;
+    else
+      curl -sSfLk -o ~/.phpenv/versions/$TRAVIS_PHP_VERSION/bin/phpunit https://phar.phpunit.de/phpunit-7.phar;
+    fi
   - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
   - composer install -o --no-dev
 
