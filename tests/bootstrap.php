@@ -11,6 +11,12 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
+/*
+ * Changes to the WordPress Core PHP Test Suite
+ * Please see: https://make.wordpress.org/core/2021/09/27/changes-to-the-wordpress-core-php-test-suite/
+ */
+require 'vendor/yoast/phpunit-polyfills/phpunitpolyfills-autoload.php';
+
 $_tests_dir = getenv( 'WP_TESTS_DIR' );
 if ( ! $_tests_dir ) {
 	$_tests_dir = '/tmp/wordpress-tests-lib';
