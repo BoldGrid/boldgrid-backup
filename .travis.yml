@@ -10,33 +10,22 @@ notifications:
     secure: "GYRxUZH53f/OdEhgn4w908Ivuyl4h/p05kR1Buv0ovDEiSbuesWvqa3LMlXy8J67dLZpkFxToM4tlNCFdykNNHnKLHb1EqgjShIpRcgKppOA0L/87UrtjS+5OhAJAghnQr8KOuj+Ivn7zFVHS8+WBvLWKEeP7zrW/K1IqNrvUjzVcg9xSzLL/q6l/yLaAxqtCX4jXudg5HmtK7QTTQEjFSnnNW4J4hWbrKGHH43C5+9msUT7Mqo3mNjJf1tKGm+HJ5NN2wk3x/SzVEFdUJIUoFVAoG1CjOZKPqfKi7I9VStaC6sGhhiq53Sn7rbmbPJqH3ZD+Q3GaE/sqc5RxuC/34Bn1rGPs3H7RGi5DAAz7f5fHpaZWsux4b+QvLwVx7FHky44uGzPPgzN7+jJxwXh1RBd6yZq6551mHDvOdF77RPJlTJ1UukqQFjqMLNUISX9Pv6cQPealEXjFM7fOMofGyIAkJQusDczIekIZqB5W44i4XwBjKMky+47CZK9Ac41HSpJdpLs+jVa1G7N8Kb/mNSzGx4ABGbXLt+V0YphAL2+WPJ1DEYRZZVCcEzwJl/M5CFOBiUAcd9B3ZpFXoYBxyfjReJFUY7xMVozRXB7hu6RatmLhh+mYbL48572eq01wMxtfr/Klr82PwzoSX5qujWZv2ksxJTiRbPJcBk22YQ="
 
 php:
-  - 7.3
+  - 5.6
+  - 7.4
 
 before_script:
   - nvm install 10
   - nvm use 10
   - yarn install
   - composer self-update --1
-# We are NOT omitting dev scripts just yet. We need them for the phpunit tests below.
-# Composer will be ran again with the --no-dev flag to remove them.
-  - composer install -o
-# WordPress requires older PHPUnit.
-# ERROR: Looks like you're using PHPUnit 9.5.2. WordPress is currently only compatible
-# with PHPUnit up to 7.x. Please use the latest PHPUnit version from the 7.x branch.
-# Please see: https://www.reddit.com/r/PHPhelp/comments/apipqs/travis_specifying_phpunit_version/
-  - curl -sSfLk -o ~/.phpenv/versions/$TRAVIS_PHP_VERSION/bin/phpunit https://phar.phpunit.de/phpunit-7.phar;
-  - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
+  - composer install -o --no-dev
 
 script:
   - find . -name composer -prune -o -name node_modules -prune -o -name '*.php' -exec php -lf {} \; > /dev/null
-# Run phpunit.
-# Avoid adding --coverage-clover=coverage.xml for reporting. It adds a 4.92MB coverage.xml file.
   - phpunit --debug
   - yarn run php-codesniffer
 # Temp. Different results in wpbex2 vs travix.
 #  - yarn run js-lint
-# Remove our dev scripts.
-  - composer install -o --no-dev
 
 deploy:
   - provider: script
