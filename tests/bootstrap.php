@@ -41,7 +41,7 @@ $files = array(
 	'/vendor/boldgrid/library/src/Library/Theme/Themes.php',
 	'/vendor/boldgrid/library/src/Library/Theme/UpdateData.php',
 	/*
-	 * Changes to the WordPress Core PHP Test Suite
+	 * WordPress Core PHP Test Suite requires phpunit-polyfills.
 	 * Please see: https://make.wordpress.org/core/2021/09/27/changes-to-the-wordpress-core-php-test-suite/
 	 */
 	'/vendor/yoast/phpunit-polyfills/phpunitpolyfills-autoload.php',
