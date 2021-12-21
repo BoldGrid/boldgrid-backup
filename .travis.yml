@@ -25,14 +25,15 @@ before_script:
       curl -sSfLk -o ~/.phpenv/versions/$TRAVIS_PHP_VERSION/bin/phpunit https://phar.phpunit.de/phpunit-7.phar;
     fi
   - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
-  - composer install -o --no-dev
+  - composer install -o
 
 script:
   - find . -name composer -prune -o -name node_modules -prune -o -name '*.php' -exec php -lf {} \; > /dev/null
   - phpunit --debug
   - yarn run php-codesniffer
 # Temp. Different results in wpbex2 vs travix.
-#  - yarn run js-lint
+# - yarn run js-lint
+  - composer install -o --no-dev
 
 deploy:
   - provider: script
