@@ -40,6 +40,8 @@ $files = array(
 	'/vendor/boldgrid/library/src/Library/Theme/Theme.php',
 	'/vendor/boldgrid/library/src/Library/Theme/Themes.php',
 	'/vendor/boldgrid/library/src/Library/Theme/UpdateData.php',
+	// WordPress Core PHP Test Suite requires phpunit-polyfills.
+	'/vendor/yoast/phpunit-polyfills/phpunitpolyfills-autoload.php',
 	'/admin/class-boldgrid-backup-admin-premium-features.php',
 	'/admin/class-boldgrid-backup-admin-core.php',
 	'/admin/class-boldgrid-backup-admin.php',

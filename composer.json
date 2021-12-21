@@ -22,7 +22,8 @@
 		"chland/tdcron" : "dev-master"
 	},
 	"require-dev" : {
-		"lox/xhprof" : "dev-master"
+		"lox/xhprof" : "dev-master",
+		"yoast/phpunit-polyfills": "^1.0"
 	},
 	"scripts" : {
 		"post-autoload-dump" : "composer run-script post-autoload-dump -d ./vendor/boldgrid/library"
