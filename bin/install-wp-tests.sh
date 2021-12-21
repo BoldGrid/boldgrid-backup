@@ -45,8 +45,8 @@ install_test_suite() {
 	cd $WP_TESTS_DIR
 	# Temporarily set to 5.2 until this issue is resolved:
 	# https://core.trac.wordpress.org/ticket/50377
-	svn co --quiet https://develop.svn.wordpress.org/branches/5.2/tests/phpunit/includes/
-	wget -nv -O wp-tests-config.php https://develop.svn.wordpress.org/branches/5.2/wp-tests-config-sample.php
+	svn co --quiet https://develop.svn.wordpress.org/trunk/tests/phpunit/includes/
+	wget -nv -O wp-tests-config.php https://develop.svn.wordpress.org/trunk/wp-tests-config-sample.php
 	sed $ioption "s:dirname( __FILE__ ) . '/build/':'$WP_CORE_DIR':" "$WP_TESTS_DIR"/wp-tests-config.php
 	sed $ioption "s:dirname( __FILE__ ) . '/src/':'$WP_CORE_DIR':" "$WP_TESTS_DIR"/wp-tests-config.php
 	sed $ioption "s/youremptytestdbnamehere/$DB_NAME/" wp-tests-config.php
