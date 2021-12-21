@@ -513,7 +513,7 @@ class Info {
 						case class_exists( 'ZipArchive' ):
 							self::$info['method'] = 'ziparchive';
 							break;
-						case file_exists( $info['ABSPATH'] . 'wp-admin/includes/class-pclzip.php' ):
+						case file_exists( self::$info['ABSPATH'] . 'wp-admin/includes/class-pclzip.php' ):
 							self::$info['method'] = 'pclzip';
 							break;
 						case \Boldgrid_Backup_Admin_Cli::call_command( 'unzip', $success, $return_var ) || $success || 0 === $return_var:
