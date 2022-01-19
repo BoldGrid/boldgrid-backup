@@ -267,17 +267,17 @@ BoldGrid.Settings = function( $ ) {
 		if ( '1' === $siteCheck.filter( ':checked' ).val() ) {
 
 			// Site Check is enabled.
-			$( '#site-check-interval' ).removeAttr( 'disabled' );
-			$( 'input[name="site_check_logger"]' ).removeAttr( 'disabled' );
-			$( 'input[name="auto_recovery"]' ).removeAttr( 'disabled' );
-			$( '#notification-site-check' ).removeAttr( 'disabled' );
+			$( '#site-check-interval' ).prop( 'disabled', false );
+			$( 'input[name="site_check_logger"]' ).prop( 'disabled', false );
+			$( 'input[name="auto_recovery"]' ).prop( 'disabled', false );
+			$( '#notification-site-check' ).prop( 'disabled', false );
 		} else {
 
 			// Site Check is disabled.
-			$( '#site-check-interval' ).attr( 'disabled', true );
-			$( 'input[name="site_check_logger"]' ).attr( 'disabled', true );
-			$( 'input[name="auto_recovery"]' ).attr( 'disabled', true );
-			$( '#notification-site-check' ).attr( 'disabled', true );
+			$( '#site-check-interval' ).prop( 'disabled', true );
+			$( 'input[name="site_check_logger"]' ).prop( 'disabled', true );
+			$( 'input[name="auto_recovery"]' ).prop( 'disabled', true );
+			$( '#notification-site-check' ).prop( 'disabled', true );
 		}
 	};
 
@@ -322,7 +322,7 @@ BoldGrid.Settings = function( $ ) {
 		self.toggleSiteCheck();
 		$body.on( 'click', $siteCheck, self.toggleSiteCheck );
 
-		$( 'select[name="compressor"]' ).change( self.toggleCompressionInfo );
+		$( 'select[name="compressor"]' ).on( 'change', self.toggleCompressionInfo );
 	} );
 };
 

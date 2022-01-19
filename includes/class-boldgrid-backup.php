@@ -161,6 +161,7 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-restore-git.php';
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-filelist.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-filelist-analyzer.php';
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-compressor.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-compressors.php';
@@ -186,6 +187,7 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archive-log.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archive-details.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archive-fail.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archiver-cancel.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-archiver-utility.php';
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-wp-cron.php';
@@ -328,6 +330,8 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/orphan/class-cleanup.php';
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-environment.php';
+
+		require_once BOLDGRID_BACKUP_PATH . '/cli/class-info.php';
 
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
@@ -601,6 +605,8 @@ class Boldgrid_Backup {
 
 		// Tools page.
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core->tools, 'admin_enqueue_scripts' );
+
+		add_action( 'wp_ajax_boldgrid_backup_cancel', 'Boldgrid_Backup_Admin_Archiver_Cancel::wp_ajax_cancel' );
 
 		/*
 		 * Plugin notices.

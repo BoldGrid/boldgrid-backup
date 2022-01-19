@@ -343,6 +343,18 @@ class Boldgrid_Backup_Admin_Core {
 	public $archive_fail;
 
 	/**
+	 * Archive filepath.
+	 *
+	 * This is similar to $db_dump_filepath, but holds the path to the archive instead of the .sql file.
+	 * This is being added in 1.14.13 to handle the scenario of a user canceling a backup. If the
+	 * user does cancel the backup, we need to delete it (which is handled in archive-fail).
+	 *
+	 * @since 1.14.13
+	 * @var   string
+	 */
+	public $archive_filepath;
+
+	/**
 	 * Whether or not we're in the middle of archiving files.
 	 *
 	 * This is set at the beginning and end of self::archive_files().
@@ -1580,8 +1592,13 @@ class Boldgrid_Backup_Admin_Core {
 	public function archive_files( $save = false, $dryrun = false ) {
 		$this->archiving_files = true;
 
-		$this->logger->init( 'archive-' . time() . '.log' );
+		$pid = getmypid();
+
+		$log_time     = time();
+		$log_filename = 'archive-' . $log_time . '.log';
+		$this->logger->init( $log_filename );
 		$this->logger->add( 'Backup process initialized.' );
+		$this->logger->add( 'Process id: ' . $pid );
 
 		$this->utility->bump_memory_limit( '1G' );
 
@@ -1593,9 +1610,12 @@ class Boldgrid_Backup_Admin_Core {
 		 */
 		$this->is_scheduled_backup = $this->doing_cron && ! $this->pre_auto_update;
 
-		Boldgrid_Backup_Admin_In_Progress_Data::set_args(
-			[ 'status' => esc_html__( 'Initializing backup', 'boldgrid-backup' ) ]
-		);
+		Boldgrid_Backup_Admin_In_Progress_Data::init( array(
+			'status'       => esc_html__( 'Initializing backup', 'boldgrid-backup' ),
+			'log_filename' => $log_filename,
+			'pid'          => $pid,
+			'start_time'   => $log_time,
+		) );
 
 		/**
 		 * Actions to take before any archiving begins.
@@ -1620,6 +1640,7 @@ class Boldgrid_Backup_Admin_Core {
 		if ( $this->is_scheduled_backup && ! $this->remote->any_enabled() ) {
 			$error = esc_html__( 'No backup locations selected! While we could create a backup archive, you have not selected where the backup archive should be saved. Please choose a storage location in your settings for where to save this backup archive.', 'boldgrid-backup' );
 			$this->archive_fail->schedule_fail_email( $error );
+			$this->logger->add( $error );
 			return [ 'error' => $error ];
 		}
 
@@ -1630,8 +1651,9 @@ class Boldgrid_Backup_Admin_Core {
 				// Display an error notice.
 				$this->notice->functionality_fail_notice();
 			}
-
-			return [ 'error' => 'Functionality tests fail.' ];
+			$error = __( 'Functionality tests fail.', 'boldgrid-backup' );
+			$this->logger->add( $error );
+			return [ 'error' => $error ];
 		}
 
 		// Close any PHP session, so that another session can open during the backup operation.
@@ -1688,6 +1710,7 @@ class Boldgrid_Backup_Admin_Core {
 		} else {
 			$info['trigger'] = esc_html__( 'Unknown', 'boldgrid-backup' );
 		}
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'trigger', $info['trigger'] );
 
 		$info['compressor'] = $this->compressors->get();
 
@@ -1720,10 +1743,9 @@ class Boldgrid_Backup_Admin_Core {
 			$this->logger->add_separator();
 
 			if ( false === $status || ! empty( $status['error'] ) ) {
-				return [
-					'error' => ! empty( $status['error'] ) ? $status['error'] :
-						__( 'An unknown error occurred when backing up the database.', 'boldgrid-backup' ),
-				];
+				$error = ! empty( $status['error'] ) ? $status['error'] : __( 'An unknown error occurred when backing up the database.', 'boldgrid-backup' );
+				$this->logger->add( $error );
+				return array( 'error' => $error );
 			}
 		}
 
@@ -1751,6 +1773,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Check if the backup directory is writable.
 		if ( ! $this->wp_filesystem->is_writable( $backup_directory ) ) {
+			$this->logger->add( 'Backup directory is not writable.' );
 			return false;
 		}
 
@@ -1794,15 +1817,26 @@ class Boldgrid_Backup_Admin_Core {
 		$this->logger->add_memory();
 
 		// Determine the path to our zip file.
-		$info['filepath'] = $this->generate_archive_path( 'zip' );
+		$info['filepath']       = $this->generate_archive_path( 'zip' );
+		$this->archive_filepath = $info['filepath'];
 
-		Boldgrid_Backup_Admin_In_Progress_Data::set_args(
-			[
-				'total_files_todo' => count( $filelist ),
-				'filepath'         => $info['filepath'],
-				'compressor'       => $info['compressor'],
-			]
-		);
+		Boldgrid_Backup_Admin_In_Progress_Data::set_args( array(
+			'total_files_todo' => count( $filelist ),
+			'filepath'         => $info['filepath'],
+			'compressor'       => $info['compressor'],
+		) );
+
+		if ( Boldgrid_Backup_Admin_Filelist_Analyzer::is_enabled() ) {
+			$this->logger->add_separator();
+			$this->logger->add( 'Starting to analyze filelist...' );
+			$this->logger->add_memory();
+
+			$filelist_analyzer = new Boldgrid_Backup_Admin_Filelist_Analyzer( $filelist, $log_time );
+			$filelist_analyzer->run();
+
+			$this->logger->add( 'Finished analyzing filelist!' );
+			$this->logger->add_memory();
+		}
 
 		/*
 		 * Use the chosen compressor to build an archive.
@@ -1842,6 +1876,8 @@ class Boldgrid_Backup_Admin_Core {
 				break;
 		}
 
+		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'status', 'Wrapping things up...' );
+
 		$archive_exists = ! empty( $info['filepath'] ) && $this->wp_filesystem->exists( $info['filepath'] );
 		$archive_size   = ! $archive_exists ? 0 : $this->wp_filesystem->size( $info['filepath'] );
 
@@ -1860,9 +1896,6 @@ class Boldgrid_Backup_Admin_Core {
 		);
 		$this->logger->add_memory();
 
-		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'status', esc_html__( 'Wrapping things up...', 'boldgrid-backup' ) );
-		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'percentage', 100 );
-
 		$info['total_size'] += $this->filelist->get_total_size( $filelist );
 
 		if ( true === $status && ! $archive_exists ) {
@@ -1870,6 +1903,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		if ( ! empty( $status['error'] ) ) {
+			$this->logger->add( $status['error'] );
 			return $status;
 		}
 
@@ -1938,6 +1972,7 @@ class Boldgrid_Backup_Admin_Core {
 		 */
 		if ( $this->email->user_wants_notification( 'backup' ) && ! $this->is_scheduled_backup ) {
 			$this->logger->add( 'Starting sending of email...' );
+			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'status', 'Sending email...' );
 
 			$email_parts          = $this->email->post_archive_parts( $info );
 			$email_body           = $email_parts['body']['main'] . $email_parts['body']['signature'];
@@ -1964,8 +1999,6 @@ class Boldgrid_Backup_Admin_Core {
 			$this->archive->write_results_file( $info );
 		}
 
-		Boldgrid_Backup_Admin_In_Progress_Data::set_args( [ 'status' => esc_html__( 'Backup complete!', 'boldgrid-backup' ) ] );
-
 		if ( isset( $this->activity ) ) {
 			$this->activity->add( 'any_backup_created', 1, $this->rating_prompt_config );
 		}
@@ -1974,6 +2007,11 @@ class Boldgrid_Backup_Admin_Core {
 		$this->logger->add_memory();
 
 		$this->archiving_files = false;
+
+		Boldgrid_Backup_Admin_In_Progress_Data::set_args( array(
+			'status'  => esc_html__( 'Backup complete!', 'boldgrid-backup' ),
+			'success' => true,
+		) );
 
 		// Return the array of archive information.
 		return $info;
@@ -2652,14 +2690,15 @@ class Boldgrid_Backup_Admin_Core {
 
 		$archive_info = $archiver->get_info();
 
-		// If there were any errors encountered during the backup, save them to the In Progress data.
+		/*
+		 * If there were any errors encountered during the backup, save them to the In Progress data.
+		 *
+		 * A "process error" is when the archive_files() method successfully returns info, and it includes
+		 * an error.
+		 */
 		if ( ! empty( $archive_info['error'] ) ) {
-			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'error', $archive_info['error'] );
-			$this->notice->add_user_notice(
-				'<p>' . $archive_info['error'] . '</p>',
-				'notice notice-error is-dismissible',
-				'Backup Failed'
-			);
+			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'process_error', $archive_info['error'] );
+			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'success', false );
 		}
 
 		if ( $this->is_archiving_update_protection ) {
@@ -2687,12 +2726,19 @@ class Boldgrid_Backup_Admin_Core {
 	 * @see Boldgrid_Backup_File::send_file()
 	 */
 	public function download_archive_file_callback() {
+		$log = new Boldgrid_Backup_Admin_Log( $this );
+		$log->init( 'backup-download.log' );
+		$log->add_separator();
+		$log->add( 'Attempting ajax download...' );
+
 		// Verify nonce, or die.
 		check_ajax_referer( 'archive_auth', 'wpnonce' );
 
 		// Check user capabilities.
 		if ( ! current_user_can( 'update_plugins' ) ) {
-			esc_html_e( 'Security violation (not authorized).', 'boldgrid-backup' );
+			$error = __( 'Security violation (not authorized).', 'boldgrid-backup' );
+			echo esc_html( $error );
+			$log->add( $error );
 			wp_die();
 		}
 
@@ -2700,7 +2746,9 @@ class Boldgrid_Backup_Admin_Core {
 		if ( isset( $_POST['download_key'] ) && is_numeric( $_POST['download_key'] ) ) {
 			$download_key = (int) $_POST['download_key'];
 		} else {
-			esc_html_e( 'INVALID DOWNLOAD KEY', 'boldgrid-backup' );
+			$error = __( 'INVALID DOWNLOAD KEY', 'boldgrid-backup' );
+			echo esc_html( $error );
+			$log->add( $error );
 			wp_die();
 		}
 
@@ -2708,7 +2756,9 @@ class Boldgrid_Backup_Admin_Core {
 		if ( ! empty( $_POST['download_filename'] ) ) {
 			$download_filename = sanitize_file_name( $_POST['download_filename'] );
 		} else {
-			esc_html_e( 'INVALID DOWNLOAD FILENAME', 'boldgrid-backup' );
+			$error = __( 'INVALID DOWNLOAD FILENAME', 'boldgrid-backup' );
+			echo esc_html( $error );
+			$log->add( $error );
 			wp_die();
 		}
 
@@ -2717,7 +2767,9 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Check WP_Filesystem method; ensure it is "direct".
 		if ( 'direct' !== $access_type ) {
-			esc_html_e( 'WP_Filesystem method is not "direct"', 'boldgrid-backup' );
+			$error = __( 'WP_Filesystem method is not "direct"', 'boldgrid-backup' );
+			echo esc_html( $error );
+			$log->add( $error );
 			wp_die();
 		}
 
@@ -2726,7 +2778,9 @@ class Boldgrid_Backup_Admin_Core {
 
 		// If no files were found, then abort.
 		if ( empty( $archives ) ) {
-			esc_html_e( 'NO BACKUP ARCHIVES FOUND', 'boldgrid-backup' );
+			$error = __( 'NO BACKUP ARCHIVES FOUND', 'boldgrid-backup' );
+			echo esc_html( $error );
+			$log->add( $error );
 			wp_die();
 		}
 
@@ -2738,7 +2792,9 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Verify filename.
 		if ( $download_filename !== $filename ) {
-			esc_html_e( 'FILE NOT FOUND', 'boldgrid-backup' );
+			$error = __( 'FILE NOT FOUND', 'boldgrid-backup' );
+			echo esc_html( $error );
+			$log->add( $error );
 			wp_die();
 		}
 
@@ -2751,6 +2807,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Send the file and die nicely.
+		$log->add( 'Request validated successfully. Now on to sending the file...' );
 		Boldgrid_Backup_File::send_file( $filepath, $filesize );
 	}
 

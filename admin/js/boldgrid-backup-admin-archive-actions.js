@@ -226,7 +226,7 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 			.always( function() {
 				$downloadLink.show();
 				$spinner.removeClass( 'inline' );
-				$this.removeAttr( 'disabled' );
+				$this.prop( 'disabled', false );
 			} );
 	};
 
@@ -246,7 +246,7 @@ BOLDGRID.BACKUP.ACTIONS = function( $ ) {
 
 		setTimeout( function() {
 			$this.html( oldHtml );
-			$this.removeAttr( 'disabled' );
+			$this.prop( 'disabled', false );
 		}, 3000 );
 	};
 

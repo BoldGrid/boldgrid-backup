@@ -697,7 +697,7 @@ class Boldgrid_Backup_Admin_Archive {
 	public function write_results_file( $info ) {
 		$success          = false;
 		$archive_filepath = ! empty( $info['filepath'] ) ? $info['filepath'] : null;
-		$results_filepath = BOLDGRID_BACKUP_PATH . '/cron/restore-info.json';
+		$results_filepath = \Boldgrid\Backup\Cli\Info::get_results_filepath();
 		$is_dir_writable  = $this->core->wp_filesystem->is_writable( dirname( $results_filepath ) );
 
 		if ( $archive_filepath && $is_dir_writable ) {

@@ -107,8 +107,7 @@ class Boldgrid_Backup_Admin_Log {
 		 * WP_Filesystem does not have a way to append to a file, so we're rewriting the file each
 		 * time. Best route would be to fopen the file and append. This may need to be revisited.
 		 */
-		$file_content  = $this->core->wp_filesystem->get_contents( $this->filepath );
-		$file_content .= PHP_EOL . $message;
+		$file_content = $this->get_contents() . PHP_EOL . $message;
 		$this->core->wp_filesystem->put_contents( $this->filepath, $file_content );
 	}
 
@@ -124,6 +123,9 @@ class Boldgrid_Backup_Admin_Log {
 
 		$version = defined( 'BOLDGRID_BACKUP_VERSION' ) ? BOLDGRID_BACKUP_VERSION : 'Unknown';
 		$this->add( 'Total Upkeep version: ' . $version );
+
+		$pgid_support = Boldgrid_Backup_Admin_Test::is_getpgid_supported();
+		$this->add( 'getpgid support: ' . ( $pgid_support ? 'Available' : 'Unavailable' ) );
 	}
 
 	/**
@@ -206,6 +208,17 @@ class Boldgrid_Backup_Admin_Log {
 	}
 
 	/**
+	 * Return the contents of the log file.
+	 *
+	 * @since 1.14.13
+	 *
+	 * @return string
+	 */
+	public function get_contents() {
+		return $this->core->wp_filesystem->get_contents( $this->filepath );
+	}
+
+	/**
 	 * Init.
 	 *
 	 * @since 1.12.5
@@ -240,7 +253,7 @@ class Boldgrid_Backup_Admin_Log {
 	/**
 	 * Add signal handlers.
 	 *
-	 * The one signal we can't handle is SIGFILL (kill -9).
+	 * The one signal we can't handle is SIGKILL (kill -9).
 	 *
 	 * @since 1.12.6
 	 */
@@ -280,6 +293,8 @@ class Boldgrid_Backup_Admin_Log {
 			 * @link https://stackoverflow.com/questions/780853/what-is-in-apache-2-a-caught-sigwinch-error
 			 */
 			SIGWINCH,
+			// The user requested to cancel (kill) the backup.
+			SIGUSR1,
 		];
 
 		foreach ( $signals as $signal ) {

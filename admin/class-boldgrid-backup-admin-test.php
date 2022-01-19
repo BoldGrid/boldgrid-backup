@@ -76,6 +76,15 @@ class Boldgrid_Backup_Admin_Test {
 	private $is_crontab_available = null;
 
 	/**
+	 * A cached value of whether or not posix_getpgid() is supported.
+	 *
+	 * @since 1.14.13
+	 * @access private
+	 * @var bool
+	 */
+	private static $is_getpgid_supported;
+
+	/**
 	 * Is WP-CRON enabled?
 	 *
 	 * @since 1.0
@@ -495,6 +504,40 @@ class Boldgrid_Backup_Admin_Test {
 	}
 
 	/**
+	 * Determine whether or not we can get our group process id.
+	 *
+	 * This is often used to determine if a backup process is still running.
+	 *
+	 * @since 1.14.13
+	 *
+	 * @link https://www.win.tue.nl/~aeb/linux/lk/lk-10.html
+	 *
+	 * @return bool
+	 */
+	public static function is_getpgid_supported() {
+		if ( ! is_null( self::$is_getpgid_supported ) ) {
+			return self::$is_getpgid_supported;
+		}
+
+		// Ensure we can get our process id.
+		$pid = getmypid();
+		if ( false === $pid ) {
+			self::$is_getpgid_supported = false;
+			return false;
+		}
+
+		// posix_getpgid() may not be available in all environments. Win 10 user running xampp for example.
+		if ( ! function_exists( 'posix_getpgid' ) ) {
+			self::$is_getpgid_supported = false;
+			return false;
+		}
+
+		self::$is_getpgid_supported = false !== posix_getpgid( $pid );
+
+		return self::$is_getpgid_supported;
+	}
+
+	/**
 	 * Determine if this is a plesk environment.
 	 *
 	 * @since 1.5.1
@@ -554,8 +597,23 @@ class Boldgrid_Backup_Admin_Test {
 
 		$available_compressors = $this->core->config->get_available_compressors();
 		$compressor            = $this->core->compressors->get();
+		$execution_functions   = Boldgrid_Backup_Admin_Cli::get_execution_functions();
 
-		if ( ! self::is_filesystem_supported() ) {
+		if ( empty( $execution_functions ) ) {
+			/*
+			 * The first test is to determine if we have any execution functions available. Some of
+			 * the other tests may require them. Before this test was added, a variety of warnings would
+			 * appear due to trying to run commands such as the following:
+			 *
+			 * # echo "This file is safe to delete." > /home/user/boldgrid_backup/safe-to-delete.txt 2>/dev/null
+			 * # crontab -l 2>/dev/null
+			 * # crontab /home/user/boldgrid_backup/crontab.1607956270.549.tmp 2>/dev/null
+			 *
+			 * Technically, we may be able to be fully functional without being able to execute commands,
+			 * but for the moment, let's say we're not funtional. Only two reports of this ever.
+			 */
+			$this->is_functional = false;
+		} elseif ( ! self::is_filesystem_supported() ) {
 			$this->is_functional = false;
 		} elseif ( ! $this->get_is_abspath_writable() ) {
 			$this->is_functional = false;

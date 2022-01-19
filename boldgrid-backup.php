@@ -16,7 +16,7 @@
  *          Plugin Name: Total Upkeep
  *          Plugin URI: https://www.boldgrid.com/boldgrid-backup/
  *          Description: Automated backups, remote backup to Amazon S3 and Google Drive, stop website crashes before they happen and more. Total Upkeep is the backup solution you need.
- *          Version: 1.14.4
+ *          Version: 1.14.13
  *          Author: BoldGrid
  *          Author URI: https://www.boldgrid.com/
  *          License: GPL-2.0+
@@ -148,4 +148,16 @@ if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) || defined( 'WP_CLI
 		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup.php';
 		run_boldgrid_backup();
 	}
+}
+
+/*
+ * Fix added as of 1.14.10.
+ *
+ * @todo This fix can be removed in the future.
+ */
+$oldname = BOLDGRID_BACKUP_PATH . '/cron/restore-info.json';
+if ( file_exists( $oldname ) ) {
+	require_once 'cli/class-info.php';
+	$newname = BOLDGRID_BACKUP_PATH . '/cron/' . basename( \Boldgrid\Backup\Cli\Info::get_results_filepath() );
+	rename( $oldname, $newname );
 }
