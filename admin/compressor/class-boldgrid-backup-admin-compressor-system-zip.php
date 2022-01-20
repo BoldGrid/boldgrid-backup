@@ -369,7 +369,7 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 
 			// Check for any errors.
 			$stderr = stream_get_contents( $pipes[2] );
-			fclose( $pipes[2] );
+			fclose( $pipes[2] ); //phpcs:ignore WordPress.WP.AlternativeFunctions
 			if ( ! empty( $stderr ) ) {
 				$this->error = $stderr;
 				$this->core->logger->add( 'Error zipping files with system zip: ' . $stderr );
