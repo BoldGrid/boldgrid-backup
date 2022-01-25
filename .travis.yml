@@ -50,7 +50,7 @@ matrix:
 
 script:
   - find . -name composer -prune -o -name node_modules -prune -o -name '*.php' -exec php -lf {} \; > /dev/null
-  - phpunit --debug --coverage-clover=coverage.xml
+  - vendor/phpunit/phpunit/phpunit --debug
   - yarn run php-codesniffer
 # Temp. Different results in wpbex2 vs travix.
 #  - yarn run js-lint
