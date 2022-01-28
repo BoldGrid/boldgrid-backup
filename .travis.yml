@@ -34,7 +34,7 @@ matrix:
         - nvm use 10
         - yarn install
         - composer self-update --1
-        # Lock file has phpunit 7. Remove it and install phpunit 5 for php 5.6.
+        # Lock file has phpunit 7. Remove it and install phpunit for this environment.
         - composer remove --dev phpunit/phpunit
         - composer require --dev phpunit/phpunit
         - composer install -o
@@ -45,7 +45,7 @@ matrix:
         - nvm use 10
         - yarn install
         - composer self-update --1
-        # Lock file has phpunit 7. Remove it and install latest phpunit for php 8.
+        # Lock file has phpunit 7. Remove it and install phpunit for this environment.
         - composer remove --dev phpunit/phpunit
         - composer require --dev phpunit/phpunit
         - composer install -o
