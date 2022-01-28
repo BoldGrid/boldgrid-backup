@@ -54,7 +54,9 @@ matrix:
 script:
   - find . -name composer -prune -o -name node_modules -prune -o -name '*.php' -exec php -lf {} \; > /dev/null
   - vendor/phpunit/phpunit/phpunit --debug
-  - yarn run php-codesniffer
+  - composer require --dev squizlabs/php_codesniffer
+  - vendor/bin/phpcs -p -s --report=emacs --report-width=220 --standard=WordPress-Docs --standard=WordPress-Extra --ignore=*/node_modules/*,*/vendor/* --extensions=php .
+  # - yarn run php-codesniffer
 # Temp. Different results in wpbex2 vs travix.
 #  - yarn run js-lint
   # Composer install was run above in the matrix, and included dev scripts. Run it again with --no-dev
