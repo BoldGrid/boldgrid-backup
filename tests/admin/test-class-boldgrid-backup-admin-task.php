@@ -31,7 +31,7 @@ class Test_Boldgrid_Backup_Admin_Task extends WP_UnitTestCase {
 	 *
 	 * @since SINCEVERSION
 	 */
-	public function setUp() {
+	public function set_up() {
 		$this->task = new Boldgrid_Backup_Admin_Task();
 		$this->task->init( [ 'type' => 'backup' ] );
 		$this->task->update();

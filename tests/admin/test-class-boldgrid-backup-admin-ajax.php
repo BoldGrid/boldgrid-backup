@@ -27,7 +27,7 @@ class Test_Boldgrid_Backup_Admin_Ajax extends WP_Ajax_UnitTestCase {
 	 *
 	 * @since 1.10.7
 	 */
-	public function setUp() {
+	public function set_up() {
 		parent::setup();
 
 		require_once dirname( dirname( __DIR__ ) ) . '/includes/class-boldgrid-backup.php';

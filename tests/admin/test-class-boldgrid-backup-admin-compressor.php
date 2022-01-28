@@ -29,7 +29,7 @@ class Test_Boldgrid_Backup_Admin_Compressor extends WP_UnitTestCase {
 	 *
 	 * @since 1.13.0
 	 */
-	public function setUp() {
+	public function set_up() {
 		if ( ! defined( 'BOLDGRID_BACKUP_VERSION' ) ) {
 			define( 'BOLDGRID_BACKUP_VERSION', '1.12.7' );
 		}

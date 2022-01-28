@@ -232,7 +232,7 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 	 *
 	 * @since xxx
 	 */
-	public function setUp() {
+	public function set_up() {
 		global $wpdb;
 
 		if ( ! defined( 'BOLDGRID_BACKUP_VERSION' ) ) {
