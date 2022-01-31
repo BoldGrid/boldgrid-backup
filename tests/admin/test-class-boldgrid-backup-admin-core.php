@@ -38,7 +38,7 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 	 * @param int    $min_file_size The minimum file size of all files in the directory.
 	 * @param int    $min_dir_count  The minimum number of folders that need to be in the directory.
 	 */
-	public function assertDirNotEmpty( $filepath, $dir = '.', $min_file_count, $min_file_size, $min_dir_count ) {
+	public function assertDirNotEmpty( $filepath, $dir, $min_file_count, $min_file_size, $min_dir_count ) {
 		$abspath    = $this->zip->browse( $filepath, $dir );
 		$file_count = 0;
 		$file_size  = 0;
