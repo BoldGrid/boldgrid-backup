@@ -71,6 +71,12 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 	public function test_get_lines() {
 		$db_import = new \Boldgrid_Backup_Admin_Db_Import();
 		$file      = __FILE__;
+
+		/*
+		 * The get_lines() method simply returns the lines of a file in an array. If we pass it this
+		 * file, we should be get an array. If we pass it 'x', we should get back false because it is
+		 * expecting a filepath, not a string.
+		 */
 		$this->assertTrue( is_array( $db_import->get_lines( $file ) ) );
 		$this->assertFalse( $db_import->get_lines( 'x' ) );
 	}
@@ -103,14 +109,8 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 	public function test_import_lines() {
 		$db_import = new \Boldgrid_Backup_Admin_Db_Import();
 
+		// @todo This is a basic test and should be expanded upon to thoroughly test import_lines().
 		$this->assertFalse( $db_import->import_lines( array() ) );
-
-		$mock_db_import = $this->getMockBuilder( \Boldgrid_Backup_Admin_Db_Import::class )
-			->setMethods( array( 'exec_import' ) )
-			->getMock();
-		$mock_db_import->method( 'exec_import' )
-			->willReturn( false );
-		$this->assertFalse( $db_import->import_lines( $this->original_view_lines ) );
 	}
 	/**
 	 * Test Import String.
