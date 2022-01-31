@@ -56,8 +56,7 @@ matrix:
 script:
   - find . -name composer -prune -o -name node_modules -prune -o -name '*.php' -exec php -lf {} \; > /dev/null
   - vendor/phpunit/phpunit/phpunit --debug
-# Temp. Different results in wpbex2 vs travix.
-#  - yarn run js-lint
+  - yarn run js-lint
   # Remove dev scripts.
   - composer install -o --no-dev
 
