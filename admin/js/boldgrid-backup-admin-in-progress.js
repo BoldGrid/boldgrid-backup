@@ -191,12 +191,13 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 		 * @since 1.14.13
 		 */
 		onClickCancel: function() {
+
 			/*
-			* Make the ajax call to cancel the backup.
-			*
-			* No success, error, or complete callback is passed to the ajax call. Status updates will
-			* be handled naturally by the in progress system.
-			*/
+			 * Make the ajax call to cancel the backup.
+			 *
+			 * No success, error, or complete callback is passed to the ajax call. Status updates will
+			 * be handled naturally by the in progress system.
+			 */
 			$.ajax( {
 				url: ajaxurl,
 				data: {
@@ -206,8 +207,9 @@ BOLDGRID.BACKUP = BOLDGRID.BACKUP || {};
 				type: 'post'
 			} );
 
-			$( '#bgbkup_progress_actions' ).html( wp.i18n.__( 'Canceling backup', 'boldgrid-backup' ) +
-				' <span class="spinner inline"></span>' );
+			$( '#bgbkup_progress_actions' ).html(
+				wp.i18n.__( 'Canceling backup', 'boldgrid-backup' ) + ' <span class="spinner inline"></span>'
+			);
 		},
 
 		/**
