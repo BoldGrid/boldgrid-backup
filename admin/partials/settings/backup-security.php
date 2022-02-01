@@ -69,7 +69,7 @@ if ( ! $is_premium ) {
 			<tr><td colspan="2">
 				<div class="bg-box-bottom premium wp-clearfix">
 	<?php
-	$get_premium_url = 'https://www.boldgrid.com/update-backup?source=bgbkup-settings-security';
+	$get_premium_url = $this->core->go_pro->get_premium_url( 'bgbkup-settings-security' );
 	printf(
 		// translators: 1: Get premium button/link, 2: Opening <a> tag, 3: Closing </a> tag.
 		esc_html__(
