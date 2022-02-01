@@ -52,6 +52,8 @@ if ( ! defined( 'BOLDGRID_BACKUP_TITLE' ) ) {
 
 require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-utility.php';
 
+Catch if a syntax error is caught.
+
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-boldgrid-backup-activator.php
