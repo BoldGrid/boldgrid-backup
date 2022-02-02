@@ -123,6 +123,15 @@ $files = array(
 	// Vendor.
 	'/vendor/phpseclib/phpseclib/phpseclib/Net/SSH2.php',
 	'/vendor/ifsnop/mysqldump-php/src/Ifsnop/Mysqldump/Mysqldump.php',
+	/*
+	 * Yoast/PHPUnit-Polyfills, required for running the WP test suite.
+	 * Please see https://make.wordpress.org/core/2021/09/27/changes-to-the-wordpress-core-php-test-suite/
+	 *
+	 * The WP Core test suite can now run on all PHPUnit versions between PHPUnit 5.7.21 up to the latest
+	 * release (at the time of writing: PHPUnit 9.5.10), which allows for running the test suite against
+	 * all supported PHP versions using the most appropriate PHPUnit version for that PHP version.
+	 */
+	'/vendor/yoast/phpunit-polyfills/phpunitpolyfills-autoload.php',
 	// Cli.
 	'/cli/class-info.php',
 	'/cli/class-log.php',

@@ -79,7 +79,7 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 	 *
 	 * @since 1.14.0
 	 */
-	public function setUp() {
+	public function set_up() {
 		$this->default_test_settings = array(
 			'auto_update' => array(
 				'timely-updates-enabled' => '0',

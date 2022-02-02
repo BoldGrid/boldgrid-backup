@@ -23,7 +23,7 @@ class Test_Boldgrid_Backup_Admin_Test extends WP_UnitTestCase {
 	 *
 	 * @since 1.6.2
 	 */
-	public function setUp() {
+	public function set_up() {
 		$this->core = new Boldgrid_Backup_Admin_Core();
 	}
 

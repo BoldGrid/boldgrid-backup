@@ -42,7 +42,7 @@ class Test_Boldgrid_Backup_Cli_Info extends WP_UnitTestCase {
 	 *
 	 * @since 1.9.0
 	 */
-	public function setUp() {
+	public function set_up() {
 		$this->original_argv = $_SERVER['argv'];
 		$this->change_server_argv();
 		$this->info = new \Boldgrid\Backup\Cli\Info();

@@ -159,37 +159,6 @@ class Site_Check {
 	}
 
 	/**
-	 * Check if a port is open.
-	 *
-	 * @since 1.10.0
-	 * @static
-	 *
-	 * @link https://www.php.net/manual/en/function.fsockopen.php
-	 *
-	 * @param  int    $port    Port number (1-65535).
-	 * @param  string $host    Optional hostname; defaults to "localhost".
-	 * @param  int    $timeout Connect timeout, in seconds; defaults to 5.
-	 * @param  int    $errno   If provided, holds the system level error number that occurred in the system-level connect() call.
-	 * @param  string $errstr  The error message as a string.
-	 * @return bool
-	 */
-	public static function check_port( $port, $host = 'localhost', $timeout = 5, &$errno, &$errstr ) {
-		// Check for valid port reange.
-		if ( 0 > $port || 65535 < $port ) {
-			return false;
-		}
-
-		$res = @fsockopen( $host, $port, $errno, $errstr, $timeout ); // phpcs:ignore Generic.PHP.NoSilencedErrors
-
-		if ( is_resource( $res ) ) {
-			fclose( $res );
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
 	 * Perform a site check.
 	 *
 	 * @since 1.10.0

@@ -21,6 +21,19 @@
  */
 class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_Compressor {
 	/**
+	 * An error message.
+	 *
+	 * If we encounter an error while zipping, the error may be placed here - key phrase "may be placed
+	 * here". At the introduction of this class property, it is being used in only one place. The entire
+	 * class was not checked and tested to ensure all methods add any errors they run into here.
+	 *
+	 * @since SINCEVERSION
+	 * @access private
+	 * @var string
+	 */
+	private $error;
+
+	/**
 	 * An array of files that should be archived.
 	 *
 	 * @since 1.13.0
@@ -125,6 +138,8 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	 *     @type bool   save       1
 	 *     @type int    total_size 0
 	 * }
+	 * @return mixed True on success, an array on failure. This approach has been taken to follow the
+	 *               standards already set by the pcl-zip and php-zip classes.
 	 */
 	public function archive_files( $filelist, &$info ) {
 		if ( $info['dryrun'] ) {
@@ -143,8 +158,9 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 
 		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'step', 3 );
 
-		$this->zip();
+		$zip_success = $this->zip();
 
+		// @todo Simliar to the zip call above which returns a success status, so should zip_sql.
 		$this->zip_sql();
 
 		Boldgrid_Backup_Admin_In_Progress_Data::delete_arg( 'step' );
@@ -152,7 +168,9 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 		// Actions to take when we're all done / cleanup.
 		$this->core->wp_filesystem->delete( $this->filelist_path );
 
-		return true;
+		return true === $zip_success ? true : array(
+			'error' => $this->error,
+		);
 	}
 
 	/**
@@ -207,6 +225,9 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	 * Run the command to actually zip the files.
 	 *
 	 * @since 1.13.0
+	 *
+	 * @return bool True on success. Do note that $this->close() calls $this->zip_proc(), which will
+	 *                               store any error messages in $this->error.
 	 */
 	private function zip() {
 		$this->core->logger->add( 'Starting to close the zip file.' );
@@ -214,12 +235,14 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 
 		$this->temp_folder->create();
 
-		$this->close();
+		$success = $this->close();
 
 		$this->temp_folder->delete();
 
 		$this->core->logger->add( 'Finished closing the zip file.' );
 		$this->core->logger->add_memory();
+
+		return $success;
 	}
 
 	/**
@@ -264,13 +287,21 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 
 		foreach ( $filelist_chunks as $filelist_chunk ) {
 			$chunk_start_time = microtime( true );
-			$add_file_string  = implode( ' ', $filelist_chunk );
-			$this->zip_proc( $filelist_chunk );
+
+			$success = $this->zip_proc( $filelist_chunk );
+			if ( ! $success ) {
+				return false;
+			}
+
+			// Process some stats.
 			$chunks_closed++;
 			$percent_complete = round( $chunks_closed / $total_chunks, 2 );
 			$chunk_end_time   = microtime( true );
 			$close_duration   = $chunk_end_time - $chunk_start_time;
+
 			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'percent_closed', $percent_complete );
+
+			// Add messages to the log.
 			$this->core->logger->add(
 				'Chunk closed in ' .
 				$close_duration .
@@ -279,6 +310,8 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 			);
 			$this->core->logger->add_memory();
 		}
+
+		return true;
 	}
 
 	/**
@@ -299,12 +332,19 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	 * @since 1.14.0
 	 *
 	 * @param array $filelist_chunk Array of Files to be added.
+	 * @return bool True on success.
 	 */
 	private function zip_proc( $filelist_chunk ) {
+		$has_error = false;
+
 		$descriptorspec = array(
 			0 => array( 'pipe', 'r' ),  // stdin is a pipe that the child will read from.
 			1 => array( 'pipe', 'w' ),  // stdout is a pipe that the child will write to.
-			2 => array( 'file', '/tmp/error-output.txt', 'a' ), // stderr is a file to write to.
+			/**
+			 * Initially we sent errors to /tmp/error-output.txt. This caused warnings when the file
+			 * was not writable. For any error messages, see $pipes[2] further down this method.
+			 */
+			2 => array( 'pipe', 'w' ),
 		);
 
 		$cwd = ABSPATH;
@@ -319,11 +359,6 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 		);
 
 		if ( is_resource( $process ) ) {
-			/* $pipes now looks like this:
-			 * 0 => writeable handle connected to child stdin
-			 * 1 => readable handle connected to child stdout
-			 * Any error output will be appended to /tmp/error-output.txt
-			 */
 			foreach ( $filelist_chunk as $file ) {
 				fwrite( $pipes[0], $file . "\n" ); //phpcs:ignore WordPress.WP.AlternativeFunctions
 			}
@@ -332,10 +367,23 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 
 			fclose( $pipes[1] ); //phpcs:ignore WordPress.WP.AlternativeFunctions
 
+			// Check for any errors.
+			$stderr = stream_get_contents( $pipes[2] );
+			fclose( $pipes[2] ); //phpcs:ignore WordPress.WP.AlternativeFunctions
+			if ( ! empty( $stderr ) ) {
+				$this->error = $stderr;
+				$this->core->logger->add( 'Error zipping files with system zip: ' . $stderr );
+				$has_error = true;
+			}
+
 			// It is important that you close any pipes before calling.
 			// proc_close in order to avoid a deadlock.
 			proc_close( $process );
+		} else {
+			$has_error = true;
 		}
+
+		return ! $has_error;
 	}
 
 	/**
