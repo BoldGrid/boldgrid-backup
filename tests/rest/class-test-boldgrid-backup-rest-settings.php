@@ -32,8 +32,8 @@ class Test_Boldgrid_Backup_Rest_Settings extends Boldgrid_Backup_Rest_Case {
 	 *
 	 * @since SINCEVERSION
 	 */
-	public function tearDown() {
-		parent::tearDown();
+	public function tear_down() {
+		parent::tear_down();
 	}
 
 	/**

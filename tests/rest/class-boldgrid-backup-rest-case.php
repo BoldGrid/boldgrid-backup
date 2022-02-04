@@ -76,7 +76,7 @@ class Boldgrid_Backup_Rest_Case extends WP_UnitTestCase {
 
 		// Initiate the REST API.
 		global $wp_rest_server;
-		$this->server = $wp_rest_server = new \WP_REST_Server;
+		$this->server = $wp_rest_server = new \WP_REST_Server();
 		do_action( 'rest_api_init' );
 
 		$this->editor_id = $this->factory->user->create( array(
@@ -95,7 +95,7 @@ class Boldgrid_Backup_Rest_Case extends WP_UnitTestCase {
 	 *
 	 * @since SINCEVERSION
 	 */
-	public function tearDown() {
+	public function tear_down() {
 		wp_delete_user( $this->editor_id );
 		wp_delete_user( $this->admin_id );
 	}

@@ -32,8 +32,8 @@ class Test_Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Case {
 	 *
 	 * @since SINCEVERSION
 	 */
-	public function tearDown() {
-		parent::tearDown();
+	public function tear_down() {
+		parent::tear_down();
 	}
 
 	/**
@@ -56,8 +56,8 @@ class Test_Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Case {
 		wp_set_current_user( $this->editor_id );
 
 		$request  = new WP_REST_Request( 'POST', '/bgbkup/v1/archives' );
-    	$response = $this->server->dispatch( $request );
-    	$data     = $response->get_data();
+		$response = $this->server->dispatch( $request );
+		$data     = $response->get_data();
 
 		$this->assertTrue( 403 === $data['data']['status'] );
 
@@ -66,20 +66,20 @@ class Test_Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Case {
 		 *
 		 * Our API call return will be similar to the following:
 		 * Array (
-		 * 		[id] => 1643907103-e7c738
-		 * 		[type] => backup
-		 * 		[created_at] => 2022-02-03T16:51:43+00:00
-		 * 		[started_at] =>
-		 * 		[completed_at] =>
-		 * 		[status] => pending
-		 * 		[data] => Array ( )
-		 * 	)
+		 *      [id] => 1643907103-e7c738
+		 *      [type] => backup
+		 *      [created_at] => 2022-02-03T16:51:43+00:00
+		 *      [started_at] =>
+		 *      [completed_at] =>
+		 *      [status] => pending
+		 *      [data] => Array ( )
+		 * )
 		 */
 		wp_set_current_user( $this->admin_id );
 
 		$request  = new WP_REST_Request( 'POST', '/bgbkup/v1/archives' );
-    	$response = $this->server->dispatch( $request );
-    	$data     = $response->get_data();
+		$response = $this->server->dispatch( $request );
+		$data     = $response->get_data();
 
 		$this->assertTrue( 'backup' === $data['type'] );
 
@@ -113,8 +113,8 @@ class Test_Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Case {
 		wp_set_current_user( $this->editor_id );
 
 		$request  = new WP_REST_Request( 'POST', '/bgbkup/v1/archives' );
-    	$response = $this->server->dispatch( $request );
-    	$data     = $response->get_data();
+		$response = $this->server->dispatch( $request );
+		$data     = $response->get_data();
 
 		$this->assertTrue( 403 === $data['data']['status'] );
 
@@ -152,7 +152,7 @@ class Test_Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Case {
 
 		$backup_id = 1;
 
-		$request  = new WP_REST_Request( 'PUT', '/bgbkup/v1/archives' );
+		$request = new WP_REST_Request( 'PUT', '/bgbkup/v1/archives' );
 		$request->set_param( 'id', $backup_id );
     	$response = $this->server->dispatch( $request );
     	$data     = $response->get_data();
