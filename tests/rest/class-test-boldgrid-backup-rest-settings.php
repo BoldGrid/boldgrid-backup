@@ -65,7 +65,7 @@ class Test_Boldgrid_Backup_Rest_Settings extends Boldgrid_Backup_Rest_Case {
 
 		wp_set_current_user( $this->admin_id );
 
-		$request  = new WP_REST_Request( 'POST', '/bgbkup/v1/settings' );
+		$request = new WP_REST_Request( 'POST', '/bgbkup/v1/settings' );
 		$request->set_body_params( array(
 			'settings' => array(
 				'notification_email' => $example_email,
