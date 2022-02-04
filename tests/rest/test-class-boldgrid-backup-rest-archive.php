@@ -90,6 +90,17 @@ class Test_Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Case {
 		$this->assertTrue( $data['id'] === $task->get_id() );
 
 		// @todo Find a way to ensure our backup finishes.
+
+		// While we're here, let's test the jobs REST calls.
+		$request  = new WP_REST_Request( 'GET', '/bgbkup/v1/jobs/' . $data['id'] );
+		$request->set_param( 'id', $data['id'] );
+		$response = $this->server->dispatch( $request );
+		$data     = $response->get_data();
+
+		// A basic test to ensure the jobs REST call is working. @todo expand upon.
+		$this->assertTrue( 'backup' === $data['type'] );
+		$this->assertTrue( 'pending' === $data['status'] );
+		$this->assertTrue( ! empty( $data['id'] ) );
 	}
 
 	/**
