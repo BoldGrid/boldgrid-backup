@@ -98,6 +98,7 @@ $files = array(
 	'/admin/class-boldgrid-backup-admin-log.php',
 	'/admin/class-boldgrid-backup-admin-log-page.php',
 	'/admin/class-boldgrid-backup-admin-environment.php',
+	'/admin/class-boldgrid-backup-admin-nopriv.php',
 	// Tasks.
 	'/admin/class-boldgrid-backup-admin-task.php',
 	'/admin/class-boldgrid-backup-admin-task-helper.php',
@@ -162,3 +163,6 @@ function phpunit_error_log( $var ) {
 }
 
 require $_tests_dir . '/includes/bootstrap.php';
+
+// Our extendable Rest class. It extends WP_UnitTestCase and must come after the boostrap above.
+require_once BOLDGRID_BACKUP_PATH . '/tests/rest/class-boldgrid-backup-rest-case.php';
