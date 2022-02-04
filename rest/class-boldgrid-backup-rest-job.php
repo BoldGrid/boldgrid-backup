@@ -128,7 +128,7 @@ class Boldgrid_Backup_Rest_Job extends Boldgrid_Backup_Rest_Controller {
 	public function get_item( $request ) {
 		$id = $request->get_param( 'id' );
 
-		$task = new Boldgrid_Backup_Admin_Task();
+		$task  = new Boldgrid_Backup_Admin_Task();
 		$found = $task->init_by_id( $id );
 		$task->date_format = 'c';
 

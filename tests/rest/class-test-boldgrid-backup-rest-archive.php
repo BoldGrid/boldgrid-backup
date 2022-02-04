@@ -19,24 +19,6 @@
  */
 class Test_Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Case {
 	/**
-	 * Setup.
-	 *
-	 * @since SINCEVERSION
-	 */
-	public function set_up() {
-		parent::set_up();
-	}
-
-	/**
-	 * Tear down.
-	 *
-	 * @since SINCEVERSION
-	 */
-	public function tear_down() {
-		parent::tear_down();
-	}
-
-	/**
 	 * Test creating a backup.
 	 *
 	 * @since SINCEVERSION
@@ -92,7 +74,7 @@ class Test_Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Case {
 		// @todo Find a way to ensure our backup finishes.
 
 		// While we're here, let's test the jobs REST calls.
-		$request  = new WP_REST_Request( 'GET', '/bgbkup/v1/jobs/' . $data['id'] );
+		$request = new WP_REST_Request( 'GET', '/bgbkup/v1/jobs/' . $data['id'] );
 		$request->set_param( 'id', $data['id'] );
 		$response = $this->server->dispatch( $request );
 		$data     = $response->get_data();
@@ -128,8 +110,8 @@ class Test_Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Case {
 		wp_set_current_user( $this->admin_id );
 
 		$request  = new WP_REST_Request( 'GET', '/bgbkup/v1/archives' );
-    	$response = $this->server->dispatch( $request );
-    	$data     = $response->get_data();
+		$response = $this->server->dispatch( $request );
+		$data     = $response->get_data();
 
 		// Ensure we have a filename in the first backup. @todo A very basic test, should be expanded.
 		$this->assertTrue( ! empty( $data[0]['filename'] ) );
@@ -144,8 +126,8 @@ class Test_Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Case {
 		wp_set_current_user( $this->admin_id );
 
 		$request  = new WP_REST_Request( 'PUT', '/bgbkup/v1/archives' );
-    	$response = $this->server->dispatch( $request );
-    	$data     = $response->get_data();
+		$response = $this->server->dispatch( $request );
+		$data     = $response->get_data();
 
 		// We should get an error: Unable to restore. Missing required parameters.
 		$this->assertTrue( 'bgbkup_rest_missing_param' === $data['code'] );
@@ -154,8 +136,8 @@ class Test_Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Case {
 
 		$request = new WP_REST_Request( 'PUT', '/bgbkup/v1/archives' );
 		$request->set_param( 'id', $backup_id );
-    	$response = $this->server->dispatch( $request );
-    	$data     = $response->get_data();
+		$response = $this->server->dispatch( $request );
+		$data     = $response->get_data();
 
 		$this->assertTrue( $data['data']['backup_id'] === $backup_id );
 

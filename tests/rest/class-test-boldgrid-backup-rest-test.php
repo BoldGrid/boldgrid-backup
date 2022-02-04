@@ -19,24 +19,6 @@
  */
 class Test_Boldgrid_Backup_Rest_Test extends Boldgrid_Backup_Rest_Case {
 	/**
-	 * Setup.
-	 *
-	 * @since SINCEVERSION
-	 */
-	public function set_up() {
-		parent::set_up();
-	}
-
-	/**
-	 * Tear down.
-	 *
-	 * @since SINCEVERSION
-	 */
-	public function tear_down() {
-		parent::tear_down();
-	}
-
-	/**
 	 * Test get_item.
 	 *
 	 * @since SINCEVERISON
@@ -45,8 +27,8 @@ class Test_Boldgrid_Backup_Rest_Test extends Boldgrid_Backup_Rest_Case {
 		wp_set_current_user( $this->editor_id );
 
 		$request  = new WP_REST_Request( 'GET', '/bgbkup/v1/test' );
-    	$response = $this->server->dispatch( $request );
-    	$data     = $response->get_data();
+		$response = $this->server->dispatch( $request );
+		$data     = $response->get_data();
 
 		// Ensure we don't have permission as an editor.
 		$this->assertTrue( 403 === $data['data']['status'] );
@@ -54,8 +36,8 @@ class Test_Boldgrid_Backup_Rest_Test extends Boldgrid_Backup_Rest_Case {
 		wp_set_current_user( $this->admin_id );
 
 		$request  = new WP_REST_Request( 'GET', '/bgbkup/v1/test' );
-    	$response = $this->server->dispatch( $request );
-    	$data     = $response->get_data();
+		$response = $this->server->dispatch( $request );
+		$data     = $response->get_data();
 
 		// Ensure our response has the "passed" key.
 		$this->assertTrue( array_key_exists( 'passed', $data ) );

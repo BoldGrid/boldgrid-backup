@@ -76,7 +76,9 @@ class Boldgrid_Backup_Rest_Case extends WP_UnitTestCase {
 
 		// Initiate the REST API.
 		global $wp_rest_server;
-		$this->server = $wp_rest_server = new \WP_REST_Server();
+		$this->server   = new WP_REST_Server();
+		$wp_rest_server = $this->server;
+
 		do_action( 'rest_api_init' );
 
 		$this->editor_id = $this->factory->user->create( array(
