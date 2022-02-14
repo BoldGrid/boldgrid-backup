@@ -79,7 +79,7 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 					'id'  => [
 						'required'            => false,
 						'description'         => esc_html__( 'Backup id to restore.', 'boldgrid-backup' ),
-						'type'                => 'int',
+						'type'                => 'integer',
 						'sanitation_callback' => function ( $field ) {
 							return (int) $field;
 						},

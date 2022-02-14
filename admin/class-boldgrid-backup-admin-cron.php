@@ -202,6 +202,7 @@ class Boldgrid_Backup_Admin_Cron {
 		if ( 'cron' === $scheduler && $this->core->scheduler->is_available( $scheduler ) ) {
 			$this->core->scheduler->clear_all_schedules();
 
+			$scheduled = false;
 			if ( ! empty( $schedule ) ) {
 				$scheduled = $this->add_cron_entry( $settings );
 			}
@@ -347,7 +348,7 @@ class Boldgrid_Backup_Admin_Cron {
 			$settings = $this->core->settings->get_settings();
 		}
 
-		if ( ! $settings['site_check']['enabled'] ) {
+		if ( empty( $settings['site_check']['enabled'] ) ) {
 			return false;
 		}
 

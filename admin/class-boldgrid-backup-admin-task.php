@@ -220,7 +220,7 @@ class Boldgrid_Backup_Admin_Task {
 	public function init_by_id( $id ) {
 		$task = $this->helper->get_by_id( $id );
 
-		return $this->init( $task );
+		return empty( $task ) ? false : $this->init( $task );
 	}
 
 
