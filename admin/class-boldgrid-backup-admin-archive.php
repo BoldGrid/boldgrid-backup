@@ -143,7 +143,7 @@ class Boldgrid_Backup_Admin_Archive {
 	 *
 	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
 	 */
-	public function __construct( $core = null ) {
+	public function __construct( Boldgrid_Backup_Admin_Core $core = null ) {
 		if ( empty( $core ) ) {
 			$core = apply_filters( 'boldgrid_backup_get_core', null );
 		}

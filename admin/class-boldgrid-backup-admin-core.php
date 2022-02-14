@@ -2330,7 +2330,7 @@ class Boldgrid_Backup_Admin_Core {
 	 * }
 	 * @return array An array of archive file information.
 	 */
-	public function restore_archive_file( $dryrun = false, $args = [] ) {
+	public function restore_archive_file( $dryrun = false, array $args = [] ) {
 		$this->restoring_archive_file = true;
 
 		$this->logger->init( 'restore-' . time() . '.log' );
