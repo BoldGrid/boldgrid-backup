@@ -424,126 +424,16 @@ class Boldgrid_Backup_Admin_Upload {
 			);
 		}
 
-		$url       = ! empty( $_POST['url'] ) ? esc_url_raw( $_POST['url'] ) : null;
-		$url_regex = '/' . $this->core->configs['url_regex'] . '/i';
+		$url = ! empty( $_POST['url'] ) ? esc_url_raw( $_POST['url'] ) : null;
 
-		if ( ! preg_match( $url_regex, $url ) ) {
-			wp_send_json_error(
-				array(
-					'error' => __( 'Invalid URL address.', 'boldgrid-backup' ),
-				)
-			);
-		}
+		$archive_fetcher = new Boldgrid_Backup_Archive_Fetcher( $url );
+		$archive_fetcher->download();
 
-		$backup_directory = $this->core->backup_dir->get();
-
-		if ( ! $this->core->backup_dir->is_valid( $backup_directory ) &&
-			! empty( $this->core->backup_dir->errors ) ) {
-			wp_send_json_error(
-				array(
-					'error' => implode( '<br />', $this->core->backup_dir->errors ),
-				)
-			);
-		}
-
-		$filepath = $this->get_save_path( basename( $url ) );
-
-		$allowed_content_types = array(
-			'application/octet-stream',
-			'binary/octet-stream',
-			'application/zip',
-		);
-
-		$response = wp_remote_get(
-			$url, array(
-				'filename'  => $filepath,
-				'headers'   => 'Accept: ' . implode( ', ', $allowed_content_types ),
-				'sslverify' => false,
-				'stream'    => true,
-				'timeout'   => MINUTE_IN_SECONDS * 20,
-			)
-		);
-
-		if ( is_array( $response ) && ! is_wp_error( $response ) &&
-			in_array( $response['headers']['content-type'], $allowed_content_types, true ) ) {
-			$logger->add( 'Archive downloaded successfully.' );
-			$logger->add( 'Headers: ' . ( empty( $response['headers'] ) ? 'Empty' : print_r( $response['headers'], 1 ) ) ); // phpcs:ignore
-
-			// Determine the archive log file path.
-			$log_filepath = $filepath;
-
-			if ( ! empty( $response['headers']['content-disposition'] ) ) {
-				$log_filepath = trim(
-					str_replace(
-						'attachment; filename=', '', $response['headers']['content-disposition']
-					), '"'
-				);
-
-				$log_filepath = $this->core->backup_dir->get_path_to( $log_filepath );
-			}
-
-			$log_filepath = $this->core->archive_log->path_from_zip( $log_filepath );
-			$filename     = basename( $filepath );
-
-			// Restore the log file from the archive.
-			$restored = $this->core->archive_log->restore_by_zip( $filepath, basename( $log_filepath ) );
-			$logger->add( 'Log restored from zip: ' . ( $restored ? 'Success' : 'Fail' ) );
-
-			// Update the archive file modification time, based on the log file contents.
-			$this->core->remote->post_download( $filepath );
-
-			// Get the archive details.
-			$archive = $this->core->archive->get_by_name( $filename );
-
-			wp_send_json_success(
-				[
-					'filepath'        => $filepath,
-					'detailsUrl'      => admin_url(
-						'admin.php?page=boldgrid-backup-archive-details&filename=' .
-						basename( $filepath )
-					),
-					'archiveFilename' => $filename,
-					'archiveKey'      => $archive['key'],
-				]
-			);
+		if ( $archive_fetcher->has_error() ) {
+			wp_send_json_error( [ 'error' => $archive_fetcher->get_error() ] );
 		} else {
-			// Get the data from the $response that we want to print to the log.
-			// @todo simply the below.
-			if ( is_wp_error( $response ) ) {
-				$log_data = $response;
-			} elseif ( is_array( $response ) ) {
-				$log_data = array();
-
-				if ( ! empty( $response['body'] ) ) {
-					$log_data['body'] = $response['body'];
-				}
-				if ( ! empty( $response['response'] ) ) {
-					$log_data['response'] = $response['response'];
-				}
-			}
-
-			$logger->add( 'Failed to download archive. Additional info: ' . print_r( $log_data, 1 ) ); // phpcs:ignore
-			$this->core->wp_filesystem->delete( $filepath );
+			wp_send_json_success( $archive_fetcher->get_info() );
 		}
-
-		// Determine the error message the user will see and return it.
-		$error_message = __( 'Could not retrieve the remote file.', 'boldgrid-backup' );
-		if ( is_wp_error( $response ) ) {
-			// Example: cURL error 28: Connection timed out after 100001 milliseconds.
-			$error_message .= ' ' . $response->get_error_message();
-		} elseif ( ! empty( $response['response']['code'] && ! empty( $response['response']['message'] ) ) ) {
-			// Example: 403 Forbidden
-			$error_message .= ' ' . $response['response']['code'] . ' ' . $response['response']['message'];
-		} else {
-			// Unkown error.
-			$error_message .= ' ' . __( 'Unknown error. It may not be a ZIP file, or the link is no longer valid.', 'boldgrid-backup' );
-		}
-
-		wp_send_json_error(
-			[
-				'error' => $error_message,
-			]
-		);
 	}
 
 	/**

@@ -21,7 +21,7 @@ class Test_Boldgrid_Backup_Admin_Notice_Counts extends WP_UnitTestCase {
 
 	public $core;
 
-	public function setUp() {
+	public function set_up() {
 		$this->core = apply_filters( 'boldgrid_backup_get_core', null );
 	}
 	public function test_notice_not_displayed_first_install() {

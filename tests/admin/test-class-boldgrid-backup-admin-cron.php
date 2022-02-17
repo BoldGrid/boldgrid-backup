@@ -75,7 +75,7 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 	 *
 	 * @since 1.11.1
 	 */
-	public function setUp() {
+	public function set_up() {
 		$this->core      = new Boldgrid_Backup_Admin_Core();
 		$this->base_path = BOLDGRID_BACKUP_PATH . '/';
 

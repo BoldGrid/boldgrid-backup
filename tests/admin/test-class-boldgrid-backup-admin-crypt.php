@@ -23,7 +23,7 @@ class Test_Boldgrid_Backup_Admin_Crypt extends WP_UnitTestCase {
 	 *
 	 * @since 1.6.0
 	 */
-	public function setUp() {
+	public function set_up() {
 		/*
 		 * Define keys / salts for crypt.
 		 *

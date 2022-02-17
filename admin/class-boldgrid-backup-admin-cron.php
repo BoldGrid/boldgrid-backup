@@ -202,6 +202,7 @@ class Boldgrid_Backup_Admin_Cron {
 		if ( 'cron' === $scheduler && $this->core->scheduler->is_available( $scheduler ) ) {
 			$this->core->scheduler->clear_all_schedules();
 
+			$scheduled = false;
 			if ( ! empty( $schedule ) ) {
 				$scheduled = $this->add_cron_entry( $settings );
 			}
@@ -347,7 +348,7 @@ class Boldgrid_Backup_Admin_Cron {
 			$settings = $this->core->settings->get_settings();
 		}
 
-		if ( ! $settings['site_check']['enabled'] ) {
+		if ( empty( $settings['site_check']['enabled'] ) ) {
 			return false;
 		}
 
@@ -1080,7 +1081,10 @@ class Boldgrid_Backup_Admin_Cron {
 	/**
 	 * Hook into "wp_ajax_nopriv_boldgrid_backup_run_backup" and generate backup.
 	 *
-	 * @since 1.6.1-rc.1
+	 * A scheduled backup (via cron) will call a url which ultimately triggers this method to be ran
+	 * to backup the site.
+	 *
+	 * @since 1.6.1
 	 *
 	 * @see Boldgrid_Backup_Admin_Cron::is_valid_call()
 	 *
@@ -1091,9 +1095,10 @@ class Boldgrid_Backup_Admin_Cron {
 			wp_die( esc_html__( 'Error: Invalid request.', 'boldgrid-backup' ) );
 		}
 
-		$archive_info = $this->core->archive_files( true );
+		$archiver = new Boldgrid_Backup_Archiver();
+		$archiver->run();
 
-		return $archive_info;
+		return $archiver->get_info();
 	}
 
 	/**
@@ -1106,16 +1111,49 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @return array An array of archive file information.
 	 */
 	public function restore() {
+		// phpcs:disable WordPress.CSRF.NonceVerification.NoNonceVerification
+		$task_id = ! empty( $_POST['task_id'] ) ? $_POST['task_id'] : null;
+		// phpcs:enable WordPress.CSRF.NonceVerification.NoNonceVerification
+
 		if ( ! $this->is_valid_call() ) {
 			wp_die( esc_html__( 'Error: Invalid request.', 'boldgrid-backup' ) );
 		}
 
-		$archive_info = array(
-			'error' => __( 'Could not perform restoration from cron job.', 'boldgrid-backup' ),
-		);
+		// A default error to return if restoration is not started in conditionals below.
+		$archive_info = [
+			'error' => __( 'Unknown error attempting restore.', 'boldgrid-backup' ),
+		];
 
-		if ( $this->core->restore_helper->prepare_restore() ) {
-			$archive_info = $this->core->restore_archive_file();
+		/*
+		 * Restore an archive.
+		 *
+		 * As of @SINCEVERSION, archives can be restored via REST. If we have a task, we're handling
+		 * a REST restore. Otherwise, we're handling a standard restore request.
+		 */
+		if ( ! empty( $task_id ) ) {
+			$task       = new Boldgrid_Backup_Admin_Task();
+			$task_found = $task->init_by_id( $task_id );
+			$restorer   = new Boldgrid_Backup_Restorer();
+
+			if ( ! $task_found ) {
+				$archive_info = [
+					'error' => __( 'Resore error: Unable to instantiate task.', 'boldgrid-backup' ),
+				];
+			} elseif ( false !== $task->get_data( 'url' ) ) {
+				$restorer->run_by_url( $task->get_data( 'url' ) );
+				$archive_info = $restorer->get_info();
+			} elseif ( false !== $task->get_data( 'backup_id' ) ) {
+				$restorer->run_by_id( $task->get_data( 'backup_id' ) );
+				$archive_info = $restorer->get_info();
+			} else {
+				$archive_info = [
+					'error' => __( 'Restore error: Missing url / id.', 'boldgrid-backup' ),
+				];
+			}
+		} else {
+			if ( $this->core->restore_helper->prepare_restore() ) {
+				$archive_info = $this->core->restore_archive_file();
+			}
 		}
 
 		return $archive_info;

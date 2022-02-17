@@ -121,7 +121,8 @@ class Boldgrid_Backup_Admin_Log {
 
 		$this->add( 'WordPress Version: ' . get_bloginfo( 'version' ) );
 
-		$this->add( 'Total Upkeep version: ' . BOLDGRID_BACKUP_VERSION );
+		$version = defined( 'BOLDGRID_BACKUP_VERSION' ) ? BOLDGRID_BACKUP_VERSION : 'Unknown';
+		$this->add( 'Total Upkeep version: ' . $version );
 
 		$pgid_support = Boldgrid_Backup_Admin_Test::is_getpgid_supported();
 		$this->add( 'getpgid support: ' . ( $pgid_support ? 'Available' : 'Unavailable' ) );

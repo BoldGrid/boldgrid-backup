@@ -98,6 +98,10 @@ $files = array(
 	'/admin/class-boldgrid-backup-admin-log.php',
 	'/admin/class-boldgrid-backup-admin-log-page.php',
 	'/admin/class-boldgrid-backup-admin-environment.php',
+	'/admin/class-boldgrid-backup-admin-nopriv.php',
+	// Tasks.
+	'/admin/class-boldgrid-backup-admin-task.php',
+	'/admin/class-boldgrid-backup-admin-task-helper.php',
 	// Compressors.
 	'/admin/compressor/class-boldgrid-backup-admin-compressor-php-zip.php',
 	'/admin/compressor/class-boldgrid-backup-admin-compressor-pcl-zip.php',
@@ -108,6 +112,9 @@ $files = array(
 	'/includes/class-boldgrid-backup-authentication.php',
 	'/includes/class-boldgrid-backup-download.php',
 	'/includes/class-boldgrid-backup-file.php',
+	'/includes/class-boldgrid-backup-archiver.php',
+	'/includes/archive/class-factory.php',
+	'/includes/archive/class-option.php',
 	'/admin/storage/class-boldgrid-backup-admin-storage-local.php',
 	// Remote storage providers.
 	'/admin/remote/class-boldgrid-backup-admin-ftp.php',
@@ -117,6 +124,15 @@ $files = array(
 	// Vendor.
 	'/vendor/phpseclib/phpseclib/phpseclib/Net/SSH2.php',
 	'/vendor/ifsnop/mysqldump-php/src/Ifsnop/Mysqldump/Mysqldump.php',
+	/*
+	 * Yoast/PHPUnit-Polyfills, required for running the WP test suite.
+	 * Please see https://make.wordpress.org/core/2021/09/27/changes-to-the-wordpress-core-php-test-suite/
+	 *
+	 * The WP Core test suite can now run on all PHPUnit versions between PHPUnit 5.7.21 up to the latest
+	 * release (at the time of writing: PHPUnit 9.5.10), which allows for running the test suite against
+	 * all supported PHP versions using the most appropriate PHPUnit version for that PHP version.
+	 */
+	'/vendor/yoast/phpunit-polyfills/phpunitpolyfills-autoload.php',
 	// Cli.
 	'/cli/class-info.php',
 	'/cli/class-log.php',
@@ -147,3 +163,6 @@ function phpunit_error_log( $var ) {
 }
 
 require $_tests_dir . '/includes/bootstrap.php';
+
+// Our extendable Rest class. It extends WP_UnitTestCase and must come after the boostrap above.
+require_once BOLDGRID_BACKUP_PATH . '/tests/rest/class-boldgrid-backup-rest-case.php';

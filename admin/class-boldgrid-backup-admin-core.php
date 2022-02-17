@@ -2321,10 +2321,16 @@ class Boldgrid_Backup_Admin_Core {
 	 *
 	 * @see https://codex.wordpress.org/Function_Reference/flush_rewrite_rules
 	 *
-	 * @param bool $dryrun An optional switch to perform a dry run test.
+	 * @param  bool  $dryrun An optional switch to perform a dry run test.
+	 * @param  array $args {
+	 *     An optional array of args.
+	 *
+	 *     @type int    $archive_key      An archive key.
+	 *     @type string $archive_filename An archive filename.
+	 * }
 	 * @return array An array of archive file information.
 	 */
-	public function restore_archive_file( $dryrun = false ) {
+	public function restore_archive_file( $dryrun = false, array $args = [] ) {
 		$this->restoring_archive_file = true;
 
 		$this->logger->init( 'restore-' . time() . '.log' );
@@ -2336,9 +2342,23 @@ class Boldgrid_Backup_Admin_Core {
 
 		$restore_ok = true;
 
+		/*
+		 * This is a generic method to restore an archive. Do not assume the request to restore is coming
+		 * from a user directly via $_POST.
+		 *
+		 * Refer to check_ajax_referer usage below to help protect ajax requests.
+		 */
+		$is_post_restore = isset( $_POST['action'] ) && 'boldgrid_backup_restore_archive' === $_POST['action']; // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+
 		// If a restoration was not requested, then abort.
 		if ( empty( $_POST['restore_now'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			$error_message = esc_html__( 'Invalid restore_now value.', 'boldgrid-backup' );
+			$this->logger->add( $error_message );
+			return [ 'error' => $error_message ];
+		}
+
+		if ( $is_post_restore && ! check_ajax_referer( 'boldgrid_backup_restore_archive', 'archive_auth', false ) ) {
+			$error_message = esc_html__( 'Invalid nonce.', 'boldgrid-backup' );
 			$this->logger->add( $error_message );
 			return [ 'error' => $error_message ];
 		}
@@ -2350,12 +2370,15 @@ class Boldgrid_Backup_Admin_Core {
 			return [ 'error' => $error_message ];
 		}
 
-		// Initialize variables.
-		$archive_key      = null;
-		$archive_filename = null;
-
-		// Validate archive_key.
-		if ( isset( $_POST['archive_key'] ) && is_numeric( $_POST['archive_key'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		/*
+		 * Get our archive key.
+		 *
+		 * It can be passed in via $args or $_POST.
+		 */
+		$archive_key = false;
+		if ( isset( $args['archive_key'] ) ) {
+			$archive_key = (int) $args['archive_key'];
+		} elseif ( isset( $_POST['archive_key'] ) && is_numeric( $_POST['archive_key'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			$archive_key = (int) $_POST['archive_key'];
 		} else {
 			$error_message = esc_html__( 'Invalid key for the selected archive file.', 'boldgrid-backup' );
@@ -2363,8 +2386,15 @@ class Boldgrid_Backup_Admin_Core {
 			return [ 'error' => $error_message ];
 		}
 
-		// Validate archive_filename.
-		if ( ! empty( $_POST['archive_filename'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		/*
+		 * Get our archive filename.
+		 *
+		 * It can be passed in via $args or $_POST.
+		 */
+		$archive_filename = false;
+		if ( ! empty( $args['archive_filename'] ) ) {
+			$archive_filename = sanitize_file_name( $args['archive_filename'] );
+		} elseif ( ! empty( $_POST['archive_filename'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			$archive_filename = sanitize_file_name( $_POST['archive_filename'] );
 		} else {
 			$error_message = esc_html__( 'Invalid filename for the selected archive file.', 'boldgrid-backup' );
@@ -2655,7 +2685,10 @@ class Boldgrid_Backup_Admin_Core {
 		$this->is_archiving_update_protection = ! empty( $_POST['is_updating'] ) &&
 			'true' === $_POST['is_updating'];
 
-		$archive_info = $this->archive_files( true );
+		$archiver = new Boldgrid_Backup_Archiver();
+		$archiver->run();
+
+		$archive_info = $archiver->get_info();
 
 		/*
 		 * If there were any errors encountered during the backup, save them to the In Progress data.
@@ -3007,7 +3040,11 @@ class Boldgrid_Backup_Admin_Core {
 			wp_send_json_error();
 		}
 
-		$archive_info = $this->restore_archive_file();
+		// Do the actual restoration.
+		$restorer = new Boldgrid_Backup_Restorer();
+		$restorer->run();
+
+		$archive_info = $restorer->get_info();
 
 		/*
 		 * Generate success message and add as a user notice.
@@ -3070,7 +3107,8 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Perform the backup operation.
-		$this->archive_files( true );
+		$archiver = new Boldgrid_Backup_Archiver();
+		$archiver->run();
 	}
 
 	/**

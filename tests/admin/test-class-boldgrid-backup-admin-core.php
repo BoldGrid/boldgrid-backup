@@ -38,7 +38,7 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 	 * @param int    $min_file_size The minimum file size of all files in the directory.
 	 * @param int    $min_dir_count  The minimum number of folders that need to be in the directory.
 	 */
-	public function assertDirNotEmpty( $filepath, $dir = '.', $min_file_count, $min_file_size, $min_dir_count ) {
+	public function assertDirNotEmpty( $filepath, $dir, $min_file_count, $min_file_size, $min_dir_count ) {
 		$abspath    = $this->zip->browse( $filepath, $dir );
 		$file_count = 0;
 		$file_size  = 0;
@@ -232,7 +232,7 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 	 *
 	 * @since xxx
 	 */
-	public function setUp() {
+	public function set_up() {
 		global $wpdb;
 
 		if ( ! defined( 'BOLDGRID_BACKUP_VERSION' ) ) {
@@ -275,7 +275,10 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 		$views = $this->core->db_get->get_by_type( 'VIEW' );
 		$this->assertTrue( 1 === count( $views ) );
 
-		$this->info = $this->core->archive_files( true );
+		$archiver = new Boldgrid_Backup_Archiver();
+		$archiver->run();
+
+		$this->info = $archiver->get_info();
 
 		// Ensure a backup was made and we have a filepath.
 		$this->assertTrue( ! empty( $this->info['filepath'] ) );
@@ -308,7 +311,10 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 
 		// Create a backup if don't already have one.
 		if ( empty( $this->info ) ) {
-			$this->info = $this->core->archive_files( true );
+			$archiver = new Boldgrid_Backup_Archiver();
+			$archiver->run();
+
+			$this->info = $archiver->get_info();
 		}
 
 		$this->deleteBasic( 'delete' );
@@ -335,7 +341,10 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 		$this->createWpconfig();
 
 		if ( empty( $this->info ) ) {
-			$this->info = $this->core->archive_files( true );
+			$archiver = new Boldgrid_Backup_Archiver();
+			$archiver->run();
+
+			$this->info = $archiver->get_info();
 		}
 
 		$this->deleteBasic( 'delete' );

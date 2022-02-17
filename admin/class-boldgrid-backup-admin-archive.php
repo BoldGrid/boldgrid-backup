@@ -107,13 +107,47 @@ class Boldgrid_Backup_Admin_Archive {
 	public $view_details_url = '';
 
 	/**
+	 * Archive id.
+	 *
+	 * The archive id is the archive's id as found in the boldgrid_backup_backups option.
+	 *
+	 * This class includes the self::set_id() method to set the actual id, but this class doesn't actually
+	 * call that method to set the id. The id is generally set within Boldgrid\Backup\Archive\Factory.
+	 *
+	 * @since SINCEVERSION
+	 * @access private
+	 * @var int
+	 *
+	 * @see Boldgrid\Backup\Archive\Option for more information about the boldgrid_backup_backups option.
+	 */
+	private $id;
+
+	/**
+	 * The archive key.
+	 *
+	 * When retrieving a list of archives, you'll get an array, and this is the archives location in
+	 * the array.
+	 *
+	 * @since SINCEVERSION
+	 * @access private
+	 * @var int
+	 *
+	 * @see self::init() To see this property initialized.
+	 */
+	private $key;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.5.3
 	 *
 	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
 	 */
-	public function __construct( $core ) {
+	public function __construct( Boldgrid_Backup_Admin_Core $core = null ) {
+		if ( empty( $core ) ) {
+			$core = apply_filters( 'boldgrid_backup_get_core', null );
+		}
+
 		$this->core = $core;
 	}
 
@@ -235,6 +269,28 @@ class Boldgrid_Backup_Admin_Archive {
 	}
 
 	/**
+	 * Get the archive id.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @return int
+	 */
+	public function get_id() {
+		return $this->id;
+	}
+
+	/**
+	 * Get the archive key.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @return int
+	 */
+	public function get_key() {
+		return $this->key;
+	}
+
+	/**
 	 * Init.
 	 *
 	 * @since 1.6.0
@@ -277,6 +333,10 @@ class Boldgrid_Backup_Admin_Archive {
 		$this->compressor = ! empty( $this->log['compressor'] ) ? $this->log['compressor'] : 'php_zip';
 
 		$this->view_details_url = admin_url( 'admin.php?page=boldgrid-backup-archive-details&filename=' . $this->filename );
+
+		// Set our key.
+		$details   = $this->get_by_name( $this->filename );
+		$this->key = isset( $details['key'] ) ? $details['key'] : null;
 	}
 
 	/**
@@ -480,6 +540,17 @@ class Boldgrid_Backup_Admin_Archive {
 		$this->log[ $key ] = $value;
 
 		return $this->core->archive_log->write( $this->log );
+	}
+
+	/**
+	 * Set the archive id.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param int $id The archive id.
+	 */
+	public function set_id( $id ) {
+		$this->id = (int) $id;
 	}
 
 	/**

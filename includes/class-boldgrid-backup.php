@@ -294,11 +294,34 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-activator.php';
 
+		// REST API support.
+		require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-controller.php';
+		require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-job.php';
+		require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-setting.php';
+		require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-archive.php';
+		require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-test.php';
+
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-usage.php';
 
 		// Logs system.
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-log.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-log-page.php';
+
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-nopriv.php';
+
+		// Task system.
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-task.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-task-helper.php';
+
+		// Archiver and Restorer classes.
+		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-archiver.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-restorer.php';
+
+		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-archive-fetcher.php';
+
+		// Archive namespace.
+		require_once BOLDGRID_BACKUP_PATH . '/includes/archive/class-factory.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/archive/class-option.php';
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-plugin-notices.php';
 
@@ -551,6 +574,21 @@ class Boldgrid_Backup {
 		$this->loader->add_action( 'admin_notices', $plugin_admin_core->notice, 'plugin_renamed_notice' );
 		$this->loader->add_action( 'wp_ajax_dismissBoldgridNotice', 'Boldgrid\Library\Library\Notice', 'dismiss' );
 
+		// Register REST endpoints.
+		add_action( 'rest_api_init', function() use ( $plugin_admin_core ) {
+			$rest_job = new Boldgrid_Backup_Rest_Job( $plugin_admin_core );
+			$rest_job->register_routes();
+
+			$rest_archive = new Boldgrid_Backup_Rest_Archive( $plugin_admin_core );
+			$rest_archive->register_routes();
+
+			$rest_setting = new Boldgrid_Backup_Rest_Setting( $plugin_admin_core );
+			$rest_setting->register_routes();
+
+			$rest_test = new Boldgrid_Backup_Rest_Test( $plugin_admin_core );
+			$rest_test->register_routes();
+		} );
+
 		$usage = new Boldgrid_Backup_Admin_Usage();
 
 		$this->loader->add_action( 'admin_init', $usage, 'admin_init' );
@@ -583,6 +621,15 @@ class Boldgrid_Backup {
 		$this->loader->add_filter( 'Boldgrid\Library\Plugin\Notices\admin_enqueue_scripts', $plugin_notices, 'filter' );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core, 'add_thickbox' );
+
+		/*
+		 * Things to do in a dev environment.
+		 *
+		 * @link https://make.wordpress.org/core/2020/07/24/new-wp_get_environment_type-function-in-wordpress-5-5/
+		 */
+		if ( defined( 'WP_ENVIRONMENT_TYPE' ) && 'development' === WP_ENVIRONMENT_TYPE ) {
+			$this->loader->add_action( 'admin_footer', 'Boldgrid_Backup_Rest_Utility', 'insert_nonce' );
+		}
 	}
 
 	/**
