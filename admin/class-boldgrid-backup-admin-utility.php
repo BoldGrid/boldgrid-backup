@@ -517,6 +517,17 @@ class Boldgrid_Backup_Admin_Utility {
 	}
 
 	/**
+	 * Determine whether or not the current user is an administrator.
+	 *
+	 * @since 1.14.14
+	 *
+	 * @return bool
+	 */
+	public static function is_user_admin() {
+		return current_user_can( 'update_plugins' );
+	}
+
+	/**
 	 * Determine whether or not the given $page is the current.
 	 *
 	 * @since 1.7.0

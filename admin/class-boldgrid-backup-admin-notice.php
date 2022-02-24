@@ -94,7 +94,10 @@ class Boldgrid_Backup_Admin_Notice {
 
 		$notices = get_option( $option, [] );
 
-		$notices = $this->core->in_progress->add_notice( $notices );
+		// Only admins should see "backup in progress" notices.
+		if ( Boldgrid_Backup_Admin_Utility::is_user_admin() ) {
+			$notices = $this->core->in_progress->add_notice( $notices );
+		}
 
 		if ( empty( $notices ) ) {
 			return;
