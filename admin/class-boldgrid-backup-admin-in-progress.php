@@ -63,6 +63,8 @@ class Boldgrid_Backup_Admin_In_Progress {
 	/**
 	 * Add a notice telling the user there's a backup in progress.
 	 *
+	 * Calls to this method should ensure user (based on role) should actually see this notice.
+	 *
 	 * @since 1.6.0
 	 *
 	 * @param  array $notices Array of notices to display.
@@ -425,6 +427,11 @@ class Boldgrid_Backup_Admin_In_Progress {
 	 * @return array
 	 */
 	public function heartbeat_received( $response, $data ) {
+		// Only admins should see the status of a backup in progress.
+		if ( ! Boldgrid_Backup_Admin_Utility::is_user_admin() ) {
+			return $response;
+		}
+
 		$key = 'boldgrid_backup_in_progress';
 
 		if ( empty( $data[ $key ] ) ) {
