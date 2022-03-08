@@ -21,4 +21,7 @@
 			<group>ajax</group>
 		</exclude>
 	</groups>
+	<php>
+		 <ini name="display_errors" value="true"/>
+	</php>
 </phpunit>

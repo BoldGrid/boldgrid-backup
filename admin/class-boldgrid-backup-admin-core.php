@@ -1340,7 +1340,10 @@ class Boldgrid_Backup_Admin_Core {
 		// If changed, then update the siteurl in the database.
 		if ( $restored_wp_siteurl !== $wp_siteurl ) {
 			$update_siteurl_success =
-				Boldgrid_Backup_Admin_Utility::update_siteurl( $restored_wp_siteurl, $wp_siteurl );
+				Boldgrid_Backup_Admin_Utility::update_siteurl( array(
+					'old_siteurl' => $restored_wp_siteurl,
+					'siteurl'     => $wp_siteurl,
+				) );
 
 			if ( ! $update_siteurl_success ) {
 				// Display an error notice.

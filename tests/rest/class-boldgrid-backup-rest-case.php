@@ -57,6 +57,7 @@ class Boldgrid_Backup_Rest_Case extends WP_UnitTestCase {
 		require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-archive.php';
 		require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-setting.php';
 		require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-test.php';
+		require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-siteurl.php';
 
 		// Register REST endpoints.
 		$core = new Boldgrid_Backup_Admin_Core();
@@ -72,6 +73,9 @@ class Boldgrid_Backup_Rest_Case extends WP_UnitTestCase {
 
 			$rest_test = new Boldgrid_Backup_Rest_Test( $core );
 			$rest_test->register_routes();
+
+			$rest_siteurl = new Boldgrid_Backup_Rest_Siteurl( $core );
+			$rest_siteurl->register_routes();
 		} );
 
 		// Initiate the REST API.
