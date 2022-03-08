@@ -89,5 +89,23 @@ class Test_Boldgrid_Backup_Rest_Siteurl extends Boldgrid_Backup_Rest_Case {
 		// Validate some options.
 		$this->assertTrue( 'http://example.com' === get_option( 'home' ) );
 		$this->assertTrue( 'http://example.com' === get_option( 'siteurl' ) );
+
+		// Test and make sure we don't get weird find / replace issues.
+		$request = new WP_REST_Request( 'POST', '/bgbkup/v1/siteurl' );
+		$request->set_body_params( array(
+			'siteurl' => 'http://example.com/514/514',
+		) );
+		$response = $this->server->dispatch( $request );
+		$data     = $response->get_data();
+
+		// Validate the data we got back after changing the site url.
+		$this->assertTrue( 'http://example.com/514/514' === $data['home'] );
+		$this->assertTrue( 'http://example.com/514/514' === $data['siteurl'] );
+		$this->assertTrue( 'http://example.com' === $data['old_home'] );
+		$this->assertTrue( 'http://example.com' === $data['old_siteurl'] );
+
+		// Validate some options.
+		$this->assertTrue( 'http://example.com/514/514' === get_option( 'home' ) );
+		$this->assertTrue( 'http://example.com/514/514' === get_option( 'siteurl' ) );
 	}
 }

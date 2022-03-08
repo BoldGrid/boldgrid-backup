@@ -841,19 +841,38 @@ class Boldgrid_Backup_Admin_Utility {
 		$old_siteurl = $args['old_siteurl'];
 		$new_siteurl = $args['siteurl'];
 
-		// Validate our urls and get them ready.
+		// Validate.
 		if ( false === filter_var( $old_siteurl, FILTER_VALIDATE_URL ) ) {
 			return false;
 		}
 		if ( false === filter_var( $new_siteurl, FILTER_VALIDATE_URL ) ) {
 			return false;
 		}
+
+		/*
+		 * Ensure the site url does not end in a trailing slash.
+		 *
+		 * This is best practice. IE when you manually edit your home / siteurl in the dashboard on
+		 * the Settings > General page, WordPress will automatically untrailingslahsit.
+		 */
 		$old_siteurl = untrailingslashit( $old_siteurl );
 		$new_siteurl = untrailingslashit( $new_siteurl );
+
+		/*
+		 * Find and replace option values.
+		 *
+		 * Do this before updating the "siteurl" and "home" via the update_option calls below. Otherwise,
+		 * we'll runing into:
+		 * # Old url:           domain.com
+		 * # Requested new url: domain.com/514/514
+		 * # Resulting url:     domain.com/514/514/514/514
+		 */
+		self::option_find_replace( $old_siteurl, $new_siteurl );
 
 		remove_all_filters( 'pre_update_option_siteurl' );
 
 		update_option( 'siteurl', $new_siteurl );
+		update_option( 'home', $new_siteurl );
 
 		$replacers = array(
 			// Post content.
@@ -882,10 +901,6 @@ class Boldgrid_Backup_Admin_Utility {
 			$upload_url_path = str_replace( $old_siteurl, $new_siteurl, $upload_url_path );
 			update_option( 'upload_url_path', $upload_url_path );
 		}
-
-		// Find and replace option values.
-		self::option_find_replace( addslashes( $old_siteurl ), addslashes( $new_siteurl ) );
-		self::option_find_replace( $old_siteurl, $new_siteurl );
 
 		/*
 		 * If requested (false by default), flush the rewrite rules.
