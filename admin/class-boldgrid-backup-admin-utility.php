@@ -110,20 +110,22 @@ class Boldgrid_Backup_Admin_Utility {
 	public static function db_find_replace( $table, $column, $find, $replace ) {
 		global $wpdb;
 
+		// phpcs:disable WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder, WordPress.DB.PreparedSQLPlaceholders.LikeWildcardsInQuery
 		$wpdb->query(
 			$wpdb->prepare(
-				'UPDATE `%1$s` SET `%2$s` = REPLACE( `%3$s`, \'%4$s\', \'%5$s\' ) WHERE `%6$s` LIKE %7$s;',
-				array(
-					$wpdb->prefix . $table,
-					$column,
-					$column,
-					$find,
-					$replace,
-					$column,
-					'%' . $wpdb->esc_like( $find ) . '%',
-				)
+				'UPDATE	`' . $wpdb->prefix . '%1$s`
+				SET		`%2$s` = REPLACE( `%3$s`, "%4$s", "%5$s" )
+				WHERE	`%6$s` LIKE "%%%7$s%%";',
+				$table,
+				$column,
+				$column,
+				$find,
+				$replace,
+				$column,
+				$wpdb->esc_like( $find )
 			)
 		);
+		// phpcs:enable
 	}
 
 	/**
@@ -371,7 +373,9 @@ class Boldgrid_Backup_Admin_Utility {
 
 		$matched_options = $wpdb->get_results(
 			$wpdb->prepare(
-				'SELECT `option_name` FROM `' . $wpdb->prefix . 'options` WHERE `option_value` LIKE %1$s;',
+				'SELECT	`option_name`
+				FROM	`' . $wpdb->prefix . 'options`
+				WHERE	`option_value` LIKE %s;',
 				'%' . $wpdb->esc_like( $find ) . '%'
 			),
 			ARRAY_N
