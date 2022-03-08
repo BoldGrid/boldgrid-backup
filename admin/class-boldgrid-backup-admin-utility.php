@@ -112,15 +112,15 @@ class Boldgrid_Backup_Admin_Utility {
 
 		$wpdb->query(
 			$wpdb->prepare(
-				'UPDATE `' . $wpdb->prefix . '%1$s` SET `%2$s` = REPLACE( `%3$s`, \'%4$s\', \'%5$s\' ) WHERE `%6$s` LIKE \'%%%7$s%%\';',
+				'UPDATE `%1$s` SET `%2$s` = REPLACE( `%3$s`, \'%4$s\', \'%5$s\' ) WHERE `%6$s` LIKE %7$s;',
 				array(
-					$table,
+					$wpdb->prefix . $table,
 					$column,
 					$column,
 					$find,
 					$replace,
 					$column,
-					$find,
+					'%' . $wpdb->esc_like( $find ) . '%',
 				)
 			)
 		);
@@ -370,7 +370,10 @@ class Boldgrid_Backup_Admin_Utility {
 		global $wpdb;
 
 		$matched_options = $wpdb->get_results(
-			$wpdb->prepare( 'SELECT `option_name` FROM `' . $wpdb->prefix . 'options` WHERE `option_value` LIKE \'%%%1$s%%\';', $find ),
+			$wpdb->prepare(
+				'SELECT `option_name` FROM `' . $wpdb->prefix . 'options` WHERE `option_value` LIKE %1$s;',
+				'%' . $wpdb->esc_like( $find ) . '%'
+			),
 			ARRAY_N
 		);
 
@@ -818,11 +821,11 @@ class Boldgrid_Backup_Admin_Utility {
 	 * @static
 	 *
 	 * @param array $args {
-	 * 		An array of arguments.
+	 *      An array of arguments.
 	 *
-	 * 		@type string $old_siteurl The old/restored siteurl to find and be replaced.
-	 * 		@type string $siteurl     The siteurl to replace the old siteurl.
-	 * 		@type bool   $flush       Whether or not to flush the rewrite rules.
+	 *      @type string $old_siteurl The old/restored siteurl to find and be replaced.
+	 *      @type string $siteurl     The siteurl to replace the old siteurl.
+	 *      @type bool   $flush       Whether or not to flush the rewrite rules.
 	 * }
 	 * @return bool
 	 */

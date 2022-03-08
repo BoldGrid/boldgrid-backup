@@ -106,22 +106,22 @@ class Boldgrid_Backup_Rest_Siteurl extends Boldgrid_Backup_Rest_Controller {
 			'title'      => $this->resource,
 			'type'       => 'object',
 			'properties' => [
-				'home'                 => [
+				'home'        => [
 					'context'     => [ 'view' ],
 					'description' => esc_html__( 'Home.', 'boldgrid-backup' ),
 					'type'        => 'string',
 				],
-				'siteurl'                 => [
+				'siteurl'     => [
 					'context'     => [ 'view' ],
 					'description' => esc_html__( 'Siteurl.', 'boldgrid-backup' ),
 					'type'        => 'string',
 				],
-				'old_home'                 => [
+				'old_home'    => [
 					'context'     => [ 'view' ],
 					'description' => esc_html__( 'Old home (before changing).', 'boldgrid-backup' ),
 					'type'        => 'string',
 				],
-				'old_siteurl'                 => [
+				'old_siteurl' => [
 					'context'     => [ 'view' ],
 					'description' => esc_html__( 'Old siteurl (before changing).', 'boldgrid-backup' ),
 					'type'        => 'string',

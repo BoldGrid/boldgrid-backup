@@ -100,8 +100,8 @@ class Test_Boldgrid_Backup_Admin_Utility extends WP_UnitTestCase {
 		$this->assertTrue( 'Tuesdaay' === $option['days_of_the_week'][2] );
 
 		// Save our option and ensure it's working.
-		$option_value = new stdClass();
-		$option_value->days_of_the_week = new stdClass();
+		$option_value                        = new stdClass();
+		$option_value->days_of_the_week      = new stdClass();
 		$option_value->days_of_the_week->one = 'Monday';
 		$option_value->days_of_the_week->two = 'Tuesday';
 		update_option( 'dow', $option_value );
