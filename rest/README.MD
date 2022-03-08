@@ -109,3 +109,33 @@ jQuery.ajax({
 	type: 'put'
 });
 ```
+
+## Site URL ##
+
+### Get ###
+
+```
+jQuery.ajax( {
+    url: jQuery( '#bgbkup_site_url' ).val()  + '/wp-json/bgbkup/v1/siteurl',
+    method: 'GET',
+    beforeSend: function ( xhr ) {
+        xhr.setRequestHeader( 'X-WP-Nonce', jQuery( '#wp_rest' ).val() );
+    }
+} ).done( function ( response ) {
+    console.log( response );
+} );
+```
+
+### Set ###
+
+```
+jQuery.ajax( {
+    url: jQuery( '#bgbkup_site_url' ).val()  + '/wp-json/bgbkup/v1/siteurl/?siteurl=https://[NEW_SITE_URL]',
+    method: 'POST',
+    beforeSend: function ( xhr ) {
+        xhr.setRequestHeader( 'X-WP-Nonce', jQuery( '#wp_rest' ).val() );
+    }
+} ).done( function ( response ) {
+    console.log( response );
+} );
+```
