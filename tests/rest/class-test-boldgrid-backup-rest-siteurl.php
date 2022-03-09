@@ -73,6 +73,12 @@ class Test_Boldgrid_Backup_Rest_Siteurl extends Boldgrid_Backup_Rest_Case {
 		$this->assertTrue( 400 === $data['data']['status'] );
 		$this->assertTrue( 'rest_missing_callback_param' === $data['code'] );
 
+		// Before we change the site url, let's create a post with a link in it.
+		$post_id = wp_insert_post( array(
+			'post_title'   => 'Test post',
+			'post_content' => 'A link to <a href="http://example.org/about-us">about us</a>.',
+		) );
+
 		$request = new WP_REST_Request( 'POST', '/bgbkup/v1/siteurl' );
 		$request->set_body_params( array(
 			'siteurl' => 'http://example.com',
@@ -89,6 +95,11 @@ class Test_Boldgrid_Backup_Rest_Siteurl extends Boldgrid_Backup_Rest_Case {
 		// Validate some options.
 		$this->assertTrue( 'http://example.com' === get_option( 'home' ) );
 		$this->assertTrue( 'http://example.com' === get_option( 'siteurl' ) );
+
+		// Ensure the link in our post was updated.
+		clean_post_cache( $post_id );
+		$post = get_post( $post_id );
+		$this->assertTrue( false !== strpos( $post->post_content, 'http://example.com/about-us' ) );
 
 		// Test and make sure we don't get weird find / replace issues.
 		$request = new WP_REST_Request( 'POST', '/bgbkup/v1/siteurl' );
@@ -107,5 +118,10 @@ class Test_Boldgrid_Backup_Rest_Siteurl extends Boldgrid_Backup_Rest_Case {
 		// Validate some options.
 		$this->assertTrue( 'http://example.com/514/514' === get_option( 'home' ) );
 		$this->assertTrue( 'http://example.com/514/514' === get_option( 'siteurl' ) );
+
+		// Ensure the link in our post was updated.
+		clean_post_cache( $post_id );
+		$post = get_post( $post_id );
+		$this->assertTrue( false !== strpos( $post->post_content, 'http://example.com/514/514/about-us' ) );
 	}
 }
