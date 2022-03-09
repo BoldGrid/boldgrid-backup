@@ -25,9 +25,13 @@ class Boldgrid_Backup_Rest_Utility {
 	 * @return string
 	 */
 	public static function get_current_url() {
-		$protocol = isset( $_SERVER['HTTPS'] ) && 'on' === $_SERVER['HTTPS'] ? 'https' : 'http';
+		$url = '';
 
-		return $protocol . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+		if ( ! empty( $_SERVER['HTTP_HOST'] ) ) {
+			$url = ( is_ssl() ? 'https' : 'http' ) . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+		}
+
+		return $url;
 	}
 
 	/**
