@@ -300,6 +300,7 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-setting.php';
 		require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-archive.php';
 		require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-test.php';
+		require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-siteurl.php';
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-usage.php';
 
@@ -587,6 +588,9 @@ class Boldgrid_Backup {
 
 			$rest_test = new Boldgrid_Backup_Rest_Test( $plugin_admin_core );
 			$rest_test->register_routes();
+
+			$rest_siteurl = new Boldgrid_Backup_Rest_Siteurl( $plugin_admin_core );
+			$rest_siteurl->register_routes();
 		} );
 
 		$usage = new Boldgrid_Backup_Admin_Usage();

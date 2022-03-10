@@ -92,7 +92,7 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 	 * @since 1.5.1
 	 */
 	public function post_restore_htaccess() {
-		add_action( 'shutdown', 'flush_rewrite_rules' );
+		add_action( 'shutdown', '\Boldgrid_Backup_Admin_Utility::flush_rewrite_rules' );
 	}
 
 	/**
