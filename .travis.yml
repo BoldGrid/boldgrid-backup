@@ -31,10 +31,11 @@ matrix:
         # We are only running phpcs on php 5.6. @todo fix with php 7 and 8.
         - yarn run php-codesniffer
     - php: 7.4
-      before_script:
+      before_install:
         - php -v
         - apt-get update -y
         - apt-get install -y libargon2-0
+      before_script:
         - nvm install 10
         - nvm use 10
         - yarn install
