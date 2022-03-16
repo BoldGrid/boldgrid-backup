@@ -21,9 +21,8 @@ matrix:
         - nvm use 10
         - yarn install
         - composer self-update --1
-        # Lock file has phpunit 7. Remove it and install phpunit 5 for php 5.6.
-        - composer remove --dev phpunit/phpunit
-        - composer require --dev phpunit/phpunit ^5
+        # Lock file has phpunit 7. Update phpunit for this current environment.
+        - composer update phpunit/phpunit
         - composer install -o
         - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
         # We are only running phpcs on php 5.6. @todo fix with php 7 and 8.
@@ -36,9 +35,7 @@ matrix:
         - nvm use 10
         - yarn install
         - composer self-update --1
-        # Lock file has phpunit 7. Remove it and install phpunit for this environment.
-        - composer remove --dev phpunit/phpunit
-        - composer require --dev phpunit/phpunit
+        - composer update phpunit/phpunit
         - composer install -o
         - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
     -
@@ -49,9 +46,7 @@ matrix:
         - nvm use 10
         - yarn install
         - composer self-update --1
-        # Lock file has phpunit 7. Remove it and install phpunit for this environment.
-        - composer remove --dev phpunit/phpunit
-        - composer require --dev phpunit/phpunit
+        - composer update phpunit/phpunit
         - composer install -o
         - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
 
