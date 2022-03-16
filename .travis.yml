@@ -1,9 +1,5 @@
 language: php
 
-# Distrubution / environments: https://docs.travis-ci.com/user/reference/overview/
-# Ubuntu Trusty does not support php8: https://docs.travis-ci.com/user/languages/php/
-dist: xenial
-
 services:
   # Specifically including MySQL was not needed with Trusty, but other environments do need it.
   - mysql
@@ -17,7 +13,9 @@ notifications:
 
 matrix:
   include:
-    - php: 5.6
+    -
+      php: 5.6
+      dist: xenial
       before_script:
         - nvm install 10
         - nvm use 10
@@ -30,13 +28,9 @@ matrix:
         - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
         # We are only running phpcs on php 5.6. @todo fix with php 7 and 8.
         - yarn run php-codesniffer
-    - php: 7.4
-      before_install:
-        - sudo apt-get update -y
-        - sudo apt-get -y install libargon2-1
-        - curl -sSf --retry 5 -o archive.tar.bz2 https://storage.googleapis.com/travis-ci-language-archives/php/binaries/ubuntu/16.04/x86_64/php-7.4.tar.bz2 && tar xjf archive.tar.bz2 --directory /
-        - phpenv global 7.4
-        - php -v
+    -
+      php: 7.4
+      dist: bionic
       before_script:
         - nvm install 10
         - nvm use 10
@@ -47,7 +41,9 @@ matrix:
         - composer require --dev phpunit/phpunit
         - composer install -o
         - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
-    - php: 8.0
+    -
+      php: 8.0
+      dist: xenial
       before_script:
         - nvm install 10
         - nvm use 10
