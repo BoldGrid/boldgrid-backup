@@ -793,7 +793,7 @@ class Boldgrid_Backup_Admin_Utility {
 		return true;
 	}
 
-	/**
+		/**
 	 * A wrapper for WordPress' flush_rewrite_rules.
 	 *
 	 * Wrapper function is necessary because rewriting the .htaccess only works if the
@@ -806,7 +806,17 @@ class Boldgrid_Backup_Admin_Utility {
 	 *                   (soft flush).
 	 */
 	public static function flush_rewrite_rules( $hard = true ) {
-		// A requirement for rewriting the .htaccess file.
+		/**
+		 * We need to reinitialize $wp_rewrite here to ensure that the .htaccess gets the proper
+		 * rewrite structure added to it when post_restore_htaccess is called. The original rewrite
+		 * rules are still cached in the wp_rewrite object and this reinitialization ensures that the
+		 * old values are cleared. When flush_rewrite_rules runs here the new settings from the
+		 * database restoration are detected and the .htaccess is updated as intended if the file
+		 * changed during the restore.
+		*/
+		global $wp_rewrite;
+        $wp_rewrite->init();
+
 		if ( $hard && ! function_exists( 'save_mod_rewrite_rules' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/misc.php';
 		}
