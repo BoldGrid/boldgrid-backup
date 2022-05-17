@@ -806,7 +806,6 @@ class Boldgrid_Backup_Admin_Utility {
 	 *                   (soft flush).
 	 */
 	public static function flush_rewrite_rules( $hard = true ) {
-		// A requirement for rewriting the .htaccess file.
 		if ( $hard && ! function_exists( 'save_mod_rewrite_rules' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/misc.php';
 		}

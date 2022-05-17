@@ -1263,6 +1263,7 @@ class Boldgrid_Backup_Admin_Core {
 	 * @see Boldgrid_Backup_Admin_Utility::update_siteurl()
 	 * @global WP_Filesystem $wp_filesystem The WordPress Filesystem API global object.
 	 * @global wpdb $wpdb The WordPress database class object.
+	 * @global WP_Rewrite $wp_rewrite Core class used to implement a rewrite component API.
 	 *
 	 * @param  string $db_dump_filepath File path to the mysql dump file.
 	 * @param  string $db_prefix        The database prefix to use, if restoring and it changed.
@@ -1332,6 +1333,23 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Clear the WordPress cache.
 		wp_cache_flush();
+
+		/**
+		 * In addition to flushing the cache (above), some classes may have cached option values (or other
+		 * data from the database) in some other way - e.g. in class properties. That cached data cannot
+		 * be flushed with wp_cache_flush.
+		 *
+		 * For example, the global $wp_rewrite class caches the permalink_structure option's value during
+		 * its init method. Running the cache flush above will not update this class' permalink_structure
+		 * property.
+		 *
+		 * @link https://github.com/WordPress/WordPress/blob/master/wp-includes/class-wp-rewrite.php#L1894
+		 *
+		 * This is important because if trying to rebuild the .htaccess file, it won't rebuild correctly
+		 * based on the permalink_structure option in the database just restored.
+		*/
+		global $wp_rewrite;
+		$wp_rewrite->init();
 
 		// Get the restored "siteurl" and "home".
 		$restored_wp_siteurl = get_option( 'siteurl' );

@@ -135,15 +135,11 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 			$original = ABSPATH . $file['filename'];
 			$new      = $original . '.bgb';
 
-			// Determine if the file was restored from backup.
-			$file_restored = false;
-			if ( $file['copied'] && sha1_file( $original ) !== sha1_file( $new ) ) {
-				$file_restored = true;
-			} elseif ( $file['copy'] && ! $file['copied'] && $wp_filesystem->exists( $original ) ) {
-				$file_restored = true;
-			}
+			// Determine if the file was changed during restoration.
+			$post_sha1   = sha1_file( $original );
+			$has_changed = $this->monitors_files[ $key ]['pre_sha1'] !== $post_sha1;
 
-			if ( $file_restored ) {
+			if ( $has_changed ) {
 				/**
 				 * Action to take after a specific file has been restored.
 				 *
@@ -182,6 +178,9 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 				$wp_filesystem->copy( $original, $new, true, 0644 );
 				$this->monitor_files[ $key ]['copied'] = true;
 			}
+
+			// Store sha1 to help identify if file was restored (later on).
+			$this->monitor_files[ $key ]['pre_sha1'] = sha1_file( $original );
 		}
 
 		// Only register this action when we know we're doing a restore.
