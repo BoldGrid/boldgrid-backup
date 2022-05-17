@@ -815,7 +815,7 @@ class Boldgrid_Backup_Admin_Utility {
 		 * changed during the restore.
 		*/
 		global $wp_rewrite;
-        $wp_rewrite->init();
+		$wp_rewrite->init();
 
 		if ( $hard && ! function_exists( 'save_mod_rewrite_rules' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/misc.php';

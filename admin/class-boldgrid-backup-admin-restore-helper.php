@@ -137,7 +137,7 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 
 			// Determine if the file was changed during restoration.
 			$post_sha1   = sha1_file( $original );
-			$has_changed = $this->monitors_files[ $key ][ 'pre_sha1' ] !== $post_sha1;
+			$has_changed = $this->monitors_files[ $key ]['pre_sha1'] !== $post_sha1;
 
 			if ( $has_changed ) {
 				/**
