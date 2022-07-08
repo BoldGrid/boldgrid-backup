@@ -154,47 +154,49 @@ class Boldgrid_Backup_Admin_Db_Dump {
 	public function get_connection_string( $db_host = null, $db_name = null ) {
 		$params = array();
 
+        $has_socket = false;
+
 		// Configure parameters passed in.
 		$db_name = empty( $db_name ) ? DB_NAME : $db_name;
 		$db_host = empty( $db_host ) ? DB_HOST : $db_host;
 		$db_host = explode( ':', $db_host );
 
+        if ( 'sock' === pathinfo( $db_host[0], PATHINFO_EXTENSION ) || 'sock' === pathinfo( $db_host[1], PATHINFO_EXTENSION ) ) {
+            $has_socket = true;
+        }
+
 		// Parse info and get hostname, port, and socket. Not all required. See comments below.
-		switch ( count( $db_host ) ) {
+		switch ( $has_socket ) {
 			/*
 			 * Examples:
 			 *
-			 * # localhost
+			 * # localhost:/var/lib/mysql/mysql.sock
 			 * # /var/lib/mysql/mysql.sock
 			 */
-			case 1:
-				$has_socket = 'sock' === pathinfo( $db_host[0], PATHINFO_EXTENSION );
-
-				if ( $has_socket ) {
-					$params['unix_socket'] = $db_host[0];
+			case true:
+				if ( count( $db_host ) === 2 ) {
+                    $params['host'] = $db_host[0];
+					$params['unix_socket'] = $db_host[1];
 				} else {
-					$params['host'] = $db_host[0];
+					$params['unix_socket'] = $db_host[0];
 				}
 
 				break;
 			/*
 			 * Examples:
 			 *
-			 * # localhost:/var/lib/mysql/mysql.sock
+			 * # localhost
 			 * # localhost:3306
 			 */
-			case 2:
-				$has_socket = 'sock' === pathinfo( $db_host[1], PATHINFO_EXTENSION );
-				$has_port   = is_numeric( $db_host[1] );
+			case false:
+                function get_db_port() {
+                    global $wpdb;
+                    return $wpdb->get_row( "SHOW GLOBAL VARIABLES LIKE 'PORT'" ); 
+                }
 
 				$params['host'] = $db_host[0];
-
-				if ( $has_socket ) {
-					$params['unix_socket'] = $db_host[1];
-				} elseif ( $has_port ) {
-					$params['port'] = $db_host[1];
-				}
-
+				$params['port'] = get_db_port()->Value;
+				
 				break;
 		}
 
