@@ -150,48 +150,11 @@ class Boldgrid_Backup_Admin_Db_Import {
 			return false;
 		}
 
-        // Parameters to check the DB_HOST setup
-        $db_host = empty( $db_host ) ? DB_HOST : $db_host;
-		$db_host = explode( ':', $db_host );
-        $has_socket = false;
+        $core = apply_filters( 'boldgrid_backup_get_core', null );
 
-        if ( 'sock' === pathinfo( $db_host[0], PATHINFO_EXTENSION ) || 'sock' === pathinfo( $db_host[1], PATHINFO_EXTENSION ) ) {
-            $has_socket = true;
-        }
+        $db_connection_string = $core->db_dump->get_connection_string();
 
-        switch ( $has_socket ) {
-
-            /*
-			 * Examples:
-			 *
-			 * # localhost:/var/lib/mysql/mysql.sock
-			 * # /var/lib/mysql/mysql.sock
-			 */
-
-			case true:
-
-                if ( count( $db_host ) === 2 ) {
-                    $db = new PDO( sprintf( 'mysql:unix-socket=%1$s;dbname=%2$s;', $db_host[1], DB_NAME ), DB_USER, DB_PASSWORD );
-				} else {
-					$db = new PDO( sprintf( 'mysql:unix-socket=%1$s;dbname=%2$s;', $db_host[0], DB_NAME ), DB_USER, DB_PASSWORD );
-				}
-
-				break;
-
-            /*
-			 * Examples:
-			 *
-			 * # localhost
-			 * # localhost:3306
-			 */
-
-			case false:
-
-                $db = new PDO( sprintf( 'mysql:host=%1$s;dbname=%2$s;', DB_HOST, DB_NAME ), DB_USER, DB_PASSWORD );
-				
-				break;
-
-        }
+        $db = new PDO( $db_connection_string, DB_USER, DB_PASSWORD );
 
 		$templine = '';
 
