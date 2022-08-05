@@ -143,6 +143,17 @@ class Boldgrid_Backup_Admin_Db_Dump {
 	}
 
 	/**
+	 * Fetch MySQL port number from global DB variables.
+	 */
+	public function get_db_port() {
+		if ( ! $wpdb ) {
+			global $wpdb;
+		}
+
+		return $wpdb->get_row( "SHOW GLOBAL VARIABLES LIKE 'PORT'" )->Value; 
+	}
+
+	/**
 	 * Get our PDO DSN connection string.
 	 *
 	 * @since 1.13.3
@@ -154,20 +165,16 @@ class Boldgrid_Backup_Admin_Db_Dump {
 	public function get_connection_string( $db_host = null, $db_name = null ) {
 		global $wpdb;
 
-		function get_db_port() {
-			return $wpdb->get_row( "SHOW GLOBAL VARIABLES LIKE 'PORT'" ); 
+		$params = array();
+
+		$db_host = $wpdb->parse_db_host( DB_HOST );
+		
+		if ( $db_host[0] ) {
+			$params['host'] = $db_host[0];
 		}
 
-        $params = array();
-
-        $db_host = $wpdb->parse_db_host( DB_HOST );
-		
-        if ( $db_host[0] ) {
-            $params['host'] = $db_host[0];
-        }
-
 		if ( $db_host[0] && ! $db_host[2] ) {
-			$params['port'] = get_db_port()->Value;
+			$params['port'] = $this->get_db_port();
 		}
 
 		if ( $db_host[2] ) {
