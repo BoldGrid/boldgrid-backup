@@ -146,7 +146,7 @@ class Boldgrid_Backup_Admin_Db_Dump {
 	 * Fetch MySQL port number from global DB variables.
 	 */
 	public function get_db_port() {
-		if ( ! $wpdb ) {
+		if ( ! isset( $wpdb ) ) {
 			global $wpdb;
 		}
 
@@ -165,20 +165,24 @@ class Boldgrid_Backup_Admin_Db_Dump {
 	public function get_connection_string( $db_host = null, $db_name = null ) {
 		global $wpdb;
 
+		// Configure parameters passed in.
+		$db_name = empty( $db_name ) ? DB_NAME : $db_name;
+		$db_host = empty( $db_host ) ? DB_HOST : $db_host;
+
 		$params = array();
 
-		$db_host = $wpdb->parse_db_host( DB_HOST );
+		$db_host_params = $wpdb->parse_db_host( $db_host );
 		
-		if ( $db_host[0] ) {
-			$params['host'] = $db_host[0];
+		if ( $db_host_params[0] ) {
+			$params['host'] = $db_host_params[0];
 		}
 
-		if ( $db_host[0] && ! $db_host[2] ) {
+		if ( $db_host_params[0] && ! $db_host_params[2] ) {
 			$params['port'] = $this->get_db_port();
 		}
 
-		if ( $db_host[2] ) {
-			$params['unix-socket'] = $db_host[2];
+		if ( $db_host_params[2] ) {
+			$params['unix-socket'] = $db_host_params[2];
 		}
 
 		$connection_string = 'mysql:';
