@@ -189,7 +189,7 @@ class Boldgrid_Backup_Admin_Db_Dump {
 		foreach ( $params as $key => $value ) {
 			$connection_string .= $key . '=' . $value . ';';
 		}
-		$connection_string .= 'dbname=' . $db_name;
+		$connection_string .= 'dbname=' . $db_name . ';';
 
 		return $connection_string;
 	}
