@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0f9476fab65b10a14433d2c1584c5469",
+    "content-hash": "5638633930df768027386929107b0b53",
     "packages": [
         {
             "name": "boldgrid/library",
-            "version": "2.13.9",
+            "version": "2.13.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BoldGrid/library.git",
-                "reference": "b7f4081e84181aff6ca68f7eda22c048174f50cd"
+                "reference": "e6f9638b89d63f390c3ea86fd1873eaa383ef979"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BoldGrid/library/zipball/b7f4081e84181aff6ca68f7eda22c048174f50cd",
-                "reference": "b7f4081e84181aff6ca68f7eda22c048174f50cd",
+                "url": "https://api.github.com/repos/BoldGrid/library/zipball/e6f9638b89d63f390c3ea86fd1873eaa383ef979",
+                "reference": "e6f9638b89d63f390c3ea86fd1873eaa383ef979",
                 "shasum": ""
             },
             "require-dev": {
@@ -57,31 +57,20 @@
                 }
             ],
             "description": "The BoldGrid Library for shared code used in official BoldGrid plugins and themes.",
-            "time": "2022-07-05T20:49:37+00:00"
-        },
-        {
-            "name": "chland/tdcron",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/chland/tdcron",
-                "reference": "origin/master"
-            },
-            "type": "library",
-            "time": "2018-01-23T14:06:12+00:00"
+            "time": "2022-11-01T14:58:10+00:00"
         },
         {
             "name": "ifsnop/mysqldump-php",
-            "version": "dev-add-include-views",
+            "version": "v2.9",
             "source": {
                 "type": "git",
-                "url": "https://github.com/BoldGrid/mysqldump-php.git",
-                "reference": "e9d009e543795069272d09ed5cb71a865a805522"
+                "url": "https://github.com/ifsnop/mysqldump-php.git",
+                "reference": "fc9c119fe5d70af9a685cad6a8ac612fd7589e25"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BoldGrid/mysqldump-php/zipball/e9d009e543795069272d09ed5cb71a865a805522",
-                "reference": "e9d009e543795069272d09ed5cb71a865a805522",
+                "url": "https://api.github.com/repos/ifsnop/mysqldump-php/zipball/fc9c119fe5d70af9a685cad6a8ac612fd7589e25",
+                "reference": "fc9c119fe5d70af9a685cad6a8ac612fd7589e25",
                 "shasum": ""
             },
             "require": {
@@ -97,6 +86,7 @@
                     "Ifsnop\\": "src/Ifsnop/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "GPL-3.0-or-later"
             ],
@@ -110,6 +100,7 @@
             "description": "PHP version of mysqldump cli that comes with MySQL",
             "homepage": "https://github.com/ifsnop/mysqldump-php",
             "keywords": [
+                "PHP7",
                 "database",
                 "hhvm",
                 "mariadb",
@@ -119,13 +110,9 @@
                 "pdo",
                 "php",
                 "php5",
-                "php7",
                 "sql"
             ],
-            "support": {
-                "source": "https://github.com/BoldGrid/mysqldump-php/tree/add-include-views"
-            },
-            "time": "2020-01-09T19:43:11+00:00"
+            "time": "2020-04-03T14:40:40+00:00"
         },
         {
             "name": "phpseclib/phpseclib",
@@ -338,6 +325,7 @@
                 "performance",
                 "profiling"
             ],
+            "abandoned": true,
             "time": "2015-08-31T22:07:48+00:00"
         },
         {
@@ -1912,8 +1900,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "ifsnop/mysqldump-php": 20,
-        "chland/tdcron": 20,
         "lox/xhprof": 20
     },
     "prefer-stable": false,

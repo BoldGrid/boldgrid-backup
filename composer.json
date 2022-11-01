@@ -2,24 +2,20 @@
 	"repositories" : [{
 			"type" : "package",
 			"package" : {
-				"name" : "chland/tdcron",
+				"name" : "boldgrid/tdcron",
 				"version" : "dev-master",
 				"source" : {
-					"url" : "https://github.com/chland/tdcron",
+					"url" : "https://github.com/boldgrid/tdcron",
 					"type" : "git",
 					"reference" : "origin/master"
 				}
 			}
-		}, {
-			"type" : "vcs",
-            "url" : "https://github.com/BoldGrid/mysqldump-php"
 		}
 	],
 	"require" : {
 		"boldgrid/library" : "^2.13.2",
-		"ifsnop/mysqldump-php" : "dev-add-include-views",
 		"phpseclib/phpseclib" : "~2.0",
-		"chland/tdcron" : "dev-master"
+		"ifsnop/mysqldump-php": "^2.9"
 	},
 	"require-dev" : {
 		"lox/xhprof" : "dev-master",
