@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d43d20971fdc0a52438e8fb473a422d4",
+    "content-hash": "5638633930df768027386929107b0b53",
     "packages": [
         {
             "name": "boldgrid/library",
@@ -61,16 +61,16 @@
         },
         {
             "name": "ifsnop/mysqldump-php",
-            "version": "dev-add-include-views",
+            "version": "v2.9",
             "source": {
                 "type": "git",
-                "url": "https://github.com/BoldGrid/mysqldump-php.git",
-                "reference": "e9d009e543795069272d09ed5cb71a865a805522"
+                "url": "https://github.com/ifsnop/mysqldump-php.git",
+                "reference": "fc9c119fe5d70af9a685cad6a8ac612fd7589e25"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BoldGrid/mysqldump-php/zipball/e9d009e543795069272d09ed5cb71a865a805522",
-                "reference": "e9d009e543795069272d09ed5cb71a865a805522",
+                "url": "https://api.github.com/repos/ifsnop/mysqldump-php/zipball/fc9c119fe5d70af9a685cad6a8ac612fd7589e25",
+                "reference": "fc9c119fe5d70af9a685cad6a8ac612fd7589e25",
                 "shasum": ""
             },
             "require": {
@@ -86,6 +86,7 @@
                     "Ifsnop\\": "src/Ifsnop/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "GPL-3.0-or-later"
             ],
@@ -99,6 +100,7 @@
             "description": "PHP version of mysqldump cli that comes with MySQL",
             "homepage": "https://github.com/ifsnop/mysqldump-php",
             "keywords": [
+                "PHP7",
                 "database",
                 "hhvm",
                 "mariadb",
@@ -108,13 +110,9 @@
                 "pdo",
                 "php",
                 "php5",
-                "php7",
                 "sql"
             ],
-            "support": {
-                "source": "https://github.com/BoldGrid/mysqldump-php/tree/add-include-views"
-            },
-            "time": "2020-01-09T19:43:11+00:00"
+            "time": "2020-04-03T14:40:40+00:00"
         },
         {
             "name": "phpseclib/phpseclib",
@@ -1902,7 +1900,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "ifsnop/mysqldump-php": 20,
         "lox/xhprof": 20
     },
     "prefer-stable": false,

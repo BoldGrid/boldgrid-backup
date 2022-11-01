@@ -10,15 +10,12 @@
 					"reference" : "origin/master"
 				}
 			}
-		}, {
-			"type" : "vcs",
-            "url" : "https://github.com/BoldGrid/mysqldump-php"
 		}
 	],
 	"require" : {
 		"boldgrid/library" : "^2.13.2",
-		"ifsnop/mysqldump-php" : "dev-add-include-views",
-		"phpseclib/phpseclib" : "~2.0"
+		"phpseclib/phpseclib" : "~2.0",
+		"ifsnop/mysqldump-php": "^2.9"
 	},
 	"require-dev" : {
 		"lox/xhprof" : "dev-master",
