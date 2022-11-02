@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5638633930df768027386929107b0b53",
+    "content-hash": "061c116ad2c2916e129591350529454c",
     "packages": [
         {
             "name": "boldgrid/library",
@@ -58,6 +58,17 @@
             ],
             "description": "The BoldGrid Library for shared code used in official BoldGrid plugins and themes.",
             "time": "2022-11-01T14:58:10+00:00"
+        },
+        {
+            "name": "boldgrid/tdcron",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/boldgrid/tdcron",
+                "reference": "origin/master"
+            },
+            "type": "library",
+            "time": "2022-11-02T14:18:33+00:00"
         },
         {
             "name": "ifsnop/mysqldump-php",
@@ -1900,6 +1911,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "boldgrid/tdcron": 20,
         "lox/xhprof": 20
     },
     "prefer-stable": false,
