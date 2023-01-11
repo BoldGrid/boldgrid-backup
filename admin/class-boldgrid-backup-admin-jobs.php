@@ -247,6 +247,7 @@ class Boldgrid_Backup_Admin_Jobs {
 			}
 
 			$job['start_time'] = time();
+			$job[status] = 'running';
 			$this->save_jobs();
 
 			$status = apply_filters( $job['action'], $job['action_data'] );
