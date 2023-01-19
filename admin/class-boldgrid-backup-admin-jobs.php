@@ -289,7 +289,6 @@ class Boldgrid_Backup_Admin_Jobs {
 		$this->jobs = get_site_option( $this->option, array() );
 	}
 }
-
 	/**
 	* Fix stalled jobs.
 	*
@@ -300,7 +299,7 @@ class Boldgrid_Backup_Admin_Jobs {
 	* been running for 3 hours, it's stalled. Most likely the process was
 	* either killed and or had a fatal error.
 	*/
-	function maybe_fixed_stalled() {
+	private function maybe_fixed_stalled() {
 		$this->set_jobs();
 
 		// If we make any changes to jobs, we'll need to update the option.
