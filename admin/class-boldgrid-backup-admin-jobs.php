@@ -224,7 +224,6 @@ class Boldgrid_Backup_Admin_Jobs {
 
 		return $this->core->email->send( $email_parts['subject'], $body );
 	}
-
 	/**
 	 * Run the next job in the queue.
 	 *
@@ -248,7 +247,6 @@ class Boldgrid_Backup_Admin_Jobs {
 			}
 
 			$job['start_time'] = time();
-			$job['status']     = 'running';
 			$this->save_jobs();
 
 			$status = apply_filters( $job['action'], $job['action_data'] );
@@ -290,14 +288,24 @@ class Boldgrid_Backup_Admin_Jobs {
 	}
 }
 
-	private function maybe_fixed_stalled() {
+	/**
+	* Fix stalled jobs.
+	*
+	* A stalled job is a job who's status has been set to 'running',
+	* however it's been running longer than expected.
+	*
+	* For example, if a job is only supposed to take 1 minute, and it's
+	* been running for 3 hours, it's stalled. Most likely the process was
+	* either killed and or had a fatal error.
+	*/
+	function maybe_fixed_stalled() {
 		$this->set_jobs();
 
 		// If we make any changes to jobs, we'll need to update the option.
 		$have_changes = false;
 
 		foreach ( $this->jobs as &$job ) {
-		   	// If the job never started, then it can't be stalled. Move on to the next job.
+		   // If the job never started, then it can't be stalled. Move on to the next job.
 			if ( empty( $job['start_time'] ) ) {
 				continue;
 			}
