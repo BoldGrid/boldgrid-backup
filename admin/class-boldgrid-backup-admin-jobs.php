@@ -226,6 +226,47 @@ class Boldgrid_Backup_Admin_Jobs {
 	}
 
 	/**
+	* Fix stalled jobs.
+	*
+	* A stalled job is a job who's status has been set to 'running',
+	* however it's been running longer than expected.
+	*
+	* For example, if a job is only supposed to take 1 minute, and it's
+	* been running for 3 hours, it's stalled. Most likely the process was
+	* either killed and or had a fatal error.
+	*/
+	private function maybe_fixed_stalled() {
+		$this->set_jobs();
+
+		// If we make any changes to jobs, we'll need to update the option.
+		$have_changes = false;
+
+		foreach ( $this->jobs as &$job ) {
+			// If the job never started, then it can't be stalled. Move on to the next job.
+			if ( empty( $job['start_time'] ) ) {
+				continue;
+			}
+
+			// Determine whether or not this job is stalled.
+			$time_limit = HOUR_IN_SECONDS;
+			$duration   = time() - $job['start_time'];
+			$is_stalled = $duration > $time_limit;
+
+			if ( $is_stalled ) {
+				$jobs['end_time'] = time();
+				$jobs['status']   = 'stalled';
+
+				$have_changes = true;
+			}
+		}
+
+		// If we have changes, update the option in the db.
+		if ( $have_changes ) {
+			$this->save_jobs();
+		}
+	}
+
+	/**
 	 * Run the next job in the queue.
 	 *
 	 * This is the main method of this class. When cron or wp-cron runs, it will
@@ -239,6 +280,7 @@ class Boldgrid_Backup_Admin_Jobs {
 		// If there are no jobs or already running, then abort.
 		if ( empty( $this->jobs ) || $this->is_running() ) {
 			wp_die();
+			$this->maybe_fixed_stalled();
 		}
 
 		foreach ( $this->jobs as $key => &$job ) {
