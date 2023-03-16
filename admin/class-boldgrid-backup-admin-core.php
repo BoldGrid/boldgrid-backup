@@ -330,12 +330,12 @@ class Boldgrid_Backup_Admin_Core {
 	 * An instance of the Archive Details class.
 	 *
 	 * @since  1.5.1
-	 * @var    Boldgrid_Backup_Admin_Archive_Details 
+	 * @var    Boldgrid_Backup_Admin_Archive_Details
 	 */
 	public $archive_details;
 
 	/**
-	 * An instance of the Archive Fail class. 
+	 * An instance of the Archive Fail class.
 	 *
 	 * @since  1.5.2
 	 * @var    Boldgrid_Backup_Admin_Archive_Fail
