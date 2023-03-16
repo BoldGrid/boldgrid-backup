@@ -1774,6 +1774,7 @@ class Boldgrid_Backup_Admin_Core {
 		$db_time_stop = microtime( true );
 
 		// Get the file list.
+		$this->logger->add( 'Retrieving file list.' );
 		$filelist = $this->get_filtered_filelist( ABSPATH );
 
 		// Initialize total_size.
@@ -1790,6 +1791,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Get the backup directory path.
+		$this->logger->add( 'Retrieving backup directory.' );
 		$backup_directory = $this->backup_dir->get();
 
 		// Check if the backup directory is writable.
@@ -1799,6 +1801,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Add the database dump file to the beginning of file list.
+		$this->logger->add( 'Adding Database to file list.' );
 		if ( ! empty( $this->db_dump_filepath ) ) {
 			$db_dump_size = $this->wp_filesystem->size( $this->db_dump_filepath );
 
