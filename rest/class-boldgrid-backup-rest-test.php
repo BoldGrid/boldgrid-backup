@@ -85,6 +85,26 @@ class Boldgrid_Backup_Rest_Test extends Boldgrid_Backup_Rest_Controller {
 					'description' => esc_html__( 'Whether or not the site passed the preflight check.', 'boldgrid-backup' ),
 					'type'        => 'bool',
 				],
+				'php_version' => [
+					'context'     => [ 'view' ],
+					'description' => esc_html__( 'PHP Version', 'boldgrid-backup' ),
+					'type'        => 'string',
+				],
+				'database_size' => [
+					'context'     => [ 'view' ],
+					'description' => esc_html__( 'Size of the database', 'boldgrid-backup' ),
+					'type'        => 'integer',
+				],
+				'abspath' => [
+					'context'     => [ 'view' ],
+					'description' => esc_html__( 'ABSPATH Version', 'boldgrid-backup' ),
+					'type'        => 'string',
+				],
+				'abspath_size' => [
+					'context'     => [ 'view' ],
+					'description' => esc_html__( 'Size of ABSPATH', 'boldgrid-backup' ),
+					'type'        => 'integer',
+				],
 			],
 		];
 
@@ -94,14 +114,25 @@ class Boldgrid_Backup_Rest_Test extends Boldgrid_Backup_Rest_Controller {
 	/**
 	 * Get the the preflight check results.
 	 *
+	 * Originally built to show just the pass / fail status, but has since been updated to show
+	 * more details (such as php version, disk sizes, etc).
+	 *
 	 * @since SINCEVERSION
 	 *
 	 * @param WP_REST_Request $request Request object.
 	 * @return array                   Preflight check results.
 	 */
 	public function get_item( $request ) {
-		$preflight_test     = new Boldgrid_Backup_Admin_Test( $this->core );
-		$settings['passed'] = $preflight_test->run_functionality_tests();
+		$preflight_test = new Boldgrid_Backup_Admin_Test( $this->core );
+
+		$settings = array(
+			'passed'        => $preflight_test->run_functionality_tests(),
+			'php_version'   => phpversion(),
+			'database_size' => $preflight_test->get_database_size(),
+			'abspath'       => ABSPATH,
+			'abspath_size'  => get_dirsize( ABSPATH ),
+		);
+
 		return $this->prepare_item_for_response( $settings, $request );
 	}
 }
