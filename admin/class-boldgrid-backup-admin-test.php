@@ -832,11 +832,13 @@ class Boldgrid_Backup_Admin_Test {
 			return 0;
 		}
 
+		$size = (int) $result[0];
+
 		// Save some time, set transient.
-		set_transient( 'boldgrid_backup_db_size', $result[0], $this->transient_time );
+		set_transient( 'boldgrid_backup_db_size', $size, $this->transient_time );
 
 		// Return result.
-		return $result[0];
+		return $size;
 	}
 
 	/**
