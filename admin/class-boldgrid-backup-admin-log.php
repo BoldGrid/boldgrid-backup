@@ -147,6 +147,12 @@ class Boldgrid_Backup_Admin_Log {
 		$this->last_error = $current_error;
 	}
 
+	/**
+	 * Add user-friendly messaging to the log regarding the last error
+	 *
+     * @param array $current_error The error array to format
+	 * @since 1.5.7
+	 */
 	public static function format_error_info( $current_error ) {
 		// Array containing error details for logging purposes
 		$error_codes = [ 
@@ -169,7 +175,7 @@ class Boldgrid_Backup_Admin_Log {
 
 		// Add additional info for common errors
 		switch ($current_error['type']) {
-			
+
 			case 1:
 				$current_error['additional_info'] = "This type of error may indicate a possible issue with the backup process";
 
