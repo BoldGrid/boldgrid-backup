@@ -136,7 +136,10 @@ class Boldgrid_Backup_Admin_Log {
 	 * @since 1.13.5
 	 */
 	public function add_last_error() {
-		$current_error = $this->format_error_info( error_get_last() );
+		$current_error = error_get_last();
+		if ( ! empty( $current_error ) ) {
+			$current_error = $this->format_error_info( $current_error );
+		}
 
 		// Only new errors are logged.
 		if ( $current_error !== $this->last_error ) {
@@ -180,22 +183,22 @@ class Boldgrid_Backup_Admin_Log {
 		 * all cases should fall through to default to complete the formatting.
 		 */
 		switch ( $current_error['type'] ) {
-
+			// Fatal error
 			case 1:
 				$current_error['additional_info'] = 'This type of error may indicate a possible issue with the backup process';
-
+			// Warnings
 			case 2:
 				$current_error['additional_info'] = 'Warnings can be ignored safely in most cases. These may indicate a problem if your backup is failing.';
-
+			// Parse errors
 			case 4:
 				$current_error['additional_info'] = 'This type of error may indicate a possible issue with the backup process';
-
+			// Notices
 			case 8:
 				$current_error['additional_info'] = 'Notices can be ignored safely in most cases. These may indicate a problem if your backup is failing.';
-
+			// Deprecated warnings
 			case 8192:
 				$current_error['additional_info'] = 'Deprecation warnings can be ignored safely in most cases. These may indicate a problem if your backup is failing.';
-
+			// Complete formatting
 			default:
 				$error_info                = array();
 				$error_info['error_code']  = $current_error['type'];
