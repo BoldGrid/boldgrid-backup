@@ -183,22 +183,26 @@ class Boldgrid_Backup_Admin_Log {
 		 * all cases should fall through to default to complete the formatting.
 		 */
 		switch ( $current_error['type'] ) {
-			// Fatal error
 			case 1:
 				$current_error['additional_info'] = 'This type of error may indicate a possible issue with the backup process';
-			// Warnings
+				// Add additional info for  Fatal error and fall through to complete formatting
+
 			case 2:
 				$current_error['additional_info'] = 'Warnings can be ignored safely in most cases. These may indicate a problem if your backup is failing.';
-			// Parse errors
+				// Add additional info for wWrnings and fall through to complete formatting
+
 			case 4:
 				$current_error['additional_info'] = 'This type of error may indicate a possible issue with the backup process';
-			// Notices
+				// Add additional info for Parse errors and fall through to complete formatting
+
 			case 8:
 				$current_error['additional_info'] = 'Notices can be ignored safely in most cases. These may indicate a problem if your backup is failing.';
-			// Deprecated warnings
+				// Add additional info for Notices and fall through to complete formatting
+
 			case 8192:
 				$current_error['additional_info'] = 'Deprecation warnings can be ignored safely in most cases. These may indicate a problem if your backup is failing.';
-			// Complete formatting
+				// Add additional info for  Deprecated warnings and fall through to complete formatting
+
 			default:
 				$error_info                = array();
 				$error_info['error_code']  = $current_error['type'];
