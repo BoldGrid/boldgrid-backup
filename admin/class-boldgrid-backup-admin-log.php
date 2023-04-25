@@ -156,10 +156,9 @@ class Boldgrid_Backup_Admin_Log {
 	 * @param array $current_error The error array to format.
 	 * @since 1.5.7
 	 */
-	public static function format_error_info( $current_error ) {
-		/**
-		 * Array containing error codes and definitions.
-		 */
+	public function format_error_info( $current_error ) {
+
+		// Array containing error codes and definitions.
 		$error_codes = array(
 			1     => array( 'E_ERROR', 'Fatal run-time errors. These indicate errors that can not be recovered from, such as a memory allocation problem. Execution of the script is halted.' ),
 			2     => array( 'E_WARNING', 'Run-time warnings (non-fatal errors). Execution of the script is not halted.' ),
@@ -179,8 +178,8 @@ class Boldgrid_Backup_Admin_Log {
 		);
 
 		/**
-		 * Switch case to Add additional info for the corresponding errors from $error_codes
-		 * all cases should fall through to default to complete the formatting.
+		 * Switch case to add additional info for the corresponding errors from $error_codes
+		 * All cases should fall through to default to complete the formatting.
 		 */
 		switch ( $current_error['type'] ) {
 			case 1:
@@ -208,9 +207,6 @@ class Boldgrid_Backup_Admin_Log {
 				$error_info['error_code']  = $current_error['type'];
 				$error_info['description'] = $error_codes[ $current_error['type'] ][0] . ': ' . $error_codes[ $current_error['type'] ][1];
 				$current_error['type']     = $error_info;
-				if ( ! isset( $current_error['additional_info'] ) ) {
-					$current_error['additional_info'] = 'No additional info available.';
-				}
 				break;
 		}
 		return $current_error;
