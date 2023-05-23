@@ -602,6 +602,55 @@ class Boldgrid_Backup_Admin_Core {
 	 */
 	public $auto_updates;
 
+
+	/**
+	 * An instance of the Boldgrid_Backup_Admin_Upload class
+	 *
+	 * @since 1.0
+	 * @var Boldgrid_Backup_Admin_Upload
+	 */
+	public $upload;
+
+	/**
+	 * An instance of the Boldgrid_Backup_Admin_Restore_Git class
+	 *
+	 * @since 1.5.1
+	 * @var Boldgrid_Backup_Admin_Restore_Git
+	 */
+	public $restore_git;
+
+	/**
+	 * An instance of the Boldgrid_Backup_Admin_Compressors class
+	 *
+	 * @since 1.5.1
+	 * @var Boldgrid_Backup_Admin_Compressors
+	 */
+	public $compressors;
+
+	/**
+	 * An instance of the Boldgrid_Backup_Admin_Remote class
+	 *
+	 * @since 1.5.2
+	 * @var Boldgrid_Backup_Admin_Remote
+	 */
+	public $remote;
+
+	/**
+	 * An instance of the Boldgrid_Backup_Admin_Jobs class
+	 *
+	 * @since 1.5.2
+	 * @var Boldgrid_Backup_Admin_Jobs
+	 */
+	public $jobs;
+
+	/**
+	 * An instance of the Boldgrid_Backup_Premium class
+	 *
+	 * @since 1.5.2
+	 * @var Boldgrid_Backup_Premium
+	 */
+	public $premium;
+
 	/**
 	 * Constructor.
 	 *
@@ -1063,7 +1112,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Add "Backup Archive Details" page.
 		add_submenu_page(
-			null,
+			'null',
 			'BoldGrid ' . $lang['backup_archive'],
 			$lang['backup_archive'],
 			$capability,

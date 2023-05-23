@@ -238,6 +238,14 @@ class Boldgrid_Backup_Admin_Ftp {
 	private $reconnected = false;
 
 	/**
+	 * An instance of the Boldgrid_Backup_Admin_Ftp_Page class
+	 *
+	 * @since 1.6.0
+	 * @var Boldgrid_Backup_Admin_Ftp_Page
+	 */
+	public $page;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.6.0
