@@ -95,6 +95,9 @@ class Boldgrid_Backup_Admin_Filelist {
 
 		$size = 0;
 
+		// Delete transient "dirsize_cache" that WordPress sets when using recurse_dirsize(); used for Site Health info, our REST endpoint, and here.
+		delete_transient( 'dirsize_cache' );
+
 		foreach ( $this->filelist_filter as $file ) {
 			$file_path = ABSPATH . $file;
 
