@@ -49,7 +49,7 @@ matrix:
 
 script:
   - find . \( -name composer -o -name node_modules -o -name phpunit -o -name phpunit-polyfills -o -name code-unit-reverse-lookup \) -prune -o -name '*.php' -exec php -lf {} \; > /dev/null
-  - vendor/phpunit/phpunit/phpunit --debug
+  - vendor/phpunit/phpunit/phpunit --debug --verbose
   - yarn run js-lint
   # Remove dev scripts.
   - composer install -o --no-dev
@@ -60,8 +60,11 @@ deploy:
     skip_cleanup: true
     on:
       tags: true
+      php: 5.6
   - provider: releases
     api_key: "${GITHUB_TOKEN}"
     file: "boldgrid-backup.zip"
+    skip_cleanup: true
     on:
       tags: true
+      php: 5.6
