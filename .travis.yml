@@ -48,7 +48,7 @@ matrix:
         - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
 
 script:
-  - find . -name composer -prune -o -name node_modules -prune -o -name '*.php' -exec php -lf {} \; > /dev/null
+  - find . \( -name composer -o -name node_modules -o -name phpunit -o -name phpunit-polyfills -o -name code-unit-reverse-lookup \) -prune -o -name '*.php' -exec php -lf {} \; > /dev/null
   - vendor/phpunit/phpunit/phpunit --debug
   - yarn run js-lint
   # Remove dev scripts.
