@@ -85,12 +85,12 @@ class Boldgrid_Backup_Rest_Case extends WP_UnitTestCase {
 
 		do_action( 'rest_api_init' );
 
-		$this->editor_id = $this->factory->user->create( array(
+		$this->editor_id = $this->factory()->user->create( array(
 			'role'         => 'editor',
 			'display_name' => 'test_editor',
 		) );
 
-		$this->admin_id = $this->factory->user->create( array(
+		$this->admin_id = $this->factory()->user->create( array(
 			'role'         => 'administrator',
 			'display_name' => 'test_admin',
 		) );

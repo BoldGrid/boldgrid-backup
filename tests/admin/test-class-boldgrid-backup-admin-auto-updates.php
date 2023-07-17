@@ -188,25 +188,25 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 	 */
 	public function test_maybe_update_theme() {
 		// Test does not update if this theme hasn't been configured yet.
-		$twentytwenty_test_settings = $this->default_test_settings;
-		update_option( 'boldgrid_backup_settings', $twentytwenty_test_settings );
+		$twentytwentytwo_test_settings = $this->default_test_settings;
+		update_option( 'boldgrid_backup_settings', $twentytwentytwo_test_settings );
 		$auto_updates = new Boldgrid_backup_Admin_Auto_Updates();
-		$this->assertFalse( $auto_updates->maybe_update_theme( 'twentytwenty' ) );
+		$this->assertFalse( $auto_updates->maybe_update_theme( 'twentytwentytwo' ) );
 
 		// Test does not update if this theme has updates disabled.
-		$twentytwenty_test_settings['auto_update']['themes']['twentytwenty'] = '0';
-		update_option( 'boldgrid_backup_settings', $twentytwenty_test_settings );
+		$twentytwentytwo_test_settings['auto_update']['themes']['twentytwentytwo'] = '0';
+		update_option( 'boldgrid_backup_settings', $twentytwentytwo_test_settings );
 		$auto_updates->set_settings();
-		$this->assertFalse( $auto_updates->maybe_update_theme( 'twentytwenty' ) );
+		$this->assertFalse( $auto_updates->maybe_update_theme( 'twentytwentytwo' ) );
 
 		// Test that updates do occur if enabled.
-		$twentytwenty_test_settings['auto_update']['themes']['twentytwenty'] = '1';
-		update_option( 'boldgrid_backup_settings', $twentytwenty_test_settings );
+		$twentytwentytwo_test_settings['auto_update']['themes']['twentytwentytwo'] = '1';
+		update_option( 'boldgrid_backup_settings', $twentytwentytwo_test_settings );
 		$auto_updates->set_settings();
-		$this->assertTrue( $auto_updates->maybe_update_theme( 'twentytwenty' ) );
+		$this->assertTrue( $auto_updates->maybe_update_theme( 'twentytwentytwo' ) );
 
 		$themes = new \Boldgrid\Library\Library\Theme\Themes();
-		$theme  = $themes->getFromStylesheet( 'twentytwenty' );
+		$theme  = $themes->getFromStylesheet( 'twentytwentytwo' );
 		$theme->setUpdateData();
 		$days = $theme->updateData->days; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
 
@@ -216,7 +216,7 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 			->getMock();
 		$mock_auto_updates->method( 'is_premium_done' )
 			->will( $this->returnValue( false ) );
-		$this->assertTrue( $mock_auto_updates->maybe_update_theme( 'twentytwenty' ) );
+		$this->assertTrue( $mock_auto_updates->maybe_update_theme( 'twentytwentytwo' ) );
 
 		// Test updates will occur if within the day's option with premium active.
 		$mock_auto_updates = $this->getMockBuilder( Boldgrid_backup_Admin_Auto_Updates::class )
@@ -224,14 +224,14 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 			->getMock();
 		$mock_auto_updates->method( 'is_premium_done' )
 			->will( $this->returnValue( true ) );
-		$this->assertTrue( $mock_auto_updates->maybe_update_theme( 'twentytwenty' ) );
+		$this->assertTrue( $mock_auto_updates->maybe_update_theme( 'twentytwentytwo' ) );
 
 		// Test updates will not occur if not within the day's option with premium active.
-		$twentytwenty_test_settings['auto_update']['days']                   = (int) $days + 10;
-		$twentytwenty_test_settings['auto_update']['timely-updates-enabled'] = true;
-		update_option( 'boldgrid_backup_settings', $twentytwenty_test_settings );
+		$twentytwentytwo_test_settings['auto_update']['days']                   = (int) $days + 10;
+		$twentytwentytwo_test_settings['auto_update']['timely-updates-enabled'] = true;
+		update_option( 'boldgrid_backup_settings', $twentytwentytwo_test_settings );
 		$mock_auto_updates->set_settings();
-		$this->assertFalse( $mock_auto_updates->maybe_update_theme( 'twentytwenty' ) );
+		$this->assertFalse( $mock_auto_updates->maybe_update_theme( 'twentytwentytwo' ) );
 	}
 
 	/**
@@ -265,8 +265,8 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 			->will( $this->returnValue( true ) );
 		$themes = new \Boldgrid\Library\Library\Theme\Themes();
 		foreach ( $themes->get() as $theme ) {
-			if ( 'twentytwenty' === $theme->stylesheet ) {
-				$this->assertTrue( $mock_auto_updates->auto_update_themes( true, (object) array( 'theme' => 'twentytwenty' ) ) );
+			if ( 'twentytwentytwo' === $theme->stylesheet ) {
+				$this->assertTrue( $mock_auto_updates->auto_update_themes( true, (object) array( 'theme' => 'twentytwentytwo' ) ) );
 			}
 		}
 
@@ -277,8 +277,8 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 			->will( $this->returnValue( false ) );
 		$themes = new \Boldgrid\Library\Library\Theme\Themes();
 		foreach ( $themes->get() as $theme ) {
-			if ( 'twentytwenty' === $theme->stylesheet ) {
-				$this->assertFalse( $mock_auto_updates->auto_update_themes( true, (object) array( 'theme' => 'twentytwenty' ) ) );
+			if ( 'twentytwentytwo' === $theme->stylesheet ) {
+				$this->assertFalse( $mock_auto_updates->auto_update_themes( true, (object) array( 'theme' => 'twentytwentytwo' ) ) );
 			}
 		}
 	}
