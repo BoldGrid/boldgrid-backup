@@ -4,7 +4,7 @@ Tags: backup, cloud backup, database backup, restore, wordpress backup
 Requires at least: 4.4
 Tested up to: 6.2
 Requires PHP: 5.4
-Stable tag: 1.15.6
+Stable tag: 1.15.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,9 +23,9 @@ Total Upkeep is a full 360 solution that keeps your data safe and protects your 
 * Automated and manual backups
 * Full file and database backup or customize settings based on your needs
 * Remote backups via FTP / SFTP, Amazon S3 and Google Drive (Premium)
-* Total Upkeep checks to ensure that your webserver has the necessary features to properly create backup archives, which protects the integrity of your backups
+* Total Upkeep checks to ensure that your web server has the necessary features to properly create backup archives, which protects the integrity of your backups
 * Clone, duplicate and/or migrate your site with just a few clicks
-* Site Check monitors your site for issues that could lead to site crashes, provides a toolset to restore your site even if your WordPress installation is inaccessible
+* Site Check monitors your site for issues that could lead to site crashes, provides a tool set to restore your site even if your WordPress installation is inaccessible
 * Auto rollback feature creates a backup before updates, restores your site to the last backup if an update fails
 * Create staging sites to test new plugins or themes with Total Upkeep + Cloud WordPress
 
@@ -121,7 +121,7 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 = Minimum Requirements =
 
-* PHP 5.4 or higher.  PHP 7.3 or higher is recommended.
+* PHP 5.4 or higher.  PHP 7.4 or higher is recommended.
 * At least one of the following PHP execution functions enabled: "popen", "proc_open", "exec", "shell_exec", "passthru", or "system".
 * A Cron system with the "crontab" utility, or WP Cron.
 * A WP_Filesystem FS_METHOD being "direct".
@@ -131,6 +131,13 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 1. Activate the plugin through the Plugins menu in WordPress.
 
 == Changelog ==
+
+= 1.15.7 =
+
+Release date: July 17, 2023
+
+* Update: Better handling when checking the WordPress installation size.
+* Update: Updated translation POT file.
 
 = 1.15.6 =
 
@@ -274,7 +281,7 @@ Release date: August 12th, 2020
 
 Release date: July 22nd, 2020
 
-* Bug fix: Fixed array_key_exists() warings from auto-updates class.
+* Bug fix: Fixed array_key_exists() warnings from auto-updates class.
 * Bug fix: Fixed several invalid nonce errors.
 * Bug fix: Fixed markup escaping in rating prompt.
 * Bug fix: Fixed "backup site now" on archive page.
@@ -364,7 +371,7 @@ Release date: April 2nd, 2020
 
 = 1.13.2 =
 
-Release date: Februrary 21st, 2020
+Release date: February 21st, 2020
 
 * Bug fix:    Resolved activation bug during BoldGrid Inspirations deployment.
 
@@ -823,7 +830,7 @@ Release Date: September 7th, 2016
 
 Release Date: August 23rd, 2016
 
-* Bug fix: Updates via adminajax now updates the rollback timer.
+* Bug fix: Updates via admin-ajax now updates the rollback timer.
 * Misc: Updated readme.txt for Tested up to 4.6.
 
 = 1.2 =
@@ -883,4 +890,3 @@ BoldGrid Backup has become Total Upkeep.  Different name with the same great fea
 
 = 1.14.10 =
 Updating to Total Upkeep 1.14.10 will fix possible security issues related to the restore-info.json file and cli/env-info.php script.
-

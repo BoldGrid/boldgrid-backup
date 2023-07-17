@@ -1,0 +1,3768 @@
+# Copyright (C) 2023 BoldGrid
+# This file is distributed under the GPL-2.0+.
+msgid ""
+msgstr ""
+"Project-Id-Version: Total Upkeep 1.15.7\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/boldgrid-backup\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2023-07-17T16:09:29+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.5.0\n"
+"X-Domain: boldgrid-backup\n"
+
+#. Plugin Name of the plugin
+msgid "Total Upkeep"
+msgstr ""
+
+#. Plugin URI of the plugin
+msgid "https://www.boldgrid.com/boldgrid-backup/"
+msgstr ""
+
+#. Description of the plugin
+msgid "Automated backups, remote backup to Amazon S3 and Google Drive, stop website crashes before they happen and more. Total Upkeep is the backup solution you need."
+msgstr ""
+
+#. Author of the plugin
+msgid "BoldGrid"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://www.boldgrid.com/"
+msgstr ""
+
+#: admin/card/class-amazon-s3.php:32
+#: admin/partials/tools/local-remote.php:203
+#: includes/config/config.plugin.php:75
+msgid "Amazon S3"
+msgstr ""
+
+#: admin/card/class-amazon-s3.php:36
+msgid "Safely store backups in the cloud via Amazon S3. Compatible with automated remote backups feature."
+msgstr ""
+
+#: admin/card/class-backups.php:32
+#: admin/partials/boldgrid-backup-admin-nav.php:33
+msgid "Backups"
+msgstr ""
+
+#: admin/card/class-backups.php:34
+msgid "It's website insurance. Make sure you have a backup."
+msgstr ""
+
+#: admin/card/class-database-encryption.php:32
+#: admin/card/feature/class-database-encryption.php:32
+msgid "Database Encryption"
+msgstr ""
+
+#: admin/card/class-database-encryption.php:36
+msgid "Provides another level of protection by preventing unauthorized access to your database backup archives."
+msgstr ""
+
+#: admin/card/class-dream-objects.php:33
+#: includes/config/config.plugin.php:80
+msgid "DreamObjects"
+msgstr ""
+
+#: admin/card/class-dream-objects.php:37
+msgid "Safely store backups in the cloud via DreamObjects by DreamHost. Compatible with automated backups feature."
+msgstr ""
+
+#: admin/card/class-find-modified-files.php:30
+msgid "Find Modified Files"
+msgstr ""
+
+#: admin/card/class-find-modified-files.php:36
+msgid "Search for all files modified within a certain time period. You can also look for other versions of that file within your backups."
+msgstr ""
+
+#: admin/card/class-google-drive.php:33
+#: admin/partials/tools/local-remote.php:202
+#: includes/config/config.plugin.php:70
+msgid "Google Drive"
+msgstr ""
+
+#: admin/card/class-google-drive.php:39
+msgid "Keep your backup archives safe and secure with remote, automated backups to Google Drive."
+msgstr ""
+
+#: admin/card/class-historical-versions.php:33
+msgid "Historical Versions"
+msgstr ""
+
+#: admin/card/class-historical-versions.php:39
+msgid "Search through all backup archives for a particular, individual file and restore it."
+msgstr ""
+
+#: admin/card/class-history.php:33
+msgid "Update History"
+msgstr ""
+
+#: admin/card/class-history.php:39
+msgid "View a running log of significant actions to your WordPress site, including which users updated a plugin, theme, or WordPress itself."
+msgstr ""
+
+#: admin/card/class-one-click-restoration.php:33
+msgid "One Click File Restorations"
+msgstr ""
+
+#: admin/card/class-one-click-restoration.php:39
+msgid "Restore a single file within the backup browser. Helpful when modifying individual files."
+msgstr ""
+
+#: admin/card/class-plugin-editor-tools.php:33
+msgid "Plugin Editor Tools"
+msgstr ""
+
+#: admin/card/class-plugin-editor-tools.php:39
+msgid "When using the WordPress Plugin Editor, Total Upkeep Premium will save a copy of the file in case you need to undo any changes."
+msgstr ""
+
+#: admin/card/class-premium.php:41
+#: admin/card/feature/class-central.php:34
+msgid "BoldGrid Central"
+msgstr ""
+
+#: admin/card/class-premium.php:43
+msgid "All the tools and services you need to succeed."
+msgstr ""
+
+#: admin/card/class-premium.php:51
+msgid "Enjoying your free account?"
+msgstr ""
+
+#: admin/card/class-premium.php:53
+msgid "We hope so. There's more available by upgrading now!"
+msgstr ""
+
+#: admin/card/class-premium.php:61
+msgid "BoldGrid Premium"
+msgstr ""
+
+#: admin/card/class-premium.php:63
+msgid "Thank you for running BoldGrid Premium!"
+msgstr ""
+
+#: admin/card/class-timely-auto-updates.php:32
+#: admin/card/feature/class-timely-auto-updates.php:35
+msgid "Timely Auto Updates"
+msgstr ""
+
+#: admin/card/class-timely-auto-updates.php:36
+msgid "Gives you more control over when new updates are installed by WordPress' Automatic Updates."
+msgstr ""
+
+#: admin/card/class-timely-auto-updates.php:45
+msgid "Setup Guide"
+msgstr ""
+
+#: admin/card/class-updates.php:35
+msgid "Update Management"
+msgstr ""
+
+#: admin/card/class-updates.php:37
+msgid "Keep everything tidy and up to date."
+msgstr ""
+
+#: admin/card/feature/class-auto-rollback.php:34
+#: admin/partials/settings/auto-backup.php:81
+msgid "Auto Rollback"
+msgstr ""
+
+#: admin/card/feature/class-auto-rollback.php:37
+msgid "Auto Rollback is enabled!"
+msgstr ""
+
+#: admin/card/feature/class-auto-rollback.php:39
+msgid "With Auto Rollback, we can help fix your site if anything goes wrong while performing updates."
+msgstr ""
+
+#. translators: 1 An opening anchor tag to the "Auto Updates" settings page, 2 its closing tag.
+#: admin/card/feature/class-auto-rollback.php:44
+msgid "Auto Rollback is not enabled. %1$sFix this%2$s."
+msgstr ""
+
+#: admin/card/feature/class-auto-update-backup.php:35
+msgid "Auto Backup Before Updates"
+msgstr ""
+
+#: admin/card/feature/class-auto-update-backup.php:42
+msgid "Auto Backup Before Updates is enabled!"
+msgstr ""
+
+#: admin/card/feature/class-auto-update-backup.php:44
+msgid "When Auto Backup is enabled, we will backup your site before any auto-updates occur."
+msgstr ""
+
+#. translators: 1 Opening anchor tag to "Auto Updates" settings page, 2 its closing tag.
+#: admin/card/feature/class-auto-update-backup.php:48
+msgid "Auto Backup Before Updates is not enabled. %1$sFix this%2$s."
+msgstr ""
+
+#: admin/card/feature/class-central.php:36
+msgid "Manage your account, Run Automated Website Speed Tests, and more within BoldGrid Central."
+msgstr ""
+
+#: admin/card/feature/class-central.php:38
+msgid "BoldGrid Central Login"
+msgstr ""
+
+#: admin/card/feature/class-cloud-wordpress.php:30
+msgid "Cloud WordPress"
+msgstr ""
+
+#: admin/card/feature/class-cloud-wordpress.php:32
+msgid "Create a fully functional free WordPress demo in just a few clicks. Easily design, build, test and share your WordPress website with clients or teams."
+msgstr ""
+
+#: admin/card/feature/class-database-encryption.php:34
+msgid "Secure your sensitive data with Database Encryption."
+msgstr ""
+
+#. translators: 1 An opening anchor tag to the Remote Storage settings, 2 its closing anchor tag.
+#: admin/card/feature/class-database-encryption.php:38
+msgid "Database Encryption is not configured. %1$sFix this%2$s"
+msgstr ""
+
+#. translators: 1: Plugin title.
+#: admin/card/feature/class-more-backup.php:32
+msgid "More %1$s Features"
+msgstr ""
+
+#. translators: 1 A span displaying the Google Drive logo, 2 a span displaying the Amazon S3 logo.
+#: admin/card/feature/class-more-backup.php:39
+msgid "%3$s can store backups on %1$s and %2$s, restore individual files with just a click, and more!"
+msgstr ""
+
+#: admin/card/feature/class-more-boldgrid.php:30
+msgid "More Premium BoldGrid Plugins"
+msgstr ""
+
+#: admin/card/feature/class-more-boldgrid.php:32
+msgid "Gain access to all BoldGrid premium plugins and services. This includes Post and Page Builder Premium, which offers premium Blocks and native sliders."
+msgstr ""
+
+#: admin/card/feature/class-more-central.php:34
+msgid "More BoldGrid Central Features"
+msgstr ""
+
+#: admin/card/feature/class-more-central.php:36
+msgid "Unlock more features within BoldGrid Central, including Cloud WordPress Advanced Controls and Automated Website Speed Tests."
+msgstr ""
+
+#: admin/card/feature/class-more-central.php:38
+#: admin/class-boldgrid-backup-admin-plugins.php:46
+#: admin/partials/boldgrid-backup-admin-archive-details.php:171
+#: admin/partials/settings/backup-security.php:80
+#: admin/partials/transfers/destination.php:37
+#: admin/partials/transfers/source.php:51
+msgid "Get Premium"
+msgstr ""
+
+#: admin/card/feature/class-remote-storage.php:32
+#: admin/partials/boldgrid-backup-admin-archive-details.php:288
+#: admin/partials/tools/local-remote.php:189
+msgid "Remote Storage"
+msgstr ""
+
+#: admin/card/feature/class-remote-storage.php:54
+msgid "Don't put all of your eggs in one basket! Store your backups remotely."
+msgstr ""
+
+#. translators: 1 An opening anchor tag to the Remote Storage settings, 2 its closing anchor tag.
+#: admin/card/feature/class-remote-storage.php:58
+msgid "Remote Storage is not configured. %1$sFix this%2$s"
+msgstr ""
+
+#: admin/card/feature/class-scheduled-backups.php:34
+msgid "Scheduled Backups"
+msgstr ""
+
+#. Translators: 1 An opening span tag, 2 the date of the next backup, 3 its closing span tag.
+#: admin/card/feature/class-scheduled-backups.php:57
+msgid "Next backup in: %1$s%2$s%3$s"
+msgstr ""
+
+#: admin/card/feature/class-scheduled-backups.php:70
+msgid "It's easy to forget to make a backup. Schedule automatic backups so they're made for you."
+msgstr ""
+
+#. translators: 1 An opening anchor tag to the settings page, 2 its closing tag.
+#: admin/card/feature/class-scheduled-backups.php:74
+msgid "Scheduled Backups not configured. %1$sFix this%2$s."
+msgstr ""
+
+#: admin/card/feature/class-sign-up.php:32
+msgid "There’s more waiting for you in BoldGrid Central. Download the full-featured community versions of ALL our plugins for FREE. It’s just a click away."
+msgstr ""
+
+#: admin/card/feature/class-sign-up.php:34
+msgid "Sign Up for Free!"
+msgstr ""
+
+#: admin/card/feature/class-speed-coach.php:30
+msgid "Speed Coach"
+msgstr ""
+
+#: admin/card/feature/class-speed-coach.php:32
+msgid "A faster website means happier visitors and higher rankings on the search engines. Simply type in your website’s URL and receive detailed advice on making your site lightning fast."
+msgstr ""
+
+#: admin/card/feature/class-timely-auto-updates.php:43
+msgid "Timely Auto Updates are enabled!"
+msgstr ""
+
+#: admin/card/feature/class-timely-auto-updates.php:45
+msgid "By setting up Timely Auto Updates, you can have more control over when new updates are installed by WordPress."
+msgstr ""
+
+#. translators: 1 Opening anchor tag to "Auto Updates" settings page, 2 its closing tag.
+#: admin/card/feature/class-timely-auto-updates.php:49
+msgid "Timely Auto Updates are not enabled. %1$sFix this%2$s."
+msgstr ""
+
+#: admin/card/feature/class-versions.php:32
+msgid "WordPress, Plugins, & Theme Version"
+msgstr ""
+
+#. translators: 1 A description of what updates are available (such as plugins, themes, or core).
+#: admin/card/feature/class-versions.php:38
+msgid "The following updates are available: %1$s"
+msgstr ""
+
+#. translators: 1 An opening anchor tag to the update-core.php page, 2 its closing tag.
+#: admin/card/feature/class-versions.php:48
+msgid "Not everything is up to date. %1$sFix this%2$s."
+msgstr ""
+
+#: admin/card/feature/class-versions.php:60
+msgid "Everything is up to date!"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-actions.php:50
+msgid "Please confirm the deletion of the archive file:"
+msgstr ""
+
+#. translators: 1: Archive filename.
+#: admin/class-boldgrid-backup-admin-archive-actions.php:56
+msgid ""
+"Please confirm the restoration of this WordPress installation from the archive file:\n"
+"\"%s\"\n"
+"\n"
+"Please be aware that you may get logged-out if your session token does not exist in the database restored."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-actions.php:61
+msgid "Could not generate link."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-actions.php:62
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:294
+#: admin/class-boldgrid-backup-admin-config.php:287
+#: admin/partials/boldgrid-backup-admin-backup.php:171
+msgid "Unknown error."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-actions.php:63
+msgid "Copy Link"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-actions.php:64
+msgid "Copied!"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-actions.php:65
+msgid "This link expires in:"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-actions.php:66
+msgid "Please keep this link private, as the download file contains sensitive data."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-actions.php:70
+msgid "The database was encrypted with a token that does not match the one saved in your settings and cannot be imported.  In order to restore the encrypted database, the matching encryption token is required.  If you have the matching token, then go to the Backup Security settings page to save it."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-actions.php:133
+msgid "Delete backup"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-actions.php:168
+#: admin/partials/boldgrid-backup-admin-archive-details.php:367
+msgid "Download to Local Machine"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-actions.php:186
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:297
+#: admin/partials/boldgrid-backup-admin-archive-details.php:379
+msgid "Restore"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-actions.php:246
+msgid "Get Download Link"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-browser.php:57
+#: admin/class-boldgrid-backup-admin-archive-details.php:224
+#: admin/class-boldgrid-backup-admin-in-progress.php:608
+#: admin/class-boldgrid-backup-admin-log-page.php:59
+#: admin/remote/class-boldgrid-backup-admin-ftp-hooks.php:108
+#: admin/remote/class-boldgrid-backup-admin-ftp-hooks.php:238
+#: admin/remote/class-boldgrid-backup-admin-ftp-hooks.php:293
+#: admin/storage/class-boldgrid-backup-admin-storage-local.php:305
+msgid "Permission denied."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-browser.php:70
+msgid "Invalid nonce; security check failed."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-browser.php:91
+msgid "# Records in this backup"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-browser.php:92
+msgid "# Records in current database"
+msgstr ""
+
+#. translators: 1: Premium plugin title.
+#: admin/class-boldgrid-backup-admin-archive-browser.php:121
+msgid "The database dump file in this archive has been encrypted with %1$s."
+msgstr ""
+
+#. translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag, 3: Premium plugin title.
+#: admin/class-boldgrid-backup-admin-archive-browser.php:129
+msgid "A %3$s license is required for decryption.  %1$sGet Premium%2$s"
+msgstr ""
+
+#. translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag, 3: Premium plugin title.
+#: admin/class-boldgrid-backup-admin-archive-browser.php:143
+#: admin/partials/boldgrid-backup-admin-archive-details.php:194
+msgid "%3$s is not active.  Please go to the %1$sPlugins%2$s page to activate it."
+msgstr ""
+
+#. translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag.
+#: admin/class-boldgrid-backup-admin-archive-browser.php:159
+msgid "The database in this backup archive was encrypted with a token that does not match the one saved in your settings.  In order to access the encrypted database, the matching encryption token is required.  If you have the matching token, then go to the %1$sBackup Security%2$s settings page to save it."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-browser.php:189
+#: admin/partials/boldgrid-backup-admin-archive-details.php:187
+#: admin/partials/boldgrid-backup-admin-archive-details.php:348
+#: admin/partials/boldgrid-backup-admin-home.php:47
+#: admin/partials/settings/backup-security.php:97
+#: admin/partials/tools/local-remote.php:215
+#: admin/partials/transfers/destination.php:48
+#: admin/partials/transfers/source.php:62
+msgid "Unlock Feature"
+msgstr ""
+
+#. translators: 1: Premium plugin title.
+#: admin/class-boldgrid-backup-admin-archive-browser.php:192
+msgid "Secure your sensitive data with the %1$s plugin."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-browser.php:208
+msgid "Unable to get contents of archive file:"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-browser.php:215
+msgid "Invalid archive filename."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-browser.php:239
+msgid "Empty directory"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-browser.php:255
+msgid "Name"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-browser.php:256
+#: admin/class-boldgrid-backup-admin-archives.php:225
+#: admin/partials/tools/view-logs.php:39
+msgid "Size"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-browser.php:257
+msgid "Last Modified"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-browser.php:290
+#: admin/class-boldgrid-backup-admin-archive-browser.php:328
+#: admin/class-boldgrid-backup-admin-archive-browser.php:366
+msgid "Invalid file / filepath."
+msgstr ""
+
+#. translators: 1: Plugin title.
+#: admin/class-boldgrid-backup-admin-archive-browser.php:296
+msgid "With %1$s, you can view and restore files from here."
+msgstr ""
+
+#. translators: 1: Filename 2: File path.
+#: admin/class-boldgrid-backup-admin-archive-browser.php:337
+msgid "Success! Database %1$s imported from %2$s."
+msgstr ""
+
+#. translators: 1: Filename 2: File path.
+#: admin/class-boldgrid-backup-admin-archive-browser.php:345
+msgid "Error, unable to import database %1$s from %2$s."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-browser.php:372
+msgid "Error, unable to get details from this database backup."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-details.php:85
+msgid "Uploading"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-details.php:86
+#: admin/partials/archive-details/remote-storage.php:68
+msgid "Uploaded"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-details.php:87
+msgid "Unable to upload backup file."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-details.php:98
+msgid "An unknown error has occurred."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-details.php:100
+#: admin/class-boldgrid-backup-admin.php:130
+msgid "Loading"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-details.php:101
+msgid "Home"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-details.php:102
+msgid "Restoring"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-details.php:103
+msgid "Are you sure you want to restore this database backup?"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-details.php:104
+msgid "An unknown error has occurred when trying to get a listing of the files in this archive."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-details.php:142
+msgid "No archive specified."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-details.php:178
+msgid "Total Upkeep Archive Details"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-details.php:181
+#: admin/class-boldgrid-backup-admin-core.php:2936
+#: admin/class-boldgrid-backup-admin-dashboard.php:105
+#: admin/class-boldgrid-backup-admin-premium-features.php:131
+#: admin/class-boldgrid-backup-admin-settings.php:1077
+#: admin/class-boldgrid-backup-admin-support.php:294
+#: admin/class-boldgrid-backup-admin-tools.php:85
+#: admin/class-boldgrid-backup-admin-transfers.php:79
+#: admin/partials/boldgrid-backup-admin-backup-button.php:48
+#: admin/partials/boldgrid-backup-admin-backup-button.php:60
+#: admin/partials/boldgrid-backup-admin-backup-modal.php:38
+#: admin/partials/boldgrid-backup-admin-home.php:65
+msgid "Backup Site Now"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-details.php:183
+#: admin/class-boldgrid-backup-admin-core.php:2938
+#: admin/class-boldgrid-backup-admin-dashboard.php:107
+#: admin/class-boldgrid-backup-admin-premium-features.php:133
+#: admin/class-boldgrid-backup-admin-settings.php:1079
+#: admin/class-boldgrid-backup-admin-support.php:296
+#: admin/class-boldgrid-backup-admin-tools.php:87
+#: admin/class-boldgrid-backup-admin-transfers.php:81
+#: admin/partials/boldgrid-backup-admin-home.php:67
+msgid "Upload Backup"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-details.php:232
+#: admin/remote/class-boldgrid-backup-admin-ftp-hooks.php:306
+msgid "Invalid archive filepath."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-fail.php:59
+msgid "We were unable to create a backup of your website due to the following:"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-fail.php:101
+msgid "Backup failed for"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-fail.php:125
+msgid "Send warning email because backup failed"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive-fail.php:156
+#: admin/class-boldgrid-backup-admin-restore-helper.php:302
+msgid "Fatal error"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive.php:589
+msgid "Insufficient permission"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive.php:594
+msgid "Invalid archive filename"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive.php:599
+msgid "Filesystem access method is not \"direct\""
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive.php:610
+msgid "Archive file not found"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archive.php:616
+msgid "Invalid \"public_link_lifetime\" configuration setting"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archiver-cancel.php:26
+msgid "This backup has been successfully canceled by the user."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archiver-cancel.php:109
+msgid "Cancel backup"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archiver-cancel.php:134
+msgid "Invalid nonce"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archives-all.php:100
+#: admin/class-boldgrid-backup-admin-core.php:3014
+#: admin/partials/tools/local-remote.php:156
+#: admin/storage/class-boldgrid-backup-admin-storage-local.php:141
+#: admin/storage/class-boldgrid-backup-admin-storage-local.php:142
+#: admin/storage/class-boldgrid-backup-admin-storage-local.php:334
+msgid "Web Server"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archives.php:112
+msgid "This backup will not be deleted automatically from your Web Server due to your retention settings."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archives.php:174
+msgid "This list shows on which computers your backup archives are being stored. They can be saved to more than one location. Please <a href=\"admin.php?page=boldgrid-backup-tools&section=section_locations\">click here</a> for more information on what <strong>Web Server</strong> and other terms mean."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archives.php:197
+msgid "Backup"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archives.php:198
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:291
+#: admin/partials/boldgrid-backup-admin-backup.php:128
+msgid "View details"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-archives.php:224
+msgid "Date"
+msgstr ""
+
+#. translators: 1 an opening strong tag, 2 its closing strong tag.
+#: admin/class-boldgrid-backup-admin-archives.php:304
+msgid "Go to the %1$sBackups%2$s page to create a backup of your site, and then come back here for further instruction."
+msgstr ""
+
+#. translators: 1 an opening strong tag, 2 its closing strong tag.
+#: admin/class-boldgrid-backup-admin-archives.php:314
+msgid "Create a backup of your site right now by clicking the %1$sBackup Site Now%2$s button at the top of the page."
+msgstr ""
+
+#. translators: 1 the opening anchor tag linking to the settings page, 2 its closing anchor tag.
+#: admin/class-boldgrid-backup-admin-archives.php:329
+msgid "After the backup is created, go to your %1$ssettings%2$s page and setup backups so they're create automatically on a set schedule."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:290
+msgid "File saved to: "
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:292
+msgid "You must enter valid a URL address."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:293
+msgid "The URL address is not a ZIP file."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:295
+msgid "Could not reach the URL address. HTTP error: "
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:373
+msgid "Your website is currently being backed up. You can perform updates when the backup is complete."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:524
+msgid "Rollback Site Now"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:536
+msgid "There is a pending automatic rollback using the most recent backup archive."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:542
+msgid "Now is the time to test your website to ensure the upgrade did not break anything. If the upgrade did cause problems, you can click <strong>Rollback Site Now</strong> to restore your site to just before the update. If the update was a success, click <strong>Cancel Rollback</strong> so a backup is not automatically restored at the end of the countdown."
+msgstr ""
+
+#. translators: 1: URL address.
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:549
+msgid "<strong>Update Protection</strong> for <em>future updates</em> can be configured on your <a href=\"%1$s\">Settings</a> page."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:558
+msgid "Countdown"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:568
+msgid "Cancel Rollback"
+msgstr ""
+
+#. translators: 1: WordPress version string.
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:697
+msgid "WordPress was recently updated to version %1$s."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:709
+msgid "The following theme(s) were recently updated:"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:719
+msgid "The following plugin(s) were recently updated:"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:739
+#: admin/class-boldgrid-backup-admin-core.php:2996
+msgid "Update Protection"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:753
+msgid "It is recommended to backup your site before performing updates. If you perform a backup here, before performing updates, then an automatic rollback is possible."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:760
+msgid "Update protection not available until you click <strong>Backup Site Now</strong> and a backup is created."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:977
+msgid "If you update a theme on this page, an auto rollback will occur if anything goes wrong."
+msgstr ""
+
+#. translators: 1: Time difference.
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:987
+msgid "You last made a backup %1$s ago."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:993
+msgid "If you update WordPress, any plugins, or any themes on this page, an auto rollback will occur if anything goes wrong."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:996
+msgid "If you update a plugin on this page, an auto rollback will occur if anything goes wrong."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:1058
+#: admin/class-boldgrid-backup-admin-core.php:2697
+#: admin/class-boldgrid-backup-admin-core.php:2763
+#: admin/class-boldgrid-backup-admin-core.php:3052
+#: admin/class-boldgrid-backup-admin-upload.php:62
+msgid "Security violation (not authorized)."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:1068
+#: admin/class-boldgrid-backup-admin-core.php:2688
+#: admin/class-boldgrid-backup-admin-core.php:3061
+#: admin/class-boldgrid-backup-admin-upload.php:74
+msgid "Security violation (invalid nonce)."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:1208
+msgid "Rollback canceled"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-auto-rollback.php:1210
+msgid "Invalid arguments"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-backup-dir.php:90
+msgid "Please ensure your backup directory exists and has the proper read, write, and modify permissions."
+msgstr ""
+
+#. translators: 1: File path, 2: Informational message above ($check_permissions).
+#: admin/class-boldgrid-backup-admin-backup-dir.php:93
+msgid "Unable to create necessary file: %1$s<br />%2$s"
+msgstr ""
+
+#. translators: 1: File path, 2: Informational message above ($check_permissions).
+#: admin/class-boldgrid-backup-admin-backup-dir.php:96
+msgid "Unable to write to necessary file: %1$s<br />%2$s"
+msgstr ""
+
+#. translators: 1: Backup directory path.
+#: admin/class-boldgrid-backup-admin-backup-dir.php:500
+msgid "Backup Directory does not exists: %1$s"
+msgstr ""
+
+#. translators: 1: Backup directory path.
+#: admin/class-boldgrid-backup-admin-backup-dir.php:508
+msgid "Backup Directory does not have read permission: %1$s"
+msgstr ""
+
+#. translators: 1: Backup directory path.
+#: admin/class-boldgrid-backup-admin-backup-dir.php:516
+msgid "Backup Directory does not have permission to rename files: %1$s"
+msgstr ""
+
+#. translators: 1: Backup directory path.
+#: admin/class-boldgrid-backup-admin-backup-dir.php:527
+msgid "Backup Directory does not have permission to delete files: %1$s"
+msgstr ""
+
+#. translators: 1: Backup directory path.
+#: admin/class-boldgrid-backup-admin-backup-dir.php:538
+msgid "Backup Directory does not have permission to retrieve directory listing: %1$s"
+msgstr ""
+
+#. translators: 1: WordPress installation directory path, 2: Backup directory path.
+#: admin/class-boldgrid-backup-admin-backup-dir.php:558
+msgid "Your <strong>WordPress directory</strong> <em>%1$s</em> cannot be within your <strong>backup directory</strong> %2$s."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-config.php:254
+#: admin/class-boldgrid-backup-admin-core.php:1732
+#: admin/class-boldgrid-backup-admin-time.php:87
+#: admin/partials/tools/local-remote.php:37
+#: admin/partials/tools/local-remote.php:91
+msgid "Unknown"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-config.php:279
+msgid "Website Size:"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-config.php:280
+msgid "Database Size:"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-config.php:281
+#: admin/class-boldgrid-backup-admin-folder-exclusion.php:319
+msgid "of"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-config.php:283
+#: admin/partials/boldgrid-backup-admin-archive-details.php:120
+msgid "Update"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-config.php:284
+msgid "Updating..."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-config.php:285
+msgid "Updated!"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-config.php:286
+msgid "Failed to update: "
+msgstr ""
+
+#. Translators: 1 The minimum version required, 2 an opening strong tag, 3 its closing strong tag, 4 an opening anchor to the updates page, 5 its closing anchor, 6: Plugin title, 7: Premium plugin title.
+#: admin/class-boldgrid-backup-admin-core.php:869
+msgid "The version of the %2$s%7$s%3$s plugin you have installed requires %2$s%6$s%3$s version %1$s or higher. Don't worry, the fix is simple. Please go to your %4$sUpdates page%5$s and update the %2$s%6$s%3$s plugin."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:892
+msgid "Update required"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:951
+#: admin/partials/boldgrid-backup-admin-home.php:61
+msgid "Backup Archives"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:954
+#: admin/partials/boldgrid-backup-admin-nav.php:53
+msgid "Preflight Check"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:955
+#: admin/class-boldgrid-backup-admin-plugins.php:41
+#: admin/partials/boldgrid-backup-admin-nav.php:48
+msgid "Settings"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:956
+#: admin/partials/boldgrid-backup-admin-nav.php:43
+msgid "Tools"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:957
+#: admin/partials/boldgrid-backup-admin-nav.php:38
+msgid "Transfers"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:958
+#: admin/partials/boldgrid-backup-admin-nav.php:58
+msgid "Support"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:959
+#: admin/partials/boldgrid-backup-admin-nav.php:63
+msgid "Premium Features"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:985
+#: admin/class-boldgrid-backup-admin-core.php:986
+#: admin/class-boldgrid-backup-admin-dashboard.php:102
+#: admin/partials/boldgrid-backup-admin-nav.php:28
+msgid "Dashboard"
+msgstr ""
+
+#. translators: 1: Backup directory path.
+#: admin/class-boldgrid-backup-admin-core.php:1206
+msgid "The backup directory is not writable: %1$s."
+msgstr ""
+
+#. translators: 1: MySQL dump file path.
+#: admin/class-boldgrid-backup-admin-core.php:1232
+msgid "mysqldump file does not exist: %1$s"
+msgstr ""
+
+#. translators: 1: MySQL dump file path.
+#: admin/class-boldgrid-backup-admin-core.php:1242
+msgid "mysqldump file was not written to: %1$s"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:1279
+msgid "The database dump file was not found."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:1370
+msgid "The WordPress siteurl has changed.  There was an issue changing it back.  You will have to fix the siteurl manually in the database, or use an override in your wp-config.php file."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:1635
+msgid "Initializing backup"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:1662
+msgid "No backup locations selected! While we could create a backup archive, you have not selected where the backup archive should be saved. Please choose a storage location in your settings for where to save this backup archive."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:1675
+#: admin/class-boldgrid-backup-admin-core.php:2392
+msgid "Functionality tests fail."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:1767
+msgid "An unknown error occurred when backing up the database."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:2036
+msgid "Backup complete!"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:2169
+#: admin/class-boldgrid-backup-admin-core.php:2408
+msgid "Invalid key for the selected archive file."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:2183
+#: admin/class-boldgrid-backup-admin-core.php:2424
+msgid "Invalid filename for the selected archive file."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:2203
+#: admin/class-boldgrid-backup-admin-core.php:2434
+msgid "No archive files were found."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:2221
+#: admin/class-boldgrid-backup-admin-core.php:2442
+msgid "The selected archive file was not found."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:2240
+msgid "Error deleting the selected archive file."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:2379
+msgid "Invalid restore_now value."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:2385
+#: admin/class-boldgrid-backup-admin-folder-exclusion.php:524
+#: admin/class-boldgrid-backup-admin-in-progress.php:612
+#: admin/remote/class-boldgrid-backup-admin-ftp-hooks.php:112
+#: admin/remote/class-boldgrid-backup-admin-ftp-hooks.php:247
+#: admin/remote/class-boldgrid-backup-admin-ftp-hooks.php:297
+#: admin/storage/class-boldgrid-backup-admin-storage-local.php:309
+msgid "Invalid nonce."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:2452
+msgid "The selected archive file is empty."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:2570
+msgid "Could not restore database."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:2773
+msgid "INVALID DOWNLOAD KEY"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:2783
+msgid "INVALID DOWNLOAD FILENAME"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:2794
+msgid "WP_Filesystem method is not \"direct\""
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:2805
+msgid "NO BACKUP ARCHIVES FOUND"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:2819
+msgid "FILE NOT FOUND"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:2933
+msgid "Total Upkeep Preflight Check"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:2981
+msgid "All"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:2982
+msgid "Backup created successfully!"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:2983
+msgid "Checking credentials"
+msgstr ""
+
+#. translators: 1 The opening anchor tag to the support tab, 2 its closing anchor tag.
+#: admin/class-boldgrid-backup-admin-core.php:2988
+msgid "Please try again. If you continue to experience problems, please %1$scontact us for additional support%2$s."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:2998
+msgid "Remote"
+msgstr ""
+
+#. translators: 1 Markup showing a "Google Drive" logo, 2 Markup showing an "Amazon S3" logo.
+#: admin/class-boldgrid-backup-admin-core.php:3008
+msgid "Catastrophic data loss can happen at any time. Storing your archives in multiple secure locations will keep your website data safe and put your mind at ease. Upgrade to %3$s to enable automated remote backups to %1$s and %2$s"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:3018
+msgid "Update protection activated!"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:3046
+msgid "Unable to restore backup: "
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-core.php:3087
+msgid "The selected archive file has been successfully restored."
+msgstr ""
+
+#. translators: %1$s is the URL to view the cron log.
+#: admin/class-boldgrid-backup-admin-cron-log.php:107
+msgid "Your latest <em>scheduled backup</em> may not have finished successfully. For more info, please <a href=\"%1$s\">click here</a> to see your latest <em>cron notices</em>."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-cron-log.php:151
+msgid "Latest Cron Notices"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-cron-log.php:152
+msgid "If a scheduled backup cron fails, an error message will be logged to the <em>cron notices</em> log file. You can view those log entries below:"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-cron-log.php:155
+msgid "No entries in the log."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-cron-log.php:160
+msgid "Time"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-cron-log.php:161
+msgid "Message"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-cron-test.php:104
+msgid "Test may take up to 25 minutes to complete"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-cron-test.php:111
+#: admin/partials/boldgrid-backup-admin-archive-details.php:147
+#: admin/partials/boldgrid-backup-admin-archive-details.php:235
+#: admin/partials/boldgrid-backup-admin-test.php:24
+msgid "No"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-cron-test.php:116
+msgid "This test is in progress, and may take up to 25 minutes to complete. Refresh this page for an update."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-cron-test.php:118
+msgid "Run test"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-cron-test.php:120
+#: admin/partials/boldgrid-backup-admin-archive-details.php:148
+#: admin/partials/boldgrid-backup-admin-archive-details.php:237
+#: admin/partials/boldgrid-backup-admin-test.php:23
+msgid "Yes"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-cron-test.php:123
+msgid "Server offset"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-cron-test.php:126
+msgid "Run test again"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-cron-test.php:130
+msgid "Cron should run in the same time zone as your server. For example, if your server timezone is EST, setting a cron to run at 5am should run it at 5am EST. This test runs a series of cron jobs to determine which timezone is used by Cron."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-cron-test.php:241
+msgid "Failed to setup Cron time zone test."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-cron.php:870
+msgid "Error: A mode was not specified."
+msgstr ""
+
+#. translators: 1: Archive mode ("backup" or "restore").
+#: admin/class-boldgrid-backup-admin-cron.php:881
+msgid "Error: Invalid mode \"%s\"."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-cron.php:906
+msgid "There was an error $s backup archive file."
+msgstr ""
+
+#. translators: 1: Error message.
+#: admin/class-boldgrid-backup-admin-cron.php:912
+msgid "Error: %s"
+msgstr ""
+
+#. translators: 1: Error message.
+#: admin/class-boldgrid-backup-admin-cron.php:919
+msgid "Error Message: %s"
+msgstr ""
+
+#. translators: 1: File path.
+#: admin/class-boldgrid-backup-admin-cron.php:935
+msgid "File Path: %s"
+msgstr ""
+
+#. translators: 1: File size.
+#: admin/class-boldgrid-backup-admin-cron.php:943
+msgid "File Size: %s"
+msgstr ""
+
+#. translators: 1: Total backup size.
+#: admin/class-boldgrid-backup-admin-cron.php:951
+msgid "Total size: %s"
+msgstr ""
+
+#. translators: 1: Compressor name.
+#: admin/class-boldgrid-backup-admin-cron.php:959
+msgid "Compressor: %s"
+msgstr ""
+
+#. translators: 1: Backup duration.
+#: admin/class-boldgrid-backup-admin-cron.php:975
+msgid "Duration: %s seconds"
+msgstr ""
+
+#. translators: 1: Backup action name.
+#: admin/class-boldgrid-backup-admin-cron.php:983
+msgid "There was an unknown error %s a backup archive file."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-cron.php:1095
+#: admin/class-boldgrid-backup-admin-cron.php:1119
+msgid "Error: Invalid request."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-cron.php:1124
+msgid "Unknown error attempting restore."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-cron.php:1140
+msgid "Resore error: Unable to instantiate task."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-cron.php:1150
+msgid "Restore error: Missing url / id."
+msgstr ""
+
+#. translators: 1 The opening anchor tag to the Inspirations page, 2 its closing tag.
+#: admin/class-boldgrid-backup-admin-dashboard-widget.php:56
+msgid "Not fully protected. %1$sFix this%2$s."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-db-dump.php:58
+msgid "No tables selected to backup."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-db-dump.php:76
+#: admin/class-boldgrid-backup-admin-in-progress.php:251
+msgid "Backing up database..."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-db-dump.php:115
+msgid "The database contains VIEWS, but the database user does not have the permissions needed to create a backup."
+msgstr ""
+
+#. translators: 1: File path.
+#: admin/class-boldgrid-backup-admin-db-import.php:84
+#: tests/admin/test-class-boldgrid-backup-admin-db-import.php:91
+msgid "Unable to open mysqldump, %1$s."
+msgstr ""
+
+#. translators: 1: Database File Name
+#: admin/class-boldgrid-backup-admin-db-import.php:96
+#: tests/admin/test-class-boldgrid-backup-admin-db-import.php:92
+msgid "MySQL Database User does not have necessary priviliges to restore mysqldump, %1$s."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-db-import.php:123
+#: tests/admin/test-class-boldgrid-backup-admin-db-import.php:63
+msgid "Unable to get contents of file."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-db-import.php:197
+msgid "The Database User does not have the necessary priviliges to restore this database."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-db-omit.php:79
+msgid "DATABASE SETTINGS"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-db-omit.php:81
+#: admin/class-boldgrid-backup-admin-support.php:205
+#: admin/partials/boldgrid-backup-admin-test.php:25
+msgid "None"
+msgstr ""
+
+#. translators: 1: Database tables excluded.
+#: admin/class-boldgrid-backup-admin-db-omit.php:85
+msgid "Tables Excluded: %1$s"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-email.php:66
+#: admin/class-boldgrid-backup-admin-email.php:121
+#: admin/partials/boldgrid-backup-admin-mail-restore.php:36
+msgid "Hello"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-email.php:74
+#: admin/class-boldgrid-backup-admin-email.php:179
+#: admin/partials/boldgrid-backup-admin-mail-restore.php:87
+msgid "Best regards"
+msgstr ""
+
+#. translators: 1: Plugin title.
+#: admin/class-boldgrid-backup-admin-email.php:77
+#: admin/class-boldgrid-backup-admin-email.php:182
+#: admin/partials/boldgrid-backup-admin-mail-restore.php:91
+msgid "The %1$s plugin"
+msgstr ""
+
+#. translators: 1: URL address, 2: Premium plugin title.
+#: admin/class-boldgrid-backup-admin-email.php:93
+msgid "Want to store your backups on Google Drive and Amazon S3, restore individual files with just a click, and have access to more tools? Get %2$s! - %1$s"
+msgstr ""
+
+#. translators: 1: Site identifier.
+#: admin/class-boldgrid-backup-admin-email.php:119
+msgid "Backup completed for %1$s"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-email.php:124
+#: admin/partials/boldgrid-backup-admin-mail-restore.php:39
+msgid "THIS OPERATION WAS A DRY-RUN TEST"
+msgstr ""
+
+#. translators: 1: Site identifier/name.
+#: admin/class-boldgrid-backup-admin-email.php:129
+msgid "A backup archive has been created for %1$s"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-email.php:132
+msgid "Backup details"
+msgstr ""
+
+#. translators: 1: Backup duration.
+#: admin/class-boldgrid-backup-admin-email.php:136
+msgid "Duration: %1$s seconds"
+msgstr ""
+
+#. translators: 1: Total backup size.
+#: admin/class-boldgrid-backup-admin-email.php:139
+msgid "Total size: %1$s"
+msgstr ""
+
+#. translators: 1: Archive file path.
+#: admin/class-boldgrid-backup-admin-email.php:142
+msgid "Archive file path: %1$s"
+msgstr ""
+
+#. translators: 1: Archive file size.
+#: admin/class-boldgrid-backup-admin-email.php:145
+msgid "Archive file size: %1$s"
+msgstr ""
+
+#. translators: 1: Archive compressor name.
+#: admin/class-boldgrid-backup-admin-email.php:148
+msgid "Compressor used: %1$s"
+msgstr ""
+
+#. translators: 1: What triggered the backup process.
+#: admin/class-boldgrid-backup-admin-email.php:152
+msgid "Backup triggered by: %1$s"
+msgstr ""
+
+#. translators: 1: Plugin title.
+#: admin/class-boldgrid-backup-admin-email.php:163
+msgid "You can manage notifications in your WordPress admin panel, under %1$s settings"
+msgstr ""
+
+#. translators: 1: Plugin title, 2: URL address for help restoring a backup archive file.
+#: admin/class-boldgrid-backup-admin-email.php:172
+msgid "For help with restoring a %1$s archive file, please visit: %2$s"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-folder-exclusion.php:222
+msgid "FILE AND FOLDER SETTINGS"
+msgstr ""
+
+#. translators: 1: Included folder list.
+#: admin/class-boldgrid-backup-admin-folder-exclusion.php:228
+msgid "Included: %1$s"
+msgstr ""
+
+#. translators: 1: Excluded folder list.
+#: admin/class-boldgrid-backup-admin-folder-exclusion.php:236
+msgid "Excluded: %1$s"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-folder-exclusion.php:317
+msgid "items"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-folder-exclusion.php:318
+msgid "No results"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-folder-exclusion.php:531
+msgid "Invalid include / exclude values."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-folder-exclusion.php:539
+msgid "No files match your criteria."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-go-pro.php:83
+msgid "Class \"Boldgrid\\Library\\Library\\Plugin\\Plugin\" not found. Please ensure you are running the lastest version of the BoldGrid Library."
+msgstr ""
+
+#. translators: 1: URL address for the wp-admin plugins page, 2: Plugin/extension title.
+#: admin/class-boldgrid-backup-admin-go-pro.php:101
+msgid "You have a <strong>Premium BoldGrid Connect Key</strong> and you have the <strong>%2$s Extension installed</strong>. Please go to your <a href=\"%1$s\">plugins page</a> and activate your premium extension!"
+msgstr ""
+
+#. translators: 1: URL address for the upgrade page, 2: Premium plugin title.
+#: admin/class-boldgrid-backup-admin-go-pro.php:115
+msgid "Thank you for activating the <strong>%3$s</strong> plugin! Before you can begin using all of the premium features, you must <a href=\"%2$s\">add your premium key</a>. If you are using an Official BoldGrid Host, contact them or login to their management system to retrieve your Premium key. Otherwise, please visit <a href=\"%1$s\" target=\"_blank\">BoldGrid Central</a> to upgrade."
+msgstr ""
+
+#. translators: 1: URL address to download plugin 2: URL to plugin-installer.php, 3: Plugin title, 4: Premium plugin title.
+#: admin/class-boldgrid-backup-admin-go-pro.php:127
+msgid "Hello there! We see that you have a <strong>Premium BoldGrid Connect Key</strong> and you have the <strong>%3$s</strong> plugin activated! <a href=\"%1$s\">Click here</a> to download the <strong>%4$s</strong> plugin and gain access to more features! After the download completes, go to <a href=\"%2$s\">Plugins &raquo; Add New</a> and click the <em>Upload Plugin</em> button at the top of the page to upload your new plugin."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-in-progress.php:111
+msgid " Most backups usually finish before this amount of time, so we will stop displaying this notice."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-in-progress.php:237
+msgid "Started at:"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-in-progress.php:238
+msgid "ago"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-in-progress.php:241
+msgid "Triggered by:"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-in-progress.php:245
+msgid "Actions:"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-in-progress.php:252
+msgid "Adding files to archive..."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-in-progress.php:253
+msgid "Saving archive to disk..."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-in-progress.php:257
+#: admin/class-boldgrid-backup-admin-in-progress.php:265
+msgid "Loading..."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-in-progress.php:273
+msgid "Backup in progress"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-in-progress.php:473
+msgid "Backup Canceled"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-in-progress.php:473
+msgid "Error creating backup"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-in-progress.php:519
+msgid "Backup failed"
+msgstr ""
+
+#. Translators: 1 An opening anchor tag to our troubleshooting tutorial, 2 its closing tag.
+#: admin/class-boldgrid-backup-admin-in-progress.php:523
+msgid "Your backup failed, and we were unable to detect any fatal errors. This usually happens when your hosting provider kills a backup process using the \"SIGKILL\" signal. To learn more about this as well as troubleshooting techniques, please %1$sclick here%2$s."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-jobs.php:186
+msgid "The following tasks were run after creating the backup:"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-jobs.php:201
+msgid "Task"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-jobs.php:204
+msgid "status"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-jobs.php:206
+msgid "start"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-jobs.php:208
+msgid "end"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-log-page.php:41
+msgid "Loading log file"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-log-page.php:42
+msgid "An unknown error occurred. Please close this modal and try again."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-log-page.php:65
+msgid "Invalid nonce. Please refresh the page and try again."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-log-page.php:74
+msgid "Error: No log filename provided."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-log-page.php:81
+msgid "Error: Log file does not exist."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-log-page.php:88
+msgid "Log file is empty."
+msgstr ""
+
+#. translators: 1: HTML anchor opening tag, 2: HTML anchor closing tag.
+#. translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag.
+#: admin/class-boldgrid-backup-admin-notice.php:193
+#: admin/class-boldgrid-backup-admin-settings.php:949
+#: admin/storage/class-boldgrid-backup-admin-storage-local.php:210
+msgid "Functionality test has failed.  You can go to %1$sFunctionality Test%2$s to view a report."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-notice.php:201
+msgid "Functionality test has failed."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-notice.php:262
+msgid "disabled for all"
+msgstr ""
+
+#. translators: 1: Auto Update Type.
+#: admin/class-boldgrid-backup-admin-notice.php:268
+msgid "enabled for %s"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-notice.php:273
+msgid "enabled for all"
+msgstr ""
+
+#. translators: 1: Auto Update Types, 2: Auto Update Type.
+#: admin/class-boldgrid-backup-admin-notice.php:281
+msgid "enabled for %1$s and %2$s"
+msgstr ""
+
+#. translators: 1: HTML anchor opening tag, 2: HTML anchor closing tag, 3: Plugin title.
+#: admin/class-boldgrid-backup-admin-notice.php:293
+msgid "Auto Updates are %4$s WordPress Core Updates. This can be configured in the %1$s%3$s Settings%2$s."
+msgstr ""
+
+#. translators: 1: HTML anchor open tag, 2: HTML anchor close tag, 3: HTML H3 open tag, 4: HTML H3 close tag, 5: HTML p open tag, 6: HTML p close tag, 7: Plugin title.
+#: admin/class-boldgrid-backup-admin-notice.php:334
+msgid "%3$sBoldGrid Backup has become Total Upkeep!%4$s%5$sDifferent name with the same great features.  For more information on the change, please go to %1$sour website%2$s.%6$s"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-premium-features.php:128
+msgid "Total Upkeep Premium Features"
+msgstr ""
+
+#. translators: 1: Directory path.
+#: admin/class-boldgrid-backup-admin-restore-git.php:36
+msgid "A file permissions error was encountered when attempting to restore files in \"%1$s\"."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-restore-git.php:46
+msgid "We updated file permissions, and suggest that you attempt the restoration again."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-restore-git.php:48
+msgid "We attempted to updated file permissions, but that does not appear to have worked. Before attempting to restore again, please manually review these file permissions."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-restore-helper.php:109
+msgid "Could not update the WordPress configuration file."
+msgstr ""
+
+#. translators: 1 The path to a file that cannot be restored due to file permissions.
+#: admin/class-boldgrid-backup-admin-restore-helper.php:261
+msgid "Permission denied. Unable to restore the following file: %1$s"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-settings.php:530
+#: admin/class-boldgrid-backup-admin-upload.php:422
+msgid "Security violation! Please try again."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-settings.php:690
+msgid "The compressor you seleted is unavailable. Please select another."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-settings.php:723
+msgid "The extractor you seleted is unavailable. Please select another."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-settings.php:752
+msgid "An error occurred when modifying cron jobs. Please try again."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-settings.php:861
+#: admin/remote/class-boldgrid-backup-admin-ftp-page.php:232
+#: admin/storage/class-boldgrid-backup-admin-storage-local.php:268
+msgid "Settings saved."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-settings.php:865
+msgid "Invalid settings submitted.  Please try again."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-settings.php:867
+msgid "We were unable to save your settings for the following reason(s):"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-settings.php:967
+msgid "Warning: Making backups uses resources. When the system is backing up, it will slow down your site for visitors. Furthermore, when the database itself is being copied, your site must “pause” temporarily to preserve data integrity. For most sites, the pause is typically a few seconds and is not noticed by visitors. Large sites take longer though. Please keep the number of backups you have stored and how often you make those backups to a minimum."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-settings.php:985
+msgid "Please note that your web hosting provider may have a policy against these types of backups. Please verify with your provider or choose a BoldGrid Official Host."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-settings.php:1074
+msgid "Total Upkeep Backup and Restore Settings"
+msgstr ""
+
+#. translators: 1: HTML opening strong tags, 2: HTML closing strong tag, 3: Plugin title.
+#: admin/class-boldgrid-backup-admin-support.php:78
+msgid "%1$s%3$s%2$s is unable to load due to the following error:"
+msgstr ""
+
+#. translators: 1 Plugin title, 2 opening anchor tag linking to plugin page, 3 url to plugin page, 4 closing anchor tag.
+#: admin/class-boldgrid-backup-admin-support.php:87
+msgid "Please deactivate / reactivate Total Upkeep as this often resolves issues. If you are installing %1$s from .zip, ensure you downloaded it from %2$s%3$s%4$s. For additional help, please post a question in the %5$sWordPress Support Forums.%4$s"
+msgstr ""
+
+#. translators: 1 A list of library versions that are registered. It will be within a <pre> tag.
+#: admin/class-boldgrid-backup-admin-support.php:201
+msgid "One or more library files are missing. Registered libraries: %1$s"
+msgstr ""
+
+#. Translators: 1: Current PHP version, 2: Minimum supported PHP version.
+#: admin/class-boldgrid-backup-admin-support.php:238
+msgid "Your PHP version (%1$s) is not supported.  Please upgrade PHP to %2$s or higher, or contact your host for further assistance."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-support.php:252
+msgid "The vendor folder is missing. Please run \"composer install\", or contact your host for further assistance."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-support.php:291
+msgid "Total Upkeep Support"
+msgstr ""
+
+#. translators: 1: Plugin title.
+#: admin/class-boldgrid-backup-admin-test.php:207
+#: admin/compressor/class-boldgrid-backup-admin-compressor-pcl-zip.php:526
+#: admin/compressor/class-boldgrid-backup-admin-compressor-php-zip.php:307
+msgid "This is a test file from %1$s. You can delete this file."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-test.php:384
+msgid "The following node_modules folder was found in your account:"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-test.php:385
+msgid "Due to possible issues node_modules folders can cause when calculating disk space, your WordPress directory size was not calculated."
+msgstr ""
+
+#. translators: 1: Link.
+#: admin/class-boldgrid-backup-admin-test.php:388
+msgid "To ignore this warning and try again, please <a href=\"%1$s\">click here</a>"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-time.php:359
+msgid "Change timezone"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-time.php:360
+msgid "WordPress timezone settings can be adjusted within Settings &raquo; General"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-tools.php:82
+msgid "Total Upkeep Tools"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-transfers.php:76
+msgid "Total Upkeep Transfers"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-upload.php:86
+msgid "Upload file was not send from the proper form."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-upload.php:98
+#: admin/class-boldgrid-backup-admin-upload.php:110
+msgid "File upload error.  Please try again."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-upload.php:137
+msgid "The backup directory is not configured."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-upload.php:148
+msgid "Uploaded File is not a Total Upkeep backup file."
+msgstr ""
+
+#. translators: 1: File extension.
+#: admin/class-boldgrid-backup-admin-upload.php:212
+msgid "Upload file extension type %s is not allowed."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-upload.php:364
+msgid "Upload successful."
+msgstr ""
+
+#. translators: 1: Error message.
+#: admin/class-boldgrid-backup-admin-upload.php:378
+msgid "Upload has failed; %s."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-upload.php:413
+msgid "User access violation!"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-usage.php:95
+msgid "Thank you for using Total Upkeep by BoldGrid! Would you be ok with helping us improve our products by sending anonymous usage data? Information collected will not be personal and is not used to identify or contact you."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-utility.php:209
+msgid "File already exists"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-utility.php:212
+msgid "Zip archive inconsistent"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-utility.php:215
+msgid "Invalid argument"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-utility.php:218
+msgid "Malloc failure"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-utility.php:221
+msgid "No such file"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-utility.php:224
+msgid "Not a zip archive"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-utility.php:227
+msgid "Cannot open file"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-utility.php:230
+msgid "Read error"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-utility.php:233
+msgid "Seek error"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-utility.php:236
+msgid "No error code was passed"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-utility.php:258
+msgid "The uploaded file exceeds the upload_max_filesize directive in php.ini"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-utility.php:265
+msgid "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-utility.php:272
+msgid "The uploaded file was only partially uploaded"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-utility.php:279
+msgid "No file was uploaded"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-utility.php:287
+msgid "Missing a temporary folder"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-utility.php:294
+msgid "Failed to write file to disk"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-utility.php:301
+msgid "File upload stopped by extension"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-wp-cron.php:79
+msgid "Every 5 minutes"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-wp-cron.php:83
+msgid "Weekly"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-wp-cron.php:93
+msgid "Never"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-wp-cron.php:238
+msgid "starting"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-wp-cron.php:253
+msgid "Could not perform restoration from WP Cron task."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-wpcli.php:92
+msgid "Schedule cleared."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-wpcli.php:96
+#: admin/class-boldgrid-backup-admin-wpcli.php:100
+msgid "Schedule listed."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-wpcli.php:104
+msgid "Schedule set."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-wpcli.php:106
+msgid "Could not set schedule.  Check syntax."
+msgstr ""
+
+#. Translators: 1: WP-CLI command.
+#: admin/class-boldgrid-backup-admin-wpcli.php:114
+msgid "\"%s\" is not a valid command."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-wpcli.php:150
+#: admin/partials/settings/days-of-week.php:32
+msgid "Sunday"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-wpcli.php:153
+#: admin/partials/settings/days-of-week.php:38
+msgid "Monday"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-wpcli.php:156
+#: admin/partials/settings/days-of-week.php:44
+msgid "Tuesday"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-wpcli.php:159
+#: admin/partials/settings/days-of-week.php:50
+msgid "Wednesday"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-wpcli.php:162
+#: admin/partials/settings/days-of-week.php:56
+msgid "Thursday"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-wpcli.php:165
+#: admin/partials/settings/days-of-week.php:62
+msgid "Friday"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-wpcli.php:168
+#: admin/partials/settings/days-of-week.php:68
+msgid "Saturday"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-wpcli.php:184
+msgid " at "
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-wpcli.php:186
+msgid " (WordPress timezone: "
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-wpcli.php:189
+msgid " at unknown time"
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin.php:151
+msgid "Archive file size: "
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin.php:152
+msgid "File size before compression: "
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin.php:153
+msgid "Adding tables."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin.php:154
+msgid "Completing database backup..."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin.php:157
+msgid "Unfortunately there was an error creating your backup. Update protection is not available."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin.php:158
+msgid "Error:"
+msgstr ""
+
+#: admin/compressor/class-boldgrid-backup-admin-compressor-pcl-zip.php:329
+msgid "Not an archive."
+msgstr ""
+
+#: admin/compressor/class-boldgrid-backup-admin-compressor-pcl-zip.php:334
+msgid "Empty file."
+msgstr ""
+
+#: admin/compressor/class-boldgrid-backup-admin-compressor-pcl-zip.php:340
+msgid "Unable to extract single file from archive."
+msgstr ""
+
+#: admin/compressor/class-boldgrid-backup-admin-compressor-pcl-zip.php:349
+msgid "Not written."
+msgstr ""
+
+#. translators: 1: File path.
+#: admin/compressor/class-boldgrid-backup-admin-compressor-pcl-zip.php:489
+msgid "PclZip encountered the following broken symlink and is unable to create a backup:<br />%1$s"
+msgstr ""
+
+#: admin/compressor/class-boldgrid-backup-admin-compressor-pcl-zip.php:530
+#: admin/compressor/class-boldgrid-backup-admin-compressor-php-zip.php:316
+msgid "safe-to-delete"
+msgstr ""
+
+#. translators: 1: File path.
+#: admin/compressor/class-boldgrid-backup-admin-compressor-pcl-zip.php:544
+msgid ""
+"PclZip test failed. We were unable to create the following test file:<br />\n"
+"\t\t\t%1$s.<br />\n"
+"\t\t\tPlease ensure your backup directory has read, write, and modify permissions."
+msgstr ""
+
+#. translators: 1: File path.
+#: admin/compressor/class-boldgrid-backup-admin-compressor-pcl-zip.php:552
+msgid ""
+"PclZip test failed. We were able to create the following test file, but we were unable to modify it. were unable to modify it:<br />\n"
+"\t\t\t%1$s<br />\n"
+"\t\t\tPlease ensure your backup directory has read, write, and modify permissions."
+msgstr ""
+
+#. translators: 1 The path to a file that was unable to be added to the backup.
+#: admin/compressor/class-boldgrid-backup-admin-compressor-php-zip.php:162
+msgid "Permission defined. Unable to add the following file to your backup: %1$s"
+msgstr ""
+
+#. translators: 1: A filename.
+#: admin/compressor/class-boldgrid-backup-admin-compressor-php-zip.php:312
+msgid "Unable to create zip file: %1$s"
+msgstr ""
+
+#. translators: 1: Backup directory path.
+#: admin/compressor/class-boldgrid-backup-admin-compressor-php-zip.php:315
+msgid "When testing ZipArchive functionality, we are able to create a zip file and add files to it, but we were unable to close the zip file.<br /><strong>Please be sure the following backup directory has modify permissions</strong>:<br />%1$s"
+msgstr ""
+
+#. translators: 1 The name of a folder that could not be created.
+#: admin/compressor/class-boldgrid-backup-admin-compressor-system-zip-test.php:153
+msgid "Unable to create test directory: %1$s"
+msgstr ""
+
+#. translators: 1 The name of a file that could not be created.
+#: admin/compressor/class-boldgrid-backup-admin-compressor-system-zip-test.php:180
+msgid "Unable to create test file: %1$s"
+msgstr ""
+
+#: admin/compressor/class-boldgrid-backup-admin-compressor-system-zip-test.php:190
+msgid "Unable to create filelist.txt"
+msgstr ""
+
+#: admin/compressor/class-boldgrid-backup-admin-compressor-system-zip-test.php:208
+msgid "Unable to delete test directory."
+msgstr ""
+
+#: admin/compressor/class-boldgrid-backup-admin-compressor-system-zip-test.php:214
+msgid "Unable to recreate test directory."
+msgstr ""
+
+#: admin/compressor/class-boldgrid-backup-admin-compressor-system-zip-test.php:220
+msgid "Unable to move zip to test directory."
+msgstr ""
+
+#: admin/compressor/class-boldgrid-backup-admin-compressor-system-zip-test.php:230
+msgid "Unable to restore all files and folders."
+msgstr ""
+
+#: admin/compressor/class-boldgrid-backup-admin-compressor-system-zip-test.php:249
+msgid "Unable to create zip file."
+msgstr ""
+
+#: admin/compressor/class-boldgrid-backup-admin-compressor-system-zip-test.php:284
+msgid "/usr/bin/zip is not available."
+msgstr ""
+
+#: admin/partials/archive-details/db.php:29
+msgid "This archive does not contain a database backup."
+msgstr ""
+
+#. translators: 1: Backup archive filename.
+#: admin/partials/archive-details/db.php:36
+msgid "This archive contains the following database backup: <strong>%1$s</strong>"
+msgstr ""
+
+#: admin/partials/archive-details/db.php:58
+msgid "Restore this database"
+msgstr ""
+
+#: admin/partials/archive-details/details.php:28
+msgid "Backup triggered by"
+msgstr ""
+
+#: admin/partials/archive-details/details.php:32
+#: admin/partials/settings/compressor.php:83
+#: admin/partials/settings/compressor.php:100
+msgid "Compressor"
+msgstr ""
+
+#: admin/partials/archive-details/details.php:36
+msgid "Total duration"
+msgstr ""
+
+#: admin/partials/archive-details/details.php:37
+#: admin/partials/archive-details/details.php:42
+msgid "seconds"
+msgstr ""
+
+#: admin/partials/archive-details/details.php:41
+msgid "Time to backup database"
+msgstr ""
+
+#: admin/partials/archive-details/details.php:46
+msgid "Email sent after backup"
+msgstr ""
+
+#: admin/partials/archive-details/details.php:51
+msgid "Files included"
+msgstr ""
+
+#: admin/partials/archive-details/details.php:55
+msgid "Files excluded"
+msgstr ""
+
+#: admin/partials/archive-details/details.php:59
+msgid "Database tables excluded"
+msgstr ""
+
+#: admin/partials/archive-details/details.php:83
+msgid "yes"
+msgstr ""
+
+#: admin/partials/archive-details/details.php:83
+msgid "no"
+msgstr ""
+
+#: admin/partials/archive-details/details.php:87
+msgid "n/a"
+msgstr ""
+
+#: admin/partials/archive-details/not-found.php:20
+msgid "Backup file not found!"
+msgstr ""
+
+#: admin/partials/archive-details/only-remote.php:29
+msgid "This backup file is not on your <strong>web server</strong>, but it is saved to one or more of your <strong>remote storage providers</strong>. If you would like to restore this backup or review the contents of this backup, you will first need to download it to your web server."
+msgstr ""
+
+#. translators: 1 An opening anchor tag to the tools page, 2 its closing tag.
+#: admin/partials/archive-details/only-remote.php:35
+msgid "After your backup has been downloaded to the web server, this page will refresh and you will see more options available. To learn more about your web server vs. remote storage providers, %1$sclick here%2$s."
+msgstr ""
+
+#: admin/partials/archive-details/remote-storage.php:34
+msgid "No remote storage options available."
+msgstr ""
+
+#: admin/partials/archive-details/remote-storage.php:61
+msgid "Download to web server"
+msgstr ""
+
+#: admin/partials/archive-details/remote-storage.php:72
+#: admin/partials/archives/add-new.php:90
+#: admin/partials/transfers/destination.php:102
+msgid "Upload"
+msgstr ""
+
+#. translators: 1: HTML anchor open tag, 2: HTML anchor close tag, 3: Provider title.
+#: admin/partials/archive-details/remote-storage.php:78
+msgid "Please go to your %1$ssettings page%2$s to configure %3$s."
+msgstr ""
+
+#. translators: 1: HTML opening anchor tag linking to the plugin, 2: HTML closing anchor tag, 3: Name of a remote storage provider, 4: Premium plugin title.
+#: admin/partials/archive-details/remote-storage.php:120
+msgid "Please upgrade to %1$s%4$s%2$s to enable %3$s."
+msgstr ""
+
+#: admin/partials/archives/add-new.php:22
+msgid "File upload size limit"
+msgstr ""
+
+#: admin/partials/archives/add-new.php:27
+msgid "Files uploaded from your computer are limited to a maximum size.  To change the limit, you may be able to modify your server's php.ini or .htaccess file.  Please ask your web hosting provider if you need assistance.  Uploads from URL addresses do not have a size limit."
+msgstr ""
+
+#. translators: 1: Plugin title.
+#: admin/partials/archives/add-new.php:34
+msgid ""
+"You can upload a backup file that was created with %1$s.\n"
+"\t\t\tIf you choose to restore an uploaded file from a different web location (URL), then we will try to ensure that references to URL address are updated.\n"
+"\t\t\tThere may be times when some items may need to be updated manually."
+msgstr ""
+
+#. translators: 1: HTML tag, 2: Filename part, 3: Backup identifier, 4: File extension, 5: Archive filename, 6: Backup directory path, 7: Plugin title.
+#: admin/partials/archives/add-new.php:48
+msgid ""
+"Your %7$s id is %3$s. This backup id is used to determine if a backup archive file is associated with this WordPress installation.\n"
+"\t\tManually uploaded archive files must have filenames starting with \"%2$s\", contain the %7$s id \"%3$s\", and end with \"%4$s\", to be recognized.%1$s%1$s\n"
+"\t\tFor example: %5$s%1$s%1$s\n"
+"\t\tManually uploaded archive files should be uploaded to: %6$s"
+msgstr ""
+
+#: admin/partials/archives/add-new.php:69
+msgid "Upload a Backup Archive"
+msgstr ""
+
+#: admin/partials/archives/add-new.php:85
+#: admin/partials/transfers/destination.php:100
+msgid "Import from a download link:"
+msgstr ""
+
+#: admin/partials/archives/add-new.php:87
+#: admin/partials/transfers/destination.php:101
+msgid "Download URL address"
+msgstr ""
+
+#: admin/partials/archives/add-new.php:96
+msgid "From a file on your computer:"
+msgstr ""
+
+#: admin/partials/archives/add-new.php:123
+msgid "Have a large file to upload or want to use FTP?"
+msgstr ""
+
+#. translators: 1: URL address.
+#: admin/partials/archives/note-pre-backup.php:31
+msgid "<strong>Note</strong>: Backups use resources and <a href=\"%s\" target=\"_blank\">must pause your site</a> momentarily.  Use sparingly. "
+msgstr ""
+
+#. translators: 1: Archive count, 2: Retention limit, 3: URL address.
+#: admin/partials/archives/note-pre-backup.php:57
+msgid "You currently have %1$s backups stored on your server, and your <a href=\"%3$s\">backup settings</a> are only configured to store %2$s. Backing up your site now will delete your oldest backup to make room for your new backup. We recommend you download a backup to your local computer."
+msgstr ""
+
+#: admin/partials/backup-now-modal/title.php:20
+msgid "Title & Description"
+msgstr ""
+
+#: admin/partials/backup-now-modal/title.php:23
+msgid "To help remember the details of this backup, you may enter a title and description."
+msgstr ""
+
+#: admin/partials/backup-now-modal/title.php:24
+msgid "Backup Title"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-archive-details.php:83
+msgid "File size"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-archive-details.php:91
+msgid "Backup date"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-archive-details.php:126
+msgid "Ignore retention"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-archive-details.php:128
+#: admin/partials/boldgrid-backup-admin-archive-details.php:215
+msgid "Edit"
+msgstr ""
+
+#. translators: 1: HTML anchor open tags, 2: HTML close tag, 3: HTML anchor open tags, 4: HTML close tag.
+#: admin/partials/boldgrid-backup-admin-archive-details.php:137
+msgid "Protect this backup from being deleted due to %1$sretention settings%2$s. Applies only to backups stored on your %3$sWeb Server%4$s."
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-archive-details.php:151
+#: admin/partials/boldgrid-backup-admin-archive-details.php:241
+msgid "OK"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-archive-details.php:152
+#: admin/partials/boldgrid-backup-admin-archive-details.php:242
+msgid "Cancel"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-archive-details.php:166
+msgid "Upgrade to Premium to protect your sensitive data!"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-archive-details.php:182
+msgid "Secure your sensitive data with the Premium plugin!"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-archive-details.php:213
+msgid "Encrypt database"
+msgstr ""
+
+#. translators: 1: HTML anchor open tags, 2: HTML close tag, 3: HTML anchor open tags, 4: HTML close tag.
+#: admin/partials/boldgrid-backup-admin-archive-details.php:224
+msgid "Database encryption protects sensitive data stored in backup archives.  The encryption settings are configured on the %1$sBackup Security%2$s settings page."
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-archive-details.php:263
+msgid "Backup Archive"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-archive-details.php:264
+msgid "File name"
+msgstr ""
+
+#. translators: 1: HTML strong open tag, 2: HTML strong close tag, 3: Plugin title.
+#: admin/partials/boldgrid-backup-admin-archive-details.php:299
+msgid "Upgrade to %1$s%3$s%2$s for more Storage Locations!"
+msgstr ""
+
+#. translators: 1 An opening anchor tag linking to the remote storate settings, 2 its closing anchor tag.
+#: admin/partials/boldgrid-backup-admin-archive-details.php:308
+msgid "Secure your backups by keeping copies of them on %1$sremote storage%2$s."
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-archive-details.php:333
+msgid "Files & Folders"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-archive-details.php:334
+#: admin/partials/boldgrid-backup-admin-test.php:388
+#: admin/partials/settings/db.php:87
+msgid "Database"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-archive-details.php:347
+msgid "Restore Individual Files With One Click"
+msgstr ""
+
+#. translators: 1: Plugin title.
+#: admin/partials/boldgrid-backup-admin-archive-details.php:351
+msgid "Changed a file and now your site isn’t working properly? With %1$s, you can browse through past backup archives and restore individual files with a single click."
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-archive-details.php:363
+msgid "Download & Restore"
+msgstr ""
+
+#. translators: 1 the opening anchor tag linking to the locations page, 2 its closing anchor tag, 3 opening strong tag, 4 its closing strong tag.
+#: admin/partials/boldgrid-backup-admin-archive-details.php:371
+msgid "Backup archives generally should be stored in more locations than just your %3$sweb server%4$s. Be sure to keep copies on your %3$slocal machine%4$s and / or a %3$sremote storage%4$s provider. Learn more about these different locations %1$shere%2$s."
+msgstr ""
+
+#. translators: 1 an opening strong tag, 2 its closing strong tag.
+#: admin/partials/boldgrid-backup-admin-archive-details.php:383
+msgid "Restore this backup. This will restore all the files and the database in this backup. Use the %1$sBackup Browser%2$s below to look at the backup archive and see what will be restored."
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-archive-details.php:389
+msgid "Download Link"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-archive-details.php:390
+msgid "A public link that is used to download a backup archive file.  You can use it to migrate your website to another WordPress installation.  Please keep download links private, as the download files contains sensitive data."
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-archive-details.php:397
+msgid "Backup Browser"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-archive-details.php:399
+msgid "Use the File & Folders and Database tools below to browse the contents of this backup file."
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-archive-details.php:418
+msgid "Unnamed Backup"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-archive-details.php:422
+msgid "Backup description."
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-backup-button.php:43
+msgid "Your backup is starting. This page will refresh and display the progress of the backup."
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-backup-button.php:56
+msgid "You may leave this page, doing so will not stop your backup."
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-backup-modal.php:39
+msgid "The <strong>Files and Folders</strong> and <strong>Database</strong> settings below customize which parts of your site to backup."
+msgstr ""
+
+#. translators: 1: URL address, 2: Plugin title.
+#: admin/partials/boldgrid-backup-admin-backup.php:90
+msgid "See <a href=\"%1$s\">Settings for %2$s</a> for details."
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-backup.php:102
+msgid "This was a dry run test"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-backup.php:126
+msgid "A backup archive file has been created successfully!"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-backup.php:130
+msgid "Backup complete"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-backup.php:140
+msgid "Error creating archive"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-backup.php:141
+msgid "Error restoring archive"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-backup.php:155
+msgid "There was an error restoring the selected backup archive file"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-backup.php:156
+msgid "There was an error creating a backup archive file"
+msgstr ""
+
+#. translators: 1: File path.
+#: admin/partials/boldgrid-backup-admin-backup.php:158
+msgid "File Path: %1$s"
+msgstr ""
+
+#. translators: 1: Error message.
+#: admin/partials/boldgrid-backup-admin-backup.php:161
+msgid "Error Details: %1$s"
+msgstr ""
+
+#. translators: 1: Site identifier.
+#: admin/partials/boldgrid-backup-admin-mail-restore.php:32
+msgid "Restoration completed for %s"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-mail-restore.php:43
+msgid "A backup archive has been restored"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-mail-restore.php:45
+msgid "An error occurred when attempting to restore a backup archive"
+msgstr ""
+
+#. translators: 1: Site identifier.
+#: admin/partials/boldgrid-backup-admin-mail-restore.php:53
+msgid " for %s"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-mail-restore.php:57
+msgid "Restoration details"
+msgstr ""
+
+#. translators: 1: Archive file path.
+#: admin/partials/boldgrid-backup-admin-mail-restore.php:61
+msgid "Archive file path: %s"
+msgstr ""
+
+#. translators: 1: Archive file size.
+#: admin/partials/boldgrid-backup-admin-mail-restore.php:67
+msgid "Archive file size: %s"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-mail-restore.php:72
+msgid "The restoration request was made via CRON (task scheduler)"
+msgstr ""
+
+#. translators: 1: Plugin title.
+#: admin/partials/boldgrid-backup-admin-mail-restore.php:80
+msgid "You can manage notifications in your WordPress admin panel, under %1$s Settings"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-premium.php:38
+msgid "Total Upkeep Premium"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-premium.php:40
+msgid ""
+"Give your website data the protection it deserves with Total Upkeep Premium.\n"
+"\tEnjoy automated remote backups to Google Drive and Amazon S3, individual file restoration,\n"
+"\tthe ability to restore from historical versions, premium support and more."
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-settings.php:45
+msgid "Backup Schedule"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-settings.php:50
+#: admin/partials/settings/storage.php:80
+msgid "Backup Storage"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-settings.php:55
+#: admin/partials/settings/backup-security.php:20
+msgid "Backup Security"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-settings.php:60
+msgid "Backup Process"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-settings.php:65
+#: admin/partials/settings/connect-key.php:22
+msgid "BoldGrid Connect Key"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-settings.php:70
+#: admin/partials/settings/auto-backup.php:22
+msgid "Auto Updates"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-settings.php:75
+#: admin/partials/settings/site-check.php:20
+msgid "Site Check"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-settings.php:80
+#: admin/partials/settings/notifications.php:24
+msgid "Notifications"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-settings.php:91
+msgid "Save Changes"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-settings.php:115
+msgid "Unable to display settings page. Unknown BoldGrid Library error."
+msgstr ""
+
+#. translators: 1: Plugin title, 2:URL address.
+#: admin/partials/boldgrid-backup-admin-settings.php:153
+msgid "The %1$s Backup and Restore system allows you to upgrade your themes and plugins without being afraid it will do something you cannot easily undo. We perform a <a href=\"%2$s\">Preflight Check</a> to see if the needed support is available on your web hosting account."
+msgstr ""
+
+#. translators: 1: Anchored URL address for reseller support, 2: Reseller title/name, 3: HTML anchor close tag.
+#: admin/partials/boldgrid-backup-admin-support.php:34
+msgid "You can receive premium support from your official reseller %1$s%2$s%3$s"
+msgstr ""
+
+#. translators: 1: Reseller telephone number
+#: admin/partials/boldgrid-backup-admin-support.php:49
+msgid "Telephone: %1$s"
+msgstr ""
+
+#. translators: Reseller email address.
+#: admin/partials/boldgrid-backup-admin-support.php:63
+msgid "Email: %1$s"
+msgstr ""
+
+#. translators: 1: HTML anchor for the URL address for BoldGrid Central, 2: HTML anchor close tag..
+#: admin/partials/boldgrid-backup-admin-support.php:79
+msgid "You can receive premium support using %1$sBoldGrid Central%2$s"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-support.php:93
+msgid "Upgrade to receive Premium support from BoldGrid"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-support.php:118
+msgid "Free Support"
+msgstr ""
+
+#. translators: URL address for the WordPress.org boldgrid-backup plugin support forum.
+#: admin/partials/boldgrid-backup-admin-support.php:122
+msgid "Ask on <a href=\"%1$s\" target=\"_blank\">WordPress.org</a>"
+msgstr ""
+
+#. translators: URL address for the WordPress.org boldgrid-backup plugin support forum.
+#: admin/partials/boldgrid-backup-admin-support.php:130
+msgid "Browse our <a href=\"%1$s\" target=\"_blank\">Support Guides</a>"
+msgstr ""
+
+#. translators: URL address for the WordPress.org boldgrid-backup plugin support forum.
+#: admin/partials/boldgrid-backup-admin-support.php:138
+msgid "Join <a href=\"%1$s\" target=\"_blank\">Team Orange User Group</a> on Facebook"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-support.php:154
+msgid "Premium Support"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:26
+msgid "untested"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:27
+msgid "PASS"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:28
+msgid "FAIL"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:29
+msgid "not set"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:30
+msgid "Before any compressors are tested, please be sure your backup directory is created and has proper permissions set."
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:31
+msgid "Please be sure that your backup directory exists. If it does, also ensure it has read, write, and modify permissions."
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:36
+msgid "Please review directory permissions. If you are on a Windows server, your user may need to be able to read BOTH the backup directory and its parent directory."
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:105
+msgid "Functionality test status:"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:109
+msgid "General tests"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:112
+msgid "User home directory:"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:116
+msgid "User home directory writable?"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:120
+msgid "WordPress directory:"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:124
+msgid "WordPress directory writable?"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:128
+msgid "Document root:"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:132
+msgid "Current user:"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:136
+msgid "PHP in safe mode?"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:140
+msgid "Filesystem Method"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:144
+msgid "Only \"direct\" filesystem supported."
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:148
+msgid "Execution functions available"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:152
+msgid "WordPress version:"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:156
+msgid "Server time zone:"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:160
+msgid "Server date:"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:166
+msgid "Backup directory & permissions:"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:170
+msgid "Possible backup directory parents:"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:175
+msgid "Backup directory:"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:182
+msgid "Backup directory without ABSPATH:"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:187
+msgid "Backup directory exists?"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:193
+msgid "Backup directory has read permission?"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:198
+msgid "Directory listing of backup directory can be fetched?"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:203
+msgid "Backup directory has write permission?"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:208
+msgid "Backup directory has modify permission?"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:213
+msgid "Backup directory has delete permission?"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:224
+msgid "PHP ZipArchive available?"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:238
+msgid "PHP ZipArchive test passed?"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:244
+msgid "PclZip available?"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:258
+msgid "PclZip test passed?"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:264
+msgid "PHP Bzip2 available?"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:269
+msgid "PHP Zlib available?"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:274
+msgid "PHP LZF available?"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:279
+msgid "System TAR available?"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:285
+msgid "System ZIP available?"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:292
+msgid "Cron"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:296
+msgid "System crontab available?"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:301
+msgid "PHP allow_url_fopen enabled?"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:306
+msgid "Curl SSL enabled?"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:311
+msgid "Can fetch a remote url via CLI?"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:316
+msgid "Cron time zone matches server time zone? <span class=\"dashicons dashicons-editor-help\" data-id=\"cron-time-zone\"></span>"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:321
+msgid "Cron jobs:"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:326
+msgid "Method used to read cron:"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:327
+msgid "Crontab output to file."
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:327
+msgid "Crontab read via exec function."
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:331
+msgid "WP Cron enabled?"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:336
+msgid "WP Cron jobs:"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:343
+msgid "Disk space"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:347
+msgid "Directory used to calculate disk space:"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:352
+msgid "Disk total space:"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:357
+msgid "Disk used space:"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:362
+msgid "Disk free space:"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:368
+msgid "WordPress directory size:"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:378
+msgid "Estimated free space after backup:"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:383
+msgid "THERE IS NOT ENOUGH SPACE TO PERFORM A BACKUP!"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:392
+msgid "Database size:"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:397
+msgid "WordPress database charset:"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:403
+msgid "WordPress database collate:"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:419
+msgid "is not compatible with your hosting account. For further help please see:"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-test.php:420
+msgid "Making your web hosting account compatible with"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-tools.php:23
+msgid "Local & Remote"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-tools.php:28
+msgid "Cron Log"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-tools.php:33
+#: admin/partials/tools/view-logs.php:29
+msgid "Logs"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-transfers.php:32
+msgid "Overview"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-transfers.php:37
+msgid "Source"
+msgstr ""
+
+#: admin/partials/boldgrid-backup-admin-transfers.php:42
+msgid "Destination"
+msgstr ""
+
+#: admin/partials/remote/ftp.php:32
+#: admin/remote/class-boldgrid-backup-admin-ftp-hooks.php:61
+#: admin/remote/class-boldgrid-backup-admin-ftp-hooks.php:62
+msgid "FTP Settings"
+msgstr ""
+
+#: admin/partials/remote/ftp.php:43
+msgid "FTP Host"
+msgstr ""
+
+#: admin/partials/remote/ftp.php:45
+msgid "FTP host should be in the format of: example.com"
+msgstr ""
+
+#: admin/partials/remote/ftp.php:50
+msgid "FTP Port"
+msgstr ""
+
+#: admin/partials/remote/ftp.php:56
+msgid "FTP Type"
+msgstr ""
+
+#: admin/partials/remote/ftp.php:64
+msgid "FTP Mode"
+msgstr ""
+
+#: admin/partials/remote/ftp.php:66
+msgid "Auto"
+msgstr ""
+
+#: admin/partials/remote/ftp.php:67
+#: admin/partials/settings/auto-update.php:26
+msgid "Active"
+msgstr ""
+
+#: admin/partials/remote/ftp.php:68
+msgid "Passive"
+msgstr ""
+
+#: admin/partials/remote/ftp.php:74
+msgid "FTP Username"
+msgstr ""
+
+#: admin/partials/remote/ftp.php:78
+msgid "FTP Password"
+msgstr ""
+
+#: admin/partials/remote/ftp.php:84
+msgid "Folder name"
+msgstr ""
+
+#: admin/partials/remote/ftp.php:85
+msgid "A folder in your FTP/SFTP server to store your backups, will be created if it doesn't exist. Please only use letters, numbers, dashes, and underscores."
+msgstr ""
+
+#: admin/partials/remote/ftp.php:91
+msgid "Retention (Number of backup archives to retain)"
+msgstr ""
+
+#: admin/partials/remote/ftp.php:98
+msgid "Nickname (If you would like to refer to this account as something other than FTP)"
+msgstr ""
+
+#: admin/partials/remote/ftp.php:107
+msgid "With automated FTP your credentials must be stored here in your WordPress. They will be encrypted in the database and this protects them significantly, but they could be decrypted in the unlikely event of a compromise. We recommended you use a separate FTP user and password specifically for backups."
+msgstr ""
+
+#: admin/partials/remote/ftp.php:115
+#: admin/partials/remote/local.php:30
+msgid "Save changes"
+msgstr ""
+
+#: admin/partials/remote/ftp.php:116
+msgid "Delete settings"
+msgstr ""
+
+#: admin/partials/settings/auto-backup.php:26
+msgid "WordPress has the ability to auto update both itself and your plugins and themes. Keeping your software up to date is very important, and this automation helps you more easily do that."
+msgstr ""
+
+#: admin/partials/settings/auto-backup.php:29
+msgid "Total Upkeep adds on top of this functionality by giving you the ability to have backups made before any auto update, and by making it easier to control what is updated and when."
+msgstr ""
+
+#: admin/partials/settings/auto-backup.php:33
+msgid "Backup Before Updating"
+msgstr ""
+
+#: admin/partials/settings/auto-backup.php:37
+msgid "Sometimes updating your software can break your site. It's recommended to make a backup before updates, so in the event something goes wrong, you can reasily restore your site."
+msgstr ""
+
+#: admin/partials/settings/auto-backup.php:42
+msgid "Auto Backup Before Update"
+msgstr ""
+
+#: admin/partials/settings/auto-backup.php:53
+msgid "Enabled (Recommended)"
+msgstr ""
+
+#: admin/partials/settings/auto-backup.php:60
+#: admin/partials/settings/auto-backup.php:98
+#: admin/partials/settings/backup-security.php:63
+#: admin/partials/settings/site-check.php:62
+#: admin/partials/settings/site-check.php:88
+#: admin/partials/settings/site-check.php:107
+msgid "Disabled"
+msgstr ""
+
+#. translators: 1: HTML anchor open tag, 2: HTML anchor close tag.
+#: admin/partials/settings/auto-backup.php:69
+msgid "Auto Backup Before Update: Automatically perform a backup before WordPress updates. When this feature is enabled, a full backup will be made during the %1$spre_auto_update action%2$s."
+msgstr ""
+
+#: admin/partials/settings/auto-backup.php:91
+#: admin/partials/settings/backup-security.php:52
+#: admin/partials/settings/site-check.php:55
+#: admin/partials/settings/site-check.php:81
+#: admin/partials/settings/site-check.php:100
+msgid "Enabled"
+msgstr ""
+
+#: admin/partials/settings/auto-backup.php:105
+msgid "Auto Rollback: If something goes wrong while performing WordPress updates, automatically restore the site using a backup made before updating WordPress. This feature does not apply to auto updates."
+msgstr ""
+
+#: admin/partials/settings/auto-update.php:27
+msgid "Inactive"
+msgstr ""
+
+#: admin/partials/settings/auto-update.php:28
+msgid "Parent"
+msgstr ""
+
+#. translators: 1: HTML anchor open tag, 2: HTML anchor close tag, 3: HTML em open tag, 4: HTML em close tag, 5: Plugin Title.
+#: admin/partials/settings/auto-update.php:54
+msgid "You have %3$sAuto Backup Before Update%4$s disabled in the %1$s%5$s Backup and Restore Settings%2$s.  Please consider enabling the setting."
+msgstr ""
+
+#: admin/partials/settings/auto-update.php:88
+msgid "Upgrade to Premium for the option to configure a delay on updates!"
+msgstr ""
+
+#: admin/partials/settings/auto-update.php:115
+msgid "Configure what is Auto Updated"
+msgstr ""
+
+#: admin/partials/settings/auto-update.php:121
+msgid "WordPress Core"
+msgstr ""
+
+#: admin/partials/settings/auto-update.php:125
+msgid "All Update Types"
+msgstr ""
+
+#: admin/partials/settings/auto-update.php:138
+msgid "Select Which WordPress Core updates you wish to have automatically updated"
+msgstr ""
+
+#: admin/partials/settings/auto-update.php:144
+msgid "Major Updates"
+msgstr ""
+
+#: admin/partials/settings/auto-update.php:156
+msgid "Minor Updates"
+msgstr ""
+
+#: admin/partials/settings/auto-update.php:168
+msgid "Development Updates"
+msgstr ""
+
+#: admin/partials/settings/auto-update.php:180
+msgid "Translation Updates"
+msgstr ""
+
+#: admin/partials/settings/auto-update.php:228
+msgid "Plugins"
+msgstr ""
+
+#: admin/partials/settings/auto-update.php:234
+msgid "Choose which Plugins you wish to update automatically"
+msgstr ""
+
+#: admin/partials/settings/auto-update.php:238
+msgid "Default For New Plugins"
+msgstr ""
+
+#: admin/partials/settings/auto-update.php:244
+msgid "All Plugins"
+msgstr ""
+
+#: admin/partials/settings/auto-update.php:348
+msgid "Themes"
+msgstr ""
+
+#: admin/partials/settings/auto-update.php:354
+msgid "Choose which Themes you wish to update automatically "
+msgstr ""
+
+#: admin/partials/settings/auto-update.php:358
+msgid "Default For New Themes"
+msgstr ""
+
+#: admin/partials/settings/auto-update.php:365
+msgid "All Themes"
+msgstr ""
+
+#: admin/partials/settings/auto-update.php:421
+msgid "Configure When Auto Updates Occur"
+msgstr ""
+
+#: admin/partials/settings/auto-update.php:443
+msgid "View Updates"
+msgstr ""
+
+#: admin/partials/settings/auto-update.php:444
+msgid "Upgrade to the newest version of Premium for the option to configure a delay on updates!"
+msgstr ""
+
+#: admin/partials/settings/backup-directory.php:24
+msgid "Backup Directory"
+msgstr ""
+
+#. translators: 1: URL address link.
+#: admin/partials/settings/backup-directory.php:39
+msgid "For security purposes, please do not set this to a publicly available directory. Once you set this, it is not recommended that you change it again. You can find more help with setting your backup directory %1$s."
+msgstr ""
+
+#: admin/partials/settings/backup-directory.php:47
+msgid "here"
+msgstr ""
+
+#: admin/partials/settings/backup-directory.php:55
+msgid "Directory to store backup archives"
+msgstr ""
+
+#: admin/partials/settings/backup-directory.php:63
+msgid "If you change this directory, current backups will not show in the list. Would you like us to move the backups to the new directory?"
+msgstr ""
+
+#: admin/partials/settings/backup-logs.php:25
+msgid "Backup Logs"
+msgstr ""
+
+#: admin/partials/settings/backup-logs.php:32
+msgid "Filelist Analysis"
+msgstr ""
+
+#: admin/partials/settings/backup-logs.php:34
+msgid "Include a filelist analysis log file with each backup. This log file will show you the largest files and directories that were added to your backup, and can be useful in troubleshooting."
+msgstr ""
+
+#. translators: 1: HTML break tag, 2: HTML strong open tag, 3: HTML strong closing tag.
+#: admin/partials/settings/backup-security.php:28
+msgid "Manage security features to help protect backup archives.%1$s%1$s%2$sEncrypt Database%3$s%1$s This premium feature will encrypt the database dump file in backup archives in order to protect sensitive information."
+msgstr ""
+
+#: admin/partials/settings/backup-security.php:40
+msgid "Encrypt Database"
+msgstr ""
+
+#. translators: 1: Get premium button/link, 2: Opening <a> tag, 3: Closing </a> tag.
+#: admin/partials/settings/backup-security.php:75
+msgid ""
+"%1$sDatabase Encryption provides another level of protection by preventing unauthorized access to your database backup archives.\n"
+"\t\t\t%2$sLearn More%3$s"
+msgstr ""
+
+#. translators: 1: Unlock Feature button/link, 2: Premium plugin title.
+#: admin/partials/settings/backup-security.php:96
+msgid "%1$sThe %2$s plugin is required for encryption features."
+msgstr ""
+
+#. translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag, 3: Premium plugin title.
+#: admin/partials/settings/backup-security.php:110
+msgid "The %3$s plugin is not active.  Encryption features are not available.  Please go to the %1$sPlugins%2$s page to activate it."
+msgstr ""
+
+#: admin/partials/settings/compressor.php:72
+msgid ""
+"The compression level defines how compacted the files will be within the backup file.\n"
+"\tHigher compression levels result in smaller backup files, but take longer to create and use more system resources.\n"
+"\tIf you are having trouble getting backups to complete successfully, try using a lower compression level."
+msgstr ""
+
+#: admin/partials/settings/compressor.php:91
+msgid "These are advanced settings. You do not need to configure this setting."
+msgstr ""
+
+#: admin/partials/settings/compressor.php:106
+msgid "Compression Level"
+msgstr ""
+
+#: admin/partials/settings/connect-key.php:28
+msgid "Connect Key management has been moved to"
+msgstr ""
+
+#: admin/partials/settings/connect-key.php:29
+msgid "Settings >> BoldGrid Connect"
+msgstr ""
+
+#: admin/partials/settings/days-of-week.php:24
+msgid "Days of the Week"
+msgstr ""
+
+#: admin/partials/settings/days-of-week.php:75
+msgid "Backup will not occur if no days are selected."
+msgstr ""
+
+#. translators: 1: HTML markup.
+#: admin/partials/settings/days-of-week.php:88
+msgid "Backups use resources and <a href=\"%s\" target=\"_blank\">must pause your site</a> momentarily. Use sparingly."
+msgstr ""
+
+#: admin/partials/settings/db.php:37
+msgid "Backup all tables (full backup)"
+msgstr ""
+
+#: admin/partials/settings/db.php:38
+#: admin/partials/settings/folders.php:48
+msgid "Custom Backup"
+msgstr ""
+
+#: admin/partials/settings/db.php:48
+msgid "Include all"
+msgstr ""
+
+#: admin/partials/settings/db.php:49
+msgid "Exclude all"
+msgstr ""
+
+#: admin/partials/settings/db.php:61
+msgid "All database tables will be backed up."
+msgstr ""
+
+#: admin/partials/settings/db.php:62
+msgid "You are not backing up all database tables. Backups created may not contain all of the needed tables to restore your website in the event of an emergency."
+msgstr ""
+
+#: admin/partials/settings/db.php:63
+msgid "Backup all tables"
+msgstr ""
+
+#: admin/partials/settings/folders.php:47
+msgid "Backup all files (full backup)"
+msgstr ""
+
+#: admin/partials/settings/folders.php:90
+msgid "This includes the wp-admin and wp-includes folders, as well as all of the core WordPress files in the root directory of WordPress."
+msgstr ""
+
+#: admin/partials/settings/folders.php:91
+msgid "Begin a filter with a forward slash(/) to specify the file or folder must be in the root WordPress directory."
+msgstr ""
+
+#: admin/partials/settings/folders.php:92
+msgid "For example, <strong>/index.php</strong> will not match index.php files in subdirectories, such as wp-includes/index.php"
+msgstr ""
+
+#: admin/partials/settings/folders.php:93
+msgid "Use a comma to add more than one filter."
+msgstr ""
+
+#: admin/partials/settings/folders.php:94
+msgid "For example, <strong>wp-admin,wp-includes</strong> will backup both the wp-admin folder and the wp-includes folder."
+msgstr ""
+
+#: admin/partials/settings/folders.php:121
+msgid "Default"
+msgstr ""
+
+#: admin/partials/settings/folders.php:122
+msgid "These are the <strong>default</strong> settings. Include all core WordPress files and the wp-content folder (which includes your plugins, themes, and uploads)."
+msgstr ""
+
+#: admin/partials/settings/folders.php:123
+msgid "Example 1"
+msgstr ""
+
+#: admin/partials/settings/folders.php:124
+msgid "Backup only the wp-content folder."
+msgstr ""
+
+#: admin/partials/settings/folders.php:125
+msgid "Example 2"
+msgstr ""
+
+#: admin/partials/settings/folders.php:126
+msgid "Backup only the plugins and themes folders."
+msgstr ""
+
+#: admin/partials/settings/folders.php:127
+msgid "Example 3"
+msgstr ""
+
+#: admin/partials/settings/folders.php:128
+msgid "Backup everything except WordPress core files."
+msgstr ""
+
+#: admin/partials/settings/folders.php:140
+msgid "You are using the the default <strong>Include</strong> and <strong>Exclude</strong> settings. Backups created will contain all of the needed files to restore your website in the event of an emergency."
+msgstr ""
+
+#: admin/partials/settings/folders.php:141
+msgid "You are not using the the default <strong>Include</strong> and <strong>Exclude</strong> settings. Backups created may not contain all of the needed files to restore your website in the event of an emergency."
+msgstr ""
+
+#: admin/partials/settings/folders.php:146
+msgid "Use default settings"
+msgstr ""
+
+#: admin/partials/settings/folders.php:176
+msgid "Use the <strong>Include</strong> and <strong>Exclude</strong> settings to adjust which files are included in your backup. Click the <strong>Preview</strong> button to see which files will be included in your backup based on your settings."
+msgstr ""
+
+#: admin/partials/settings/folders.php:177
+msgid "The following special characters can be used in your <strong>include</strong> and <strong>exclude</strong> filters:"
+msgstr ""
+
+#: admin/partials/settings/folders.php:179
+msgid "For help with creating a filter, click one of the examples. This will fill in the <strong>Include</strong> and <strong>Exclude</strong> settings below."
+msgstr ""
+
+#: admin/partials/settings/folders.php:196
+msgid "Include"
+msgstr ""
+
+#: admin/partials/settings/folders.php:213
+msgid "Exclude"
+msgstr ""
+
+#: admin/partials/settings/folders.php:245
+msgid "Preview"
+msgstr ""
+
+#: admin/partials/settings/folders.php:246
+msgid "Filter below results"
+msgstr ""
+
+#: admin/partials/settings/folders.php:267
+msgid "Files and Folders"
+msgstr ""
+
+#: admin/partials/settings/notifications.php:29
+msgid "Notification email address"
+msgstr ""
+
+#: admin/partials/settings/notifications.php:34
+msgid "Send an email when a backup completes"
+msgstr ""
+
+#: admin/partials/settings/notifications.php:47
+msgid "Send an email when a restoration is performed"
+msgstr ""
+
+#: admin/partials/settings/notifications.php:60
+msgid "Send an email when there is a failed site check"
+msgstr ""
+
+#. translators: 1: URL address, 2: Plugin title.
+#: admin/partials/settings/premium-message.php:34
+msgid "You are running the Premium version of the %2$s plugin. Please visit our <a href=\"%1$s\" target=\"_blank\">%2$s User Guide</a> for more information."
+msgstr ""
+
+#. translators: 1: URL address for user guide, 2: URL address for upgrade, 3: Plugin title.
+#: admin/partials/settings/premium-message.php:65
+msgid ""
+"\n"
+"\t\t\t\t<p>The %3$s plugin comes in two versions, the Free and Premium. The Premium version is part of the BoldGrid Premium Suite. To learn about the capabilities of the %3$s plugin, check out our <a href=\"%1$s\" target=\"_blank\">%3$s User Guide</a>.</p>\n"
+"\t\t\t\t<p>Key differences are size of backups supported, scheduling capabilities, and number of archives supported. To upgrade now, go <a href=\"%2$s\" target=\"_blank\">here</a>.</p>\n"
+"\t\t\t\t"
+msgstr ""
+
+#: admin/partials/settings/retention.php:32
+msgid "Retention"
+msgstr ""
+
+#: admin/partials/settings/retention.php:38
+msgid "Number of backup archives to retain"
+msgstr ""
+
+#: admin/partials/settings/scheduler.php:31
+msgid "When using WP Cron, we cannot guarantee that backups will be created at the times you specify. Cron is the recommended scheduler."
+msgstr ""
+
+#: admin/partials/settings/scheduler.php:36
+msgid "Recommended"
+msgstr ""
+
+#: admin/partials/settings/scheduler.php:59
+msgid "Scheduler"
+msgstr ""
+
+#: admin/partials/settings/scheduler.php:62
+msgid "Advanced"
+msgstr ""
+
+#. translators: 1: Log file path, 2: Wiki page URL address.
+#: admin/partials/settings/site-check.php:29
+msgid "Site Check is a feature that can be enabled to periodically check your site for errors. If an error is found, it can be logged and an email alert can be sent to you. If logging is enabled, then activity is logged to a file \"%1$s\". More information on Site Check and the commands used can be found in the <a target=\"_blank\" href=\"%2$s\">wiki</a>."
+msgstr ""
+
+#: admin/partials/settings/site-check.php:47
+msgid "Site Checker"
+msgstr ""
+
+#: admin/partials/settings/site-check.php:66
+msgid "Check Interval (in minutes)"
+msgstr ""
+
+#: admin/partials/settings/site-check.php:73
+msgid "Logger"
+msgstr ""
+
+#: admin/partials/settings/site-check.php:92
+msgid "Auto Recovery"
+msgstr ""
+
+#: admin/partials/settings/storage-location.php:37
+msgid "Authorized"
+msgstr ""
+
+#: admin/partials/settings/storage-location.php:39
+msgid "Authorize"
+msgstr ""
+
+#: admin/partials/settings/storage-location.php:45
+msgid "Configured"
+msgstr ""
+
+#: admin/partials/settings/storage-location.php:46
+msgid "update"
+msgstr ""
+
+#: admin/partials/settings/storage-location.php:48
+msgid "Configure"
+msgstr ""
+
+#: admin/partials/settings/storage.php:73
+msgid "Upgrade to Premium for more Storage Locations!"
+msgstr ""
+
+#. translators: 1: URL address.
+#: admin/partials/settings/storage.php:89
+msgid "The following is a list of storage locations available to store your backup archives on. It is recommended to store your backups on at least 2 different storage locations. You can find more information <a href=\"%1$s\">here</a>."
+msgstr ""
+
+#: admin/partials/settings/storage.php:112
+msgid "Backup will not occur if no storage locations are selected."
+msgstr ""
+
+#: admin/partials/settings/time-of-day.php:24
+msgid "Time of Day"
+msgstr ""
+
+#: admin/partials/tools/local-remote.php:30
+msgid "Browser"
+msgstr ""
+
+#: admin/partials/tools/local-remote.php:31
+msgid "Unknown browser"
+msgstr ""
+
+#: admin/partials/tools/local-remote.php:33
+msgid "Unknown version"
+msgstr ""
+
+#: admin/partials/tools/local-remote.php:36
+msgid "Operating System"
+msgstr ""
+
+#: admin/partials/tools/local-remote.php:57
+msgid "Server Name"
+msgstr ""
+
+#: admin/partials/tools/local-remote.php:61
+msgid "Server IP Address"
+msgstr ""
+
+#: admin/partials/tools/local-remote.php:65
+msgid "Server Type"
+msgstr ""
+
+#: admin/partials/tools/local-remote.php:96
+msgid "Server OS"
+msgstr ""
+
+#: admin/partials/tools/local-remote.php:106
+msgid "Where should I store my backups?"
+msgstr ""
+
+#. translators: 1: HTML strong open tag. 2: HTML strong close tag, 3: Plugin title.
+#: admin/partials/tools/local-remote.php:109
+msgid "Throughout the %3$s plugin, you will see references to %1$sLocal Machine%2$s, %1$sWeb Server%2$s, and %1$sRemote Storage%2$s. These are all locations you can save your backup archives to."
+msgstr ""
+
+#: admin/partials/tools/local-remote.php:117
+msgid "Continue reading below to find out more about each. It is recommended to store backup archives in at least 2 different storage locations."
+msgstr ""
+
+#: admin/partials/tools/local-remote.php:123
+msgid "Local Machine"
+msgstr ""
+
+#. translators: 1: HTML strong open tag. 2: HTML strong close tag.
+#: admin/partials/tools/local-remote.php:128
+msgid "Your %1$sLocal Machine%2$s is the device you are using right now to access the internet. It could be a desktop, laptop, tablet, or even a smart phone."
+msgstr ""
+
+#. translators: 1: HTML strong open tag. 2: HTML strong close tag.
+#: admin/partials/tools/local-remote.php:144
+msgid "We are able to see the following information about your %1$sLocal Machine%2$s:"
+msgstr ""
+
+#. translators: 1: HTML strong open tag. 2: HTML strong close tag.
+#: admin/partials/tools/local-remote.php:160
+msgid "The %1$sWeb Server%2$s is the server where your WordPress website lives. You usually pay your web hosting provider monthly or yearly for hosting."
+msgstr ""
+
+#. translators: 1: HTML strong open tag. 2: HTML strong close tag.
+#: admin/partials/tools/local-remote.php:176
+msgid "We are able to see the following information about your %1$sWeb Server%2$s:"
+msgstr ""
+
+#. translators: 1: HTML strong open tag, 2: HTML strong close tag, 3: HTML em open tag, 4: HTML em close tag.
+#: admin/partials/tools/local-remote.php:194
+msgid "%1$sRemote Storage%2$s providers are servers other than your %3$sLocal Machine%4$s and %3$sWeb Server%4$s where you can store files. For example, %3$sFTP%4$s, %5$s, and %6$s are all considered Remote Storage Providers."
+msgstr ""
+
+#. translators: 1 Markup showing a "Google Drive" logo, 2 Markup showing an "Amazon S3" logo.
+#: admin/partials/tools/local-remote.php:218
+msgid "Catastrophic data loss can happen at any time. Storing your archives in multiple secure locations will keep your website data safe and put your mind at ease. Upgrade now to enable automated remote backups to %1$s and %2$s"
+msgstr ""
+
+#: admin/partials/tools/view-logs.php:32
+msgid "No log files exist."
+msgstr ""
+
+#: admin/partials/tools/view-logs.php:38
+msgid "Filename"
+msgstr ""
+
+#: admin/partials/tools/view-logs.php:40
+msgid "Timestamp"
+msgstr ""
+
+#. translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag.
+#: admin/partials/transfers/destination.php:23
+msgid "Note: If you are going to import and restore a backup containing encrypted files, then don't forget to copy your encryption token to your source site.  You can save your encryption token on the %1$sBackup Security%2$s settings page."
+msgstr ""
+
+#. translators: 1: Get premium button/link, 2: Premium plugin title.
+#: admin/partials/transfers/destination.php:36
+msgid "If you are going to import and restore a backup containing encrypted files, then a %2$s license is required for decryption.  %1$s"
+msgstr ""
+
+#. translators: 1: Unlock Feature button/link, 2: Premium plugin title.
+#: admin/partials/transfers/destination.php:47
+#: admin/partials/transfers/source.php:61
+msgid "The %2$s plugin is required for encryption.  %1$s"
+msgstr ""
+
+#. translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag, 3: Premium plugin title.
+#: admin/partials/transfers/destination.php:57
+msgid "%3$s is not active. %3$s is required for encryption features.  Please go to the %1$sPlugins%2$s page to activate it."
+msgstr ""
+
+#. translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag.
+#: admin/partials/transfers/source.php:37
+msgid "Note: If you are going to migrate and restore a backup containing encrypted files, then don't forget to copy your encryption token to your destination site.  You can retrieve your encryption token on the %1$sBackup Security%2$s settings page. "
+msgstr ""
+
+#. translators: 1: Get premium button/link, 2: Premium plugin title.
+#: admin/partials/transfers/source.php:50
+msgid "If you are going to migrate and restore a backup containing encrypted files, then a %2$s license is required for decryption.  %1$s"
+msgstr ""
+
+#. translators: 1: HTML anchor link open tag, 2: HTML anchor closing tag, 3: Premium plugin title.
+#: admin/partials/transfers/source.php:71
+msgid "%3$s is not active and required for encryption features.  Please go to the %1$sPlugins%2$s page to activate it."
+msgstr ""
+
+#. translators: 1: FTP account title/name.
+#: admin/remote/class-boldgrid-backup-admin-ftp-hooks.php:154
+msgid "Upload backup file to %1$s"
+msgstr ""
+
+#: admin/remote/class-boldgrid-backup-admin-ftp-hooks.php:259
+msgid "Invalid filename."
+msgstr ""
+
+#. translators: 1: Plugin title,2: Filename.
+#: admin/remote/class-boldgrid-backup-admin-ftp-hooks.php:272
+msgid "<h2>%1$s - FTP Download</h2><p>Backup file <strong>%2$s</strong> successfully downloaded from FTP.</p>"
+msgstr ""
+
+#: admin/remote/class-boldgrid-backup-admin-ftp-page.php:163
+msgid "Settings deleted."
+msgstr ""
+
+#: admin/remote/class-boldgrid-backup-admin-ftp-page.php:179
+#: admin/storage/class-boldgrid-backup-admin-storage-local.php:200
+msgid "Unauthorized request."
+msgstr ""
+
+#: admin/remote/class-boldgrid-backup-admin-ftp.php:305
+msgid "Unable to get a directory listing from FTP server."
+msgstr ""
+
+#. translators: 1: Remote directory path.
+#: admin/remote/class-boldgrid-backup-admin-ftp.php:326
+msgid "Unable to create the following directory on FTP server: %1$s"
+msgstr ""
+
+#: admin/remote/class-boldgrid-backup-admin-ftp.php:684
+msgid "Unable to log in to FTP server."
+msgstr ""
+
+#. translators: 1: Hostname, 2: Port number.
+#: admin/remote/class-boldgrid-backup-admin-ftp.php:870
+#: admin/remote/class-boldgrid-backup-admin-ftp.php:896
+msgid "Unable to connect to %1$s over port %2$u."
+msgstr ""
+
+#: admin/remote/class-boldgrid-backup-admin-ftp.php:955
+msgid "Invalid username / password."
+msgstr ""
+
+#: admin/remote/class-boldgrid-backup-admin-ftp.php:959
+msgid "Could not retrieve FTP directory listing."
+msgstr ""
+
+#. translators: 1 The filepath to a backup file.
+#: admin/remote/class-boldgrid-backup-admin-ftp.php:1110
+msgid "Archive does not exist: $1$s"
+msgstr ""
+
+#: admin/remote/class-boldgrid-backup-admin-ftp.php:1129
+msgid "Unable to log in to ftp server."
+msgstr ""
+
+#: admin/remote/class-boldgrid-backup-admin-ftp.php:1172
+msgid "Unable to upload file."
+msgstr ""
+
+#: admin/storage/class-boldgrid-backup-admin-storage-local.php:127
+msgid "Delete backup from Web Server"
+msgstr ""
+
+#: admin/storage/class-boldgrid-backup-admin-storage-local.php:231
+msgid "Invalid backup directory"
+msgstr ""
+
+#. translators: 1: Original backup directory, 2: New backup directory.
+#: admin/storage/class-boldgrid-backup-admin-storage-local.php:243
+msgid "Unable to move backups from %1$s to %2$s"
+msgstr ""
+
+#. translators: 1: Plugin title.
+#: includes/class-boldgrid-backup-activator.php:163
+msgid "Thank you for installing %1$s!"
+msgstr ""
+
+#. translators: 1 An opening strong tag, 2 its closing strong tag.
+#: includes/class-boldgrid-backup-activator.php:171
+msgid "Creating your first backup is easy! Simply go to your %1$sBackup Archives%2$s page and click %1$sBackup Site Now%2$s."
+msgstr ""
+
+#: includes/class-boldgrid-backup-activator.php:179
+msgid "Create your first Backup now!"
+msgstr ""
+
+#: includes/class-boldgrid-backup-archive-fetcher.php:130
+msgid "Invalid URL address."
+msgstr ""
+
+#: includes/class-boldgrid-backup-archive-fetcher.php:159
+msgid "Could not retrieve the remote file.  It may not be a ZIP file, or the link is no longer valid."
+msgstr ""
+
+#: includes/class-boldgrid-backup-restorer.php:86
+msgid "Unknown error"
+msgstr ""
+
+#. translators: 1: Number of seconds.
+#: includes/config/config.plugin.php:37
+msgid "Estimated Pause: %s seconds"
+msgstr ""
+
+#. translators: 1: Plugin title.
+#: includes/config/config.rating-prompt.php:33
+msgid "If you feel you're getting really good value from the %1$s plugin, could you do us a favor and rate us 5 stars on WordPress?"
+msgstr ""
+
+#: includes/config/config.rating-prompt.php:61
+msgid "Yes, I sure will!"
+msgstr ""
+
+#: includes/config/config.rating-prompt.php:66
+msgid "Maybe later, I'm still testing the plugin."
+msgstr ""
+
+#: includes/config/config.rating-prompt.php:71
+msgid "I already did / Permanently dismiss this notice"
+msgstr ""
+
+#. translators: 1: Plugin title, 2: An open and closed anchor tag linking to the boldgrid-backup plugin in the repo.
+#: includes/config/config.rating-prompt.php:80
+msgid "Thanks! A new page should have opened to the %1$s ratings page on WordPress.org. You will need to log in to your WordPress.org account before you can post a review. If the page didn't open, please click the following link: %2$s"
+msgstr ""
+
+#. translators: 1: The URL to submit boldgrid-backup bug reports and feature requests.
+#: includes/config/config.rating-prompt.php:94
+msgid "No problem, maybe now is not a good time. We want to be your WordPress backup plugin of choice. If you're experiencing a problem or want to make a suggestion, please %1$sclick here%2$s."
+msgstr ""
+
+#. translators: 1: HTML opening anchor tag linking to submit boldgrid-backup bug reports and feature requests, 2: HTML closing anchor tag, 3: Plugin title.
+#: includes/config/config.rating-prompt.php:108
+msgid "Thank you for the previous rating! You can help us to continue improving the %3$s plugin by reporting any bugs or submitting feature requests %1$shere%2$s. Thank you for using the %3$s plugin!"
+msgstr ""
+
+#: includes/config/config.rating-prompt.php:125
+msgid "We hope that you're finding adding titles and descriptions to your backups helpful in keeping things organized."
+msgstr ""
+
+#: includes/config/config.rating-prompt.php:130
+msgid "We're glad to see you're keeping your backups safe and downloading them to your local machine!"
+msgstr ""
+
+#. translators: 1: Plugin title.
+#: includes/config/config.rating-prompt.php:137
+msgid "It looks like you've created 10 backups with the %1$s plugin!"
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-archive.php:73
+msgid "Route URL to restore."
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-archive.php:81
+msgid "Backup id to restore."
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-archive.php:124
+#: rest/class-boldgrid-backup-rest-job.php:47
+#: rest/class-boldgrid-backup-rest-job.php:71
+msgid "Unique identifier for the object."
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-archive.php:129
+msgid "Name of the archive."
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-archive.php:134
+msgid "Description of the archive."
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-archive.php:139
+msgid "Filename of backup."
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-archive.php:144
+msgid "Download link for the backup."
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-archive.php:149
+msgid "Date the archive was created."
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-archive.php:270
+msgid "Unable to restore. Missing required parameters."
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-job.php:76
+msgid "Type of job."
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-job.php:85
+msgid "Currently status of the job."
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-job.php:90
+msgid "Information attached to the start of the prcoess."
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-job.php:95
+msgid "Results of the process."
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-job.php:141
+msgid "Job Not found"
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-setting.php:102
+msgid "Date the backup was created."
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-setting.php:107
+msgid "Automatic Update."
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-setting.php:112
+msgid "Email to notify got backups."
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-setting.php:117
+msgid "Does a site have auto backups enabled?"
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-setting.php:122
+msgid "Does a site have auto rollback enabled?"
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-setting.php:127
+msgid "Directories and files to include."
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-setting.php:132
+msgid "Directories and files to exclude."
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-siteurl.php:71
+msgid "New site url."
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-siteurl.php:111
+msgid "Home."
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-siteurl.php:116
+msgid "Siteurl."
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-siteurl.php:121
+msgid "Old home (before changing)."
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-siteurl.php:126
+msgid "Old siteurl (before changing)."
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-test.php:85
+msgid "Whether or not the site passed the preflight check."
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-test.php:90
+msgid "PHP Version"
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-test.php:95
+msgid "WordPress Version"
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-test.php:100
+msgid "Size of the database"
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-test.php:105
+msgid "ABSPATH Version"
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-test.php:110
+msgid "Size of ABSPATH"
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-test.php:115
+msgid "Home dir total disk."
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-test.php:120
+msgid "Home dir total disk used."
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-test.php:125
+msgid "Home dir total disk free (total - used)."
+msgstr ""
+
+#: rest/class-boldgrid-backup-rest-test.php:130
+msgid "Estimated disk sapce after backup (free - abspath - db)."
+msgstr ""
+
+#: admin/js/boldgrid-backup-admin-in-progress.js:211
+msgid "Canceling backup"
+msgstr ""
