@@ -136,12 +136,11 @@ class Boldgrid_Backup_Admin_Cli {
 				case 'popen':
 					$handle = popen( $command, 'r' );
 
-					$output = fread( $handle, 4096 );
-
 					/*
 					 * If handle is a valid resource, then check for success.
 					 */
 					if ( false !== $handle ) {
+						$output = fread( $handle, 4096 );
 						// Close the process handle and get the return status.
 						$return_var = pclose( $handle );
 
