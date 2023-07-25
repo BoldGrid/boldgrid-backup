@@ -139,7 +139,6 @@ class Boldgrid_Backup_Admin_Cli {
 					if ( false === $handle ) {
 					     break;
 					}
-				
 					$output = fread( $handle, 4096 );
 					// Close the process handle and get the return status.
 					$return_var = pclose( $handle );
