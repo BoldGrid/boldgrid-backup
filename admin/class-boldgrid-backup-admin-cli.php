@@ -135,24 +135,22 @@ class Boldgrid_Backup_Admin_Cli {
 
 				case 'popen':
 					$handle = popen( $command, 'r' );
+				
+					// Proc may be seen as available, but our command is not working. Break and try another exec method.
+					if ( false === $handle ) {
+						break;
+					}
 
-					/*
-					 * If handle is a valid resource, then check for success.
-					 */
-					if ( false !== $handle ) {
 						$output = fread( $handle, 4096 );
+
 						// Close the process handle and get the return status.
 						$return_var = pclose( $handle );
 
 						// If the exit status is int(0), then it was successful.
-						if ( 0 === $return_var ) {
-							$success = true;
+						$success = 0 === $return_var;
 
-							break 2;
-						}
-					}
-
-					break 2;
+						break 2;
+				
 
 				case 'proc_open':
 					// Create the descriptor spec array.
