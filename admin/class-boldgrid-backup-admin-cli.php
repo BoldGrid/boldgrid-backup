@@ -137,7 +137,7 @@ class Boldgrid_Backup_Admin_Cli {
 					$handle = popen( $command, 'r' );
 					// Proc may be seen as available, but our command is not working. Break and try another exec method.
 					if ( false === $handle ) {
-					     break;
+						break;
 					}
 					$output = fread( $handle, 4096 );
 					// Close the process handle and get the return status.
