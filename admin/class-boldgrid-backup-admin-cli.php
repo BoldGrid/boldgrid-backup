@@ -140,8 +140,10 @@ class Boldgrid_Backup_Admin_Cli {
 						break;
 					}
 					$output = fread( $handle, 4096 );
+
 					// Close the process handle and get the return status.
 					$return_var = pclose( $handle );
+
 					// If the exit status is int(0), then it was successful.
 					$success = 0 === $return_var;
 					break 2;
