@@ -145,7 +145,7 @@ class Boldgrid_Backup_Admin_Cli {
 					// If the exit status is int(0), then it was successful.
 					$success = 0 === $return_var;
 					break 2;
-				
+
 				case 'proc_open':
 					// Create the descriptor spec array.
 					$descriptorspec = array(
