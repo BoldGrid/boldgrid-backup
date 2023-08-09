@@ -61,6 +61,14 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	public $auto_update_log;
 
 	/**
+	 * Core Save Settings.
+	 *
+	 * @since 1.14.0
+	 * @var bool
+	 */
+	public $core_save_settings = false;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.14.0
@@ -103,7 +111,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 		$wpcs           = isset( $this->settings['auto_update']['wpcore'] ) ? $this->settings['auto_update']['wpcore'] : [];
 
 		// Log the Core auto update settings only once.
-		if ( 'plugins' === $update_type ) {
+		if ( false === $this->core_save_settings ) {
 			$this->auto_update_log->add( '--------------------------------------------------' );
 			$this->auto_update_log->add( 'WP Core auto update settings' );
 
@@ -119,6 +127,8 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 			$translation = ( ! empty( $wpcs ) && $wpcs['translation'] ) ? 'true' : 'false';
 			$this->auto_update_log->add( 'Setting WP Core Translation Updates to ' . $translation . '.' );
 			$this->auto_update_log->add( '--------------------------------------------------' );
+			
+			$this->core_save_settings = true;
 		}
 
 		// The plugins / themes listed in $new_value will only be those that have auto updates enabled.
