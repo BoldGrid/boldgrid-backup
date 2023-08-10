@@ -127,7 +127,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 			$translation = ( ! empty( $wpcs ) && $wpcs['translation'] ) ? 'true' : 'false';
 			$this->auto_update_log->add( 'Setting WP Core Translation Updates to ' . $translation . '.' );
 			$this->auto_update_log->add( '--------------------------------------------------' );
-			
+
 			$this->core_save_settings = true;
 		}
 
@@ -156,6 +156,8 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 			// If the theme / plugin is found in the $enabled_offers array, enable in our settings, otherwise disable.
 			$this->settings['auto_update'][ $update_type ][ $offer ] = in_array( $offer, $enabled_offers, true ) ? '1' : '0';
 		}
+
+		$this->auto_update_log->add( '--------------------------------------------------' );
 
 		// Save the settings.
 		$this->core->settings->save( $this->settings );
