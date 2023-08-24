@@ -16,11 +16,15 @@
  *
  * @since 1.8.0
  */
-class Boldgrid_Backup_Admin_Auto_Updates_Logger extends Boldgrid_Backup_Admin_Auto_Updates {
+class Boldgrid_Backup_Admin_Auto_Updates_Logger {
 	public $core;
 	public $log;
 
 	public function __construct() {
+		$this->core            = apply_filters( 'boldgrid_backup_get_core', null );
+		$this->auto_update_log = new Boldgrid_Backup_Admin_Log( $this->core );
+		$this->auto_update_log->init( 'auto-update.log' );
+
 		add_action( 'upgrader_process_complete', array( $this, 'log_update' ), 10, 2 );
 	}
 
