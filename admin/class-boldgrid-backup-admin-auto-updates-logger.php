@@ -17,14 +17,28 @@
  * @since 1.8.0
  */
 class Boldgrid_Backup_Admin_Auto_Updates_Logger {
+	/**
+	 * Core object.
+	 *
+	 * @var Boldgrid_Backup_Core
+	 * @since 1.8.0
+	 */
 	public $core;
-	public $log;
 
+	/**
+	 * Log object.
+	 *
+	 * @var Boldgrid_Backup_Admin_Log
+	 * @since 1.8.0
+	 */
+	public $auto_update_log;
+
+	/**
+	 * Constructor.
+	 *
+	 * @since 1.8.0
+	 */
 	public function __construct() {
-		$this->core            = apply_filters( 'boldgrid_backup_get_core', null );
-		$this->auto_update_log = new Boldgrid_Backup_Admin_Log( $this->core );
-		$this->auto_update_log->init( 'auto-update.log' );
-
 		add_action( 'upgrader_process_complete', array( $this, 'log_update' ), 10, 2 );
 	}
 
@@ -35,52 +49,28 @@ class Boldgrid_Backup_Admin_Auto_Updates_Logger {
 	 * @param array       $options
 	 */
 	public function log_update( $upgrader_object, $options ) {
+		$this->core            = apply_filters( 'boldgrid_backup_get_core', null );
+		$this->auto_update_log = new Boldgrid_Backup_Admin_Log( $this->core );
+		$this->auto_update_log->init( 'auto-update.log' );
+
+		$this->auto_update_log->add( 'Upgrader Object: ' . wp_json_encode( $upgrader_object ) );
+		$this->auto_update_log->add( 'Options: ' . wp_json_encode( $options ) );
+
 		if ( isset( $options['action'] ) && 'update' === $options['action'] ) {
-			$type    = isset( $options['type'] ) ? $options['type'] : '';
-			$plugins = isset( $options['plugins'] ) ? $options['plugins'] : array();
-			$themes  = isset( $options['themes'] ) ? $options['themes'] : array();
+			$type = isset( $options['type'] ) ? $options['type'] : 'WP Core';
 
-			// Check if the update was successful.
-			if ( 'success' !== $options['result'] ) {
-				$this->log->add(
-					'Auto update failed for' . $type
-					. ":\nUpgraderObject: " . wp_json_encode( $upgrader_object )
-					. "\nResults: " . wp_json_encode( $options )
-				);
-				return;
+			$update_item = '';
+			if ( isset( $options['temp_backup'] ) && ! empty( $options['temp_backup'] ) ) {
+				$update_item = implode( ', ', $options['temp_backup'] );
 			}
 
-			// Check if the update was for a plugin.
-			if ( 'plugin' === $type ) {
-				$plugin         = $upgrader_object->skin->plugin_info();
-				$plugin_name    = $plugin['Name'];
-				$plugin_version = $plugin['Version'];
-				$this->log->add(
-					'Auto update for plugin ' . $plugin_name
-					. ' to version ' . $plugin_version . ' was successful.'
-				);
-			}
+			$log_message = sprintf(
+				'Automatic %s update for %s: complete.',
+				$type,
+				$update_item
+			);
 
-			// Check if the update was for a theme.
-			if ( 'theme' === $type ) {
-				$theme         = $upgrader_object->skin->theme_info();
-				$theme_name    = $theme['Name'];
-				$theme_version = $theme['Version'];
-				$this->log->add(
-					'Auto update for theme ' . $theme_name
-					. ' to version ' . $theme_version . ' was successful.'
-				);
-			}
-
-			// Check if the update was for core.
-			if ( 'core' === $type ) {
-				// check if is it is minor, major, translation, or dev update
-				$core_version = $upgrader_object->skin->result['new_version'];
-				$this->log->add(
-					'Auto update for core to version '
-					. $core_version . ' was successful.'
-				);
-			}
+			$this->auto_update_log->add( $log_message );
 		}
 	}
 }
