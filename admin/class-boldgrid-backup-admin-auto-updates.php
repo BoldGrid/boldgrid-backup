@@ -118,13 +118,13 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 			if ( ! empty( $wpcs['all'] ) ) {
 				$this->auto_update_log->add( 'WP Core Updates are set to auto update all.' );
 			}
-			$dev = ( ! empty( $wpcs ) && $wpcs['dev'] ) ? 'true' : 'false';
+			$dev = ( ! empty( $wpcs['dev'] ) ) ? 'true' : 'false';
 			$this->auto_update_log->add( 'Setting WP Core Dev Updates to ' . $dev . '.' );
-			$major = ( ! empty( $wpcs ) && $wpcs['major'] ) ? 'true' : 'false';
+			$major = ( ! empty( $wpcs['major'] ) ) ? 'true' : 'false';
 			$this->auto_update_log->add( 'Setting WP Core Major Updates to ' . $major . '.' );
-			$minor = ( ! empty( $wpcs ) && $wpcs['minor'] ) ? 'true' : 'false';
+			$minor = ( ! empty( $wpcs['minor']) ) ? 'true' : 'false';
 			$this->auto_update_log->add( 'Setting WP Core Minor Updates to ' . $minor . '.' );
-			$translation = ( ! empty( $wpcs ) && $wpcs['translation'] ) ? 'true' : 'false';
+			$translation = ( ! empty( $wpcs['translation'] ) ) ? 'true' : 'false';
 			$this->auto_update_log->add( 'Setting WP Core Translation Updates to ' . $translation . '.' );
 			$this->auto_update_log->add( '--------------------------------------------------' );
 
