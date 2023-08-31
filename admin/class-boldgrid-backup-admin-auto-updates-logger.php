@@ -59,8 +59,8 @@ class Boldgrid_Backup_Admin_Auto_Updates_Logger {
 		if ( isset( $options['action'] ) && 'update' === $options['action'] ) {
 			$type = isset( $options['type'] ) ? $options['type'] : 'WP Core';
 
-			$update_item = '';
-			if ( isset( $options['temp_backup'] ) && ! empty( $options['temp_backup'] ) ) {
+			$update_item = ! empty( $options['temp_backup'] ) ? implode( ', ', $options['temp_backup'] ) : '';
+			if ( ! empty( $options['temp_backup'] ) ) {
 				$update_item = implode( ', ', $options['temp_backup'] );
 			}
 

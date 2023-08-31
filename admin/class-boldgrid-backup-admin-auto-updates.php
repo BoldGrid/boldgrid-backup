@@ -115,7 +115,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 			$this->auto_update_log->add( '--------------------------------------------------' );
 			$this->auto_update_log->add( 'WP Core auto update settings' );
 
-			if ( isset( $wpcs['all'] ) && $wpcs['all'] ) {
+			if ( ! empty( $wpcs['all'] ) ) {
 				$this->auto_update_log->add( 'WP Core Updates are set to auto update all.' );
 			}
 			$dev = ( ! empty( $wpcs ) && $wpcs['dev'] ) ? 'true' : 'false';
@@ -146,7 +146,6 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 				$item_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $offer );
 				$item_name = $item_data['Name'];
 			} else {
-				$item_data = get_plugin_data( get_template_directory() . '/../' . $offer . '/style.css' );
 				$item_name = $offer;
 			}
 
