@@ -104,7 +104,7 @@ class Boldgrid_Backup_Admin_Auto_Updates_Logger {
 							$core_msg = sprintf(
 								'WordPress Core Update Available from version %s to %s.',
 								$update->current,
-								$update->version,
+								$update->version
 							);
 
 							$this->auto_update_log->add( $core_msg );
