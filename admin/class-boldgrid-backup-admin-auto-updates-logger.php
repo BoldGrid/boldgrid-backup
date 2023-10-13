@@ -189,7 +189,7 @@ class Boldgrid_Backup_Admin_Auto_Updates_Logger {
 				$this->auto_update_log->add( 'All themes are up to date.' );
 			}
 		}
-    }
+	}
 
 	/**
 	 * Log update information.
