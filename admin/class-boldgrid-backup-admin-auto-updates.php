@@ -122,7 +122,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 			$this->auto_update_log->add( 'Setting WP Core Dev Updates to ' . $dev . '.' );
 			$major = ( ! empty( $wpcs['major'] ) ) ? 'true' : 'false';
 			$this->auto_update_log->add( 'Setting WP Core Major Updates to ' . $major . '.' );
-			$minor = ( ! empty( $wpcs['minor']) ) ? 'true' : 'false';
+			$minor = ( ! empty( $wpcs['minor'] ) ) ? 'true' : 'false';
 			$this->auto_update_log->add( 'Setting WP Core Minor Updates to ' . $minor . '.' );
 			$translation = ( ! empty( $wpcs['translation'] ) ) ? 'true' : 'false';
 			$this->auto_update_log->add( 'Setting WP Core Translation Updates to ' . $translation . '.' );
