@@ -26,7 +26,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	 * @since 1.6.0
 	 * @var   string
 	 */
-	public $default_exclude = '.git,node_modules';
+	public $default_exclude = '.git,node_modules,/wp-content/cache,';
 
 	/**
 	 * The default include value.
