@@ -13,7 +13,7 @@
 		}
 	],
 	"require" : {
-		"boldgrid/library" : "^2.13.2",
+		"boldgrid/library" : "^2.13.11",
 		"boldgrid/tdcron" : "dev-master",
 		"phpseclib/phpseclib" : "~2.0",
 		"ifsnop/mysqldump-php": "^2.9"
