@@ -1035,7 +1035,7 @@ class Boldgrid_Backup_Admin_Utility {
 		if ( isset( $socket ) ) {
 			$params['unix_socket'] = $socket;
 		}
-		//If only a socket is provided, without a ':' character before it, the entire array will be empty not false
+		// If only a socket is provided, without a ':' character before it, the entire array will be empty not false.
 		if ( count( $params ) === 0 ) {
 			$params['unix_socket'] = $db_host;
 		}
