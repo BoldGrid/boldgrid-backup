@@ -101,8 +101,8 @@ class Crontab extends Base implements Entry {
 	public function get_next_runtime() {
 		$core = apply_filters( 'boldgrid_backup_get_core', null );
 
-		require_once BOLDGRID_BACKUP_PATH . '/vendor/chland/tdcron/class.tdcron.php';
-		require_once BOLDGRID_BACKUP_PATH . '/vendor/chland/tdcron/class.tdcron.entry.php';
+		require_once BOLDGRID_BACKUP_PATH . '/vendor/boldgrid/tdcron/class.tdcron.php';
+		require_once BOLDGRID_BACKUP_PATH . '/vendor/boldgrid/tdcron/class.tdcron.entry.php';
 
 		/*
 		 * Get our next runtime.

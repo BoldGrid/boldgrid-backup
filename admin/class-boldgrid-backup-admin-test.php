@@ -693,13 +693,12 @@ class Boldgrid_Backup_Admin_Test {
 	 * Get the WordPress total file size.
 	 *
 	 * @since 1.0
-	 * @access private
 	 *
 	 * @see get_filtered_filelist
 	 *
 	 * @return int|bool The total size for the WordPress file system in bytes, or FALSE on error.
 	 */
-	private function get_wp_size() {
+	public function get_wp_size() {
 		// Save time, use transients.
 		$transient = get_transient( 'boldgrid_backup_wp_size' );
 
@@ -832,11 +831,13 @@ class Boldgrid_Backup_Admin_Test {
 			return 0;
 		}
 
+		$size = (int) $result[0];
+
 		// Save some time, set transient.
-		set_transient( 'boldgrid_backup_db_size', $result[0], $this->transient_time );
+		set_transient( 'boldgrid_backup_db_size', $size, $this->transient_time );
 
 		// Return result.
-		return $result[0];
+		return $size;
 	}
 
 	/**
