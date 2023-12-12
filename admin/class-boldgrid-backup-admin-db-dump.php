@@ -256,17 +256,4 @@ class Boldgrid_Backup_Admin_Db_Dump {
 
 		return $tables;
 	}
-
-	/**
-	 * Deprecated, use Boldgrid_Backup_Admin_Utility::get_pdo_connection_string.
-	 *
-	 * @since 1.15.8
-	 *
-	 * @param  string $db_host DB hostname.
-	 * @param  string $db_name DB name.
-	 * @return string
-	 */
-	public function get_connection_string( $db_host = null, $db_name = null ) {
-		return Boldgrid_Backup_Admin_Utility::get_pdo_connection_string( $db_host, $db_name );
-	}
 }

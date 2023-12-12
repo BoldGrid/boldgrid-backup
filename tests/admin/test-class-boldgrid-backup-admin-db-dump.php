@@ -29,25 +29,25 @@ class Test_Boldgrid_Backup_Admin_Db_Dump extends WP_UnitTestCase {
 		// localhost.
 		$this->assertEquals(
 			'mysql:host=localhost;dbname=db_catfish',
-			$core->db_dump->get_connection_string( 'localhost', 'db_catfish' )
+			Boldgrid_Backup_Admin_Utility::get_pdo_connection_string( 'localhost', 'db_catfish' )
 		);
 
 		// localhost:3306.
 		$this->assertEquals(
 			'mysql:host=localhost;port=3306;dbname=db_catfish',
-			$core->db_dump->get_connection_string( 'localhost:3306', 'db_catfish' )
+			Boldgrid_Backup_Admin_Utility::get_pdo_connection_string( 'localhost:3306', 'db_catfish' )
 		);
 
 		// localhost:/var/lib/mysql/mysql.sock.
 		$this->assertEquals(
 			'mysql:host=localhost;unix_socket=/var/lib/mysql/mysql.sock;dbname=db_catfish',
-			$core->db_dump->get_connection_string( 'localhost:/var/lib/mysql/mysql.sock', 'db_catfish' )
+			Boldgrid_Backup_Admin_Utility::get_pdo_connection_string( 'localhost:/var/lib/mysql/mysql.sock', 'db_catfish' )
 		);
 
 		// /var/lib/mysql/mysql.sock.
 		$this->assertEquals(
 			'mysql:unix_socket=/var/lib/mysql/mysql.sock;dbname=db_catfish',
-			$core->db_dump->get_connection_string( '/var/lib/mysql/mysql.sock', 'db_catfish' )
+			Boldgrid_Backup_Admin_Utility::get_pdo_connection_string( '/var/lib/mysql/mysql.sock', 'db_catfish' )
 		);
 	}
 }
