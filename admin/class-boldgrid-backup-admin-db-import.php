@@ -150,8 +150,11 @@ class Boldgrid_Backup_Admin_Db_Import {
 			return false;
 		}
 
-		/* phpcs:disable WordPress.DB.RestrictedClasses */
-		$db = new PDO( sprintf( 'mysql:host=%1$s;dbname=%2$s;', DB_HOST, DB_NAME ), DB_USER, DB_PASSWORD );
+        $core = apply_filters( 'boldgrid_backup_get_core', null );
+
+        $db_connection_string = Boldgrid_Backup_Admin_Db_Dump::get_connection_string();
+
+        $db = new PDO( $db_connection_string, DB_USER, DB_PASSWORD );
 
 		$templine = '';
 
