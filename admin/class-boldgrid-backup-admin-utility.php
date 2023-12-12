@@ -1016,7 +1016,7 @@ class Boldgrid_Backup_Admin_Utility {
 		// Configure parameters passed in.
 		$db_name = empty( $db_name ) ? DB_NAME : $db_name;
 		$db_host = empty( $db_host ) ? DB_HOST : $db_host;
-		
+
 		// Parse info and get hostname, port, and socket. False if fails to parse.
 		$host_data = $wpdb->parse_db_host( $db_host );
 
