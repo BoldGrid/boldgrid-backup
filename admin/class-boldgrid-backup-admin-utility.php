@@ -999,4 +999,53 @@ class Boldgrid_Backup_Admin_Utility {
 
 		return untrailingslashit( $string ) . DIRECTORY_SEPARATOR;
 	}
+
+	/**
+	 * Get our PDO DSN connection string.
+	 *
+	 * @since 1.15.8
+	 *
+	 * @param  string $db_host DB hostname.
+	 * @param  string $db_name DB name.
+	 * @return string
+	 */
+	public static function get_pdo_connection_string( $db_host = null, $db_name = null ) {
+		global $wpdb;
+		$params = array();
+
+		// Configure parameters passed in.
+		$db_name = empty( $db_name ) ? DB_NAME : $db_name;
+		$db_host = empty( $db_host ) ? DB_HOST : $db_host;
+		
+		// Parse info and get hostname, port, and socket. False if fails to parse.
+		$host_data = $wpdb->parse_db_host( $db_host );
+
+		if ( $host_data ) {
+			list( $host, $port, $socket, $is_ipv6 ) = $host_data;
+		} else {
+			return '';
+		}
+
+		if ( ! empty( $host ) ) {
+			$params['host'] = $host;
+		}
+		if ( isset( $port ) ) {
+			$params['port'] = $port;
+		}
+		if ( isset( $socket ) ) {
+			$params['unix_socket'] = $socket;
+		}
+		//If only a socket is provided, without a ':' character before it, the entire array will be empty not false
+		if ( count( $params ) === 0 ) {
+			$params['unix_socket'] = $db_host;
+		}
+
+		$connection_string = 'mysql:';
+		foreach ( $params as $key => $value ) {
+			$connection_string .= $key . '=' . $value . ';';
+		}
+		$connection_string .= 'dbname=' . $db_name;
+
+		return $connection_string;
+	}
 }

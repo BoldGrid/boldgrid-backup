@@ -151,7 +151,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 		}
 
 		/* phpcs:disable WordPress.DB.RestrictedClasses */
-		$db = new PDO( sprintf( 'mysql:host=%1$s;dbname=%2$s;', DB_HOST, DB_NAME ), DB_USER, DB_PASSWORD );
+		$db = new PDO( Boldgrid_Backup_Admin_Utility::get_pdo_connection_string(), DB_USER, DB_PASSWORD );
 
 		$templine = '';
 
@@ -331,7 +331,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * @return array an array of results from the database query
 	 */
 	public function show_grants_query() {
-		$db           = new PDO( sprintf( 'mysql:host=%1$s;dbname=%2$s;', DB_HOST, DB_NAME ), DB_USER, DB_PASSWORD );
+		$db           = new PDO( Boldgrid_Backup_Admin_Utility::get_pdo_connection_string(), DB_USER, DB_PASSWORD );
 		$db_statement = $db->query( 'SHOW GRANTS' );
 		return $db_statement->fetchAll();
 	}
