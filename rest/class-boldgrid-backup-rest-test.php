@@ -152,21 +152,21 @@ class Boldgrid_Backup_Rest_Test extends Boldgrid_Backup_Rest_Controller {
 
 		$preflight_test = new Boldgrid_Backup_Admin_Test( $this->core );
 
-		$disk_space   = $preflight_test->get_disk_space( false );
-		$disk_abspath = get_dirsize( ABSPATH );
-		$disk_db      = $preflight_test->get_database_size();
+		$disk_space = $preflight_test->get_disk_space( false );
+		$disk_wp    = $preflight_test->get_wp_size();
+		$disk_db    = $preflight_test->get_database_size();
 
 		$settings = array(
 			'passed'            => $preflight_test->run_functionality_tests(),
 			'php_version'       => phpversion(),
 			'wordpress_version' => $wp_version,
 			'abspath'           => ABSPATH,
-			'disk_abspath'      => $disk_abspath,
+			'disk_abspath'      => $disk_wp,
 			'disk_database'     => $disk_db,
 			'disk_total'        => $disk_space[0],
 			'disk_used'         => $disk_space[1],
 			'disk_free'         => $disk_space[2],
-			'disk_post_backup'  => $disk_space[2] - $disk_abspath - $disk_db,
+			'disk_post_backup'  => $disk_space[2] - $disk_wp - $disk_db,
 		);
 
 		return $this->prepare_item_for_response( $settings, $request );
