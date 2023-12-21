@@ -137,37 +137,16 @@ class Boldgrid_Backup_Admin_Log {
 	 */
 	public function add_last_error() {
 		$current_error = error_get_last();
-		if ( ! empty( $current_error ) ) {
-			$current_error = $this->format_error_info( $current_error );
-		}
 
 		// Only new errors are logged.
 		if ( $current_error !== $this->last_error ) {
-			$this->add( 'Last error: ' . print_r( $current_error, 1 ), false ); // phpcs:ignore
+		    if ( 1 === $current_error['type'] ) {
+			    $this->add( 'Last error: ' . print_r( $current_error, 1 ), false ); // phpcs:ignore
+		    }
 		}
 
 		// This method will be called often, so keep track of errors to avoid logging duplicates.
 		$this->last_error = $current_error;
-	}
-
-	/**
-	 * Add user-friendly messaging to the log regarding the last error
-	 *
-	 * @since 1.5.7
-	 *
-	 * @param array $current_error The error array to format.
-	 * @return array Return updated array for logs.
-	 */
-	public function format_error_info( $current_error ) {
-		$error_code                = $this->core->configs['error_codes'][ $current_error['type'] ];
-		$error_info                = array();
-		$error_info['error_code']  = $current_error['type'];
-		$error_info['description'] = $error_code['type'] . ': ' . $error_code['description'];
-		$current_error['type']     = $error_info;
-		if ( ! empty( $error_code['additional_info'] ) ) {
-			$current_error['additional_info'] = $error_code['additional_info'];
-		}
-		return $current_error;
 	}
 
 
