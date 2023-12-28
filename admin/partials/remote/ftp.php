@@ -83,7 +83,7 @@ $auto_selected    = empty( $active_selected ) && empty( $passive_selected ) ? $s
 			<td colspan="2">
 				<?php esc_html_e( 'Folder name', 'boldgrid-backup' ); ?><br />
 				<?php esc_html_e( 'A folder in your FTP/SFTP server to store your backups, will be created if it doesn\'t exist. Please only use letters, numbers, dashes, and underscores.', 'boldgrid-backup' ); ?><br />
-				<input type="text" name="folder_name" value="<?php echo esc_attr( $data['folder_name'] ); ?>" min="1" required pattern="[A-Za-z0-9-_]+">
+				<input type="text" name="folder_name" value="<?php echo esc_attr( $data['folder_name'] ); ?>" min="1" required pattern="[A-Za-z0-9\-_]+">
 			</td>
 		</tr>
 		<tr>
