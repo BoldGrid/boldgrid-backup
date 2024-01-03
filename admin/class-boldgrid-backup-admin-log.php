@@ -60,15 +60,6 @@ class Boldgrid_Backup_Admin_Log {
 	private $filepath;
 
 	/**
-	 * The last error, as per error_get_last().
-	 *
-	 * @since 1.13.5
-	 * @var array
-	 * @access private
-	 */
-	private $last_error;
-
-	/**
 	 * Constructor.
 	 *
 	 * @since 1.10.1
@@ -129,24 +120,19 @@ class Boldgrid_Backup_Admin_Log {
 	}
 
 	/**
-	 * Add the last error to the log.
+	 * Add the last  fatal error to the log.
 	 *
-	 * The error is only added to the log if it hasn't been logged before.
+	 * The error is only added to the log if it is a fatal error
 	 *
 	 * @since 1.13.5
 	 */
 	public function add_last_error() {
 		$current_error = error_get_last();
 
-		// Only new errors are logged.
-		if ( $current_error !== $this->last_error ) {
-		    if ( 1 === $current_error['type'] ) {
-			    $this->add( 'Last error: ' . print_r( $current_error, 1 ), false ); // phpcs:ignore
-		    }
+		// Only new fatal are logged.
+		if ( 1 === $current_error['type'] ) {
+			$this->add( 'Last error: ' . print_r( $current_error, 1 ), false ); // phpcs:ignore
 		}
-
-		// This method will be called often, so keep track of errors to avoid logging duplicates.
-		$this->last_error = $current_error;
 	}
 
 
