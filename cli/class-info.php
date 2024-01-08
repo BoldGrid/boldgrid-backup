@@ -253,6 +253,7 @@ class Info {
 	 */
 	public static function have_execution_functions() {
 		require_once dirname( __DIR__ ) . '/admin/class-boldgrid-backup-admin-cli.php';
+		require_once dirname( __DIR__ ) . '/admin/class-boldgrid-backup-admin-utility.php';
 
 		$exec_functions = \Boldgrid_Backup_Admin_Cli::get_execution_functions();
 
