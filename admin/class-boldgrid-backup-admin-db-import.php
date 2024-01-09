@@ -151,7 +151,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 		}
 
 		/* phpcs:disable WordPress.DB.RestrictedClasses */
-		$db = new PDO( sprintf( 'mysql:host=%1$s;dbname=%2$s;', DB_HOST, DB_NAME ), DB_USER, DB_PASSWORD );
+		$db = new PDO( $this->get_connection_string(), DB_USER, DB_PASSWORD );
 
 		$templine = '';
 
@@ -331,7 +331,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * @return array an array of results from the database query
 	 */
 	public function show_grants_query() {
-		$db           = new PDO( sprintf( 'mysql:host=%1$s;dbname=%2$s;', DB_HOST, DB_NAME ), DB_USER, DB_PASSWORD );
+		$db           = new PDO( $this->get_connection_string(), DB_USER, DB_PASSWORD );
 		$db_statement = $db->query( 'SHOW GRANTS' );
 		return $db_statement->fetchAll();
 	}
@@ -373,5 +373,74 @@ class Boldgrid_Backup_Admin_Db_Import {
 		}
 
 		return explode( ', ', $grants_string );
+	}
+
+	/**
+	 * Get our PDO DSN connection string.
+	 *
+	 * This function is copied from class-boldgrid-backup-admin-db-dump.php. It hasn't been migrated to a utility function
+	 * because these scripts are designed to be able to run without WordPress from the command line, including without the
+	 * core wpdb::parse_db_host() function.
+	 * 
+	 * @since 1.15.8
+	 *
+	 * @param  string $db_host DB hostname.
+	 * @param  string $db_name DB name.
+	 * @return string
+	 */
+	public function get_connection_string( $db_host = null, $db_name = null ) {
+		$params = array();
+
+		// Configure parameters passed in.
+		$db_name = empty( $db_name ) ? DB_NAME : $db_name;
+		$db_host = empty( $db_host ) ? DB_HOST : $db_host;
+		$db_host = explode( ':', $db_host );
+
+		// Parse info and get hostname, port, and socket. Not all required. See comments below.
+		switch ( count( $db_host ) ) {
+			/*
+			 * Examples:
+			 *
+			 * # localhost
+			 * # /var/lib/mysql/mysql.sock
+			 */
+			case 1:
+				$has_socket = 'sock' === pathinfo( $db_host[0], PATHINFO_EXTENSION );
+
+				if ( $has_socket ) {
+					$params['unix_socket'] = $db_host[0];
+				} else {
+					$params['host'] = $db_host[0];
+				}
+
+				break;
+			/*
+			 * Examples:
+			 *
+			 * # localhost:/var/lib/mysql/mysql.sock
+			 * # localhost:3306
+			 */
+			case 2:
+				$has_socket = 'sock' === pathinfo( $db_host[1], PATHINFO_EXTENSION );
+				$has_port   = is_numeric( $db_host[1] );
+
+				$params['host'] = $db_host[0];
+
+				if ( $has_socket ) {
+					$params['unix_socket'] = $db_host[1];
+				} elseif ( $has_port ) {
+					$params['port'] = $db_host[1];
+				}
+
+				break;
+		}
+
+		$connection_string = 'mysql:';
+		foreach ( $params as $key => $value ) {
+			$connection_string .= $key . '=' . $value . ';';
+		}
+		$connection_string .= 'dbname=' . $db_name;
+
+		return $connection_string;
 	}
 }
