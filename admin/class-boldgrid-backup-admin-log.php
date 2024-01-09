@@ -130,7 +130,7 @@ class Boldgrid_Backup_Admin_Log {
 		$current_error = error_get_last();
 
 		// Only new fatal are logged.
-		if ( 1 === $current_error['type'] ) {
+		if ( is_array( $current_error ) && 1 === $current_error['type'] ) {
 			$this->add( 'Last error: ' . print_r( $current_error, 1 ), false ); // phpcs:ignore
 		}
 	}
