@@ -21,7 +21,7 @@
 	"require-dev" : {
 		"lox/xhprof" : "dev-master",
 		"phpunit/phpunit": "^7",
-		"yoast/phpunit-polyfills": "^1.0"
+		"yoast/phpunit-polyfills": "^2.0"
 	},
 	"scripts" : {
 		"post-autoload-dump" : "composer run-script post-autoload-dump -d ./vendor/boldgrid/library"
