@@ -381,7 +381,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * This function is copied from class-boldgrid-backup-admin-db-dump.php. It hasn't been migrated to a utility function
 	 * because these scripts are designed to be able to run without WordPress from the command line, including without the
 	 * core wpdb::parse_db_host() function.
-	 * 
+	 *
 	 * @since 1.15.8
 	 *
 	 * @param  string $db_host DB hostname.
