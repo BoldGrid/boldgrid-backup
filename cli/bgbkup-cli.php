@@ -32,6 +32,18 @@ if ( version_compare( PHP_VERSION, $php_min_version, '<' ) ) {
 	exit( 1 );
 }
 
+/*
+ * We need to ensure that this is only run from the command-line.
+ * Some environments use different SAPI names for CLI, such as 'cli'
+ * or 'cli-server'. Therefore we check for the first three characters.
+ */
+$sapi_type = php_sapi_name();
+
+if ( is_string( $sapi_type ) && 'cli' !== substr( $sapi_type, 0, 3 ) ) {
+	throw new \Exception( 'This script must be run from the command line.' );
+	exit( 1 );
+}
+
 require __DIR__ . '/class-info.php';
 require __DIR__ . '/class-site-check.php';
 require __DIR__ . '/class-log.php';
