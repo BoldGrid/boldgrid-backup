@@ -41,7 +41,6 @@ $sapi_type = php_sapi_name();
 
 if ( is_string( $sapi_type ) && 'cli' !== substr( $sapi_type, 0, 3 ) ) {
 	throw new \Exception( 'This script must be run from the command line.' );
-	exit( 1 );
 }
 
 require __DIR__ . '/class-info.php';
