@@ -4,7 +4,7 @@ Tags: backup, cloud backup, database backup, restore, wordpress backup
 Requires at least: 4.4
 Tested up to: 6.4
 Requires PHP: 5.4
-Stable tag: 1.15.9
+Stable tag: 1.15.10
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -131,6 +131,11 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 1. Activate the plugin through the Plugins menu in WordPress.
 
 == Changelog ==
+
+= 1.15.10 =
+
+Release date: February 7, 2024
+* Bug Fix: User on composer based sites getting errors [#546](https://github.com/BoldGrid/boldgrid-backup/issues/546)
 
 = 1.15.9 =
 * Bug Fix: Fixed security issue with bgbkup-cli being executable from the web, when it should only be executable via cli.

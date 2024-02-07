@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "boldgrid/library",
-            "version": "2.13.10",
+            "version": "2.13.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BoldGrid/library.git",
-                "reference": "e6f9638b89d63f390c3ea86fd1873eaa383ef979"
+                "reference": "5d9d108b999f42c369169f609504f31634c42d1c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BoldGrid/library/zipball/e6f9638b89d63f390c3ea86fd1873eaa383ef979",
-                "reference": "e6f9638b89d63f390c3ea86fd1873eaa383ef979",
+                "url": "https://api.github.com/repos/BoldGrid/library/zipball/5d9d108b999f42c369169f609504f31634c42d1c",
+                "reference": "5d9d108b999f42c369169f609504f31634c42d1c",
                 "shasum": ""
             },
             "require-dev": {
@@ -57,7 +57,7 @@
                 }
             ],
             "description": "The BoldGrid Library for shared code used in official BoldGrid plugins and themes.",
-            "time": "2022-11-01T14:58:10+00:00"
+            "time": "2024-02-07T17:39:59+00:00"
         },
         {
             "name": "boldgrid/tdcron",
