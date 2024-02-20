@@ -207,7 +207,7 @@ class Boldgrid_Backup_Admin_Cron {
 				$scheduled = $this->add_cron_entry( $settings );
 			}
 
-			$jobs_scheduled = $this->schedule_jobs();
+			$jobs_scheduled = $this->schedule_jobs( $settings );
 			$site_check     = $this->schedule_site_check( $settings );
 
 			$success = $scheduled && $jobs_scheduled;
@@ -313,17 +313,21 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @see BoldGrid_Backup_Admin_Core::get_backup_identifier()
 	 * @see BoldGrid_Backup_Admin_Cron::get_cron_secret()
 	 *
+	 * @param  array $settings Settings.
+	 *
 	 * @return bool Success.
 	 */
-	public function schedule_jobs() {
-		$entry = sprintf(
-			'*/5 * * * * %6$s "%1$s/%2$s" siteurl=%3$s id=%4$s secret=%5$s > /dev/null 2>&1',
+	public function schedule_jobs( $settings ) {
+		$cron_interval = isset( $settings['cron_interval'] ) ? $settings['cron_interval'] : '*/10 * * * *';
+		$entry         = sprintf(
+			'%7$s %6$s "%1$s/%2$s" siteurl=%3$s id=%4$s secret=%5$s > /dev/null 2>&1',
 			dirname( dirname( __FILE__ ) ),
 			$this->run_jobs,
 			get_site_url(),
 			$this->core->get_backup_identifier(),
 			$this->get_cron_secret(),
-			$this->cron_command
+			$this->cron_command,
+			$cron_interval
 		);
 
 		return $this->update_cron( $entry );

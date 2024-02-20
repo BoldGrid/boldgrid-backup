@@ -740,6 +740,15 @@ class Boldgrid_Backup_Admin_Settings {
 			}
 
 			/*
+			 * Save cron interval Settings.
+			 *
+			 * @since 1.16.0
+			 */
+			if ( isset( $_POST['cron_interval'] ) ) {
+				$settings['cron_interval'] = $_POST['cron_interval'];
+			}
+
+			/*
 			 * Save WP Cron / Crons.
 			 *
 			 * @since 1.5.1
