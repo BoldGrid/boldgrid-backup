@@ -298,23 +298,27 @@ BoldGrid.Settings = function( $ ) {
 	 * Toggle Cron Interval
 	 *
 	 * @summary Toggle the cron interval select element.
-	 * 
+	 *
 	 * @since 1.16.0
 	 */
 	self.toggleCronInterval = function() {
-		var $schedulerSelect   = $( 'select[name="scheduler"]' ),
-			toggleInterval     = function( val ) {
-			if ( 'cron' === val ) {
-				$( '#cron_interval' ).show();
-			} else {
-				$( '#cron_interval' ).hide();
-			}
-		}
+		var $schedulerSelect = $( 'select[name="scheduler"]' ),
+			toggleInterval = function( val ) {
+				if ( 'cron' === val ) {
+					$( '#cron_interval' ).show();
+				} else {
+					$( '#cron_interval' ).hide();
+				}
+			};
 
 		toggleInterval( $schedulerSelect.find( 'option:selected' ).val() );
 
 		$schedulerSelect.on( 'change', function() {
-			toggleInterval( $( this ).find( 'option:selected' ).val() );
+			toggleInterval(
+				$( this )
+					.find( 'option:selected' )
+					.val()
+			);
 		} );
 	};
 
