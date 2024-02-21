@@ -50,7 +50,6 @@ $intervals = array(
 	'*/10 * * * *' => esc_html__( 'Every 10 Minutes', 'boldgrid-backup' ),
 	'*/30 * * * *' => esc_html__( 'Every 30 Minutes', 'boldgrid-backup' ),
 	'0 * * * *'    => esc_html__( 'Once Every Hour', 'boldgrid-backup' ),
-	'0 0 * * *'    => esc_html__( 'Once Every Day', 'boldgrid-backup' ),
 );
 
 $selected_interval = ! empty( $settings['cron_interval'] ) ? $settings['cron_interval'] : '*/10 * * * *';

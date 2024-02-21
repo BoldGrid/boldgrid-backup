@@ -276,7 +276,7 @@ class Boldgrid_Backup_Admin_Jobs {
 
 		// If there are no jobs, then delete cron entries and abort.
 		if ( empty( $this->jobs ) ) {
-			$this->core->cron->delete_cron_entries( 'cron/run-jobs.php' );
+			$this->core->cron->delete_cron_entries( 'jobs' );
 			wp_die();
 		}
 
