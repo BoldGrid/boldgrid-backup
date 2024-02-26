@@ -274,7 +274,24 @@ class Boldgrid_Backup_Admin_Jobs {
 	public function run() {
 		$this->set_jobs();
 
-		// If there are no jobs, then delete cron entries and abort.
+		/*
+		 * If there are no jobs in the job list, then delete this cron.
+		 * Please note, that this method is called by the cron itself,
+		 * so it will only delete if the cron list is empty when the cron starts.
+		 * Sometimes, the job will have completed, but not have been removed from the list yet.
+		 * In this case, the cron will not delete itself until the next scheduled cron run.
+		 *
+		 * The basic pattern is this:
+		 * 1. Automatic backup is scheduled.
+		 * 2. Automatic backup is run.
+		 * 3. While automatic backup is running, if remote storage is enabled,
+		 *    the run-jobs.php cron is added.
+		 * 4. When automatic backup is complete, the upload backup job is added to the cron list.
+		 * 5. Next time the run-jobs.php cron runs, the upload backup job is run.
+		 * 6. The next time the run-jobs.php cron runs, the upload backup job is deleted.
+		 * 7. The next time the run-jobs.php cron runs, the run-jobs.php cron is deleted.
+		 * 8. Repeat.
+		 */
 		if ( empty( $this->jobs ) ) {
 			$this->core->cron->delete_cron_entries( 'jobs' );
 			wp_die();
