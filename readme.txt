@@ -133,7 +133,7 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 == Changelog ==
 
 = 1.16.0 =
-Release Date: February 20, 2024
+Release Date: February 26, 2024
 * New Feature: Add settings for cron interval for run-jobs.php [#584](https://github.com/BoldGrid/boldgrid-backup/issues/584)
 
 = 1.15.10 =
