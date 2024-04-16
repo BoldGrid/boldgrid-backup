@@ -2,9 +2,9 @@
 Contributors: boldgrid, joemoto, imh_brad, rramo012, bgnicolepaschen, jamesros161, joe9663, weaponx13, jessecowens
 Tags: backup, cloud backup, database backup, restore, wordpress backup
 Requires at least: 4.4
-Tested up to: 6.4
+Tested up to: 6.5
 Requires PHP: 5.4
-Stable tag: 1.16.0
+Stable tag: 1.16.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -131,6 +131,10 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 1. Activate the plugin through the Plugins menu in WordPress.
 
 == Changelog ==
+
+= 1.16.1 =
+Release Date: April 16th, 2024
+* Update: Add additional logging to help determine what is triggering automatic backups [$586](https://github.com/BoldGrid/boldgrid-backup/issues/586)
 
 = 1.16.0 =
 Release Date: February 26, 2024

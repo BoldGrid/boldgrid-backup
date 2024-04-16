@@ -1733,6 +1733,8 @@ class Boldgrid_Backup_Admin_Core {
 		}
 		Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'trigger', $info['trigger'] );
 
+		$this->logger->add( 'Backup triggered by: ' . $info['trigger'] );
+
 		$info['compressor'] = $this->compressors->get();
 
 		// If there is no available compressor, then fail.
