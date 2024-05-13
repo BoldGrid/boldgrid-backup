@@ -13,10 +13,10 @@
 		}
 	],
 	"require" : {
-		"boldgrid/library" : "^2.13.12",
+		"boldgrid/library" : "^2.13.13",
 		"boldgrid/tdcron" : "dev-master",
 		"phpseclib/phpseclib" : "~2.0",
-		"ifsnop/mysqldump-php": "^2.9"
+		"ifsnop/mysqldump-php": "^2.11"
 	},
 	"require-dev" : {
 		"lox/xhprof" : "dev-master",
