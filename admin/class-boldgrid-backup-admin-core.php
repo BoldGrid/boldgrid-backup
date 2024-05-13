@@ -604,7 +604,7 @@ class Boldgrid_Backup_Admin_Core {
 
 	/**
 	 * An Instance of the Upload class.
-	 * 
+	 *
 	 * @since 1.2.2
 	 * @var Boldgrid_Backup_Admin_Upload
 	 */
@@ -612,7 +612,7 @@ class Boldgrid_Backup_Admin_Core {
 
 	/**
 	 * An instance of the Restore Git class.
-	 * 
+	 *
 	 * @since 1.5.1
 	 * @var Boldgrid_Backup_Admin_Restore_Git
 	 */
@@ -620,7 +620,7 @@ class Boldgrid_Backup_Admin_Core {
 
 	/**
 	 * An instance of the Compressors class.
-	 * 
+	 *
 	 * @since 1.5.1
 	 * @var Boldgrid_Backup_Admin_Compressors
 	 */
@@ -628,7 +628,7 @@ class Boldgrid_Backup_Admin_Core {
 
 	/**
 	 * An instance of the Remote class
-	 * 
+	 *
 	 * @since 1.5.2
 	 * @var Boldgrid_Backup_Admin_Remote
 	 */
@@ -636,7 +636,7 @@ class Boldgrid_Backup_Admin_Core {
 
 	/**
 	 * An instance of the Jobs class
-	 * 
+	 *
 	 * @since 1.5.2
 	 * @var Boldgrid_Backup_Admin_Jobs
 	 */
@@ -644,7 +644,7 @@ class Boldgrid_Backup_Admin_Core {
 
 	/**
 	 * An instance of the Premium class
-	 * 
+	 *
 	 * @since 1.0.0
 	 * @var Boldgrid_Backup_Premium
 	 */

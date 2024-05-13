@@ -44,7 +44,7 @@ class Boldgrid_Backup_Admin_Ftp {
 
 	/**
 	 * Port
-	 * 
+	 *
 	 * @since 1.6.0
 	 * @var   string
 	 */
