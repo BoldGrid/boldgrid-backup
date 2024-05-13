@@ -43,6 +43,14 @@ class Boldgrid_Backup_Admin_Ftp {
 	];
 
 	/**
+	 * Port
+	 * 
+	 * @since 1.6.0
+	 * @var   string
+	 */
+	public $port;
+
+	/**
 	 * Default type.
 	 *
 	 * @since 1.6.0
@@ -236,6 +244,14 @@ class Boldgrid_Backup_Admin_Ftp {
 	 * @var    bool
 	 */
 	private $reconnected = false;
+
+	/**
+	 * Page class.
+	 *
+	 * @since 1.6.0
+	 * @var   Boldgrid_Backup_Admin_Ftp_Page
+	 */
+	public $page;
 
 	/**
 	 * Constructor.

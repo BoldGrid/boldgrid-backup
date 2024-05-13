@@ -137,7 +137,7 @@ class Boldgrid_Backup_Admin_Storage_Local {
 	 */
 	public function add_submenus() {
 		add_submenu_page(
-			null,
+			'',
 			__( 'Web Server', 'boldgrid-backup' ),
 			__( 'Web Server', 'boldgrid-backup' ),
 			'administrator',
