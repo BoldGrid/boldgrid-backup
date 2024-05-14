@@ -1111,7 +1111,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Add "Backup Archive Details" page.
 		add_submenu_page(
-			'',
+			'boldgrid-backup',
 			'BoldGrid ' . $lang['backup_archive'],
 			$lang['backup_archive'],
 			$capability,
