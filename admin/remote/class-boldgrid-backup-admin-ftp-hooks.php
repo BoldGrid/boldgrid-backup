@@ -57,7 +57,7 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 		$capability = 'administrator';
 
 		add_submenu_page(
-			null,
+			'boldgrid-backup-settings',
 			__( 'FTP Settings', 'boldgrid-backup' ),
 			__( 'FTP Settings', 'boldgrid-backup' ),
 			$capability,
