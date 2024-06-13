@@ -291,7 +291,7 @@ class Boldgrid_Backup_Admin_Archives {
 			<div class="notice notice-warning inline" style="margin:15px 0">
 				<p>
 					<strong>
-					' . esc_html( 'It looks like you don\'t have any backups! That\'s ok, let\'s fix that now. Here\'s what we recommend you do:', 'boldgrid-backup' ) . '
+					' . esc_html__( 'It looks like you don\'t have any backups! That\'s ok, let\'s fix that now. Here\'s what we recommend you do:', 'boldgrid-backup' ) . '
 					</strong>
 				</p>
 				<ol>
