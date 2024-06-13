@@ -22,7 +22,7 @@ return '
 	<div class="bg-box-bottom">
 		<p>' . esc_html__( 'To help remember the details of this backup, you may enter a title and description.', 'boldgrid-backup' ) . '</p>
 		<input type="text" name="backup_title" style="width:100%" placeholder="' . esc_html__( 'Backup Title', 'boldgrid-backup' ) . '" /><br /><br />
-		<textarea name="backup_description" style="width:100%;height:75px;" placeholder="' . esc_html( 'Backup Description', 'boldgrid-backup' ) . '" /></textarea>
+		<textarea name="backup_description" style="width:100%;height:75px;" placeholder="' . esc_html__( 'Backup Description', 'boldgrid-backup' ) . '" /></textarea>
 	</div>
 </div>
 ';
