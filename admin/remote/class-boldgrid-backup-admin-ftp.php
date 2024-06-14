@@ -295,7 +295,7 @@ class Boldgrid_Backup_Admin_Ftp {
 				$this->connection = ftp_ssl_connect( $this->host, $this->port, $this->timeout );
 				break;
 			case 'sftp':
-				$this->connection = new phpseclib\Net\SFTP( $this->host, $this->port );
+				$this->connection = new phpseclib3\Net\SFTP( $this->host, $this->port );
 				break;
 			default:
 				break;
@@ -901,7 +901,7 @@ class Boldgrid_Backup_Admin_Ftp {
 				$connection = @ftp_ssl_connect( $host, $port, $this->timeout ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
 				break;
 			case 'sftp':
-				$connection = @new phpseclib\Net\SFTP( $host, $port, $this->timeout ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
+				$connection = @new phpseclib3\Net\SFTP( $host, $port, $this->timeout ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
 				break;
 			default:
 				break;
