@@ -125,7 +125,7 @@ printf(
 	</p>
 
 	<div class="help wp-upload-form" data-id="backup-id">
-		<?php echo $backup_id_notice; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped ?>
+		<?php echo wp_kses_post( $backup_id_notice ); ?>
 	</div>
 
 </div>

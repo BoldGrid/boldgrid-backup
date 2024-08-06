@@ -77,7 +77,7 @@ ob_start();
 
 		<div style="vertical-align:middle;display:inline-block;">
 			<?php
-			echo $tz_info['markup_timezone'] . ' <em>' . $tz_info['markup_change'] . '</em>'; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+			echo wp_kses_post( $tz_info['markup_timezone'] ) . ' <em>' . wp_kses_post( $tz_info['markup_change'] ) . '</em>'; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 			?>
 		</div>
 

@@ -94,7 +94,7 @@ if ( ! empty( $reseller ) ) {
 		'</p><p>' . $premium_button . '</p></div>';
 }
 
-echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+echo wp_kses_post( $nav );
 
 require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
 ?>
@@ -152,7 +152,7 @@ printf(
 		</div>
 	</div>',
 	esc_html__( 'Premium Support', 'boldgrid-backup' ),
-	$premium_markup // phpcs:ignore WordPress.XSS.EscapeOutput
+	wp_kses_post( $premium_markup )
 );
 ?>
 

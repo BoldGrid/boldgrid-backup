@@ -822,6 +822,72 @@ class Boldgrid_Backup_Admin_Core {
 	}
 
 	/**
+	 * Kses Allowed CSS
+	 *
+	 * Filters allowed CSS for admin pages.
+	 *
+	 * @since 1.16.4
+	 *
+	 * @param array $css Allowed CSS.
+	 * 
+	 * @return array
+	 */
+	public function kses_allowed_css( $attr ) {
+		$attr[] = 'display';
+	}
+
+	/**
+	 * Kses Allowed HTML
+	 * 
+	 * Filters allowed HTML tags for admin pages.
+	 * 
+	 * @since 1.16.4
+	 */
+	public function kses_allowed_html( $tags, $context ) {
+		$default_attrs = array(
+			'type' => true,
+			'name' => true,
+			'value' => true,
+			'class' => true,
+			'id' => true,
+			'checked' => true,
+			'disabled' => true,
+			'readonly' => true,
+			'style' => true,
+			'size' => true,
+			'spellcheck' => true,
+			'autocomplete' => true,
+			'placeholder' => true,
+			'selected' => true,
+			'min' => true,
+			'max' => true,
+			'required' => true,
+		);
+
+		$tags['form'] = array(
+			'action' => true,
+			'method' => true,
+			'id' => true,
+			'class' => true,
+			'style' => true,
+			'target' => true,
+		);
+
+		$tags['input'] = $default_attrs;
+
+		$tags['select'] = $default_attrs;
+
+		$tags['option'] = $default_attrs;
+
+		$tags['textarea']['name'] = true;
+		$tags['textarea']['id'] = true;
+		$tags['textarea']['placeholder'] = true;
+		$tags['textarea']['class'] = true;
+
+		return $tags;
+	}
+
+	/**
 	 * Get the unique identifier for backups of this WordPress installation.
 	 *
 	 * @since 1.0.1
@@ -856,7 +922,7 @@ class Boldgrid_Backup_Admin_Core {
 			$random_string = '';
 
 			for ( $i = 0; $i <= 32; $i ++ ) {
-				$random_string .= chr( mt_rand( 40, 126 ) );
+				$random_string .= chr( wp_rand( 40, 126 ) );
 			}
 
 			$backup_identifier = hash( 'crc32', $random_string );
@@ -1258,7 +1324,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Create a file path for the dump file.
-		$db_dump_filepath = $backup_directory . DIRECTORY_SEPARATOR . DB_NAME . '.' . date( 'Ymd-His' ) . '.sql';
+		$db_dump_filepath = $backup_directory . DIRECTORY_SEPARATOR . DB_NAME . '.' . gmdate( 'Ymd-His' ) . '.sql';
 
 		// Save the file path.
 		$this->db_dump_filepath = $db_dump_filepath;
@@ -1628,7 +1694,7 @@ class Boldgrid_Backup_Admin_Core {
 			'boldgrid-backup-%1$s-%2$s-%3$s',
 			$site_id,
 			$backup_identifier,
-			date( 'Ymd-His' )
+			gmdate( 'Ymd-His' )
 		);
 		$filename = sanitize_file_name( $filename );
 
@@ -1716,7 +1782,8 @@ class Boldgrid_Backup_Admin_Core {
 		// Check if functional.
 		if ( ! $this->test->run_functionality_tests() ) {
 			// Display an error notice, if not already on the test page.
-			if ( ! isset( $_GET['page'] ) || 'boldgrid-backup-test' !== $_GET['page'] ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+			$referrer = wp_get_referrer();
+			if ( ! $referrer || false === strpos( $referrer, 'page=boldgrid-backup-test' ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 				// Display an error notice.
 				$this->notice->functionality_fail_notice();
 			}
@@ -2170,7 +2237,7 @@ class Boldgrid_Backup_Admin_Core {
 					'filepath'    => $backup_directory . '/' . $fileinfo['name'],
 					'filename'    => $fileinfo['name'],
 					'filedate'    => get_date_from_gmt(
-						date( 'Y-m-d H:i:s', $fileinfo['lastmodunix'] ), 'n/j/Y g:i A'
+						gmdate( 'Y-m-d H:i:s', $fileinfo['lastmodunix'] ), 'n/j/Y g:i A'
 					),
 					'filesize'    => $fileinfo['size'],
 					'lastmodunix' => $fileinfo['lastmodunix'],
@@ -2991,7 +3058,7 @@ class Boldgrid_Backup_Admin_Core {
 				</div>
 				<div id="bglib-page-content">
 					<div class="wp-header-end"></div>';
-		echo $modal; //phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+		echo wp_kses_post( $modal );
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-test.php';
 		echo '
 				</div>

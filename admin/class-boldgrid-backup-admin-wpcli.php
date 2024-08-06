@@ -171,7 +171,12 @@ class Boldgrid_Backup_Admin_Wpcli {
 		$backup_days = implode( ', ', $backup_days );
 		$backup_days = $backup_days ? $backup_days : 'None';
 
-		echo 'Backup schedule: ' . $backup_days;
+		printf(
+			'%1$s: %2$s',
+			esc_html__( 'Backup schedule', 'boldgrid-backup' ),
+			esc_html( $backup_days )
+
+		);
 
 		if ( 'None' !== $backup_days ) {
 			$has_tod = isset(
@@ -181,10 +186,25 @@ class Boldgrid_Backup_Admin_Wpcli {
 			);
 
 			if ( $has_tod ) {
-				echo __( ' at ', 'boldgrid-backup' ) . $settings['schedule']['tod_h'] . ':' .
-					$settings['schedule']['tod_m'] . ' ' . $settings['schedule']['tod_a'] .
-					__( ' (WordPress timezone: ', 'boldgrid-backup' ) .
-					get_option( 'timezone_string' ) . ' / UTC ' . get_option( 'gmt_offset' ) . ')';
+				printf(
+					/* translators:
+					 * 1: 'at',
+					 * 2: hour,
+					 * 3: minute,
+					 * 4: AM/PM,
+					 * 5: WordPress timezone,
+					 * 6: timezone string,
+					 * 7: GMT offset
+					 */
+					' %1$s %2$s:%3$s %4$s (%5$s: %6$s / UTC %7$s)',
+					esc_html__( 'at', 'boldgrid-backup' ),
+					esc_html( $settings['schedule']['tod_h'] ),
+					esc_html( $settings['schedule']['tod_m'] ),
+					esc_html( $settings['schedule']['tod_a'] ),
+					esc_html__( 'WordPress timezone', 'boldgrid-backup' ),
+					esc_html( get_option( 'timezone_string' ) ),
+					esc_html( get_option( 'gmt_offset' ) )
+				);
 			} else {
 				esc_html_e( ' at unknown time', 'boldgrid-backup' );
 			}
@@ -233,9 +253,9 @@ class Boldgrid_Backup_Admin_Wpcli {
 			'dow_thursday'  => in_array( '4', $days, true ) ? 1 : 0,
 			'dow_friday'    => in_array( '5', $days, true ) ? 1 : 0,
 			'dow_saturday'  => in_array( '6', $days, true ) ? 1 : 0,
-			'tod_h'         => (int) date( 'g', $time ),
-			'tod_m'         => date( 'i', $time ),
-			'tod_a'         => date( 'A', $time ),
+			'tod_h'         => (int) gmdate( 'g', $time ),
+			'tod_m'         => gmdate( 'i', $time ),
+			'tod_a'         => gmdate( 'A', $time ),
 		];
 
 		$settings = self::$core->settings->update_cron( $settings );

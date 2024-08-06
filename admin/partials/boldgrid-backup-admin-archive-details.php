@@ -466,8 +466,9 @@ $page = sprintf(
 	/* 4 */ $main_meta_box,
 	/* 5 */ $remote_meta_box
 );
-echo $pre_page; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+
+echo wp_kses_post( $pre_page );
 
 require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
 
-echo $page; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+wp_kses_post( $page ); // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped

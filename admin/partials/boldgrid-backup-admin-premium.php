@@ -47,8 +47,9 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 
 require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
 
-echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
-echo $premium_box; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+echo wp_kses_post( $nav );
+
+echo wp_kses_post( $premium_box );
 
 $dashboard->printCards();

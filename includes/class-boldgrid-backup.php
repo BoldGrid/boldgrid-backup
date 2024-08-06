@@ -446,6 +446,9 @@ class Boldgrid_Backup {
 			'wp_ajax_get_deadline'
 		);
 
+		$this->loader->add_filter( 'safe_style_css', $plugin_admin_core, 'kses_allowed_css', 10, 1 );
+		$this->loader->add_filter( 'wp_kses_allowed_html', $plugin_admin_core, 'kses_allowed_html', 10, 2 );
+
 		$this->loader->add_action( 'boldgrid_backup_pre_restore', $plugin_admin_core->restore_helper, 'pre_restore' );
 		$this->loader->add_action( 'boldgrid_backup_post_restore', $plugin_admin_core->restore_helper, 'post_restore' );
 		$this->loader->add_filter( 'boldgrid_backup_post_restore', $plugin_admin_core->archive_log, 'post_restore' );

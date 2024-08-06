@@ -91,7 +91,7 @@ ob_start();
 			esc_html_e( 'These are advanced settings. You do not need to configure this setting.', 'boldgrid-backup' );
 			?>
 			<span class="compression-level hidden">
-				<br/><?php echo $compression_level_info; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped ?>
+				<br/><?php echo esc_html( $compression_level_info ); ?>
 			</span>
 		</p>
 
@@ -99,13 +99,13 @@ ob_start();
 			<tr>
 				<th><?php esc_html_e( 'Compressor', 'boldgrid-backup' ); ?>:</th>
 				<td>
-					<?php echo $select_compressor; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped ?>
+					<?php echo wp_kses_post( $select_compressor ); ?>
 				</td>
 			</tr>
 			<tr class="compression-level hidden">
 				<th><?php esc_html_e( 'Compression Level', 'boldgrid-backup' ); ?>:</th>
 				<td>
-					<?php echo $select_compression_level; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped ?>
+					<?php echo wp_kses_post( $select_compression_level ); // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped ?>
 				</td>
 			</tr>
 		</table>

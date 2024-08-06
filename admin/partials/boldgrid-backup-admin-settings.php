@@ -132,7 +132,7 @@ if ( empty( $settings ) ) {
  */
 wp_nonce_field( 'boldgrid_backup_settings', 'bgbkup_settings_nonce' );
 
-	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+	echo wp_kses_post( $nav );
 
 	require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
 
@@ -168,7 +168,7 @@ $show_section = ! empty( $_REQUEST['section'] ) ? sanitize_key( $_REQUEST['secti
 
 <form id='bgb-settings-form' method='post'>
 <?php
-	echo $col_container; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+	echo wp_kses_post( $col_container );
 	wp_nonce_field( 'boldgrid-backup-settings', 'settings_auth' );
 ?>
 	<input type="hidden" name="save_time" value="<?php echo esc_attr( time() ); ?>" />

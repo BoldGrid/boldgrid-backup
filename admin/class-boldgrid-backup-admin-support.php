@@ -299,7 +299,7 @@ class Boldgrid_Backup_Admin_Support {
 				</div>
 				<div id="bglib-page-content">
 					<div class="wp-header-end"></div>';
-		echo $modal; //phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped, WordPress.Security.EscapeOutput
+		echo wp_kses_post( $modal );
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-support.php';
 		echo '
 				</div>

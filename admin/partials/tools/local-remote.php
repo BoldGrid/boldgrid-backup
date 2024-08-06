@@ -148,7 +148,7 @@ if ( ! empty( $local_info_markup ) ) {
 			'<strong>',
 			'</strong>'
 		),
-		$local_info_markup // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+		wp_kses_post( $local_info_markup )
 	);
 }
 
@@ -180,7 +180,7 @@ if ( ! empty( $server_info_markup ) ) {
 			'<strong>',
 			'</strong>'
 		),
-		$server_info_markup // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+		wp_kses_post( $server_info_markup )
 	);
 }
 

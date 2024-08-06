@@ -112,7 +112,7 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 			<?php esc_html_e( 'Backup will not occur if no storage locations are selected.', 'boldgrid-backup' ); ?>
 		</p>
 	</div>
-	<?php echo $premium_box; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped ?>
+	<?php echo wp_kses_post( $premium_box ); ?>
 </div>
 
 <?php

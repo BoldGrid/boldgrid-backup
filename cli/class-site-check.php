@@ -180,7 +180,7 @@ class Site_Check {
 		Log::write( $message, ( $status ? LOG_INFO : LOG_ERR ) );
 
 		if ( $print ) {
-			echo $message . PHP_EOL;
+			echo esc_html( $message ) . PHP_EOL;
 		}
 
 		return $status;
@@ -214,7 +214,7 @@ class Site_Check {
 				$result['error']['line'] . "\r\n";
 		}
 
-		echo 'Info: Sending notification email to "' . $recipient . '".' . PHP_EOL;
+		echo 'Info: Sending notification email to "' . esc_html( $recipient ) . '".' . PHP_EOL;
 		return ( new Email( $recipient ) )->send( $subject, $message );
 	}
 }

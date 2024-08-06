@@ -22,8 +22,8 @@
 <?php
 	wp_nonce_field( 'bgb-settings-webserver', 'webserver_auth' );
 
-	echo require BOLDGRID_BACKUP_PATH . '/admin/partials/settings/backup-directory.php';
-	echo require BOLDGRID_BACKUP_PATH . '/admin/partials/settings/retention.php';
+	echo wp_kses_post( require BOLDGRID_BACKUP_PATH . '/admin/partials/settings/backup-directory.php' );
+	echo wp_kses_post( require BOLDGRID_BACKUP_PATH . '/admin/partials/settings/retention.php' );
 ?>
 	<p>
 		<input type="hidden" name="action" value="save" />

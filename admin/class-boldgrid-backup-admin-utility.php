@@ -190,7 +190,13 @@ class Boldgrid_Backup_Admin_Utility {
 			return;
 		}
 
-		throw new ErrorException( $errstr, 0, $errno, $errfile, $errline );
+		throw new ErrorException(
+			esc_html( $errstr ),
+			0,
+			esc_html( $errno ),
+			esc_html( $errfile ),
+			esc_html( $errline )
+		);
 	}
 
 	/**
