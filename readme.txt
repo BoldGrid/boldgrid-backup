@@ -4,7 +4,7 @@ Tags: backup, cloud backup, database backup, restore, wordpress backup
 Requires at least: 5.0
 Tested up to: 6.6
 Requires PHP: 5.4
-Stable tag: 1.16.4
+Stable tag: 1.16.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -131,6 +131,11 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 1. Activate the plugin through the Plugins menu in WordPress.
 
 == Changelog ==
+
+= 1.16.5 =
+Release Date: Sept 25th, 2024
+* Bug Fix: Total Upkeep Disables Buttons in AIOSEO admin pages [#598](https://github.com/BoldGrid/boldgrid-backup/issues/598)
+* Bug Fix: system_zip option no longer available [#599](https://github.com/BoldGrid/boldgrid-backup/issues/599)
 
 = 1.16.4 =
 Release Date: Aug 28th, 2024
