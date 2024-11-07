@@ -40,6 +40,12 @@ script:
   # Remove dev scripts.
   - composer install -o --no-dev
 
+before_deploy:
+  - yes | gem update --system --force
+  - gem install bundler
+  - gem install uri
+  - gem install logger
+
 deploy:
   - provider: script
     script: chmod +x ./bin/release.sh && ./bin/release.sh
