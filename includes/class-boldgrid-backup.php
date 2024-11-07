@@ -349,7 +349,7 @@ class Boldgrid_Backup {
 	private function set_locale() {
 		$plugin_i18n = new Boldgrid_Backup_I18n();
 
-		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
+		$this->loader->add_action( 'after_setup_theme', $plugin_i18n, 'load_plugin_textdomain' );
 	}
 
 	/**
