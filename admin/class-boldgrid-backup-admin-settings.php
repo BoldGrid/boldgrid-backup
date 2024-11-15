@@ -744,7 +744,8 @@ class Boldgrid_Backup_Admin_Settings {
 			 *
 			 * @since 1.16.0
 			 */
-			if ( isset( $_POST['cron_interval'] ) ) {
+			$intervals_available = $this->core->scheduler->get_intervals();
+			if ( isset( $_POST['cron_interval'] ) && array_key_exists( $_POST['cron_interval'], $intervals_available ) ) {
 				$settings['cron_interval'] = $_POST['cron_interval'];
 			}
 

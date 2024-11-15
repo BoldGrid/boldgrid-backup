@@ -127,4 +127,10 @@ return [
 		 */
 		'.ea-php-cli.cache',
 	],
+	'cron_intervals'       => array(
+		'*/5 * * * *'  => esc_html__( 'Every 5 Minutes', 'boldgrid-backup' ),
+		'*/10 * * * *' => esc_html__( 'Every 10 Minutes', 'boldgrid-backup' ),
+		'*/30 * * * *' => esc_html__( 'Every 30 Minutes', 'boldgrid-backup' ),
+		'0 * * * *'    => esc_html__( 'Once Every Hour', 'boldgrid-backup' ),
+	),
 ];

@@ -121,6 +121,17 @@ class Boldgrid_Backup_Admin_Scheduler {
 	}
 
 	/**
+	 * Get cron intervals.
+	 * 
+	 * @since SINCEVERSION
+	 * 
+	 * @return array Available cron intervals.
+	 */
+	public function get_intervals() {
+		return $this->core->configs['cron_intervals'];
+	}
+
+	/**
 	 * Check if a scheduler is available.
 	 *
 	 * @since 1.5.1
