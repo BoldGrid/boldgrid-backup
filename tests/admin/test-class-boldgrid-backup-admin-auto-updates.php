@@ -13,6 +13,10 @@
 
 require_once ABSPATH . 'wp-includes/plugin.php';
 require_once ABSPATH . 'wp-admin/includes/class-wp-automatic-updater.php';
+require_once ABSPATH . 'wp-admin/includes/theme.php';
+require_once ABSPATH . 'wp-admin/includes/file.php';
+require_once ABSPATH . 'wp-admin/includes/misc.php';
+require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 require_once dirname( __FILE__ ) . '/class-license.php';
 
 /**
@@ -99,6 +103,15 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 				),
 			),
 		);
+
+		$installed_themes = wp_get_themes();
+		$theme_slug       = 'twentytwentytwo'; // Replace with your desired theme slug
+		$installed        = isset( $installed_themes[$theme_slug] );
+
+		if ( ! $installed ) {
+			$upgrader  = new Theme_Upgrader();
+			$installed = $upgrader->install("https://downloads.wordpress.org/theme/{$theme_slug}.latest-stable.zip");
+		}
 	}
 
 	/**
