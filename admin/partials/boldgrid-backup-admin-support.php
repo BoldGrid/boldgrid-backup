@@ -77,7 +77,7 @@ if ( ! empty( $reseller ) ) {
 		wp_kses(
 			/* translators: 1: HTML anchor for the URL address for BoldGrid Central, 2: HTML anchor close tag.. */
 			__(
-				'Create a ticket at %1$ssupport.boldgrid.com%2$s',
+				'Create a ticket at %1$sBoldGrid Support%2$s',
 				'boldgrid-backup'
 			),
 			$allowed_tags
