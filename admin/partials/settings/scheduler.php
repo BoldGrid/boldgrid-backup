@@ -61,6 +61,14 @@ foreach ( $intervals_available as $key => $interval ) {
 
 $cron_interval_select = sprintf( '<select name="cron_interval" id="cron_interval">%1$s</select>', $cron_interval_options );
 
+if ( 0 === $schedulers_count ) {
+	$scheduler_select = '';
+	$wp_cron_warning  = sprintf(
+		'<p class="no-cron-notice"><span class="dashicons dashicons-warning yellow"></span> %1$s</p>',
+		__( 'There are currently no cron systems available on your server. Scheduled backups will not occur.', 'boldgrid-backup' )
+	);
+}
+
 return sprintf(
 	'
 	<div class="bg-box">
