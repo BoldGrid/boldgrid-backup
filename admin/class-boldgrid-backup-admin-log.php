@@ -259,7 +259,7 @@ class Boldgrid_Backup_Admin_Log {
 		}
 
 		if ( ! function_exists( 'pcntl_async_signals' ) ) {
-			$this->add( 'Cannot add signal handlers, pcntl_async_signals function does not exist.' );
+			//$this->add( 'Cannot add signal handlers, pcntl_async_signals function does not exist.' );
 			return;
 		}
 
