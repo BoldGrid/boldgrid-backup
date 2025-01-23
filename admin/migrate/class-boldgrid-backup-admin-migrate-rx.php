@@ -65,6 +65,17 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	public $lists_option_name = 'boldgrid_backup_xfer_file_lists';
 
 	/**
+	 * Transfer Cron Interval
+	 * 
+	 * @var int
+	 * 
+	 * @since 0.0.1
+	 */
+	public $transfer_cron_interval = 60;
+
+
+
+	/**
 	 * Boldgrid_Transfer_Admin constructor.
 	 * 
 	 * @param Boldgrid_Backup_Admin_Migrate $migrate_core
@@ -119,7 +130,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 */
 	public function add_cron_interval( $schedules ) {
 		$schedules['every_minute'] = array(
-			'interval' => BOLDGRID_TRANSFER_CRON_INTERVAL,
+			'interval' => $this->transfer_cron_interval,
 			'display'  => esc_html__( 'Every Minute' ),
 		);
 

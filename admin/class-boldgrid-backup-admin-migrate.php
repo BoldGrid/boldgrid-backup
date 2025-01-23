@@ -20,15 +20,6 @@
  */
 class Boldgrid_Backup_Admin_Migrate {
 	/**
-	 * Plugin Configs
-	 * 
-	 * @var array
-	 * 
-	 * @since 0.0.1
-	 */
-	public $configs = array();
-
-	/**
 	 * Backup Core
 	 * 
 	 * @var Boldgrid_Backup_Admin_Core
@@ -77,9 +68,7 @@ class Boldgrid_Backup_Admin_Migrate {
 	 * @since 0.0.1
 	 */
 	public function __construct( $backup_core ) {
-		$this->configs     = include( BOLDGRID_TRANSFER_PATH . '/includes/configs/plugin.config.php' );
 		$this->backup_core = $backup_core;
-
 		$this->log         = new Boldgrid_Backup_Admin_Log( $this->backup_core );
 		$this->log->init( 'v2-transfers' );
 

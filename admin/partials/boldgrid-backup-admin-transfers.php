@@ -17,10 +17,11 @@ $is_premium           = $this->core->config->get_is_premium();
 $is_premium_installed = $this->core->config->is_premium_installed;
 $is_premium_active    = $this->core->config->is_premium_active;
 
-$nav         = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
-$overview    = include BOLDGRID_BACKUP_PATH . '/admin/partials/transfers/overview.php';
-$source      = include BOLDGRID_BACKUP_PATH . '/admin/partials/transfers/source.php';
-$destination = include BOLDGRID_BACKUP_PATH . '/admin/partials/transfers/destination.php';
+$nav             = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
+$overview        = include BOLDGRID_BACKUP_PATH . '/admin/partials/transfers/overview.php';
+$source          = include BOLDGRID_BACKUP_PATH . '/admin/partials/transfers/source.php';
+$destination     = include BOLDGRID_BACKUP_PATH . '/admin/partials/transfers/destination.php';
+$direct_transfer = include BOLDGRID_BACKUP_PATH . '/admin/partials/transfers/direct-transfer.php';
 
 $this->core->archive_actions->enqueue_scripts();
 $this->core->auto_rollback->enqueue_home_scripts();
@@ -41,6 +42,11 @@ $sections = [
 			'id'      => 'section_destination',
 			'title'   => __( 'Destination', 'boldgrid-backup' ),
 			'content' => $destination,
+		],
+		[
+			'id'      => 'section_direct_transfer',
+			'title'   => __( 'Direct Transfer', 'boldgrid-backup' ),
+			'content' => $direct_transfer,
 		],
 	],
 ];

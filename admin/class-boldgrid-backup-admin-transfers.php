@@ -50,6 +50,12 @@ class Boldgrid_Backup_Admin_Transfers {
 		$settings = $this->core->settings->get_settings();
 		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
 
+		wp_enqueue_style(
+			'boldgrid-backup-direct-transfer',
+			plugin_dir_url( BOLDGRID_BACKUP_PATH . '/admin/css/boldgrid-backup-admin-migrate.css' ) . 'boldgrid-backup-admin-migrate.css'
+		);
+
+
 		$this->core->auto_rollback->enqueue_home_scripts();
 		$this->core->auto_rollback->enqueue_backup_scripts();
 		$this->core->archive_actions->enqueue_scripts();

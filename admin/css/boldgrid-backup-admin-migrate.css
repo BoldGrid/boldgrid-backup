@@ -1,0 +1,108 @@
+.progress-row:not( .hidden ) .progress-bar {
+	width: 100%;
+    height: 40px;
+    position: relative;
+    border: 1px solid;
+    background-color: white;
+    border-radius: 10px;
+}
+
+.progress-row.canceled {
+    display: none;
+}
+
+div.boldgrid-transfer-input-fields {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px;
+}
+
+div.boldgrid-transfer-input-fields input[type="text"] {
+    flex-grow: 1;
+    margin-right: 10px;
+}
+
+table.bgbkup-transfers-sites-table {
+    margin-bottom: 10px;
+}
+
+table.bgbkup-transfers-tx-table.widefat th,
+table.bgbkup-transfers-sites-table.widefat th {
+    font-weight: bold;
+}
+
+.progress-row .progress-status {
+    display: none;
+}
+
+.progress-row:not( .hidden ) .progress-bar-text {
+    position: absolute;
+    text-align: center;
+    width: 100%;
+    top: 25%;
+}
+
+.progress-row:not( .hidden ) .progress-bar-fill {
+    width: 0;
+    height: 100%;
+    border-radius: 10px 0 0 10px;
+    background-color: lightgreen;
+}
+
+.progress-row.complete .progress-bar-fill {
+    width: 0;
+    height: 100%;
+    border-radius: 10px;
+    background-color: lightgreen;
+}
+
+#test-results-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#test-results-modal .modal-panel {
+    position: absolute;
+    left: calc( 50% - 250px );
+    top: 50%;
+    background-color: white;
+    border-radius: 8px;
+    max-width: 500px;
+    text-align: left;
+}
+
+#test-results-modal-close {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
+}
+
+#test-results-modal .modal-header {
+    background-color: #f1f1f1;
+    border-bottom: 1px solid #ddd;
+    border-radius: 8px 8px 0 0;
+}
+
+#test-results-modal .modal-header h2 {
+    margin: 0;
+    padding: 10px;
+}
+
+#test-results-modal-content {
+    padding: 0 20px 20px;
+}
+#test-results-modal #test-results-modal-content h3 {
+    margin: 0.5em 0;
+}
+
+#test-results-modal #test-results-modal-content p {
+    margin: 0;
+    padding-left: 10px;
+}
