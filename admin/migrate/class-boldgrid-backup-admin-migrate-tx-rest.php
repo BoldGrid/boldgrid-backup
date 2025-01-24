@@ -1,0 +1,551 @@
+<?php
+/**
+ * File: class-boldgrid-backup-admin-migrate-tx-rest.php
+ * 
+ * The trasnmitting rest api class for the Transfer process.
+ * 
+ * @link https://www.boldgrid.com
+ * @since 0.0.1
+ * @package Boldgrid_Transfer
+ * @copyright  BoldGrid
+ * @author     BoldGrid <support@boldgrid.com>
+ */
+
+/**
+ * Class: Boldgrid_Backup_Admin_Migrate_Tx_Rest
+ * 
+ * The transmitting rest api class for the Transfer process.
+ *
+ * @since 0.0.1
+ */
+class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
+	/**
+	 * Boldgrid_Transfer Core
+	 *
+	 * @var Boldgrid_Backup_Admin_Migrate
+	 * 
+	 * @since 0.0.1
+	 */
+	public $migrate_core;
+
+	/**
+	 * Transfers Option Name
+	 * 
+	 * @var string
+	 * 
+	 * @since 0.0.1
+	 */
+	public $transfers_option_name;
+
+	/**
+	 * DB Dump Status Option Name
+	 * 
+	 * @var string
+	 * 
+	 * @since 0.0.1
+	 */
+	public $db_dump_status_option_name;
+
+	/**
+	 * Boldgrid_Transfer_Rx_Rest constructor.
+	 * 
+	 * @param Boldgrid_Transfer $migrate_core
+	 * 
+	 * @since 0.0.1
+	 */
+	public function __construct( $migrate_core ) {
+		$this->migrate_core = $migrate_core;
+
+		$this->transfers_option_name      = $this->migrate_core->configs['option_names']['transfers'];
+		$this->db_dump_status_option_name = $this->migrate_core->configs['option_names']['db_dump_status'];
+	}
+
+	public function authenticate_request( $request ) {
+		$params = $request->get_params();
+
+		if ( ! isset( $params['user'] ) && ! isset( $params['pass'] ) ) {
+			return false;
+		}
+
+		$creds = array(
+			'user_login'    => $params['user'],
+			'user_password' => base64_decode( $params['pass'] ),
+			'remember'      => false,
+		);
+
+		$user = wp_signon( $creds );
+
+		if ( is_wp_error( $user ) ) {
+			return false;
+		}
+
+		set_current_user( $user->ID );
+
+		if ( ! current_user_can( 'administrator' ) ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Register the rest api routes
+	 * 
+	 * @since 0.0.1
+	 */
+	public function register_routes() {
+		register_rest_route( 'boldgrid-transfer/v1', '/start-db-dump', array(
+			'methods'             => 'POST',
+			'callback'            => array( $this, 'start_db_dump' ),
+			'permission_callback' => array( $this, 'authenticate_request' ),
+		) );
+
+		register_rest_route( 'boldgrid-transfer/v1', '/check-dump-status', array(
+			'methods'             => 'POST',
+			'callback'            => array( $this, 'check_dump_status' ),
+			'permission_callback' => array( $this, 'authenticate_request' ),
+		) );
+
+		register_rest_route( 'boldgrid-transfer/v1', '/split-db-file', array(
+			'methods'             => 'POST',
+			'callback'            => array( $this, 'split_db_file' ),
+			'permission_callback' => array( $this, 'authenticate_request' ),
+		) );
+
+		register_rest_route( 'boldgrid-transfer/v1', '/generate-file-list', array(
+			'methods'             => 'GET',
+			'callback'            => array( $this, 'generate_file_list' ),
+			'permission_callback' => array( $this, 'authenticate_request' ),
+		) );
+
+		register_rest_route( 'boldgrid-transfer/v1', '/get-wp-version', array(
+			'methods'             => 'GET',
+			'callback'            => array( $this, 'get_wp_version' ),
+			'permission_callback' => array( $this, 'authenticate_request' ),
+		) );
+
+		register_rest_route( 'boldgrid-transfer/v1', '/get-db-prefix', array(
+			'methods'             => 'GET',
+			'callback'            => array( $this, 'get_db_prefix' ),
+			'permission_callback' => array( $this, 'authenticate_request' ),
+		) );
+
+		register_rest_route( 'boldgrid-transfer/v1', '/retrieve-files', array(
+			'methods'             => 'POST',
+			'callback'            => array( $this, 'retrieve_files' ),
+			'permission_callback' => array( $this, 'authenticate_request' ),
+		) );
+
+		register_rest_route( 'boldgrid-transfer/v1', '/retrieve-large-file-part', array(
+			'methods'             => 'POST',
+			'callback'            => array( $this, 'retrieve_large_file_part' ),
+			'permission_callback' => array( $this, 'authenticate_request' ),
+		) );
+
+		register_rest_route( 'boldgrid-transfer/v1', '/delete-large-file-parts', array(
+			'methods'             => 'POST',
+			'callback'            => array( $this, 'delete_large_file_parts' ),
+			'permission_callback' => array( $this, 'authenticate_request' ),
+		) );
+
+		// Register a rest route to retrieve a DB dump file, where the file name is an
+		// argument in the rest route: /boldgrid-transfer/v1/get-db-dump/<file_name>
+		register_rest_route( 'boldgrid-transfer/v1', '/get-db-dump', array(
+			'methods'             => 'POST',
+			'callback'            => array( $this, 'get_db_dump' ),
+			'permission_callback' => array( $this, 'authenticate_request' ),
+		) );
+
+		register_rest_route( 'boldgrid-transfer/v1', '/split-large-files', array(
+			'methods'             => 'POST',
+			'callback'            => array( $this, 'split_large_files' ),
+			'permission_callback' => array( $this, 'authenticate_request' ),
+		) );
+	}
+
+	/**
+	 * Start db dump
+	 *  
+	 * @param $request WP_REST_Request
+	 * @since 0.0.1
+	 */
+	public function start_db_dump( $request ) {
+		require_once ABSPATH . 'wp-admin/includes/class-wp-debug-data.php';
+		$request_params = $request->get_params();
+		$transfer_id    = $request_params['transfer_id'];
+		$dest_url       = $request_params['dest_url'];
+		$dest_dir       = $this->migrate_core->util->url_to_safe_directory_name( $dest_url );
+		$dump_dir       = $this->migrate_core->util->get_transfer_dir() . '/' . $dest_dir . '/' . $transfer_id;
+		$db_size        = WP_Debug_Data::get_database_size();
+		$db_dump_file   = $dump_dir . '/db-' . DB_NAME . '-export-' . date('Y-m-d-H-i-s');
+		update_option( $this->db_dump_status_option_name, $db_dump_file );
+		$response       = json_encode( array(
+			'status'  => 'pending',
+			'file'    => $db_dump_file,
+			'db_size' => $db_size,
+		) );
+		$this->migrate_core->log->init( 'v2-transfer-' . $transfer_id );
+
+		$this->migrate_core->util->create_dirpath( $dump_dir . '/db-dump-status.json' );
+		file_put_contents( $dump_dir . '/db-dump-status.json', $response );
+
+        $cron_disabled = defined( 'DISABLE_WP_CRON' ) ? DISABLE_WP_CRON : false;
+        $this->migrate_core->log->add( 'DISABLE_WP_CRON: ' . json_encode( $cron_disabled ) );
+		$this->migrate_core->log->add( 'Scheduling db dump cron ' );
+		$scheduled = wp_schedule_single_event( time() + 10, 'boldgrid_transfer_db_dump_cron' );
+		$this->migrate_core->log->add( 'Scheduled: ' . json_encode( $scheduled, JSON_PRETTY_PRINT ) );
+
+		return new WP_REST_Response( array(
+			'success' => true,
+			'db_dump_info' => $response,
+		) );
+	}
+
+	/**
+	 * Generate a database dump
+	 * 
+	 * @since 0.0.1
+	 */
+	public function generate_db_dump() {
+		$db_dump_file = $this->migrate_core->util->get_option( $this->db_dump_status_option_name, '' );
+
+		$dump_dir = dirname( $db_dump_file );
+		$progress = json_decode( file_get_contents( $dump_dir . '/db-dump-status.json' ), true );
+
+		$progress['status'] = 'dumping';
+
+		file_put_contents( $dump_dir . '/db-dump-status.json', json_encode( $progress ) );
+
+		$db_dump = new Boldgrid_Backup_Admin_Db_Dump( $this->migrate_core->backup_core );
+
+		$db_dump->dump( $db_dump_file );
+
+		$progress['status'] = 'complete';
+
+		file_put_contents( $dump_dir . '/db-dump-status.json', json_encode( $progress ) );
+	}
+
+	/** 
+	 * Check Status of DB Dump
+	 * 
+	 * @since 0.0.8
+	 * 
+	 * @param $request WP_REST_Request
+	 * @return WP_Rest_Response
+	 */
+	public function check_dump_status( $request ) {
+		$params      = $request->get_params();
+		$transfer_id = $params['transfer_id'];
+		$dest_url    = $params['dest_url'];
+		$dest_dir	 = $this->migrate_core->util->url_to_safe_directory_name( $dest_url );
+		$dump_dir    = $this->migrate_core->util->get_transfer_dir() . '/' . $dest_dir . '/' . $transfer_id;
+		$status_file = $dump_dir . '/db-dump-status.json';
+
+		if ( ! file_exists( $status_file ) ) {
+			return new WP_REST_Response( array(
+				'success' => false,
+				'error'   => 'Status file not found',
+			) );
+		}
+
+		$response  = json_decode( file_get_contents( $status_file ), true );
+		$restarted = false;
+
+		if ( file_exists( $response['file'] ) ) {
+			clearstatcache();
+			$file_size = filesize( $response['file'] );
+			/*
+			 * If the file is not complete and it has been more
+			 * than 15 seconds since the last modification, then
+			 * set the status to pending and reschedule the cron
+			 * to start the dump again.
+			 */
+			$restarted = $this->maybe_restart_dump( $response, $status_file );
+		} else {
+			$file_size = 0;
+		}
+
+		if ( $restarted ) {
+			$response['restarted'] = true;
+		}
+
+		$response['file_size'] = $file_size;
+
+		if ( 'complete' === $response['status'] ) {
+			$response['db_size'] = $file_size;
+			$response['db_hash'] = md5_file( $response['file'] );
+		}
+
+		return new WP_REST_Response( array(
+			'success'      => true,
+			'db_dump_info' => $response,
+		) );
+	}
+
+	public function maybe_restart_dump( $status, $status_file ) {
+		if ( 'complete' === $status['status'] || 'pending' === $status['status'] ) {
+			return false;
+		}
+
+		$time_since_modified = time() - filemtime( $status['file'] );
+
+		if ( 15 > $time_since_modified ) {
+			return false;
+		}
+
+		error_log( 'Restarting DB Dump. Time since modified: ' . $time_since_modified );
+
+		// Update Status File
+		file_put_contents( $status_file, json_encode( array(
+			'status'  => 'pending',
+			'file'    => $status['file'],
+			'db_size' => $status['db_size'],
+		) ) );
+	
+		// Delete the failed file if it exists
+		if ( file_exists( $status['file'] ) ) {
+			unlink( $status['file'] );
+		}
+		
+		// Reschedule the cron
+		if ( ! wp_next_scheduled( 'boldgrid_transfer_db_dump' ) ) {
+			wp_schedule_single_event( time() + 10, 'boldgrid_transfer_db_dump_cron' );
+		}
+
+		return true;
+	}
+
+	/**
+	 * Delete large file parts
+	 * 
+	 * @param $request WP_REST_Request
+	 * @since 0.0.3
+	 */
+	public function delete_large_file_parts( $request ) {
+		$params = $request->get_params();
+
+		$transfer_id = $params['transfer_id'];
+
+		foreach( $params['file_parts'] as $file_part ) {
+			if ( file_exists( $file_part ) ) {
+				unlink( $file_part );
+			}
+		}
+
+		return new WP_REST_Response( array(
+			'success' => true,
+		) );
+	}
+
+	/**
+	 * Retrieve large file part
+	 * 
+	 * @param $request WP_REST_Request
+	 * @since 0.0.1
+	 */
+	public function retrieve_large_file_part( $request ) {
+		$params = $request->get_params();
+
+		$transfer_id = $params['transfer_id'];
+		$part_path   = $params['file_part'];
+
+		if ( ! file_exists( $part_path ) ) {
+			return new WP_REST_Response( array(
+				'success' => false,
+				'error'   => 'File part not found',
+			) );
+		}
+
+		Boldgrid_Backup_Admin_Utility::bump_memory_limit( '1G' );
+
+		$file_contents = base64_encode( file_get_contents( $part_path ) );
+
+		return new WP_REST_Response( array(
+			'success'   => true,
+			'file_part' => $file_contents,
+		) );
+	}
+
+	/**
+	 * Split db file
+	 * 
+	 * Rest API request to split the database dump file into smaller parts
+	 * The request should contain the following parameters:
+	 * - transfer_id: The transfer id
+	 * - db_file: The path to the database dump file
+	 * - max_upload_size: The maximum upload size for the parts
+	 * 
+	 * Compare the remote max_upload_size with the local max_upload_size
+	 * Use the smaller of the two values to split the file.
+	 * 
+	 * @param $request WP_REST_Request
+	 * 
+	 * @since 0.0.8
+	 * 
+	 * @return WP_Rest_Response
+	 */
+	public function split_db_file( $request ) {
+		$params = $request->get_params();
+
+		$db_file         = $params['db_file'];
+		$transfer_id     = $params['transfer_id'];
+		$max_upload_size = $params['max_upload_size'];
+		$memory_limit    = $this->migrate_core->util->convert_to_bytes( ini_get('memory_limit') );
+		
+		$max_upload_size = min( $max_upload_size, $memory_limit );
+
+		// extract the file name, from the absolute path in $db_file
+		$relative_path = basename( $db_file );
+
+		$split_files = $this->migrate_core->util->split_large_file( $transfer_id, $db_file, $relative_path, $max_upload_size * 2 );
+
+		return new WP_REST_Response( array(
+			'success'     => true,
+			'split_files' => json_encode( $split_files ),
+		) );
+	}
+
+	/**
+	 * Split large files
+	 * 
+	 * @since 0.0.1
+	 */
+	public function split_large_files( $request ) {
+		$params = $request->get_params();
+
+		$files           = json_decode( $params['files'], true );
+		$transfer_id     = $params['transfer_id'];
+		$max_upload_size = $params['max_upload_size'];
+
+		$split_files = array();
+
+		foreach( $files as $file ) {
+			$relative_path = $file['path'];
+			$file_path     = ABSPATH . $relative_path;
+
+			$file['md5'] = md5_file( $file_path );
+
+			$file[ 'parts' ]  = $this->migrate_core->util->split_large_file( $transfer_id, $file_path, $relative_path, $max_upload_size );
+
+			$file[ 'status' ] = 'ready-to-transfer';
+
+			$split_files[] = $file;
+		}
+
+		return new WP_REST_Response( array(
+			'success'      => true,
+			'split_files'  => json_encode( $split_files ),
+		) );
+	}
+
+	/**
+	 * Retrieve files
+	 * 
+	 * @since 0.0.1
+	 */
+	public function retrieve_files( $request ) {
+		$params = $request->get_params();
+
+		$files    = json_decode( $params['files'], true );
+		$batch_id = $params['batch_id'];
+
+		$files_data = array();
+
+		$memory_requirement = 0;
+
+		foreach ( $files as $file ) {
+			$memory_requirement += filesize( ABSPATH . $file ) * 2;
+		}
+
+		Boldgrid_Backup_Admin_Utility::bump_memory_limit( intval( $memory_requirement ) * 3 );
+
+		foreach ( $files as $file ) {
+			$file_path = ABSPATH . $file;
+			if ( ! file_exists( $file_path ) ) {
+				continue;
+			}
+			$files_data[$file] = array(
+				'md5'  => md5_file( $file_path ),
+				'file' => base64_encode( file_get_contents( $file_path ) ),
+			);
+		}
+
+		return new WP_REST_Response( array(
+			'success'  => true,
+			'batch_id' => $batch_id,
+			'files'    => json_encode( $files_data ),
+		) );
+	}
+
+	/**
+	 * Get the db dump file
+	 * 
+	 * @since 0.0.1
+	 */
+	public function get_db_dump( $request ) {
+		$request_params = $request->get_params();
+		$file_name      = $request_params['file_path'];
+		$db_path        = urldecode( $file_name );
+		error_log( 'db_path: ' . $db_path );
+		if ( ! file_exists( $db_path ) ) {
+			return new WP_REST_Response( array(
+				'success' => false,
+				'error'   => 'File not found',
+			) );
+		}
+
+		return new WP_REST_Response( array(
+			'success' => true,
+			'file'    => file_get_contents( $db_path ),
+			'file_hash' => md5_file( $db_path ),
+		) );
+	}
+
+	/**
+	 * Get the wp version info
+	 * 
+	 * @since 0.0.1
+	 */
+	public function get_wp_version() {
+		return new WP_REST_Response( array(
+			'success'    => true,
+			'wp_version' => get_bloginfo( 'version' ),
+		) );
+	}
+
+	/**
+	 * Get the wp version info
+	 * 
+	 * @since 0.0.1
+	 */
+	public function get_db_prefix() {
+		global $wpdb;
+		return new WP_REST_Response( array(
+			'success'   => true,
+			'db_prefix' => $wpdb->get_blog_prefix(),
+		) );
+	}
+
+	/**
+	 * Generate a file list
+	 * 
+	 * @since 0.0.1
+	 */
+	public function generate_file_list( $request ) {
+		$file_list = $this->migrate_core->util->generate_file_list();
+
+		// Sort filelist ascending by size
+		usort( $file_list, function( $a, $b ) {
+			return $a['size'] - $b['size'];
+		} );
+
+		$largest_file = $this->migrate_core->util->get_largest_file_size( $file_list, 0 );
+
+		Boldgrid_Backup_Admin_Utility::bump_memory_limit( intval( $largest_file ) * 2 );
+
+		return $response = new WP_REST_Response( array(
+			'success'   => true,
+			'file_list' => json_encode( $file_list )
+		) );
+	}
+}

@@ -44,9 +44,9 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * 
 	 * @since 0.0.1
 	 */
-	public $option_name;
+	public $transfers_option_name;
 
-	/**
+		/**
 	 * File List Option Name
 	 * 
 	 * @var string
@@ -65,6 +65,15 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	public $authd_sites_option_name;
 
 	/**
+	 * Cancelled Transfers Option Name
+	 * 
+	 * @var string
+	 * 
+	 * @since 0.0.2
+	 */
+	public $cancelled_transfers_option_name;
+
+	/**
 	 * Boldgrid_Transfer_Admin constructor.
 	 * 
 	 * @param Boldgrid_Backup_Admin_Migrate $core
@@ -74,10 +83,11 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	public function __construct( $migrate_core ) {
 		$this->migrate_core = $migrate_core;
 
-		$this->option_name              = $this->migrate_core->configs['option_name'];
-		$this->lists_option_name        = $this->migrate_core->configs['lists_option_name'];
-		$this->authd_sites_option_name  = $this->migrate_core->configs['authd_sites_option_name'];
-		$this->heartbeat_option_name    = $this->migrate_core->configs['heartbeat_option_name'];
+		$this->transfers_option_name           = $this->migrate_core->configs['option_names']['transfers'];
+		$this->lists_option_name               = $this->migrate_core->configs['option_names']['file_lists'];
+		$this->authd_sites_option_name         = $this->migrate_core->configs['option_names']['authd_sites'];
+		$this->heartbeat_option_name           = $this->migrate_core->configs['option_names']['heartbeat'];
+		$this->cancelled_transfers_option_name = $this->migrate_core->configs['option_names']['cancelled_transfers'];
 	}
 
 	/**
@@ -85,7 +95,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * in `boldgrid_backup_settings` option.
 	 */
 	public function get_transfer_dir() {
-		$settings = get_option( 'boldgrid_backup_settings', array() );
+		$settings = $this->get_option( 'boldgrid_backup_settings', array() );
 
 		// TODO: Use the Boldgrid_Backup_Admin_Backup_Dir::guess_and_set() method once this is
 		// 	 integrated into the Boldgrid Backup plugin.
@@ -121,8 +131,8 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	/**
 	 * Split Large File
 	 * 
-	 * Given a file path, this function will split the file
-	 * into BOLDGRID_TRANSFER_FILE_CHUNK_SIZE sized chunks.
+	 * Given a file path, this function will split the large file
+	 * into max_upload_size / 10 sized chunks.
 	 * They will be placed in the transfer_dir / transfer id
 	 * directory.
 	 * 
@@ -156,56 +166,22 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 
 	public function update_transfer_heartbeat() {
 		wp_cache_delete( $this->heartbeat_option_name, 'options' );
-		update_option( $this->heartbeat_option_name, time() );
+		update_option( $this->heartbeat_option_name, time(), false );
 	}
 
 	public function get_transfer_heartbeat() {
 		wp_cache_delete( $this->heartbeat_option_name, 'options' );
-		return get_option( $this->heartbeat_option_name, 0 );
+		return $this->get_option( $this->heartbeat_option_name, 0 );
 	}
 
 	public function generate_db_dump() {
-		global $wpdb;
+		$backup_file = $this->get_transfer_dir() . '/db-' . DB_NAME . '-export-' . date('Y-m-d-H-i-s') . '.sql';
 
-		$backupFile = $this->get_transfer_dir() . '/db-' . DB_NAME . '-export-' . date('Y-m-d-H-i-s') . '.sql';
+		$db_dump = new Boldgrid_Backup_Admin_Db_Dump( $this->transfer_core->backup_core );
 
-		// Get all table names from the database
-		$tables = $wpdb->get_results( "SHOW TABLES", ARRAY_N );
-		$tables = array_map( function( $table ) {
-			return $table[0];
-		}, $tables );
+		$db_dump->dump( $backup_file );
 
-		// Initialize the backup content
-		$backupContent = '';
-
-		foreach ( $tables as $table ) {
-			// Add DROP TABLE IF EXISTS statement
-			$backupContent .= "DROP TABLE IF EXISTS `$table`;\n";
-
-			// Get the create table statement
-			$createTable    = $wpdb->get_row( "SHOW CREATE TABLE `$table`", ARRAY_N );
-			$backupContent .= "\n" . $createTable[1] . ";\n\n";
-	
-			// Get the table data
-			$tableData = $wpdb->get_results( "SELECT * FROM `$table`", ARRAY_N );
-			foreach ( $tableData as $row ) {
-				$values = array_map( function( $value ) use ( $wpdb ) {
-					if ( $value === null ) {
-						return 'NULL';
-					}
-					return "'" . $wpdb->_real_escape($value) . "'";
-				}, $row );
-				$backupContent .= "INSERT INTO `$table` VALUES(" . implode(", ", $values) . ");\n";
-			}
-			$backupContent .= "\n";
-		}
-
-		// Save the backup content to a file
-		if ( ! file_put_contents( $backupFile, $backupContent ) ) {
-			wp_die( "Error writing to file" );
-		}
-
-		return $backupFile;
+		return $backup_file;
 	}
 
 	/**
@@ -240,7 +216,6 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 					$files[] = [
 						'path' => $relativePath,
 						'size' => $fileInfo->getSize(),
-						'md5'  => md5_file( $fileInfo->getPathname() ),
 					];
 				}
 			}
@@ -282,6 +257,13 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		$upload_max_filesize = $this->convert_to_bytes(ini_get('upload_max_filesize'));
 		$post_max_size       = $this->convert_to_bytes(ini_get('post_max_size'));
 		$memory_limit        = $this->convert_to_bytes(ini_get('memory_limit'));
+
+		$this->migrate_core->log->add( json_encode( array(
+			'upload_max_filesize' => $upload_max_filesize,
+			'post_max_size'       => $post_max_size,
+			'memory_limit'        => $memory_limit,
+			'sapi_name'		      => php_sapi_name(),
+		) ) );
 	
 		// Return the smallest value
 		return min( $upload_max_filesize, $post_max_size, $memory_limit );
@@ -296,7 +278,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * 
 	 * @since 0.0.1
 	 */
-	public function get_largest_file_size( $files, $db_file_size ) {
+	public function get_largest_file_size( $files ) {
 		$largest = 0;
 		foreach ( $files as $file ) {
 			if ( $file['size'] > $largest ) {
@@ -304,7 +286,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 			}
 		}
 
-		return max( $largest, $db_file_size );
+		return $largest;
 	}
 
 	/**
@@ -312,8 +294,8 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * 
 	 * Determine what the size in bytes will be of
 	 * the average batch of files based on the 
-	 * BOLDGRID_TRANSFER_BATCH_CHUNKS and 
-	 * BOLDGRID_TRANSFER_CHUNK_SIZE constants,
+	 * configs['batch_chunks'] and 
+	 * configs['chunk_size'] configs,
 	 * as well as the largest file size and the total transfer
 	 * size.
 	 * 
@@ -328,28 +310,9 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 
 		$average_file_size = $transfer_size / count( $file_list );
 
-		$average_batch_size = $average_file_size * BOLDGRID_TRANSFER_CHUNK_SIZE;
-
-		error_log( json_encode( array(
-			'transfer_size' => $transfer_size,
-			'average_file_size' => $average_file_size,
-			'file count' => count( $file_list ),
-			'files per batch' => BOLDGRID_TRANSFER_CHUNK_SIZE,
-			'average_batch_size' => $average_batch_size,
-		) ) );
+		$average_batch_size = $average_file_size * $this->migrate_core->configs['batch_chunks'];
 
 		return $average_batch_size;
-	}
-
-	/**
-	 * Get Input Vars Limit
-	 * 
-	 * @return int
-	 * 
-	 * @since 0.0.1
-	 */
-	public function get_input_vars_limit() {
-		return ini_get('max_input_vars');
 	}
 
 	public function generate_file_list() {
@@ -403,7 +366,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		$namespace = $this->migrate_core->configs['REST']['namespace'];
 		$request_url = $site_url . '/wp-json/' . $namespace . $route;
 
-		$authd_sites = get_option( $this->authd_sites_option_name, array() );
+		$authd_sites = $this->get_option( $this->authd_sites_option_name, array() );
 		$auth        = isset( $authd_sites[ $site_url ] ) ? $authd_sites[ $site_url ] : false;
 
 		if ( ! $auth ) {
@@ -412,11 +375,10 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 
 		$user = $auth['user'];
 		$pass = Boldgrid_Backup_Admin_Crypt::crypt( $auth['pass'], 'd' );
-	
 		$response = wp_remote_get(
 			$request_url . '?user=' . $user . '&pass=' . base64_encode( $pass ),
 			array(
-				'timeout' => BOLDGRID_TRANSFER_CONN_TIMEOUT,
+				'timeout' => 600,
 			)
 		);
 
@@ -425,14 +387,15 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 			return new WP_Error( 'rest_error', $response->get_error_message() );
 		}
 
-		$body = wp_remote_retrieve_body( $response );
+		$body    = wp_remote_retrieve_body( $response );
+		$headers = wp_remote_retrieve_headers( $response );
 
 		$data = json_decode( $body, true );
 
 		if ( isset ( $data[ $key ] ) ) {
 			return $data[ $key ];
 		} else {
-			return new WP_Error( 'rest_error', 'Requested Key: ' . $key . ' not found in response', $body );
+			return new WP_Error( 'rest_error', 'Requested Key: ' . $key . ' not found in response' );
 		}
 	}
 
@@ -442,7 +405,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * @return string
 	 */
 	public function gen_transfer_id() {
-		$transfers = get_option( 'boldgrid_transfer_rx_list', array() );
+		$transfers = $this->get_option( $this->transfers_option_name, array() );
 
 		$transfer_id = wp_generate_password( 8, false );
 
@@ -453,35 +416,63 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		return $transfer_id;
 	}
 
+	/**
+	 * Get Option
+	 * 
+	 * Get an option from the php table using
+	 * wpdb to avoid caching issues.
+	 * 
+	 * @param string $option_name The name of the option
+	 * @param mixed  $fallback    The fallback value if the option is not found
+	 * 
+	 * @return mixed
+	 */
+	public function get_option( $option_name, $fallback = null ) {
+		$wpdb   = $GLOBALS['wpdb'];
+		$query  = $wpdb->prepare( "SELECT * FROM {$wpdb->options} WHERE option_name = %s", $option_name );
+		$result = $wpdb->get_row( $query );
+
+		// If the option is not found, return the fallback value
+		if ( ! $result ) {
+			return $fallback;
+		}
+
+		// Unserialize the option value and return it
+		return maybe_unserialize( $result->option_value );
+	}
+
 	public function cancel_transfer( $transfer_id ) {
-		$cancelled_transfers = get_option( 'boldgrid_transfer_cancelled_transfers', array() );
+		$cancelled_transfers = $this->get_option( $this->cancelled_transfers_option_name, array() );
 
 		if ( ! in_array( $transfer_id, $cancelled_transfers ) ) {
 			$cancelled_transfers[] = $transfer_id;
 		}
 
-		update_option( 'boldgrid_transfer_cancelled_transfers', $cancelled_transfers );
+		wp_cache_delete( $this->cancelled_transfers_option_name, 'options' );
+		update_option( $this->cancelled_transfers_option_name, $cancelled_transfers, false );
 
-		$transfers = get_option( $this->option_name, array() );
+		wp_cache_delete( $this->transfers_option_name, 'options' );
+		$transfers = $this->get_option( $this->transfers_option_name, array() );
 
 		if ( ! isset( $transfers[ $transfer_id ] ) ) {
 			return;
 		}
 
 		$transfers[ $transfer_id ]['status'] = 'canceled';
-		wp_cache_delete( $this->option_name, 'options' );
-
-		$status_updated = update_option( $this->option_name, $transfers );
+		$status_updated = update_option( $this->transfers_option_name, $transfers );
+		wp_cache_delete( $this->transfers_option_name, 'options' );
 	
 		return $status_updated;
 	}
 
 	public function update_bulk_file_status( $transfer_id, $batch, $status ) {
 		wp_cache_delete( $this->lists_option_name, 'options' );
-		wp_cache_delete( $this->option_name, 'options' );
+		wp_cache_delete( $this->transfers_option_name, 'options' );
 		wp_cache_delete( 'boldgrid_transfer_cancelled_transfers', 'options' );
-		$file_lists = get_option( $this->lists_option_name, array() );
-		$transfers  = get_option( $this->option_name, array () );
+		$file_lists = $this->get_option( $this->lists_option_name, array() );
+		$transfers  = $this->get_option( $this->transfers_option_name, array () );
+
+		set_time_limit( ini_get( 'max_execution_time' ) );
 
 		if ( 'canceled' === $transfers[ $transfer_id ]['status'] ) {
 			wp_die();
@@ -515,23 +506,63 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		$file_lists[ $transfer_id ]['small'] = json_encode( $file_list );
 
 		$this->update_transfer_heartbeat();
-		update_option( $this->lists_option_name, $file_lists );
+		update_option( $this->lists_option_name, $file_lists, false );
+	}
+
+	public function update_file_md5( $transfer_id, $small_or_large, $file_path, $new_md5_hash ) {
+		wp_cache_delete( $this->lists_option_name, 'options' );
+		wp_cache_delete( $this->transfers_option_name, 'options' );
+		wp_cache_delete( 'boldgrid_transfer_cancelled_transfers', 'options' );
+		$file_lists = $this->get_option( $this->lists_option_name, array() );
+		$transfers  = $this->get_option( $this->transfers_option_name, array() );
+
+		if ( 'canceled' === $transfers[ $transfer_id ]['status'] ) {
+			wp_die();
+		}
+
+		if ( ! isset( $transfers[ $transfer_id ] ) ) {
+			wp_die();
+			return;
+		}
+
+		if ( ! isset( $file_lists[ $transfer_id ] ) ) {
+			wp_die();
+			return;
+		}
+
+		$file_list = json_decode( $file_lists[ $transfer_id ][ $small_or_large ], true );
+
+		foreach ( $file_list as $key => $file_item ) {
+			if ( $file_item['path'] === $file_path ) {
+				$file_list[ $key ]['md5'] = $new_md5_hash;
+			}
+		}
+
+		// Sort filelist ascending by size
+		usort( $file_list, function( $a, $b ) {
+			return $a['size'] - $b['size'];
+		} );
+
+		$file_lists[ $transfer_id ][ $small_or_large ] = json_encode( $file_list );
+
+		update_option( $this->lists_option_name, $file_lists, false );
+		$this->update_transfer_heartbeat();
 	}
 	
 	public function update_file_status( $transfer_id, $small_or_large, $file_path, $status ) {
 		wp_cache_delete( $this->lists_option_name, 'options' );
-		wp_cache_delete( $this->option_name, 'options' );
-		wp_cache_delete( 'boldgrid_transfer_cancelled_transfers', 'options' );
-		$file_lists          = get_option( $this->lists_option_name, array() );
-		$transfers           = get_option( $this->option_name, array() );
-		$cancelled_transfers = get_option( 'boldgrid_transfer_cancelled_transfers', array() );
+		wp_cache_delete( $this->transfers_option_name, 'options' );
+		wp_cache_delete( $this->cancelled_transfers_option_name, 'options' );
+		$file_lists          = $this->get_option( $this->lists_option_name, array() );
+		$transfers           = $this->get_option( $this->transfers_option_name, array() );
+		$cancelled_transfers = $this->get_option( $this->cancelled_transfers_option_name, array() );
 
 		if ( 'canceled' === $transfers[ $transfer_id ]['status'] ) {
 			wp_die();
 		}
 
 		if ( in_array( $transfer_id, $cancelled_transfers ) ) {
-			$this->cancel_transfer( $this->option_name, $transfer_id );
+			$this->cancel_transfer( $this->transfers_option_name, $transfer_id );
 			wp_die();
 		}
 
@@ -560,7 +591,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 
 		$file_lists[ $transfer_id ][ $small_or_large ] = json_encode( $file_list );
 
-		update_option( $this->lists_option_name, $file_lists );
+		update_option( $this->lists_option_name, $file_lists, false );
 		$this->update_transfer_heartbeat();
 	}
 
@@ -568,7 +599,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		$namespace = $this->migrate_core->configs['REST']['namespace'];
 		$request_url = $site_url . '/wp-json/' . $namespace . $route;
 
-		$authd_sites = get_option( $this->authd_sites_option_name, array() );
+		$authd_sites = $this->get_option( $this->authd_sites_option_name, array() );
 		$auth        = isset( $authd_sites[ $site_url ] ) ? $authd_sites[ $site_url ] : false;
 
 		if ( ! $auth ) {
@@ -582,17 +613,16 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 			$request_url,
 			array(
 				'body' => $data,
-				'timeout' => BOLDGRID_TRANSFER_CONN_TIMEOUT,
+				'timeout' => $this->migrate_core->configs['conn_timeout'],
 			)
 		);
 
 		if ( is_wp_error( $response ) ) {
-			error_log( 'Error getting REST data: ' . $response->get_error_message() );
+			$this->migrate_core->log->add( 'Error posting REST data: ' . $response->get_error_message() );
 			return new WP_Error( 'rest_error', $response->get_error_message() );
 		}
 
-		$body = wp_remote_retrieve_body( $response );
-
+		$body      = wp_remote_retrieve_body( $response );
 		$body_data = json_decode( $body, true );
 
 		if ( isset ( $body_data[ 'success' ] ) && ! $return ) {
@@ -600,8 +630,25 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		} else if ( isset( $body_data[ 'success' ] ) && $return ) {
 			return $body_data;
 		} else {
-			$this->migrate_core->log->add('Rest Post Error: ' . json_encode( $response ) );
+			$this->migrate_core->log->add( 'Post Rest Error: /wp-json/' . $namespace . $route );
+			$this->migrate_core->log->add( 'Post Rest Error: ' . $body );
 			return new WP_Error( 'rest_error', 'No Seccess Response' );
 		}
+	}
+
+	/**
+	 * Convert to MM:SS
+	 * 
+	 * @param int $seconds
+	 * 
+	 * @return string
+	 * 
+	 * @since 0.0.5
+	 */
+	public function convert_to_mmss( $seconds ) {
+		if ( $seconds >= 3600 ) { // Check if time is 1 hour or more
+			return date_i18n( 'H:i:s', mktime( 0, 0, $seconds ) );
+		}
+		return date_i18n( 'i:s', mktime( 0, 0, $seconds ) );
 	}
 }

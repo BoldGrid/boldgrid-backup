@@ -47,7 +47,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 	public function __construct( $migrate_core ) {
 		$this->migrate_core  = $migrate_core;
 		$this->util          = $this->migrate_core->util;
-		$this->rest          = new Boldgrid_Backup_Admin_Migrate_Rest( $migrate_core );
+		$this->rest          = new Boldgrid_Backup_Admin_Migrate_Tx_Rest( $migrate_core );
 		$this->add_hooks();
 	}
 
@@ -58,5 +58,6 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 	 */
 	public function add_hooks() {
 		add_action( 'rest_api_init', array( $this->rest, 'register_routes' ) );
+		add_action( 'boldgrid_transfer_db_dump_cron', array( $this->rest, 'generate_db_dump' ) );
 	}
 }
