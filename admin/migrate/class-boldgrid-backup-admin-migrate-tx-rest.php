@@ -47,6 +47,15 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	public $db_dump_status_option_name;
 
 	/**
+	 * Rest API Namespace
+	 * 
+	 * @var string
+	 * 
+	 * @since 0.0.1
+	 */
+	public $namespace;
+
+	/**
 	 * Boldgrid_Transfer_Rx_Rest constructor.
 	 * 
 	 * @param Boldgrid_Transfer $migrate_core
@@ -58,6 +67,8 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 
 		$this->transfers_option_name      = $this->migrate_core->configs['option_names']['transfers'];
 		$this->db_dump_status_option_name = $this->migrate_core->configs['option_names']['db_dump_status'];
+
+		$this->namespace = $this->migrate_core->configs['rest_api_namespace'];
 	}
 
 	public function authenticate_request( $request ) {
@@ -94,55 +105,55 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 * @since 0.0.1
 	 */
 	public function register_routes() {
-		register_rest_route( 'boldgrid-transfer/v1', '/start-db-dump', array(
+		register_rest_route( $this->namespace, '/start-db-dump', array(
 			'methods'             => 'POST',
 			'callback'            => array( $this, 'start_db_dump' ),
 			'permission_callback' => array( $this, 'authenticate_request' ),
 		) );
 
-		register_rest_route( 'boldgrid-transfer/v1', '/check-dump-status', array(
+		register_rest_route( $this->namespace, '/check-dump-status', array(
 			'methods'             => 'POST',
 			'callback'            => array( $this, 'check_dump_status' ),
 			'permission_callback' => array( $this, 'authenticate_request' ),
 		) );
 
-		register_rest_route( 'boldgrid-transfer/v1', '/split-db-file', array(
+		register_rest_route( $this->namespace, '/split-db-file', array(
 			'methods'             => 'POST',
 			'callback'            => array( $this, 'split_db_file' ),
 			'permission_callback' => array( $this, 'authenticate_request' ),
 		) );
 
-		register_rest_route( 'boldgrid-transfer/v1', '/generate-file-list', array(
+		register_rest_route( $this->namespace, '/generate-file-list', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'generate_file_list' ),
 			'permission_callback' => array( $this, 'authenticate_request' ),
 		) );
 
-		register_rest_route( 'boldgrid-transfer/v1', '/get-wp-version', array(
+		register_rest_route( $this->namespace, '/get-wp-version', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_wp_version' ),
 			'permission_callback' => array( $this, 'authenticate_request' ),
 		) );
 
-		register_rest_route( 'boldgrid-transfer/v1', '/get-db-prefix', array(
+		register_rest_route( $this->namespace, '/get-db-prefix', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'get_db_prefix' ),
 			'permission_callback' => array( $this, 'authenticate_request' ),
 		) );
 
-		register_rest_route( 'boldgrid-transfer/v1', '/retrieve-files', array(
+		register_rest_route( $this->namespace, '/retrieve-files', array(
 			'methods'             => 'POST',
 			'callback'            => array( $this, 'retrieve_files' ),
 			'permission_callback' => array( $this, 'authenticate_request' ),
 		) );
 
-		register_rest_route( 'boldgrid-transfer/v1', '/retrieve-large-file-part', array(
+		register_rest_route( $this->namespace, '/retrieve-large-file-part', array(
 			'methods'             => 'POST',
 			'callback'            => array( $this, 'retrieve_large_file_part' ),
 			'permission_callback' => array( $this, 'authenticate_request' ),
 		) );
 
-		register_rest_route( 'boldgrid-transfer/v1', '/delete-large-file-parts', array(
+		register_rest_route( $this->namespace, '/delete-large-file-parts', array(
 			'methods'             => 'POST',
 			'callback'            => array( $this, 'delete_large_file_parts' ),
 			'permission_callback' => array( $this, 'authenticate_request' ),
@@ -150,13 +161,13 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 
 		// Register a rest route to retrieve a DB dump file, where the file name is an
 		// argument in the rest route: /boldgrid-transfer/v1/get-db-dump/<file_name>
-		register_rest_route( 'boldgrid-transfer/v1', '/get-db-dump', array(
+		register_rest_route( $this->namespace, '/get-db-dump', array(
 			'methods'             => 'POST',
 			'callback'            => array( $this, 'get_db_dump' ),
 			'permission_callback' => array( $this, 'authenticate_request' ),
 		) );
 
-		register_rest_route( 'boldgrid-transfer/v1', '/split-large-files', array(
+		register_rest_route( $this->namespace, '/split-large-files', array(
 			'methods'             => 'POST',
 			'callback'            => array( $this, 'split_large_files' ),
 			'permission_callback' => array( $this, 'authenticate_request' ),

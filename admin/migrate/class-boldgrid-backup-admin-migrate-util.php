@@ -363,7 +363,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	}
 
 	public function rest_get( $site_url, $route, $key ) {
-		$namespace = $this->migrate_core->configs['rest_api_namespace'];
+		$namespace = $this->migrate_core->configs['rest_api_namespace'] . '/';
 		$request_url = $site_url . '/wp-json/' . $namespace . $route;
 
 		$authd_sites = $this->get_option( $this->authd_sites_option_name, array() );
@@ -395,6 +395,10 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		if ( isset ( $data[ $key ] ) ) {
 			return $data[ $key ];
 		} else {
+			$this->migrate_core->log->add( 'Get Rest Error: /wp-json/' . $namespace . $route );
+			$this->migrate_core->log->add( 'Get Rest Error Headers: ' . json_encode( $body, JSON_PRETTY_PRINT ) );
+			$this->migrate_core->log->add( 'Get Rest Error Body: ' . $body );
+			
 			return new WP_Error( 'rest_error', 'Requested Key: ' . $key . ' not found in response' );
 		}
 	}
