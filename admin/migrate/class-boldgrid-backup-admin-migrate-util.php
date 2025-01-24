@@ -363,7 +363,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	}
 
 	public function rest_get( $site_url, $route, $key ) {
-		$namespace = $this->migrate_core->configs['REST']['namespace'];
+		$namespace = $this->migrate_core->configs['rest_api_namespace'];
 		$request_url = $site_url . '/wp-json/' . $namespace . $route;
 
 		$authd_sites = $this->get_option( $this->authd_sites_option_name, array() );

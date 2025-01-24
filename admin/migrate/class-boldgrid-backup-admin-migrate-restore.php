@@ -91,7 +91,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 
 		$transfer_id = sanitize_text_field( $_POST['transfer_id'] );
 
-		$this->migrate_core->log->init( 'v2-transfer-' . $transfer_id );
+		$this->migrate_core->log->init( 'direct-transfer-' . $transfer_id );
 
 		$transfers = $this->util->get_option( $this->transfer_option_name, array() );
 

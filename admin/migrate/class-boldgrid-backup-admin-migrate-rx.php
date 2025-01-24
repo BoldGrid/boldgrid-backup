@@ -110,12 +110,13 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	public function __construct( $migrate_core ) {
 		$this->migrate_core   = $migrate_core;
 
-		$this->transfers_option_name       = $this->migrate_core->configs['option_names']['transfers'];
-		$this->lists_option_name           = $this->migrate_core->configs['option_names']['file_lists'];
-		$this->open_batches_option_name    = $this->migrate_core->configs['option_names']['open_batches'];
-		$this->authd_sites_option_name     = $this->migrate_core->configs['option_names']['authd_sites'];
-		$this->bytes_received_option_name  = $this->migrate_core->configs['option_names']['bytes_received'];
-		$this->active_transfer_option_name = $this->migrate_core->configs['option_names']['active_transfer'];
+		$this->transfers_option_name           = $this->migrate_core->configs['option_names']['transfers'];
+		$this->lists_option_name               = $this->migrate_core->configs['option_names']['file_lists'];
+		$this->open_batches_option_name        = $this->migrate_core->configs['option_names']['open_batches'];
+		$this->authd_sites_option_name         = $this->migrate_core->configs['option_names']['authd_sites'];
+		$this->bytes_received_option_name      = $this->migrate_core->configs['option_names']['bytes_received'];
+		$this->active_transfer_option_name     = $this->migrate_core->configs['option_names']['active_transfer'];
+		$this->cancelled_transfers_option_name = $this->migrate_core->configs['option_names']['cancelled_transfers'];
 		
 		$this->rest = new Boldgrid_Backup_Admin_Migrate_Rx_Rest( $migrate_core );
 		$this->util = $this->migrate_core->util;
@@ -278,7 +279,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		$transfer_id = $active_transfer['transfer_id'];
 
-		$this->migrate_core->log->init( 'v2-transfer-' . $transfer_id );
+		$this->migrate_core->log->init( 'direct-transfer-' . $transfer_id );
 
 		if ( ! wp_next_scheduled( 'boldgrid_transfer_process_transfers' ) ) {
 			$scheduled = wp_schedule_event( time(), 'every_minute', 'boldgrid_transfer_process_transfers' );
@@ -453,7 +454,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		update_option( $this->active_transfer_option_name, $transfer_id, false );
 
-		$this->migrate_core->log->init( 'v2-transfer-' . $transfer_id );
+		$this->migrate_core->log->init( 'direct-transfer-' . $transfer_id );
 
 		$this->fix_stalled_transfer( $transfer );
 
@@ -632,6 +633,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			);
 	
 			if ( is_wp_error( $file_list ) ) {
+				$this->migrate_core->log->add( 'Error generating file list: ' . $file_list->get_error_message() );
 				return $file_list;
 			}
 

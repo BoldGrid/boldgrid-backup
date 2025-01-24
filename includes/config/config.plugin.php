@@ -137,7 +137,7 @@ return [
 		'rest_api_namespace'          => 'boldgrid-backup/v1/migrate',
 		'batch_chunks'                => 10,
 		'chunk_size'                  => 50,
-		'stalled_timout'              => 120,
+		'stalled_timeout'              => 120,
 		'cron_interval'               => 60,
 		'conn_timeout'                => 60,
 		'option_names'                => array(

@@ -184,7 +184,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 			'file'    => $db_dump_file,
 			'db_size' => $db_size,
 		) );
-		$this->migrate_core->log->init( 'v2-transfer-' . $transfer_id );
+		$this->migrate_core->log->init( 'direct-transfer-' . $transfer_id );
 
 		$this->migrate_core->util->create_dirpath( $dump_dir . '/db-dump-status.json' );
 		file_put_contents( $dump_dir . '/db-dump-status.json', $response );
