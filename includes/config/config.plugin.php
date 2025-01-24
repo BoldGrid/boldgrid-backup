@@ -134,10 +134,11 @@ return [
 		'0 * * * *'    => esc_html__( 'Once Every Hour', 'boldgrid-backup' ),
 	),
 	'direct_transfer'      => array(
-		'rest_api_namespace'          => 'boldgrid-backup/v1/migrate',
+		'rest_api_namespace'          => 'boldgrid-backup/v1',
+		'rest_api_prefix'             => 'direct-transfer',
 		'batch_chunks'                => 10,
 		'chunk_size'                  => 50,
-		'stalled_timeout'              => 120,
+		'stalled_timeout'             => 120,
 		'cron_interval'               => 60,
 		'conn_timeout'                => 60,
 		'option_names'                => array(

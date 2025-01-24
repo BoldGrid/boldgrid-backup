@@ -47,6 +47,15 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	public $namespace;
 
 	/**
+	 * Rest API Prefix
+	 * 
+	 * @var string
+	 * 
+	 * @since 0.0.1
+	 */
+	public $prefix;
+
+	/**
 	 * Boldgrid_Transfer_Rx_Rest constructor.
 	 * 
 	 * @param Boldgrid_Backup_Admin_Migrate $migrate_core
@@ -58,7 +67,8 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 
 		$this->transfers_option_name  = $this->migrate_core->configs['option_names']['transfers'];
 
-		$this->namespace = $this->migrate_core->configs['rest_api_namespace']; 
+		$this->namespace = $this->migrate_core->configs['rest_api_namespace'];
+		$this->prefix    = $this->migrate_core->configs['rest_api_prefix'];
 	}
 
 	public function authenticate_local_request( $request ) {
@@ -115,13 +125,13 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	 * @since 0.0.1
 	 */
 	public function register_routes() {
-		register_rest_route( $this->namespace, '/cron_resume_transfer', array(
+		register_rest_route( $this->namespace, $this->prefix . '/cron_resume_transfer', array(
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'cron_resume_transfer' ),
 			'permission_callback' => array( $this, 'authenticate_local_request' ),
 		) );
 
-		register_rest_route( $this->namespace, '/transfer_status/(?P<transfer_id>[A-Za-z0-9]+)/(?P<status>[A-Za-z0-9\-]+)', array(
+		register_rest_route( $this->namespace, $this->prefix . '/transfer_status/(?P<transfer_id>[A-Za-z0-9]+)/(?P<status>[A-Za-z0-9\-]+)', array(
 			'methods'             => 'PUT',
 			'callback'            => array( $this, 'update_transfer_status' ),
 			'permission_callback' => array( $this, 'authenticate_request' ),

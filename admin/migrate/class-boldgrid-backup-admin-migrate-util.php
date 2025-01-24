@@ -364,7 +364,8 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 
 	public function rest_get( $site_url, $route, $key ) {
 		$namespace = $this->migrate_core->configs['rest_api_namespace'] . '/';
-		$request_url = $site_url . '/wp-json/' . $namespace . $route;
+		$prefix    = $this->migrate_core->configs['rest_api_prefix'] . '/';
+		$request_url = $site_url . '/wp-json/' . $namespace . $prefix . $route;
 
 		$authd_sites = $this->get_option( $this->authd_sites_option_name, array() );
 		$auth        = isset( $authd_sites[ $site_url ] ) ? $authd_sites[ $site_url ] : false;
@@ -395,7 +396,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		if ( isset ( $data[ $key ] ) ) {
 			return $data[ $key ];
 		} else {
-			$this->migrate_core->log->add( 'Get Rest Error: /wp-json/' . $namespace . $route );
+			$this->migrate_core->log->add( 'Get Rest Error: ' . $request_url );
 			$this->migrate_core->log->add( 'Get Rest Error Headers: ' . json_encode( $body, JSON_PRETTY_PRINT ) );
 			$this->migrate_core->log->add( 'Get Rest Error Body: ' . $body );
 			
@@ -600,8 +601,9 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	}
 
 	public function rest_post( $site_url, $route, $data, $return = false ) {
-		$namespace = $this->migrate_core->configs['REST']['namespace'];
-		$request_url = $site_url . '/wp-json/' . $namespace . $route;
+		$namespace = $this->migrate_core->configs['rest_api_namespace'] . '/';
+		$prefix    = $this->migrate_core->configs['rest_api_prefix'] . '/';
+		$request_url = $site_url . '/wp-json/' . $namespace . $prefix . $route;
 
 		$authd_sites = $this->get_option( $this->authd_sites_option_name, array() );
 		$auth        = isset( $authd_sites[ $site_url ] ) ? $authd_sites[ $site_url ] : false;
@@ -634,7 +636,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		} else if ( isset( $body_data[ 'success' ] ) && $return ) {
 			return $body_data;
 		} else {
-			$this->migrate_core->log->add( 'Post Rest Error: /wp-json/' . $namespace . $route );
+			$this->migrate_core->log->add( 'Post Rest Error: ' . $request_url );
 			$this->migrate_core->log->add( 'Post Rest Error: ' . $body );
 			return new WP_Error( 'rest_error', 'No Seccess Response' );
 		}

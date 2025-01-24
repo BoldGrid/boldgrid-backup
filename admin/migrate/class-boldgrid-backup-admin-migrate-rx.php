@@ -217,10 +217,11 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		if ( 'cli' === $php_sapi_name ) {
 			$this->migrate_core->log->add( 'Processing via CLI....' );
-			$namespace   = $this->migrate_core->configs['rest_api_namespace'];
+			$namespace   = $this->migrate_core->configs['rest_api_namespace'] . '/';
+			$prefix      = $this->migrate_core->configs['rest_api_prefix'] . '/';
 			$nonce       = wp_create_nonce( 'boldgrid_transfer_cron_resume_transfer' );
 			wp_remote_get(
-				home_url( '/wp-json/' . $namespace . 'cron_resume_transfer' ) . '?nonce=' . $nonce,
+				home_url( '/wp-json/' . $namespace . $prefix . 'cron_resume_transfer' ) . '?nonce=' . $nonce,
 				array(
 					'timeout' => $this->migrate_core->configs['conn_timeout'],
 				)
@@ -1314,7 +1315,8 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		$ch_batch = array();
 
 		$mh          = curl_multi_init();
-		$namespace   = $this->migrate_core->configs['REST']['namespace'];
+		$namespace   = $this->migrate_core->configs['rest_api_namespace'] . '/';
+		$prefix      = $this->migrate_core->configs['rest_api_prefix'] . '/';
 		$request_url = $site_url . '/wp-json/' . $namespace . $route;
 
 		$authd_sites = $this->util->get_option( $this->authd_sites_option_name, array() );
@@ -1722,9 +1724,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			'db_dump_info' => $db_dump_info,
 		) ) );
 		$this->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', $db_dump_info );
-
-		$namespace = $this->migrate_core->configs['REST']['namespace'];
-		$url       = $transfer['source_site_url'] . '/wp-json/' . $namespace . 'get-db-dump/' . urlencode( $file_path );
 		
 		$response = $this->util->rest_post(
 			$transfer['source_site_url'],
@@ -1893,9 +1892,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		$transfer_id = $transfer['transfer_id'];
 		$db_file     = $transfer['db_dump_info']['file'];
 		$source_site = $transfer['source_site_url'];
-
-		$namespace = $this->migrate_core->configs['REST']['namespace'];
-		$url       = $source_site . '/wp-json/' . $namespace . 'split-db-file';
 
 		$authd_sites = $this->util->get_option( $this->authd_sites_option_name, array() );
 		$auth        = isset( $authd_sites[ $source_site ] ) ? $authd_sites[ $source_site ] : false;
