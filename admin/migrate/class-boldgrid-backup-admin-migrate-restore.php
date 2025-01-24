@@ -402,6 +402,8 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 			'db_prefix'
 		);
 
+		$this->migrate_core->log->add( 'New database prefix: ' . json_encode( $new_db_prefix ) );
+
 		// Connect to the WordPress database via $wpdb.
 		global $wpdb;
 

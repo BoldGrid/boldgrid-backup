@@ -16,6 +16,7 @@
 			var $authButton  = $( '#auth_transfer' ),
 				$xferButtons = $( 'button.start-transfer' ),
 				$migrateButton = $( 'button.migrate-site' ),
+				$resyncDbButton = $( 'button.resync-database' ),
 				$cancelButton = $( 'button.cancel-transfer' ),
 				$deleteButton = $( 'button.delete-transfer' ),
 				$closeModalButton = $( '#test-results-modal-close' );
@@ -43,6 +44,15 @@
 
 				e.preventDefault();
 				self._startMigrate( $this, transferId, nonce );
+			} );
+
+			$resyncDbButton.on( 'click', function( e ) {
+				var $this 	= $( e.currentTarget ),
+					transferId = $this.data( 'transferId' ),
+					nonce      = $( '#resync_database_nonce' ).val();
+
+				e.preventDefault();
+				self._startResyncDb( $this, transferId, nonce );
 			} );
 
 			$deleteButton.on( 'click', function( e ) {
@@ -87,6 +97,23 @@
 				console.log( response );
 				if ( response.success ) {
 					$button.text( 'Migrated' );
+				}
+			} );
+		},
+		_startResyncDb: function( $button, transferId, nonce ) {
+			$button.prop( 'disabled', true );
+			$.ajax( {
+				url: ajaxurl,
+				method: 'POST',
+				data: {
+					'action': 'boldgrid_transfer_resync_database',
+					'transfer_id': transferId,
+					'nonce': nonce
+				},
+			} ).done( function( response ) {
+				console.log( response );
+				if ( response.success ) {
+					window.location.reload();
 				}
 			} );
 		},
@@ -247,14 +274,14 @@
 
 			$statusRow.each( function( index, row ) {
 				console.log( $statusRow );
-				$( row ).attr( 'data-intervalId', setInterval( self._verifyRxFiles, 15000, row ) );
-				self._verifyRxFiles( row );
+				$( row ).attr( 'data-intervalId', setInterval( self._checkRxStatus, 15000, row ) );
+				self._checkRxStatus( row );
 			} );
 		},
-		_verifyRxFiles: function( row ) {
+		_checkRxStatus: function( row ) {
 			var $row                = $( row ),
 				transferId          = $row.data( 'transferId' ),
-				nonce               = $( '#verify_files_nonce' ).val(),
+				nonce               = $( '#check_status_nonce' ).val(),
 				$progressBar        = $row.find( '.progress-bar' ),
 				$progressText       = $row.find( '.progress-bar-text' ),
 				$progressBarFill    = $row.find( '.progress-bar-fill' ),
@@ -266,7 +293,7 @@
 				url: ajaxurl,
 				method: 'POST',
 				data: {
-					'action': 'boldgrid_transfer_verify_files',
+					'action': 'boldgrid_transfer_check_status',
 					'nonce' : nonce,
 					'type': 'rx',
 					'transfer_id': transferId,
@@ -294,7 +321,7 @@
 					$progressBarFill.css( 'width', progress + '%' );
 					$progressText.text( progressText );
 					$progressStatusText.text( progressStatusText );
-					$timeElapsedText.text( self._formatTime( timeElapsed ) );
+					$timeElapsedText.text( timeElapsed );
 
 					console.log( { response: response.data } );
 
