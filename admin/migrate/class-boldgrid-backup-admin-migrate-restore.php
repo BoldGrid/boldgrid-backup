@@ -388,6 +388,12 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 		$wp_siteurl = $this->util->get_option( 'siteurl' );
 		$wp_home    = $this->util->get_option( 'home' );
 
+		$new_db_prefix = $this->migrate_core->util->rest_get(
+			$site_url,
+			'get-db-prefix',
+			'db_prefix'
+		);
+
 		// Import the dump file.
 		$memory_limit_bumped = Boldgrid_Backup_Admin_Utility::bump_memory_limit( filesize( $db_dump_filepath ) * 10 );
 		$this->migrate_core->log->add( 'Memory limit bumped: ' . json_encode( $memory_limit_bumped ) );
@@ -395,12 +401,6 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 		$status   = $importer->import( $db_dump_filepath );
 
 		$this->migrate_core->log->add( 'Database import status: ' . json_encode( $status ) );
-
-		$new_db_prefix = $this->migrate_core->util->rest_get(
-			$site_url,
-			'get-db-prefix',
-			'db_prefix'
-		);
 
 		$this->migrate_core->log->add( 'New database prefix: ' . json_encode( $new_db_prefix ) );
 
