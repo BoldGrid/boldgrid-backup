@@ -1317,7 +1317,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		$mh          = curl_multi_init();
 		$namespace   = $this->migrate_core->configs['rest_api_namespace'] . '/';
 		$prefix      = $this->migrate_core->configs['rest_api_prefix'] . '/';
-		$request_url = $site_url . '/wp-json/' . $namespace . $route;
+		$request_url = $site_url . '/wp-json/' . $namespace . $prefix . $route;
 
 		$authd_sites = $this->util->get_option( $this->authd_sites_option_name, array() );
 		$auth        = isset( $authd_sites[ $site_url ] ) ? $authd_sites[ $site_url ] : false;
