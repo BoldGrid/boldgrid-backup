@@ -144,7 +144,10 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 
 		$this->migrate_core->log->add( '$db_file: ' . json_encode( $db_file, JSON_PRETTY_PRINT ) );
 
-		// 5. Restore the WordPress database from the dump file.
+		// 5. Export the options to a file.
+		$options_file = $this->export_options( $transfer_dir );
+
+		// 6. Restore the WordPress database from the dump file.
 		if ( ! $this->restore_database( $db_file['path'], $transfer['source_site_url'] ) ) {
 			$this->migrate_core->log->add( 'Failed to restore the database.' );
 			return array(
@@ -152,6 +155,9 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 				'error'   => 'Failed to restore the database.'
 			);
 		}
+
+		// 7. Restore the options that were exported before the migration.
+		$this->restore_options( $options_file );
 
 		$migration_end_time = microtime( true );
 		$time_to_migrate    = $migration_end_time - $migrate_start_time;
@@ -474,6 +480,56 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 
 		// Return success.
 		return true;
+	}
+
+		/**
+	 * Export Options
+	 * 
+	 * Export all the options in the
+	 * $this->migrate_core->configs['option_names'] array
+	 * to the backup directory so they can be restored after the migration.
+	 * 
+	 * @since 0.0.7
+	 * 
+	 * @param string $transfer_dir The directory transfered files are located in
+	 */
+	public function export_options( $transfer_dir ) {
+		$options = $this->migrate_core->configs['option_names'];
+		$backup_dir = $this->migrate_core->util->get_backup_dir();
+		$backup_options_file = $backup_dir . 'direct-transfer-options.json';
+
+		$this->migrate_core->log->add( 'Exporting options to: ' . $backup_options_file );
+
+		$options_array = array();
+		foreach( $options as $option_name ) {
+			$option_value = $this->migrate_core->util->get_option( $option_name );
+			$options_array[ $option_name ] = $option_value;
+		}
+
+		file_put_contents( $backup_options_file, json_encode( $options_array ) );
+
+		return $backup_options_file;
+	}
+
+	/**
+	 * Restore Options
+	 * 
+	 * Restore the options that were exported before the migration.
+	 * 
+	 * @since 0.0.7
+	 * 
+	 * @param string $options_file The file containing the options to restore
+	 */
+	public function restore_options( $options_file ) {
+		$this->migrate_core->log->add( 'Restoring options from: ' . $options_file );
+
+		$options_array = json_decode( file_get_contents( $options_file ), true );
+
+		foreach( $options_array as $option_name => $option_value ) {
+			update_option( $option_name, $option_value );
+		}
+
+		$this->migrate_core->log->add( 'Finished restoring options.' );
 	}
 
 	public function update_table_prefix( $new_db_prefix ) {
