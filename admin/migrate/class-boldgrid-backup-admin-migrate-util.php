@@ -44,7 +44,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * 
 	 * @since 0.0.1
 	 */
-	public $option_name = 'boldgrid_backup_xfers';
+	public $option_name;
 
 	/**
 	 * File List Option Name
@@ -53,7 +53,16 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * 
 	 * @since 0.0.2
 	 */
-	public $lists_option_name = 'boldgrid_backup_xfer_file_lists';
+	public $lists_option_name;
+
+	/**
+	 * Authenticated Sites Option Name
+	 * 
+	 * @var string
+	 * 
+	 * @since 0.0.2
+	 */
+	public $authd_sites_option_name;
 
 	/**
 	 * Boldgrid_Transfer_Admin constructor.
@@ -64,6 +73,11 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 */
 	public function __construct( $migrate_core ) {
 		$this->migrate_core = $migrate_core;
+
+		$this->option_name              = $this->migrate_core->configs['option_name'];
+		$this->lists_option_name        = $this->migrate_core->configs['lists_option_name'];
+		$this->authd_sites_option_name  = $this->migrate_core->configs['authd_sites_option_name'];
+		$this->heartbeat_option_name    = $this->migrate_core->configs['heartbeat_option_name'];
 	}
 
 	/**
@@ -141,13 +155,13 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	}
 
 	public function update_transfer_heartbeat() {
-		wp_cache_delete( 'boldgrid_transfer_heartbeat', 'options' );
-		update_option( 'boldgrid_transfer_heartbeat', time() );
+		wp_cache_delete( $this->heartbeat_option_name, 'options' );
+		update_option( $this->heartbeat_option_name, time() );
 	}
 
 	public function get_transfer_heartbeat() {
-		wp_cache_delete( 'boldgrid_transfer_heartbeat', 'options' );
-		return get_option( 'boldgrid_transfer_heartbeat', 0 );
+		wp_cache_delete( $this->heartbeat_option_name, 'options' );
+		return get_option( $this->heartbeat_option_name, 0 );
 	}
 
 	public function generate_db_dump() {
@@ -389,7 +403,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		$namespace = $this->migrate_core->configs['REST']['namespace'];
 		$request_url = $site_url . '/wp-json/' . $namespace . $route;
 
-		$authd_sites = get_option( 'boldgrid_transfer_authd_sites', array() );
+		$authd_sites = get_option( $this->authd_sites_option_name, array() );
 		$auth        = isset( $authd_sites[ $site_url ] ) ? $authd_sites[ $site_url ] : false;
 
 		if ( ! $auth ) {
@@ -554,7 +568,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		$namespace = $this->migrate_core->configs['REST']['namespace'];
 		$request_url = $site_url . '/wp-json/' . $namespace . $route;
 
-		$authd_sites = get_option( 'boldgrid_transfer_authd_sites', array() );
+		$authd_sites = get_option( $this->authd_sites_option_name, array() );
 		$auth        = isset( $authd_sites[ $site_url ] ) ? $authd_sites[ $site_url ] : false;
 
 		if ( ! $auth ) {

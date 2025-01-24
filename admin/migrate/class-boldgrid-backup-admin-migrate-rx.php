@@ -53,7 +53,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * 
 	 * @since 0.0.1
 	 */
-	public $option_name = 'boldgrid_backup_xfers';
+	public $option_name;
 
 	/**
 	 * File List Option Name
@@ -62,7 +62,25 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * 
 	 * @since 0.0.2
 	 */
-	public $lists_option_name = 'boldgrid_backup_xfer_file_lists';
+	public $lists_option_name;
+
+	/**
+	 * Open Batches Option Name
+	 * 
+	 * @var string
+	 * 
+	 * @since 0.0.2
+	 */
+	public $open_batches_option_name;
+
+	/**
+	 * Authenticated Sites Option Name
+	 * 
+	 * @var string
+	 * 
+	 * @since 0.0.2
+	 */
+	public $authd_sites_option_name;
 
 	/**
 	 * Transfer Cron Interval
@@ -83,8 +101,13 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * @since 0.0.1
 	 */
 	public function __construct( $migrate_core ) {
-		$this->migrate_core   = $migrate_core;
-		$this->util            = $this->migrate_core->util;
+		$this->migrate_core = $migrate_core;
+		$this->util         = $this->migrate_core->util;
+
+		$this->option_name              = $this->migrate_core->configs['option_name'];
+		$this->lists_option_name        = $this->migrate_core->configs['lists_option_name'];
+		$this->open_batches_option_name = $this->migrate_core->configs['open_batches_option_name'];
+		$this->authd_sites_option_name  = $this->migrate_core->configs['authd_sites_option_name'];
 
 		$this->add_hooks();
 	}
@@ -451,7 +474,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		$site_url = sanitize_text_field( $_POST['url'] );
 
-		$authd_sites = get_option( 'boldgrid_transfer_authd_sites', array() );
+		$authd_sites = get_option( $this->authd_sites_option_name, array() );
 		
 		if ( ! isset( $authd_sites[ $site_url ] ) ) {
 			$this->migrate_core->log->add( 'Site ' . $site_url . ' not authenticated.' );
@@ -614,7 +637,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		$time_since_last_heartbeat = time() - $this->util->get_transfer_heartbeat();
 
 		// If the last heartbeat was more than 120 seconds ago, then find the stalled file / files and retry them.
-		if ( BOLDGRID_TRANSFER_STALLED_TIMEOUT > $time_since_last_heartbeat ) {
+		if ( $this->migrate_core->configs['stalled_timeout'] > $time_since_last_heartbeat ) {
 			return;
 		}
 
@@ -870,7 +893,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	}
 
 	public function remove_stale_batches() {
-		$open_batches = get_option( 'boldgrid_transfer_open_batches', array() );
+		$open_batches = get_option( $this->open_batches_option_name, array() );
 
 		// Select all open batches that are older than 2 minutes.
 		$stale_batches = array_filter( $open_batches, function( $batch ) {
@@ -885,21 +908,21 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		$open_batches = array_diff_key( $open_batches, $stale_batches );
 
-		update_option( 'boldgrid_transfer_open_batches', $open_batches );
+		update_option( $this->open_batches_option_name, $open_batches );
 	}
 
 	public function determine_open_batches() {
-		wp_cache_delete( 'boldgrid_transfer_open_batches', 'options' );
+		wp_cache_delete( $this->open_batches_option_name, 'options' );
 
 		$this->remove_stale_batches();
 		
-		return count( get_option( 'boldgrid_transfer_open_batches', array() ) );
+		return count( get_option( $this->open_batches_option_name, array() ) );
 	}
 
 	public function update_open_batches( $open_batches = array() ) {
-		wp_cache_delete( 'boldgrid_transfer_open_batches', 'options' );
+		wp_cache_delete( $this->open_batches_option_name, 'options' );
 			
-		update_option( 'boldgrid_transfer_open_batches', $open_batches );
+		update_option( $this->open_batches_option_name, $open_batches );
 	}
 
 	public function update_transfer_rate( $transfer_id, $transfer_rate ) {
@@ -1051,20 +1074,20 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	}
 
 	public function add_open_batch( $batch_id ) {
-		wp_cache_delete( 'boldgrid_transfer_open_batches', 'options' );
-		$open_batches = get_option( 'boldgrid_transfer_open_batches', array() );
+		wp_cache_delete( $this->open_batches_option_name, 'options' );
+		$open_batches = get_option( $this->open_batches_option_name, array() );
 		$open_batches[ $batch_id ] = time();
 
-		update_option( 'boldgrid_transfer_open_batches', $open_batches );
+		update_option( $this->open_batches_option_name, $open_batches );
 		$this->util->update_transfer_heartbeat();
 	}
 
 	public function remove_open_batch( $batch_id ) {
-		wp_cache_delete( 'boldgrid_transfer_open_batches', 'options' );
-		$open_batches = get_option( 'boldgrid_transfer_open_batches', array() );
+		wp_cache_delete( $this->open_batches_option_name, 'options' );
+		$open_batches = get_option( $this->open_batches_option_name, array() );
 		unset( $open_batches[ $batch_id ] );
 
-		update_option( 'boldgrid_transfer_open_batches', $open_batches );
+		update_option( $this->open_batches_option_name, $open_batches );
 	}
 
 	public function process_batch( $transfer, $file_batch, $route ) {
@@ -1076,7 +1099,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		$namespace   = $this->migrate_core->configs['REST']['namespace'];
 		$request_url = $site_url . '/wp-json/' . $namespace . $route;
 
-		$authd_sites = get_option( 'boldgrid_transfer_authd_sites', array() );
+		$authd_sites = get_option( $this->authd_sites_option_name, array() );
 		$auth        = isset( $authd_sites[ $site_url ] ) ? $authd_sites[ $site_url ] : false;
 
 		if ( ! $auth ) {

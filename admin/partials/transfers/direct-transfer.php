@@ -4,18 +4,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+$configs = $this->core->configs['direct_transfer'];
+error_log( '$configs: ' . json_encode( $configs ) );
+
 if ( isset( $_GET['user_login'] ) ) {
-	$authd_sites = get_option( 'boldgrid_transfer_authd_sites', array() );
+	$authd_sites = get_option( $configs['authd_sites_option_name'], array() );
 	$authd_sites[ $_GET['site_url'] ] = array(
 		'user' => $_GET['user_login'],
 		'pass' => Boldgrid_Backup_Admin_Crypt::crypt( $_GET['password'], 'e' )
 	);
 
-	update_option( 'boldgrid_transfer_authd_sites', $authd_sites );
+	update_option( $configs['authd_sites_option_name'], $authd_sites );
 }
 
-$authd_sites = get_option( 'boldgrid_transfer_authd_sites', array() );
-$transfers   = get_option( 'boldgrid_transfer_xfers', array() );
+$authd_sites = get_option( $configs['authd_sites_option_name'], array() );
+$transfers   = get_option( $configs['option_name'], array() );
 
 $table = '<table class="wp-list-table widefat fixed striped pages bgbkup-transfers-sites-table">
 	<thead>

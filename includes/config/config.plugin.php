@@ -133,4 +133,17 @@ return [
 		'*/30 * * * *' => esc_html__( 'Every 30 Minutes', 'boldgrid-backup' ),
 		'0 * * * *'    => esc_html__( 'Once Every Hour', 'boldgrid-backup' ),
 	),
+	'direct_transfer'      => array(
+		'rest_api_namespace'       => 'boldgrid-backup/v1/migrate',
+		'batch_chunks'             => 10,
+		'chunk_size'               => 50,
+		'stalled_timout'           => 120,
+		'cron_interval'            => 60,
+		'conn_timeout'             => 60,
+		'option_name'              => 'boldgrid_backup_xfers',
+		'lists_option_name'        => 'boldgrid_backup_xfer_file_lists',
+		'open_batches_option_name' => 'boldgrid_backup_open_xfer_batches',
+		'authd_sites_option_name'  => 'boldgrid_backup_xfer_authd_sites',
+		'hearbeat_option_name'     => 'boldgrid_backup_xfer_heartbeat',
+	),
 ];

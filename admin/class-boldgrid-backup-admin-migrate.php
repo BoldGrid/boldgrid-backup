@@ -69,8 +69,9 @@ class Boldgrid_Backup_Admin_Migrate {
 	 */
 	public function __construct( $backup_core ) {
 		$this->backup_core = $backup_core;
+		$this->configs     = $backup_core->configs['direct_transfer'];
 		$this->log         = new Boldgrid_Backup_Admin_Log( $this->backup_core );
-		$this->log->init( 'v2-transfers' );
+		$this->log->init( 'direct-transfers' );
 
 		$this->util  = new Boldgrid_Backup_Admin_Migrate_Util( $this );
 		$this->tx    = new Boldgrid_Backup_Admin_Migrate_Tx( $this );
