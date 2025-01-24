@@ -495,8 +495,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 	 */
 	public function export_options( $transfer_dir ) {
 		$options = $this->migrate_core->configs['option_names'];
-		$backup_dir = $this->migrate_core->util->get_backup_dir();
-		$backup_options_file = $backup_dir . 'direct-transfer-options.json';
+		$backup_options_file = $transfer_dir . '/direct-transfer-options.json';
 
 		$this->migrate_core->log->add( 'Exporting options to: ' . $backup_options_file );
 
