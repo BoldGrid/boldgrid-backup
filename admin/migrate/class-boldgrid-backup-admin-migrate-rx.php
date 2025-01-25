@@ -507,7 +507,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		$db_file_hash = $db_dump_info['db_hash'];
 		
 		$max_upload_size = $this->util->get_max_upload_size();
-		if ( $db_file_size > $max_upload_size ) {
+		if ( $db_file_size > ( $max_upload_size / 10 ) ) {
 			$this->migrate_core->log->add( 'Database dump file size exceeds the maximum upload size and must be split' );
 			$db_files = $this->split_db_file( $transfer );
 		} else {
