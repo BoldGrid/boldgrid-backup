@@ -104,8 +104,6 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 		}
 
 		$this->migrate_core->rx->update_transfer_prop( $transfer_id, 'status', 'pending-restore' );
-
-		$result = $this->migrate_site( $transfers[ $transfer_id ], $transfer_id );
 		
 		wp_send_json_success( $result );
 	}

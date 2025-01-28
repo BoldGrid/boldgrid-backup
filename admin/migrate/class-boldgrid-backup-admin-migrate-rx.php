@@ -487,7 +487,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 				$this->process_db_rx( $transfer_id );
 				break;
 			case 'pending-restore':
-				$this->migrate_core->restore->restore_site( $transfer );
+				$this->migrate_core->restore->restore_site( $transfer, $transfer_id );
 				break;
 		}
 	}
@@ -893,6 +893,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 				$progress_data['progress'] = 0;
 				$progress_data['progress_text'] = 'Pending Restore';
 				$progress_data['progress_status_text'] = 'Pending Restore';
+				$this->process_transfers();
 				break;
 			case 'restoring-files':
 				$progress_data['status'] = 'restoring-files';
