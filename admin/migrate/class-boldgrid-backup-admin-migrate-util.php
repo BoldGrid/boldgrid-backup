@@ -34,7 +34,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	public $excluded_paths = array(
 		'.git',
 		'node_modules',
-		'boldgrid-transfer'
+		'boldgrid-backup'
 	);
 
 	/**

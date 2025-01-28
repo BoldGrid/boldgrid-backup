@@ -15,7 +15,7 @@
 		_bindEvents: function() {
 			var $authButton  = $( '#auth_transfer' ),
 				$xferButtons = $( 'button.start-transfer' ),
-				$migrateButton = $( 'button.migrate-site' ),
+				$restoreButton = $( 'button.restore-site' ),
 				$resyncDbButton = $( 'button.resync-database' ),
 				$cancelButton = $( 'button.cancel-transfer' ),
 				$deleteButton = $( 'button.delete-transfer' ),
@@ -37,13 +37,13 @@
 				self._startTransfer( $this, url, nonce );
 			} );
 
-			$migrateButton.on( 'click', function( e ) {
+			$restoreButton.on( 'click', function( e ) {
 				var $this      = $( e.currentTarget ),
 					transferId = $this.data( 'transferId' ),
-					nonce      = $( '#migrate_site_nonce' ).val();
+					nonce      = $( '#restore_site_nonce' ).val();
 
 				e.preventDefault();
-				self._startMigrate( $this, transferId, nonce );
+				self._startRestore( $this, transferId, nonce );
 			} );
 
 			$resyncDbButton.on( 'click', function( e ) {
@@ -83,20 +83,20 @@
 				self._cancelTransfer( $this, transferId, nonce );
 			} );
 		},
-		_startMigrate: function( $button, transferId, nonce ) {
+		_startRestore: function( $button, transferId, nonce ) {
 			$button.prop( 'disabled', true );
 			$.ajax( {
 				url: ajaxurl,
 				method: 'POST',
 				data: {
-					'action': 'boldgrid_transfer_migrate_site',
+					'action': 'boldgrid_transfer_start_restore',
 					'transfer_id': transferId,
 					'nonce': nonce
 				},
 			} ).done( function( response ) {
 				console.log( response );
 				if ( response.success ) {
-					$button.text( 'Migrated' );
+					$button.text( 'Restoring' );
 				}
 			} );
 		},

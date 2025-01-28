@@ -81,7 +81,7 @@ if ( empty( $transfers ) ) {
 		$action_buttons = '';
 		if ( 'completed' === $transfer['status'] ) {
 			$status = 'completed';
-			$action_buttons  = '<button class="migrate-site button-primary" data-transfer-id="' . esc_attr( $transfer['transfer_id'] ) . '">Migrate</button>';
+			$action_buttons  = '<button class="restore-site button-primary" data-transfer-id="' . esc_attr( $transfer['transfer_id'] ) . '">Restore</button>';
 			$action_buttons .= '<button class="delete-transfer button-secondary" data-transfer-id="' . esc_attr( $transfer['transfer_id'] ) . '">Delete</button>';
 			$action_buttons .= '<button class="resync-database button-secondary" data-transfer-id="' . esc_attr( $transfer['transfer_id'] ) . '">Resync Database</button>';
 		} else if ( 'canceled' === $transfer['status'] ) {
@@ -130,7 +130,7 @@ $transfer_table .= '</tbody></table>';
 $start_transfer_nonce_field  = wp_nonce_field( 'boldgrid_transfer_start_rx', 'transfer_start_nonce' );
 $auth_transfer_nonce_field   = wp_nonce_field( 'boldgrid_transfer_auth_tx', 'transfer_auth_nonce' );
 $check_status_nonce_field    = wp_nonce_field( 'boldgrid_transfer_check_status', 'check_status_nonce' );
-$migrate_site_nonce_field    = wp_nonce_field( 'boldgrid_transfer_migrate_site', 'migrate_site_nonce' );
+$restore_site_nonce_field    = wp_nonce_field( 'boldgrid_transfer_restore_site', 'restore_site_nonce' );
 $resync_database_nonce       = wp_nonce_field( 'boldgrid_transfer_resync_database', 'resync_database_nonce' );
 $cancel_transfer_nonce_field = wp_nonce_field( 'boldgrid_transfer_cancel_transfer', 'cancel_transfer_nonce' );
 $delete_transfer_nonce_field = wp_nonce_field( 'boldgrid_transfer_delete_transfer', 'delete_transfer_nonce' );
@@ -170,7 +170,7 @@ return sprintf(
 	$start_transfer_nonce_field,
 	$auth_transfer_nonce_field,
 	$check_status_nonce_field,
-	$migrate_site_nonce_field,
+	$restore_site_nonce_field,
 	$cancel_transfer_nonce_field,
 	$delete_transfer_nonce_field,
 	$test_results_modal

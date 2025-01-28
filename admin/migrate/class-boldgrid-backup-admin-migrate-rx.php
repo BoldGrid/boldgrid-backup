@@ -486,6 +486,9 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			case 'db-transferring':
 				$this->process_db_rx( $transfer_id );
 				break;
+			case 'pending-restore':
+				$this->migrate_core->restore->restore_site( $transfer );
+				break;
 		}
 	}
 
@@ -811,6 +814,12 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 				$progress_data['progress_text'] = 'Transfer Complete';
 				$progress_data['progress_status_text'] = 'Completed';
 				break;
+			case 'restore-completed':
+				$progress_data['status'] = 'completed';
+				$progress_data['progress'] = 100;
+				$progress_data['progress_text'] = 'Restoration Complete';
+				$progress_data['progress_status_text'] = 'Restoration Complete';
+				break;
 			case 'pending':
 				$progress_data['status'] = 'pending';
 				$progress_data['progress'] = 0;
@@ -878,6 +887,24 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 				if ( isset ( $verification_data['error'] ) && $verification_data['error'] ) {
 					wp_send_json_error( array( 'message' => $verification_data['message'] ) );
 				}
+				break;
+			case 'pending-restore':
+				$progress_data['status'] = 'pending-restore';
+				$progress_data['progress'] = 0;
+				$progress_data['progress_text'] = 'Pending Restore';
+				$progress_data['progress_status_text'] = 'Pending Restore';
+				break;
+			case 'restoring-files':
+				$progress_data['status'] = 'restoring-files';
+				$progress_data['progress'] = 0;
+				$progress_data['progress_text'] = 'Restoring Files';
+				$progress_data['progress_status_text'] = 'Restoring Files';
+				break;
+			case 'restoring-db':
+				$progress_data['status'] = 'restoring-db';
+				$progress_data['progress'] = 0;
+				$progress_data['progress_text'] = 'Restoring Database';
+				$progress_data['progress_status_text'] = 'Restoring Database';
 				break;
 		}
 

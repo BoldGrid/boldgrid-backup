@@ -78,7 +78,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 	 * @since 0.0.7
 	 */
 	public function add_hooks() {
-		add_action( 'wp_ajax_boldgrid_transfer_migrate_site', array( $this, 'ajax_migrate_site' ) );
+		add_action( 'wp_ajax_boldgrid_transfer_start_restore', array( $this, 'ajax_start_restore' ) );
 	}
 
 	/**
@@ -86,8 +86,8 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 	 * 
 	 * @since 0.0.1
 	 */
-	public function ajax_migrate_site() {
-		check_ajax_referer( 'boldgrid_transfer_migrate_site', 'nonce' );
+	public function ajax_start_restore() {
+		check_ajax_referer( 'boldgrid_transfer_start_restore', 'nonce' );
 
 		$transfer_id = sanitize_text_field( $_POST['transfer_id'] );
 
@@ -97,24 +97,27 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 
 		if ( ! isset( $transfers[ $transfer_id ] ) ) {
 			$this->migrate_core->log->add(
-				'Attempted to migrate invalid transfer: ' . $transfer_id .
+				'Attempted to restore invalid transfer: ' . $transfer_id .
 				' - Transfer ID must be present in the following list: ' . json_encode( array_keys( $transfers ) )
 			);
 			wp_send_json_error( array( 'message' => 'Invalid transfer ID.' ) );
 		}
+
+		$this->migrate_core->rx->update_transfer_prop( $transfer_id, 'status', 'pending-restore' );
 
 		$result = $this->migrate_site( $transfers[ $transfer_id ], $transfer_id );
 		
 		wp_send_json_success( $result );
 	}
 
-	public function migrate_site( $transfer, $transfer_id ) {
+	public function restore_site( $transfer, $transfer_id ) {
 		$migrate_start_time = microtime( true );
 		$transfer_dir       = $this->util->get_transfer_dir();
 		$source_dir         = $this->util->url_to_safe_directory_name( $transfer['source_site_url'] );
 		$transfer_dir       = $transfer_dir . '/' . $source_dir . '/' . $transfer_id . '/';
 
 		$this->migrate_core->log->add( 'Starting migration for transfer ID ' . $transfer_id );
+		$this->migrate_core->rx->update_transfer_prop( $transfer_id, 'status', 'restoring-files' );
 
 		// 1. Download and extract the wordpress core files for the version specified in the transfer.
 		if ( ! $this->download_extract_wordpress( $transfer_dir, $transfer['source_wp_version'] ) ) {
@@ -144,6 +147,8 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 
 		$this->migrate_core->log->add( '$db_file: ' . json_encode( $db_file, JSON_PRETTY_PRINT ) );
 
+		$this->migrate_core->rx->update_transfer_prop( $transfer_id, 'status', 'restoring-db' );
+
 		// 5. Export the options to a file.
 		$options_file = $this->export_options( $transfer_dir );
 
@@ -161,6 +166,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 
 		$migration_end_time = microtime( true );
 		$time_to_migrate    = $migration_end_time - $migrate_start_time;
+		$this->migrate_core->rx->update_transfer_prop( $transfer_id, 'status', 'restore-completed' );
 		$this->migrate_core->log->add(
 			sprintf(
 				'Completed migration for transfer ID %1$s in %2$s.',
