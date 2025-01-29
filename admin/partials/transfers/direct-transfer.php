@@ -135,16 +135,25 @@ $transfer_table .= '</tbody></table>';
 return sprintf(
 	'<div class="bgbkup-transfers-rx">
 		<h2>%1$s</h2>
+		<p>%2$s</p>
+		<h3>%3$s</h3>
 		<div class="boldgrid-transfer-input-fields">
 			<input id="auth_admin_url" name="auth_admin_url" type="text" placeholder="http://example.com/wp-admin/" />
-			<input id="app_uuid" name="app_uuid" type="hidden" value"%2$s" />
-			<button id="auth_transfer" class="button-primary">Authenticate</button>
+			<input id="app_uuid" name="app_uuid" type="hidden" value="%4$s" />
+			<button id="auth_transfer" class="button-primary">%5$s</button>
 		</div>
-		%3$s
-		%4$s
+		%6$s
+		%7$s
 	</div>',
-	esc_html__( 'Use this section if you want to select this WordPress installation as the destination.', 'boldgrid_backup' ),
+	esc_html__( 'Direct Transfer', 'boldgrid_backup' ),
+	esc_html__(
+		'The direct transfer feature allows you to transfer files from another website to this site without having to make a backup first. ' .
+		'The Total Upkeep plugin must be installed on both this site AND the source site.',
+		'boldgrid_backup'
+	),
+	esc_html__( 'Enter the source site\'s Admin URL below in order to generate an application password. ', 'boldgrid_backup' ),
 	esc_attr( wp_generate_uuid4() ),
+	esc_html__( 'Authenticate', 'boldgrid_backup' ),
 	$table,
 	$transfer_table
 );

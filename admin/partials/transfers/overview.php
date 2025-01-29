@@ -20,9 +20,10 @@ return sprintf(
 	<h2>%1$s</h2>
 	<p>%2$s</p>
 	<p>%3$s</p>
+	<p>%4$s</p>
 </div>',
 	esc_html__( 'Easily transfer websites!', 'boldgrid_backup' ),
 	esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'provides an easy way to transfer a website from one installation to another.', 'boldgrid_backup' ) ),
 	esc_html__( 'Use the section selection on the left to choose if this WordPress installation is either the source or destination.', 'boldgrid_backup' ),
-	esc_html__( 'You can also try using our new "Direct Transfer" feature to transfer a website without creating a backup.', 'boldgrid_backup' )
+	esc_html__( 'You can also try using our new "Direct Transfer" feature to transfer the files from a website without having to create a backup.', 'boldgrid_backup' )
 );
