@@ -21,58 +21,59 @@
 class Boldgrid_Backup_Admin_Migrate {
 	/**
 	 * Plugin Configs
-	 * 
+	 *
 	 * @var array
-	 * 
+	 *
 	 * @since 1.17.0
 	 */
 	public $configs = array();
+
 	/**
 	 * Backup Core
-	 * 
+	 *
 	 * @var Boldgrid_Backup_Admin_Core
-	 * 
+	 *
 	 * @since 1.17.0
 	 */
 	public $backup_core;
 
 	/**
 	 * Log
-	 * 
+	 *
 	 * @var Boldgrid_Backup_Admin_Log
 	 */
 	public $log;
 
 	/**
 	 * Boldgrid_Transfer_ Tx instance
-	 * 
+	 *
 	 * @var Boldgrid_Transfer_Tx
-	 * 
+	 *
 	 * @since 1.17.0
 	 */
 	public $tx;
 
 	/**
 	 * Boldgrid_Transfer_Rx instance
-	 * 
+	 *
 	 * @var Boldgrid_Transfer_Rx
-	 * 
+	 *
 	 * @since 1.17.0
 	 */
 	public $rx;
 
 	/**
 	 * Boldgrid_Transfer_Util instance
-	 * 
+	 *
 	 * @var Boldgrid_Transfer_Util
-	 * 
+	 *
 	 * @since 1.17.0
 	 */
 	public $util;
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @since 1.17.0
 	 */
 	public function __construct( $backup_core ) {

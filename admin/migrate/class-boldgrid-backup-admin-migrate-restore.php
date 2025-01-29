@@ -70,6 +70,18 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 		$this->lists_option_name    = $this->migrate_core->configs['option_names']['file_lists'];
 	}
 
+	/**
+	 * Restore Site
+	 * 
+	 * Restores a Site that has been transferred.
+	 *
+	 * @param array $transfer
+	 * @param string $transfer_id
+	 * 
+	 * @return array The result of the restore operation
+	 * 
+	 * @since 1.17.0
+	 */
 	public function restore_site( $transfer, $transfer_id ) {
 		$migrate_start_time = microtime( true );
 		$transfer_dir       = $this->util->get_transfer_dir();
@@ -143,13 +155,13 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 
 	/**
 	 * Separate DB Dump from files
-	 * 
-	 * @since 1.17.0
-	 * 
-	 * @param array  $files          The files to separate the db dump from
-	 * @param string $db_dump_path   The path to the db dump file
+	 *
+	 * @param array  $files        The files to separate the db dump from
+	 * @param string $db_dump_path The path to the db dump file
 	 * 
 	 * @return array The db dump file
+	 * 
+	 * @since 1.17.0
 	 */
 	public function seperate_db_from_files( $files, $db_dump_path ) {
 		$db_dump_basename = basename( $db_dump_path );
@@ -174,12 +186,12 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 	 * should merge the wordpress core files with the transfered files,
 	 * merging directories when necessary, but not overridding any files.
 	 * 
-	 * @since 1.17.0
-	 * 
 	 * @param string $transfer_dir The directory transfered files are located in
 	 * @param string $wp_version   The version of wordpress to download
-	 * 
+	 *
 	 * @return bool True if the download and extraction was successful, false otherwise
+	 *
+	 * @since 1.17.0
 	 */
 	public function download_extract_wordpress( $transfer_dir, $wp_version ) {
 		// Validate Inputs
@@ -318,8 +330,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 	/**
 	 * Restore the WordPress database from a dump file.
 	 *
-	 * @since 1.0
-	 * @access private
+	 * @since 1.17.0
 	 *
 	 * @see Boldgrid_Backup_Admin_Test::run_functionality_tests()
 	 * @see Boldgrid_Backup_Admin_Backup_Dir::get()
@@ -448,7 +459,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 		return true;
 	}
 
-		/**
+	/**
 	 * Export Options
 	 * 
 	 * Export all the options in the
@@ -497,6 +508,15 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 		$this->migrate_core->log->add( 'Finished restoring options.' );
 	}
 
+	/**
+	 * Update Table Prefix
+	 *
+	 * @param string $new_db_prefix The new database prefix
+	 * 
+	 * @return bool True if the update was successful, false otherwise
+	 * 
+	 * @since 1.17.0
+	 */
 	public function update_table_prefix( $new_db_prefix ) {
 		$wp_config_path = ABSPATH . 'wp-config.php';
 		$wp_config      = file_get_contents( $wp_config_path );
@@ -509,8 +529,8 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 
 		$wp_config = preg_replace( $pattern, $replacement, $wp_config );
 		
-		file_put_contents( $wp_config_path, $wp_config );
+		$result = file_put_contents( $wp_config_path, $wp_config );
 
-		return true;
+		return $result ? true : false;
 	}
 }
