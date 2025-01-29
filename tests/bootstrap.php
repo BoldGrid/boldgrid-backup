@@ -121,6 +121,14 @@ $files = array(
 	'/admin/remote/class-boldgrid-backup-admin-ftp-hooks.php',
 	'/admin/remote/class-boldgrid-backup-admin-ftp-page.php',
 	'/admin/remote/class-boldgrid-backup-admin-remote-settings.php',
+	// Direct Transfers
+	'/admin/class-boldgrid-backup-admin-migrate.php',
+	'/admin/migrate/class-boldgrid-backup-admin-migrate-rx-rest.php',
+	'/admin/migrate/class-boldgrid-backup-admin-migrate-tx-rest.php',
+	'/admin/migrate/class-boldgrid-backup-admin-migrate-restore.php',
+	'/admin/migrate/class-boldgrid-backup-admin-migrate-rx.php',
+	'/admin/migrate/class-boldgrid-backup-admin-migrate-tx.php',
+	'/admin/migrate/class-boldgrid-backup-admin-migrate-util.php',
 	// Vendor.
 	'/vendor/phpseclib/phpseclib/phpseclib/Net/SSH2.php',
 	'/vendor/ifsnop/mysqldump-php/src/Ifsnop/Mysqldump/Mysqldump.php',
