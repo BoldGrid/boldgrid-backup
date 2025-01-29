@@ -11,6 +11,16 @@
 		_onLoad: function() {
 			self._bindEvents();
 			self._checkReceiveStatus();
+			console.log( wpApiSettings );
+		},
+		_restRequest: function( endpoint, method, data, callback, callbackArgs = {} ) {
+			wp.apiRequest( {
+				path: '/boldgrid-backup/v1/direct-transfer/' + endpoint,
+				method: method,
+				data: data,
+			} ).then( function( response ) {
+				callback( response, callbackArgs );
+			} );
 		},
 		_bindEvents: function() {
 			var $authButton  = $( '#auth_transfer' ),
@@ -30,11 +40,16 @@
 
 			$xferButtons.on( 'click', function( e ) {
 				var $this = $( e.currentTarget ),
-					url   = $this.data( 'url' ),
-					nonce = $( '#transfer_start_nonce' ).val();
-
+					url   = $this.data( 'url' );
 				e.preventDefault();
-				self._startTransfer( $this, url, nonce );
+				$this.prop( 'disabled', true );
+				self._restRequest(
+					'start-migration',
+					'POST',
+					{ url: url },
+					self._startTransfer,
+					{ $startButton: $this, url: url }
+				);
 			} );
 
 			$restoreButton.on( 'click', function( e ) {
@@ -43,7 +58,15 @@
 					nonce      = $( '#restore_site_nonce' ).val();
 
 				e.preventDefault();
-				self._startRestore( $this, transferId, nonce );
+				$this.prop( 'disabled', true );
+				$this.text( 'Restoring...' );
+				self._restRequest(
+					'start-restore',
+					'POST',
+					{ transfer_id: transferId },
+					self._startRestoreCallback,
+					{ $restoreButton: $this }
+				);
 			} );
 
 			$resyncDbButton.on( 'click', function( e ) {
@@ -52,7 +75,14 @@
 					nonce      = $( '#resync_database_nonce' ).val();
 
 				e.preventDefault();
-				self._startResyncDb( $this, transferId, nonce );
+
+				$this.prop( 'disabled', true );
+				self._restRequest(
+					'resync-database',
+					'POST',
+					{ transfer_id: transferId },
+					self._resyncCallback
+				);
 			} );
 
 			$deleteButton.on( 'click', function( e ) {
@@ -61,7 +91,16 @@
 					nonce      = $( '#delete_transfer_nonce' ).val();
 
 				e.preventDefault();
-				self._deleteTransfer( $this, transferId, nonce );
+				$this.prop( 'disabled', true );
+				$this.text( 'Deleting...' );
+
+				self._restRequest(
+					'delete-transfer',
+					'POST',
+					{ transfer_id: transferId },
+					self._deleteCallback,
+					{ $deleteButton: $this }
+				);
 			} );
 
 			$authButton.on( 'click', function( e ) {
@@ -80,117 +119,65 @@
 					nonce      = $( '#cancel_transfer_nonce' ).val();
 
 				e.preventDefault();
-				self._cancelTransfer( $this, transferId, nonce );
+				$this.prop( 'disabled', true );
+				$this.text( 'Cancelling...' );
+				self._restRequest(
+					'cancel-transfer',
+					'POST',
+					{ transfer_id: transferId },
+					self._cancelCallback,
+					{ $cancelButton: $this }
+				);
 			} );
 		},
-		_startRestore: function( $button, transferId, nonce ) {
-			$button.prop( 'disabled', true );
-			$.ajax( {
-				url: ajaxurl,
-				method: 'POST',
-				data: {
-					'action': 'boldgrid_transfer_start_restore',
-					'transfer_id': transferId,
-					'nonce': nonce
-				},
-			} ).done( function( response ) {
-				console.log( response );
-				if ( response.success ) {
-					$button.text( 'Restoring' );
-				}
-			} );
+		_startRestoreCallback: function( response, args ) {
+			var $button = args.$restoreButton;
+			if ( response.success ) {
+				$button.text( 'Restoring' );
+			}
 		},
-		_startResyncDb: function( $button, transferId, nonce ) {
-			$button.prop( 'disabled', true );
-			$.ajax( {
-				url: ajaxurl,
-				method: 'POST',
-				data: {
-					'action': 'boldgrid_transfer_resync_database',
-					'transfer_id': transferId,
-					'nonce': nonce
-				},
-			} ).done( function( response ) {
-				console.log( response );
-				if ( response.success ) {
-					window.location.reload();
-				}
-			} );
+		_resyncCallback: function( response, args ) {
+			if ( response.success ) {
+				window.location.reload();
+			}
 		},
-		_cancelTransfer: function( $button, transferId, nonce ) {
-			$button.prop( 'disabled', true );
-			$button.text( 'Cancelling...' );
-			$.ajax( {
-				url: ajaxurl,
-				method: 'POST',
-				data: {
-					'action': 'boldgrid_transfer_cancel_transfer',
-					'transfer_id': transferId,
-					'nonce': nonce
-				},
-			} ).done( function( response ) {
-				console.log( response );
-				if ( response.success ) {
-					$button.text( 'Cancelled' );
-					// Wait 3 seconds then reload page.
-					setTimeout( function() {
-						location.reload();
-					}, 3000 );
-				}
-			} );
+		_cancelCallback: function( response, args ) {
+			var $button = args.$cancelButton;
+			if ( response.success ) {
+				$button.text( 'Cancelled' );
+				// Wait 3 seconds then reload page.
+				setTimeout( function() {
+					location.reload();
+				}, 3000 );
+			}
 		},
-		_deleteTransfer: function( $button, transferId, nonce ) {
-			$button.prop( 'disabled', true );
-			$button.text( 'Deleting...' );
-			$.ajax( {
-				url: ajaxurl,
-				method: 'POST',
-				data: {
-					'action': 'boldgrid_transfer_delete_transfer',
-					'transfer_id': transferId,
-					'nonce': nonce
-				},
-			} ).done( function( response ) {
-				console.log( response );
-				if ( response.success ) {
-					$button.text( 'Deleted' );
-					// Wait 3 seconds then reload page.
-					setTimeout( function() {
-						location.reload();
-					}, 3000 );
-				} else {
-					$button.text( 'Delete Error. Refresh and try again.' );
-				}
-			} );
+		_deleteCallback: function( response, args ) {
+			var $button = args.$deleteButton;
+			console.log( response );
+			if ( response.success ) {
+				$button.text( 'Deleted' );
+				// Wait 2 seconds then reload page.
+				setTimeout( function() {
+					location.reload();
+				}, 2000 );
+			} else {
+				$button.text( 'Delete Error. Refresh and try again.' );
+			}
 		},
-		_startTransfer: function( $button, url, nonce ) {
+		_startTransfer: function( response, args ) {
+			var $button = args.$startButton,
+				url     = args.url;
 			$button.prop( 'disabled', true );
-
-			$.ajax( {
-				url: ajaxurl,
-				method: 'POST',
-				data: {
-					'action': 'boldgrid_transfer_start_rx',
-					'url': url,
-					'nonce': nonce
-				},
-			} ).done( function( response ) {
-				console.log( { response } );
-				if ( response.success ) {
-					var transferId = response.data.transfer_id;
-					$button.text( 'Transfer Started' );
-					$button.addClass( 'transfer-started' );
-					$button.prop( 'style', 'color: #2271b1 !important' );
-					self._processTransfer( transferId );
-					setTimeout( function() {
-						self._addTransferRow( transferId, url );
-					}, 3000 );
-				} else if ( false === response.success && response.data.tests ) {
-					self._checkResultsAndOpenModal( response.data.tests );
-					$button.text( 'Preflight Tests Failed' );
-					$button.addClass( 'preflight-tests-failed' );
-				}
-			} );
+			console.log( { response } );
+			if ( response.success ) {
+				var transferId = response.data.transfer_id;
+				$button.text( 'Transfer Started' );
+				$button.addClass( 'transfer-started' );
+				$button.prop( 'style', 'color: #2271b1 !important' );
+				setTimeout( function() {
+					self._addTransferRow( transferId, url );
+				}, 3000 );
+			}
 		},
 		_checkResultsAndOpenModal: function( results ) {
 			// Collect messages of items with `result` as false
@@ -256,85 +243,83 @@
 			} );
 			window.location.href = authAdminUrl + endpointUri + '?' + params;
 		},
-		_processTransfer: function( transferId ) {
-			var nonce = $( '#verify_files_nonce' ).val();
-			$.ajax( {
-				url: ajaxurl,
-				method: 'POST',
-				data: {
-					'action': 'boldgrid_transfer_verify_files',
-					'nonce' : nonce,
-					'type': 'rx',
-					'transfer_id': transferId,
-				},
-			} );
-		},
 		_checkReceiveStatus: function() {
-			var $statusRow = $( '.bgbkup-transfers-rx tr.progress-row:not( .hidden ):not( .canceled )' );
+			var $statusRow = $( '.bgbkup-transfers-rx tr.progress-row:not( .hidden ):not( .canceled ):not( .completed )' );
 
 			$statusRow.each( function( index, row ) {
 				console.log( $statusRow );
 				$( row ).attr( 'data-intervalId', setInterval( self._checkRxStatus, 15000, row ) );
+				transferId = $( row ).data( 'transferId' );
 				self._checkRxStatus( row );
 			} );
+		},
+		_updateProgress: function( response, args ) {
+			var $progressBar        = args.$progressBar,
+				$progressBarFill    = args.$progressBarFill,
+				$progressStatusText = args.$progressStatusText,
+				$timeElapsedText	= args.$timeElapsedText,
+				$progressText       = args.$progressText,
+				$row				= args.$row;
+
+			if ( response.success ) {
+				var status             = response.data.status,
+					progress           = response.data.progress,
+					progressText       = response.data.progress_text,
+					progressStatusText = response.data.progress_status_text,
+					timeElapsed        = response.data.elapsed_time;
+
+				
+				if ( 'completed' === status ) {
+					$row.addClass( 'completed' );
+					$progressBar.addClass( 'completed' );
+					clearInterval( $row.data( 'intervalId' ) );
+
+					status = 'Completed';
+					progress = 100;
+					progressText = '100%';
+					progressStatusText = progressStatusText;
+				}
+
+				$progressBarFill.css( 'width', progress + '%' );
+				$progressText.text( progressText );
+				$progressStatusText.text( progressStatusText );
+				$timeElapsedText.text( timeElapsed );
+
+				console.log( { response: response.data } );
+
+				if ( 'canceled' === status ) {
+					console.log( 'canceled' );
+					$row.addClass( 'canceled' );
+					$progressStatusText.text( 'Canceled' );
+				}
+			} else {
+				console.log( response );
+				$row.addClass( 'error' );
+			}
 		},
 		_checkRxStatus: function( row ) {
 			var $row                = $( row ),
 				transferId          = $row.data( 'transferId' ),
-				nonce               = $( '#check_status_nonce' ).val(),
 				$progressBar        = $row.find( '.progress-bar' ),
 				$progressText       = $row.find( '.progress-bar-text' ),
 				$progressBarFill    = $row.find( '.progress-bar-fill' ),
 				$progressStatusText = $('.bgbkup-transfers-rx tr.transfer-info[data-transfer-id=' + transferId + ']').find( '.status' ),
 				$timeElapsedText    = $('.bgbkup-transfers-rx tr.transfer-info[data-transfer-id=' + transferId + ']').find( '.time_elapsed' );
 
-			console.log(  { row } );
-			$.ajax( {
-				url: ajaxurl,
-				method: 'POST',
-				data: {
-					'action': 'boldgrid_transfer_check_status',
-					'nonce' : nonce,
-					'type': 'rx',
-					'transfer_id': transferId,
-				},
-			} ).done( function( response ) {
-				if ( response.success ) {
-					var status             = response.data.status,
-						progress           = response.data.progress,
-						progressText       = response.data.progress_text,
-						progressStatusText = response.data.progress_status_text,
-						timeElapsed        = response.data.elapsed_time;
-
-					
-					if ( 'completed' === status ) {
-						$row.addClass( 'completed' );
-						$progressBar.addClass( 'completed' );
-						clearInterval( $row.data( 'intervalId' ) );
-
-						status = 'Completed';
-						progress = 100;
-						progressText = '100%';
-						progressStatusText = 'Transfer Completed';
-					}
-
-					$progressBarFill.css( 'width', progress + '%' );
-					$progressText.text( progressText );
-					$progressStatusText.text( progressStatusText );
-					$timeElapsedText.text( timeElapsed );
-
-					console.log( { response: response.data } );
-
-					if ( 'canceled' === status ) {
-						console.log( 'canceled' );
-						$row.addClass( 'canceled' );
-						$progressStatusText.text( 'Canceled' );
-					}
-				} else {
-					console.log( response );
-					$row.addClass( 'error' );
+			self._restRequest(
+				'check-status',
+				'GET',
+				{ transfer_id: transferId },
+				self._updateProgress,
+				{
+					$row: $row,
+					$progressBar: $progressBar,
+					$progressText: $progressText,
+					$progressBarFill: $progressBarFill,
+					$progressStatusText: $progressStatusText,
+					$timeElapsedText: $timeElapsedText,
 				}
-			} );
+			);
 		},
 		_formatTime: function( seconds ) {
 			const minutes = Math.floor(seconds / 60);

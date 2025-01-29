@@ -129,10 +129,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * @since 0.0.1
 	 */
 	public function add_hooks() {
-		add_action( 'wp_ajax_boldgrid_transfer_check_status', array( $this, 'ajax_check_status' ) );
-		add_action( 'wp_ajax_boldgrid_transfer_start_rx', array( $this, 'ajax_start_handler' ) );
-		add_action( 'wp_ajax_boldgrid_transfer_cancel_transfer', array( $this, 'ajax_cancel_transfer' ) );
-		add_action( 'wp_ajax_boldgrid_transfer_delete_transfer', array( $this, 'ajax_delete_transfer' ) );
 		add_action( 'wp_ajax_boldgrid_transfer_resync_database', array( $this, 'ajax_resync_database' ) );
 		add_action( 'boldgrid_transfer_process_transfers', array( $this, 'wp_cron_process_transfers' ) );
 
@@ -156,49 +152,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		} );
 	}
 
-	/**
-	 * Ajax Resync Database
-	 * 
-	 * @since 0.0.9
-	 * 
-	 * @return void
-	 */
-	public function ajax_resync_database() {
-		check_ajax_referer( 'boldgrid_transfer_resync_database', 'nonce' );
-
-		// Delete the database file and reset the transfer status to 'pending-db-dump'.
-		$transfer_id = sanitize_text_field( $_POST['transfer_id'] );
-		$transfers   = $this->util->get_option( $this->transfers_option_name, array() );
-
-		if ( ! isset( $transfers[ $transfer_id ] ) ) {
-			$this->migrate_core->log->add(
-				'Attempted to resync an invalid transfer: ' . $transfer_id .
-				' - Transfer ID must be present in the following list: ' . json_encode( array_keys( $transfers ) )
-			);
-			wp_send_json_error( array( 'message' => 'Invalid transfer ID.' ) );
-		}
-
-		$transfer = $transfers[ $transfer_id ];
-
-		$transfer_dir = $this->util->get_transfer_dir();
-
-		$source_dir   = $this->util->url_to_safe_directory_name( $transfer['source_site_url'] );
-
-		$db_file_name = basename( $transfer['db_dump_info']['file'] );
-
-		$db_dump_path = $transfer_dir . '/' . $source_dir . '/' . $transfer_id . '/' . $db_file_name;
-
-		$deleted = unlink( $db_dump_path );
-
-		if ( $deleted ) {
-			$this->update_transfer_prop( $transfer_id, 'status', 'pending-db-dump' );
-			$this->migrate_core->log->add( 'Database dump file deleted and pending re-sync: ' . $transfer_id );
-			wp_send_json_success( array( 'message' => 'Database dump file deleted and pending re-sync' ) );
-		} else {
-			$this->migrate_core->log->add( 'Error deleting database dump file for transfer: ' . $transfer_id );
-			wp_send_json_error( array( 'message' => 'Error deleting database dump file.' ) );
-		}
-	}
 
 	/**
 	 * WP Cron Process Transfers.
@@ -221,7 +174,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			$prefix      = $this->migrate_core->configs['rest_api_prefix'] . '/';
 			$nonce       = wp_create_nonce( 'boldgrid_transfer_cron_resume_transfer' );
 			wp_remote_get(
-				home_url( '/wp-json/' . $namespace . $prefix . 'cron_resume_transfer' ) . '?nonce=' . $nonce,
+				home_url( '/wp-json/' . $namespace . $prefix . 'cron-resume-transfer' ) . '?nonce=' . $nonce,
 				array(
 					'timeout' => $this->migrate_core->configs['conn_timeout'],
 				)
@@ -288,110 +241,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		}
 	}
 
-	public function ajax_delete_transfer() {
-		check_ajax_referer( 'boldgrid_transfer_delete_transfer', 'nonce' );
-
-		global $wp_filesystem;
-
-		$transfer_id = sanitize_text_field( $_POST['transfer_id'] );
-		$transfers   = $this->util->get_option( $this->transfers_option_name, array() );
-
-		if ( ! isset( $transfers[ $transfer_id ] ) ) {
-			$this->migrate_core->log->add(
-				'Attempted to delete invalid transfer: ' . $transfer_id .
-				' - Transfer ID must be present in the following list: ' . json_encode( array_keys( $transfers ) )
-			);
-			wp_send_json_error( array( 'message' => 'Invalid transfer ID.' ) );
-		}
-
-		$transfer = $transfers[ $transfer_id ];
-
-		$transfer_dir = $this->util->get_transfer_dir();
-		$source_dir   = $this->util->url_to_safe_directory_name( $transfer['source_site_url'] );
-		$transfer_dir = $transfer_dir . '/' . $source_dir . '/' . $transfer_id . '/';
-
-		$deleted = $wp_filesystem->delete( $transfer_dir, true );
-
-		$this->cleanup_filelists();
-
-		if ( $deleted ) {
-			unset( $transfers[ $transfer_id ] );
-			update_option( $this->transfers_option_name, $transfers, false );
-
-			$cancelled_transfers = $this->util->get_option( $this->cancelled_transfers_option_name, array() );
-			$cancelled_transfers = array_filter( $cancelled_transfers, function( $id ) use ( $transfer_id ) {
-				return $id !== $transfer_id;
-			} );
-
-			update_option( $this->cancelled_transfers_option_name, array_values( $cancelled_transfers ), false );
-			$this->migrate_core->log->add( 'Transfer ' . $transfer_id . ' deleted.' );
-			wp_send_json_success( array( 'message' => 'Transfer Deleted' ) );
-		} else {
-			$this->migrate_core->log->add( 'Error deleting transfer: ' . $transfer_id );
-			wp_send_json_error( array( 'message' => 'Error Deleting Transfer' ) );
-		}
-
-	}
-
-	public function cleanup_filelists() {
-		$transfers = $this->util->get_option( $this->transfers_option_name, array() );
-		$transfer_ids = array_keys( $transfers );
-
-		$file_lists = $this->util->get_option( $this->lists_option_name, array() );
-
-		foreach( $file_lists as $transfer_id => $file_list ) {
-			if ( ! in_array( $transfer_id, $transfer_ids ) ) {
-				unset( $file_lists[ $transfer_id ] );
-			}
-		}
-
-		update_option( $this->lists_option_name, $file_lists, false );
-	}
-
-	public function ajax_cancel_transfer() {
-		check_ajax_referer( 'boldgrid_transfer_cancel_transfer', 'nonce' );
-
-		$transfer_id = sanitize_text_field( $_POST['transfer_id'] );
-
-		$transfers = $this->util->get_option( $this->transfers_option_name, array() );
-
-		if ( ! isset( $transfers[ $transfer_id ] ) ) {
-			$this->migrate_core->log->add(
-				'Attempted to cancel invalid transfer: ' . $transfer_id .
-				' - Transfer ID must be present in the following list: ' . json_encode( array_keys( $transfers ) )
-			);
-			wp_send_json_error( array( 'message' => 'Invalid transfer ID.' ) );
-		}
-
-		$this->util->cancel_transfer( $transfer_id );
-
-		$this->migrate_core->log->add( 'Transfer ' . $transfer_id . ' cancelled by user.' );
-
-		wp_send_json_success( array( 'message' => 'Transfer Cancelled' ) );
-	}
-
-	/**
-	 * Start the transfer process
-	 * 
-	 * @since 0.0.1
-	 */
-	public function ajax_start_handler() {
-		check_ajax_referer( 'boldgrid_transfer_start_rx', 'nonce' );
-
-		$site_url = sanitize_text_field( $_POST['url'] );
-
-		$authd_sites = $this->util->get_option( $this->authd_sites_option_name, array() );
-		
-		if ( ! isset( $authd_sites[ $site_url ] ) ) {
-			$this->migrate_core->log->add( 'Site ' . $site_url . ' not authenticated.' );
-			wp_send_json_error( array( 'message' => 'Site not authenticated' ) );
-		}
-
-		$auth = $authd_sites[ $site_url ];
-
-		$this->create_new_transfer( $site_url, $auth['user'], $auth['pass'] );
-	}
-
 	/**
 	 * Create a new transfer
 	 * 
@@ -402,7 +251,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		$this->util->update_transfer_heartbeat();
 
-		$this->cleanup_filelists();
+		$this->util->cleanup_filelists();
 
 		$transfer_id = $this->util->gen_transfer_id();
 
@@ -771,145 +620,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 				$this->util->update_file_status( $transfer_id, 'large', $file['path'], 'pending' );
 			}
 		}
-	}
-
-	/**
-	 * Handle AJAX request to verify files.
-	 *
-	 * @since 0.0.1
-	 */
-	public function ajax_check_status() {
-		check_ajax_referer( 'boldgrid_transfer_check_status', 'nonce' );
-
-		$transfer_id = sanitize_text_field( $_POST['transfer_id'] );
-		$transfers   = $this->util->get_option( $this->transfers_option_name, array() );
-		if ( ! isset( $transfers[ $transfer_id ] ) ) {
-			$this->migrate_core->log->add(
-				'Attempted to check the status of an invalid transfer: ' . $transfer_id .
-				' - Transfer ID must be present in the following list: ' . json_encode( array_keys( $transfers ) )
-			);
-			return array(
-				'error' => true,
-				'message' => 'Invalid transfer ID: ' . $transfer_id,
-			);
-		}
-	
-		$transfer  = $transfers[ $transfer_id ];
-		$status    = $transfer['status'];
-
-		$progress_data = array();
-
-		$elapsed_time = microtime( true ) - intval( $this->get_transfer_prop( $transfer_id, 'start_time', 0 ) );
-		$progress_data['elapsed_time'] = $this->migrate_core->util->convert_to_mmss( $elapsed_time );
-		switch( $status ) {
-			case 'failed':
-				$progress_data['status'] = 'failed';
-				$progress_data['progress'] = 0;
-				$progress_data['progress_text'] = 'Transfer Failed';
-				$progress_data['progress_status_text'] = 'Failed';
-				break;
-			case 'completed':
-				$progress_data['status'] = 'completed';
-				$progress_data['progress'] = 100;
-				$progress_data['progress_text'] = 'Transfer Complete';
-				$progress_data['progress_status_text'] = 'Completed';
-				break;
-			case 'restore-completed':
-				$progress_data['status'] = 'completed';
-				$progress_data['progress'] = 100;
-				$progress_data['progress_text'] = 'Restoration Complete';
-				$progress_data['progress_status_text'] = 'Restoration Complete';
-				break;
-			case 'pending':
-				$progress_data['status'] = 'pending';
-				$progress_data['progress'] = 0;
-				$progress_data['progress_text'] = 'Transfer Still Pending';
-				$progress_data['progress_status_text'] = 'Pending';
-				$this->process_transfers();
-				break;
-			case 'dumping-db-tables':
-				$this->check_dump_status( $transfer );
-				$db_size   = $transfer['db_dump_info']['db_size'];
-				$dump_size = isset( $transfer['db_dump_info']['file_size'] ) ? $transfer['db_dump_info']['file_size'] : 0;
-				$progress  = $db_size > 0 ? ( $dump_size / $db_size ) * 100 : 0;
-
-				$progress_text = sprintf(
-					'%1$s / %2$s (%3$s%%)',
-					size_format( $dump_size, 2 ),
-					size_format( $db_size, 2 ),
-					number_format( $progress, 2 )
-				);
-				$progress_data['status'] = 'dumping-db-tables';
-				$progress_data['progress']             = $progress;
-				$progress_data['progress_text']        = $progress_text;
-				$progress_data['progress_status_text'] = 'Dumping Database Tables';
-				break;
-			case 'db-dump-complete':
-				$db_size   = $transfer['db_dump_info']['db_size'];
-				$progress_data['status'] = 'db-dump-complete';
-				$progress_data['progress'] = 100;
-				$progress_data['progress_text'] = $progress_text = sprintf(
-					'%1$s / %2$s (%3$s%%)',
-					size_format( $db_size, 2 ),
-					size_format( $db_size, 2 ),
-					number_format( 100, 2 )
-				);
-				$progress_data['progress_status_text'] = 'Database Dump Complete. Pending Transfer';
-				break;
-			case 'db-ready-for-transfer':
-				$progress_data['status'] = 'db-ready-for-transfer';
-				$progress_data['progress'] = 0;
-				$progress_data['progress_text'] = 'Database Pending Transfer';
-				$progress_data['progress_status_text'] = 'Database Pending Transfer';
-				break;
-			case 'db-transferring':
-				$db_part_count = count( $transfer['db_dump_info']['split_files'] );
-				$completed_count = count(
-					array_filter( $transfer['db_dump_info']['split_files'], function( $file ) {
-						return 'transferred' === $file['status'];
-					} )
-				);
-				$progress = $db_part_count > 0 ? ( $completed_count / $db_part_count ) * 100 : 0;
-				$progress_data['status'] = 'db-transferring';
-				$progress_data['progress'] = $db_part_count > 0 ? ( $completed_count / $db_part_count ) * 100 : 0;
-				$progress_data['progress_text'] = $progress_text = sprintf(
-					'%1$s / %2$s Files (%3$s%%)',
-					$completed_count,
-					$db_part_count,
-					number_format( $progress, 2 )
-				);
-				$progress_data['progress_status_text'] = 'Transferring Database';
-				$this->process_transfers();
-				break;
-			case 'transferring-small-files':
-			case 'transferring-large-files':
-				$progress_data = $this->verify_files( $transfer_id );
-				if ( isset ( $verification_data['error'] ) && $verification_data['error'] ) {
-					wp_send_json_error( array( 'message' => $verification_data['message'] ) );
-				}
-				break;
-			case 'pending-restore':
-				$progress_data['status'] = 'pending-restore';
-				$progress_data['progress'] = 0;
-				$progress_data['progress_text'] = 'Pending Restore';
-				$progress_data['progress_status_text'] = 'Pending Restore';
-				$this->process_transfers();
-				break;
-			case 'restoring-files':
-				$progress_data['status'] = 'restoring-files';
-				$progress_data['progress'] = 0;
-				$progress_data['progress_text'] = 'Restoring Files';
-				$progress_data['progress_status_text'] = 'Restoring Files';
-				break;
-			case 'restoring-db':
-				$progress_data['status'] = 'restoring-db';
-				$progress_data['progress'] = 0;
-				$progress_data['progress_text'] = 'Restoring Database';
-				$progress_data['progress_status_text'] = 'Restoring Database';
-				break;
-		}
-
-		wp_send_json_success( $progress_data );
 	}
 
 	/**

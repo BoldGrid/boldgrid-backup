@@ -68,44 +68,6 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 
 		$this->transfer_option_name = $this->migrate_core->configs['option_names']['transfers'];
 		$this->lists_option_name    = $this->migrate_core->configs['option_names']['file_lists'];
-
-		$this->add_hooks();
-	}
-
-	/**
-	 * Add Hooks
-	 * 
-	 * @since 0.0.7
-	 */
-	public function add_hooks() {
-		add_action( 'wp_ajax_boldgrid_transfer_start_restore', array( $this, 'ajax_start_restore' ) );
-	}
-
-	/**
-	 * Migrate the site
-	 * 
-	 * @since 0.0.1
-	 */
-	public function ajax_start_restore() {
-		check_ajax_referer( 'boldgrid_transfer_start_restore', 'nonce' );
-
-		$transfer_id = sanitize_text_field( $_POST['transfer_id'] );
-
-		$this->migrate_core->log->init( 'direct-transfer-' . $transfer_id );
-
-		$transfers = $this->util->get_option( $this->transfer_option_name, array() );
-
-		if ( ! isset( $transfers[ $transfer_id ] ) ) {
-			$this->migrate_core->log->add(
-				'Attempted to restore invalid transfer: ' . $transfer_id .
-				' - Transfer ID must be present in the following list: ' . json_encode( array_keys( $transfers ) )
-			);
-			wp_send_json_error( array( 'message' => 'Invalid transfer ID.' ) );
-		}
-
-		$this->migrate_core->rx->update_transfer_prop( $transfer_id, 'status', 'pending-restore' );
-		
-		wp_send_json_success( $result );
 	}
 
 	public function restore_site( $transfer, $transfer_id ) {

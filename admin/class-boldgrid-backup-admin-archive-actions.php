@@ -104,7 +104,7 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 		wp_register_script(
 			'boldgrid-backup-direct-transfer',
 			plugin_dir_url( __FILE__ ) . 'js/' . '/boldgrid-backup-direct-transfer.js',
-			array( 'jquery' ),
+			array( 'jquery', 'wp-api' ),
 			BOLDGRID_BACKUP_VERSION,
 			true
 		);

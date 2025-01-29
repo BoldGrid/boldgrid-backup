@@ -87,6 +87,9 @@ if ( empty( $transfers ) ) {
 		} else if ( 'canceled' === $transfer['status'] ) {
 			$status         = 'canceled';
 			$action_buttons = '<button class="delete-transfer button-secondary" data-transfer-id="' . esc_attr( $transfer['transfer_id'] ) . '">Delete</button>';
+		} else if ( 'restore-completed' === $transfer['status'] ) {
+			$status = 'Restore Completed';
+			$action_buttons  = '<button class="delete-transfer button-secondary" data-transfer-id="' . esc_attr( $transfer['transfer_id'] ) . '">Delete</button>';
 		} else {
 			$status = 'transferring';
 			$action_buttons  = '<button class="cancel-transfer button-secondary" data-transfer-id="' . esc_attr( $transfer['transfer_id'] ) . '">Cancel</button>';
@@ -108,6 +111,8 @@ if ( empty( $transfers ) ) {
 			esc_attr( $status )
 		);
 
+		$hidden_statuses = array( 'completed', 'canceled', 'restore-completed' );
+
 		$transfer_table .= sprintf(
 			'<tr class="progress-row %1$s" data-transfer-id="%2$s">
 				<td colspan="5">
@@ -119,7 +124,7 @@ if ( empty( $transfers ) ) {
 					</div>
 				</td>
 			</tr>',
-			'completed' === $transfer['status'] || 'canceled' === $transfer['status'] ? 'hidden' : '',
+			in_array( $transfer['status'], $hidden_statuses ) ? 'hidden' : '',
 			esc_attr( $transfer['transfer_id'] )
 		);
 	}

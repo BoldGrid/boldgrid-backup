@@ -315,6 +315,21 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		return $average_batch_size;
 	}
 
+	public function cleanup_filelists() {
+		$transfers = $this->get_option( $this->transfers_option_name, array() );
+		$transfer_ids = array_keys( $transfers );
+
+		$file_lists = $this->get_option( $this->lists_option_name, array() );
+
+		foreach( $file_lists as $transfer_id => $file_list ) {
+			if ( ! in_array( $transfer_id, $transfer_ids ) ) {
+				unset( $file_lists[ $transfer_id ] );
+			}
+		}
+
+		update_option( $this->lists_option_name, $file_lists, false );
+	}
+
 	public function generate_file_list() {
 		$file_list = $this->get_files_in_dir( WP_CONTENT_DIR );
 
