@@ -5,7 +5,7 @@
  * The trasnmitting rest api class for the Transfer process.
  * 
  * @link https://www.boldgrid.com
- * @since 0.0.1
+ * @since 1.17.0
  * @package Boldgrid_Transfer
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
@@ -16,7 +16,7 @@
  * 
  * The transmitting rest api class for the Transfer process.
  *
- * @since 0.0.1
+ * @since 1.17.0
  */
 class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	/**
@@ -24,7 +24,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 *
 	 * @var Boldgrid_Backup_Admin_Migrate
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public $migrate_core;
 
@@ -33,7 +33,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 * 
 	 * @var string
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public $transfers_option_name;
 
@@ -42,7 +42,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 * 
 	 * @var string
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public $db_dump_status_option_name;
 
@@ -51,7 +51,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 * 
 	 * @var string
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.00
 	 */
 	public $namespace;
 
@@ -60,7 +60,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 * 
 	 * @var string
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.00
 	 */
 	public $prefix;
 
@@ -69,7 +69,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 * 
 	 * @param Boldgrid_Transfer $migrate_core
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function __construct( $migrate_core ) {
 		$this->migrate_core = $migrate_core;
@@ -112,7 +112,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	/**
 	 * Register the rest api routes
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.00
 	 */
 	public function register_routes() {
 		register_rest_route( $this->namespace, $this->prefix . '/start-db-dump', array(
@@ -188,7 +188,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 * Start db dump
 	 *  
 	 * @param $request WP_REST_Request
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function start_db_dump( $request ) {
 		require_once ABSPATH . 'wp-admin/includes/class-wp-debug-data.php';
@@ -225,7 +225,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	/**
 	 * Generate a database dump
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function generate_db_dump() {
 		$db_dump_file = $this->migrate_core->util->get_option( $this->db_dump_status_option_name, '' );
@@ -249,7 +249,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	/** 
 	 * Check Status of DB Dump
 	 * 
-	 * @since 0.0.8
+	 * @since 1.17.00
 	 * 
 	 * @param $request WP_REST_Request
 	 * @return WP_Rest_Response
@@ -340,7 +340,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 * Delete large file parts
 	 * 
 	 * @param $request WP_REST_Request
-	 * @since 0.0.3
+	 * @since 1.17.00
 	 */
 	public function delete_large_file_parts( $request ) {
 		$params = $request->get_params();
@@ -362,7 +362,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 * Retrieve large file part
 	 * 
 	 * @param $request WP_REST_Request
-	 * @since 0.0.1
+	 * @since 1.17.00
 	 */
 	public function retrieve_large_file_part( $request ) {
 		$params = $request->get_params();
@@ -401,7 +401,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 * 
 	 * @param $request WP_REST_Request
 	 * 
-	 * @since 0.0.8
+	 * @since 1.17.00
 	 * 
 	 * @return WP_Rest_Response
 	 */
@@ -429,7 +429,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	/**
 	 * Split large files
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function split_large_files( $request ) {
 		$params = $request->get_params();
@@ -462,7 +462,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	/**
 	 * Retrieve files
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function retrieve_files( $request ) {
 		$params = $request->get_params();
@@ -501,7 +501,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	/**
 	 * Get the db dump file
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function get_db_dump( $request ) {
 		$request_params = $request->get_params();
@@ -525,7 +525,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	/**
 	 * Get the wp version info
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function get_wp_version() {
 		return new WP_REST_Response( array(
@@ -537,7 +537,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	/**
 	 * Get the wp version info
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function get_db_prefix() {
 		global $wpdb;
@@ -550,7 +550,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	/**
 	 * Generate a file list
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function generate_file_list( $request ) {
 		$file_list = $this->migrate_core->util->generate_file_list();

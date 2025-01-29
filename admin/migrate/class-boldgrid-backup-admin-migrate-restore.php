@@ -5,7 +5,7 @@
  * The class for the handling migration of transfered sites.
  * 
  * @link https://www.boldgrid.com
- * @since 0.0.7
+ * @since 1.17.0
  * @package Boldgrid_Transfer
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
@@ -16,7 +16,7 @@
  * 
  * The main class for restoring the transferred files & DB.
  *
- * @since 0.0.7
+ * @since 1.17.0
  */
 class Boldgrid_Backup_Admin_Migrate_Restore {
 	/**
@@ -24,7 +24,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 	 * 
 	 * @var Boldgrid_Backup_Admin_Migrate
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public $migrate_core;
 
@@ -33,7 +33,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 	 * 
 	 * @var Boldgrid_Backup_Admin_Migrate_Util
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public $util;
 
@@ -42,7 +42,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 	 * 
 	 * @var string
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public $transfer_option_name;
 
@@ -51,7 +51,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 	 * 
 	 * @var string
 	 * 
-	 * @since 0.0.2
+	 * @since 1.17.0
 	 */
 	public $lists_option_name;
 
@@ -60,7 +60,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 	 * 
 	 * @param Boldgrid_Transfer $core
 	 * 
-	 * @since 0.0.7
+	 * @since 1.17.0
 	 */
 	public function __construct( $migrate_core ) {
 		$this->migrate_core   = $migrate_core;
@@ -144,7 +144,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 	/**
 	 * Separate DB Dump from files
 	 * 
-	 * @since 0.0.7
+	 * @since 1.17.0
 	 * 
 	 * @param array  $files          The files to separate the db dump from
 	 * @param string $db_dump_path   The path to the db dump file
@@ -174,7 +174,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 	 * should merge the wordpress core files with the transfered files,
 	 * merging directories when necessary, but not overridding any files.
 	 * 
-	 * @since 0.0.7
+	 * @since 1.17.0
 	 * 
 	 * @param string $transfer_dir The directory transfered files are located in
 	 * @param string $wp_version   The version of wordpress to download
@@ -284,7 +284,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 	 * 
 	 * Copy the files from the transfer directory to the site's root directory.
 	 * 
-	 * @since 0.0.7
+	 * @since 1.17.0
 	 * 
 	 * @param array  $files        Array of files to copy
 	 * @param string $transfer_dir The directory transfered files are located in
@@ -455,7 +455,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 	 * $this->migrate_core->configs['option_names'] array
 	 * to the backup directory so they can be restored after the migration.
 	 * 
-	 * @since 0.0.7
+	 * @since 1.17.0
 	 * 
 	 * @param string $transfer_dir The directory transfered files are located in
 	 */
@@ -481,7 +481,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 	 * 
 	 * Restore the options that were exported before the migration.
 	 * 
-	 * @since 0.0.7
+	 * @since 1.17.0
 	 * 
 	 * @param string $options_file The file containing the options to restore
 	 */

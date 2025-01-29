@@ -5,7 +5,7 @@
  * The trasnmitting rest api class for the Transfer process.
  * 
  * @link https://www.boldgrid.com
- * @since 0.0.1
+ * @since 1.17.0
  * @package Boldgrid_Transfer
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
@@ -16,7 +16,7 @@
  * 
  * The receiving rest api class for the Transfer process.
  *
- * @since 0.0.1
+ * @since 1.17.0
  */
 class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	/**
@@ -24,7 +24,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	 *
 	 * @var Boldgrid_Backup_Admin_Migrate
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public $migrate_core;
 
@@ -33,7 +33,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	 * 
 	 * @var string
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public $transfers_option_name;
 
@@ -42,7 +42,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	 * 
 	 * @var string
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public $cancelled_transfers_option_name;
 
@@ -52,7 +52,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	 * 
 	 * @var string
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public $namespace;
 
@@ -61,7 +61,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	 * 
 	 * @var string
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public $prefix;
 
@@ -70,7 +70,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	 * 
 	 * @param Boldgrid_Backup_Admin_Migrate $migrate_core
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function __construct( $migrate_core ) {
 		$this->migrate_core = $migrate_core;
@@ -141,7 +141,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	/**
 	 * Register the rest api routes
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function register_routes() {
 		$rest_routes = array(
@@ -198,7 +198,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	/**
 	 * Migrate the site
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function start_restore( $request ) {
 		$params      = $request->get_params();
@@ -206,13 +206,9 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 
 		$this->migrate_core->log->init( 'direct-transfer-' . $transfer_id );
 
-		$transfers = $this->util->get_option( $this->transfers_option_name, array() );
+		$transfer = $this->util->get_transfer_from_id( $transfer_id );
 
-		if ( ! isset( $transfers[ $transfer_id ] ) ) {
-			$this->migrate_core->log->add(
-				'Attempted to restore invalid transfer: ' . $transfer_id .
-				' - Transfer ID must be present in the following list: ' . json_encode( array_keys( $transfers ) )
-			);
+		if ( ! $transfer ) {
 			wp_send_json_error( array( 'message' => 'Invalid transfer ID.' ) );
 		}
 
@@ -224,24 +220,18 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	/**
 	 * Ajax Resync Database
 	 * 
-	 * @since 0.0.9
+	 * @since 1.17.0
 	 * 
 	 * @return void
 	 */
 	public function resync_database( $request ) {
 		$params      = $request->get_params();
 		$transfer_id = isset( $params['transfer_id'] ) ? sanitize_text_field( $params['transfer_id'] ) : '';
-		$transfers   = $this->util->get_option( $this->transfers_option_name, array() );
+		$transfer    = $this->util->get_transfer_from_id( $transfer_id );
 
-		if ( ! isset( $transfers[ $transfer_id ] ) ) {
-			$this->migrate_core->log->add(
-				'Attempted to resync an invalid transfer: ' . $transfer_id .
-				' - Transfer ID must be present in the following list: ' . json_encode( array_keys( $transfers ) )
-			);
+		if ( ! $transfer ) {
 			wp_send_json_error( array( 'message' => 'Invalid transfer ID.' ) );
 		}
-
-		$transfer = $transfers[ $transfer_id ];
 
 		$transfer_dir = $this->util->get_transfer_dir();
 
@@ -268,18 +258,12 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 
 		$params      = $request->get_params();
 		$transfer_id = isset( $params['transfer_id'] ) ? sanitize_text_field( $params['transfer_id'] ) : '';
-
 		$transfers   = $this->util->get_option( $this->transfers_option_name, array() );
+		$transfer    = $this->util->get_transfer_from_id( $transfer_id );
 
-		if ( ! isset( $transfers[ $transfer_id ] ) ) {
-			$this->migrate_core->log->add(
-				'Attempted to delete invalid transfer: ' . $transfer_id .
-				' - Transfer ID must be present in the following list: ' . json_encode( array_keys( $transfers ) )
-			);
+		if ( ! $transfer ) {
 			wp_send_json_error( array( 'message' => 'Invalid transfer ID.' ) );
 		}
-
-		$transfer = $transfers[ $transfer_id ];
 
 		$transfer_dir = $this->util->get_transfer_dir();
 		$source_dir   = $this->util->url_to_safe_directory_name( $transfer['source_site_url'] );
@@ -311,14 +295,9 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	public function cancel_transfer( $request) {
 		$params      = $request->get_params();
 		$transfer_id = isset( $params['transfer_id'] ) ? sanitize_text_field( $params['transfer_id'] ) : '';
+		$transfer    = $this->util->get_transfer_from_id( $transfer_id );
 
-		$transfers = $this->util->get_option( $this->transfers_option_name, array() );
-
-		if ( ! isset( $transfers[ $transfer_id ] ) ) {
-			$this->migrate_core->log->add(
-				'Attempted to cancel invalid transfer: ' . $transfer_id .
-				' - Transfer ID must be present in the following list: ' . json_encode( array_keys( $transfers ) )
-			);
+		if ( ! $transfer ) {
 			wp_send_json_error( array( 'message' => 'Invalid transfer ID.' ) );
 		}
 
@@ -332,25 +311,20 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	/**
 	 * Check Status of Transfer
 	 *
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function check_status( $request ) {
 		$params      = $request->get_params();
 		$transfer_id = isset( $params['transfer_id'] ) ? sanitize_text_field( $params['transfer_id'] ) : '';
 
-		$transfers   = $this->util->get_option( $this->transfers_option_name, array() );
-		if ( ! isset( $transfers[ $transfer_id ] ) ) {
-			$this->migrate_core->log->add(
-				'Attempted to check the status of an invalid transfer: ' . $transfer_id .
-				' - Transfer ID must be present in the following list: ' . json_encode( array_keys( $transfers ) )
-			);
+		$transfer    = $this->util->get_transfer_from_id( $transfer_id );
+		if ( ! $transfer ) {
 			return array(
 				'error' => true,
 				'message' => 'Invalid transfer ID: ' . $transfer_id,
 			);
 		}
-	
-		$transfer  = $transfers[ $transfer_id ];
+
 		$status    = $transfer['status'];
 
 		$progress_data = array();
@@ -471,16 +445,10 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	/**
 	 * Start the migration process
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function start_migration( $request ) {
 		$params   = $request->get_params();
-		error_log( json_encode(
-			array(
-				'method' => 'start_migration',
-				'params' => $params
-			)
-		) );
 		$site_url = isset( $params['url'] ) ? sanitize_text_field( $params['url'] ) : '';
 
 		$authd_sites = $this->util->get_option( $this->migrate_core->rx->authd_sites_option_name, array() );
@@ -496,29 +464,17 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	}
 
 	public function update_transfer_status( $request ) {
-		$params = $request->get_params();
+		$params      = $request->get_params();
 		$transfer_id = $params['transfer_id'];
-		$status = $params['status'];
+		$status      = $params['status'];
+		$transfer    = $this->util->get_transfer_from_id( $transfer_id );
 
-		$transfers = $this->migrate_core->util->get_option( $this->transfers_option_name, array() );
-		error_log( json_encode(
-			array(
-				'method' => 'update_transfer_status',
-				'transfers' => $transfers
-			)
-		) );
 
-		if ( ! isset( $transfers[ $transfer_id ] ) ) {
-			return new WP_Error(
-				'boldgrid_transfer_transfer_not_found',
-				'Transfer with id '. $transfer_id . ' not found',
-				array( 'status' => 404 )
-			);
+		if ( $transfer ) {
+			wp_send_json_error( array( 'message' => 'Invalid transfer ID.' ) );
 		}
 
-		$transfers[ $transfer_id ]['status'] = $status;
-
-		update_option( $this->transfers_option_name, $transfers );
+		$this->util->update_transfer_prop( $transfer_id, 'status', $status );
 
 		return new WP_REST_Response( array(
 			'success' => true,

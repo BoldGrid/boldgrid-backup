@@ -5,7 +5,7 @@
  * The main class for the BoldGrid Transfer plugin.
  * 
  * @link https://www.boldgrid.com
- * @since 0.0.1
+ * @since 1.17.0
  * @package Boldgrid_Transfer
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
@@ -16,7 +16,7 @@
  * 
  * The main class for the BoldGrid Transfer plugin.
  *
- * @since 0.0.1
+ * @since 1.17.0
  */
 class Boldgrid_Backup_Admin_Migrate {
 	/**
@@ -24,7 +24,7 @@ class Boldgrid_Backup_Admin_Migrate {
 	 * 
 	 * @var array
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public $configs = array();
 	/**
@@ -32,7 +32,7 @@ class Boldgrid_Backup_Admin_Migrate {
 	 * 
 	 * @var Boldgrid_Backup_Admin_Core
 	 * 
-	 * @since 0.0.3
+	 * @since 1.17.0
 	 */
 	public $backup_core;
 
@@ -48,7 +48,7 @@ class Boldgrid_Backup_Admin_Migrate {
 	 * 
 	 * @var Boldgrid_Transfer_Tx
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public $tx;
 
@@ -57,7 +57,7 @@ class Boldgrid_Backup_Admin_Migrate {
 	 * 
 	 * @var Boldgrid_Transfer_Rx
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public $rx;
 
@@ -66,14 +66,14 @@ class Boldgrid_Backup_Admin_Migrate {
 	 * 
 	 * @var Boldgrid_Transfer_Util
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public $util;
 
 	/**
 	 * Constructor
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function __construct( $backup_core ) {
 		$this->backup_core = $backup_core;
@@ -90,7 +90,7 @@ class Boldgrid_Backup_Admin_Migrate {
 	/**
 	 * Initialize logging
 	 * 
-	 * @since 0.0.5
+	 * @since 1.17.0
 	 */
 	public function init_logging() {
 		$this->log = new \Boldgrid_Backup_Admin_Log( $this->backup_core );

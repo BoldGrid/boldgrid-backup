@@ -5,7 +5,7 @@
  * The main class for the transmitting ( tx ) of the Transfer process.
  * 
  * @link https://www.boldgrid.com
- * @since 0.0.1
+ * @since 1.17.0
  * @package Boldgrid_Transfer
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
@@ -16,7 +16,7 @@
  * 
  * The main class for the transmitting ( tx ) of the Transfer process.
  *
- * @since 0.0.1
+ * @since 1.17.0
  */
 class Boldgrid_Backup_Admin_Migrate_Tx {
 	/**
@@ -24,7 +24,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 	 * 
 	 * @var Boldgrid_Backup_Admin_Migrate
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public $migrate_core;
 
@@ -33,7 +33,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 	 * 
 	 * @var Boldgrid_Backup_Admin_Migrate_Util
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public $util;
 
@@ -42,7 +42,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 	 * 
 	 * @param Boldgrid_Backup_Admin_Migrate $migrate_core
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function __construct( $migrate_core ) {
 		$this->migrate_core  = $migrate_core;
@@ -54,7 +54,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 	/**
 	 * Add hooks
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function add_hooks() {
 		add_action( 'rest_api_init', array( $this->rest, 'register_routes' ) );

@@ -5,7 +5,7 @@
  * The main class for the receiving ( rx ) of the Transfer process.
  * 
  * @link https://www.boldgrid.com
- * @since 0.0.1
+ * @since 1.17.0
  * @package Boldgrid_Transfer
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
@@ -16,7 +16,7 @@
  * 
  * The main class for the receiving ( rx ) of the Transfer process.
  *
- * @since 0.0.1
+ * @since 1.17.0
  */
 class Boldgrid_Backup_Admin_Migrate_Rx {
 	/**
@@ -24,7 +24,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * 
 	 * @var Boldgrid_Backup_Admin_Migrate
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public $migrate_core;
 
@@ -33,7 +33,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * 
 	 * @var Boldgrid_Backup_Admin_Migrate_Rx_Rest
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public $rest;
 
@@ -42,7 +42,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * 
 	 * @var Boldgrid_Backup_Admin_Migrate_Util
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public $util;
 
@@ -51,7 +51,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * 
 	 * @var string
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public $transfers_option_name;
 
@@ -60,7 +60,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * 
 	 * @var string
 	 * 
-	 * @since 0.0.2
+	 * @since 1.17.0
 	 */
 	public $lists_option_name;
 
@@ -69,7 +69,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * 
 	 * @var string
 	 * 
-	 * @since 0.0.2
+	 * @since 1.17.0
 	 */
 	public $open_batches_option_name;
 
@@ -78,7 +78,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * 
 	 * @var string
 	 * 
-	 * @since 0.0.2
+	 * @since 1.17.00
 	 */
 	public $authd_sites_option_name;
 
@@ -87,7 +87,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * 
 	 * @var string
 	 * 
-	 * @since 0.0.2
+	 * @since 1.17.0
 	 */
 	public $bytes_received_option_name;
 
@@ -96,7 +96,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * 
 	 * @var string
 	 * 
-	 * @since 0.0.2
+	 * @since 1.17.0
 	 */
 	public $active_transfer_option_name;
 
@@ -105,7 +105,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * 
 	 * @param Boldgrid_Backup_Admin_Migrate $migrate_core
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function __construct( $migrate_core ) {
 		$this->migrate_core   = $migrate_core;
@@ -126,7 +126,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	/**
 	 * Add hooks
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function add_hooks() {
 		add_action( 'wp_ajax_boldgrid_transfer_resync_database', array( $this, 'ajax_resync_database' ) );
@@ -188,7 +188,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	/**
 	 * Add cron interval
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function add_cron_interval( $schedules ) {
 		$schedules['every_minute'] = array(
@@ -206,7 +206,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * transfers. If there are none, then deactivate the cron
 	 * job.
 	 * 
-	 * @since 0.0.3
+	 * @since 1.17.00
 	 */
 	public function cron_deactivation() {
 		$incomplete_transfers = $this->get_incomplete_transfers();
@@ -220,7 +220,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	/**
 	 * cron_activation
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function cron_activation() {
 		$incomplete_transfers = $this->get_incomplete_transfers();
@@ -244,7 +244,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	/**
 	 * Create a new transfer
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function create_new_transfer( $site_url, $user, $pass ) {
 		$transfer_status = 'pending';
@@ -296,7 +296,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	/**
 	 * Process the active transfer
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function process_active_transfer( $transfer ) {
 		$transfer_id     = $transfer['transfer_id'];
@@ -344,13 +344,12 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	/**
 	 * Maybe Split DB dump file
 	 * 
-	 * @since 0.0.8
+	 * @since 1.17.0
 	 * 
 	 * @param array $transfer Transfer data
 	 */
 	public function maybe_split_dump( $transfer_id ) {
-		$transfers    = $this->util->get_option( $this->transfers_option_name, array() );
-		$transfer     = $transfers[ $transfer_id ];
+		$transfer     = $this->util->get_transfer_from_id( $transfer_id );
 		$db_dump_info = $transfer['db_dump_info'];
 	
 		// Get DB Info.
@@ -474,7 +473,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	/**
 	 * Generate File Lists
 	 * 
-	 * @since 0.0.8
+	 * @since 1.17.0
 	 */
 	public function generate_file_lists( $transfer ) {
 			$site_url = $transfer['source_site_url'];
@@ -513,7 +512,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * 
 	 * Retrieve list of incomplete transfers
 	 * 
-	 * @since 0.0.3
+	 * @since 1.17.0
 	 * 
 	 * @return array List of incomplete transfers
 	 */
@@ -540,7 +539,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	/**
 	 * Process the transfers
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function process_transfers() {
 		$incomplete_transfers = $this->get_incomplete_transfers();
@@ -585,7 +584,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 	/** Retry Stalled DB File
 	 * 
-	 * @since 0.0.8
+	 * @since 1.17.0
 	 */
 	public function retry_stalled_db_file( $transfer ) {
 		$transfer_id = $transfer['transfer_id'];
@@ -605,7 +604,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	/**
 	 * Retry stalled large files
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function retry_stalled_large_files( $transfer ) {
 		// Stalled files will be marked as 'transferring' in the file list.
@@ -625,7 +624,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	/**
 	 * Verify the files for a transfer.
 	 *
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 *
 	 * @param string $transfer_id The ID of the transfer to verify.
 	 * @return array Verification data.
@@ -634,7 +633,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		// Reset execution time limit
 		set_time_limit( max( ini_get( 'max_execution_time' ), $this->migrate_core->configs['cron_interval'] ) );
 
-		$transfers   = $this->util->get_option( $this->transfers_option_name, array() );
+		$transfer    = $this->util->get_transfer_from_id( $transfer_id );
 		$file_lists  = $this->util->get_option( $this->lists_option_name, array() );
 
 		$response = array();
@@ -643,18 +642,12 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			$response['missing_files'] = array();
 		}
 
-		if ( ! isset( $transfers[ $transfer_id ] ) ) {
-			$this->migrate_core->log->add(
-				'Attempted to verify files for an invalid transfer: ' . $transfer_id .
-				' - Transfer ID must be present in the following list: ' . json_encode( array_keys( $transfers ) )
-			);
+		if ( ! $transfer ) {
 			return array(
 				'error' => true,
 				'message' => 'Invalid transfer ID: ' . $transfer_id,
 			);
 		}
-
-		$transfer  = $transfers[ $transfer_id ];
 
 		if ( 'db-transferred' === $transfer['status'] ) {
 			$response['status'] = 'db-transferred';
@@ -712,7 +705,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			number_format( $progress, 2 )
 		);
 
-		$status = $transfers[ $transfer_id ]['status'];
+		$status = $transfer['status'];
 
 		if ( $completed_count === $total_file_count && 'transferring-small-files' === $status ) {
 			$this->util->update_transfer_prop( $transfer_id, 'status', 'pending-db-dump' );
@@ -768,7 +761,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * 
 	 * @param string $transfer_id Transfer ID
 	 * 
-	 * @since 0.0.5
+	 * @since 1.17.0
 	 */
 	public function complete_transfer( $transfer_id ) {
 		$this->util->update_transfer_prop( $transfer_id, 'status', 'completed' );
@@ -778,8 +771,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		$bytes_rcvd   = $this->util->get_option( $this->bytes_received_option_name, 0 );
 		
 		// Count the number of files transferred.
-		$transfers     = $this->util->get_option( $this->transfers_option_name, array() );
-		$transfer      = $transfers[ $transfer_id ];
+		$transfer      = $this->util->get_transfer_from_id( $transfer_id );
 		$file_lists    = $this->util->get_option( $this->lists_option_name, array() );
 		$file_list     = $file_lists[ $transfer_id ];
 		$file_count    = count( json_decode( $file_list['small'], true ) ) + count( json_decode( $file_list['large'], true ) );
@@ -894,13 +886,13 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	public function process_small_files_rx( $transfer_id ) {
 		// Reset execution time limit
 		set_time_limit( max( ini_get( 'max_execution_time' ), $this->migrate_core->configs['cron_interval'] ) );
-		$transfers  = $this->util->get_option( $this->transfers_option_name, array() );
+		$transfer   = $this->util->get_transfer_from_id( $transfer_id );
 		$file_lists = $this->util->get_option( $this->lists_option_name, array() );
-		if ( ! isset( $transfers[ $transfer_id ] ) || ! isset( $file_lists[ $transfer_id ] ) ) {
+
+		if ( ! $transfer || ! isset( $file_lists[ $transfer_id ] ) ) {
 			return;
 		}
 
-		$transfer  = $transfers[ $transfer_id ];
 		$file_list = $file_lists[ $transfer_id ]['small'];
 
 		Boldgrid_Backup_Admin_Utility::bump_memory_limit( intval( $transfer['largest_file_size'] ) * 2 );
@@ -918,13 +910,12 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	}
 
 	public function split_large_files( $transfer_id ) {
-		$transfers  = $this->util->get_option( $this->transfers_option_name, array() );
+		$transfer   = $this->util->get_transfer_from_id( $transfer_id );
 		$file_lists = $this->util->get_option( $this->lists_option_name, array() );
-		if ( ! isset( $transfers[ $transfer_id ] ) || ! isset( $file_lists[ $transfer_id ] ) ) {
+		if ( ! $transfer || ! isset( $file_lists[ $transfer_id ] ) ) {
 			return;
 		}
 
-		$transfer  = $transfers[ $transfer_id ];
 		$file_list = $file_lists[ $transfer_id ]['large'];
 
 
@@ -987,9 +978,8 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		set_time_limit( max( ini_get( 'max_execution_time' ), $this->migrate_core->configs['cron_interval'] ) );
 
 		$this->split_large_files( $transfer_id );
-		
-		$transfers  = $this->util->get_option( $this->transfers_option_name, array() );
-		$transfer   = $transfers[ $transfer_id ];
+
+		$transfer = $this->util->get_transfer_from_id( $transfer_id );
 
 		$file_lists = $this->util->get_option( $this->lists_option_name, array() );
 		$file_list  = $file_lists[ $transfer_id ]['large'];
@@ -1348,12 +1338,13 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 	public function process_small_file_rx( $transfer_id, $file_path, $file_data ) {
 		global $wp_filesystem;
-		$transfers  = $this->util->get_option( $this->transfers_option_name, array() );
+		$transfer   = $this->util->get_transfer_from_id( $transfer_id );
 		$file_lists = $this->util->get_option( $this->lists_option_name, array() );
-		if ( ! isset( $transfers[ $transfer_id ] ) || ! isset( $file_lists[ $transfer_id ] ) ) {
+
+		if ( ! $transfer || ! isset( $file_lists[ $transfer_id ] ) ) {
 			return;
 		}
-		$transfer  = $transfers[ $transfer_id ];
+
 		$file_list = $file_lists[ $transfer_id ]['small'];
 
 		$file_status = 'transferring';
@@ -1417,12 +1408,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		$db_dump_info = $transfer['db_dump_info'];
 
 		$db_dump_info['split_files'][ $part_number ]['status'] = 'transferring';
-		error_log( json_encode( array(
-			'method' => __METHOD__,
-			'part_number' => $part_number,
-			'file_path' => $file_path,
-			'db_dump_info' => $db_dump_info,
-		) ) );
+
 		$this->util->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', $db_dump_info );
 		
 		$response = $this->util->rest_post(
@@ -1473,9 +1459,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 	public function process_db_rx( $transfer_id ) {
 		global $wp_filesystem;
-		// Refresh Transfer Info.
-		$transfers = $this->migrate_core->util->get_option( $this->transfers_option_name, array() );
-		$transfer  = $transfers[ $transfer_id ];
+		$transfer = $this->util->get_transfer_from_id( $transfer_id );
 
 		$db_dump_info = $transfer['db_dump_info'];
 
@@ -1494,12 +1478,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		}
 
 		$db_files = $db_dump_info['split_files'];
-
-		error_log( json_encode( array(
-			'method' => __METHOD__,
-			'path crated' => $path_created,
-			'db_files' => $db_files,
-		) ) );
 
 		// loop through the split files and return true if any of them are marked 'transferring'
 		$transferring = array_filter( $db_files, function( $file, $key ) {
@@ -1570,10 +1548,11 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	}
 
 	public function reset_db_transfer( $transfer_id ) {
-		$transfers = $this->migrate_core->util->get_option( $this->transfers_option_name, array() );
-		$transfer  = $transfers[ $transfer_id ];
+		$db_dump_info = $this->util->get_transfer_prop( $transfer_id, 'db_dump_info', array() );
 
-		$db_dump_info = $transfer['db_dump_info'];
+		if ( empty( $db_dump_info ) ) {
+			return;
+		}
 
 		// Reset the status of all split files to 'pending'
 		foreach( $db_dump_info['split_files'] as $index => $split_file ) {

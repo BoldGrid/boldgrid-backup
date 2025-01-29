@@ -11,7 +11,6 @@
 		_onLoad: function() {
 			self._bindEvents();
 			self._checkReceiveStatus();
-			console.log( wpApiSettings );
 		},
 		_restRequest: function( endpoint, method, data, callback, callbackArgs = {} ) {
 			wp.apiRequest( {
@@ -166,7 +165,6 @@
 		},
 		_deleteCallback: function( response, args ) {
 			var $button = args.$deleteButton;
-			console.log( response );
 			if ( response.success ) {
 				$button.text( 'Deleted' );
 				// Wait 2 seconds then reload page.
@@ -181,7 +179,7 @@
 			var $button = args.$startButton,
 				url     = args.url;
 			$button.prop( 'disabled', true );
-			console.log( { response } );
+
 			if ( response.success ) {
 				var transferId = response.data.transfer_id;
 				$button.text( 'Transfer Started' );
@@ -234,8 +232,6 @@
 
 			$cancelButton = $( `.bgbkup-transfers-tx-table tbody tr.transfer-info[data-transfer-id="${transferId}"] button.cancel-transfer` );
 
-			console.log( $cancelButton );
-
 			self._checkReceiveStatus();
 			self._bindCancelButton( $cancelButton );
 			
@@ -248,19 +244,12 @@
 					'success_url': window.location.href,
 				} );
 
-			console.log( {
-				'authAdminUrl': authAdminUrl,
-				'endpointUri': endpointUri,
-				'params': params,
-				'fullUrl': authAdminUrl + endpointUri + '?' + params,
-			} );
 			window.location.href = authAdminUrl + endpointUri + '?' + params;
 		},
 		_checkReceiveStatus: function() {
 			var $statusRow = $( '.bgbkup-transfers-rx tr.progress-row:not( .hidden ):not( .canceled ):not( .completed )' );
 
 			$statusRow.each( function( index, row ) {
-				console.log( $statusRow );
 				$( row ).attr( 'data-intervalId', setInterval( self._checkRxStatus, 15000, row ) );
 				transferId = $( row ).data( 'transferId' );
 				self._checkRxStatus( row );
@@ -300,10 +289,7 @@
 				$progressStatusText.text( progressStatusText );
 				$timeElapsedText.text( timeElapsed );
 
-				console.log( { response: response.data } );
-
 				if ( 'canceled' === status ) {
-					console.log( 'canceled' );
 					$row.addClass( 'canceled' );
 					$progressStatusText.text( 'Canceled' );
 				}

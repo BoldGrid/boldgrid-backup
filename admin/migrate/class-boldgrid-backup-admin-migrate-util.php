@@ -5,7 +5,7 @@
  * The main class for the BoldGrid Transfer utility functions.
  * 
  * @link https://www.boldgrid.com
- * @since 0.0.1
+ * @since 1.17.0
  * @package Boldgrid_Transfer
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
@@ -16,7 +16,7 @@
  * 
  * The main class for the BoldGrid Transfer utility functions.
  *
- * @since 0.0.1
+ * @since 1.17.0
  */
 class Boldgrid_Backup_Admin_Migrate_Util {
 	/**
@@ -24,7 +24,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * 
 	 * @var Boldgrid_Backup_Admin_Migrate
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public $migrate_core;
 
@@ -42,7 +42,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * 
 	 * @var string
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public $transfers_option_name;
 
@@ -51,7 +51,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * 
 	 * @var string
 	 * 
-	 * @since 0.0.2
+	 * @since 1.17.0
 	 */
 	public $lists_option_name;
 
@@ -60,7 +60,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * 
 	 * @var string
 	 * 
-	 * @since 0.0.2
+	 * @since 1.17.0
 	 */
 	public $authd_sites_option_name;
 
@@ -69,7 +69,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * 
 	 * @var string
 	 * 
-	 * @since 0.0.2
+	 * @since 1.17.0
 	 */
 	public $cancelled_transfers_option_name;
 
@@ -78,7 +78,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * 
 	 * @param Boldgrid_Backup_Admin_Migrate $core
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function __construct( $migrate_core ) {
 		$this->migrate_core = $migrate_core;
@@ -191,7 +191,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * 
 	 * @return array
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function get_files_in_dir( $dir ) {
 		$wp_root = ABSPATH;
@@ -250,7 +250,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 *
 	 * @return int
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function get_max_upload_size() {
 		// Get values from PHP configuration
@@ -276,7 +276,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * 
 	 * @return int
 	 * 
-	 * @since 0.0.1
+	 * @since 1.17.0
 	 */
 	public function get_largest_file_size( $files ) {
 		$largest = 0;
@@ -303,7 +303,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * 
 	 * @return int
 	 * 
-	 * @since 0.0.3
+	 * @since 1.17.0
 	 */
 	public function get_estimated_batch_size( $file_list ) {
 		$transfer_size = array_sum( array_column( $file_list, 'size' ) );
@@ -315,20 +315,31 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		return $average_batch_size;
 	}
 
+	public function get_transfer_from_id( $transfer_id ) {
+		$transfers = $this->get_option( $this->transfers_option_name, array() );
+
+		if ( ! isset( $transfers[ $transfer_id ] ) ) {
+			$this->migrate_core->log->add( "Transfer $transfer_id not found" );
+			return false;
+		}
+
+		return $transfers[ $transfer_id ];
+	}
+
 	public function get_transfer_prop( $transfer_id, $property, $fallback ) {
 		wp_cache_delete( $this->transfers_option_name, 'options' );
 
-		$transfers = $this->get_option( $this->transfers_option_name, array() );
-	
-		if ( ! isset( $transfers[ $transfer_id ] ) ) {
+		$transfer  = $this->get_transfer_from_id( $transfer_id );
+
+		if ( ! $transfer ) {
 			return $fallback;
 		}
 
-		if ( ! isset( $transfers[ $transfer_id ][ $property ] ) ) {
+		if ( ! isset( $transfer[ $property ] ) ) {
 			return $fallback;
 		}
 
-		return $transfers[ $transfer_id ][ $property ];
+		return $transfer[ $property ];
 	}
 
 	public function update_transfer_prop( $transfer_id, $key, $value ) {
@@ -354,7 +365,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	}
 
 	public function cleanup_filelists() {
-		$transfers = $this->get_option( $this->transfers_option_name, array() );
+		$transfers    = $this->get_option( $this->transfers_option_name, array() );
 		$transfer_ids = array_keys( $transfers );
 
 		$file_lists = $this->get_option( $this->lists_option_name, array() );
@@ -510,15 +521,13 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		update_option( $this->cancelled_transfers_option_name, $cancelled_transfers, false );
 
 		wp_cache_delete( $this->transfers_option_name, 'options' );
-		$transfers = $this->get_option( $this->transfers_option_name, array() );
+		$transfer = $this->get_transfer_from_id( $transfer_id );
 
-		if ( ! isset( $transfers[ $transfer_id ] ) ) {
+		if ( ! $transfer ) {
 			return;
 		}
 
-		$transfers[ $transfer_id ]['status'] = 'canceled';
-		$status_updated = update_option( $this->transfers_option_name, $transfers );
-		wp_cache_delete( $this->transfers_option_name, 'options' );
+		$status_updated = $this->update_transfer_prop( $transfer_id, 'status', 'canceled' );
 	
 		return $status_updated;
 	}
@@ -572,13 +581,13 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		wp_cache_delete( $this->transfers_option_name, 'options' );
 		wp_cache_delete( 'boldgrid_transfer_cancelled_transfers', 'options' );
 		$file_lists = $this->get_option( $this->lists_option_name, array() );
-		$transfers  = $this->get_option( $this->transfers_option_name, array() );
+		$transfer = $this->get_transfer_from_id( $transfer_id );
 
-		if ( 'canceled' === $transfers[ $transfer_id ]['status'] ) {
+		if ( 'canceled' === $transfer['status'] ) {
 			wp_die();
 		}
 
-		if ( ! isset( $transfers[ $transfer_id ] ) ) {
+		if ( ! isset( $transfer ) ) {
 			wp_die();
 			return;
 		}
@@ -612,10 +621,10 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		wp_cache_delete( $this->transfers_option_name, 'options' );
 		wp_cache_delete( $this->cancelled_transfers_option_name, 'options' );
 		$file_lists          = $this->get_option( $this->lists_option_name, array() );
-		$transfers           = $this->get_option( $this->transfers_option_name, array() );
+		$transfer            = $this->get_transfer_from_id( $transfer_id );
 		$cancelled_transfers = $this->get_option( $this->cancelled_transfers_option_name, array() );
 
-		if ( 'canceled' === $transfers[ $transfer_id ]['status'] ) {
+		if ( 'canceled' === $transfer['status'] ) {
 			wp_die();
 		}
 
@@ -624,7 +633,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 			wp_die();
 		}
 
-		if ( ! isset( $transfers[ $transfer_id ] ) ) {
+		if ( ! isset( $transfer ) ) {
 			wp_die();
 			return;
 		}
@@ -702,7 +711,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * 
 	 * @return string
 	 * 
-	 * @since 0.0.5
+	 * @since 1.17.0
 	 */
 	public function convert_to_mmss( $seconds ) {
 		if ( $seconds >= 3600 ) { // Check if time is 1 hour or more
