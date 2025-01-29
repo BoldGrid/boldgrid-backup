@@ -315,6 +315,44 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		return $average_batch_size;
 	}
 
+	public function get_transfer_prop( $transfer_id, $property, $fallback ) {
+		wp_cache_delete( $this->transfers_option_name, 'options' );
+
+		$transfers = $this->get_option( $this->transfers_option_name, array() );
+	
+		if ( ! isset( $transfers[ $transfer_id ] ) ) {
+			return $fallback;
+		}
+
+		if ( ! isset( $transfers[ $transfer_id ][ $property ] ) ) {
+			return $fallback;
+		}
+
+		return $transfers[ $transfer_id ][ $property ];
+	}
+
+	public function update_transfer_prop( $transfer_id, $key, $value ) {
+		wp_cache_delete( $this->transfers_option_name, 'options' );
+		$transfers = $this->get_option( $this->transfers_option_name, array() );
+
+		if ( ! isset( $transfers[ $transfer_id ] ) ) {
+			return;
+		}
+
+		if ( 'status' === $key && $transfers[ $transfer_id ][ $key ] !== $value ) {
+			$this->migrate_core->log->add(
+				"Transfer $transfer_id status updated from {$transfers[ $transfer_id ][ $key ]} to $value"
+			);
+		}
+
+		$transfers[ $transfer_id ][ $key ] = $value;
+
+		$this->update_transfer_heartbeat();
+
+		wp_cache_delete( $this->transfers_option_name, 'options' );
+		return update_option( $this->transfers_option_name, $transfers, false );
+	}
+
 	public function cleanup_filelists() {
 		$transfers = $this->get_option( $this->transfers_option_name, array() );
 		$transfer_ids = array_keys( $transfers );

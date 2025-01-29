@@ -61,11 +61,11 @@ $table .= '</tbody></table>';
 $transfer_table = '<table class="wp-list-table widefat fixed striped pages bgbkup-transfers-tx-table">
 	<thead>
 		<tr>
-			<th>Transfer ID</th>
-			<th>Source URL</th>
-			<th>Transfer Status</th>
-			<th>Elapsed Time</th>
-			<th>Actions</th>
+			<th class="transfer_id">Transfer ID</th>
+			<th class="source_url">Source URL</th>
+			<th class="status">Transfer Status</th>
+			<th class="elapsed_time">Elapsed Time</th>
+			<th class="actions">Actions</th>
 		</tr>
 	</thead>
 <tbody>';
@@ -97,7 +97,7 @@ if ( empty( $transfers ) ) {
 		$transfer_table .= sprintf(
 			'<tr class="transfer-info %7$s" data-transfer-id="%1$s">
 				<td class="transfer_id">%1$s</td>
-				<td class="dest_url">%2$s</td>
+				<td class="source_url">%2$s</td>
 				<td class="status">%3$s</td>
 				<td class="time_elapsed">%4$s:%5$02d</td>
 				<td class="actions">%6$s</td>

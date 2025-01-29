@@ -311,7 +311,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		switch( $transfer_status ) {
 			case 'pending':
 				$this->generate_file_lists( $transfer );
-				$this->update_transfer_prop( $transfer_id, 'status', 'transferring-large-files' );
+				$this->util->update_transfer_prop( $transfer_id, 'status', 'transferring-large-files' );
 				$this->process_large_files_rx( $transfer_id );
 				break;
 			case 'transferring-large-files':
@@ -369,14 +369,14 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		if ( empty( $db_files ) ) {
 			$this->migrate_core->log->add( 'Error splitting database dump file' );
-			$this->update_transfer_prop( $transfer['transfer_id'], 'status', 'db-dump-complete' );
+			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'db-dump-complete' );
 			return new WP_Error( 'boldgrid_transfer_rx_db_split_error', __( 'There was an error splitting the database dump file.', 'boldgrid-transfer' ) );
 		}
 
 		$db_dump_info['split_files'] = $db_files;
 
-		$this->update_transfer_prop( $transfer_id, 'db_dump_info', $db_dump_info );
-		$this->update_transfer_prop( $transfer_id, 'status', 'db-ready-for-transfer' );
+		$this->util->update_transfer_prop( $transfer_id, 'db_dump_info', $db_dump_info );
+		$this->util->update_transfer_prop( $transfer_id, 'status', 'db-ready-for-transfer' );
 
 		$this->process_db_rx( $transfer_id );
 	}
@@ -395,7 +395,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		if ( is_wp_error( $response ) ) {
 			$this->migrate_core->log->add( 'Error checking database dump status: ' . $response->get_error_message() );
-			$this->update_transfer_prop( $transfer['transfer_id'], 'status', 'failed' );
+			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'failed' );
 			return $response;
 		} else if ( ! isset( $response['db_dump_info'] ) ) {
 			$this->migrate_core->log->add( 'No db_dump_info in response: ' . json_encode( $response ) );
@@ -404,7 +404,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		$db_dump_info = $response['db_dump_info'];
 
-		$this->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', $db_dump_info );
+		$this->util->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', $db_dump_info );
 
 		$this->migrate_core->log->add(
 			sprintf(
@@ -416,8 +416,8 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		);
 
 		if ( 'complete' === $db_dump_info['status'] ) {
-			$this->update_transfer_prop( $transfer['transfer_id'], 'status', 'db-dump-complete' );
-			$this->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', array(
+			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'db-dump-complete' );
+			$this->util->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', array(
 				'file'      => $db_dump_info['file'],
 				'status'    => 'complete',
 				'db_size'   => $db_dump_info['db_size'],
@@ -443,11 +443,11 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		if ( is_wp_error( $response ) ) {
 			$this->migrate_core->log->add( 'Error starting database dump: ' . $response->get_error_message() );
-			$this->update_transfer_prop( $transfer['transfer_id'], 'status', 'failed' );
+			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'failed' );
 			return $response;
 		} else if ( isset( $response['db_dump_info'] ) ) {
-			$this->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', $response['db_dump_info'] );
-			$this->update_transfer_prop( $transfer['transfer_id'], 'status', 'dumping-db-tables' );
+			$this->util->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', $response['db_dump_info'] );
+			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'dumping-db-tables' );
 			$this->check_dump_status( $transfer );
 		}
 	}
@@ -466,7 +466,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		if ( is_wp_error( $generate_db_dump ) ) {
 			$this->migrate_core->log->add( 'Error generating database dump: ' . $generate_db_dump->get_error_message() );
-			$this->update_transfer_prop( $transfer_id, 'status', 'failed' );
+			$this->util->update_transfer_prop( $transfer_id, 'status', 'failed' );
 			return $generate_db_dump;
 		}
 	}
@@ -494,7 +494,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			$largest_file_size = $this->util->get_largest_file_size( json_decode( $file_list, true ) );
 			$max_upload_size   = $this->util->get_max_upload_size();
 
-			$this->update_transfer_prop( $transfer['transfer_id'], 'largest_file_size', $largest_file_size );
+			$this->util->update_transfer_prop( $transfer['transfer_id'], 'largest_file_size', $largest_file_size );
 
 			$file_lists = $this->util->get_option( $this->lists_option_name, array() );
 
@@ -599,7 +599,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			}
 		}
 
-		$this->update_transfer_prop( $transfer_id, 'db_dump_info', $db_dump_info );
+		$this->util->update_transfer_prop( $transfer_id, 'db_dump_info', $db_dump_info );
 	}
 
 	/**
@@ -715,10 +715,10 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		$status = $transfers[ $transfer_id ]['status'];
 
 		if ( $completed_count === $total_file_count && 'transferring-small-files' === $status ) {
-			$this->update_transfer_prop( $transfer_id, 'status', 'pending-db-dump' );
+			$this->util->update_transfer_prop( $transfer_id, 'status', 'pending-db-dump' );
 			$status       = 'pending-db-dump';
 		} else if ( $completed_count === $total_file_count && 'transferring-large-files' === $status ) {
-			$this->update_transfer_prop( $transfer_id, 'status', 'transferring-small-files' );
+			$this->util->update_transfer_prop( $transfer_id, 'status', 'transferring-small-files' );
 			$status = 'transferring-small-files';
 			$elapsed_time = $this->update_elapsed_time( $transfer_id );
 		}
@@ -771,10 +771,10 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * @since 0.0.5
 	 */
 	public function complete_transfer( $transfer_id ) {
-		$this->update_transfer_prop( $transfer_id, 'status', 'completed' );
-		$elapsed_time = microtime( true ) - intval( $this->get_transfer_prop( $transfer_id, 'start_time', 0 ) );
-		$this->update_transfer_prop( $transfer_id, 'end_time', microtime( true ) );
-		$this->update_transfer_prop( $transfer_id, 'time_elapsed', $elapsed_time );
+		$this->util->update_transfer_prop( $transfer_id, 'status', 'completed' );
+		$elapsed_time = microtime( true ) - intval( $this->util->get_transfer_prop( $transfer_id, 'start_time', 0 ) );
+		$this->util->update_transfer_prop( $transfer_id, 'end_time', microtime( true ) );
+		$this->util->update_transfer_prop( $transfer_id, 'time_elapsed', $elapsed_time );
 		$bytes_rcvd   = $this->util->get_option( $this->bytes_received_option_name, 0 );
 		
 		// Count the number of files transferred.
@@ -889,28 +889,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		wp_cache_delete( $this->open_batches_option_name, 'options' );
 			
 		update_option( $this->open_batches_option_name, $open_batches, false );
-	}
-
-	public function update_transfer_prop( $transfer_id, $key, $value ) {
-		wp_cache_delete( $this->transfers_option_name, 'options' );
-		$transfers = $this->util->get_option( $this->transfers_option_name, array() );
-
-		if ( ! isset( $transfers[ $transfer_id ] ) ) {
-			return;
-		}
-
-		if ( 'status' === $key && $transfers[ $transfer_id ][ $key ] !== $value ) {
-			$this->migrate_core->log->add(
-				"Transfer $transfer_id status updated from {$transfers[ $transfer_id ][ $key ]} to $value"
-			);
-		}
-
-		$transfers[ $transfer_id ][ $key ] = $value;
-
-		$this->util->update_transfer_heartbeat();
-
-		wp_cache_delete( $this->transfers_option_name, 'options' );
-		return update_option( $this->transfers_option_name, $transfers, false );
 	}
 
 	public function process_small_files_rx( $transfer_id ) {
@@ -1167,22 +1145,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		curl_multi_close( $mh );
 	}
 
-	public function get_transfer_prop( $transfer_id, $property, $fallback ) {
-		wp_cache_delete( $this->transfers_option_name, 'options' );
-
-		$transfers = $this->util->get_option( $this->transfers_option_name, array() );
-	
-		if ( ! isset( $transfers[ $transfer_id ] ) ) {
-			return $fallback;
-		}
-
-		if ( ! isset( $transfers[ $transfer_id ][ $property ] ) ) {
-			return $fallback;
-		}
-
-		return $transfers[ $transfer_id ][ $property ];
-	}
-
 	public function create_file_batch( $transfer, $file_list ) {
 		$transfer_id     = $transfer['transfer_id'];
 		$open_batches    = $this->determine_open_batches();
@@ -1371,7 +1333,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 	public function transfer_is_canceled( $transfer_id ) {
 		// Check if the transfer still exists:
-		$transfer_status = $this->get_transfer_prop( $transfer_id, 'status', 'no transfer found' );
+		$transfer_status = $this->util->get_transfer_prop( $transfer_id, 'status', 'no transfer found' );
 		if ( 'canceled' === $transfer_status || 'no transfer found' === $transfer_status ) {
 			return true;
 		}
@@ -1461,7 +1423,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			'file_path' => $file_path,
 			'db_dump_info' => $db_dump_info,
 		) ) );
-		$this->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', $db_dump_info );
+		$this->util->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', $db_dump_info );
 		
 		$response = $this->util->rest_post(
 			$transfer['source_site_url'],
@@ -1475,7 +1437,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		if ( is_wp_error( $response ) ) {
 			$this->migrate_core->log->add( 'Error retrieving database dump file: ' . $response->get_error_message() );
 			$db_dump_info['split_files'][ $part_number ]['status'] = 'pending';
-			$this->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', $db_dump_info );
+			$this->util->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', $db_dump_info );
 			return $response;
 		}
 
@@ -1487,8 +1449,8 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 				'response' => $response,
 			) ) );
 			$db_dump_info['split_files'][ $part_number ]['status'] = 'failed';
-			$this->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', $db_dump_info );
-			$this->update_transfer_prop( $transfer['transfer_id'], 'status', 'db-dump-complete' );
+			$this->util->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', $db_dump_info );
+			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'db-dump-complete' );
 			return;
 		}
 
@@ -1500,13 +1462,13 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		if ( $new_file_hash !== $old_file_hash ) {
 			$this->migrate_core->log->add( 'DB Dump file hash mismatch. Expected: ' . $old_file_hash . ' Got: ' . $new_file_hash );
 			$db_dump_info['split_files'][ $part_number ]['status'] = 'pending';
-			$this->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', $db_dump_info );
+			$this->util->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', $db_dump_info );
 			return new WP_Error( 'boldgrid_transfer_rx_db_file_hash_mismatch', __( 'Database dump file hash mismatch', 'boldgrid-transfer' ) );
 		}
 
 		$db_dump_info['split_files'][ $part_number ]['status'] = 'transferred';
 		$db_dump_info['split_files'][ $part_number ]['path'] = $db_dump_file;
-		$this->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', $db_dump_info );
+		$this->util->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', $db_dump_info );
 	}
 
 	public function process_db_rx( $transfer_id ) {
@@ -1527,7 +1489,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		if ( ! $path_created ) {
 			$this->migrate_core->log->add( 'There was an error creating the directory path for the database dump' );
-			$this->update_transfer_prop( $transfer['transfer_id'], 'status', 'pending-db-tx' );
+			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'pending-db-tx' );
 			return new WP_Error( 'boldgrid_transfer_rx_db_dir_error', __( 'There was an error creating the directory path for the database dump.', 'boldgrid-transfer' ) );
 		}
 
@@ -1555,7 +1517,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		}, ARRAY_FILTER_USE_BOTH );
 
 		if ( ! empty( $pending_db_files ) ) {
-			$this->update_transfer_prop( $transfer['transfer_id'], 'status', 'db-transferring' );
+			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'db-transferring' );
 			$this->retrieve_db_files( $transfer, $pending_db_files, $db_file_dir );
 			return;
 		}
@@ -1579,7 +1541,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 			if ( is_wp_error( $merged_db_file ) ) {
 				$this->migrate_core->log->add( 'Error merging database dump files: ' . $merged_db_file->get_error_message() );
-				$this->update_transfer_prop( $transfer['transfer_id'], 'status', 'db-ready-for-transfer' );
+				$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'db-ready-for-transfer' );
 				return $merged_db_file;
 			}
 			$db_dump_file = $merged_db_file;
@@ -1589,7 +1551,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		if ( ! file_exists( $db_dump_file ) ) {
 			$this->migrate_core->log->add( 'The database dump file was not properly received: ' . $db_dump_file );
-			$this->update_transfer_prop( $transfer['transfer_id'], 'status', 'pending-db-dump' );
+			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'pending-db-dump' );
 			return new WP_Error( 'boldgrid_transfer_rx_db_file_not_received', __( 'The database dump file was not properly received.', 'boldgrid-transfer' ) );
 		}
 		
@@ -1598,7 +1560,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		if ( $new_file_hash !== $db_dump_info['db_hash'] ) {
 			//$wp_filesystem->delete( $db_dump_file );
 			$this->migrate_core->log->add( 'DB Dump file hash mismatch. Expected: ' . $db_dump_info['db_hash'] . ' Got: ' . $new_file_hash );
-			$this->update_transfer_prop( $transfer['transfer_id'], 'status', 'db-dump-complete' );
+			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'db-dump-complete' );
 			$this->reset_db_transfer( $transfer['transfer_id'] );
 			return new WP_Error( 'boldgrid_transfer_rx_db_hash_mismatch', __( 'The database dump file hash does not match the expected hash.', 'boldgrid-transfer' ) );
 		} else {
@@ -1618,7 +1580,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			$db_dump_info['split_files'][ $index ]['status'] = 'pending';
 		}
 
-		$this->update_transfer_prop( $transfer_id, 'db_dump_info', $db_dump_info );
+		$this->util->update_transfer_prop( $transfer_id, 'db_dump_info', $db_dump_info );
 
 	}
 
@@ -1697,10 +1659,10 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 	public function update_elapsed_time( $transfer_id, $save = true ) {
 		$microtime    = microtime( true );
-		$elapsed_time = $microtime - $this->get_transfer_prop( $transfer_id, 'start_time', 0 );
+		$elapsed_time = $microtime - $this->util->get_transfer_prop( $transfer_id, 'start_time', 0 );
 
 		if ( $save ) {
-			$this->update_transfer_prop( $transfer_id, 'time_elapsed', $elapsed_time );
+			$this->util->update_transfer_prop( $transfer_id, 'time_elapsed', $elapsed_time );
 		}
 
 		return $elapsed_time;

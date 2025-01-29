@@ -77,7 +77,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 		$transfer_dir       = $transfer_dir . '/' . $source_dir . '/' . $transfer_id . '/';
 
 		$this->migrate_core->log->add( 'Starting migration for transfer ID ' . $transfer_id );
-		$this->migrate_core->rx->update_transfer_prop( $transfer_id, 'status', 'restoring-files' );
+		$this->util->update_transfer_prop( $transfer_id, 'status', 'restoring-files' );
 
 		// 1. Download and extract the wordpress core files for the version specified in the transfer.
 		if ( ! $this->download_extract_wordpress( $transfer_dir, $transfer['source_wp_version'] ) ) {
@@ -107,7 +107,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 
 		$this->migrate_core->log->add( '$db_file: ' . json_encode( $db_file, JSON_PRETTY_PRINT ) );
 
-		$this->migrate_core->rx->update_transfer_prop( $transfer_id, 'status', 'restoring-db' );
+		$this->util->update_transfer_prop( $transfer_id, 'status', 'restoring-db' );
 
 		// 5. Export the options to a file.
 		$options_file = $this->export_options( $transfer_dir );
@@ -126,7 +126,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 
 		$migration_end_time = microtime( true );
 		$time_to_migrate    = $migration_end_time - $migrate_start_time;
-		$this->migrate_core->rx->update_transfer_prop( $transfer_id, 'status', 'restore-completed' );
+		$this->util->update_transfer_prop( $transfer_id, 'status', 'restore-completed' );
 		$this->migrate_core->log->add(
 			sprintf(
 				'Completed migration for transfer ID %1$s in %2$s.',
@@ -412,7 +412,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 		$wp_rewrite->init();
 
 		// Get the restored "siteurl" and "home".
-		$restored_wp_siteurl = $this->util->get_option( 'siteurl', false, $db );
+		$restored_wp_siteurl = $this->util->get_option( 'siteurl' );
 		$restored_wp_home    = $this->util->get_option( 'home' );
 		
 		$this->migrate_core->log->add( json_encode( array(

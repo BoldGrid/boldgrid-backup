@@ -29,7 +29,8 @@
 				$resyncDbButton = $( 'button.resync-database' ),
 				$cancelButton = $( 'button.cancel-transfer' ),
 				$deleteButton = $( 'button.delete-transfer' ),
-				$closeModalButton = $( '#test-results-modal-close' );
+				$closeModalButton = $( '#test-results-modal-close' ),
+				$sectionLinks = $( '.bg-left-nav li[data-section-id]' );
 
 			self._bindCancelButton( $cancelButton );
 
@@ -111,6 +112,17 @@
 				e.preventDefault();
 				self._authTransfer( $authAdminInput.val(), appUuid );
 			} );
+
+			$sectionLinks.on( 'click', function( e ) {
+				var $link = $( this ),
+					sectionId = $link.attr( 'data-section-id' ),
+					url = new URL( window.location );
+
+				if ( window.history.pushState ) {
+					url.searchParams.set( 'section', sectionId );
+					window.history.pushState( {}, '', url );
+				}
+			} );
 		},
 		_bindCancelButton: function( $button ) {
 			$button.on( 'click', function( e ) {
@@ -134,6 +146,7 @@
 			var $button = args.$restoreButton;
 			if ( response.success ) {
 				$button.text( 'Restoring' );
+				window.location.reload();
 			}
 		},
 		_resyncCallback: function( response, args ) {
@@ -278,6 +291,8 @@
 					progress = 100;
 					progressText = '100%';
 					progressStatusText = progressStatusText;
+
+					window.location.reload();
 				}
 
 				$progressBarFill.css( 'width', progress + '%' );

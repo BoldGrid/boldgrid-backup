@@ -38,6 +38,16 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	public $transfers_option_name;
 
 	/**
+	 * Cancelled Transfers Option Name
+	 * 
+	 * @var string
+	 * 
+	 * @since 0.0.1
+	 */
+	public $cancelled_transfers_option_name;
+
+
+	/**
 	 * Rest API Namespace
 	 * 
 	 * @var string
@@ -66,7 +76,8 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 		$this->migrate_core = $migrate_core;
 		$this->util         = $this->migrate_core->util;
 
-		$this->transfers_option_name  = $this->migrate_core->configs['option_names']['transfers'];
+		$this->transfers_option_name           = $this->migrate_core->configs['option_names']['transfers'];
+		$this->cancelled_transfers_option_name = $this->migrate_core->configs['option_names']['cancelled_transfers'];
 
 		$this->namespace = $this->migrate_core->configs['rest_api_namespace'];
 		$this->prefix    = $this->migrate_core->configs['rest_api_prefix'];
@@ -75,13 +86,14 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	public function authenticate_local_request( $request ) {
 		$params = $request->get_params();
 
-		$host = $request->get_header( 'host' );
+		$host  = $request->get_header( 'host' );
+		$nonce = isset( $params['nonce'] ) ? $params['nonce'] : '';
 		
-		if ( ! isset( $params['nonce'] ) ) {
+		if ( empty( $nonce ) ) {
 			return false;
 		}
 
-		if ( ! wp_verify_nonce( $params['nonce'], 'boldgrid_transfer_cron_resume_transfer' ) ) {
+		if ( ! wp_verify_nonce( $nonce, 'boldgrid_transfer_cron_resume_transfer' ) ) {
 			return false;
 		}
 
@@ -132,53 +144,55 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	 * @since 0.0.1
 	 */
 	public function register_routes() {
-		register_rest_route( $this->namespace, $this->prefix . '/cron-resume-transfer', array(
-			'methods'             => 'GET',
-			'callback'            => array( $this, 'cron_resume_transfer' ),
-			'permission_callback' => array( $this, 'authenticate_local_request' ),
-		) );
+		$rest_routes = array(
+			'cron-resume-transfer' => array(
+				'method'              => 'GET',
+				'endpoint'            => 'cron-resume-transfer',
+				'permission_callback' => 'authenticate_local_request',
+			),
+			'transfer-status'      => array(
+				'method'   => 'PUT',
+				'endpoint' => 'transfer-status/(?P<transfer_id>[A-Za-z0-9]+)/(?P<status>[A-Za-z0-9\-]+)',
+			),
+			'check-status'         => array(
+				'method'   => 'GET',
+				'endpoint' => 'check-status',
+			),
+			'start-migration'      => array(
+				'method'   => 'POST',
+				'endpoint' => 'start-migration',
+			),
+			'cancel-transfer'      => array(
+				'method'   => 'POST',
+				'endpoint' => 'cancel-transfer',
+			),
+			'delete-transfer'      => array(
+				'method'   => 'POST',
+				'endpoint' => 'delete-transfer',
+			),
+			'resync-database'      => array(
+				'method'   => 'POST',
+				'endpoint' => 'resync-database',
+			),
+			'start-restore'        => array(
+				'method'   => 'POST',
+				'endpoint' => 'start-restore',
+			),
+		);
 
-		register_rest_route( $this->namespace, $this->prefix . '/transfer-status/(?P<transfer_id>[A-Za-z0-9]+)/(?P<status>[A-Za-z0-9\-]+)', array(
-			'methods'             => 'PUT',
-			'callback'            => array( $this, 'update_transfer_status' ),
-			'permission_callback' => array( $this, 'authenticate_request' ),
-		) );
+		foreach ( $rest_routes as $route => $args ) {
+			$req_method  = $args['method'];
+			$endpoint    = $args['endpoint'];
+			$method_name = str_replace( '-', '_', $route );
 
-		register_rest_route( $this->namespace, $this->prefix . '/check-status', array(
-			'methods'             => 'GET',
-			'callback'            => array( $this, 'check_status' ),
-			'permission_callback' => array( $this, 'authenticate_request' ),
-		) );
+			$permission_cb_name = isset( $args['permission_callback'] ) ? $args['permission_callback'] : 'authenticate_request';
 
-		register_rest_route( $this->namespace, $this->prefix . '/start-migration', array(
-			'methods'             => 'POST',
-			'callback'            => array( $this, 'start_migration' ),
-			'permission_callback' => array( $this, 'authenticate_request' ),
-		) );
-
-		register_rest_route( $this->namespace, $this->prefix . '/cancel-transfer', array(
-			'methods'             => 'POST',
-			'callback'            => array( $this, 'cancel_transfer' ),
-			'permission_callback' => array( $this, 'authenticate_request' ),
-		) );
-
-		register_rest_route( $this->namespace, $this->prefix . '/delete-transfer', array(
-			'methods'             => 'POST',
-			'callback'            => array( $this, 'delete_transfer' ),
-			'permission_callback' => array( $this, 'authenticate_request' ),
-		) );
-
-		register_rest_route( $this->namespace, $this->prefix . '/resync-database', array(
-			'methods'             => 'POST',
-			'callback'            => array( $this, 'resync_database' ),
-			'permission_callback' => array( $this, 'authenticate_request' ),
-		) );
-
-		register_rest_route( $this->namespace, $this->prefix . '/start-restore', array(
-			'methods'             => 'POST',
-			'callback'            => array( $this, 'start_restore' ),
-			'permission_callback' => array( $this, 'authenticate_request' ),
-		) );
+			register_rest_route( $this->namespace, $this->prefix . '/' . $endpoint, array(
+				'methods'             => $req_method,
+				'callback'            => array( $this, $method_name ),
+				'permission_callback' => array( $this, $permission_cb_name ),
+			) );
+		}
 	}
 
 	/**
@@ -202,7 +216,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 			wp_send_json_error( array( 'message' => 'Invalid transfer ID.' ) );
 		}
 
-		$result = $this->migrate_core->rx->update_transfer_prop( $transfer_id, 'status', 'pending-restore' );
+		$result = $this->util->update_transfer_prop( $transfer_id, 'status', 'pending-restore' );
 		
 		wp_send_json_success( $result );
 	}
@@ -240,7 +254,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 		$deleted = unlink( $db_dump_path );
 
 		if ( $deleted ) {
-			$this->migrate_core->rx->update_transfer_prop( $transfer_id, 'status', 'pending-db-dump' );
+			$this->util->update_transfer_prop( $transfer_id, 'status', 'pending-db-dump' );
 			$this->migrate_core->log->add( 'Database dump file deleted and pending re-sync: ' . $transfer_id );
 			wp_send_json_success( array( 'message' => 'Database dump file deleted and pending re-sync' ) );
 		} else {
@@ -279,12 +293,12 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 			unset( $transfers[ $transfer_id ] );
 			update_option( $this->transfers_option_name, $transfers, false );
 
-			$cancelled_transfers = $this->util->get_option( $this->migrate_core->rx->cancelled_transfers_option_name, array() );
+			$cancelled_transfers = $this->util->get_option( $this->cancelled_transfers_option_name, array() );
 			$cancelled_transfers = array_filter( $cancelled_transfers, function( $id ) use ( $transfer_id ) {
 				return $id !== $transfer_id;
 			} );
 
-			update_option( $this->migrate_core->rx->cancelled_transfers_option_name, array_values( $cancelled_transfers ), false );
+			update_option( $this->cancelled_transfers_option_name, array_values( $cancelled_transfers ), false );
 			$this->migrate_core->log->add( 'Transfer ' . $transfer_id . ' deleted.' );
 			wp_send_json_success( array( 'message' => 'Transfer Deleted' ) );
 		} else {
@@ -341,7 +355,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 
 		$progress_data = array();
 
-		$elapsed_time = microtime( true ) - intval( $this->migrate_core->rx->get_transfer_prop( $transfer_id, 'start_time', 0 ) );
+		$elapsed_time = microtime( true ) - intval( $this->util->get_transfer_prop( $transfer_id, 'start_time', 0 ) );
 		$progress_data['elapsed_time'] = $this->util->convert_to_mmss( $elapsed_time );
 		switch( $status ) {
 			case 'failed':
