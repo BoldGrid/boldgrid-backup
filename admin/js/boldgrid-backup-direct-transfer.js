@@ -455,7 +455,7 @@
 				'check-status',
 				'GET',
 				{ transfer_id: transferId },
-				self.updateProgressCallback,
+				self._updateProgressCallback,
 				{
 					$row: $row,
 					$progressBar: $progressBar,
