@@ -132,24 +132,6 @@ if ( empty( $transfers ) ) {
 
 $transfer_table .= '</tbody></table>';
 
-$start_transfer_nonce_field  = wp_nonce_field( 'boldgrid_transfer_start_rx', 'transfer_start_nonce' );
-$auth_transfer_nonce_field   = wp_nonce_field( 'boldgrid_transfer_auth_tx', 'transfer_auth_nonce' );
-$check_status_nonce_field    = wp_nonce_field( 'boldgrid_transfer_check_status', 'check_status_nonce' );
-$restore_site_nonce_field    = wp_nonce_field( 'boldgrid_transfer_start_restore', 'restore_site_nonce' );
-$resync_database_nonce       = wp_nonce_field( 'boldgrid_transfer_resync_database', 'resync_database_nonce' );
-$cancel_transfer_nonce_field = wp_nonce_field( 'boldgrid_transfer_cancel_transfer', 'cancel_transfer_nonce' );
-$delete_transfer_nonce_field = wp_nonce_field( 'boldgrid_transfer_delete_transfer', 'delete_transfer_nonce' );
-
-$test_results_modal = '<div id="test-results-modal" style="display: none;">
-	<div class="modal-panel">
-		<div class="modal-header">
-			<h2>Pre-Flight Tests</h2>
-				<span id="test-results-modal-close" class="dashicons dashicons-dismiss"></span>
-		</div>
-		<div id="test-results-modal-content" class="modal-body"></div>
-	</div>
-</div>';
-
 return sprintf(
 	'<div class="bgbkup-transfers-rx">
 		<h2>%1$s</h2>
@@ -160,23 +142,9 @@ return sprintf(
 		</div>
 		%3$s
 		%4$s
-		%5$s
-		%6$s
-		%7$s
-		%8$s
-		%9$s
-		%10$s
-		%11$s
 	</div>',
 	esc_html__( 'Use this section if you want to select this WordPress installation as the destination.', 'boldgrid_backup' ),
 	esc_attr( wp_generate_uuid4() ),
 	$table,
-	$transfer_table,
-	$start_transfer_nonce_field,
-	$auth_transfer_nonce_field,
-	$check_status_nonce_field,
-	$restore_site_nonce_field,
-	$cancel_transfer_nonce_field,
-	$delete_transfer_nonce_field,
-	$test_results_modal
+	$transfer_table
 );
