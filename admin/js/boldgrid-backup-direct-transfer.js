@@ -20,7 +20,7 @@ var BoldGrid = BoldGrid || {};
  *
  * @since 1.17.0
  */
-BoldGrid.DirectTransfers = function( $ ) {
+BoldGrid.DirectTransfers = function($) {
 	var self = this;
 
 	self.init = function() {
@@ -421,7 +421,7 @@ BoldGrid.DirectTransfers = function( $ ) {
 			transferId = $(row).data('transferId');
 			self._checkRxStatus(row);
 		});
-	},
+	};
 
 	/**
 	 * Check Rx Status.
@@ -463,10 +463,9 @@ BoldGrid.DirectTransfers = function( $ ) {
 		);
 	};
 
-	$( function() {
+	$(function() {
 		self.init();
-	} );
+	});
 };
 
-BoldGrid.DirectTransfers( jQuery );
-
+BoldGrid.DirectTransfers(jQuery);
