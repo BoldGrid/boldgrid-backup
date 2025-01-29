@@ -46,7 +46,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	 */
 	public $cancelled_transfers_option_name;
 
-
 	/**
 	 * Rest API Namespace
 	 * 
@@ -66,6 +65,15 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	public $prefix;
 
 	/**
+	 * Util
+	 * 
+	 * @var Boldgrid_Backup_Admin_Migrate_Util
+	 * 
+	 * @since 1.17.0
+	 */
+	public $util;
+
+	/**
 	 * Boldgrid_Transfer_Rx_Rest constructor.
 	 * 
 	 * @param Boldgrid_Backup_Admin_Migrate $migrate_core
@@ -83,6 +91,18 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 		$this->prefix    = $this->migrate_core->configs['rest_api_prefix'];
 	}
 
+	/**
+	 * Authenticate a local request
+	 * 
+	 * This is used when making rest api requests
+	 * WP Cron.
+	 *
+	 * @param WP_REST_Request $request The request object.
+	 *
+	 * @return bool True if the request is authenticated, false otherwise.
+	 * 
+	 * @since 1.17.0
+	 */
 	public function authenticate_local_request( $request ) {
 		$params = $request->get_params();
 
@@ -104,6 +124,18 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 		return true;
 	}
 
+	/**
+	 * Authenticate a request
+	 * 
+	 * This is default method to authenticate all 
+	 * rest api requests.
+	 *
+	 * @param WP_REST_Request $request The request object.
+	 * 
+	 * @return bool True if the request is authenticated, false otherwise.
+	 * 
+	 * @since 1.17.0
+	 */
 	public function authenticate_request( $request ) {
 		$params = $request->get_params();
 
@@ -196,7 +228,11 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	}
 
 	/**
-	 * Migrate the site
+	 * Start Restore
+	 * 
+	 * Callback for endpoint: start-restore
+	 * 
+	 * @param WP_REST_Request $request The request object.
 	 * 
 	 * @since 1.17.0
 	 */
@@ -218,11 +254,13 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	}
 
 	/**
-	 * Ajax Resync Database
+	 * Resync Database
+	 * 
+	 * Callback for endpoint: resync-database
+	 * 
+	 * @param WP_REST_Request $request The request object.
 	 * 
 	 * @since 1.17.0
-	 * 
-	 * @return void
 	 */
 	public function resync_database( $request ) {
 		$params      = $request->get_params();
@@ -253,6 +291,15 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 		}
 	}
 
+	/**
+	 * Delete Transfer
+	 * 
+	 * Callback for endpoint: delete-transfer
+	 * 
+	 * @param WP_REST_Request $request The request object.
+	 * 
+	 * @since 1.17.0
+	 */
 	public function delete_transfer( $request ) {
 		global $wp_filesystem;
 
@@ -292,6 +339,15 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 
 	}
 
+	/**
+	 * Cancel Transfer
+	 * 
+	 * Callback for endpoint: cancel-transfer
+	 * 
+	 * @param WP_REST_Request $request The request object.
+	 * 
+	 * @since 1.17.0
+	 */
 	public function cancel_transfer( $request) {
 		$params      = $request->get_params();
 		$transfer_id = isset( $params['transfer_id'] ) ? sanitize_text_field( $params['transfer_id'] ) : '';
@@ -309,8 +365,12 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	}
 
 	/**
-	 * Check Status of Transfer
-	 *
+	 * Check Status
+	 * 
+	 * Callback for endpoint: check-status
+	 * 
+	 * @param WP_REST_Request $request The request object.
+	 * 
 	 * @since 1.17.0
 	 */
 	public function check_status( $request ) {
@@ -443,7 +503,11 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	}
 
 	/**
-	 * Start the migration process
+	 * Start Migration
+	 * 
+	 * Callback for endpoint: start-migration
+	 * 
+	 * @param WP_REST_Request $request The request object.
 	 * 
 	 * @since 1.17.0
 	 */
@@ -463,7 +527,20 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 		$this->migrate_core->rx->create_new_transfer( $site_url, $auth['user'], $auth['pass'] );
 	}
 
-	public function update_transfer_status( $request ) {
+	/**
+	 * Transfer Transfer
+	 * 
+	 * Callback for endpoint: transfer-status
+	 * 
+	 * Note: This is a PUT request, and
+	 * is used to manually update the status of a transfer.
+	 * This is mostly used during testing purposes.
+	 * 
+	 * @param WP_REST_Request $request The request object.
+	 * 
+	 * @since 1.17.0
+	 */
+	public function transfer_status( $request ) {
 		$params      = $request->get_params();
 		$transfer_id = $params['transfer_id'];
 		$status      = $params['status'];
@@ -482,6 +559,15 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 		), 200 );
 	}
 
+	/**
+	 * Cron Resume Transfer
+	 * 
+	 * Callback for endpoint: cron-resume-transfer
+	 * 
+	 * @param WP_REST_Request $request The request object.
+	 * 
+	 * @since 1.17.0
+	 */
 	public function cron_resume_transfer( $request ) {
 		error_log( 'cron_resume_transfer' );
 		$this->migrate_core->rx->process_transfers();

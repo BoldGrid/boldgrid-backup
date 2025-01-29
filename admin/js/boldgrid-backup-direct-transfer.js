@@ -283,9 +283,9 @@
 			var $progressBar        = args.$progressBar,
 				$progressBarFill    = args.$progressBarFill,
 				$progressStatusText = args.$progressStatusText,
-				$timeElapsedText	= args.$timeElapsedText,
+				$timeElapsedText    = args.$timeElapsedText,
 				$progressText       = args.$progressText,
-				$row				= args.$row;
+				$row                = args.$row;
 
 			if ( response.success ) {
 				var status             = response.data.status,
