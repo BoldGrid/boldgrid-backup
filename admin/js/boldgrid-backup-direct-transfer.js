@@ -1,17 +1,62 @@
+/**
+ * File: boldgrid-backup-direct-transfer.js
+ * 
+ * Direct Transfer UI
+ * 
+ * @since 1.17.0
+ * 
+ * @package BoldGrid\Backup
+ */
 ( function( $ ) {
 	var BOLDGRID = BOLDGRID || {};
 	BOLDGRID.TRANSFERS = BOLDGRID.TRANSFERS || {};
 
 	var self;
 
-	BOLDGRID.TRANSFERS.TransfersV2 = {
+	/**
+	 * DirectTransfers
+	 * 
+	 * This object contains all the functions and properties
+	 * for the Direct Transfers UI. Specifically, this uses
+	 * Rest API endpoints to start, cancel, delete, and check
+	 * the status of a transfer.
+	 * 
+	 * @since 1.17.0
+	 */
+	BOLDGRID.TRANSFERS.DirectTransfers = {
+		/**
+		 * Initialize the Direct Transfers UI
+		 * 
+		 * @return {void}
+		 * @since 1.17.0
+		 */
 		init: function() {
 			$( self._onLoad );
 		},
+
+		/**
+		 * On Load
+		 * 
+		 * @return {void}
+		 * @since 1.17.0
+		 */
 		_onLoad: function() {
 			self._bindEvents();
 			self._checkReceiveStatus();
 		},
+
+		/**
+		 * Rest Request
+		 *
+		 * @param {string} endpoint           The endpoint to be called ie. 'start-migration'
+		 * @param {string} method             The method to be used ie. 'POST'
+		 * @param {object} data               The data to be sent
+		 * @param {CallableFunction} callback Function to call on completion
+		 * @param {object} callbackArgs       Arguments to pass to the callback function
+		 * 
+		 * @return {void}
+		 * @since 1.17.0
+		 */
 		_restRequest: function( endpoint, method, data, callback, callbackArgs = {} ) {
 			wp.apiRequest( {
 				path: '/boldgrid-backup/v1/direct-transfer/' + endpoint,
@@ -21,45 +66,64 @@
 				callback( response, callbackArgs );
 			} );
 		},
+
+		/**
+		 * Bind Events
+		 * 
+		 * @return {void}
+		 * @since 1.17.0
+		 */
 		_bindEvents: function() {
-			var $authButton  = $( '#auth_transfer' ),
-				$xferButtons = $( 'button.start-transfer' ),
-				$restoreButton = $( 'button.restore-site' ),
-				$resyncDbButton = $( 'button.resync-database' ),
-				$cancelButton = $( 'button.cancel-transfer' ),
-				$deleteButton = $( 'button.delete-transfer' ),
-				$closeModalButton = $( '#test-results-modal-close' ),
-				$sectionLinks = $( '.bg-left-nav li[data-section-id]' );
+			var $authButton       = $( '#auth_transfer' ),
+				$xferButtons      = $( 'button.start-transfer' ),
+				$restoreButton    = $( 'button.restore-site' ),
+				$resyncDbButton   = $( 'button.resync-database' ),
+				$cancelButton     = $( 'button.cancel-transfer' ),
+				$deleteButton     = $( 'button.delete-transfer' ),
+				$sectionLinks     = $( '.bg-left-nav li[data-section-id]' );
 
-			self._bindCancelButton( $cancelButton );
+			$cancelButton.on( 'click', function( e ) {
+				var $this 	 = $( e.currentTarget ),
+					transferId = $this.data( 'transferId' );
 
-			$closeModalButton.on( 'click', function( e ) {
-				const modal         = document.getElementById( 'test-results-modal' );
-				modal.style.display = "none";
+				e.preventDefault();
+				$this.prop( 'disabled', true );
+				$this.text( 'Cancelling...' );
+				self._restRequest(
+					'cancel-transfer',
+					'POST',
+					{ transfer_id: transferId },
+					self._cancelCallback,
+					{ $cancelButton: $this }
+				);
 			} );
 
+			// Bind the Start Transfer button
 			$xferButtons.on( 'click', function( e ) {
 				var $this = $( e.currentTarget ),
 					url   = $this.data( 'url' );
+
 				e.preventDefault();
 				$this.prop( 'disabled', true );
+
 				self._restRequest(
 					'start-migration',
 					'POST',
 					{ url: url },
-					self._startTransfer,
+					self._startTransferCallback,
 					{ $startButton: $this, url: url }
 				);
 			} );
 
+			// Bind the Restore button
 			$restoreButton.on( 'click', function( e ) {
 				var $this      = $( e.currentTarget ),
-					transferId = $this.data( 'transferId' ),
-					nonce      = $( '#restore_site_nonce' ).val();
+					transferId = $this.data( 'transferId' );
 
 				e.preventDefault();
 				$this.prop( 'disabled', true );
 				$this.text( 'Restoring...' );
+
 				self._restRequest(
 					'start-restore',
 					'POST',
@@ -69,14 +133,14 @@
 				);
 			} );
 
+			// Bind the Resync Database button
 			$resyncDbButton.on( 'click', function( e ) {
-				var $this 	= $( e.currentTarget ),
-					transferId = $this.data( 'transferId' ),
-					nonce      = $( '#resync_database_nonce' ).val();
+				var $this 	   = $( e.currentTarget ),
+					transferId = $this.data( 'transferId' );
 
 				e.preventDefault();
-
 				$this.prop( 'disabled', true );
+
 				self._restRequest(
 					'resync-database',
 					'POST',
@@ -85,10 +149,10 @@
 				);
 			} );
 
+			// Bind the Delete button
 			$deleteButton.on( 'click', function( e ) {
-				var $this 	 = $( e.currentTarget ),
-					transferId = $this.data( 'transferId' ),
-					nonce      = $( '#delete_transfer_nonce' ).val();
+				var $this 	   = $( e.currentTarget ),
+					transferId = $this.data( 'transferId' );
 
 				e.preventDefault();
 				$this.prop( 'disabled', true );
@@ -103,56 +167,76 @@
 				);
 			} );
 
+			// Bind the Authenticate Button
 			$authButton.on( 'click', function( e ) {
-				var $appUuidInput = $( '#app_uuid' ),
+				var $appUuidInput   = $( '#app_uuid' ),
 					$authAdminInput = $( '#auth_admin_url' ),
-					appUuid = $appUuidInput.val();
+					appUuid         = $appUuidInput.val();
 
 				e.preventDefault();
 				self._authTransfer( $authAdminInput.val(), appUuid );
 			} );
 
+			// Bind the section links to add query arg.
 			$sectionLinks.on( 'click', function( e ) {
-				var $link = $( this ),
+				var $link     = $( this ),
 					sectionId = $link.attr( 'data-section-id' ),
-					url = new URL( window.location );
+					url       = new URL( window.location );
 
+				// Older browsers ( IE < 10 ) do not support history.pushState
 				if ( window.history.pushState ) {
 					url.searchParams.set( 'section', sectionId );
 					window.history.pushState( {}, '', url );
 				}
 			} );
 		},
-		_bindCancelButton: function( $button ) {
-			$button.on( 'click', function( e ) {
-				var $this 	 = $( e.currentTarget ),
-					transferId = $this.data( 'transferId' ),
-					nonce      = $( '#cancel_transfer_nonce' ).val();
 
-				e.preventDefault();
-				$this.prop( 'disabled', true );
-				$this.text( 'Cancelling...' );
-				self._restRequest(
-					'cancel-transfer',
-					'POST',
-					{ transfer_id: transferId },
-					self._cancelCallback,
-					{ $cancelButton: $this }
-				);
-			} );
-		},
+		/**
+		 * Start Restore Callback
+		 *
+		 * Callback for endpoint: /start-restore
+		 *
+		 * @param {object} response The response from the REST API
+		 * @param {object} args     The arguments passed to the callback
+		 *
+		 * @return {void}
+		 * @since 1.17.0
+		 */
 		_startRestoreCallback: function( response, args ) {
 			var $button = args.$restoreButton;
+			console.log( { responseType: typeof response } );
 			if ( response.success ) {
 				$button.text( 'Restoring' );
 				window.location.reload();
 			}
 		},
+		/**
+		 * Resync DB Callback
+		 *
+		 * Callback for endpoint: /resync-database
+		 *
+		 * @param {object} response The response from the REST API
+		 * @param {object} args     The arguments passed to the callback
+		 *
+		 * @return {void}
+		 * @since 1.17.0
+		 */
 		_resyncCallback: function( response, args ) {
 			if ( response.success ) {
 				window.location.reload();
 			}
 		},
+
+		/**
+		 * Cancel Callback
+		 *
+		 * Callback for endpoint: /cancel-transfer
+		 * @param {object} response The response from the REST API
+		 * @param {object} args     The arguments passed to the callback
+		 *
+		 * @return {void}
+		 * @since 1.17.0
+		 */
 		_cancelCallback: function( response, args ) {
 			var $button = args.$cancelButton;
 			if ( response.success ) {
@@ -163,6 +247,17 @@
 				}, 3000 );
 			}
 		},
+
+		/**
+		 * Delete Callback
+		 *
+		 * Callback for endpoint: /delete-transfer
+		 * @param {object} response The response from the REST API
+		 * @param {object} args     The arguments passed to the callback
+		 *
+		 * @return {void}
+		 * @since 1.17.0
+		 */
 		_deleteCallback: function( response, args ) {
 			var $button = args.$deleteButton;
 			if ( response.success ) {
@@ -175,87 +270,16 @@
 				$button.text( 'Delete Error. Refresh and try again.' );
 			}
 		},
-		_startTransfer: function( response, args ) {
-			var $button = args.$startButton,
-				url     = args.url;
-			$button.prop( 'disabled', true );
 
-			if ( response.success ) {
-				var transferId = response.data.transfer_id;
-				$button.text( 'Transfer Started' );
-				$button.addClass( 'transfer-started' );
-				$button.prop( 'style', 'color: #2271b1 !important' );
-				setTimeout( function() {
-					self._addTransferRow( transferId, url );
-				}, 3000 );
-			}
-		},
-		_checkResultsAndOpenModal: function( results ) {
-			// Collect messages of items with `result` as false
-			const failedMessages = Object.values( results )
-				.filter( item => ! item.result ) // Filter for false results
-				.map( item => item.message ); // Map to get the message only
-	
-			if ( 0 !== failedMessages.length ) {
-				// Populate the modal content with the failed messages
-				const modalContent     = document.getElementById( 'test-results-modal-content' );
-				modalContent.innerHTML = failedMessages.join( '' );
 		
-				// Show the modal
-				const modal = document.getElementById( 'test-results-modal' );
-				modal.style.display = 'block';
-			}
-		},
-		_addTransferRow: function( transferId, url ) {
-			var $cancelButton,
-				markup = `<tr class="transfer-info transferring" data-transfer-id="${transferId}">
-					<td class="transfer_id">${transferId}</td>
-					<td class="dest_url">${url}</td>
-					<td class="status">Pending</td>
-					<td class="time_elapsed">0:00</td>
-					<td class="actions">
-						<button class="cancel-transfer button-secondary" data-transfer-id="${transferId}">Cancel</button>
-					</td>
-				</tr>
-				<tr class="progress-row transferring" data-transfer-id="${transferId}">
-					<td colspan="5">
-						<div class="progress">
-							<div class="progress-bar" role="progressbar">
-								<div class="progress-bar-text">0%</div>
-								<div class="progress-bar-fill" style="width: 0%"></div>
-							</div>
-						</div>
-					</td>
-				</tr>`;
-			$( '.bgbkup-transfers-tx-table tbody' ).append( markup );
-			$( '.bgbkup-transfers-rx tbody tr.bgbkup-transfers-none-found' ).remove();
-
-			$cancelButton = $( `.bgbkup-transfers-tx-table tbody tr.transfer-info[data-transfer-id="${transferId}"] button.cancel-transfer` );
-
-			self._checkReceiveStatus();
-			self._bindCancelButton( $cancelButton );
-			
-		},
-		_authTransfer: function( authAdminUrl, appUuid ) {
-			var endpointUri = 'authorize-application.php',
-				params      = $.param( {
-					'app_name': 'BoldGrid Transfer',
-					'app_id': appUuid,
-					'success_url': window.location.href,
-				} );
-
-			window.location.href = authAdminUrl + endpointUri + '?' + params;
-		},
-		_checkReceiveStatus: function() {
-			var $statusRow = $( '.bgbkup-transfers-rx tr.progress-row:not( .hidden ):not( .canceled ):not( .completed )' );
-
-			$statusRow.each( function( index, row ) {
-				$( row ).attr( 'data-intervalId', setInterval( self._checkRxStatus, 15000, row ) );
-				transferId = $( row ).data( 'transferId' );
-				self._checkRxStatus( row );
-			} );
-		},
-		_updateProgress: function( response, args ) {
+		/**
+		 * Update Progress Bar.
+		 * 
+		 * This is a callback for the 'check-status' Rest API endpoint.
+		 * @param {object} response The response from the REST API
+		 * @param {object} args     The arguments passed to the callback
+		 */
+		_updateProgressCallback: function( response, args ) {
 			var $progressBar        = args.$progressBar,
 				$progressBarFill    = args.$progressBarFill,
 				$progressStatusText = args.$progressStatusText,
@@ -298,6 +322,126 @@
 				$row.addClass( 'error' );
 			}
 		},
+
+		/**
+		 * Start Migration Callback
+		 *
+		 * Callback for endpoint: /start-migration
+		 * @param {object} response The response from the REST API
+		 * @param {object} args     The arguments passed to the callback
+		 *
+		 * @return {void}
+		 * @since 1.17.0
+		 */
+		_startTransferCallback: function( response, args ) {
+			var $button = args.$startButton,
+				url     = args.url;
+			$button.prop( 'disabled', true );
+
+			if ( response.success ) {
+				var transferId = response.data.transfer_id;
+				$button.text( 'Transfer Started' );
+				$button.addClass( 'transfer-started' );
+				$button.prop( 'style', 'color: #2271b1 !important' );
+				setTimeout( function() {
+					self._addTransferRow( transferId, url );
+				}, 3000 );
+			}
+		},
+
+		/**
+		 * Add Transfer Row
+		 * 
+		 * Add a row to the transfers table once it has been started.
+		 *
+		 * @param {string} transferId Transfer ID
+		 * @param {string} url        Source URL
+		 * 
+		 * @return {void}
+		 * @since 1.17.0
+		 */
+		_addTransferRow: function( transferId, url ) {
+			var $cancelButton,
+				markup = `<tr class="transfer-info transferring" data-transfer-id="${transferId}">
+					<td class="transfer_id">${transferId}</td>
+					<td class="dest_url">${url}</td>
+					<td class="status">Pending</td>
+					<td class="time_elapsed">0:00</td>
+					<td class="actions">
+						<button class="cancel-transfer button-secondary" data-transfer-id="${transferId}">Cancel</button>
+					</td>
+				</tr>
+				<tr class="progress-row transferring" data-transfer-id="${transferId}">
+					<td colspan="5">
+						<div class="progress">
+							<div class="progress-bar" role="progressbar">
+								<div class="progress-bar-text">0%</div>
+								<div class="progress-bar-fill" style="width: 0%"></div>
+							</div>
+						</div>
+					</td>
+				</tr>`;
+			$( '.bgbkup-transfers-tx-table tbody' ).append( markup );
+			$( '.bgbkup-transfers-rx tbody tr.bgbkup-transfers-none-found' ).remove();
+
+			$cancelButton = $( `.bgbkup-transfers-tx-table tbody tr.transfer-info[data-transfer-id="${transferId}"] button.cancel-transfer` );
+
+			self._checkReceiveStatus();
+			self._bindCancelButton( $cancelButton );
+			
+		},
+
+		/**
+		 * Authenticate Transfer
+		 * 
+		 * Redirect to the source site to obtain application password.
+		 *
+		 * @param {string} authAdminUrl WP-Admin URL of source site
+		 * @param {string} appUuid      App UUID to be passed to the source site
+		 */
+		_authTransfer: function( authAdminUrl, appUuid ) {
+			var endpointUri = 'authorize-application.php',
+				params      = $.param( {
+					'app_name': 'BoldGrid Transfer',
+					'app_id': appUuid,
+					'success_url': window.location.href,
+				} );
+
+			window.location.href = authAdminUrl + endpointUri + '?' + params;
+		},
+
+		/**
+		 * Check Receive Status
+		 * 
+		 * This binds to all the applicable rows
+		 * and creates the interval for the _checkRxStatus
+		 * function to be called.
+		 * 
+		 * @return {void}
+		 * @since 1.17.0
+		 */
+		_checkReceiveStatus: function() {
+			var $statusRow = $( '.bgbkup-transfers-rx tr.progress-row:not( .hidden ):not( .canceled ):not( .completed )' ),
+				interval   = 15000;
+
+			$statusRow.each( function( index, row ) {
+				$( row ).attr( 'data-intervalId', setInterval( self._checkRxStatus, interval, row ) );
+				transferId = $( row ).data( 'transferId' );
+				self._checkRxStatus( row );
+			} );
+		},
+
+		/**
+		 * Check Rx Status.
+		 * 
+		 * This function is called on an interval
+		 * set for each applicable row in the transfers table.
+		 *
+		 * @param {HTMLTableRowElement} row The row to check the status of
+		 * 
+		 * @return {void}
+		 * @since 1.17.0
+		 */
 		_checkRxStatus: function( row ) {
 			var $row                = $( row ),
 				transferId          = $row.data( 'transferId' ),
@@ -311,7 +455,7 @@
 				'check-status',
 				'GET',
 				{ transfer_id: transferId },
-				self._updateProgress,
+				self.updateProgressCallback,
 				{
 					$row: $row,
 					$progressBar: $progressBar,
@@ -322,19 +466,9 @@
 				}
 			);
 		},
-		_formatTime: function( seconds ) {
-			const minutes = Math.floor(seconds / 60);
-			const remainingSeconds = Math.floor(seconds % 60);
-
-			// Pad with leading zero if necessary
-			const formattedMinutes = minutes.toString();
-			const formattedSeconds = remainingSeconds.toString().padStart(2, '0');
-
-			return `${formattedMinutes}:${formattedSeconds}`;
-		}
 	};
 
-	self = BOLDGRID.TRANSFERS.TransfersV2;
+	self = BOLDGRID.TRANSFERS.DirectTransfers;
 
-	BOLDGRID.TRANSFERS.TransfersV2.init();
+	BOLDGRID.TRANSFERS.DirectTransfers.init();
 } )( jQuery );
