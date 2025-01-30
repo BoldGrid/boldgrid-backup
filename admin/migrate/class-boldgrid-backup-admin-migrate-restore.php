@@ -218,8 +218,8 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 
 		// Create a temporary directory for extraction
 		$temp_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('wp_', true);
-		if ( ! mkdir( $temp_dir ) && ! is_dir( $temp_dir ) ) {
-			unlink( $zip_file ); // Clean up downloaded file
+		if ( ! WP_Filesystem_Direct::mkdir( $temp_dir ) && ! is_dir( $temp_dir ) ) {
+			wp_delete_file( $zip_file ); // Clean up downloaded file
 			$this->migrate_core->log->add( 'Error creating temporary directory for extraction.' );
 			return false; // Failed to create temporary directory
 		}
@@ -230,12 +230,12 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 			$zip->extractTo( $temp_dir );
 			$zip->close();
 		} else {
-			unlink( $zip_file ); // Clean up downloaded file
+			wp_delete_file( $zip_file ); // Clean up downloaded file
 			$this->migrate_core->log->add( 'Error extracting WordPress core files.' );
 			return false; // Error extracting
 		}
 
-		unlink( $zip_file ); // Clean up downloaded file
+		wp_delete_file( $zip_file ); // Clean up downloaded file
 
 		// WordPress files are in the 'wordpress' subdirectory of the temp dir
 		$wp_dir = $temp_dir . DIRECTORY_SEPARATOR . 'wordpress';
@@ -257,7 +257,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 			if ( $file->isDir() ) {
 				// Create directory if it doesn't exist
 				if ( ! is_dir( $target_path ) ) {
-					mkdir( $target_path, 0755, true );
+					wp_delete_file( $target_path, 0755, true );
 				}
 			} else {
 				// Copy file only if it doesn't already exist
@@ -277,14 +277,14 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 		
 		foreach ( $iterator as $file ) {
 			if ( $file->isFile() || $file->isLink() ) {
-				unlink( $file->getPathname() ); // Delete files and symbolic links
+				wp_delete_file( $file->getPathname() ); // Delete files and symbolic links
 			} elseif ( $file->isDir() ) {
-				rmdir( $file->getPathname() ); // Remove directories
+				WP_Filesystem_Direct::rmdir( $file->getPathname() ); // Remove directories
 			}
 		}
 		
 		// Finally, remove the root temporary directory
-		rmdir( $temp_dir );
+		WP_Filesystem_Direct::rmdir( $temp_dir );
 
 		$this->migrate_core->log->add( 'Downloaded and extracted WordPress core files.' );
 

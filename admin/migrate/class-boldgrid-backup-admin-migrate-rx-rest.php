@@ -161,7 +161,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 			return false;
 		}
 
-		set_current_user( $user->ID );
+		wp_set_current_user( $user->ID );
 
 		if ( ! current_user_can( 'administrator' ) ) {
 			return false;
@@ -279,7 +279,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 
 		$db_dump_path = $transfer_dir . '/' . $source_dir . '/' . $transfer_id . '/' . $db_file_name;
 
-		$deleted = unlink( $db_dump_path );
+		$deleted = wp_delete_file( $db_dump_path );
 
 		if ( $deleted ) {
 			$this->util->update_transfer_prop( $transfer_id, 'status', 'pending-db-dump' );
@@ -569,7 +569,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	 * @since 1.17.0
 	 */
 	public function cron_resume_transfer( $request ) {
-		error_log( 'cron_resume_transfer' );
 		$this->migrate_core->rx->process_transfers();
 	}
 }

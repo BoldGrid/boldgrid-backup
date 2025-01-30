@@ -6,11 +6,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $option_names = $this->core->configs['direct_transfer']['option_names'];
 
-if ( isset( $_GET['user_login'] ) ) {
+if ( isset( $_GET['_wpnonce'] ) &&
+	wp_verify_nonce( sanitize_text_field( wp_unslash($_GET['_wpnonce'] ) ), 'boldgrid_backup_direct_transfer_auth' ) &&
+	isset( $_GET['user_login'] ) ) {
+		$site_url = sanitize_url( wp_unslash( $_GET['site_url'] ) );
+		$user     = sanitize_text_field( wp_unslash( $_GET['user_login'] ) );
+		$pass     = sanitize_text_field( wp_unslash( $_GET['password'] ) );
 	$authd_sites = get_option( $option_names['authd_sites'], array() );
-	$authd_sites[ $_GET['site_url'] ] = array(
-		'user' => $_GET['user_login'],
-		'pass' => Boldgrid_Backup_Admin_Crypt::crypt( $_GET['password'], 'e' )
+	$authd_sites[ $site_url ] = array(
+		'user' => $user,
+		'pass' => Boldgrid_Backup_Admin_Crypt::crypt( $pass, 'e' )
 	);
 
 	update_option( $option_names['authd_sites'], $authd_sites, false );
@@ -135,25 +140,24 @@ $transfer_table .= '</tbody></table>';
 return sprintf(
 	'<div class="bgbkup-transfers-rx">
 		<h2>%1$s</h2>
-		<p>%2$s</p>
-		<h3>%3$s</h3>
+		<p>%2$s %3s</p>
+		<h3>%4$s</h3>
 		<div class="boldgrid-transfer-input-fields">
 			<input id="auth_admin_url" name="auth_admin_url" type="text" placeholder="http://example.com/wp-admin/" />
-			<input id="app_uuid" name="app_uuid" type="hidden" value="%4$s" />
-			<button id="auth_transfer" class="button-primary">%5$s</button>
+			<input id="app_uuid" name="app_uuid" type="hidden" value="%5$s" />
+			<input id="auth_nonce" name="auth_nonce" type="hidden" value="%6$s" />
+			<button id="auth_transfer" class="button-primary">%7$s</button>
 		</div>
-		%6$s
-		%7$s
+		%8$s
+		%9$s
 	</div>',
-	esc_html__( 'Direct Transfer', 'boldgrid_backup' ),
-	esc_html__(
-		'The direct transfer feature allows you to transfer files from another website to this site without having to make a backup first. ' .
-		'The Total Upkeep plugin must be installed on both this site AND the source site.',
-		'boldgrid_backup'
-	),
-	esc_html__( 'Enter the source site\'s Admin URL below in order to generate an application password. ', 'boldgrid_backup' ),
+	esc_html__( 'Direct Transfer', 'boldgrid-backup' ),
+	esc_html__( 'The direct transfer feature allows you to transfer files from another website to this site without having to make a backup first.', 'boldgrid-backup' ),
+	esc_html__( 'The Total Upkeep plugin must be installed on both this site AND the source site.','boldgrid-backup' ),
+	esc_html__( 'Enter the source site\'s Admin URL below in order to generate an application password. ', 'boldgrid-backup' ),
 	esc_attr( wp_generate_uuid4() ),
-	esc_html__( 'Authenticate', 'boldgrid_backup' ),
+	wp_create_nonce( 'boldgrid_backup_direct_transfer_auth' ),
+	esc_html__( 'Authenticate', 'boldgrid-backup' ),
 	$table,
 	$transfer_table
 );

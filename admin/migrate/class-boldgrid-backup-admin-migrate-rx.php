@@ -193,7 +193,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	public function add_cron_interval( $schedules ) {
 		$schedules['every_minute'] = array(
 			'interval' => $this->migrate_core->configs['cron_interval'],
-			'display'  => esc_html__( 'Every Minute' ),
+			'display'  => esc_html__( 'Every Minute', 'boldgrid-backup' ),
 		);
 
 		return $schedules;
@@ -369,7 +369,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		if ( empty( $db_files ) ) {
 			$this->migrate_core->log->add( 'Error splitting database dump file' );
 			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'db-dump-complete' );
-			return new WP_Error( 'boldgrid_transfer_rx_db_split_error', __( 'There was an error splitting the database dump file.', 'boldgrid-transfer' ) );
+			return new WP_Error( 'boldgrid_transfer_rx_db_split_error', __( 'There was an error splitting the database dump file.', 'boldgrid-backup' ) );
 		}
 
 		$db_dump_info['split_files'] = $db_files;
@@ -902,7 +902,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		}
 		$this->process_batch( $transfer, $file_batch, 'retrieve-files' );
 
-		$depth_of_stack = count( debug_backtrace() );
+		$depth_of_stack = count( debug_backtrace() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_debug_backtrace
 
 		if ( 0 >= intval( $this->determine_open_batches() ) && 100 > $depth_of_stack ) {
 			$this->process_transfers();
@@ -1014,6 +1014,19 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		update_option( $this->open_batches_option_name, $open_batches, false );
 	}
 
+	/**
+	 * Process Batch
+	 * 
+	 * Note: This method uses curl_multi_init instead of 
+	 * wp_remote_get() in order to handle multiple simultaneous
+	 * transfers, which isn't feasible using wp_remote_get().
+	 *
+	 * @param array  $transfer   Transfer data
+	 * @param array  $file_batch File batch
+	 * @param string $route      Route
+	 *
+	 * @return void|WP_Error Error if the site is not authenticated
+	 */
 	public function process_batch( $transfer, $file_batch, $route ) {
 		$site_url    = $transfer['source_site_url'];
 		$transfer_id = $transfer['transfer_id'];
@@ -1237,6 +1250,10 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * and then reassemble the file. The file is then checked against
 	 * the MD5 hash to ensure the file was properly received.
 	 * 
+	 * Note: This process uses fopen, fclose, fwrite, etc, instead of
+	 * the WP_Filesytem, because it needs to be able to open, read, and
+	 * write in chunks to handle large files.
+	 * 
 	 * @param array $transfer
 	 * @param array $split_file
 	 * @return void
@@ -1309,7 +1326,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			$time_before_write_option = microtime( true );
 			$this->util->update_file_status( $transfer['transfer_id'], 'large', $split_file['path'], 'transferred' );
 			$time_after_write_option = microtime( true );
-			error_log( 'Time to write option: ' . ( $time_after_write_option - $time_before_write_option ) );
 			$this->util->rest_post(
 				$transfer['source_site_url'],
 				'delete-large-file-parts',
@@ -1430,10 +1446,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		$db_dump_file = $db_file_dir . basename( $file_path );
 
 		if ( ! isset( $response['file'] ) ) {
-			error_log( json_encode( array(
-				'method' => __METHOD__,
-				'response' => $response,
-			) ) );
 			$db_dump_info['split_files'][ $part_number ]['status'] = 'failed';
 			$this->util->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', $db_dump_info );
 			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'db-dump-complete' );
@@ -1449,7 +1461,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			$this->migrate_core->log->add( 'DB Dump file hash mismatch. Expected: ' . $old_file_hash . ' Got: ' . $new_file_hash );
 			$db_dump_info['split_files'][ $part_number ]['status'] = 'pending';
 			$this->util->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', $db_dump_info );
-			return new WP_Error( 'boldgrid_transfer_rx_db_file_hash_mismatch', __( 'Database dump file hash mismatch', 'boldgrid-transfer' ) );
+			return new WP_Error( 'boldgrid_transfer_rx_db_file_hash_mismatch', __( 'Database dump file hash mismatch', 'boldgrid-backup' ) );
 		}
 
 		$db_dump_info['split_files'][ $part_number ]['status'] = 'transferred';
@@ -1474,7 +1486,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		if ( ! $path_created ) {
 			$this->migrate_core->log->add( 'There was an error creating the directory path for the database dump' );
 			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'pending-db-tx' );
-			return new WP_Error( 'boldgrid_transfer_rx_db_dir_error', __( 'There was an error creating the directory path for the database dump.', 'boldgrid-transfer' ) );
+			return new WP_Error( 'boldgrid_transfer_rx_db_dir_error', __( 'There was an error creating the directory path for the database dump.', 'boldgrid-backup' ) );
 		}
 
 		$db_files = $db_dump_info['split_files'];
@@ -1530,7 +1542,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		if ( ! file_exists( $db_dump_file ) ) {
 			$this->migrate_core->log->add( 'The database dump file was not properly received: ' . $db_dump_file );
 			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'pending-db-dump' );
-			return new WP_Error( 'boldgrid_transfer_rx_db_file_not_received', __( 'The database dump file was not properly received.', 'boldgrid-transfer' ) );
+			return new WP_Error( 'boldgrid_transfer_rx_db_file_not_received', __( 'The database dump file was not properly received.', 'boldgrid-backup' ) );
 		}
 		
 		$new_file_hash = md5_file( $db_dump_file );
@@ -1540,7 +1552,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			$this->migrate_core->log->add( 'DB Dump file hash mismatch. Expected: ' . $db_dump_info['db_hash'] . ' Got: ' . $new_file_hash );
 			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'db-dump-complete' );
 			$this->reset_db_transfer( $transfer['transfer_id'] );
-			return new WP_Error( 'boldgrid_transfer_rx_db_hash_mismatch', __( 'The database dump file hash does not match the expected hash.', 'boldgrid-transfer' ) );
+			return new WP_Error( 'boldgrid_transfer_rx_db_hash_mismatch', __( 'The database dump file hash does not match the expected hash.', 'boldgrid-backup' ) );
 		} else {
 			$this->complete_transfer( $transfer['transfer_id'] );
 			return true;
@@ -1607,6 +1619,18 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		return $split_files;
 	}
 
+	/**
+	 * Merge DB Files
+	 * 
+	 * Note: This process uses fopen, fclose, fwrite, etc, instead of
+	 * the WP_Filesytem, because it needs to be able to open, read, and
+	 * write in chunks to handle large files.
+	 *
+	 * @param array  $db_files    Array of db files to merge
+	 * @param string $output_file Patch to the output file
+	 *
+	 * @return void
+	 */
 	public function merge_db_files( $db_files, $output_file ) {
 		$outHandle = fopen( $output_file, 'wb' );
 		if ( ! $outHandle ) {
@@ -1630,7 +1654,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		// Delete the individual db files
 		foreach( $db_files as $db_file ) {
-			unlink( $db_file['path'] );
+			wp_delete_file( $db_file['path'] );
 		}
 
 		return $output_file;

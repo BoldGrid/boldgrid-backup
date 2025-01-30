@@ -100,7 +100,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 			return false;
 		}
 
-		set_current_user( $user->ID );
+		wp_set_current_user( $user->ID );
 
 		if ( ! current_user_can( 'administrator' ) ) {
 			return false;
@@ -198,7 +198,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 		$dest_dir       = $this->migrate_core->util->url_to_safe_directory_name( $dest_url );
 		$dump_dir       = $this->migrate_core->util->get_transfer_dir() . '/' . $dest_dir . '/' . $transfer_id;
 		$db_size        = WP_Debug_Data::get_database_size();
-		$db_dump_file   = $dump_dir . '/db-' . DB_NAME . '-export-' . date('Y-m-d-H-i-s');
+		$db_dump_file   = $dump_dir . '/db-' . DB_NAME . '-export-' . gmdate('Y-m-d-H-i-s');
 		update_option( $this->db_dump_status_option_name, $db_dump_file );
 		$response       = json_encode( array(
 			'status'  => 'pending',
@@ -314,7 +314,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 			return false;
 		}
 
-		error_log( 'Restarting DB Dump. Time since modified: ' . $time_since_modified );
+		$this->migrate_core->log->add( 'Restarting DB Dump. Time since modified: ' . $time_since_modified );
 
 		// Update Status File
 		file_put_contents( $status_file, json_encode( array(
@@ -325,7 +325,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	
 		// Delete the failed file if it exists
 		if ( file_exists( $status['file'] ) ) {
-			unlink( $status['file'] );
+			wp_delete_file( $status['file'] );
 		}
 		
 		// Reschedule the cron
@@ -349,7 +349,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 
 		foreach( $params['file_parts'] as $file_part ) {
 			if ( file_exists( $file_part ) ) {
-				unlink( $file_part );
+				wp_delete_file( $file_part );
 			}
 		}
 
@@ -507,7 +507,6 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 		$request_params = $request->get_params();
 		$file_name      = $request_params['file_path'];
 		$db_path        = urldecode( $file_name );
-		error_log( 'db_path: ' . $db_path );
 		if ( ! file_exists( $db_path ) ) {
 			return new WP_REST_Response( array(
 				'success' => false,

@@ -392,10 +392,11 @@ BoldGrid.DirectTransfers = function($) {
 	 */
 	self._authTransfer = function(authAdminUrl, appUuid) {
 		var endpointUri = 'authorize-application.php',
+			authNonce   = $('#auth_nonce').val(),
 			params = $.param({
 				app_name: 'Total Upkeep',
 				app_id: appUuid,
-				success_url: window.location.href
+				success_url: window.location.href + '&_wpnonce=' + authNonce,
 			});
 
 		window.location.href = authAdminUrl + endpointUri + '?' + params;

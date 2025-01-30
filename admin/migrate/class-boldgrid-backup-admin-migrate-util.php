@@ -104,7 +104,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 
 	function url_to_safe_directory_name( $url ) {
 		// Parse the URL to extract the host (domain)
-		$parsed_url = parse_url( $url );
+		$parsed_url = wp_parse_url( $url );
 		$host       = isset( $parsed_url['host'] ) ? $parsed_url['host'] : '';
 	
 		// Replace dots with dashes
@@ -150,11 +150,17 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 
 		$chunk_paths = array();
 
-		$handle       = fopen( $file_path, 'rb' );
+		/**
+		 * Note: We are using direct PHP file operations here instead of WP_Filesystem
+		 * because we need to be able to only read certain byte chunks of the file.
+		 * Using WP_Filesystem would require reading the entire file into memory
+		 * which could cause memory issues with large files.
+		 */
+		$handle       = fopen( $file_path, 'rb' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 		$chunk_number = 0;
 
 		while ( ! feof( $handle ) ) {
-			$chunk = fread( $handle, $chunk_size );
+			$chunk = fread( $handle, $chunk_size ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fread
 			$chunk_file = $chunk_dir . '/' . $relative_path . '.part-' . $chunk_number;
 			file_put_contents( $chunk_file, $chunk );
 			$chunk_paths[] = $chunk_file;
@@ -175,7 +181,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	}
 
 	public function generate_db_dump() {
-		$backup_file = $this->get_transfer_dir() . '/db-' . DB_NAME . '-export-' . date('Y-m-d-H-i-s') . '.sql';
+		$backup_file = $this->get_transfer_dir() . '/db-' . DB_NAME . '-export-' . gmdate('Y-m-d-H-i-s') . '.sql';
 
 		$db_dump = new Boldgrid_Backup_Admin_Db_Dump( $this->transfer_core->backup_core );
 
@@ -498,8 +504,9 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 */
 	public function get_option( $option_name, $fallback = null ) {
 		$wpdb   = $GLOBALS['wpdb'];
-		$query  = $wpdb->prepare( "SELECT * FROM {$wpdb->options} WHERE option_name = %s", $option_name );
-		$result = $wpdb->get_row( $query );
+		$result = $wpdb->get_row(
+			$wpdb->prepare( "SELECT * FROM {$wpdb->options} WHERE option_name = %s", $option_name )
+		);
 
 		// If the option is not found, return the fallback value
 		if ( ! $result ) {
