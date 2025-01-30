@@ -52,7 +52,9 @@ class Boldgrid_Backup_Admin_Transfers {
 
 		wp_enqueue_style(
 			'boldgrid-backup-direct-transfer',
-			plugin_dir_url( BOLDGRID_BACKUP_PATH . '/admin/css/boldgrid-backup-admin-migrate.css' ) . 'boldgrid-backup-admin-migrate.css'
+			plugin_dir_url( BOLDGRID_BACKUP_PATH . '/admin/css/boldgrid-backup-admin-direct-transfer.css' ) . 'boldgrid-backup-admin-direct-transfer.css',
+			[],
+			BOLDGRID_BACKUP_VERSION,
 		);
 
 

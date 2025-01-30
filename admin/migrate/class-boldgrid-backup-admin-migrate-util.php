@@ -30,6 +30,10 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 
 	/**
 	 * Excluded Paths
+	 *
+	 * @var array
+	 *
+	 * @since 1.17.0
 	 */
 	public $excluded_paths = array(
 		'.git',

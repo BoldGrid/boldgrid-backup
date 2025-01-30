@@ -258,8 +258,11 @@ class Boldgrid_Backup_Admin_Log {
 			return;
 		}
 
+		/*
+		 * Removed logging that 'pcntl_async_signals' is not available,
+		 * because it was filling up the logs on sites that don't have it available.
+		 */
 		if ( ! function_exists( 'pcntl_async_signals' ) ) {
-			//$this->add( 'Cannot add signal handlers, pcntl_async_signals function does not exist.' );
 			return;
 		}
 
