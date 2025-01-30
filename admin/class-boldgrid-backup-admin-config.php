@@ -285,6 +285,16 @@ class Boldgrid_Backup_Admin_Config {
 			'updated'          => esc_html__( 'Updated!', 'boldgrid-backup' ),
 			'failed_to_update' => esc_html__( 'Failed to update: ', 'boldgrid-backup' ),
 			'unknown_error'    => esc_html__( 'Unknown error.', 'boldgrid-backup' ),
+			'cancelling'       => esc_html__( 'Cancelling', 'boldgrid-backup' ),
+			'cancelled'        => esc_html__( 'Cancelled', 'boldgrid-backup' ),
+			'cancel'           => esc_html__( 'Cancel', 'boldgrid-backup' ),
+			'restoring'        => esc_html__( 'Restoring', 'boldgrid-backup' ),
+			'deleting'         => esc_html__( 'Deleting', 'boldgrid-backup' ),
+			'deleted'          => esc_html__( 'Deleted', 'boldgrid-backup' ),
+			'completed'        => esc_html__( 'Completed', 'boldgrid-backup' ),
+			'transfer_started' => esc_html__( 'Transfer Started', 'boldgrid-backup' ),
+			'pending'          => esc_html__( 'Pending', 'boldgrid-backup' ),
+			'delete_error'     => esc_html__( 'Delete Error. Refresh and try again.', 'boldgrid-backup' ),
 		);
 	}
 

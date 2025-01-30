@@ -34,6 +34,14 @@ table.bgbkup-transfers-tx-table.widefat th,
 table.bgbkup-transfers-sites-table.widefat th {
     font-weight: bold;
 }
+
+table.bgbkup-transfers-tx-table.widefat th,
+table.bgbkup-transfers-sites-table.widefat th,
+table.bgbkup-transfers-tx-table.widefat td,
+table.bgbkup-transfers-sites-table.widefat td {
+    text-align: center;
+}
+
 table.bgbkup-transfers-tx-table {
     table-layout: auto;
 }

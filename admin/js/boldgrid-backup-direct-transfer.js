@@ -34,6 +34,7 @@ BoldGrid.DirectTransfers = function($) {
 	 * @since 1.17.0
 	 */
 	self._onLoad = function() {
+		self.lang = BoldGridBackupAdmin.lang;
 		self._bindEvents();
 		self._checkReceiveStatus();
 	};
@@ -81,7 +82,7 @@ BoldGrid.DirectTransfers = function($) {
 
 			e.preventDefault();
 			$this.prop('disabled', true);
-			$this.text('Cancelling...');
+			$this.text(self.lang.cancelling + '...');
 			self._restRequest(
 				'cancel-transfer',
 				'POST',
@@ -112,7 +113,7 @@ BoldGrid.DirectTransfers = function($) {
 
 			e.preventDefault();
 			$this.prop('disabled', true);
-			$this.text('Restoring...');
+			$this.text(self.lang.restoring + '...');
 
 			self._restRequest(
 				'start-restore',
@@ -146,7 +147,7 @@ BoldGrid.DirectTransfers = function($) {
 
 			e.preventDefault();
 			$this.prop('disabled', true);
-			$this.text('Deleting...');
+			$this.text(self.lang.deleting + '...');
 
 			self._restRequest(
 				'delete-transfer',
@@ -196,7 +197,7 @@ BoldGrid.DirectTransfers = function($) {
 		var $button = args.$restoreButton;
 		console.log({ responseType: typeof response });
 		if (response.success) {
-			$button.text('Restoring');
+			$button.text(self.lang.restoring);
 			window.location.reload();
 		}
 	};
@@ -231,7 +232,7 @@ BoldGrid.DirectTransfers = function($) {
 	self._cancelCallback = function(response, args) {
 		var $button = args.$cancelButton;
 		if (response.success) {
-			$button.text('Cancelled');
+			$button.text(self.lang.cancelled);
 			// Wait 3 seconds then reload page.
 			setTimeout(function() {
 				location.reload();
@@ -252,13 +253,13 @@ BoldGrid.DirectTransfers = function($) {
 	self._deleteCallback = function(response, args) {
 		var $button = args.$deleteButton;
 		if (response.success) {
-			$button.text('Deleted');
+			$button.text(self.lang.deleted);
 			// Wait 2 seconds then reload page.
 			setTimeout(function() {
 				location.reload();
 			}, 2000);
 		} else {
-			$button.text('Delete Error. Refresh and try again.');
+			$button.text(self.lang.delete_error);
 		}
 	};
 
@@ -289,7 +290,7 @@ BoldGrid.DirectTransfers = function($) {
 				$progressBar.addClass('completed');
 				clearInterval($row.data('intervalId'));
 
-				status = 'Completed';
+				status = self.lang.completed;
 				progress = 100;
 				progressText = '100%';
 				progressStatusText = progressStatusText;
@@ -304,7 +305,7 @@ BoldGrid.DirectTransfers = function($) {
 
 			if ('canceled' === status) {
 				$row.addClass('canceled');
-				$progressStatusText.text('Canceled');
+				$progressStatusText.text(self.lang.cancelled);
 			}
 		} else {
 			console.log(response);
@@ -329,7 +330,7 @@ BoldGrid.DirectTransfers = function($) {
 
 		if (response.success) {
 			var transferId = response.data.transfer_id;
-			$button.text('Transfer Started');
+			$button.text(self.lang.transfer_started);
 			$button.addClass('transfer-started');
 			$button.prop('style', 'color: #2271b1 !important');
 			setTimeout(function() {
@@ -354,10 +355,10 @@ BoldGrid.DirectTransfers = function($) {
 			markup = `<tr class="transfer-info transferring" data-transfer-id="${transferId}">
 				<td class="transfer_id">${transferId}</td>
 				<td class="dest_url">${url}</td>
-				<td class="status">Pending</td>
+				<td class="status">${self.lang.pending}</td>
 				<td class="time_elapsed">0:00</td>
 				<td class="actions">
-					<button class="cancel-transfer button-secondary" data-transfer-id="${transferId}">Cancel</button>
+					<button class="cancel-transfer button-secondary" data-transfer-id="${transferId}">${self.lang.cancel}</button>
 				</td>
 			</tr>
 			<tr class="progress-row transferring" data-transfer-id="${transferId}">
@@ -392,7 +393,7 @@ BoldGrid.DirectTransfers = function($) {
 	self._authTransfer = function(authAdminUrl, appUuid) {
 		var endpointUri = 'authorize-application.php',
 			params = $.param({
-				app_name: 'BoldGrid Transfer',
+				app_name: 'Total Upkeep',
 				app_id: appUuid,
 				success_url: window.location.href
 			});
