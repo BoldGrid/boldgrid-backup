@@ -91,8 +91,14 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	}
 
 	/**
+	 * Get Transfer Dir
+	 * 
 	 * Get Backup Dir from boldgrid-backup settings
 	 * in `boldgrid_backup_settings` option.
+	 * 
+	 * @since 1.17.0
+	 * 
+	 * @return string
 	 */
 	public function get_transfer_dir() {
 		$settings = $this->get_option( 'boldgrid_backup_settings', array() );
@@ -102,6 +108,16 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		return isset( $settings['backup_directory'] ) ? $settings['backup_directory'] : '/var/www/boldgrid_backup';
 	}
 
+	/**
+	 * URL to Safe Directory Name
+	 * 
+	 * Given a URL, this function will return a safe directory name
+	 * by replacing dots with dashes.
+	 * 
+	 * @param string $url
+	 * 
+	 * @return string
+	 */
 	function url_to_safe_directory_name( $url ) {
 		// Parse the URL to extract the host (domain)
 		$parsed_url = wp_parse_url( $url );
@@ -113,6 +129,18 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		return $safe_directory_name;
 	}
 
+	/**
+	 * Create Dirpath
+	 * 
+	 * Given a path to a file, this function will create the directory path
+	 * if it does not exist.
+	 * 
+	 * @since 1.17.0
+	 * 
+	 * @param string $path File path to create the directory for
+	 * 
+	 * @return bool True if the directory was created, false otherwise
+	 */
 	public function create_dirpath( $path ) {
 		$dirpath = dirname( $path );
 
@@ -121,9 +149,12 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 				wp_mkdir_p( $dirpath );
 				return true;
 			} catch ( Exception $e ) {
+				error_log( 'Caught exception: ' . $e->getMessage() . "\n" );
 				return false;
 			}
 		}
+
+		error_log( 'dirpath: ' . $dirpath );
 
 		return true;
 	}
@@ -136,8 +167,12 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * They will be placed in the transfer_dir / transfer id
 	 * directory.
 	 * 
-	 * @param $transfer_id
-	 * @param $file_path
+	 * @since 1.17.0
+	 * 
+	 * @param string $transfer_id     The transfer id
+	 * @param string $file_path       The path to the file to split
+	 * @param string $relative_path   The path relative to the doc root
+	 * @param int    $max_upload_size The max upload size
 	 * 
 	 * @return array of file paths to the chunks
 	 */
@@ -170,16 +205,37 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		return $chunk_paths;
 	}
 
+	/**
+	 * Update Transfer Heartbeat
+	 *
+	 * @since 1.17.0
+	 */
 	public function update_transfer_heartbeat() {
 		wp_cache_delete( $this->heartbeat_option_name, 'options' );
 		update_option( $this->heartbeat_option_name, time(), false );
 	}
 
+	/**
+	 * Get Transfer Heartbeat
+	 *
+	 * @since 1.17.0
+	 * 
+	 * @return int
+	 */
 	public function get_transfer_heartbeat() {
 		wp_cache_delete( $this->heartbeat_option_name, 'options' );
 		return $this->get_option( $this->heartbeat_option_name, 0 );
 	}
 
+	/**
+	 * Generate DB Dump
+	 * 
+	 * Generate a database dump file.
+	 * 
+	 * @since 1.17.0
+	 * 
+	 * @return string The path to the database dump file
+	 */
 	public function generate_db_dump() {
 		$backup_file = $this->get_transfer_dir() . '/db-' . DB_NAME . '-export-' . gmdate('Y-m-d-H-i-s') . '.sql';
 
@@ -193,9 +249,12 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	/**
 	 * Get all files in a directory
 	 * 
-	 * @param string $dir
+	 * Note: This file excludes anything in the
+	 * self::excluded_paths property.
 	 * 
-	 * @return array
+	 * @param string $dir The directory to scan
+	 * 
+	 * @return array An array of files in the directory
 	 * 
 	 * @since 1.17.0
 	 */
@@ -233,7 +292,14 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	/**
 	 * Convert to Bytes
 	 * 
+	 * Convert a string representation of a file size
+	 * to bytes.
+	 * 
+	 * @since 1.17.0
+	 * 
 	 * @param string $size
+	 * 
+	 * @return int The size in bytes
 	 */
 	public function convert_to_bytes( $size ) {
 		$val  = trim( $size );
@@ -253,10 +319,13 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 
 	/**
 	 * Get Max Upload Size
-	 *
-	 * @return int
+	 * 
+	 * Get the max upload size based on max sizes
+	 * and memory limits.
 	 * 
 	 * @since 1.17.0
+	 * 
+	 * @return int The max upload size in bytes
 	 */
 	public function get_max_upload_size() {
 		// Get values from PHP configuration
@@ -275,7 +344,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		return min( $upload_max_filesize, $post_max_size, $memory_limit );
 	}
 
-		/**
+	/**
 	 * Get the largest file size from a list of files
 	 * 
 	 * @param array $files
@@ -296,31 +365,14 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	}
 
 	/**
-	 * Get Estimated Batch Size
+	 * Get Transfer From ID
 	 * 
-	 * Determine what the size in bytes will be of
-	 * the average batch of files based on the 
-	 * configs['batch_chunks'] and 
-	 * configs['chunk_size'] configs,
-	 * as well as the largest file size and the total transfer
-	 * size.
+	 * Get the transfer data from the transfer id.
 	 * 
-	 * @param array $file_list list of files
+	 * @param string $transfer_id
 	 * 
-	 * @return int
-	 * 
-	 * @since 1.17.0
+	 * @return array|bool The transfer data or false if not found
 	 */
-	public function get_estimated_batch_size( $file_list ) {
-		$transfer_size = array_sum( array_column( $file_list, 'size' ) );
-
-		$average_file_size = $transfer_size / count( $file_list );
-
-		$average_batch_size = $average_file_size * $this->migrate_core->configs['batch_chunks'];
-
-		return $average_batch_size;
-	}
-
 	public function get_transfer_from_id( $transfer_id ) {
 		$transfers = $this->get_option( $this->transfers_option_name, array() );
 
@@ -332,6 +384,17 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		return $transfers[ $transfer_id ];
 	}
 
+	/**
+	 * Get Transfer Prop
+	 * 
+	 * Get a property from a transfer.
+	 * 
+	 * @param string $transfer_id
+	 * @param string $property
+	 * @param mixed  $fallback
+	 * 
+	 * @return mixed The property value or the fallback value
+	 */
 	public function get_transfer_prop( $transfer_id, $property, $fallback ) {
 		wp_cache_delete( $this->transfers_option_name, 'options' );
 
@@ -348,12 +411,25 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		return $transfer[ $property ];
 	}
 
+	/**
+	 * Update Transfer Prop
+	 * 
+	 * Update the property of a transfer
+	 * and log the change if it is a status
+	 * change.
+	 * 
+	 * @param string $transfer_id
+	 * @param string $key
+	 * @param mixed  $value
+	 * 
+	 * @return bool True if the update was successful, false otherwise
+	 */
 	public function update_transfer_prop( $transfer_id, $key, $value ) {
 		wp_cache_delete( $this->transfers_option_name, 'options' );
 		$transfers = $this->get_option( $this->transfers_option_name, array() );
 
 		if ( ! isset( $transfers[ $transfer_id ] ) ) {
-			return;
+			return false;
 		}
 
 		if ( 'status' === $key && $transfers[ $transfer_id ][ $key ] !== $value ) {
@@ -370,6 +446,11 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		return update_option( $this->transfers_option_name, $transfers, false );
 	}
 
+	/**
+	 * Cleanup Filelists
+	 *
+	 * @since 1.17.0
+	 */
 	public function cleanup_filelists() {
 		$transfers    = $this->get_option( $this->transfers_option_name, array() );
 		$transfer_ids = array_keys( $transfers );
@@ -385,6 +466,15 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		update_option( $this->lists_option_name, $file_lists, false );
 	}
 
+	/**
+	 * Generate File List
+	 * 
+	 * Generate a list of files in the WP_CONTENT_DIR
+	 * 
+	 * @since 1.17.0
+	 * 
+	 * @return array
+	 */
 	public function generate_file_list() {
 		$file_list = $this->get_files_in_dir( WP_CONTENT_DIR );
 
@@ -432,6 +522,19 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		);
 	}
 
+	/**
+	 * Get Rest
+	 * 
+	 * Get data from a REST API endpoint
+	 * 
+	 * @since 1.17.0
+	 * 
+	 * @param string $site_url The site URL
+	 * @param string $route    The route to the REST endpoint
+	 * @param string $key      The key to get from the response
+	 * 
+	 * @return mixed The data from the REST endpoint
+	 */
 	public function rest_get( $site_url, $route, $key ) {
 		$namespace = $this->migrate_core->configs['rest_api_namespace'] . '/';
 		$prefix    = $this->migrate_core->configs['rest_api_prefix'] . '/';
@@ -476,6 +579,8 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 
 	/**
 	 * Generate a random backup id.
+	 * 
+	 * @since 1.17.0
 	 *
 	 * @return string
 	 */
@@ -497,10 +602,16 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * Get an option from the php table using
 	 * wpdb to avoid caching issues.
 	 * 
+	 * NOTE: Plugin checks don't like that we're using
+	 * this method to get options, rather than using get_option
+	 * along with cache clearing, however these options are updated
+	 * asynchronously and cache clearing wasn't working efficiently
+	 * enough for our needs.
+	 * 
 	 * @param string $option_name The name of the option
 	 * @param mixed  $fallback    The fallback value if the option is not found
 	 * 
-	 * @return mixed
+	 * @return mixed The option value or the fallback value
 	 */
 	public function get_option( $option_name, $fallback = null ) {
 		$wpdb   = $GLOBALS['wpdb'];
@@ -517,6 +628,11 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		return maybe_unserialize( $result->option_value );
 	}
 
+	/**
+	 * Cancel Transfer
+	 *
+	 * @param string $transfer_id The transfer id
+	 */
 	public function cancel_transfer( $transfer_id ) {
 		$cancelled_transfers = $this->get_option( $this->cancelled_transfers_option_name, array() );
 
@@ -539,6 +655,15 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		return $status_updated;
 	}
 
+	/**
+	 * Update Bulk File Status
+	 * 
+	 * @since 1.17.0
+	 *
+	 * @param string $transfer_id The transfer id
+	 * @param array  $batch       The batch of files to update
+	 * @param string $status      The status to update the files to
+	 */
 	public function update_bulk_file_status( $transfer_id, $batch, $status ) {
 		wp_cache_delete( $this->lists_option_name, 'options' );
 		wp_cache_delete( $this->transfers_option_name, 'options' );
@@ -583,6 +708,16 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		update_option( $this->lists_option_name, $file_lists, false );
 	}
 
+	/**
+	 * Update File MD5
+	 * 
+	 * @since 1.17.0
+	 *
+	 * @param string $transfer_id   The transfer id
+	 * @param string $small_or_large The file size
+	 * @param string $file_path      The file path
+	 * @param string $new_md5_hash   The new md5 hash
+	 */
 	public function update_file_md5( $transfer_id, $small_or_large, $file_path, $new_md5_hash ) {
 		wp_cache_delete( $this->lists_option_name, 'options' );
 		wp_cache_delete( $this->transfers_option_name, 'options' );
@@ -622,7 +757,17 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		update_option( $this->lists_option_name, $file_lists, false );
 		$this->update_transfer_heartbeat();
 	}
-	
+
+	/**
+	 * Update File Status
+	 * 
+	 * @since 1.17.0
+	 *
+	 * @param string $transfer_id   The transfer id
+	 * @param string $small_or_large The file size
+	 * @param string $file_path      The file path
+	 * @param string $status         The new status
+	 */
 	public function update_file_status( $transfer_id, $small_or_large, $file_path, $status ) {
 		wp_cache_delete( $this->lists_option_name, 'options' );
 		wp_cache_delete( $this->transfers_option_name, 'options' );
@@ -669,6 +814,20 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		$this->update_transfer_heartbeat();
 	}
 
+	/**
+	 * Rest Post
+	 * 
+	 * POST data to a REST API endpoint
+	 * 
+	 * @since 1.17.0
+	 * 
+	 * @param string $site_url The site URL
+	 * @param string $route    The route to the REST endpoint
+	 * @param array  $data     The data to post
+	 * @param bool   $return   Whether to expect a return value
+	 * 
+	 * @return mixed The response data from the REST endpoint
+	 */
 	public function rest_post( $site_url, $route, $data, $return = false ) {
 		$namespace = $this->migrate_core->configs['rest_api_namespace'] . '/';
 		$prefix    = $this->migrate_core->configs['rest_api_prefix'] . '/';

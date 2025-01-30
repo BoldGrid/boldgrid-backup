@@ -81,6 +81,15 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 		$this->prefix    = $this->migrate_core->configs['rest_api_prefix'];
 	}
 
+	/**
+	 * Authenticate the request
+	 * 
+	 * @param WP_REST_Request $request
+	 * 
+	 * @return bool True if the request is authenticated, false otherwise
+	 * 
+	 * @since 1.17.0
+	 */
 	public function authenticate_request( $request ) {
 		$params = $request->get_params();
 
@@ -115,80 +124,76 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 * @since 1.17.00
 	 */
 	public function register_routes() {
-		register_rest_route( $this->namespace, $this->prefix . '/start-db-dump', array(
-			'methods'             => 'POST',
-			'callback'            => array( $this, 'start_db_dump' ),
-			'permission_callback' => array( $this, 'authenticate_request' ),
-		) );
+		$rest_routes = array(
+			'start-db-dump' => array(
+				'methods'             => 'POST',
+				'endpoint'            => 'start-db-dump',
+			),
+			'check-dump-status' => array(
+				'methods'             => 'POST',
+				'endpoint'            => 'check-dump-status',
+			),
+			'split-db-file' => array(
+				'methods'             => 'POST',
+				'endpoint'            => 'split-db-file',
+			),
+			'generate-file-list' => array(
+				'methods'             => 'GET',
+				'endpoint'            => 'generate-file-list',
+			),
+			'get-wp-version' => array(
+				'methods'             => 'GET',
+				'endpoint'            => 'get-wp-version',
+			),
+			'get-db-prefix' => array(
+				'methods'             => 'GET',
+				'endpoint'            => 'get-db-prefix',
+			),
+			'retrieve-files' => array(
+				'methods'             => 'POST',
+				'endpoint'            => 'retrieve-files',
+			),
+			'retrieve-large-file-part' => array(
+				'methods'             => 'POST',
+				'endpoint'            => 'retrieve-large-file-part',
+			),
+			'delete-large-file-parts' => array(
+				'methods'             => 'POST',
+				'endpoint'            => 'delete-large-file-parts',
+			),
+			'get-db-dump' => array(
+				'methods'             => 'POST',
+				'endpoint'            => 'get-db-dump',
+			),
+			'split-large-files' => array(
+				'methods'             => 'POST',
+				'endpoint'            => 'split-large-files',
+			),
+		);
 
-		register_rest_route( $this->namespace, $this->prefix . '/check-dump-status', array(
-			'methods'             => 'POST',
-			'callback'            => array( $this, 'check_dump_status' ),
-			'permission_callback' => array( $this, 'authenticate_request' ),
-		) );
+		foreach( $rest_routes as $route => $args ) {
+			$req_method  = $args['methods'];
+			$endpoint    = $args['endpoint'];
+			$method_name = str_replace( '-', '_', $route );
 
-		register_rest_route( $this->namespace, $this->prefix . '/split-db-file', array(
-			'methods'             => 'POST',
-			'callback'            => array( $this, 'split_db_file' ),
-			'permission_callback' => array( $this, 'authenticate_request' ),
-		) );
+			$permission_cb_name = isset( $args['permission_callback'] ) ? $args['permission_callback'] : 'authenticate_request';
 
-		register_rest_route( $this->namespace, $this->prefix . '/generate-file-list', array(
-			'methods'             => 'GET',
-			'callback'            => array( $this, 'generate_file_list' ),
-			'permission_callback' => array( $this, 'authenticate_request' ),
-		) );
-
-		register_rest_route( $this->namespace, $this->prefix . '/get-wp-version', array(
-			'methods'             => 'GET',
-			'callback'            => array( $this, 'get_wp_version' ),
-			'permission_callback' => array( $this, 'authenticate_request' ),
-		) );
-
-		register_rest_route( $this->namespace, $this->prefix . '/get-db-prefix', array(
-			'methods'             => 'GET',
-			'callback'            => array( $this, 'get_db_prefix' ),
-			'permission_callback' => array( $this, 'authenticate_request' ),
-		) );
-
-		register_rest_route( $this->namespace, $this->prefix . '/retrieve-files', array(
-			'methods'             => 'POST',
-			'callback'            => array( $this, 'retrieve_files' ),
-			'permission_callback' => array( $this, 'authenticate_request' ),
-		) );
-
-		register_rest_route( $this->namespace, $this->prefix . '/retrieve-large-file-part', array(
-			'methods'             => 'POST',
-			'callback'            => array( $this, 'retrieve_large_file_part' ),
-			'permission_callback' => array( $this, 'authenticate_request' ),
-		) );
-
-		register_rest_route( $this->namespace, $this->prefix . '/delete-large-file-parts', array(
-			'methods'             => 'POST',
-			'callback'            => array( $this, 'delete_large_file_parts' ),
-			'permission_callback' => array( $this, 'authenticate_request' ),
-		) );
-
-		// Register a rest route to retrieve a DB dump file, where the file name is an
-		// argument in the rest route: /boldgrid-transfer/v1/get-db-dump/<file_name>
-		register_rest_route( $this->namespace, $this->prefix . '/get-db-dump', array(
-			'methods'             => 'POST',
-			'callback'            => array( $this, 'get_db_dump' ),
-			'permission_callback' => array( $this, 'authenticate_request' ),
-		) );
-
-		register_rest_route( $this->namespace, $this->prefix . '/split-large-files', array(
-			'methods'             => 'POST',
-			'callback'            => array( $this, 'split_large_files' ),
-			'permission_callback' => array( $this, 'authenticate_request' ),
-		) );
+			register_rest_route( $this->namespace, $this->prefix . '/' . $endpoint, array(
+				'methods'             => $req_method,
+				'callback'            => array( $this, $method_name ),
+				'permission_callback' => array( $this, $permission_cb_name ),
+			) );
+		}
 	}
 
 	/**
 	 * Start db dump
 	 *  
 	 * @param $request WP_REST_Request
+	 *
 	 * @since 1.17.0
+	 * 
+	 * @return WP_Rest_Response
 	 */
 	public function start_db_dump( $request ) {
 		require_once ABSPATH . 'wp-admin/includes/class-wp-debug-data.php';
@@ -252,6 +257,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 * @since 1.17.00
 	 * 
 	 * @param $request WP_REST_Request
+	 *
 	 * @return WP_Rest_Response
 	 */
 	public function check_dump_status( $request ) {
@@ -341,6 +347,8 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 * 
 	 * @param $request WP_REST_Request
 	 * @since 1.17.00
+	 * 
+	 * @return WP_Rest_Response
 	 */
 	public function delete_large_file_parts( $request ) {
 		$params = $request->get_params();
@@ -363,6 +371,8 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 * 
 	 * @param $request WP_REST_Request
 	 * @since 1.17.00
+	 * 
+	 * @return WP_Rest_Response
 	 */
 	public function retrieve_large_file_part( $request ) {
 		$params = $request->get_params();
@@ -430,6 +440,10 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 * Split large files
 	 * 
 	 * @since 1.17.0
+	 * 
+	 * @param $request WP_REST_Request
+	 * 
+	 * @return WP_Rest_Response
 	 */
 	public function split_large_files( $request ) {
 		$params = $request->get_params();
@@ -463,6 +477,10 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 * Retrieve files
 	 * 
 	 * @since 1.17.0
+	 * 
+	 * @param $request WP_REST_Request
+	 * 
+	 * @return WP_Rest_Response
 	 */
 	public function retrieve_files( $request ) {
 		$params = $request->get_params();
@@ -502,6 +520,10 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 * Get the db dump file
 	 * 
 	 * @since 1.17.0
+	 * 
+	 * @param $request WP_REST_Request
+	 * 
+	 * @return WP_Rest_Response
 	 */
 	public function get_db_dump( $request ) {
 		$request_params = $request->get_params();
@@ -525,6 +547,8 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 * Get the wp version info
 	 * 
 	 * @since 1.17.0
+	 * 
+	 * @return WP_Rest_Response
 	 */
 	public function get_wp_version() {
 		return new WP_REST_Response( array(
@@ -537,6 +561,8 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 * Get the wp version info
 	 * 
 	 * @since 1.17.0
+	 * 
+	 * @return WP_Rest_Response
 	 */
 	public function get_db_prefix() {
 		global $wpdb;
@@ -550,6 +576,10 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 * Generate a file list
 	 * 
 	 * @since 1.17.0
+	 * 
+	 * @param $request WP_REST_Request
+	 * 
+	 * @return WP_Rest_Response
 	 */
 	public function generate_file_list( $request ) {
 		$file_list = $this->migrate_core->util->generate_file_list();
