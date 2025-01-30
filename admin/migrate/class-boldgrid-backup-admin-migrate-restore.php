@@ -165,7 +165,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 	 */
 	public function seperate_db_from_files( $files, $db_dump_path ) {
 		$db_dump_basename = basename( $db_dump_path );
-		$db_file = array();
+		$db_file          = array();
 		//Find the database dump file, and remove it from the list.
 		foreach( $files as $index => $file ) {
 			if ( false !== strpos( $file['path'], $db_dump_basename ) ) {
@@ -471,7 +471,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 	 * @param string $transfer_dir The directory transfered files are located in
 	 */
 	public function export_options( $transfer_dir ) {
-		$options = $this->migrate_core->configs['option_names'];
+		$options             = $this->migrate_core->configs['option_names'];
 		$backup_options_file = $transfer_dir . '/direct-transfer-options.json';
 
 		$this->migrate_core->log->add( 'Exporting options to: ' . $backup_options_file );

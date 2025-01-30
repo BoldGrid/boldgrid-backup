@@ -24,15 +24,19 @@ if ( isset( $_GET['_wpnonce'] ) &&
 $authd_sites = get_option( $option_names['authd_sites'], array() );
 $transfers   = get_option( $option_names['transfers'], array() );
 
-$table = '<table class="wp-list-table widefat fixed striped pages bgbkup-transfers-sites-table">
+$table = sprintf( '<table class="wp-list-table widefat fixed striped pages bgbkup-transfers-sites-table">
 	<thead>
 		<tr>
-			<th>Site URL</th>
-			<th>Username</th>
-			<th></th>
+			<th>%1$s</th>
+			<th>%2$s</th>
+			<th>%3$s</th>
 		</tr>
 	</thead>
-	<tbody>';
+	<tbody>',
+	esc_html__( 'Site URL', 'boldgrid-backup' ),
+	esc_html__( 'Username', 'boldgrid-backup' ),
+	esc_html__( 'Actions', 'boldgrid-backup' )
+);
 
 
 foreach ( $authd_sites as $site => $creds ) {
@@ -63,41 +67,68 @@ foreach ( $authd_sites as $site => $creds ) {
 }
 $table .= '</tbody></table>';
 
-$transfer_table = '<table class="wp-list-table widefat fixed striped pages bgbkup-transfers-tx-table">
-	<thead>
-		<tr>
-			<th class="transfer_id">Transfer ID</th>
-			<th class="source_url">Source URL</th>
-			<th class="status">Transfer Status</th>
-			<th class="elapsed_time">Elapsed Time</th>
-			<th class="actions">Actions</th>
-		</tr>
-	</thead>
-<tbody>';
+$transfer_table = sprintf( '<table class="wp-list-table widefat fixed striped pages bgbkup-transfers-tx-table">
+		<thead>
+			<tr>
+				<th class="transfer_id">%1$s</th>
+				<th class="source_url">%2$s</th>
+				<th class="status">%3$s</th>
+				<th class="elapsed_time">%4$s</th>
+				<th class="actions">%5$s</th>
+			</tr>
+		</thead>
+	<tbody>',
+	esc_html__( 'Transfer ID', 'boldgrid-backup' ),
+	esc_html__( 'Source URL', 'boldgrid-backup' ),
+	esc_html__( 'Transfer Status', 'boldgrid-backup' ),
+	esc_html__( 'Elapsed Time', 'boldgrid-backup' ),
+	esc_html__( 'Actions', 'boldgrid-backup' )
+);
 
 if ( empty( $transfers ) ) {
-	$transfer_table .= '<tr class="bgbkup-transfers-none-found"><td colspan="5" style="text-align:center">No transfers found.</td></tr>';
+	$transfer_table .= sprintf(
+		'<tr class="bgbkup-transfers-none-found"><td colspan="5" style="text-align:center">%1$s</td></tr>',
+		esc_html__( 'No transfers found.', 'boldgrid-backup' )
+	);
 } else {
 	foreach ( $transfers as $transfer ) {
-		$time_elapsed = $transfer['time_elapsed'];
-		$minutes	  = floor( $time_elapsed / 60 );
-		$seconds	  = $time_elapsed % 60;
-		$status = '';
+		$time_elapsed   = $transfer['time_elapsed'];
+		$minutes        = floor( $time_elapsed / 60 );
+		$seconds        = $time_elapsed % 60;
+		$status         = '';
 		$action_buttons = '';
 		if ( 'completed' === $transfer['status'] ) {
-			$status = 'completed';
-			$action_buttons  = '<button class="restore-site button-primary" data-transfer-id="' . esc_attr( $transfer['transfer_id'] ) . '">Restore</button>';
-			$action_buttons .= '<button class="delete-transfer button-secondary" data-transfer-id="' . esc_attr( $transfer['transfer_id'] ) . '">Delete</button>';
-			$action_buttons .= '<button class="resync-database button-secondary" data-transfer-id="' . esc_attr( $transfer['transfer_id'] ) . '">Resync Database</button>';
+			$status         = 'completed';
+			$action_buttons = sprintf(
+				'<button class="restore-site button-primary" data-transfer-id="%1$s">%2$s</button>
+				<button class="delete-transfer button-secondary" data-transfer-id="%1$s">%3$s</button>
+				<button class="resync-database button-secondary" data-transfer-id="%1$s">%4$s</button>',
+				esc_attr( $transfer['transfer_id'] ),
+				esc_html__( 'Restore', 'boldgrid-backup' ),
+				esc_html__( 'Delete', 'boldgrid-backup' ),
+				esc_html__( 'Resync Database', 'boldgrid-backup' )
+			);
 		} else if ( 'canceled' === $transfer['status'] ) {
 			$status         = 'canceled';
-			$action_buttons = '<button class="delete-transfer button-secondary" data-transfer-id="' . esc_attr( $transfer['transfer_id'] ) . '">Delete</button>';
+			$action_buttons = sprintf(
+				'<button class="delete-transfer button-secondary" data-transfer-id="%1$s">%2$s</button>',
+				esc_attr( $transfer['transfer_id'] ),
+				esc_html__( 'Delete', 'boldgrid-backup' )
+			);
 		} else if ( 'restore-completed' === $transfer['status'] ) {
-			$status = 'Restore Completed';
-			$action_buttons  = '<button class="delete-transfer button-secondary" data-transfer-id="' . esc_attr( $transfer['transfer_id'] ) . '">Delete</button>';
+			$status         = 'Restore Completed';
+			$action_buttons = sprintf(
+				'<button class="delete-transfer button-secondary" data-transfer-id="%1$s">%2$s</button>',
+				esc_attr( $transfer['transfer_id'] ),
+				esc_html__( 'Delete', 'boldgrid-backup' )
+			);
 		} else {
-			$status = 'transferring';
-			$action_buttons  = '<button class="cancel-transfer button-secondary" data-transfer-id="' . esc_attr( $transfer['transfer_id'] ) . '">Cancel</button>';
+			$status         = 'transferring';
+			$action_buttons = sprintf(
+				'<button class="cancel-transfer button-secondary" data-transfer-id="%1$s">%2$s</button>',
+				esc_attr( $transfer['transfer_id'] ),
+				esc_html__( 'Cancel', 'boldgrid-backup' )
+			);
 		}
 		$transfer_table .= sprintf(
 			'<tr class="transfer-info %7$s" data-transfer-id="%1$s">
