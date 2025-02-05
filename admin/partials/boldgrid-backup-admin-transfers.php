@@ -34,6 +34,12 @@ $sections = [
 			'content' => $overview,
 		],
 		[
+			'id'       => 'option-1-divider',
+			'title'    => 'Option 1',
+			'subtitle' => 'ZIP Transfer',
+			'divider'  => true,
+		],
+		[
 			'id'      => 'section_source',
 			'title'   => __( 'Source', 'boldgrid-backup' ),
 			'content' => $source,
@@ -42,6 +48,12 @@ $sections = [
 			'id'      => 'section_destination',
 			'title'   => __( 'Destination', 'boldgrid-backup' ),
 			'content' => $destination,
+		],
+		[
+			'id'       => 'option-2-divider',
+			'title'    => 'Option 2',
+			'subtitle' => 'Direct Transfer',
+			'divider'  => true,
 		],
 		[
 			'id'      => 'section_direct_transfer',

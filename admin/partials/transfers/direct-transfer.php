@@ -168,27 +168,52 @@ if ( empty( $transfers ) ) {
 
 $transfer_table .= '</tbody></table>';
 
-return sprintf(
-	'<div class="bgbkup-transfers-rx">
-		<h2>%1$s</h2>
-		<p>%2$s %3s</p>
-		<h3>%4$s</h3>
-		<div class="boldgrid-transfer-input-fields">
-			<input id="auth_admin_url" name="auth_admin_url" type="text" placeholder="http://example.com/wp-admin/" />
-			<input id="app_uuid" name="app_uuid" type="hidden" value="%5$s" />
-			<input id="auth_nonce" name="auth_nonce" type="hidden" value="%6$s" />
-			<button id="auth_transfer" class="button-primary">%7$s</button>
-		</div>
-		%8$s
-		%9$s
-	</div>',
+$escaped_headings = sprintf(
+	'<h2>%1$s</h2>
+	<p>%2$s</p>
+	<p>%3$s</p>',
 	esc_html__( 'Direct Transfer', 'boldgrid-backup' ),
-	esc_html__( 'The direct transfer feature allows you to transfer files from another website to this site without having to make a backup first.', 'boldgrid-backup' ),
-	esc_html__( 'The Total Upkeep plugin must be installed on both this site AND the source site.','boldgrid-backup' ),
+	esc_html__(
+		'The direct transfer feature allows you to transfer files from another website to this site without having to make a backup first.',
+		'boldgrid-backup'
+	),
+	esc_html__( 'The Total Upkeep plugin must be installed on both this site AND the source site.','boldgrid-backup' )
+);
+
+$escaped_auth_input = sprintf(
+	'<h3>%1$s <span class="dashicons dashicons-editor-help" data-id="direct-transfer-auth"></span></h3>
+	<p class="help" data-id="direct-transfer-auth">%2$s %3$s</p>
+	<div class="boldgrid-transfer-input-fields">
+		<input id="auth_admin_url" name="auth_admin_url" type="text" placeholder="http://example.com/wp-admin/" />
+		<input id="app_uuid" name="app_uuid" type="hidden" value="%4$s" />
+		<input id="auth_nonce" name="auth_nonce" type="hidden" value="%5$s" />
+		<button id="auth_transfer" class="button-primary">%6$s</button>
+	</div>
+	<p class="authentication-error"></p>',
 	esc_html__( 'Enter the source site\'s Admin URL below in order to generate an application password. ', 'boldgrid-backup' ),
+	esc_html__(
+		'When you click the authenticate button, you will be redirected to the source site to create an application password.',
+		'boldgrid-backup'
+	),
+	esc_html__(
+		'This password will be used to authenticate the transfer process. You will then be redirected back here.',
+		'boldgrid-backup'
+	),
 	esc_attr( wp_generate_uuid4() ),
 	wp_create_nonce( 'boldgrid_backup_direct_transfer_auth' ),
 	esc_html__( 'Authenticate', 'boldgrid-backup' ),
+
+);
+
+return sprintf(
+	'<div class="bgbkup-transfers-rx">
+		%1$s
+		%2$s
+		%3$s
+		%4$s
+	</div>',
+	$escaped_headings,
+	$escaped_auth_input,
 	$table,
 	$transfer_table
 );
