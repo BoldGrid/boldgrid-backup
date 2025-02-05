@@ -125,7 +125,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 		$options_file = $this->export_options( $transfer_dir );
 
 		// 6. Restore the WordPress database from the dump file.
-		if ( ! $this->restore_database( $db_file['path'], $transfer['source_rest_url'] ) ) {
+		if ( ! $this->restore_database( $db_file['path'], $transfer ) ) {
 			$this->migrate_core->log->add( 'Failed to restore the database.' );
 			return array(
 				'success' => false,
@@ -344,9 +344,11 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 	 * @param  bool   $db_encrypted     Is the database dump file encrypted.
 	 * @return bool Status of the operation.
 	 */
-	public function restore_database( $db_dump_filepath, $site_url ) {
+	public function restore_database( $db_dump_filepath, $transfer ) {
 		global $wp_filesystem;
 		$db_prefix = null;
+
+		$site_url = $transfer['source_site_url'];
 
 		$this->migrate_core->log->add( 'Restoring the WordPress database from the dump file: ' . $db_dump_filepath );
 
@@ -372,7 +374,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 		$wp_home    = $this->util->get_option( 'home' );
 
 		$new_db_prefix = $this->migrate_core->util->rest_get(
-			$site_url,
+			$transfer,
 			'get-db-prefix',
 			'db_prefix'
 		);

@@ -57,7 +57,12 @@ foreach ( $authd_sites as $site => $creds ) {
 			<td>%1$s</td>
 			<td>%2$s</td>
 			<td><button class="start-transfer button-primary %3$s" data-url="%1$s">%4$s</button></td>
-		</tr>'
+		</tr>
+		<tr class="errors-row" data-url="%1$s">
+			<td colspan="3">
+				<div class="errors"></div>
+			</td>
+		'
 		,
 		esc_html( $site ),
 		esc_html( $creds['user'] ),

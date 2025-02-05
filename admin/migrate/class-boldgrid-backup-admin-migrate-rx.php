@@ -263,8 +263,14 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		$site_rest_url = $this->util->get_site_rest_url( $site_url );
 
+		// Validates that the correct TU plugin is installed, and quits with feedback if it's not
+		$this->util->validate_total_upkeep_status( $site_rest_url, $site_url );
+
 		$source_wp_version = $this->util->rest_get(
-			$site_rest_url,
+			array(
+				'source_rest_url' => $site_rest_url,
+				'source_site_url' => $site_url,
+			),
 			'get-wp-version',
 			'wp_version'
 		);
@@ -487,7 +493,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		} else if ( $transfer['status'] === 'dumping-db-tables' ) 
 		// Generate Database Dump
 		$generate_db_dump = $this->util->rest_get(
-			$transfer['source_rest_url'],
+			$transfer,
 			'generate-db-dump',
 			'generate_db_dump'
 		);
@@ -507,10 +513,10 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * @param array $transfer Transfer data
 	 */
 	public function generate_file_lists( $transfer ) {
-			$site_url = $transfer['source_rest_url'l'];
+			$site_url = $transfer['source_rest_url'];
 			// Generate File List & hashes;
 			$file_list = $this->util->rest_get(
-				$site_url,
+				$transfer,
 				'generate-file-list',
 				'file_list'
 			);

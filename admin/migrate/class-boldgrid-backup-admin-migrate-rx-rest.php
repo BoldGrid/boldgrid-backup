@@ -214,6 +214,14 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				'method'   => 'GET',
 				'endpoint' => 'validate-url',
 			),
+			'install-total-upkeep' => array(
+				'method'   => 'POST',
+				'endpoint' => 'install-total-upkeep',
+			),
+			'update-total-upkeep' => array(
+				'method'   => 'POST',
+				'endpoint' => 'update-total-upkeep',
+			),
 		);
 
 		foreach ( $rest_routes as $route => $args ) {
@@ -228,6 +236,62 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				'callback'            => array( $this, $method_name ),
 				'permission_callback' => array( $this, $permission_cb_name ),
 			) );
+		}
+	}
+
+	/**
+	 * Update Total Upkeep
+	 * 
+	 * Callback for endpoint: install-total-upkeep
+	 * 
+	 * @param WP_REST_Request $request The request object.
+	 * 
+	 * @since 1.17.0
+	 */
+	public function install_total_upkeep( $request ) {
+		$url = $request->get_param( 'url' );
+
+		$installed = $this->util->install_total_upkeep( $url );
+
+		if ( is_wp_error( $installed ) ) {
+			wp_send_json_error( array( 'message' => $installed->get_error_message() ) );
+		} else {
+			wp_send_json_success(
+				array(
+					'message' => sprintf(
+						'<p class="notice notice-success">%s</p>',
+						__( 'Total Upkeep has been successfully installed on the source site.', 'boldgrid-backup' )
+					)
+				)
+			);
+		}
+	}
+
+	/**
+	 * Update Total Upkeep
+	 * 
+	 * Callback for endpoint: update-total-upkeep
+	 * 
+	 * @param WP_REST_Request $request The request object.
+	 * 
+	 * @since 1.17.0
+	 */
+	public function update_total_upkeep( $request ) {
+		$url = $request->get_param( 'url' );
+
+		$installed = $this->util->update_total_upkeep( $url );
+
+		if ( is_wp_error( $installed ) ) {
+			wp_send_json_error( array( 'message' => $installed->get_error_message() ) );
+		} else {
+			wp_send_json_success(
+				array(
+					'message' => sprintf(
+						'<p class="notice notice-success">%s</p>',
+						__( 'Total Upkeep has been successfully updated on the source site.', 'boldgrid-backup' )
+					)
+				)
+			);
 		}
 	}
 

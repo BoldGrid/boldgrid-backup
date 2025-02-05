@@ -57,6 +57,7 @@ BoldGrid.DirectTransfers = function($) {
 			method: method,
 			data: data
 		}).then(function(response) {
+			console.log( response );
 			callback(response, callbackArgs);
 		});
 	};
@@ -393,8 +394,9 @@ BoldGrid.DirectTransfers = function($) {
 	 * @since 1.17.0
 	 */
 	self._startTransferCallback = function(response, args) {
-		var $button = args.$startButton,
-			url = args.url;
+		var $button   = args.$startButton,
+			url       = args.url,
+			$errorDiv = $button.parents( 'tbody' ).find( '.errors-row[data-url="' + url + '"] .errors' );
 		$button.prop('disabled', true);
 
 		if (response.success) {
@@ -405,8 +407,72 @@ BoldGrid.DirectTransfers = function($) {
 			setTimeout(function() {
 				self._addTransferRow(transferId, url);
 			}, 3000);
+		} else {
+			console.log( {
+				response,
+				$errorDiv,
+				url
+			} );
+			$errorDiv.empty();
+			$errorDiv.append( response.data.error );
+			self._bindInstallTotalUpkeepButton( $errorDiv.find( 'button.install-total-upkeep' ) );
+			self._bindUpdateTotalUpkeepButton( $errorDiv.find( 'button.update-total-upkeep' ) );
 		}
 	};
+
+	self._bindUpdateTotalUpkeepButton = function( $button ) {
+		var url                  = $button.data( 'url' ),
+			$errorDiv            = $button.parents( '.errors' ),
+			$startTransferButton = $button.parents( 'tbody' ).find( 'button.start-transfer[data-url="' + url + '"]' );
+
+		$button.on( 'click', function( e ) {
+			self._restRequest(
+				'update-total-upkeep',
+				'POST',
+				{ url: url },
+				self._updateTotalUpkeepCallback,
+				{
+					$startTransferButton: $startTransferButton,
+					$errorDiv: $errorDiv
+				}
+			)
+		} );
+	};
+
+	self._updateTotalUpkeepCallback = function( response, args ) {
+		if ( response.success ) {
+			args.$startTransferButton.prop( 'disabled', false );
+			args.$errorDiv.empty();
+			args.$errorDiv.append( response.data.message );
+		}
+	}
+
+	self._bindInstallTotalUpkeepButton = function( $button ) {
+		var url                  = $button.data( 'url' ),
+			$errorDiv            = $button.parents( '.errors' ),
+			$startTransferButton = $button.parents( 'tbody' ).find( 'button.start-transfer[data-url="' + url + '"]' );
+
+		$button.on( 'click', function( e ) {
+			self._restRequest(
+				'install-total-upkeep',
+				'POST',
+				{ url: url },
+				self._installTotalUpkeepCallback,
+				{
+					$startTransferButton: $startTransferButton,
+					$errorDiv: $errorDiv
+				}
+			)
+		} );
+	};
+
+	self._installTotalUpkeepCallback = function( response, args ) {
+		if ( response.success ) {
+			args.$startTransferButton.prop( 'disabled', false );
+			args.$errorDiv.empty();
+			args.$errorDiv.append( response.data.message );
+		}
+	}
 
 	/**
 	 * Add Transfer Row

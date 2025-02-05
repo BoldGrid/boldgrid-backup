@@ -42,6 +42,15 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	);
 
 	/**
+	 * Minimum TU Version
+	 * 
+	 * @var string
+	 * 
+	 * @since 1.17.0
+	 */
+	public $min_tu_version = '1.17.0';
+
+	/**
 	 * Option Name
 	 * 
 	 * @var string
@@ -399,7 +408,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * @return string The REST URL
 	 */
 	public function get_site_rest_url( $site_url ) {
-		$response     = wp_remote_get( $url );
+		$response     = wp_remote_get( $site_url );
 		$headers      = $response['headers']->getAll();
 		$links        = explode( ',', $headers['link'] );
 		$wp_json_link = array_filter( $links, function( $link ) {
@@ -562,9 +571,10 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * 
 	 * @return mixed The data from the REST endpoint
 	 */
-	public function rest_get( $rest_url, $route, $key ) {
-		$namespace = $this->migrate_core->configs['rest_api_namespace'] . '/';
-		$prefix    = $this->migrate_core->configs['rest_api_prefix'] . '/';
+	public function rest_get( $transfer, $route, $key ) {
+		$namespace   = $this->migrate_core->configs['rest_api_namespace'] . '/';
+		$prefix      = $this->migrate_core->configs['rest_api_prefix'] . '/';
+		$site_url    = $transfer['source_site_url'];
 		$request_url = $rest_url . $namespace . $prefix . $route;
 
 		$authd_sites = $this->get_option( $this->authd_sites_option_name, array() );
@@ -897,6 +907,245 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 			$this->migrate_core->log->add( 'Post Rest Error: ' . $body );
 			return new WP_Error( 'rest_error', 'No Seccess Response' );
 		}
+	}
+
+	public function install_total_upkeep( $url ) {
+		$site_url    = $url;
+		$rest_url    = $this->get_site_rest_url( $site_url );
+		$authd_sites = $this->get_option( $this->authd_sites_option_name, array() );
+		$auth        = isset( $authd_sites[ $site_url ] ) ? $authd_sites[ $site_url ] : false;
+
+		if ( ! $auth ) {
+			return new WP_Error( 'site_not_authenticated', 'Site not authenticated' );
+		}
+
+		$request_url = $rest_url . 'wp/v2/plugins';
+
+		$user = $auth['user'];
+		$pass = Boldgrid_Backup_Admin_Crypt::crypt( $auth['pass'], 'd' );
+		$response = wp_remote_post(
+			$request_url,
+			array(
+				'body'    => array(
+					'slug'   => 'boldgrid-backup',
+					'status' => 'active',
+				),
+				'headers' => array(
+					'Authorization' => 'Basic ' . base64_encode( $user . ':' . $pass ),
+				),
+				'timeout' => 600,
+			)
+		);
+
+		$response_code = wp_remote_retrieve_response_code( $response );
+
+		if ( 201 !== $response_code ) {
+			return new WP_Error( 'install_error', 'Error installing Total Upkeep' );
+		}
+
+		if ( is_wp_error( $response ) ) {
+			return new WP_Error( 'install_error', $response->get_error_message() );
+		}
+
+		return true;
+	}
+
+	public function validate_total_upkeep_status( $site_rest_url, $site_url ) {
+		$total_upkeep_status = $this->get_total_upkeep_status(
+			array(
+				'source_rest_url' => $site_rest_url,
+				'source_site_url' => $site_url,
+			)
+		);
+
+		error_log( 'total_upkeep_status: ' . json_encode( $total_upkeep_status ) );
+
+		if ( is_wp_error( $total_upkeep_status ) ) {
+			$this->migrate_core->log->add( 'Error getting Total Upkeep Status: ' . $total_upkeep_status->get_error_message() );
+			wp_send_json_error( array( 'success' => false, 'error' => 'Error getting Total Upkeep Status' ) );
+		}
+
+		if ( empty( $total_upkeep_status ) ) {
+			$this->migrate_core->log->add( 'Total Upkeep is not installed on the source site.' );
+			wp_send_json_error(
+				array(
+					'success' => false,
+					'error'   => sprintf(
+						'<p class="notice notice-error">%1$s %2$s %3$s</p>
+						<button class="install-total-upkeep button-primary" data-url="%4$s">%5$s</button>',
+						'Total Upkeep is not installed on the source site.',
+						'Total Upkeep must be installed on the source site in order to transfer the site.',
+						'You may click the button below to install Total Upkeep on the source site.',
+						esc_url( $site_url ),
+						'Install Total Upkeep'
+						)
+					)
+				);
+		}
+
+		$version_compare = version_compare(
+			$total_upkeep_status['version'],
+			$this->min_tu_version,
+			'ge'
+		);
+
+		if ( ! $version_compare ) {
+			wp_send_json_error(
+				array(
+					'success' => false,
+					'error'   => sprintf(
+						'<p class="notice notice-error">%1$s %2$s %3$s</p>
+						<button class="update-total-upkeep button-primary" data-url="%4$s">%5$s</button>',
+						'Total Upkeep Version is not compatible with this site.',
+						'Total Upkeep must be version ' . $this->min_tu_version . ' or higher in order to transfer the site.',
+						'You may click the button below to update Total Upkeep to othe newest version on the source site.',
+						esc_url( $site_url ),
+						'Update Total Upkeep'
+						)
+					)
+				);
+		}
+
+		if ( 'active' !== $total_upkeep_status['active'] ) {
+			wp_send_json_error(
+				array(
+					'success' => false,
+					'error'   => sprintf(
+						'<p class="notice notice-error">%1$s %2$s %3$s</p>
+						<button class="activate-total-upkeep button-primary" data-url="%4$s">%5$s</button>',
+						'Total Upkeep is installed but is not active on the source site.',
+						'Total Upkeep must be active on the source site in order to transfer the site.',
+						'You may click the button below to activate Total Upkeep on the source site.',
+						esc_url( $site_url ),
+						'Activate Total Upkeep'
+						)
+					)
+				);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Edit Total Upkeep Status
+	 * 
+	 * @param string $site_url The site URL
+	 */
+	public function edit_total_upkeep_status( $site_url, $status ) {
+		$rest_url    = $this->get_site_rest_url( $site_url );
+		$authd_sites = $this->get_option( $this->authd_sites_option_name, array() );
+		$auth        = isset( $authd_sites[ $site_url ] ) ? $authd_sites[ $site_url ] : false;
+
+		if ( ! $auth ) {
+			return new WP_Error( 'site_not_authenticated', 'Site not authenticated' );
+		}
+
+		$request_url = $rest_url . 'wp/v2/plugins/boldgrid-backup/boldgrid-backup';
+
+		$user = $auth['user'];
+		$pass = Boldgrid_Backup_Admin_Crypt::crypt( $auth['pass'], 'd' );
+		$response = wp_remote_post(
+			$rest_url . 'wp/v2/plugins/boldgrid-backup/boldgrid-backup',
+			array(
+				'body' => array(
+					'context' => 'edit',
+					'status'  => $status,
+					'plugin'  => 'boldgrid-backup/boldgrid-backup',
+				),
+				'headers' => array(
+					'Authorization' => 'Basic ' . base64_encode( $user . ':' . $pass ),
+				),
+				'timeout' => 600,
+			)
+		);
+
+		$response_code = wp_remote_retrieve_response_code( $response );
+
+		error_log( 'edit_response: ' . json_encode( $response_code ) );
+
+		if ( 200 !== $response_code ) {
+			return new WP_Error( 'install_error', 'Error installing Total Upkeep' );
+		}
+
+		if ( is_wp_error( $response ) ) {
+			return new WP_Error( 'install_error', $response->get_error_message() );
+		}
+
+		return true;
+	}
+
+	/**
+	 * Update the Total Upkeep Plugin
+	 * 
+	 * @param string $site_url The site URL
+	 */
+	public function update_total_upkeep( $site_url ) {
+		$rest_url    = $this->get_site_rest_url( $site_url );
+		$authd_sites = $this->get_option( $this->authd_sites_option_name, array() );
+		$auth        = isset( $authd_sites[ $site_url ] ) ? $authd_sites[ $site_url ] : false;
+
+		if ( ! $auth ) {
+			return new WP_Error( 'site_not_authenticated', 'Site not authenticated' );
+		}
+
+		$request_url = $rest_url . 'wp/v2/plugins/boldgrid-backup/boldgrid-backup';
+
+		$user = $auth['user'];
+		$pass = Boldgrid_Backup_Admin_Crypt::crypt( $auth['pass'], 'd' );
+		$this->edit_total_upkeep_status( $site_url, 'inactive' );
+		$response = wp_remote_get(
+			$request_url,
+			array(
+				'method' => 'DELETE',
+				'headers' => array(
+					'Authorization' => 'Basic ' . base64_encode( $user . ':' . $pass ),
+				),
+				'timeout' => 600,
+			)
+		); 
+
+		return $this->install_total_upkeep( $site_url );
+	}
+
+	public function get_total_upkeep_status( $transfer ) {
+		$site_url    = $transfer['source_site_url'];
+		$rest_url    = $transfer['source_rest_url'];
+		$authd_sites = $this->get_option( $this->authd_sites_option_name, array() );
+		$auth        = isset( $authd_sites[ $site_url ] ) ? $authd_sites[ $site_url ] : false;
+
+		if ( ! $auth ) {
+			return new WP_Error( 'site_not_authenticated', 'Site not authenticated' );
+		}
+
+		$request_url = $rest_url . 'wp/v2/plugins';
+
+		$user = $auth['user'];
+		$pass = Boldgrid_Backup_Admin_Crypt::crypt( $auth['pass'], 'd' );
+		$response = wp_remote_get(
+			$request_url,
+			array(
+				'headers' => array(
+					'Authorization' => 'Basic ' . base64_encode( $user . ':' . $pass ),
+				),
+				'timeout' => 600,
+			)
+		);
+
+		$body    = wp_remote_retrieve_body( $response );
+		$plugins = json_decode( $body, true );
+		$total_upkeep_data = array();
+
+		foreach( $plugins as $plugin ) {
+			if ( 'Total Upkeep' === $plugin['name'] ) {
+				$total_upkeep_data = array(
+					'version' => $plugin['version'],
+					'active'  => $plugin['status'],
+				);
+				break;
+			}
+		}
+
+		return $total_upkeep_data;
 	}
 
 	/**
