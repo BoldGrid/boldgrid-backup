@@ -295,6 +295,8 @@ class Boldgrid_Backup_Admin_Config {
 			'transfer_started' => esc_html__( 'Transfer Started', 'boldgrid-backup' ),
 			'pending'          => esc_html__( 'Pending', 'boldgrid-backup' ),
 			'delete_error'     => esc_html__( 'Delete Error. Refresh and try again.', 'boldgrid-backup' ),
+			'invalid_url'      => esc_html__( 'You must enter a valid URL', 'boldgrid-backup' ),
+			'same_site_error'  => esc_html__( 'You must enter the URL of the source site, not this site. Ex: https://source-site.com', 'boldgrid-backup' ),
 		);
 	}
 

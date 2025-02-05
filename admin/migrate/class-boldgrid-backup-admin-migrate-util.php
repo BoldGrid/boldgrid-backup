@@ -389,6 +389,29 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	}
 
 	/**
+	 * Get Site Rest URL
+	 * 
+	 * Get the REST URL for a site using the link
+	 * header provided by wordpress.
+	 * 
+	 * @param string $site_url
+	 * 
+	 * @return string The REST URL
+	 */
+	public function get_site_rest_url( $site_url ) {
+		$response     = wp_remote_get( $url );
+		$headers      = $response['headers']->getAll();
+		$links        = explode( ',', $headers['link'] );
+		$wp_json_link = array_filter( $links, function( $link ) {
+			return false !== strpos( $link, 'rel="https://api.w.org/"' );
+		} );
+
+		preg_match('/<([^>]+)>/', $wp_json_link[0], $matches );
+
+		return $matches[1];
+	}
+
+	/**
 	 * Get Transfer Prop
 	 * 
 	 * Get a property from a transfer.
@@ -539,10 +562,10 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * 
 	 * @return mixed The data from the REST endpoint
 	 */
-	public function rest_get( $site_url, $route, $key ) {
+	public function rest_get( $rest_url, $route, $key ) {
 		$namespace = $this->migrate_core->configs['rest_api_namespace'] . '/';
 		$prefix    = $this->migrate_core->configs['rest_api_prefix'] . '/';
-		$request_url = $site_url . '/wp-json/' . $namespace . $prefix . $route;
+		$request_url = $rest_url . $namespace . $prefix . $route;
 
 		$authd_sites = $this->get_option( $this->authd_sites_option_name, array() );
 		$auth        = isset( $authd_sites[ $site_url ] ) ? $authd_sites[ $site_url ] : false;
@@ -825,17 +848,19 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * 
 	 * @since 1.17.0
 	 * 
-	 * @param string $site_url The site URL
+	 * @param array  $transfer Transfer Data
 	 * @param string $route    The route to the REST endpoint
 	 * @param array  $data     The data to post
 	 * @param bool   $return   Whether to expect a return value
 	 * 
 	 * @return mixed The response data from the REST endpoint
 	 */
-	public function rest_post( $site_url, $route, $data, $return = false ) {
+	public function rest_post( $transfer, $route, $data, $return = false ) {
 		$namespace = $this->migrate_core->configs['rest_api_namespace'] . '/';
 		$prefix    = $this->migrate_core->configs['rest_api_prefix'] . '/';
-		$request_url = $site_url . '/wp-json/' . $namespace . $prefix . $route;
+		$site_url  = $transfer['source_site_url'];
+		$rest_url  = $transfer['source_rest_url'];
+		$request_url = $rest_url . $namespace . $prefix . $route;
 
 		$authd_sites = $this->get_option( $this->authd_sites_option_name, array() );
 		$auth        = isset( $authd_sites[ $site_url ] ) ? $authd_sites[ $site_url ] : false;

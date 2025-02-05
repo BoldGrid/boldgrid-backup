@@ -74,7 +74,16 @@ BoldGrid.DirectTransfers = function($) {
 			$resyncDbButton = $('button.resync-database'),
 			$cancelButton = $('button.cancel-transfer'),
 			$deleteButton = $('button.delete-transfer'),
-			$sectionLinks = $('.bg-left-nav li[data-section-id]');
+			$sectionLinks = $('.bg-left-nav li[data-section-id]'),
+			$authError    = $('.bgbkup-transfers-rx .authentication-error');
+
+		// Hide the authentication error message on load.
+		$authError.hide();
+
+		// Hide the authentication error message on input.
+		$('#auth_admin_url').on('input', function() {
+			$authError.hide();
+		} );
 
 		$cancelButton.on('click', function(e) {
 			var $this = $(e.currentTarget),
@@ -160,12 +169,14 @@ BoldGrid.DirectTransfers = function($) {
 
 		// Bind the Authenticate Button
 		$authButton.on('click', function(e) {
-			var $appUuidInput = $('#app_uuid'),
+			var $appUuidInput   = $('#app_uuid'),
 				$authAdminInput = $('#auth_admin_url'),
-				appUuid = $appUuidInput.val();
+				appUuid         = $appUuidInput.val();
 
 			e.preventDefault();
-			self._authTransfer($authAdminInput.val(), appUuid);
+
+			self._validateUrl( $authAdminInput.val(), appUuid );
+
 		});
 
 		// Bind the section links to add query arg.
@@ -181,6 +192,64 @@ BoldGrid.DirectTransfers = function($) {
 			}
 		});
 	};
+
+	/**
+	 * Validate URL
+	 *
+	 * Validate that the URL is in fact an actual URL,
+	 * validate that the URL is not for the same site
+	 * as the current site. If the URL is invalid, display
+	 * an error message, and return false. If it is valid,
+	 * return the validated URL string.
+	 * 
+	 * @param {string} url The URL to validate
+	 *
+	 * @return {string|boolean} The validated URL or false
+	 */
+	self._validateUrl = function(url, appUuid ) {
+		var $error = $('.bgbkup-transfers-rx .authentication-error' ),
+			urlObj;
+
+		// Try to create a URL object from the string.
+		try {
+			urlObj = new URL(url);
+		} catch (e) {
+			$error.text( self.lang.invalid_url );
+			$error.show();
+			return false;
+		}
+
+		// Get Current Site URL Base by getting everything that comes before the wp-admin
+		var currentSiteUrl = window.location.href.split( 'wp-admin' )[0];
+
+		// Check if url contains the currentSiteUrl
+		if ( urlObj.href.includes( currentSiteUrl ) ) {
+			$error.text( self.lang.same_site_error );
+			$error.show();
+			return false;
+		}
+
+		console.log( {
+			url,
+			urlObj: urlObj
+		} );
+
+		self._restRequest(
+			'validate-url',
+			'GET',
+			{ url: url },
+			function( response ) {
+				if ( response.success && response.auth_endpoint ) {
+					self._authTransfer( response.auth_endpoint, appUuid );
+				} else {
+					$error.text( response.message );
+					$error.show();
+				}
+			}
+		);
+
+		return false;
+	}
 
 	/**
 	 * Start Restore Callback
@@ -390,16 +459,15 @@ BoldGrid.DirectTransfers = function($) {
 	 * @param {string} authAdminUrl WP-Admin URL of source site
 	 * @param {string} appUuid      App UUID to be passed to the source site
 	 */
-	self._authTransfer = function(authAdminUrl, appUuid) {
-		var endpointUri = 'authorize-application.php',
-			authNonce   = $('#auth_nonce').val(),
-			params = $.param({
+	self._authTransfer = function( authEndpoint, appUuid ) {
+		var authNonce = $('#auth_nonce').val(),
+			params    = $.param({
 				app_name: 'Total Upkeep',
 				app_id: appUuid,
 				success_url: window.location.href + '&_wpnonce=' + authNonce,
 			});
 
-		window.location.href = authAdminUrl + endpointUri + '?' + params;
+		window.location.href = authEndpoint + '?' + params;
 	};
 
 	/**

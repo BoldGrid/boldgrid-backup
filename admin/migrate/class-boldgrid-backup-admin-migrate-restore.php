@@ -125,7 +125,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 		$options_file = $this->export_options( $transfer_dir );
 
 		// 6. Restore the WordPress database from the dump file.
-		if ( ! $this->restore_database( $db_file['path'], $transfer['source_site_url'] ) ) {
+		if ( ! $this->restore_database( $db_file['path'], $transfer['source_rest_url'] ) ) {
 			$this->migrate_core->log->add( 'Failed to restore the database.' );
 			return array(
 				'success' => false,

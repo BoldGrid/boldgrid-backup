@@ -210,6 +210,10 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				'method'   => 'POST',
 				'endpoint' => 'start-restore',
 			),
+			'validate-url' => array(
+				'method'   => 'GET',
+				'endpoint' => 'validate-url',
+			),
 		);
 
 		foreach ( $rest_routes as $route => $args ) {
@@ -225,6 +229,89 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				'permission_callback' => array( $this, $permission_cb_name ),
 			) );
 		}
+	}
+
+	/**
+	 * Validate URL
+	 * 
+	 * Validate the url by making the following checks:
+	 * 1. Check if the URL is a valid WordPress site.
+	 * 2. Check if the REST API is enabled on the source site.
+	 * 3. Check for a valid authentication endpoint.
+	 * 
+	 * Callback for endpoint: validate-url
+	 * 
+	 * @param WP_REST_Request $request The request object.
+	 * 
+	 * @since 1.17.0
+	 * 
+	 * @return WP_REST_Response
+	 */
+	public function validate_url( $request ) {
+		$url = $request->get_param( 'url' );
+
+		$response = wp_remote_get( $url );
+
+		if ( is_wp_error( $response ) ) {
+			return new WP_REST_Response( array(
+				'error'   => true,
+				'message' => 'Error validating URL: ' . $response->get_error_message(),
+			), 200 );
+		}
+
+		$headers = $response['headers']->getAll();
+
+		if ( ! isset( $headers['link'] ) ) {
+			error_log( 'headers: ' . json_encode( $headers ) );
+			return new WP_REST_Response( array(
+				'error'   => true,
+				'message' => __(
+					'Either this is not a WordPress site, or there the WordPress REST Api is not enabled. Please enable the REST API on the source site.',
+					'boldgrid-backup'
+				),
+			), 200 );
+		}
+
+		$links = explode( ',', $headers['link'] );
+		$wp_json_link = array_filter( $links, function( $link ) {
+			return false !== strpos( $link, 'rel="https://api.w.org/"' );
+		} );
+
+		$rest_api_error_response = new WP_REST_Response( array(
+			'error'   => true,
+			'message' => __(
+				'The REST API is not properly configured on the source site. Please ensure that the REST API is properly configured.',
+				'boldgrid-backup'
+			),
+		), 200 );
+
+		if ( empty( $wp_json_link ) ) {
+			return $rest_api_error_response;
+		}
+
+		preg_match('/<([^>]+)>/', $wp_json_link[0], $matches );
+
+		$wp_json_url = $matches[1];
+
+		$wp_json_response = wp_remote_get( $wp_json_url );
+		
+
+		if ( is_wp_error( $wp_json_response ) ) {
+			return $rest_api_error_response;
+		}
+
+		$body = wp_remote_retrieve_body( $wp_json_response );
+		$body = json_decode( $body, true );
+		
+		if ( ! isset( $body['authentication'] ) && ! isset( $body['authentication']['application-passwords'] ) ) {
+			return $rest_api_error_response;
+		}
+
+		return new WP_REST_Response( array(
+			'success'       => true,
+			'auth_endpoint' => $body['authentication']['application-passwords']['endpoints']['authorization'],
+		), 200 );
+
 	}
 
 	/**

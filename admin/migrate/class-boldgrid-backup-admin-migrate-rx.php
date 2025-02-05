@@ -175,12 +175,8 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			$namespace   = $this->migrate_core->configs['rest_api_namespace'] . '/';
 			$prefix      = $this->migrate_core->configs['rest_api_prefix'] . '/';
 			$nonce       = wp_create_nonce( 'boldgrid_transfer_cron_resume_transfer' );
-			wp_remote_get(
-				home_url( '/wp-json/' . $namespace . $prefix . 'cron-resume-transfer' ) . '?nonce=' . $nonce,
-				array(
-					'timeout' => $this->migrate_core->configs['conn_timeout'],
-				)
-			);
+			$request = new WP_REST_Request( 'GET', $namespace . $prefix . 'cron-resume-transfer' );
+			rest_do_request( $request );
 		} else {
 			$this->process_transfers();
 		}
@@ -265,8 +261,10 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		$max_upload_size = $this->util->get_max_upload_size();
 
+		$site_rest_url = $this->util->get_site_rest_url( $site_url );
+
 		$source_wp_version = $this->util->rest_get(
-			$site_url,
+			$site_rest_url,
 			'get-wp-version',
 			'wp_version'
 		);
@@ -275,6 +273,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			'transfer_id'        => $transfer_id,
 			'status'             => $transfer_status,
 			'source_site_url'    => $site_url,
+			'source_rest_url'      => $site_rest_url,
 			'dest_site_url'      => get_site_url(),
 			'source_wp_version'  => $source_wp_version,
 			'rx_max_upload_size' => $max_upload_size,
@@ -402,7 +401,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 */
 	public function check_dump_status( $transfer ) {
 		$response = $this->util->rest_post(
-			$transfer['source_site_url'],
+			$transfer,
 			'check-dump-status',
 			array(
 				'transfer_id' => $transfer['transfer_id'],
@@ -454,10 +453,8 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * @param array $transfer Transfer data
 	 */
 	public function start_db_dump( $transfer ) {
-		$site_url = $transfer['source_site_url'];
-
 		$response = $this->util->rest_post(
-			$site_url,
+			$transfer,
 			'start-db-dump',
 			array(
 				'transfer_id' => $transfer['transfer_id'],
@@ -490,7 +487,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		} else if ( $transfer['status'] === 'dumping-db-tables' ) 
 		// Generate Database Dump
 		$generate_db_dump = $this->util->rest_get(
-			$site_url,
+			$transfer['source_rest_url'],
 			'generate-db-dump',
 			'generate_db_dump'
 		);
@@ -510,7 +507,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * @param array $transfer Transfer data
 	 */
 	public function generate_file_lists( $transfer ) {
-			$site_url = $transfer['source_site_url'];
+			$site_url = $transfer['source_rest_url'l'];
 			// Generate File List & hashes;
 			$file_list = $this->util->rest_get(
 				$site_url,
@@ -1015,7 +1012,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		$pending_file_list = json_encode( $pending_files );
 
 		$response = $this->util->rest_post(
-			$transfer['source_site_url'],
+			$transfer,
 			'split-large-files',
 			array(
 				'transfer_id' => $transfer_id,
@@ -1128,6 +1125,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 */
 	public function process_batch( $transfer, $file_batch, $route ) {
 		$site_url    = $transfer['source_site_url'];
+		$rest_url    = $transfer['source_rest_url'];
 		$transfer_id = $transfer['transfer_id'];
 
 		$ch_batch = array();
@@ -1135,7 +1133,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		$mh          = curl_multi_init();
 		$namespace   = $this->migrate_core->configs['rest_api_namespace'] . '/';
 		$prefix      = $this->migrate_core->configs['rest_api_prefix'] . '/';
-		$request_url = $site_url . '/wp-json/' . $namespace . $prefix . $route;
+		$request_url = $rest_url . $namespace . $prefix . $route;
 
 		$authd_sites = $this->util->get_option( $this->authd_sites_option_name, array() );
 		$auth        = isset( $authd_sites[ $site_url ] ) ? $authd_sites[ $site_url ] : false;
@@ -1382,7 +1380,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 			Boldgrid_Backup_Admin_Utility::bump_memory_limit( intval( $transfer['largest_file_size'] ) * 2 );
 			$response = $this->util->rest_post(
-				$transfer['source_site_url'],
+				$transfer,
 				'retrieve-large-file-part',
 				array(
 					'transfer_id' => $transfer['transfer_id'],
@@ -1434,7 +1432,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			$this->util->update_file_status( $transfer['transfer_id'], 'large', $split_file['path'], 'transferred' );
 			$time_after_write_option = microtime( true );
 			$this->util->rest_post(
-				$transfer['source_site_url'],
+				$transfer,
 				'delete-large-file-parts',
 				array(
 					'transfer_id' => $transfer['transfer_id'],
@@ -1572,7 +1570,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		$this->util->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', $db_dump_info );
 		
 		$response = $this->util->rest_post(
-			$transfer['source_site_url'],
+			$transfer,
 			'get-db-dump',
 			array(
 				'file_path' => $file_path,
@@ -1758,7 +1756,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		$pass        = Boldgrid_Backup_Admin_Crypt::crypt( $auth['pass'], 'd' );
 
 		$response = $this->util->rest_post(
-			$source_site,
+			$transfer,
 			'split-db-file',
 			array(
 				'transfer_id'     => $transfer_id,
