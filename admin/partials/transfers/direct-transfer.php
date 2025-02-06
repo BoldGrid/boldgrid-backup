@@ -24,15 +24,22 @@ if ( isset( $_GET['_wpnonce'] ) &&
 $authd_sites = get_option( $option_names['authd_sites'], array() );
 $transfers   = get_option( $option_names['transfers'], array() );
 
-$table = sprintf( '<table class="wp-list-table widefat fixed striped pages bgbkup-transfers-sites-table">
+$sites_table = sprintf( '<h2>%1$s</h2>
+	<p>%2$s</p>
+<table class="wp-list-table widefat fixed striped pages bgbkup-transfers-sites-table">
 	<thead>
 		<tr>
-			<th>%1$s</th>
-			<th>%2$s</th>
 			<th>%3$s</th>
+			<th>%4$s</th>
+			<th>%5$s</th>
 		</tr>
 	</thead>
 	<tbody>',
+	esc_html__( 'Authenticated Sites', 'boldgrid-backup' ),
+	esc_html__(
+		'The following sites have been authenticated for direct transfer. Click the "Start Transfer" button to begin the transfer process.',
+		'boldgrid-backup'
+	),
 	esc_html__( 'Site URL', 'boldgrid-backup' ),
 	esc_html__( 'Username', 'boldgrid-backup' ),
 	esc_html__( 'Actions', 'boldgrid-backup' )
@@ -52,7 +59,7 @@ foreach ( $authd_sites as $site => $creds ) {
 		}
 	}
 
-	$table .= sprintf(
+	$sites_table .= sprintf(
 		'<tr>
 			<td>%1$s</td>
 			<td>%2$s</td>
@@ -70,19 +77,21 @@ foreach ( $authd_sites as $site => $creds ) {
 		esc_html( $button_text )
 	);
 }
-$table .= '</tbody></table>';
+$sites_table .= '</tbody></table>';
 
-$transfer_table = sprintf( '<table class="wp-list-table widefat fixed striped pages bgbkup-transfers-tx-table">
+$transfer_table = sprintf( '<h2>%1$s</h2>
+	<table class="wp-list-table widefat fixed striped pages bgbkup-transfers-tx-table">
 		<thead>
 			<tr>
-				<th class="transfer_id">%1$s</th>
-				<th class="source_url">%2$s</th>
-				<th class="status">%3$s</th>
-				<th class="elapsed_time">%4$s</th>
-				<th class="actions">%5$s</th>
+				<th class="transfer_id">%2$s</th>
+				<th class="source_url">%3$s</th>
+				<th class="status">%4$s</th>
+				<th class="elapsed_time">%5$s</th>
+				<th class="actions">%6$s</th>
 			</tr>
 		</thead>
 	<tbody>',
+	esc_html__( 'Transfers', 'boldgrid-backup' ),
 	esc_html__( 'Transfer ID', 'boldgrid-backup' ),
 	esc_html__( 'Source URL', 'boldgrid-backup' ),
 	esc_html__( 'Transfer Status', 'boldgrid-backup' ),
@@ -219,6 +228,6 @@ return sprintf(
 	</div>',
 	$escaped_headings,
 	$escaped_auth_input,
-	$table,
+	$sites_table,
 	$transfer_table
 );
