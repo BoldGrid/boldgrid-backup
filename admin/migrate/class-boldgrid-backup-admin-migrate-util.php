@@ -905,7 +905,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		} else {
 			$this->migrate_core->log->add( 'Post Rest Error: ' . $request_url );
 			$this->migrate_core->log->add( 'Post Rest Error: ' . $body );
-			return new WP_Error( 'rest_error', 'No Seccess Response' );
+			return new WP_Error( 'rest_error', 'No Success Response' );
 		}
 	}
 

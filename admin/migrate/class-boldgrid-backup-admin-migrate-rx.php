@@ -418,6 +418,11 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		if ( is_wp_error( $response ) ) {
 			$this->migrate_core->log->add( 'Error checking database dump status: ' . $response->get_error_message() );
+			$this->util->update_transfer_prop(
+				$transfer['transfer_id'],
+				'failed_message',
+				'Error checking database dump status: ' . $response->get_error_message()
+			);
 			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'failed' );
 			return $response;
 		} else if ( ! isset( $response['db_dump_info'] ) ) {
@@ -471,6 +476,11 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		if ( is_wp_error( $response ) ) {
 			$this->migrate_core->log->add( 'Error starting database dump: ' . $response->get_error_message() );
+			$this->util->update_transfer_prop(
+				$transfer['transfer_id'],
+				'failed_message',
+				'Error starting database dump: ' . $response->get_error_message()
+			);
 			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'failed' );
 			return $response;
 		} else if ( isset( $response['db_dump_info'] ) ) {
@@ -500,6 +510,11 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		if ( is_wp_error( $generate_db_dump ) ) {
 			$this->migrate_core->log->add( 'Error generating database dump: ' . $generate_db_dump->get_error_message() );
+			$this->util->update_transfer_prop(
+				$transfer['transfer_id'],
+				'failed_message',
+				'Error generating database dump: ' . $generate_db_dump->get_error_message()
+			);
 			$this->util->update_transfer_prop( $transfer_id, 'status', 'failed' );
 			return $generate_db_dump;
 		}
