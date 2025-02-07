@@ -620,6 +620,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		}
 
 		$time_since_last_heartbeat = $this->util->convert_to_mmss( $time_since_last_heartbeat );
+		$this->migrate_core->log->add( 'Transfer Status: ' . $transfer['status'] );
 		$this->migrate_core->log->add( 'Transfer has likely stalled: Time Since Last Heartbeat: ' . $time_since_last_heartbeat );
 
 		switch( $transfer['status'] ) {
@@ -638,8 +639,26 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 				$this->util->update_transfer_heartbeat();
 				$this->process_transfers();
 				break;
+			case 'restoring-files':
+				$this->retry_stalled_restore_files( $transfer );
+				$this->util->update_transfer_heartbeat();
+				$this->process_transfers();
+				break;
 		}
 	}
+
+	/**
+	 * Retry stalled restore files
+	 * 
+	 * @since 1.17.0
+	 * 
+	 * @param array $transfer Transfer data
+	 */
+	public function retry_stalled_restore_files( $transfer ) {
+		$transfer_id = $transfer['transfer_id'];
+		$this->migrate_core->log->add( 'Retrying restore files' );
+		$this->util->update_transfer_prop( $transfer_id, 'status', 'pending-restore' );
+}
 
 	/** 
 	 * Retry Stalled DB File

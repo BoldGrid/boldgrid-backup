@@ -194,6 +194,11 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 	 * @since 1.17.0
 	 */
 	public function download_extract_wordpress( $transfer_dir, $wp_version ) {
+		if ( ! function_exists( 'WP_Filesystem' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+		}
+		global $wp_filesystem;
+
 		// Validate Inputs
 		if ( ! is_dir( $transfer_dir ) ) {
 			$this->migrate_core->log->add( 'Transfer directory does not exist: ' . $transfer_dir );
@@ -218,7 +223,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 
 		// Create a temporary directory for extraction
 		$temp_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('wp_', true);
-		if ( ! WP_Filesystem_Direct::mkdir( $temp_dir ) && ! is_dir( $temp_dir ) ) {
+		if ( ! $wp_filesystem->mkdir( $temp_dir ) && ! is_dir( $temp_dir ) ) {
 			wp_delete_file( $zip_file ); // Clean up downloaded file
 			$this->migrate_core->log->add( 'Error creating temporary directory for extraction.' );
 			return false; // Failed to create temporary directory
@@ -279,12 +284,12 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 			if ( $file->isFile() || $file->isLink() ) {
 				wp_delete_file( $file->getPathname() ); // Delete files and symbolic links
 			} elseif ( $file->isDir() ) {
-				WP_Filesystem_Direct::rmdir( $file->getPathname() ); // Remove directories
+				$wp_filesystem->rmdir( $file->getPathname() ); // Remove directories
 			}
 		}
 		
 		// Finally, remove the root temporary directory
-		WP_Filesystem_Direct::rmdir( $temp_dir );
+		$wp_filesystem->rmdir( $temp_dir );
 
 		$this->migrate_core->log->add( 'Downloaded and extracted WordPress core files.' );
 
@@ -305,6 +310,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 	public function copy_files( $files, $transfer_dir ) {
 		$this->migrate_core->log->add( 'Copying files from transfer directory to site root directory.' );
 		$failed_copies = array();
+		$count = 0;
 		foreach( $files as $file ) {
 			$relative_path  = str_replace( $transfer_dir, '', $file['path'] );
 			$dest_file_path = ABSPATH . $relative_path;
@@ -314,6 +320,12 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 			} else {
 				$this->migrate_core->log->add( 'File does not exist: ' . $file['path'] );
 				$failed_copies[] = $file['path'];
+			}
+
+			$count++;
+
+			if ( 0 === $count % 50 ) {
+				$this->util->update_transfer_heartbeat();
 			}
 		}
 

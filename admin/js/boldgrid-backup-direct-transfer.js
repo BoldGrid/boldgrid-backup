@@ -57,7 +57,7 @@ BoldGrid.DirectTransfers = function($) {
 			method: method,
 			data: data
 		}).then(function(response) {
-			console.log( response );
+			console.log( 'API Response', { response, callback, callbackArgs } );
 			callback(response, callbackArgs);
 		});
 	};
@@ -76,31 +76,20 @@ BoldGrid.DirectTransfers = function($) {
 			$cancelButton = $('button.cancel-transfer'),
 			$deleteButton = $('button.delete-transfer'),
 			$sectionLinks = $('.bg-left-nav li[data-section-id]'),
-			$authError    = $('.bgbkup-transfers-rx .authentication-error');
+			$authError    = $('.bgbkup-transfers-rx .authentication-error'),
+			$closeModal   = $( '.direct-transfer-modal-close' );
+
+		self_bindCancelButton = self._bindCancelButton( $cancelButton );
 
 		// Hide the authentication error message on load.
 		$authError.hide();
+
+		$closeModal.on( 'click', self._closeModal );
 
 		// Hide the authentication error message on input.
 		$('#auth_admin_url').on('input', function() {
 			$authError.hide();
 		} );
-
-		$cancelButton.on('click', function(e) {
-			var $this = $(e.currentTarget),
-				transferId = $this.data('transferId');
-
-			e.preventDefault();
-			$this.prop('disabled', true);
-			$this.text(self.lang.cancelling + '...');
-			self._restRequest(
-				'cancel-transfer',
-				'POST',
-				{ transfer_id: transferId },
-				self._cancelCallback,
-				{ $cancelButton: $this }
-			);
-		});
 
 		// Bind the Start Transfer button
 		$xferButtons.on('click', function(e) {
@@ -118,20 +107,29 @@ BoldGrid.DirectTransfers = function($) {
 
 		// Bind the Restore button
 		$restoreButton.on('click', function(e) {
-			var $this = $(e.currentTarget),
-				transferId = $this.data('transferId');
+			var $restoreButton = $(e.currentTarget),
+				transferId     = $restoreButton.data('transferId');
 
 			e.preventDefault();
-			$this.prop('disabled', true);
-			$this.text(self.lang.restoring + '...');
 
-			self._restRequest(
-				'start-restore',
-				'POST',
-				{ transfer_id: transferId },
-				self._startRestoreCallback,
-				{ $restoreButton: $this }
-			);
+			self._openModal( 'restore-site', transferId );
+
+			$( '#restore-site-yes' ).on( 'click', function( e ) {
+				e.preventDefault();
+
+				self._closeModal( e );
+
+				$restoreButton.prop('disabled', true);
+				$restoreButton.text(self.lang.restoring + '...');
+
+				self._restRequest(
+					'start-restore',
+					'POST',
+					{ transfer_id: transferId },
+					self._startRestoreCallback,
+					{ $restoreButton: $restoreButton }
+				);
+			} );
 		});
 
 		// Bind the Resync Database button
@@ -194,6 +192,39 @@ BoldGrid.DirectTransfers = function($) {
 		});
 	};
 
+	self._openModal = function( modalId, transferId ) {
+		var $modal           = $( '.direct-transfer-modal[data-modal-id="' + modalId + '"]' ),
+			$transferIdInput = $modal.find( 'input[name="transfer_id"]' );
+
+		$transferIdInput.val( transferId );
+
+		$modal.show();
+	}
+
+	self._closeModal = function( e ) {
+		var $this  = $( e.currentTarget ),
+			$modal = $this.parents( '.direct-transfer-modal' );
+			$modal.hide();
+	}
+
+	self._bindCancelButton = function($cancelButton) {
+		$cancelButton.on('click', function(e) {
+			var $this = $(e.currentTarget),
+				transferId = $this.data('transferId');
+
+			e.preventDefault();
+			$this.prop('disabled', true);
+			$this.text(self.lang.cancelling + '...');
+			self._restRequest(
+				'cancel-transfer',
+				'POST',
+				{ transfer_id: transferId },
+				self._cancelCallback,
+				{ $cancelButton: $this }
+			);
+		});
+	};
+
 	/**
 	 * Validate URL
 	 *
@@ -230,11 +261,6 @@ BoldGrid.DirectTransfers = function($) {
 			return false;
 		}
 
-		console.log( {
-			url,
-			urlObj: urlObj
-		} );
-
 		self._restRequest(
 			'validate-url',
 			'GET',
@@ -265,7 +291,6 @@ BoldGrid.DirectTransfers = function($) {
 	 */
 	self._startRestoreCallback = function(response, args) {
 		var $button = args.$restoreButton;
-		console.log({ responseType: typeof response });
 		if (response.success) {
 			$button.text(self.lang.restoring);
 			window.location.reload();
@@ -353,19 +378,27 @@ BoldGrid.DirectTransfers = function($) {
 				progress = response.data.progress,
 				progressText = response.data.progress_text,
 				progressStatusText = response.data.progress_status_text,
-				timeElapsed = response.data.elapsed_time;
+				timeElapsed = response.data.elapsed_time,
+				borderRadius = '10';
 
 			if ('completed' === status) {
 				$row.addClass('completed');
 				$progressBar.addClass('completed');
-				clearInterval($row.data('intervalId'));
+				clearInterval($row.data('intervalid'));
 
 				status = self.lang.completed;
 				progress = 100;
 				progressText = '100%';
 				progressStatusText = progressStatusText;
-
+				
 				window.location.reload();
+			}
+
+			if ( 99 < progress ) {
+				borderRadius = 10 * ( progress - 99 );
+				$progressBarFill.css('border-radius', '10px ' +  borderRadius + 'px' + ' ' + borderRadius + 'px 10px');
+			} else {
+				$progressBarFill.css('border-radius', '10px 0 0 10px');
 			}
 
 			$progressBarFill.css('width', progress + '%');
@@ -377,8 +410,14 @@ BoldGrid.DirectTransfers = function($) {
 				$row.addClass('canceled');
 				$progressStatusText.text(self.lang.cancelled);
 			}
+			if ( 'failed' === status ) {
+				clearInterval($row.data('intervalid'));
+				$row.addClass('error');
+				$row.find( 'td' ).empty();
+				$row.find( 'td' ).append( '<p class="notice notice-error">' + progressText + '</p>' );
+			}
 		} else {
-			console.log(response);
+			console.log( 'Update Progress Error: ', { response } );
 			$row.addClass('error');
 		}
 	};
@@ -408,11 +447,6 @@ BoldGrid.DirectTransfers = function($) {
 				self._addTransferRow(transferId, url);
 			}, 3000);
 		} else {
-			console.log( {
-				response,
-				$errorDiv,
-				url
-			} );
 			$errorDiv.empty();
 			$errorDiv.append( response.data.error );
 			self._bindInstallTotalUpkeepButton( $errorDiv.find( 'button.install-total-upkeep' ) );
@@ -548,12 +582,13 @@ BoldGrid.DirectTransfers = function($) {
 	 */
 	self._checkReceiveStatus = function() {
 		var $statusRow = $(
-				'.bgbkup-transfers-rx tr.progress-row:not( .hidden ):not( .canceled ):not( .completed )'
+				'.bgbkup-transfers-rx tr.progress-row:not( .hidden ):not( .canceled ):not( .completed ):not( .error )'
 			),
 			interval = 15000;
 
 		$statusRow.each(function(index, row) {
-			$(row).attr('data-intervalId', setInterval(self._checkRxStatus, interval, row));
+			var intervalId = setInterval(self._checkRxStatus, interval, row );
+			$(row).attr('data-intervalId', intervalId );
 			transferId = $(row).data('transferId');
 			self._checkRxStatus(row);
 		});

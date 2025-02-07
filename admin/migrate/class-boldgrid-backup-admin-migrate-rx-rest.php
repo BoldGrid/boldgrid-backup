@@ -544,9 +544,10 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 		$progress_data['elapsed_time'] = $this->util->convert_to_mmss( $elapsed_time );
 		switch( $status ) {
 			case 'failed':
+				$progress_text = $this->util->get_transfer_prop( $transfer_id, 'failed_message', 'Transfer Failed' );
 				$progress_data['status'] = 'failed';
 				$progress_data['progress'] = 0;
-				$progress_data['progress_text'] = 'Transfer Failed';
+				$progress_data['progress_text'] = $progress_text;
 				$progress_data['progress_status_text'] = 'Failed';
 				break;
 			case 'completed':

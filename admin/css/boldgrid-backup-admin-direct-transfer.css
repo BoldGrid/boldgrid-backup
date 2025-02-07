@@ -75,7 +75,7 @@ table.bgbkup-transfers-tx-table {
     background-color: lightgreen;
 }
 
-#test-results-modal {
+.direct-transfer-modal {
     position: fixed;
     top: 0;
     left: 0;
@@ -86,7 +86,7 @@ table.bgbkup-transfers-tx-table {
     align-items: center;
     justify-content: center;
 }
-#test-results-modal .modal-panel {
+.direct-transfer-modal .modal-panel {
     position: absolute;
     left: calc( 50% - 250px );
     top: 50%;
@@ -96,32 +96,40 @@ table.bgbkup-transfers-tx-table {
     text-align: left;
 }
 
-#test-results-modal-close {
+span.direct-transfer-modal-close {
     position: absolute;
     top: 5px;
     right: 5px;
     cursor: pointer;
 }
 
-#test-results-modal .modal-header {
+.direct-transfer-modal .modal-header {
     background-color: #f1f1f1;
     border-bottom: 1px solid #ddd;
     border-radius: 8px 8px 0 0;
 }
 
-#test-results-modal .modal-header h2 {
+.direct-transfer-modal .modal-header h2 {
     margin: 0;
     padding: 10px;
 }
 
-#test-results-modal-content {
+.direct-transfer-modal-content {
     padding: 0 20px 20px;
 }
-#test-results-modal #test-results-modal-content h3 {
+.direct-transfer-modal .direct-transfer-modal-content h3 {
     margin: 0.5em 0;
 }
 
-#test-results-modal #test-results-modal-content p {
+.direct-transfer-modal .direct-transfer-modal-content p {
     margin: 0;
-    padding-left: 10px;
+    padding: 10px;
+}
+
+.direct-transfer-modal-buttons {
+    margin-top: 10px;
+}
+
+.direct-transfer-modal-buttons button.button {
+    margin: 0 5px;
 }

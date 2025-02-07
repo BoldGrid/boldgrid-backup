@@ -24,7 +24,7 @@ if ( isset( $_GET['_wpnonce'] ) &&
 $authd_sites = get_option( $option_names['authd_sites'], array() );
 $transfers   = get_option( $option_names['transfers'], array() );
 
-$sites_table = sprintf( '<h2>%1$s</h2>
+$escaped_sites_table = sprintf( '<h2>%1$s</h2>
 	<p>%2$s</p>
 <table class="wp-list-table widefat fixed striped pages bgbkup-transfers-sites-table">
 	<thead>
@@ -45,7 +45,6 @@ $sites_table = sprintf( '<h2>%1$s</h2>
 	esc_html__( 'Actions', 'boldgrid-backup' )
 );
 
-
 foreach ( $authd_sites as $site => $creds ) {
 	$status      = '';
 	$disabled    = '';
@@ -59,7 +58,7 @@ foreach ( $authd_sites as $site => $creds ) {
 		}
 	}
 
-	$sites_table .= sprintf(
+	$escaped_sites_table .= sprintf(
 		'<tr>
 			<td>%1$s</td>
 			<td>%2$s</td>
@@ -77,9 +76,16 @@ foreach ( $authd_sites as $site => $creds ) {
 		esc_html( $button_text )
 	);
 }
-$sites_table .= '</tbody></table>';
 
-$transfer_table = sprintf( '<h2>%1$s</h2>
+if ( empty( $authd_sites ) ) {
+	$escaped_sites_table .= sprintf(
+		'<tr class="bgbkup-transfers-none-found"><td colspan="3" style="text-align:center">%1$s</td></tr>',
+		esc_html__( 'No authenticated sites. You must first authenticate the source site using the input above', 'boldgrid-backup' )
+	);
+}
+$escaped_sites_table .= '</tbody></table>';
+
+$escaped_transfer_table = sprintf( '<h2>%1$s</h2>
 	<table class="wp-list-table widefat fixed striped pages bgbkup-transfers-tx-table">
 		<thead>
 			<tr>
@@ -100,9 +106,9 @@ $transfer_table = sprintf( '<h2>%1$s</h2>
 );
 
 if ( empty( $transfers ) ) {
-	$transfer_table .= sprintf(
+	$escaped_transfer_table .= sprintf(
 		'<tr class="bgbkup-transfers-none-found"><td colspan="5" style="text-align:center">%1$s</td></tr>',
-		esc_html__( 'No transfers found.', 'boldgrid-backup' )
+		esc_html__( 'No transfers found. You must first authenticate a site, and start the transfer in the table above', 'boldgrid-backup' )
 	);
 } else {
 	foreach ( $transfers as $transfer ) {
@@ -144,7 +150,7 @@ if ( empty( $transfers ) ) {
 				esc_html__( 'Cancel', 'boldgrid-backup' )
 			);
 		}
-		$transfer_table .= sprintf(
+		$escaped_transfer_table .= sprintf(
 			'<tr class="transfer-info %7$s" data-transfer-id="%1$s">
 				<td class="transfer_id">%1$s</td>
 				<td class="source_url">%2$s</td>
@@ -163,7 +169,7 @@ if ( empty( $transfers ) ) {
 
 		$hidden_statuses = array( 'completed', 'canceled', 'restore-completed' );
 
-		$transfer_table .= sprintf(
+		$escaped_transfer_table .= sprintf(
 			'<tr class="progress-row %1$s" data-transfer-id="%2$s">
 				<td colspan="5">
 					<div class="progress">
@@ -180,7 +186,7 @@ if ( empty( $transfers ) ) {
 	}
 }
 
-$transfer_table .= '</tbody></table>';
+$escaped_transfer_table .= '</tbody></table>';
 
 $escaped_headings = sprintf(
 	'<h2>%1$s</h2>
@@ -219,15 +225,19 @@ $escaped_auth_input = sprintf(
 
 );
 
+$escaped_modals = include BOLDGRID_BACKUP_PATH . '/admin/partials/transfers/direct-transfer-modals.php';
+
 return sprintf(
 	'<div class="bgbkup-transfers-rx">
 		%1$s
 		%2$s
 		%3$s
 		%4$s
+		%5$s
 	</div>',
 	$escaped_headings,
 	$escaped_auth_input,
-	$sites_table,
-	$transfer_table
+	$escaped_sites_table,
+	$escaped_transfer_table,
+	$escaped_modals
 );

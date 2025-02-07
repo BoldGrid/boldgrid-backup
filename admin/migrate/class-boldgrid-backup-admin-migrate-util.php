@@ -167,8 +167,6 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 			}
 		}
 
-		error_log( 'dirpath: ' . $dirpath );
-
 		return true;
 	}
 
@@ -575,6 +573,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		$namespace   = $this->migrate_core->configs['rest_api_namespace'] . '/';
 		$prefix      = $this->migrate_core->configs['rest_api_prefix'] . '/';
 		$site_url    = $transfer['source_site_url'];
+		$rest_url    = $transfer['source_rest_url'];
 		$request_url = $rest_url . $namespace . $prefix . $route;
 
 		$authd_sites = $this->get_option( $this->authd_sites_option_name, array() );
@@ -998,7 +997,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 						<button class="update-total-upkeep button-primary" data-url="%4$s">%5$s</button>',
 						'Total Upkeep Version is not compatible with this site.',
 						'Total Upkeep must be version ' . $this->min_tu_version . ' or higher in order to transfer the site.',
-						'You may click the button below to update Total Upkeep to othe newest version on the source site.',
+						'You may click the button below to update Total Upkeep to the newest version on the source site.',
 						esc_url( $site_url ),
 						'Update Total Upkeep'
 						)
