@@ -589,6 +589,9 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 			$request_url . '?user=' . $user . '&pass=' . base64_encode( $pass ),
 			array(
 				'timeout' => 600,
+				'headers' => array(
+					'Accept' => 'application/json',
+				),
 			)
 		);
 
@@ -886,6 +889,9 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 			array(
 				'body' => $data,
 				'timeout' => $this->migrate_core->configs['conn_timeout'],
+				'headers' => array(
+					'Accept' => 'application/json',
+				),
 			)
 		);
 
@@ -931,6 +937,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 				),
 				'headers' => array(
 					'Authorization' => 'Basic ' . base64_encode( $user . ':' . $pass ),
+					'Accept' => 'application/json',
 				),
 				'timeout' => 600,
 			)
@@ -1053,6 +1060,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 				),
 				'headers' => array(
 					'Authorization' => 'Basic ' . base64_encode( $user . ':' . $pass ),
+					'Accept' => 'application/json',
 				),
 				'timeout' => 600,
 			)
@@ -1098,6 +1106,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 				'method' => 'DELETE',
 				'headers' => array(
 					'Authorization' => 'Basic ' . base64_encode( $user . ':' . $pass ),
+					'Accept' => 'application/json',
 				),
 				'timeout' => 600,
 			)
@@ -1125,6 +1134,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 			array(
 				'headers' => array(
 					'Authorization' => 'Basic ' . base64_encode( $user . ':' . $pass ),
+					'Accept' => 'application/json',
 				),
 				'timeout' => 600,
 			)

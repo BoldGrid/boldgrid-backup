@@ -1104,6 +1104,11 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		$transfer = $this->util->get_transfer_from_id( $transfer_id );
 
 		$file_lists = $this->util->get_option( $this->lists_option_name, array() );
+
+		if ( ! isset( $file_lists[ $transfer_id ]['large'] ) ) {
+			$this->util->update_transfer_prop( $transfer_id, 'status', 'transferring-small-files' );
+		}
+
 		$file_list  = $file_lists[ $transfer_id ]['large'];
 
 		$file_list = json_decode( $file_list, true );
@@ -1212,6 +1217,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 				'files'    => json_encode( $files, true ),
 			) );
 			curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+			curl_setopt( $ch, CURLOPT_HTTPHEADER, array( 'Accept: application/json' ) );
 
 			$ch_batch[ $batch_id ] = $ch;
 

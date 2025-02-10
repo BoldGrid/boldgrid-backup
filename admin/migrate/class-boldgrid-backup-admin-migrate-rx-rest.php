@@ -357,7 +357,14 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 
 		$wp_json_url = $matches[1];
 
-		$wp_json_response = wp_remote_get( $wp_json_url );
+		$wp_json_response = wp_remote_get(
+			$wp_json_url,
+			array(
+				'headers' => array(
+					'Accept' => 'application/json',
+				),
+			)
+		);
 		
 
 		if ( is_wp_error( $wp_json_response ) ) {
@@ -542,6 +549,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 
 		$elapsed_time = microtime( true ) - intval( $this->util->get_transfer_prop( $transfer_id, 'start_time', 0 ) );
 		$progress_data['elapsed_time'] = $this->util->convert_to_mmss( $elapsed_time );
+		$progress_data['status'] = $status;
 		switch( $status ) {
 			case 'failed':
 				$progress_text = $this->util->get_transfer_prop( $transfer_id, 'failed_message', 'Transfer Failed' );
