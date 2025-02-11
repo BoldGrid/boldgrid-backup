@@ -580,6 +580,8 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				$progress_data['progress_status_text'] = 'Completed';
 				break;
 			case 'restore-completed':
+				$elapsed_time = intval( $this->util->get_transfer_prop( $transfer_id, 'time_to_migrate', 0 ) );
+				$progress_data['elapsed_time'] = $this->util->convert_to_mmss( $elapsed_time );
 				$progress_data['status'] = 'completed';
 				$progress_data['progress'] = 100;
 				$progress_data['progress_text'] = 'Restoration Complete';
@@ -655,6 +657,8 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				}
 				break;
 			case 'pending-restore':
+				$elapsed_time = microtime( true ) - intval( $this->util->get_transfer_prop( $transfer_id, 'restore_start_time', 0 ) );
+				$progress_data['elapsed_time'] = $this->util->convert_to_mmss( $elapsed_time );
 				$progress_data['status'] = 'pending-restore';
 				$progress_data['progress'] = 0;
 				$progress_data['progress_text'] = 'Pending Restore';
@@ -662,12 +666,16 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				$this->rx->process_transfers();
 				break;
 			case 'restoring-files':
+				$elapsed_time = microtime( true ) - intval( $this->util->get_transfer_prop( $transfer_id, 'restore_start_time', 0 ) );
+				$progress_data['elapsed_time'] = $this->util->convert_to_mmss( $elapsed_time );
 				$progress_data['status'] = 'restoring-files';
 				$progress_data['progress'] = 0;
 				$progress_data['progress_text'] = 'Restoring Files';
 				$progress_data['progress_status_text'] = 'Restoring Files';
 				break;
 			case 'restoring-db':
+				$elapsed_time = microtime( true ) - intval( $this->util->get_transfer_prop( $transfer_id, 'restore_start_time', 0 ) );
+				$progress_data['elapsed_time'] = $this->util->convert_to_mmss( $elapsed_time );
 				$progress_data['status'] = 'restoring-db';
 				$progress_data['progress'] = 0;
 				$progress_data['progress_text'] = 'Restoring Database';

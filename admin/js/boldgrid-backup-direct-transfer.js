@@ -290,10 +290,17 @@ BoldGrid.DirectTransfers = function($) {
 	 * @since 1.17.0
 	 */
 	self._startRestoreCallback = function(response, args) {
-		var $button = args.$restoreButton;
-		if (response.success) {
+		var $button      = args.$restoreButton,
+			transferId   = $button.data( 'transferId' ),
+			$progressDiv = $button.parents( 'tbody' ).find( '.progress-row[data-transfer-id="' + transferId + '"] div.progress' );
+		if ( response.success ) {
 			$button.text(self.lang.restoring);
 			window.location.reload();
+		} else {
+			$button.text( self.lang.restore );
+			$progressDiv.empty();
+			$progressDiv.append( '<p class="notice notice-error">' + response.data.error + '</p>' );
+			$progressDiv.parents( 'tr').removeClass(  'hidden' );
 		}
 	};
 
