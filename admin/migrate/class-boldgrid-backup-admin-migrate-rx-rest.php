@@ -374,8 +374,14 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 		$body = wp_remote_retrieve_body( $wp_json_response );
 		$body = json_decode( $body, true );
 		
-		if ( ! isset( $body['authentication'] ) && ! isset( $body['authentication']['application-passwords'] ) ) {
-			return $rest_api_error_response;
+		if ( isset( $body['authentication'] ) && ! isset( $body['authentication']['application-passwords']['endpoints']['authorization'] ) ) {
+			return new WP_REST_Response( array(
+				'error'   => true,
+				'message' => __(
+					'Application passwords are not enabled on the source site. This may be due to a security plugin such as WordFence. Please enable Application Passwords to continue.',
+					'boldgrid-backup'
+				),
+			), 200 );;
 		}
 
 		return new WP_REST_Response( array(
