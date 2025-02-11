@@ -666,7 +666,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				$progress_data['progress'] = 0;
 				$progress_data['progress_text'] = 'Pending Restore';
 				$progress_data['progress_status_text'] = 'Pending Restore';
-				$this->rx->process_transfers();
+				$this->migrate_core->rx->process_transfers();
 				break;
 			case 'restoring-files':
 				$elapsed_time = microtime( true ) - intval( $this->util->get_transfer_prop( $transfer_id, 'restore_start_time', 0 ) );
