@@ -466,6 +466,13 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 			return false;
 		}
 
+		if ( 'db_dump_info' === $key ) {
+			error_log( json_encode( array(
+				'db_dump_info' => $value,
+				'backtrace'	=> debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS ),
+			) ) );
+		}
+
 		if ( 'status' === $key && $transfers[ $transfer_id ][ $key ] !== $value ) {
 			$this->migrate_core->log->add(
 				"Transfer $transfer_id status updated from {$transfers[ $transfer_id ][ $key ]} to $value"
@@ -673,8 +680,20 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * @param string $transfer_id The transfer id
 	 */
 	public function cancel_transfer( $transfer_id ) {
-		$cancelled_transfers = $this->get_option( $this->cancelled_transfers_option_name, array() );
+		$transfer = $this->get_transfer_from_id( $transfer_id );
 
+		if ( ! $transfer ) {
+			return;
+		}
+
+		error_log( 'is resyncing db: ' . json_encode( ( isset( $transfer['resyncing_db'] ) && $transfer['resyncing_db'] ) ) );
+		if ( isset( $transfer['resyncing_db'] ) && $transfer['resyncing_db'] ) {
+			$this->update_transfer_prop( $transfer_id, 'resyncing_db', false );
+			return $this->update_transfer_prop( $transfer_id, 'status', 'completed' );
+		}
+	
+		$cancelled_transfers = $this->get_option( $this->cancelled_transfers_option_name, array() );
+		
 		if ( ! in_array( $transfer_id, $cancelled_transfers ) ) {
 			$cancelled_transfers[] = $transfer_id;
 		}
@@ -683,13 +702,10 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		update_option( $this->cancelled_transfers_option_name, $cancelled_transfers, false );
 
 		wp_cache_delete( $this->transfers_option_name, 'options' );
-		$transfer = $this->get_transfer_from_id( $transfer_id );
-
-		if ( ! $transfer ) {
-			return;
-		}
 
 		$status_updated = $this->update_transfer_prop( $transfer_id, 'status', 'canceled' );
+
+		$this->migrate_core->log->add( 'Transfer ' . $transfer_id . ' cancelled by user.' );
 	
 		return $status_updated;
 	}

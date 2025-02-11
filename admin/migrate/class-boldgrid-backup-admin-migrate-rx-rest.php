@@ -406,6 +406,18 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 			wp_send_json_error( array( 'message' => 'Invalid transfer ID.' ) );
 		}
 
+		// Verify that the database file is valid.
+		if ( ! isset( $transfer['db_dump_info']['status'] ) || 'complete' !== $transfer['db_dump_info']['status'] ) {
+			$this->migrate_core->log->add( 'Database resync was not completed.' );
+			wp_send_json_error( array(
+				'success' => false,
+				'error'   => 'Database resync had started but was not completed. Please Resync database.'
+			) );
+		}
+
+		// For debugging, short circuit restoration.
+		wp_send_json_success( $result );
+
 		$result = $this->util->update_transfer_prop( $transfer_id, 'status', 'pending-restore' );
 		
 		wp_send_json_success( $result );
@@ -439,14 +451,15 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 
 		$deleted = wp_delete_file( $db_dump_path );
 
-		if ( $deleted ) {
-			$this->util->update_transfer_prop( $transfer_id, 'status', 'pending-db-dump' );
-			$this->migrate_core->log->add( 'Database dump file deleted and pending re-sync: ' . $transfer_id );
-			wp_send_json_success( array( 'message' => 'Database dump file deleted and pending re-sync' ) );
-		} else {
-			$this->migrate_core->log->add( 'Error deleting database dump file for transfer: ' . $transfer_id );
-			wp_send_json_error( array( 'message' => 'Error deleting database dump file.' ) );
+		if ( file_exists( $db_dump_path ) ) {
+			$deleted = wp_delete_file( $db_dump_path );
 		}
+
+		$this->util->update_transfer_prop( $transfer_id, 'status', 'pending-db-dump' );
+		$this->util->update_transfer_prop( $transfer_id, 'resyncing_db', true );
+		$this->util->update_transfer_prop( $transfer_id, 'resync_db_start_time', microtime( true ) );
+		$this->migrate_core->log->add( 'Database dump file deleted and pending re-sync: ' . $transfer_id );
+		wp_send_json_success( array( 'message' => 'Database dump file deleted and pending re-sync' ) );
 	}
 
 	/**
@@ -517,8 +530,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 
 		$this->util->cancel_transfer( $transfer_id );
 
-		$this->migrate_core->log->add( 'Transfer ' . $transfer_id . ' cancelled by user.' );
-
 		wp_send_json_success( array( 'message' => 'Transfer Cancelled' ) );
 	}
 
@@ -547,9 +558,13 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 
 		$progress_data = array();
 
-		$elapsed_time = microtime( true ) - intval( $this->util->get_transfer_prop( $transfer_id, 'start_time', 0 ) );
+		if ( isset( $transfer['resyncing_db'] ) && $transfer['resyncing_db'] ) {
+			$elapsed_time = microtime( true ) - intval( $transfer['resync_db_start_time'] );
+		} else {
+			$elapsed_time = microtime( true ) - intval( $this->util->get_transfer_prop( $transfer_id, 'start_time', 0 ) );
+		}
+		$progress_data['status']       = $transfer['status'];
 		$progress_data['elapsed_time'] = $this->util->convert_to_mmss( $elapsed_time );
-		$progress_data['status'] = $status;
 		switch( $status ) {
 			case 'failed':
 				$progress_text = $this->util->get_transfer_prop( $transfer_id, 'failed_message', 'Transfer Failed' );
@@ -579,6 +594,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				break;
 			case 'dumping-db-tables':
 				$this->migrate_core->rx->check_dump_status( $transfer );
+				error_log( 'db_dump_info' . json_encode( $transfer['db_dump_info'] ) );
 				$db_size   = $transfer['db_dump_info']['db_size'];
 				$dump_size = isset( $transfer['db_dump_info']['file_size'] ) ? $transfer['db_dump_info']['file_size'] : 0;
 				$progress  = $db_size > 0 ? ( $dump_size / $db_size ) * 100 : 0;
@@ -656,6 +672,10 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				$progress_data['progress'] = 0;
 				$progress_data['progress_text'] = 'Restoring Database';
 				$progress_data['progress_status_text'] = 'Restoring Database';
+				break;
+			default:
+				$progress_data['progress_text']        = ucfirst( str_replace( '-', ' ', $transfer['status'] ) );
+				$progress_data['progress_status_text'] = ucfirst( str_replace( '-', ' ', $transfer['status'] ) );
 				break;
 		}
 

@@ -432,6 +432,17 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		$db_dump_info = $response['db_dump_info'];
 
+		if ( 'pending' === $transfer['db_dump_info']['status'] && 'pending' === $db_dump_info['status'] ) {
+			$time_since_last_heartbeat = time() - $this->util->get_transfer_heartbeat();
+
+			if ( $this->migrate_core->configs['stalled_timeout'] < $time_since_last_heartbeat ) {
+				$this->migrate_core->log->add( 'Database dump has likely stalled: Time Since Last Heartbeat: ' . $time_since_last_heartbeat );
+				$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'failed' );
+				$this->util->update_transfer_prop( $transfer['transfer_id'], 'failed_message', 'Database dump has likely stalled' );
+			}
+			return;
+		}
+
 		$this->util->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', $db_dump_info );
 
 		$this->migrate_core->log->add(
@@ -484,7 +495,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'failed' );
 			return $response;
 		} else if ( isset( $response['db_dump_info'] ) ) {
-			$this->util->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', $response['db_dump_info'] );
+			$this->util->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', json_decode( $response['db_dump_info'], true ) );
 			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'dumping-db-tables' );
 			$this->check_dump_status( $transfer );
 		}
@@ -851,6 +862,27 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	public function complete_transfer( $transfer_id ) {
 		$this->util->update_transfer_prop( $transfer_id, 'status', 'completed' );
 		$elapsed_time = microtime( true ) - intval( $this->util->get_transfer_prop( $transfer_id, 'start_time', 0 ) );
+		$resyncing_db = $this->util->get_transfer_prop( $transfer_id, 'resyncing_db', false );
+		if ( $resyncing_db ) {
+			$resync_elapsed_time = microtime( true ) - intval(
+				$this->util->get_transfer_prop( $transfer_id, 'resync_db_start_time', 0 )
+			);
+
+			$this->migrate_core->log->add(
+				sprintf(
+					'Resyncing Database Completed.%2$c%3$c' .
+					'Time Elapsed: %1$s%2$c%3$c',
+					$this->util->convert_to_mmss( $resync_elapsed_time ),
+					10,
+					9
+				)
+			);
+
+			$this->util->update_transfer_prop( $transfer_id, 'resyncing_db', false );
+			$this->util->update_transfer_prop( $transfer_id, 'resync_db_elapsed_time', $resync_elapsed_time );
+
+			return;
+		}
 		$this->util->update_transfer_prop( $transfer_id, 'end_time', microtime( true ) );
 		$this->util->update_transfer_prop( $transfer_id, 'time_elapsed', $elapsed_time );
 		$bytes_rcvd   = $this->util->get_option( $this->bytes_received_option_name, 0 );
