@@ -60,6 +60,14 @@ BoldGrid.DirectTransfers = function($) {
 			console.log( 'API Response', { response, callback, callbackArgs } );
 			callback(response, callbackArgs);
 		}).fail(function(response, responseText) {
+			/*
+			 * If we are checking the status, and the status is 'restoring-db' and the response is 403
+			 * then this likely indicates that the site has been restored, and user has been logged out.
+			 * Therefore, we want to reload the page.
+			 */
+			if ( 'check-status' === endpoint && 'restoring-db' === callbackArgs.status && 403 === response.status ) {
+				window.location.reload();
+			}
 			console.log( 'API Error', { endpoint, response, responseText, callback, callback } );
 		} );
 	};
@@ -413,6 +421,7 @@ BoldGrid.DirectTransfers = function($) {
 			$progressBarFill.css('width', progress + '%');
 			$progressText.text(progressText);
 			$progressStatusText.text(progressStatusText);
+			$progressStatusText.data( 'status', status );
 			$timeElapsedText.text(timeElapsed);
 
 			if ('canceled' === status) {
@@ -625,7 +634,8 @@ BoldGrid.DirectTransfers = function($) {
 			).find('.status'),
 			$timeElapsedText = $(
 				'.bgbkup-transfers-rx tr.transfer-info[data-transfer-id=' + transferId + ']'
-			).find('.time_elapsed');
+			).find('.time_elapsed'),
+			status = $progressStatusText.data('status');
 
 		self._restRequest(
 			'check-status',
@@ -638,7 +648,8 @@ BoldGrid.DirectTransfers = function($) {
 				$progressText: $progressText,
 				$progressBarFill: $progressBarFill,
 				$progressStatusText: $progressStatusText,
-				$timeElapsedText: $timeElapsedText
+				$timeElapsedText: $timeElapsedText,
+				status: status
 			}
 		);
 	};
