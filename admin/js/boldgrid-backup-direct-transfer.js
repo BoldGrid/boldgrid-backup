@@ -65,7 +65,9 @@ BoldGrid.DirectTransfers = function($) {
 			 * then this likely indicates that the site has been restored, and user has been logged out.
 			 * Therefore, we want to reload the page.
 			 */
-			if ( 'check-status' === endpoint && 'restoring-db' === callbackArgs.status && 403 === response.status ) {
+			if ( 'check-status' === endpoint 
+				&& ( 'restoring-db' === callbackArgs.status || 'restoring-files' === callbackArgs.status )
+				&& 403 === response.status ) {
 				window.location.reload();
 			}
 			console.log( 'API Error', { endpoint, response, responseText, callback, callback } );
