@@ -138,21 +138,21 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 		$this->restore_options( $options_file );
 
 		$migration_end_time = microtime( true );
-		$time_to_migrate    = $migration_end_time - $migrate_start_time;
+		$time_to_restore    = $migration_end_time - $migrate_start_time;
 		$this->util->update_transfer_prop( $transfer_id, 'status', 'restore-completed' );
 		$this->util->update_transfer_prop( $transfer_id, 'restore_end_time', $migration_end_time );
-		$this->util->update_transfer_prop( $transfer_id, 'time_to_migrate', $time_to_migrate );
+		$this->util->update_transfer_prop( $transfer_id, 'time_to_restore', $time_to_restore );
 		$this->migrate_core->log->add(
 			sprintf(
 				'Completed migration for transfer ID %1$s in %2$s.',
 				$transfer_id,
-				$this->util->convert_to_mmss( $time_to_migrate )
+				$this->util->convert_to_mmss( $time_to_restore )
 			)
 		);
 
 		return array(
 			'success'         => true,
-			'time_to_migrate' => $time_to_migrate
+			'time_to_restore' => $time_to_restore
 		);
 	}
 

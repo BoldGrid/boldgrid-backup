@@ -112,7 +112,9 @@ if ( empty( $transfers ) ) {
 	);
 } else {
 	foreach ( $transfers as $transfer ) {
-		$time_elapsed   = $transfer['time_elapsed'];
+		$time_elapsed   = 'restore-completed' === $transfer['status'] ?
+			$transfer['time_to_restore'] :
+			$transfer['time_elapsed'];
 		$minutes        = floor( $time_elapsed / 60 );
 		$seconds        = $time_elapsed % 60;
 		$status         = '';

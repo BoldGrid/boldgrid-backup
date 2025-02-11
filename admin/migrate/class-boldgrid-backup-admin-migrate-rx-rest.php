@@ -577,7 +577,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				$progress_data['progress_status_text'] = 'Completed';
 				break;
 			case 'restore-completed':
-				$elapsed_time = intval( $this->util->get_transfer_prop( $transfer_id, 'time_to_migrate', 0 ) );
+				$elapsed_time = intval( $this->util->get_transfer_prop( $transfer_id, 'time_to_restore', 0 ) );
 				$progress_data['elapsed_time'] = $this->util->convert_to_mmss( $elapsed_time );
 				$progress_data['status'] = 'completed';
 				$progress_data['progress'] = 100;
