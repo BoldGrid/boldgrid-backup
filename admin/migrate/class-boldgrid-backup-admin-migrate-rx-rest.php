@@ -415,9 +415,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 			) );
 		}
 
-		// For debugging, short circuit restoration.
-		wp_send_json_success( $result );
-
 		$result = $this->util->update_transfer_prop( $transfer_id, 'status', 'pending-restore' );
 		
 		wp_send_json_success( $result );
