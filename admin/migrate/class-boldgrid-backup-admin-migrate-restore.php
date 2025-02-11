@@ -260,7 +260,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 		);
 
 		foreach ( $directory_iterator as $file ) {
-			$target_path = $transfer_dir . DIRECTORY_SEPARATOR . $directory_iterator->getSubPathName();
+			$target_path = $transfer_dir . $directory_iterator->getSubPathName();
 	
 			if ( $file->isDir() ) {
 				// Create directory if it doesn't exist
