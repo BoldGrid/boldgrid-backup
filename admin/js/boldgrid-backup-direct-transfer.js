@@ -59,7 +59,9 @@ BoldGrid.DirectTransfers = function($) {
 		}).then(function(response) {
 			console.log( 'API Response', { response, callback, callbackArgs } );
 			callback(response, callbackArgs);
-		});
+		}).error(function(response) {
+			console.log( 'API Error', { endpoint, response, callback, callback } );
+		} );
 	};
 
 	/**
