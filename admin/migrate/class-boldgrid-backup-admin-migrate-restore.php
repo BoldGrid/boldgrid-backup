@@ -88,7 +88,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 		$source_dir         = $this->util->url_to_safe_directory_name( $transfer['source_site_url'] );
 		$transfer_dir       = $transfer_dir . '/' . $source_dir . '/' . $transfer_id . '/';
 
-		$this->migrate_core->log->add( 'Starting migration for transfer ID ' . $transfer_id );
+		$this->migrate_core->log->add( 'Starting restoration for transfer ID ' . $transfer_id );
 		$this->util->update_transfer_prop( $transfer_id, 'status', 'matching-wp-versions' );
 		$this->util->update_transfer_prop( $transfer_id, 'restore_start_time', $migrate_start_time );
 
