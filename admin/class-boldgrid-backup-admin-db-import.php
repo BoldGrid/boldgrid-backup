@@ -368,7 +368,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * @return int Number of affected rows
 	 */
 	public function exec_import( PDO $db, $sql_line ) {
-		$affected_rows = 0;
+		$affected_rows = false;
 
 		try {
 			$affected_rows = $db->exec( $sql_line );
@@ -378,7 +378,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 			throw $e;
 		}
 		
-		return $affected_rows = 0;
+		return $affected_rows;
 	}
 
 	/**
