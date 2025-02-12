@@ -262,7 +262,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 				$fixed_lines[] = $this->fix_definer( $line );
 			} else if( 9 === strpos( $line, 'VIEW' ) && $old_database_name ) {
 				$fixed_lines[] = str_replace( $old_database_name, DB_NAME, $line );
-				error_log( 'Replaced database name in view statement: ' . $line );
+				error_log( 'Replaced database name in view statement: ' . str_replace( $old_database_name, DB_NAME, $line ) );
 			} else {
 				$fixed_lines[] = $line;
 			}
