@@ -241,7 +241,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 			}
 
 			if ( false !== strpos( $line, '-- Host:' ) ) {
-				$old_database_name = $dbname = preg_match('/Database:\s*(\S+)/', $string, $matches) ? $matches[1] : false;
+				$old_database_name = $dbname = preg_match('/Database:\s*(\S+)/', $line, $matches) ? $matches[1] : false;
 			}
 		}
 
