@@ -272,7 +272,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 			if ( $file->isDir() ) {
 				// Create directory if it doesn't exist
 				if ( ! is_dir( $target_path ) ) {
-					$wp_filesystem->mkdir( $target_path, 0755, true );
+					$wp_filesystem->mkdir( $target_path, 0755 );
 				}
 			} else {
 				// If the file is wp-config.php, or wp-config-sample.php, skip it
