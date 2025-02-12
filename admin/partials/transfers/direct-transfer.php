@@ -146,6 +146,9 @@ if ( empty( $transfers ) ) {
 			);
 		} else if ( false !== strpos( $transfer['status'], 'restor' ) ) {
 			$status         = 'restoring';
+			$time_elapsed   = microtime( true ) - $transfer['restore_start_time'];
+			$minutes        = floor( $time_elapsed / 60 );
+			$seconds        = $time_elapsed % 60;
 			$action_buttons = sprintf(
 				'<button class="cancel-transfer button-secondary" data-transfer-id="%1$s">%2$s</button>',
 				esc_attr( $transfer['transfer_id'] ),
