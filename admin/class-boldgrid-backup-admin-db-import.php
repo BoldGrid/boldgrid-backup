@@ -160,7 +160,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 			'completed_lines' => 0,
 		);
 
-		$settings   = $this->get_option( 'boldgrid_backup_settings', array() );
+		$settings   = get_option( 'boldgrid_backup_settings', array() );
 		$backup_dir = isset( $settings['backup_directory'] ) ? $settings['backup_directory'] : '/var/www/boldgrid_backup';
 		$log_file   = $backup_dir . '/active-import.log';
 
