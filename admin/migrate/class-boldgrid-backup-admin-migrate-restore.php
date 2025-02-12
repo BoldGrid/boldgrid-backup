@@ -95,15 +95,21 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 		// 1. Download and extract the wordpress core files for the version specified in the transfer.
 		if ( ! $this->download_extract_wordpress( $transfer_dir, $transfer['source_wp_version'] ) ) {
 			$this->migrate_core->log->add( 'Failed to download and extract WordPress core files.' );
-			return array(
-				'success' => false,
-				'error'   => 'Failed to download and extract WordPress core files.'
+			$this->util->update_transfer_prop( $transfer_id, 'status', 'failed' );
+			$this->util->update_transfer_prop(
+				$transfer_id,
+				'failed_message',
+				esc_html__( 'Failed to download and extract WordPress core files.', 'boldgrid-backup' )
 			);
+			return false;
 		}
 
-		return array(
-			'success' => false,
-			'error'   => 'Debugging ended restoration after extracting wordpress.'
+		// Debugging block to stop the restoration
+		$this->util->update_transfer_prop( $transfer_id, 'status', 'failed' );
+		$this->util->update_transfer_prop(
+			$transfer_id,
+			'failed_message',
+			esc_html__( 'Debugging ended restoration after extracting wordpress.', 'boldgrid-backup' )
 		);
 
 		$this->util->update_transfer_prop( $transfer_id, 'status', 'restoring-files' );

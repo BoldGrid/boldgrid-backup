@@ -685,9 +685,9 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		if ( ! $transfer ) {
 			return;
 		}
-
-		error_log( 'is resyncing db: ' . json_encode( ( isset( $transfer['resyncing_db'] ) && $transfer['resyncing_db'] ) ) );
-		if ( isset( $transfer['resyncing_db'] ) && $transfer['resyncing_db'] ) {
+	
+		if ( ( isset( $transfer['resyncing_db'] ) && $transfer['resyncing_db'] ) ||
+			 isset( $transfer['restore_start_time'] ) ) {
 			$this->update_transfer_prop( $transfer_id, 'resyncing_db', false );
 			return $this->update_transfer_prop( $transfer_id, 'status', 'completed' );
 		}

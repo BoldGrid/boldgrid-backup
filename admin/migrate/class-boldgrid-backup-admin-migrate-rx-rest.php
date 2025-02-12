@@ -563,6 +563,8 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 
 		if ( isset( $transfer['resyncing_db'] ) && $transfer['resyncing_db'] ) {
 			$elapsed_time = microtime( true ) - intval( $transfer['resync_db_start_time'] );
+		} else if ( isset( $transfer['restore_start_time'] ) ) {
+			$elapsed_time = microtime( true ) - intval( $transfer['restore_start_time'] );
 		} else {
 			$elapsed_time = microtime( true ) - intval( $this->util->get_transfer_prop( $transfer_id, 'start_time', 0 ) );
 		}
