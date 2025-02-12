@@ -270,13 +270,14 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 			if ( $file->isDir() ) {
 				// Create directory if it doesn't exist
 				if ( ! is_dir( $target_path ) ) {
-					wp_delete_file( $target_path, 0755, true );
+					$wp_filesystem->mkdir( $target_path, 0755, true );
 				}
 			} else {
-				// Copy file only if it doesn't already exist
-				if ( ! file_exists( $target_path ) ) {
-					copy( $file, $target_path );
+				// If the file is wp-config.php, or wp-config-sample.php, skip it
+				if ( 'wp-config.php' === basename( $file ) || 'wp-config-sample.php' === basename( $file ) ) {
+					continue;
 				}
+				$wp_filesystem->copy( $file, $target_path, true );
 			}
 		}
 
