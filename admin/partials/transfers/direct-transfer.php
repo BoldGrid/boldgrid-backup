@@ -144,8 +144,8 @@ if ( empty( $transfers ) ) {
 				esc_attr( $transfer['transfer_id'] ),
 				esc_html__( 'Delete', 'boldgrid-backup' )
 			);
-		} else {
-			$status         = 'transferring';
+		} else if ( false !== strpos( $transfer['status'], 'restor' ) ) {
+			$status         = 'restoring';
 			$action_buttons = sprintf(
 				'<button class="cancel-transfer button-secondary" data-transfer-id="%1$s">%2$s</button>',
 				esc_attr( $transfer['transfer_id'] ),
