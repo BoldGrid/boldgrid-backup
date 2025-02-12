@@ -99,7 +99,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 			);
 		}
 
-		//$success = $this->import_lines( $lines );
+		$success = $this->import_lines( $lines );
 
 		return $success;
 	}
@@ -239,6 +239,10 @@ class Boldgrid_Backup_Admin_Db_Import {
 			if ( strpos( $line, 'DROP VIEW IF EXISTS' ) ) {
 				$has_drop_view_if_exists = true;
 			}
+
+			if ( false !== strpos( $line, '-- Host:' ) ) {
+				$old_database_name = $dbname = preg_match('/Database:\s*(\S+)/', $string, $matches) ? $matches[1] : false;
+			}
 		}
 
 		if ( false === $has_drop_view_if_exists ) {
@@ -256,6 +260,9 @@ class Boldgrid_Backup_Admin_Db_Import {
 		foreach ( $lines as $line ) {
 			if ( strpos( $line, 'DEFINER=' ) === 9 ) {
 				$fixed_lines[] = $this->fix_definer( $line );
+			} else if( 9 === strpos( $line, 'VIEW' ) && $old_database_name ) {
+				$fixed_lines[] = str_replace( $old_database_name, DB_NAME, $line );
+				error_log( 'Replaced database name in view statement: ' . $line );
 			} else {
 				$fixed_lines[] = $line;
 			}
