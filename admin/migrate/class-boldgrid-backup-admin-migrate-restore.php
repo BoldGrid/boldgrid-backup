@@ -101,6 +101,11 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 			);
 		}
 
+		return array(
+			'success' => false,
+			'error'   => 'Debugging ended restoration after extracting wordpress.'
+		);
+
 		// 2. Get an array of files to copy.
 		$files = $this->util->get_files_in_dir( $transfer_dir );
 
