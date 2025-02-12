@@ -89,7 +89,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 		$transfer_dir       = $transfer_dir . '/' . $source_dir . '/' . $transfer_id . '/';
 
 		$this->migrate_core->log->add( 'Starting migration for transfer ID ' . $transfer_id );
-		$this->util->update_transfer_prop( $transfer_id, 'status', 'restoring-files' );
+		$this->util->update_transfer_prop( $transfer_id, 'status', 'matching-wp-versions' );
 		$this->util->update_transfer_prop( $transfer_id, 'restore_start_time', $migrate_start_time );
 
 		// 1. Download and extract the wordpress core files for the version specified in the transfer.
@@ -105,6 +105,8 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 			'success' => false,
 			'error'   => 'Debugging ended restoration after extracting wordpress.'
 		);
+
+		$this->util->update_transfer_prop( $transfer_id, 'status', 'restoring-files' );
 
 		// 2. Get an array of files to copy.
 		$files = $this->util->get_files_in_dir( $transfer_dir );
