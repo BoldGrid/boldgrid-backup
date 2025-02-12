@@ -104,6 +104,14 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 			return false;
 		}
 
+		// Debugging block to stop the restoration
+		$this->util->update_transfer_prop( $transfer_id, 'status', 'failed' );
+		$this->util->update_transfer_prop(
+			$transfer_id,
+			'failed_message',
+			esc_html__( 'Debugging ended restoration after extracting wordpress.', 'boldgrid-backup' )
+		);
+
 		$this->util->update_transfer_prop( $transfer_id, 'status', 'restoring-files' );
 
 		// 2. Get an array of files to copy.
@@ -115,14 +123,10 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 		// 4. Copy the files from the transfer directory to the site's root directory.
 		if ( ! $this->copy_files( $files, $transfer_dir ) ) {
 			$this->migrate_core->log->add( 'Failed to copy files.' );
-					
-			$this->util->update_transfer_prop( $transfer_id, 'status', 'failed' );
-			$this->util->update_transfer_prop(
-				$transfer_id,
-				'failed_message',
-				esc_html__( 'Failed to copy files.', 'boldgrid-backup' )
+			return array(
+				'success' => false,
+				'error'   => 'Failed to copy files.'
 			);
-			return false;
 		}
 		
 		unset( $files );
@@ -137,13 +141,10 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 		// 6. Restore the WordPress database from the dump file.
 		if ( ! $this->restore_database( $db_file['path'], $transfer ) ) {
 			$this->migrate_core->log->add( 'Failed to restore the database.' );
-			$this->util->update_transfer_prop( $transfer_id, 'status', 'failed' );
-			$this->util->update_transfer_prop(
-				$transfer_id,
-				'failed_message',
-				esc_html__( 'Failed to restore the database.', 'boldgrid-backup' )
+			return array(
+				'success' => false,
+				'error'   => 'Failed to restore the database.'
 			);
-			return false;
 		}
 
 		// 7. Restore the options that were exported before the migration.

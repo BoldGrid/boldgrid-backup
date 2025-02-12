@@ -680,9 +680,24 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				break;
 			case 'restoring-db':
 				$elapsed_time = microtime( true ) - intval( $this->util->get_transfer_prop( $transfer_id, 'restore_start_time', 0 ) );
+				$settings     = $this->util->get_option( 'boldgrid_backup_settings', array() );
+				$backup_dir   = isset( $settings['backup_directory'] ) ? $settings['backup_directory'] : '/var/www/boldgrid_backup';
+				$log_file     = $backup_dir . '/active-import.log';
+				if ( file_exists( $log_file ) ) {
+					$log_data = file_get_contents( $log_file );
+					$import_stats = json_decode( $log_data, true );
+					$progress_data['progress'] = intval( $import_stats['completed_lines'] ) / intval( $import_stats['total_lines'] ) * 100;
+					$progress_data['progress_text'] = sprintf(
+						'%1$s / %2$s lines (%3$s%%)',
+						$import_stats['completed_lines'],
+						$import_stats['total_lines'],
+						number_format( $progress_data['progress'], 2 )
+					);
+				} else {
+					$progress_data['progress'] = 0;
+				}
 				$progress_data['elapsed_time'] = $this->util->convert_to_mmss( $elapsed_time );
 				$progress_data['status'] = 'restoring-db';
-				$progress_data['progress'] = 0;
 				$progress_data['progress_text'] = 'Restoring Database';
 				$progress_data['progress_status_text'] = 'Restoring Database';
 				break;

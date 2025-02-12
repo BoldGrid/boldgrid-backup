@@ -155,7 +155,22 @@ class Boldgrid_Backup_Admin_Db_Import {
 
 		$templine = '';
 
+		$import_stats = array(
+			'number_of_lines' => count( $lines ),
+			'completed_lines' => 0,
+		);
+
+		$settings   = $this->get_option( 'boldgrid_backup_settings', array() );
+		$backup_dir = isset( $settings['backup_directory'] ) ? $settings['backup_directory'] : '/var/www/boldgrid_backup';
+		$log_file   = $backup_dir . '/active-import.log';
+
+		file_put_contents( $log_file, json_encode( $import_stats ) );
+
+		$line_number = 1;
+
 		foreach ( $lines as $line ) {
+			// increment the line number.
+			$line_number++;
 			// Skip comments and empty lines.
 			if ( substr( $line, 0, 2 ) === '--' || empty( $line ) ) {
 				continue;
@@ -169,6 +184,10 @@ class Boldgrid_Backup_Admin_Db_Import {
 				if ( false === $affected_rows ) {
 					return false;
 				}
+
+				$import_stats['completed_lines'] = $line_number;
+
+				file_put_contents( $log_file, json_encode( $import_stats ) );
 
 				$templine = '';
 			}
