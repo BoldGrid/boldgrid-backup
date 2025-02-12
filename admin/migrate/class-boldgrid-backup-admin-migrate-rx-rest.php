@@ -686,19 +686,19 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				if ( file_exists( $log_file ) ) {
 					$log_data = file_get_contents( $log_file );
 					$import_stats = json_decode( $log_data, true );
-					$progress_data['progress'] = intval( $import_stats['completed_lines'] ) / intval( $import_stats['total_lines'] ) * 100;
+					$progress_data['progress'] = intval( $import_stats['completed_lines'] ) / intval( $import_stats['number_of_lines'] ) * 100;
 					$progress_data['progress_text'] = sprintf(
 						'%1$s / %2$s lines (%3$s%%)',
 						$import_stats['completed_lines'],
-						$import_stats['total_lines'],
+						$import_stats['number_of_lines'],
 						number_format( $progress_data['progress'], 2 )
 					);
 				} else {
 					$progress_data['progress'] = 0;
+					$progress_data['progress_text'] = 'Restoring Database';
 				}
 				$progress_data['elapsed_time'] = $this->util->convert_to_mmss( $elapsed_time );
 				$progress_data['status'] = 'restoring-db';
-				$progress_data['progress_text'] = 'Restoring Database';
 				$progress_data['progress_status_text'] = 'Restoring Database';
 				break;
 			default:
