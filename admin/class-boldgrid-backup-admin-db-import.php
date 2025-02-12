@@ -99,7 +99,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 			);
 		}
 
-		$success = $this->import_lines( $lines );
+		//$success = $this->import_lines( $lines );
 
 		return $success;
 	}
@@ -275,6 +275,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * @return string The line with the DEFINER option removed.
 	 */
 	public function fix_definer( $line ) {
+		error_log( 'Fixing definer before: ' . $line );
 		$line_fixed_definer  = '';
 		$sql_security_offset = strpos( $line, 'SQL SECURITY' );
 		$line_fixed_definer  = substr( $line, 0, 9 );
@@ -290,6 +291,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 			$line_fixed_definer .= '*/';
 		}
 
+		error_log( 'Fixing definer after: ' . $line_fixed_definer );
 		return $line_fixed_definer;
 	}
 

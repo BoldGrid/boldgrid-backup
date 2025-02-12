@@ -104,14 +104,6 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 			return false;
 		}
 
-		// Debugging block to stop the restoration
-		$this->util->update_transfer_prop( $transfer_id, 'status', 'failed' );
-		$this->util->update_transfer_prop(
-			$transfer_id,
-			'failed_message',
-			esc_html__( 'Debugging ended restoration after extracting wordpress.', 'boldgrid-backup' )
-		);
-
 		$this->util->update_transfer_prop( $transfer_id, 'status', 'restoring-files' );
 
 		// 2. Get an array of files to copy.
