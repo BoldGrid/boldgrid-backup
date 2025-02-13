@@ -184,6 +184,8 @@ BoldGrid.DirectTransfers = function($) {
 				$authAdminInput = $('#auth_admin_url'),
 				appUuid         = $appUuidInput.val();
 
+			$( e.currentTarget ).prop('disabled', true);
+
 			e.preventDefault();
 
 			self._validateUrl( $authAdminInput.val(), appUuid );
