@@ -325,6 +325,11 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 
 		$headers = $response['headers']->getAll();
 
+		/*
+		 * All public facing wp sites have the link header added
+		 * in order to allow for rest discovery. If this header is not
+		 * present, then it's either not a wp site, or the rest api is not enabled.
+		 */
 		if ( ! isset( $headers['link'] ) ) {
 			error_log( 'headers: ' . json_encode( $headers ) );
 			return new WP_REST_Response( array(
@@ -374,6 +379,11 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 		$body = wp_remote_retrieve_body( $wp_json_response );
 		$body = json_decode( $body, true );
 		
+		/**
+		 * Application passwords are enabled by default, but some security plugins
+		 * may disable them. This is determined by the presence of the 'authentication'
+		 * and 'application-passwords' keys in the response body.
+		 */
 		if ( isset( $body['authentication'] ) && ! isset( $body['authentication']['application-passwords']['endpoints']['authorization'] ) ) {
 			return new WP_REST_Response( array(
 				'error'   => true,
@@ -540,6 +550,10 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	 * Check Status
 	 * 
 	 * Callback for endpoint: check-status
+	 * 
+	 * TODO: This method has gotten quite a bit long.
+	 *       This should eventually be refactored, or
+	 *       even moved to it's own class.
 	 * 
 	 * @param WP_REST_Request $request The request object.
 	 * 

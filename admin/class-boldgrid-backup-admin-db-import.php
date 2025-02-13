@@ -155,6 +155,11 @@ class Boldgrid_Backup_Admin_Db_Import {
 
 		$templine = '';
 
+		/*
+		 * Tracking the import stats and exporting to a log file
+		 * will allow us to track the progress of the import either
+		 * in total upkeep, or otherwise
+		 */
 		$import_stats = array(
 			'number_of_lines' => count( $lines ),
 			'completed_lines' => 0,
@@ -185,8 +190,8 @@ class Boldgrid_Backup_Admin_Db_Import {
 					return false;
 				}
 
+				// Update the import stats only when finishing a query.
 				$import_stats['completed_lines'] = $line_number;
-
 				file_put_contents( $log_file, json_encode( $import_stats ) );
 
 				$templine = '';
@@ -240,6 +245,12 @@ class Boldgrid_Backup_Admin_Db_Import {
 				$has_drop_view_if_exists = true;
 			}
 
+			/*
+			 * If the export was made by TU, then
+			 * the original database name will be included in the 
+			 * beginning of the export in a comment. This is used later
+			 * to fix any view statements that may have the original database name.
+			 */
 			if ( false !== strpos( $line, '-- Host:' ) ) {
 				$old_database_name = $dbname = preg_match('/Database:\s*(\S+)/', $line, $matches) ? $matches[1] : false;
 			}
@@ -260,6 +271,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 		foreach ( $lines as $line ) {
 			if ( strpos( $line, 'DEFINER=' ) === 9 ) {
 				$fixed_lines[] = $this->fix_definer( $line );
+			// If it's a view statement, check for old db name, and replace with new.
 			} else if( 9 === strpos( $line, 'VIEW' ) && $old_database_name ) {
 				$fixed_lines[] = str_replace( $old_database_name, DB_NAME, $line );
 			} else {
@@ -273,7 +285,10 @@ class Boldgrid_Backup_Admin_Db_Import {
 	/**
 	 * Fix Definer.
 	 *
-	 * Fixes the actual definer line.
+	 * Fixes the actual definer line. This used to just replace the
+	 * user, but keep the host as is. However, this caused issues when
+	 * migrating, and the host of the user was different. Now
+	 * we retrieve the current sql users details, and use that.
 	 *
 	 * @since 1.14.0
 	 *
@@ -291,7 +306,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 		} else {
 			// Fallback in case the query fails.
 			$current_username = DB_USER;
-			$current_host     = DB_HOST;
+			$current_host     = strpos( $line, '@`%`' ) ? '%' : DB_HOST;
 		}
 	
 		// Determine where the "SQL SECURITY" clause begins.
@@ -375,6 +390,8 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * Execute Import.
 	 *
 	 * Executes Import MySql Query.
+	 * Previously this didn't have any error handling
+	 * in the event of a PDOException. This has been added.
 	 *
 	 * @since 1.14.0
 	 *

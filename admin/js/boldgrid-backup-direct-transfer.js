@@ -206,6 +206,14 @@ BoldGrid.DirectTransfers = function($) {
 		});
 	};
 
+	/**
+	 * Open Modal
+	 * 
+	 * @since 1.17.0
+	 * 
+	 * @param {string} modalId    The ID of the modal to open
+	 * @param {string} transferId Transfer ID
+	 */
 	self._openModal = function( modalId, transferId ) {
 		var $modal           = $( '.direct-transfer-modal[data-modal-id="' + modalId + '"]' ),
 			$transferIdInput = $modal.find( 'input[name="transfer_id"]' );
@@ -215,12 +223,26 @@ BoldGrid.DirectTransfers = function($) {
 		$modal.show();
 	}
 
+	/**
+	 * Close Modal
+	 * 
+	 * @since 1.17.0
+	 * 
+	 * @param {Event} e Click Event.
+	 */
 	self._closeModal = function( e ) {
 		var $this  = $( e.currentTarget ),
 			$modal = $this.parents( '.direct-transfer-modal' );
 			$modal.hide();
 	}
 
+	/**
+	 * Bind Cancel Button
+	 *
+	 * @since 1.17.0
+	 *
+	 * @param {jQuery} $cancelButton Element to bind the cancel button to.
+	 */
 	self._bindCancelButton = function($cancelButton) {
 		$cancelButton.on('click', function(e) {
 			var $this = $(e.currentTarget),
@@ -476,6 +498,13 @@ BoldGrid.DirectTransfers = function($) {
 		}
 	};
 
+	/**
+	 * Bind Update Total Upkeep Button
+	 * 
+	 * Binds the Update Total Upkeep button to the REST API endpoint.
+	 * 
+	 * @param {jQuery} $button Update TU Button
+	 */
 	self._bindUpdateTotalUpkeepButton = function( $button ) {
 		var url                  = $button.data( 'url' ),
 			$errorDiv            = $button.parents( '.errors' ),
@@ -495,6 +524,13 @@ BoldGrid.DirectTransfers = function($) {
 		} );
 	};
 
+	/**
+	 * Update Total Upkeep Callback
+	 * 
+	 * Callback for endpoint: /update-total-upkeep
+	 * @param {object} response The response from the REST API
+	 * @param {object} args     The arguments passed to the callback
+	 */
 	self._updateTotalUpkeepCallback = function( response, args ) {
 		if ( response.success ) {
 			args.$startTransferButton.prop( 'disabled', false );
@@ -503,6 +539,13 @@ BoldGrid.DirectTransfers = function($) {
 		}
 	}
 
+	/**
+	 * Bind Install Total Upkeep Button
+	 * 
+	 * @since 1.17.0
+	 *
+	 * @param {jQuery} $button Install TU Button
+	 */
 	self._bindInstallTotalUpkeepButton = function( $button ) {
 		var url                  = $button.data( 'url' ),
 			$errorDiv            = $button.parents( '.errors' ),
@@ -522,6 +565,16 @@ BoldGrid.DirectTransfers = function($) {
 		} );
 	};
 
+	/**
+	 * Install Total Upkeep Callback
+	 * 
+	 * Callback for endpoint: /install-total-upkeep
+	 * 
+	 * @since 1.17.0
+	 * 
+	 * @param {object} response The response from the REST API
+	 * @param {object} args     The arguments passed to the callback
+	 */
 	self._installTotalUpkeepCallback = function( response, args ) {
 		if ( response.success ) {
 			args.$startTransferButton.prop( 'disabled', false );
