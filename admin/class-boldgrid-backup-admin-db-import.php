@@ -262,7 +262,6 @@ class Boldgrid_Backup_Admin_Db_Import {
 				$fixed_lines[] = $this->fix_definer( $line );
 			} else if( 9 === strpos( $line, 'VIEW' ) && $old_database_name ) {
 				$fixed_lines[] = str_replace( $old_database_name, DB_NAME, $line );
-				error_log( 'Replaced database name in view statement: ' . str_replace( $old_database_name, DB_NAME, $line ) );
 			} else {
 				$fixed_lines[] = $line;
 			}
@@ -387,13 +386,11 @@ class Boldgrid_Backup_Admin_Db_Import {
 	public function exec_import( PDO $db, $sql_line ) {
 		$affected_rows = false;
 
-		$affected_rows = $db->exec( $sql_line );
-
 		try {
 			$affected_rows = $db->exec( $sql_line );
 		} catch( PDOException $e ) {
-			error_log( 'Error: ' . $e->getMessage() );
-			error_log( 'Line: ' . $sql_line );
+			$this->core->logger->add( 'SQL Import Error: ' . $e->getMessage() );
+			$this->core->logger->add( 'Line: ' . $sql_line );
 			throw $e;
 		}
 		

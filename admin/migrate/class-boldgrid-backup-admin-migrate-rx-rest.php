@@ -677,6 +677,16 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				$progress_data['progress'] = 0;
 				$progress_data['progress_text'] = 'Restoring Files';
 				$progress_data['progress_status_text'] = 'Restoring Files';
+				$copy_files_stats = $this->util->get_transfer_prop( $transfer_id, 'copy_files_stats', array() );
+				if ( ! empty( $copy_files_stats ) ) {
+					$progress_data['progress'] = $copy_files_stats['files_copied'] / $copy_files_stats['total_files'] * 100;
+					$progress_data['progress_text'] = sprintf(
+						'%1$s / %2$s files (%3$s%%)',
+						$copy_files_stats['files_copied'],
+						$copy_files_stats['total_files'],
+						number_format( $progress_data['progress'], 2 )
+					);
+				}
 				break;
 			case 'restoring-db':
 				$elapsed_time = microtime( true ) - intval( $this->util->get_transfer_prop( $transfer_id, 'restore_start_time', 0 ) );

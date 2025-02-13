@@ -113,7 +113,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 		$db_file = $this->seperate_db_from_files( $files, $transfer['db_dump_info']['file'] );
 
 		// 4. Copy the files from the transfer directory to the site's root directory.
-		if ( ! $this->copy_files( $files, $transfer_dir ) ) {
+		if ( ! $this->copy_files( $files, $transfer_id, $transfer_dir ) ) {
 			$this->migrate_core->log->add( 'Failed to copy files.' );
 			return array(
 				'success' => false,
@@ -316,10 +316,19 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 	 * @param string $transfer_dir The directory transfered files are located in
 	 * 
 	 */
-	public function copy_files( $files, $transfer_dir ) {
+	public function copy_files( $files, $transfer_id, $transfer_dir ) {
 		$this->migrate_core->log->add( 'Copying files from transfer directory to site root directory.' );
 		$failed_copies = array();
+		$total_files_count = count( $files );
 		$count = 0;
+		$this->util->update_transfer_prop(
+			$transfer_id,
+			'copy_files_stats',
+			array(
+				'total_files'  => $total_files_count,
+				'files_copied' => $count,
+			)
+		);
 		foreach( $files as $file ) {
 			$relative_path  = str_replace( $transfer_dir, '', $file['path'] );
 			$dest_file_path = ABSPATH . $relative_path;
@@ -335,6 +344,14 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 
 			if ( 0 === $count % 50 ) {
 				$this->util->update_transfer_heartbeat();
+				$this->util->update_transfer_prop(
+					$transfer_id,
+					'copy_files_stats',
+					array(
+						'total_files'  => $total_files_count,
+						'files_copied' => $count,
+					)
+				);
 			}
 		}
 
@@ -419,7 +436,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 		if ( ! empty( $new_db_prefix ) && $new_db_prefix !== $old_db_prefix ) {
 
 			// Set the database table prefix.
-			$wpdb->set_prefix( $db_prefix );
+			$wpdb->set_prefix( $new_db_prefix );
 			$this->update_table_prefix( $new_db_prefix );
 		} else {
 			$new_db_prefix = $old_db_prefix;
