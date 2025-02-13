@@ -377,13 +377,15 @@ class Boldgrid_Backup_Admin_Db_Import {
 	public function exec_import( PDO $db, $sql_line ) {
 		$affected_rows = false;
 
-		try {
-			$affected_rows = $db->exec( $sql_line );
-		} catch( PDOException $e ) {
-			error_log( 'Error: ' . $e->getMessage() );
-			error_log( 'Line: ' . $sql_line );
-			throw $e;
-		}
+		$affected_rows = $db->exec( $sql_line );
+
+		// try {
+		// 	$affected_rows = $db->exec( $sql_line );
+		// } catch( PDOException $e ) {
+		// 	error_log( 'Error: ' . $e->getMessage() );
+		// 	error_log( 'Line: ' . $sql_line );
+		// 	throw $e;
+		// }
 		
 		return $affected_rows;
 	}
