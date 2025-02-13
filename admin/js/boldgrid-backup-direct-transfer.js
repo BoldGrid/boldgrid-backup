@@ -61,12 +61,12 @@ BoldGrid.DirectTransfers = function($) {
 			callback(response, callbackArgs);
 		}).fail(function(response, responseText) {
 			/*
-			 * If we are checking the status, and the status is 'restoring-db' and the response is 403
-			 * then this likely indicates that the site has been restored, and user has been logged out.
-			 * Therefore, we want to reload the page.
+			 * If we are checking the status, and the status contains the string 'restor' as in
+			 * 'restoring' or 'restored', and the response status is 403, then the user has been logged out.
+			 * and needs to be re-logged in.
 			 */
 			if ( 'check-status' === endpoint 
-				&& ( 'restoring-db' === callbackArgs.status || 'restoring-files' === callbackArgs.status )
+				&& ( callbackArgs.status.includes( 'restor' ) )
 				&& 403 === response.status ) {
 				window.location.reload();
 			}
