@@ -146,8 +146,8 @@ if ( empty( $transfers ) ) {
 			);
 		} else if ( false !== strpos( $transfer['status'], 'restor' ) ) {
 			$status         = 'restoring';
-			$time_elapsed   = microtime( true ) - isset( $transfer['restore_start_time'] ) ?
-				$transfer['restore_start_time'] :
+			$time_elapsed   = isset( $transfer['restore_start_time'] ) ?
+				microtime( true ) - $transfer['restore_start_time'] :
 				0;
 			$minutes        = floor( $time_elapsed / 60 );
 			$seconds        = $time_elapsed % 60;
