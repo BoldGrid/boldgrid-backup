@@ -156,6 +156,13 @@ if ( empty( $transfers ) ) {
 				esc_attr( $transfer['transfer_id'] ),
 				esc_html__( 'Cancel', 'boldgrid-backup' )
 			);
+		} else {
+			$status         = $transfer['status'];
+			$action_buttons = sprintf(
+				'<button class="cancel-transfer button-secondary" data-transfer-id="%1$s">%2$s</button>',
+				esc_attr( $transfer['transfer_id'] ),
+				esc_html__( 'Cancel', 'boldgrid-backup' )
+			);
 		}
 		$escaped_transfer_table .= sprintf(
 			'<tr class="transfer-info %7$s" data-transfer-id="%1$s">
