@@ -282,30 +282,31 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * @return string The line with the DEFINER option removed.
 	 */
 	public function fix_definer( $line ) {
-		// Query the database to get the current user in 'username@host' format.
-		$result = mysqli_query($this->connection, "SELECT CURRENT_USER() AS current_user");
-		if ($result && $row = mysqli_fetch_assoc($result)) {
-			// Split the returned string into username and host.
-			list($current_user, $current_host) = explode('@', $row['current_user']);
+		global $wpdb;
+	
+		// Retrieve the current MySQL user string, e.g., 'username@localhost'
+		$current_user_string = $wpdb->get_var( "SELECT CURRENT_USER()" );
+	
+		if ( ! empty( $current_user_string ) ) {
+			list( $current_username, $current_host ) = explode( '@', $current_user_string );
 		} else {
-			// Fallback to constants if the query fails.
-			$current_user = DB_USER;
-			$current_host = DB_HOST;
+			// Fallback in case the query fails.
+			$current_username = DB_USER;
+			$current_host     = DB_HOST;
 		}
-
-		// Determine where the "SQL SECURITY" clause starts in the line.
-		$sql_security_offset = strpos($line, 'SQL SECURITY');
-
-		// Build the fixed definer string using the current user's username and host.
-		// Note: Using strict comparison for strpos to ensure index 0 is correctly handled.
-		$line_fixed_definer  = substr($line, 0, 9) . 'DEFINER=`' . $current_user . '`@`' . $current_host . '` ';
-
-		if ($sql_security_offset !== false) {
-			$line_fixed_definer .= substr($line, $sql_security_offset);
+	
+		// Determine where the "SQL SECURITY" clause begins.
+		$sql_security_offset = strpos( $line, 'SQL SECURITY' );
+	
+		// Build the new line with the correct definer using the current user's details.
+		$line_fixed_definer = substr( $line, 0, 9 ) . 'DEFINER=`' . $current_username . '`@`' . $current_host . '` ';
+	
+		if ( false !== $sql_security_offset ) {
+			$line_fixed_definer .= substr( $line, $sql_security_offset );
 		} else {
 			$line_fixed_definer .= '*/';
 		}
-
+	
 		return $line_fixed_definer;
 	}
 
