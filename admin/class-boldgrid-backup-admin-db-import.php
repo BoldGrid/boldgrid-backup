@@ -282,17 +282,26 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * @return string The line with the DEFINER option removed.
 	 */
 	public function fix_definer( $line ) {
-		$line_fixed_definer  = '';
-		$sql_security_offset = strpos( $line, 'SQL SECURITY' );
-		$line_fixed_definer  = substr( $line, 0, 9 );
-		if ( strpos( $line, '@`%`' ) ) {
-			$line_fixed_definer .= 'DEFINER=`' . DB_USER . '`@`%` ';
+		// Query the database to get the current user in 'username@host' format.
+		$result = mysqli_query($this->connection, "SELECT CURRENT_USER() AS current_user");
+		if ($result && $row = mysqli_fetch_assoc($result)) {
+			// Split the returned string into username and host.
+			list($current_user, $current_host) = explode('@', $row['current_user']);
 		} else {
-			$line_fixed_definer .= 'DEFINER=`' . DB_USER . '`@`' . DB_HOST . '` ';
+			// Fallback to constants if the query fails.
+			$current_user = DB_USER;
+			$current_host = DB_HOST;
 		}
 
-		if ( strpos( $line, 'SQL SECURITY' ) ) {
-			$line_fixed_definer .= subStr( $line, $sql_security_offset );
+		// Determine where the "SQL SECURITY" clause starts in the line.
+		$sql_security_offset = strpos($line, 'SQL SECURITY');
+
+		// Build the fixed definer string using the current user's username and host.
+		// Note: Using strict comparison for strpos to ensure index 0 is correctly handled.
+		$line_fixed_definer  = substr($line, 0, 9) . 'DEFINER=`' . $current_user . '`@`' . $current_host . '` ';
+
+		if ($sql_security_offset !== false) {
+			$line_fixed_definer .= substr($line, $sql_security_offset);
 		} else {
 			$line_fixed_definer .= '*/';
 		}
@@ -379,13 +388,13 @@ class Boldgrid_Backup_Admin_Db_Import {
 
 		$affected_rows = $db->exec( $sql_line );
 
-		// try {
-		// 	$affected_rows = $db->exec( $sql_line );
-		// } catch( PDOException $e ) {
-		// 	error_log( 'Error: ' . $e->getMessage() );
-		// 	error_log( 'Line: ' . $sql_line );
-		// 	throw $e;
-		// }
+		try {
+			$affected_rows = $db->exec( $sql_line );
+		} catch( PDOException $e ) {
+			error_log( 'Error: ' . $e->getMessage() );
+			error_log( 'Line: ' . $sql_line );
+			throw $e;
+		}
 		
 		return $affected_rows;
 	}
