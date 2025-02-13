@@ -56,22 +56,26 @@ BoldGrid.DirectTransfers = function($) {
 			path: '/boldgrid-backup/v1/direct-transfer/' + endpoint,
 			method: method,
 			data: data
-		}).then(function(response) {
-			console.log( 'API Response', { response, callback, callbackArgs } );
-			callback(response, callbackArgs);
-		}).fail(function(response, responseText) {
-			/*
-			 * If we are checking the status, and the status contains the string 'restor' as in
-			 * 'restoring' or 'restored', and the response status is 403, then the user has been logged out.
-			 * and needs to be re-logged in.
-			 */
-			if ( 'check-status' === endpoint 
-				&& ( callbackArgs.status.includes( 'restor' ) )
-				&& 403 === response.status ) {
-				window.location.reload();
-			}
-			console.log( 'API Error', { endpoint, response, responseText, callback, callback } );
-		} );
+		})
+			.then(function(response) {
+				console.log('API Response', { response, callback, callbackArgs });
+				callback(response, callbackArgs);
+			})
+			.fail(function(response, responseText) {
+				/*
+				 * If we are checking the status, and the status contains the string 'restor' as in
+				 * 'restoring' or 'restored', and the response status is 403, then the user has been logged out.
+				 * and needs to be re-logged in.
+				 */
+				if (
+					'check-status' === endpoint &&
+					callbackArgs.status.includes('restor') &&
+					403 === response.status
+				) {
+					window.location.reload();
+				}
+				console.log('API Error', { endpoint, response, responseText, callback, callback });
+			});
 	};
 
 	/**
@@ -88,20 +92,20 @@ BoldGrid.DirectTransfers = function($) {
 			$cancelButton = $('button.cancel-transfer'),
 			$deleteButton = $('button.delete-transfer'),
 			$sectionLinks = $('.bg-left-nav li[data-section-id]'),
-			$authError    = $('.bgbkup-transfers-rx .authentication-error'),
-			$closeModal   = $( '.direct-transfer-modal-close' );
+			$authError = $('.bgbkup-transfers-rx .authentication-error'),
+			$closeModal = $('.direct-transfer-modal-close');
 
-		self_bindCancelButton = self._bindCancelButton( $cancelButton );
+		self_bindCancelButton = self._bindCancelButton($cancelButton);
 
 		// Hide the authentication error message on load.
 		$authError.hide();
 
-		$closeModal.on( 'click', self._closeModal );
+		$closeModal.on('click', self._closeModal);
 
 		// Hide the authentication error message on input.
 		$('#auth_admin_url').on('input', function() {
 			$authError.hide();
-		} );
+		});
 
 		// Bind the Start Transfer button
 		$xferButtons.on('click', function(e) {
@@ -120,16 +124,16 @@ BoldGrid.DirectTransfers = function($) {
 		// Bind the Restore button
 		$restoreButton.on('click', function(e) {
 			var $restoreButton = $(e.currentTarget),
-				transferId     = $restoreButton.data('transferId');
+				transferId = $restoreButton.data('transferId');
 
 			e.preventDefault();
 
-			self._openModal( 'restore-site', transferId );
+			self._openModal('restore-site', transferId);
 
-			$( '#restore-site-yes' ).on( 'click', function( e ) {
+			$('#restore-site-yes').on('click', function(e) {
 				e.preventDefault();
 
-				self._closeModal( e );
+				self._closeModal(e);
 
 				$restoreButton.prop('disabled', true);
 				$restoreButton.text(self.lang.restoring + '...');
@@ -141,7 +145,7 @@ BoldGrid.DirectTransfers = function($) {
 					self._startRestoreCallback,
 					{ $restoreButton: $restoreButton }
 				);
-			} );
+			});
 		});
 
 		// Bind the Resync Database button
@@ -180,16 +184,15 @@ BoldGrid.DirectTransfers = function($) {
 
 		// Bind the Authenticate Button
 		$authButton.on('click', function(e) {
-			var $appUuidInput   = $('#app_uuid'),
+			var $appUuidInput = $('#app_uuid'),
 				$authAdminInput = $('#auth_admin_url'),
-				appUuid         = $appUuidInput.val();
+				appUuid = $appUuidInput.val();
 
-			$( e.currentTarget ).prop('disabled', true);
+			$(e.currentTarget).prop('disabled', true);
 
 			e.preventDefault();
 
-			self._validateUrl( $authAdminInput.val(), appUuid );
-
+			self._validateUrl($authAdminInput.val(), appUuid);
 		});
 
 		// Bind the section links to add query arg.
@@ -208,33 +211,33 @@ BoldGrid.DirectTransfers = function($) {
 
 	/**
 	 * Open Modal
-	 * 
+	 *
 	 * @since 1.17.0
-	 * 
+	 *
 	 * @param {string} modalId    The ID of the modal to open
 	 * @param {string} transferId Transfer ID
 	 */
-	self._openModal = function( modalId, transferId ) {
-		var $modal           = $( '.direct-transfer-modal[data-modal-id="' + modalId + '"]' ),
-			$transferIdInput = $modal.find( 'input[name="transfer_id"]' );
+	self._openModal = function(modalId, transferId) {
+		var $modal = $('.direct-transfer-modal[data-modal-id="' + modalId + '"]'),
+			$transferIdInput = $modal.find('input[name="transfer_id"]');
 
-		$transferIdInput.val( transferId );
+		$transferIdInput.val(transferId);
 
 		$modal.show();
-	}
+	};
 
 	/**
 	 * Close Modal
-	 * 
+	 *
 	 * @since 1.17.0
-	 * 
+	 *
 	 * @param {Event} e Click Event.
 	 */
-	self._closeModal = function( e ) {
-		var $this  = $( e.currentTarget ),
-			$modal = $this.parents( '.direct-transfer-modal' );
-			$modal.hide();
-	}
+	self._closeModal = function(e) {
+		var $this = $(e.currentTarget),
+			$modal = $this.parents('.direct-transfer-modal');
+		$modal.hide();
+	};
 
 	/**
 	 * Bind Cancel Button
@@ -269,50 +272,45 @@ BoldGrid.DirectTransfers = function($) {
 	 * as the current site. If the URL is invalid, display
 	 * an error message, and return false. If it is valid,
 	 * return the validated URL string.
-	 * 
+	 *
 	 * @param {string} url The URL to validate
 	 *
 	 * @return {string|boolean} The validated URL or false
 	 */
-	self._validateUrl = function(url, appUuid ) {
-		var $error = $('.bgbkup-transfers-rx .authentication-error' ),
+	self._validateUrl = function(url, appUuid) {
+		var $error = $('.bgbkup-transfers-rx .authentication-error'),
 			urlObj;
 
 		// Try to create a URL object from the string.
 		try {
 			urlObj = new URL(url);
 		} catch (e) {
-			$error.text( self.lang.invalid_url );
+			$error.text(self.lang.invalid_url);
 			$error.show();
 			return false;
 		}
 
 		// Get Current Site URL Base by getting everything that comes before the wp-admin
-		var currentSiteUrl = window.location.href.split( 'wp-admin' )[0];
+		var currentSiteUrl = window.location.href.split('wp-admin')[0];
 
 		// Check if url contains the currentSiteUrl
-		if ( urlObj.href.includes( currentSiteUrl ) ) {
-			$error.text( self.lang.same_site_error );
+		if (urlObj.href.includes(currentSiteUrl)) {
+			$error.text(self.lang.same_site_error);
 			$error.show();
 			return false;
 		}
 
-		self._restRequest(
-			'validate-url',
-			'GET',
-			{ url: url },
-			function( response ) {
-				if ( response.success && response.auth_endpoint ) {
-					self._authTransfer( response.auth_endpoint, appUuid );
-				} else {
-					$error.text( response.message );
-					$error.show();
-				}
+		self._restRequest('validate-url', 'GET', { url: url }, function(response) {
+			if (response.success && response.auth_endpoint) {
+				self._authTransfer(response.auth_endpoint, appUuid);
+			} else {
+				$error.text(response.message);
+				$error.show();
 			}
-		);
+		});
 
 		return false;
-	}
+	};
 
 	/**
 	 * Start Restore Callback
@@ -326,17 +324,19 @@ BoldGrid.DirectTransfers = function($) {
 	 * @since 1.17.0
 	 */
 	self._startRestoreCallback = function(response, args) {
-		var $button      = args.$restoreButton,
-			transferId   = $button.data( 'transferId' ),
-			$progressDiv = $button.parents( 'tbody' ).find( '.progress-row[data-transfer-id="' + transferId + '"] div.progress' );
-		if ( response.success ) {
+		var $button = args.$restoreButton,
+			transferId = $button.data('transferId'),
+			$progressDiv = $button
+				.parents('tbody')
+				.find('.progress-row[data-transfer-id="' + transferId + '"] div.progress');
+		if (response.success) {
 			$button.text(self.lang.restoring);
 			window.location.reload();
 		} else {
-			$button.text( self.lang.restore );
+			$button.text(self.lang.restore);
 			$progressDiv.empty();
-			$progressDiv.append( '<p class="notice notice-error">' + response.data.error + '</p>' );
-			$progressDiv.parents( 'tr').removeClass(  'hidden' );
+			$progressDiv.append('<p class="notice notice-error">' + response.data.error + '</p>');
+			$progressDiv.parents('tr').removeClass('hidden');
 		}
 	};
 
@@ -433,13 +433,16 @@ BoldGrid.DirectTransfers = function($) {
 				progress = 100;
 				progressText = '100%';
 				progressStatusText = progressStatusText;
-				
+
 				window.location.reload();
 			}
 
-			if ( 99 < progress ) {
-				borderRadius = 10 * ( progress - 99 );
-				$progressBarFill.css('border-radius', '10px ' +  borderRadius + 'px' + ' ' + borderRadius + 'px 10px');
+			if (99 < progress) {
+				borderRadius = 10 * (progress - 99);
+				$progressBarFill.css(
+					'border-radius',
+					'10px ' + borderRadius + 'px' + ' ' + borderRadius + 'px 10px'
+				);
 			} else {
 				$progressBarFill.css('border-radius', '10px 0 0 10px');
 			}
@@ -447,21 +450,21 @@ BoldGrid.DirectTransfers = function($) {
 			$progressBarFill.css('width', progress + '%');
 			$progressText.text(progressText);
 			$progressStatusText.text(progressStatusText);
-			$progressStatusText.data( 'status', status );
+			$progressStatusText.data('status', status);
 			$timeElapsedText.text(timeElapsed);
 
 			if ('canceled' === status) {
 				$row.addClass('canceled');
 				$progressStatusText.text(self.lang.cancelled);
 			}
-			if ( 'failed' === status ) {
+			if ('failed' === status) {
 				clearInterval($row.data('intervalid'));
 				$row.addClass('error');
-				$row.find( 'td' ).empty();
-				$row.find( 'td' ).append( '<p class="notice notice-error">' + progressText + '</p>' );
+				$row.find('td').empty();
+				$row.find('td').append('<p class="notice notice-error">' + progressText + '</p>');
 			}
 		} else {
-			console.log( 'Update Progress Error: ', { response } );
+			console.log('Update Progress Error: ', { response });
 			$row.addClass('error');
 		}
 	};
@@ -477,9 +480,9 @@ BoldGrid.DirectTransfers = function($) {
 	 * @since 1.17.0
 	 */
 	self._startTransferCallback = function(response, args) {
-		var $button   = args.$startButton,
-			url       = args.url,
-			$errorDiv = $button.parents( 'tbody' ).find( '.errors-row[data-url="' + url + '"] .errors' );
+		var $button = args.$startButton,
+			url = args.url,
+			$errorDiv = $button.parents('tbody').find('.errors-row[data-url="' + url + '"] .errors');
 		$button.prop('disabled', true);
 
 		if (response.success) {
@@ -492,25 +495,27 @@ BoldGrid.DirectTransfers = function($) {
 			}, 3000);
 		} else {
 			$errorDiv.empty();
-			$errorDiv.append( response.data.error );
-			self._bindInstallTotalUpkeepButton( $errorDiv.find( 'button.install-total-upkeep' ) );
-			self._bindUpdateTotalUpkeepButton( $errorDiv.find( 'button.update-total-upkeep' ) );
+			$errorDiv.append(response.data.error);
+			self._bindInstallTotalUpkeepButton($errorDiv.find('button.install-total-upkeep'));
+			self._bindUpdateTotalUpkeepButton($errorDiv.find('button.update-total-upkeep'));
 		}
 	};
 
 	/**
 	 * Bind Update Total Upkeep Button
-	 * 
+	 *
 	 * Binds the Update Total Upkeep button to the REST API endpoint.
-	 * 
+	 *
 	 * @param {jQuery} $button Update TU Button
 	 */
-	self._bindUpdateTotalUpkeepButton = function( $button ) {
-		var url                  = $button.data( 'url' ),
-			$errorDiv            = $button.parents( '.errors' ),
-			$startTransferButton = $button.parents( 'tbody' ).find( 'button.start-transfer[data-url="' + url + '"]' );
+	self._bindUpdateTotalUpkeepButton = function($button) {
+		var url = $button.data('url'),
+			$errorDiv = $button.parents('.errors'),
+			$startTransferButton = $button
+				.parents('tbody')
+				.find('button.start-transfer[data-url="' + url + '"]');
 
-		$button.on( 'click', function( e ) {
+		$button.on('click', function(e) {
 			self._restRequest(
 				'update-total-upkeep',
 				'POST',
@@ -520,38 +525,40 @@ BoldGrid.DirectTransfers = function($) {
 					$startTransferButton: $startTransferButton,
 					$errorDiv: $errorDiv
 				}
-			)
-		} );
+			);
+		});
 	};
 
 	/**
 	 * Update Total Upkeep Callback
-	 * 
+	 *
 	 * Callback for endpoint: /update-total-upkeep
 	 * @param {object} response The response from the REST API
 	 * @param {object} args     The arguments passed to the callback
 	 */
-	self._updateTotalUpkeepCallback = function( response, args ) {
-		if ( response.success ) {
-			args.$startTransferButton.prop( 'disabled', false );
+	self._updateTotalUpkeepCallback = function(response, args) {
+		if (response.success) {
+			args.$startTransferButton.prop('disabled', false);
 			args.$errorDiv.empty();
-			args.$errorDiv.append( response.data.message );
+			args.$errorDiv.append(response.data.message);
 		}
-	}
+	};
 
 	/**
 	 * Bind Install Total Upkeep Button
-	 * 
+	 *
 	 * @since 1.17.0
 	 *
 	 * @param {jQuery} $button Install TU Button
 	 */
-	self._bindInstallTotalUpkeepButton = function( $button ) {
-		var url                  = $button.data( 'url' ),
-			$errorDiv            = $button.parents( '.errors' ),
-			$startTransferButton = $button.parents( 'tbody' ).find( 'button.start-transfer[data-url="' + url + '"]' );
+	self._bindInstallTotalUpkeepButton = function($button) {
+		var url = $button.data('url'),
+			$errorDiv = $button.parents('.errors'),
+			$startTransferButton = $button
+				.parents('tbody')
+				.find('button.start-transfer[data-url="' + url + '"]');
 
-		$button.on( 'click', function( e ) {
+		$button.on('click', function(e) {
 			self._restRequest(
 				'install-total-upkeep',
 				'POST',
@@ -561,27 +568,27 @@ BoldGrid.DirectTransfers = function($) {
 					$startTransferButton: $startTransferButton,
 					$errorDiv: $errorDiv
 				}
-			)
-		} );
+			);
+		});
 	};
 
 	/**
 	 * Install Total Upkeep Callback
-	 * 
+	 *
 	 * Callback for endpoint: /install-total-upkeep
-	 * 
+	 *
 	 * @since 1.17.0
-	 * 
+	 *
 	 * @param {object} response The response from the REST API
 	 * @param {object} args     The arguments passed to the callback
 	 */
-	self._installTotalUpkeepCallback = function( response, args ) {
-		if ( response.success ) {
-			args.$startTransferButton.prop( 'disabled', false );
+	self._installTotalUpkeepCallback = function(response, args) {
+		if (response.success) {
+			args.$startTransferButton.prop('disabled', false);
 			args.$errorDiv.empty();
-			args.$errorDiv.append( response.data.message );
+			args.$errorDiv.append(response.data.message);
 		}
-	}
+	};
 
 	/**
 	 * Add Transfer Row
@@ -634,12 +641,12 @@ BoldGrid.DirectTransfers = function($) {
 	 * @param {string} authAdminUrl WP-Admin URL of source site
 	 * @param {string} appUuid      App UUID to be passed to the source site
 	 */
-	self._authTransfer = function( authEndpoint, appUuid ) {
+	self._authTransfer = function(authEndpoint, appUuid) {
 		var authNonce = $('#auth_nonce').val(),
-			params    = $.param({
+			params = $.param({
 				app_name: 'Total Upkeep',
 				app_id: appUuid,
-				success_url: window.location.href + '&_wpnonce=' + authNonce,
+				success_url: window.location.href + '&_wpnonce=' + authNonce
 			});
 
 		window.location.href = authEndpoint + '?' + params;
@@ -662,8 +669,8 @@ BoldGrid.DirectTransfers = function($) {
 			interval = 15000;
 
 		$statusRow.each(function(index, row) {
-			var intervalId = setInterval(self._checkRxStatus, interval, row );
-			$(row).attr('data-intervalId', intervalId );
+			var intervalId = setInterval(self._checkRxStatus, interval, row);
+			$(row).attr('data-intervalId', intervalId);
 			transferId = $(row).data('transferId');
 			self._checkRxStatus(row);
 		});
