@@ -139,7 +139,7 @@ class Boldgrid_Backup_Admin_Cron_Log {
 	/**
 	 * Get our scheduled jobs.
 	 *
-	 * @since 1.6.5
+	 * @since 1.17.0
 	 *
 	 * @return string The markup displaying our scheduled jobs.
 	 */
@@ -195,7 +195,7 @@ class Boldgrid_Backup_Admin_Cron_Log {
 	/**
 	 * Generate and return the markup displaying our log entries.
 	 *
-	 * @since 1.17.0
+	 * @since 1.6.5
 	 */
 	public function get_markup() {
 

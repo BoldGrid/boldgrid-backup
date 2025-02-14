@@ -88,6 +88,9 @@ class Boldgrid_Backup_Admin_Jobs {
 		$this->jobs[] = $args;
 		$this->save_jobs();
 
+		$this->core->logger->init( 'jobs-queue' );
+		$this->core->logger->add( 'Adding Job: ' . json_encode( $args, JSON_PRETTY_PRINT ) );
+
 		/*
 		 * The cron entry is removed whenever the cron list is empty,
 		 * therefore, when adding a new job, we need to make sure
@@ -124,6 +127,8 @@ class Boldgrid_Backup_Admin_Jobs {
 
 		foreach ( $this->jobs as $key => $job ) {
 			if ( $key <= $delete_key ) {
+				$this->core->logger->init( 'jobs-queue' );
+				$this->core->logger->add( 'Deleting Job: ' . json_encode( $job, JSON_PRETTY_PRINT ) );
 				unset( $this->jobs[ $key ] );
 			}
 		}
@@ -207,6 +212,8 @@ class Boldgrid_Backup_Admin_Jobs {
 		foreach ( $this->jobs as $key => $job ) {
 
 			if ( 'boldgrid_backup_post_jobs_email' === $job['action'] ) {
+				$this->core->logger->init( 'jobs-queue' );
+				$this->core->logger->add( 'Deleting Job: ' . json_encode( $job, JSON_PRETTY_PRINT ) );
 				unset( $this->jobs[ $key ] );
 				break;
 			}
@@ -321,6 +328,9 @@ class Boldgrid_Backup_Admin_Jobs {
 			if ( 'pending' !== $job['status'] ) {
 				continue;
 			}
+
+			$this->core->logger->init( 'jobs-queue' );
+			$this->core->logger->add( 'Running job: ' . json_encode( $job, JSON_PRETTY_PRINT ) );
 
 			$job['start_time'] = time();
 			$job['status']     = 'running';
