@@ -149,18 +149,12 @@ class Boldgrid_Backup_Admin_Cron_Log {
 			array(),
 		);
 
-		// Filter out any jobs without a 'action_title' and without a 'status' key.
-		$jobs = array_filter(
-			$jobs,
-			function( $job ) {
-				return ! empty( $job['action_title'] ) && ! empty( $job['status'] );
-			}
-		);
-
+		// Return a message if there are no jobs.
 		if ( empty( $jobs ) ) {
 			return '<p style="font-style:italic">' . esc_html__( 'No jobs scheduled.', 'boldgrid-backup' ) . '</p>';
 		}
 
+		// Generate table heading
 		$markup = sprintf(
 			'<table class="wp-list-table widefat striped">
 				<thead>
@@ -173,6 +167,7 @@ class Boldgrid_Backup_Admin_Cron_Log {
 			esc_html__( 'Status', 'boldgrid-backup' )
 		);
 
+		// Generate table rows
 		foreach ( $jobs as $job ) {
 			$title = esc_html( $job['action_title'] );
 			$status = esc_html( ucfirst( $job['status'] ) );
