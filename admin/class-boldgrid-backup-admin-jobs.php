@@ -87,6 +87,21 @@ class Boldgrid_Backup_Admin_Jobs {
 		$this->set_jobs();
 		$this->jobs[] = $args;
 		$this->save_jobs();
+
+		/*
+		 * The cron entry is removed whenever the cron list is empty,
+		 * therefore, when adding a new job, we need to make sure
+		 * we re-add the entry to the crontab. There is no need to check
+		 * if the cron entry already exists, as that is done in the 
+		 * 'schedule_jobs' methods.
+		 */
+		$settings = $this->core->settings->get_settings();
+		$scheduler = $settings['scheduler'];
+		if ( 'cron' === $scheduler ) {
+			$this->core->cron->schedule_jobs( $settings );
+		} elseif ( 'wp-cron' === $scheduler ) {
+			$this->core->wp_cron->schedule_jobs( $settings );
+		}
 	}
 
 	/**
