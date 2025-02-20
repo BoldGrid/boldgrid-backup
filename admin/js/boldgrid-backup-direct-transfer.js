@@ -114,6 +114,7 @@ BoldGrid.DirectTransfers = function($) {
 
 			e.preventDefault();
 			$this.prop('disabled', true);
+			$this.text( self.lang.start_transfer);
 
 			self._restRequest('start-migration', 'POST', { url: url }, self._startTransferCallback, {
 				$startButton: $this,
@@ -189,10 +190,11 @@ BoldGrid.DirectTransfers = function($) {
 				appUuid = $appUuidInput.val();
 
 			$(e.currentTarget).prop('disabled', true);
+			$(e.currentTarget).text(self.lang.authenticating + '...');
 
 			e.preventDefault();
 
-			self._validateUrl($authAdminInput.val(), appUuid);
+			self._validateUrl($authAdminInput.val(), appUuid, $authButton);
 		});
 
 		// Bind the section links to add query arg.
@@ -274,10 +276,12 @@ BoldGrid.DirectTransfers = function($) {
 	 * return the validated URL string.
 	 *
 	 * @param {string} url The URL to validate
+	 * @param {string} appUuid The App UUID to pass to the source site
+	 * @param {jQuery} $authButton The authentication button
 	 *
 	 * @return {string|boolean} The validated URL or false
 	 */
-	self._validateUrl = function(url, appUuid) {
+	self._validateUrl = function(url, appUuid, $authButton) {
 		var $error = $('.bgbkup-transfers-rx .authentication-error'),
 			urlObj;
 
@@ -286,6 +290,8 @@ BoldGrid.DirectTransfers = function($) {
 			urlObj = new URL(url);
 		} catch (e) {
 			$error.text(self.lang.invalid_url);
+			$authButton.prop('disabled', false);
+			$authButton.text(self.lang.authenticate);
 			$error.show();
 			return false;
 		}
@@ -296,6 +302,8 @@ BoldGrid.DirectTransfers = function($) {
 		// Check if url contains the currentSiteUrl
 		if (urlObj.href.includes(currentSiteUrl)) {
 			$error.text(self.lang.same_site_error);
+			$authButton.prop('disabled', false);
+			$authButton.text(self.lang.authenticate);
 			$error.show();
 			return false;
 		}
@@ -307,6 +315,8 @@ BoldGrid.DirectTransfers = function($) {
 				$error.text(response.message);
 				$error.show();
 			}
+			$authButton.prop('disabled', false);
+			$authButton.text(self.lang.authenticate);
 		});
 
 		return false;
@@ -482,7 +492,8 @@ BoldGrid.DirectTransfers = function($) {
 	self._startTransferCallback = function(response, args) {
 		var $button = args.$startButton,
 			url = args.url,
-			$errorDiv = $button.parents('tbody').find('.errors-row[data-url="' + url + '"] .errors');
+			$errorsRow = $button.parents('tbody').find('.errors-row[data-url="' + url + '"]'),
+			$errorDiv = $errorsRow.find('.errors');
 		$button.prop('disabled', true);
 
 		if (response.success) {
@@ -490,15 +501,53 @@ BoldGrid.DirectTransfers = function($) {
 			$button.text(self.lang.transfer_started);
 			$button.addClass('transfer-started');
 			$button.prop('style', 'color: #2271b1 !important');
+			$errorsRow.hide();
 			setTimeout(function() {
 				self._addTransferRow(transferId, url);
 			}, 3000);
 		} else {
 			$errorDiv.empty();
 			$errorDiv.append(response.data.error);
+			$errorsRow.show();
 			self._bindInstallTotalUpkeepButton($errorDiv.find('button.install-total-upkeep'));
 			self._bindUpdateTotalUpkeepButton($errorDiv.find('button.update-total-upkeep'));
+			self._bindActivateTotalUpkeepButton($errorDiv.find('button.activate-total-upkeep'));
 		}
+	};
+
+	self._activateTotalUpkeepCallback = function(response, args) {
+		if (response.success) {
+			args.$startTransferButton.prop('disabled', false);
+			args.$startTransferButton.text(self.lang.start_transfer);
+			args.$errorDiv.empty();
+			args.$errorDiv.append(response.data.message);
+		}
+	};
+
+	/**
+	 * Bind Activate Total Upkeep Button
+	 */
+	self._bindActivateTotalUpkeepButton = function($button) {
+		var url = $button.data('url'),
+			$errorDiv = $button.parents('.errors'),
+			$startTransferButton = $button
+				.parents('tbody')
+				.find('button.start-transfer[data-url="' + url + '"]');
+
+		$button.on('click', function(e) {
+			$button.prop('disabled', true);
+			$button.text(self.lang.activating + '...');
+			self._restRequest(
+				'activate-total-upkeep',
+				'POST',
+				{ url: url },
+				self._activateTotalUpkeepCallback,
+				{
+					$startTransferButton: $startTransferButton,
+					$errorDiv: $errorDiv
+				}
+			);
+		});
 	};
 
 	/**
@@ -516,6 +565,8 @@ BoldGrid.DirectTransfers = function($) {
 				.find('button.start-transfer[data-url="' + url + '"]');
 
 		$button.on('click', function(e) {
+			$button.prop('disabled', true);
+			$button.text(self.lang.updating + '...');
 			self._restRequest(
 				'update-total-upkeep',
 				'POST',
@@ -539,6 +590,7 @@ BoldGrid.DirectTransfers = function($) {
 	self._updateTotalUpkeepCallback = function(response, args) {
 		if (response.success) {
 			args.$startTransferButton.prop('disabled', false);
+			args.$startTransferButton.text(self.lang.start_transfer);
 			args.$errorDiv.empty();
 			args.$errorDiv.append(response.data.message);
 		}
@@ -559,6 +611,8 @@ BoldGrid.DirectTransfers = function($) {
 				.find('button.start-transfer[data-url="' + url + '"]');
 
 		$button.on('click', function(e) {
+			$button.prop('disabled', true);
+			$button.text(self.lang.installing + '...');
 			self._restRequest(
 				'install-total-upkeep',
 				'POST',
@@ -585,6 +639,7 @@ BoldGrid.DirectTransfers = function($) {
 	self._installTotalUpkeepCallback = function(response, args) {
 		if (response.success) {
 			args.$startTransferButton.prop('disabled', false);
+			args.$startTransferButton.text(self.lang.start_transfer);
 			args.$errorDiv.empty();
 			args.$errorDiv.append(response.data.message);
 		}

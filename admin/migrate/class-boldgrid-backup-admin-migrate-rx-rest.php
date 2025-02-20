@@ -177,36 +177,36 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	 */
 	public function register_routes() {
 		$rest_routes = array(
-			'cron-resume-transfer' => array(
+			'cron-resume-transfer'  => array(
 				'method'              => 'GET',
 				'endpoint'            => 'cron-resume-transfer',
 				'permission_callback' => 'authenticate_local_request',
 			),
-			'transfer-status'      => array(
+			'transfer-status'       => array(
 				'method'   => 'PUT',
 				'endpoint' => 'transfer-status/(?P<transfer_id>[A-Za-z0-9]+)/(?P<status>[A-Za-z0-9\-]+)',
 			),
-			'check-status'         => array(
+			'check-status'          => array(
 				'method'   => 'GET',
 				'endpoint' => 'check-status',
 			),
-			'start-migration'      => array(
+			'start-migration'       => array(
 				'method'   => 'POST',
 				'endpoint' => 'start-migration',
 			),
-			'cancel-transfer'      => array(
+			'cancel-transfer'       => array(
 				'method'   => 'POST',
 				'endpoint' => 'cancel-transfer',
 			),
-			'delete-transfer'      => array(
+			'delete-transfer'       => array(
 				'method'   => 'POST',
 				'endpoint' => 'delete-transfer',
 			),
-			'resync-database'      => array(
+			'resync-database'       => array(
 				'method'   => 'POST',
 				'endpoint' => 'resync-database',
 			),
-			'start-restore'        => array(
+			'start-restore'         => array(
 				'method'   => 'POST',
 				'endpoint' => 'start-restore',
 			),
@@ -214,13 +214,17 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				'method'   => 'GET',
 				'endpoint' => 'validate-url',
 			),
-			'install-total-upkeep' => array(
+			'install-total-upkeep'  => array(
 				'method'   => 'POST',
 				'endpoint' => 'install-total-upkeep',
 			),
-			'update-total-upkeep' => array(
+			'update-total-upkeep'   => array(
 				'method'   => 'POST',
 				'endpoint' => 'update-total-upkeep',
+			),
+			'activate-total-upkeep' => array(
+				'method'   => 'POST',
+				'endpoint' => 'activate-total-upkeep',
 			),
 		);
 
@@ -261,6 +265,34 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 					'message' => sprintf(
 						'<p class="notice notice-success">%s</p>',
 						__( 'Total Upkeep has been successfully installed on the source site.', 'boldgrid-backup' )
+					)
+				)
+			);
+		}
+	}
+
+	/**
+	 * Activate Total Upkeep
+	 * 
+	 * Callback for endpoint: activate-total-upkeep
+	 * 
+	 * @param WP_REST_Request $request The request object.
+	 * 
+	 * @since 1.17.0
+	 */
+	public function activate_total_upkeep( $request ) {
+		$url = $request->get_param( 'url' );
+
+		$activated = $this->util->edit_total_upkeep_status( $url, 'active' );
+
+		if ( is_wp_error( $activated ) ) {
+			wp_send_json_error( array( 'message' => $activated->get_error_message() ) );
+		} else {
+			wp_send_json_success(
+				array(
+					'message' => sprintf(
+						'<p class="notice notice-success">%s</p>',
+						__( 'Total Upkeep has been successfully activated on the source site.', 'boldgrid-backup' )
 					)
 				)
 			);
@@ -335,7 +367,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 			return new WP_REST_Response( array(
 				'error'   => true,
 				'message' => __(
-					'Either this is not a WordPress site, or there the WordPress REST Api is not enabled. Please enable the REST API on the source site.',
+					'Either this is not a WordPress site, or the WordPress REST Api is not enabled. Please enable the REST API on the source site.',
 					'boldgrid-backup'
 				),
 			), 200 );
@@ -676,7 +708,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				}
 				break;
 			case 'pending-restore':
-				$elapsed_time = microtime( true ) - intval( $this->util->get_transfer_prop( $transfer_id, 'restore_start_time', 0 ) );
+				$elapsed_time = microtime( true ) - intval( $this->util->get_transfer_prop( $transfer_id, 'restore_start_time', microtime( true ) ) );
 				$progress_data['elapsed_time'] = $this->util->convert_to_mmss( $elapsed_time );
 				$progress_data['status'] = 'pending-restore';
 				$progress_data['progress'] = 0;

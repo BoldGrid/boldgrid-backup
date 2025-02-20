@@ -403,10 +403,13 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * 
 	 * @param string $site_url
 	 * 
-	 * @return string The REST URL
+	 * @return string|WP_Error The REST URL or a WP_Error if unable to get the URL
 	 */
 	public function get_site_rest_url( $site_url ) {
 		$response     = wp_remote_get( $site_url );
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
 		$headers      = $response['headers']->getAll();
 		$links        = explode( ',', $headers['link'] );
 		$wp_json_link = array_filter( $links, function( $link ) {
@@ -940,6 +943,11 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 			return new WP_Error( 'site_not_authenticated', 'Site not authenticated' );
 		}
 
+		if ( is_wp_error( $rest_url ) ) {
+			$this->migrate_core->log->add( 'Error getting site rest url: ' . $rest_url->get_error_message() );
+			return $rest_url;
+		}
+
 		$request_url = $rest_url . 'wp/v2/plugins';
 
 		$user = $auth['user'];
@@ -1062,6 +1070,11 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 			return new WP_Error( 'site_not_authenticated', 'Site not authenticated' );
 		}
 
+		if ( is_wp_error( $rest_url ) ) {
+			$this->migrate_core->log->add( 'Error getting site rest url: ' . $rest_url->get_error_message() );
+			return $rest_url;
+		}
+
 		$request_url = $rest_url . 'wp/v2/plugins/boldgrid-backup/boldgrid-backup';
 
 		$user = $auth['user'];
@@ -1109,6 +1122,11 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 
 		if ( ! $auth ) {
 			return new WP_Error( 'site_not_authenticated', 'Site not authenticated' );
+		}
+
+		if ( is_wp_error( $rest_url ) ) {
+			$this->migrate_core->log->add( 'Error getting site rest url: ' . $rest_url->get_error_message() );
+			return $rest_url;
 		}
 
 		$request_url = $rest_url . 'wp/v2/plugins/boldgrid-backup/boldgrid-backup';
