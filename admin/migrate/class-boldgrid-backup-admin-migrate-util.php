@@ -469,13 +469,6 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 			return false;
 		}
 
-		if ( 'db_dump_info' === $key ) {
-			error_log( json_encode( array(
-				'db_dump_info' => $value,
-				'backtrace'	=> debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS ),
-			) ) );
-		}
-
 		if ( 'status' === $key && $transfers[ $transfer_id ][ $key ] !== $value ) {
 			$this->migrate_core->log->add(
 				"Transfer $transfer_id status updated from {$transfers[ $transfer_id ][ $key ]} to $value"
@@ -988,8 +981,6 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 			)
 		);
 
-		error_log( 'total_upkeep_status: ' . json_encode( $total_upkeep_status ) );
-
 		if ( is_wp_error( $total_upkeep_status ) ) {
 			$this->migrate_core->log->add( 'Error getting Total Upkeep Status: ' . $total_upkeep_status->get_error_message() );
 			wp_send_json_error( array( 'success' => false, 'error' => 'Error getting Total Upkeep Status' ) );
@@ -1096,8 +1087,6 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		);
 
 		$response_code = wp_remote_retrieve_response_code( $response );
-
-		error_log( 'edit_response: ' . json_encode( $response_code ) );
 
 		if ( 200 !== $response_code ) {
 			return new WP_Error( 'install_error', 'Error installing Total Upkeep' );

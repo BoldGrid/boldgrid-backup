@@ -166,7 +166,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * @since 1.17.0
 	 */
 	public function wp_cron_process_transfers() {
-		error_log( 'Processing Transfers via WP Cron.' );
 		$this->migrate_core->log->add( 'Processing Transfers via WP Cron.' );
 
 		$php_sapi_name = php_sapi_name();
@@ -619,8 +618,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			$this->migrate_core->log->add( 'No Incomplete Transfers to process' );
 			return;
 		}
-
-		error_log( 'Incomplete Transfer: ' . json_encode( $incomplete_transfers ) );
 
 		$this->process_active_transfer( array_shift( $incomplete_transfers ) );
 	}
