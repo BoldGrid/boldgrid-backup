@@ -235,6 +235,8 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	public function generate_db_dump() {
 		$db_dump_file = $this->migrate_core->util->get_option( $this->db_dump_status_option_name, '' );
 
+		$this->migrate_core->log->add( 'Generating DB Dump: ' . $db_dump_file );
+
 		$dump_dir = dirname( $db_dump_file );
 		$progress = json_decode( file_get_contents( $dump_dir . '/db-dump-status.json' ), true );
 
@@ -269,6 +271,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 		$status_file = $dump_dir . '/db-dump-status.json';
 
 		if ( ! file_exists( $status_file ) ) {
+			$this->migrate_core->log->add( 'Status file not found: ' . $status_file );
 			return new WP_REST_Response( array(
 				'success' => false,
 				'error'   => 'Status file not found',
@@ -303,6 +306,8 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 			$response['db_hash'] = md5_file( $response['file'] );
 		}
 
+		$this->migrate_core->log->add( 'DB Dump Status: ' . json_encode( $response, JSON_PRETTY_PRINT ) );
+
 		return new WP_REST_Response( array(
 			'success'      => true,
 			'db_dump_info' => $response,
@@ -335,7 +340,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 		}
 		
 		// Reschedule the cron
-		if ( ! wp_next_scheduled( 'boldgrid_transfer_db_dump' ) ) {
+		if ( ! wp_next_scheduled( 'boldgrid_transfer_db_dump_cron' ) ) {
 			wp_schedule_single_event( time() + 10, 'boldgrid_transfer_db_dump_cron' );
 		}
 

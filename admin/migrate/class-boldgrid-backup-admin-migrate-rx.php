@@ -266,6 +266,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		if ( is_wp_error( $rest_url ) ) {
 			$this->migrate_core->log->add( 'Error getting site rest url: ' . $rest_url->get_error_message() );
 			wp_send_json_error( array( 'error' => true, 'message' => $rest_url->get_error_message() ) );
+			wp_die();
 		}
 
 		// Validates that the correct TU plugin is installed, and quits with feedback if it's not
