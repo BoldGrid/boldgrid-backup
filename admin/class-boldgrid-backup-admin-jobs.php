@@ -59,12 +59,13 @@ class Boldgrid_Backup_Admin_Jobs {
 	public $option = 'boldgrid_backup_jobs';
 
 	/**
-	 * 
+	 * Logger
 	 * 
 	 * @since 1.17.0
 	 * 
 	 * @var Boldgrid_Backup_Admin_Log
 	 */
+	public $logger;
 
 	/**
 	 * Constructor.
