@@ -741,8 +741,6 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->remote = new Boldgrid_Backup_Admin_Remote( $this );
 
-		$this->jobs = new Boldgrid_Backup_Admin_Jobs( $this );
-
 		$this->local = new Boldgrid_Backup_Admin_Storage_Local( $this );
 
 		$this->email = new Boldgrid_Backup_Admin_Email( $this );
@@ -756,6 +754,8 @@ class Boldgrid_Backup_Admin_Core {
 		$this->utility = new Boldgrid_Backup_Admin_Utility();
 
 		$this->folder_exclusion = new Boldgrid_Backup_Admin_Folder_Exclusion( $this );
+
+		$this->jobs = new Boldgrid_Backup_Admin_Jobs( $this );
 
 		$this->core_files = new Boldgrid_Backup_Admin_Core_Files( $this );
 
