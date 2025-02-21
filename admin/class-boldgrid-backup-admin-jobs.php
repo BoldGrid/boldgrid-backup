@@ -191,10 +191,10 @@ class Boldgrid_Backup_Admin_Jobs {
 		}
 
 		$args = array(
-			'filepath'     => $info['filepath'],
-			'action'       => 'boldgrid_backup_post_jobs_email',
-			'action_data'  => $info,
-			'post_action'  => 'delete_all_prior',
+			'filepath'    => $info['filepath'],
+			'action'      => 'boldgrid_backup_post_jobs_email',
+			'action_data' => $info,
+			'post_action' => 'delete_all_prior',
 		);
 
 		$this->add( $args );
