@@ -149,6 +149,17 @@ class Boldgrid_Backup_Admin_Cron_Log {
 			array(),
 		);
 
+		/*
+		 * Filter out any jobs without a 'action_title' key, and add it
+		 * by replacing underscores with spaces and capitalizing each word.
+		 */
+		$jobs = array_map( function( $job ) {
+			if ( ! isset( $job['action_title'] ) ) {
+				$job['action_title'] = ucwords( str_replace( '_', ' ', $job['action'] ) );
+			}
+			return $job;
+		}, $jobs );
+
 		// Return a message if there are no jobs.
 		if ( empty( $jobs ) ) {
 			return '<p style="font-style:italic">' . esc_html__( 'No jobs scheduled.', 'boldgrid-backup' ) . '</p>';

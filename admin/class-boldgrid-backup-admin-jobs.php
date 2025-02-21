@@ -59,6 +59,14 @@ class Boldgrid_Backup_Admin_Jobs {
 	public $option = 'boldgrid_backup_jobs';
 
 	/**
+	 * 
+	 * 
+	 * @since 1.17.0
+	 * 
+	 * @var Boldgrid_Backup_Admin_Log
+	 */
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.5.2
@@ -66,7 +74,9 @@ class Boldgrid_Backup_Admin_Jobs {
 	 * @param Boldgrid_Backup_Admin_Core $core Boldgrid_Backup_Admin_Core Object.
 	 */
 	public function __construct( $core ) {
-		$this->core = $core;
+		$this->core   = $core;
+		$this->logger = new Boldgrid_Backup_Admin_Log( $core );
+		$this->logger->init( 'jobs-queue' );
 	}
 
 	/**
@@ -88,8 +98,7 @@ class Boldgrid_Backup_Admin_Jobs {
 		$this->jobs[] = $args;
 		$this->save_jobs();
 
-		$this->core->logger->init( 'jobs-queue' );
-		$this->core->logger->add( 'Adding Job: ' . json_encode( $args, JSON_PRETTY_PRINT ) );
+		$this->logger->add( 'Adding Job: ' . json_encode( $args, JSON_PRETTY_PRINT ) );
 
 		/*
 		 * The cron entry is removed whenever the cron list is empty,
@@ -127,8 +136,7 @@ class Boldgrid_Backup_Admin_Jobs {
 
 		foreach ( $this->jobs as $key => $job ) {
 			if ( $key <= $delete_key ) {
-				$this->core->logger->init( 'jobs-queue' );
-				$this->core->logger->add( 'Deleting Job: ' . json_encode( $job, JSON_PRETTY_PRINT ) );
+				$this->logger->add( 'Deleting Job: ' . json_encode( $job, JSON_PRETTY_PRINT ) );
 				unset( $this->jobs[ $key ] );
 			}
 		}
@@ -186,7 +194,6 @@ class Boldgrid_Backup_Admin_Jobs {
 			'action'       => 'boldgrid_backup_post_jobs_email',
 			'action_data'  => $info,
 			'post_action'  => 'delete_all_prior',
-			'action_title' => __( 'Send an email after all jobs have been ran', 'boldgrid-backup' ),
 		);
 
 		$this->add( $args );
@@ -213,8 +220,7 @@ class Boldgrid_Backup_Admin_Jobs {
 		foreach ( $this->jobs as $key => $job ) {
 
 			if ( 'boldgrid_backup_post_jobs_email' === $job['action'] ) {
-				$this->core->logger->init( 'jobs-queue' );
-				$this->core->logger->add( 'Deleting Job: ' . json_encode( $job, JSON_PRETTY_PRINT ) );
+				$this->logger->add( 'Deleting Job: ' . json_encode( $job, JSON_PRETTY_PRINT ) );
 				unset( $this->jobs[ $key ] );
 				break;
 			}
@@ -330,8 +336,7 @@ class Boldgrid_Backup_Admin_Jobs {
 				continue;
 			}
 
-			$this->core->logger->init( 'jobs-queue' );
-			$this->core->logger->add( 'Running job: ' . json_encode( $job, JSON_PRETTY_PRINT ) );
+			$this->logger->add( 'Running job: ' . json_encode( $job, JSON_PRETTY_PRINT ) );
 
 			$job['start_time'] = time();
 			$job['status']     = 'running';
