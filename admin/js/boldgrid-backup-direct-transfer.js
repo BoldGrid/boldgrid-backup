@@ -114,7 +114,7 @@ BoldGrid.DirectTransfers = function($) {
 
 			e.preventDefault();
 			$this.prop('disabled', true);
-			$this.text( self.lang.starting_transfer + '...' );
+			$this.text(self.lang.starting_transfer + '...');
 
 			self._restRequest('start-migration', 'POST', { url: url }, self._startTransferCallback, {
 				$startButton: $this,
