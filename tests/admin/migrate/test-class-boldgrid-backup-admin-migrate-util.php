@@ -65,7 +65,7 @@ class Test_Boldgrid_Backup_Admin_Migrate_Util extends WP_UnitTestCase {
 	public function test_split_large_file() {
 		// Arrange
 		$transfer_id          = '12345';
-		$this->test_file_path =  ABSPATH . '/wp-content/uploads/temp-file.txt'; // Create a temporary file in /tmp
+		$this->test_file_path =  ABSPATH . 'wp-content/uploads/temp-file.txt'; // Create a temporary file in /tmp
 		$relative_path        = 'wp-content/uploads/temp-file.txt';
 
 		$util = new Boldgrid_Backup_Admin_Migrate_Util( $this->migrate_core );

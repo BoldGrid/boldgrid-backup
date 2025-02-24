@@ -165,11 +165,16 @@ class Boldgrid_Backup_Admin_Db_Import {
 			'completed_lines' => 0,
 		);
 
-		$settings   = get_option( 'boldgrid_backup_settings', array() );
-		$backup_dir = isset( $settings['backup_directory'] ) ? $settings['backup_directory'] : '/var/www/boldgrid_backup';
-		$log_file   = $backup_dir . '/active-import.log';
+		// If we're in cli, get_option isn't defined, so we'll skip the logging.
+		if ( 'cli' !== php_sapi_name() ) {
+			$settings   = get_option( 'boldgrid_backup_settings', array() );
+			$backup_dir = isset( $settings['backup_directory'] ) ? $settings['backup_directory'] : '/var/www/boldgrid_backup';
+			$log_file   = $backup_dir . '/active-import.log';
+		}
 
-		file_put_contents( $log_file, json_encode( $import_stats ) );
+		if ( isset( $log_file ) ) {
+			file_put_contents( $log_file, json_encode( $import_stats ) );
+		}
 
 		$line_number = 1;
 
@@ -192,7 +197,9 @@ class Boldgrid_Backup_Admin_Db_Import {
 
 				// Update the import stats only when finishing a query.
 				$import_stats['completed_lines'] = $line_number;
-				file_put_contents( $log_file, json_encode( $import_stats ) );
+				if ( isset( $log_file ) ) {
+					file_put_contents( $log_file, json_encode( $import_stats ) );
+				}
 
 				$templine = '';
 			}
@@ -272,7 +279,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 			if ( strpos( $line, 'DEFINER=' ) === 9 ) {
 				$fixed_lines[] = $this->fix_definer( $line );
 			// If it's a view statement, check for old db name, and replace with new.
-			} else if( 9 === strpos( $line, 'VIEW' ) && $old_database_name ) {
+			} else if( 9 === strpos( $line, 'VIEW' ) && ! empty( $old_database_name ) ) {
 				$fixed_lines[] = str_replace( $old_database_name, DB_NAME, $line );
 			} else {
 				$fixed_lines[] = $line;
@@ -297,9 +304,14 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 */
 	public function fix_definer( $line ) {
 		global $wpdb;
-	
-		// Retrieve the current MySQL user string, e.g., 'username@localhost'
-		$current_user_string = $wpdb->get_var( "SELECT CURRENT_USER()" );
+
+		/*
+		 * wpdb is not defined when restoring from cli, so revert to empty string
+		 * to prevent fatal error. This should still work, since running from cli
+		 * should have the same user / host as what is already defined in the
+		 * constants.
+		 */
+		$current_user_string = $wpdb ? $wpdb->get_var( "SELECT CURRENT_USER()" ) : '';
 	
 		if ( ! empty( $current_user_string ) ) {
 			list( $current_username, $current_host ) = explode( '@', $current_user_string );
