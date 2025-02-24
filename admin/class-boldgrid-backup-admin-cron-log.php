@@ -173,6 +173,7 @@ class Boldgrid_Backup_Admin_Cron_Log {
 						<th><strong>%1$s</strong></th>
 						<th><strong>%2$s</strong></th>
 					</tr>
+				</thead>
 				<tbody>',
 			esc_html__( 'Action', 'boldgrid-backup' ),
 			esc_html__( 'Status', 'boldgrid-backup' )
