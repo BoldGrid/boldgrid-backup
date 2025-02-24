@@ -334,6 +334,15 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/cli/class-info.php';
 
+		// New Migration system.
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-migrate.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/migrate/class-boldgrid-backup-admin-migrate-rx-rest.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/migrate/class-boldgrid-backup-admin-migrate-tx-rest.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/migrate/class-boldgrid-backup-admin-migrate-restore.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/migrate/class-boldgrid-backup-admin-migrate-rx.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/migrate/class-boldgrid-backup-admin-migrate-tx.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/migrate/class-boldgrid-backup-admin-migrate-util.php';
+
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
 

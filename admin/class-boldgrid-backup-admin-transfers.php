@@ -50,6 +50,13 @@ class Boldgrid_Backup_Admin_Transfers {
 		$settings = $this->core->settings->get_settings();
 		wp_enqueue_style( 'boldgrid-backup-admin-new-thickbox-style' );
 
+		wp_enqueue_style(
+			'boldgrid-backup-direct-transfer',
+			plugin_dir_url( BOLDGRID_BACKUP_PATH . '/admin/css/boldgrid-backup-admin-direct-transfer.css' ) . 'boldgrid-backup-admin-direct-transfer.css',
+			[],
+			BOLDGRID_BACKUP_VERSION,
+		);
+
 		$this->core->auto_rollback->enqueue_home_scripts();
 		$this->core->auto_rollback->enqueue_backup_scripts();
 		$this->core->archive_actions->enqueue_scripts();
@@ -73,7 +80,7 @@ class Boldgrid_Backup_Admin_Transfers {
 			<div id="bglib-page-container" class="bgbkup-page-container">
 				<div id="bglib-page-top">
 					<div id="bglib-page-header" class="bglib-has-logo">
-						<h1>' . esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'Total Upkeep Transfers', 'boldgrid-backup' ) ) . '</h1>
+						<h1>' . esc_html( BOLDGRID_BACKUP_TITLE . ' ' . __( 'Transfers', 'boldgrid-backup' ) ) . '</h1>
 						<div class="page-title-actions">
 						<a href="#TB_inline?width=800&amp;height=600&amp;inlineId=backup_now_content" class="thickbox page-title-action page-title-action-primary">' .
 							esc_html__( 'Backup Site Now', 'boldgrid-backup' ) . '
