@@ -741,6 +741,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->remote = new Boldgrid_Backup_Admin_Remote( $this );
 
+		// This was moved up the list to ensure it was defined in the Boldgrid_Backup_Admin_Jobs
 		$this->folder_exclusion = new Boldgrid_Backup_Admin_Folder_Exclusion( $this );
 
 		$this->jobs = new Boldgrid_Backup_Admin_Jobs( $this );
