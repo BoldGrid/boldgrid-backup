@@ -59,6 +59,15 @@ class Boldgrid_Backup_Admin_Jobs {
 	public $option = 'boldgrid_backup_jobs';
 
 	/**
+	 * Logger
+	 * 
+	 * @since 1.17.0
+	 * 
+	 * @var Boldgrid_Backup_Admin_Log
+	 */
+	public $logger;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.5.2
@@ -66,7 +75,9 @@ class Boldgrid_Backup_Admin_Jobs {
 	 * @param Boldgrid_Backup_Admin_Core $core Boldgrid_Backup_Admin_Core Object.
 	 */
 	public function __construct( $core ) {
-		$this->core = $core;
+		$this->core   = $core;
+		$this->logger = new Boldgrid_Backup_Admin_Log( $core );
+		$this->logger->init( 'jobs-queue' );
 	}
 
 	/**
@@ -87,6 +98,23 @@ class Boldgrid_Backup_Admin_Jobs {
 		$this->set_jobs();
 		$this->jobs[] = $args;
 		$this->save_jobs();
+
+		$this->logger->add( 'Adding Job: ' . json_encode( $args, JSON_PRETTY_PRINT ) );
+
+		/*
+		 * The cron entry is removed whenever the cron list is empty,
+		 * therefore, when adding a new job, we need to make sure
+		 * we re-add the entry to the crontab. There is no need to check
+		 * if the cron entry already exists, as that is done in the 
+		 * 'schedule_jobs' methods.
+		 */
+		$settings = $this->core->settings->get_settings();
+		$scheduler = $settings['scheduler'];
+		if ( 'cron' === $scheduler ) {
+			$this->core->cron->schedule_jobs( $settings );
+		} elseif ( 'wp-cron' === $scheduler ) {
+			$this->core->wp_cron->schedule_jobs( $settings );
+		}
 	}
 
 	/**
@@ -109,6 +137,7 @@ class Boldgrid_Backup_Admin_Jobs {
 
 		foreach ( $this->jobs as $key => $job ) {
 			if ( $key <= $delete_key ) {
+				$this->logger->add( 'Deleting Job: ' . json_encode( $job, JSON_PRETTY_PRINT ) );
 				unset( $this->jobs[ $key ] );
 			}
 		}
@@ -192,6 +221,7 @@ class Boldgrid_Backup_Admin_Jobs {
 		foreach ( $this->jobs as $key => $job ) {
 
 			if ( 'boldgrid_backup_post_jobs_email' === $job['action'] ) {
+				$this->logger->add( 'Deleting Job: ' . json_encode( $job, JSON_PRETTY_PRINT ) );
 				unset( $this->jobs[ $key ] );
 				break;
 			}
@@ -306,6 +336,8 @@ class Boldgrid_Backup_Admin_Jobs {
 			if ( 'pending' !== $job['status'] ) {
 				continue;
 			}
+
+			$this->logger->add( 'Running job: ' . json_encode( $job, JSON_PRETTY_PRINT ) );
 
 			$job['start_time'] = time();
 			$job['status']     = 'running';
