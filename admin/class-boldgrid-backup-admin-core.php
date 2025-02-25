@@ -651,6 +651,15 @@ class Boldgrid_Backup_Admin_Core {
 	public $premium;
 
 	/**
+	 * An instance of the Migrate Class
+	 * 
+	 * @since 1.17.0
+	 * 
+	 * @var Boldgrid_Backup_Admin_Migrate
+	 */
+	public $migrate;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.0

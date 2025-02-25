@@ -87,6 +87,15 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	public $cancelled_transfers_option_name;
 
 	/**
+	 * Hearbeat Option Name
+	 * 
+	 * @var string
+	 * 
+	 * @since 1.17.0
+	 */
+	public $heartbeat_option_name;
+
+	/**
 	 * Boldgrid_Transfer_Admin constructor.
 	 * 
 	 * @param Boldgrid_Backup_Admin_Migrate $core

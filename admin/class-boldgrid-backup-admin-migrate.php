@@ -72,6 +72,15 @@ class Boldgrid_Backup_Admin_Migrate {
 	public $util;
 
 	/**
+	 * Boldgrid_Transfer_Restore instance
+	 * 
+	 * @var Boldgrid_Backup_Admin_Migrate_Restore
+	 * 
+	 * @since 1.17.0
+	 */
+	public $restore;
+
+	/**
 	 * Constructor
 	 *
 	 * @since 1.17.0

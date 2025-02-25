@@ -101,6 +101,15 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	public $active_transfer_option_name;
 
 	/**
+	 * Cancelled Transfer Option Name
+	 * 
+	 * @var string
+	 * 
+	 * @since 1.17.0
+	 */
+	public $cancelled_transfers_option_name;
+
+	/**
 	 * Boldgrid_Transfer_Admin constructor.
 	 * 
 	 * @param Boldgrid_Backup_Admin_Migrate $migrate_core

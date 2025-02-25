@@ -38,6 +38,15 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 	public $util;
 
 	/**
+	 * Rest
+	 * 
+	 * @var Boldgrid_Backup_Admin_Migrate_Tx_Rest
+	 * 
+	 * @since 1.17.0
+	 */
+	public $rest;
+
+	/**
 	 * Boldgrid_Transfer_Admin constructor.
 	 * 
 	 * @param Boldgrid_Backup_Admin_Migrate $migrate_core
