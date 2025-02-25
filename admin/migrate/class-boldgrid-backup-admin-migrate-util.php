@@ -112,6 +112,65 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		$this->cancelled_transfers_option_name = $this->migrate_core->configs['option_names']['cancelled_transfers'];
 	}
 
+	public function transfer_action_buttons( $transfer_status, $transfer_id ) {
+		$buttons = array(
+			'restore' => array(
+				'label' => __( 'Restore', 'boldgrid-backup' ),
+				'classes' => 'restore-site button-primary',
+			),
+			'delete' => array(
+				'label' => __( 'Delete', 'boldgrid-backup' ),
+				'classes' => 'delete-transfer button-secondary',
+			),
+			'resync' => array(
+				'label' => __( 'Resync Database', 'boldgrid-backup' ),
+				'classes' => 'resync-database button-secondary',
+			),
+			'cancel' => array(
+				'label' => __( 'Cancel', 'boldgrid-backup' ),
+				'classes' => 'cancel-transfer button-secondary',
+			),
+		);
+
+		$used_buttons = array();
+
+		switch ( $transfer_status ) {
+			case 'completed':
+				$used_buttons = array(
+					$buttons['restore'],
+					$buttons['delete'],
+					$buttons['resync'],
+				);
+				break;
+			case 'canceled':
+			case 'restore-completed':
+			case 'restore-completed':
+			case 'failed':
+				$used_buttons = array(
+					$buttons['delete'],
+				);
+				break;
+			default:
+				$used_buttons = array(
+					$buttons['cancel'],
+				);
+				break;
+		}
+
+		$button_html = '';
+
+		foreach ( $used_buttons as $button ) {
+			$button_html .= sprintf(
+				'<button class="%s" data-transfer-id="%s">%s</button>',
+				esc_attr( $button['classes'] ),
+				esc_attr( $transfer_id ),
+				esc_html( $button['label'] )
+			);
+		}
+
+		return $button_html;
+	}
+
 	/**
 	 * Get Transfer Dir
 	 * 

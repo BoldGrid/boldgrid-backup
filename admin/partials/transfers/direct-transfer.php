@@ -4,8 +4,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-error_log( '$this class: ' . json_encode( get_class( $this ) ) );
-
 $option_names = $this->core->configs['direct_transfer']['option_names'];
 
 if ( isset( $_GET['_wpnonce'] ) &&
@@ -119,53 +117,17 @@ if ( empty( $transfers ) ) {
 			$transfer['time_elapsed'];
 		$minutes        = floor( $time_elapsed / 60 );
 		$seconds        = $time_elapsed % 60;
-		$status         = '';
-		$action_buttons = '';
-		if ( 'completed' === $transfer['status'] ) {
-			$status         = 'completed';
-			$action_buttons = sprintf(
-				'<button class="restore-site button-primary" data-transfer-id="%1$s">%2$s</button>
-				<button class="delete-transfer button-secondary" data-transfer-id="%1$s">%3$s</button>
-				<button class="resync-database button-secondary" data-transfer-id="%1$s">%4$s</button>',
-				esc_attr( $transfer['transfer_id'] ),
-				esc_html__( 'Restore', 'boldgrid-backup' ),
-				esc_html__( 'Delete', 'boldgrid-backup' ),
-				esc_html__( 'Resync Database', 'boldgrid-backup' )
-			);
-		} else if ( 'canceled' === $transfer['status'] ) {
-			$status         = 'canceled';
-			$action_buttons = sprintf(
-				'<button class="delete-transfer button-secondary" data-transfer-id="%1$s">%2$s</button>',
-				esc_attr( $transfer['transfer_id'] ),
-				esc_html__( 'Delete', 'boldgrid-backup' )
-			);
-		} else if ( 'restore-completed' === $transfer['status'] ) {
-			$status         = 'Restore Completed';
-			$action_buttons = sprintf(
-				'<button class="delete-transfer button-secondary" data-transfer-id="%1$s">%2$s</button>',
-				esc_attr( $transfer['transfer_id'] ),
-				esc_html__( 'Delete', 'boldgrid-backup' )
-			);
-		} else if ( false !== strpos( $transfer['status'], 'restor' ) ) {
-			$status         = 'restoring';
-			$time_elapsed   = isset( $transfer['restore_start_time'] ) ?
+		$status         = str_replace( '-', ' ', $transfer['status'] );
+		$action_buttons = $this->core->migrate->util->transfer_action_buttons( $transfer['status'], $transfer['transfer_id'] );
+
+		if ( false !== strpos( $transfer['status'], 'restor' ) ) {
+			$time_elapsed = isset( $transfer['restore_start_time'] ) ?
 				microtime( true ) - $transfer['restore_start_time'] :
 				0;
-			$minutes        = floor( $time_elapsed / 60 );
-			$seconds        = $time_elapsed % 60;
-			$action_buttons = sprintf(
-				'<button class="cancel-transfer button-secondary" data-transfer-id="%1$s">%2$s</button>',
-				esc_attr( $transfer['transfer_id'] ),
-				esc_html__( 'Cancel', 'boldgrid-backup' )
-			);
-		} else {
-			$status         = $transfer['status'];
-			$action_buttons = sprintf(
-				'<button class="cancel-transfer button-secondary" data-transfer-id="%1$s">%2$s</button>',
-				esc_attr( $transfer['transfer_id'] ),
-				esc_html__( 'Cancel', 'boldgrid-backup' )
-			);
+			$minutes      = floor( $time_elapsed / 60 );
+			$seconds      = $time_elapsed % 60;
 		}
+	
 		$escaped_transfer_table .= sprintf(
 			'<tr class="transfer-info %7$s" data-transfer-id="%1$s">
 				<td class="transfer_id">%1$s</td>
@@ -176,7 +138,7 @@ if ( empty( $transfers ) ) {
 			</tr>',
 			esc_attr( $transfer['transfer_id'] ),
 			esc_html( $transfer['source_site_url'] ),
-			esc_html( ucfirst( $status ) ),
+			esc_html( ucwords( $status ) ),
 			esc_html( $minutes ),
 			esc_html( $seconds ),
 			wp_kses_post( $action_buttons ),
