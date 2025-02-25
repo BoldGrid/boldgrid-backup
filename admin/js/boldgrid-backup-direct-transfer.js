@@ -500,7 +500,6 @@ BoldGrid.DirectTransfers = function($) {
 			var transferId = response.data.transfer_id;
 			$button.text(self.lang.transfer_started);
 			$button.addClass('transfer-started');
-			$button.prop('style', 'color: #2271b1 !important');
 			$errorsRow.hide();
 			setTimeout(function() {
 				self._addTransferRow(transferId, url);

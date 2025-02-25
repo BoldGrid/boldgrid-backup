@@ -4,6 +4,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+error_log( '$this class: ' . json_encode( get_class( $this ) ) );
+
 $option_names = $this->core->configs['direct_transfer']['option_names'];
 
 if ( isset( $_GET['_wpnonce'] ) &&

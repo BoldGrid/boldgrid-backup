@@ -11,8 +11,16 @@
     margin: 0 5px;
 }
 
+.bgbkup-transfers-rx .authentication-error {
+    display: none;
+}
+
 .progress-row.canceled {
     display: none;
+}
+
+.bgbkup-transfers-sites-table tr.errors-row div.errors {
+    text-align: left;
 }
 
 div.boldgrid-transfer-input-fields {
