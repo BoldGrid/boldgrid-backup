@@ -305,6 +305,7 @@ class Boldgrid_Backup_Admin_Config {
 			'delete_error'      => esc_html__( 'Delete Error. Refresh and try again.', 'boldgrid-backup' ),
 			'invalid_url'       => esc_html__( 'You must enter a valid URL', 'boldgrid-backup' ),
 			'same_site_error'   => esc_html__( 'You must enter the URL of the source site, not this site. Ex: https://source-site.com', 'boldgrid-backup' ),
+			'server_error'      => esc_html__( 'A server error has occured while trying to process your request. Additional details may be available in your logs.', 'boldgrid-backup' ),
 		);
 	}
 

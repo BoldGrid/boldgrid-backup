@@ -62,6 +62,7 @@ BoldGrid.DirectTransfers = function($) {
 				callback(response, callbackArgs);
 			})
 			.fail(function(response, responseText) {
+				console.log('API Error', { endpoint, response, responseText, callback, callback });
 				/*
 				 * If we are checking the status, and the status contains the string 'restor' as in
 				 * 'restoring' or 'restored', and the response status is 403, then the user has been logged out.
@@ -74,7 +75,9 @@ BoldGrid.DirectTransfers = function($) {
 				) {
 					window.location.reload();
 				}
-				console.log('API Error', { endpoint, response, responseText, callback, callback });
+				if ( 500 === response.status ) {
+					callback( { success: false, data: { error: self.lang.server_error } } );
+				}
 			});
 	};
 
@@ -496,6 +499,8 @@ BoldGrid.DirectTransfers = function($) {
 			$errorDiv = $errorsRow.find('.errors');
 		$button.prop('disabled', true);
 
+		console.log( 'response', response );
+
 		if (response.success) {
 			var transferId = response.data.transfer_id;
 			$button.text(self.lang.transfer_started);
@@ -506,7 +511,11 @@ BoldGrid.DirectTransfers = function($) {
 			}, 3000);
 		} else {
 			$errorDiv.empty();
-			$errorDiv.append(response.data.error);
+			if ( response.data.message ) {
+				$errorDiv.append(response.data.message );
+			} else {
+				$errorDiv.append(response.data.error);
+			}
 			$errorsRow.show();
 			self._bindInstallTotalUpkeepButton($errorDiv.find('button.install-total-upkeep'));
 			self._bindUpdateTotalUpkeepButton($errorDiv.find('button.update-total-upkeep'));

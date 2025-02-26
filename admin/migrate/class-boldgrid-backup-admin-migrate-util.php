@@ -112,6 +112,66 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		$this->cancelled_transfers_option_name = $this->migrate_core->configs['option_names']['cancelled_transfers'];
 	}
 
+	public function get_elapsed_time( $transfer_id, $formatted = false, $return_total = true ) {
+		$transfer = $this->get_transfer_from_id( $transfer_id );
+
+		if ( ! $transfer ) {
+			return;
+		}
+
+		$time_tracking = $transfer['time_tracking'];
+		$status        = $transfer['status'];
+
+		$inactive_statusus = array( 'completed', 'restore-completed', 'failed', 'canceled' );
+
+		if ( ! $return_total ) {
+			$time         = isset( $time_tracking[ $status ] ) ? $time_tracking[ $status ] : array();
+			$start_time   = isset( $time['start_time'] ) ? $time['start_time'] : microtime( true );
+			$end_time     = isset( $time['end_time'] ) ? $time['end_time'] : microtime( true );
+			$elapsed_time = $end_time - $start_time;
+			return $formatted ? $this->format_time( $elapsed_time ) : $elapsed_time;
+		}
+
+		$elapsed_time = 0;
+
+		foreach ( $time_tracking as $status => $time ) {
+			if ( ! in_array( $status, $inactive_statusus ) ) {
+				$end_time      = isset( $time['end_time'] ) ? $time['end_time'] : microtime( true );
+				$elapsed_time += $end_time - $time['start_time'];
+			}
+		}
+
+		return $formatted ? $this->format_time( $elapsed_time ) : $elapsed_time;
+	}
+
+	public function update_elapsed_time( $transfer_id ) {
+		$transfer      = $this->get_transfer_from_id( $transfer_id );
+		$resyncing_db  = isset( $transfer['resyncing_db'] ) ? $transfer['resyncing_db'] : false;
+		$status        = $resyncing_db ? 'resyncing-db' : $transfer['status'];
+		$time_tracking = $transfer['time_tracking'];
+
+		$inactive_statusus = array( 'completed', 'restore-completed', 'failed', 'canceled' );
+
+		if ( in_array( $status, $inactive_statusus ) ) {
+			return;
+		}
+
+		if ( ! isset( $time_tracking[ $status ] )  ) {
+			$time_tracking[ $status ] = array(
+				'start_time' => microtime( true ),
+			);
+		} else {
+			$time_tracking[ $status ]['end_time'] = microtime( true );
+		}
+
+		$transfers = $this->get_option( $this->transfers_option_name, array() );
+		$transfers[ $transfer_id ]['time_tracking'] = $time_tracking;
+
+		wp_cache_delete( $this->transfers_option_name, 'options' );
+
+		$option_updated = update_option( $this->transfers_option_name, $transfers, true );
+	}
+
 	public function transfer_action_buttons( $transfer_status, $transfer_id ) {
 		$buttons = array(
 			'restore' => array(
@@ -503,7 +563,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	public function get_transfer_prop( $transfer_id, $property, $fallback ) {
 		wp_cache_delete( $this->transfers_option_name, 'options' );
 
-		$transfer  = $this->get_transfer_from_id( $transfer_id );
+		$transfer = $this->get_transfer_from_id( $transfer_id );
 
 		if ( ! $transfer ) {
 			return $fallback;
@@ -541,6 +601,18 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 			$this->migrate_core->log->add(
 				"Transfer $transfer_id status updated from {$transfers[ $transfer_id ][ $key ]} to $value"
 			);
+			/*
+			 * If we are changing the status, we update the elapsed time
+			 * one last time to reflect the 'end_time' of the old status.
+			 */
+			$this->update_elapsed_time( $transfer_id );
+
+			/*
+			 * After the elapsed time is updated, we need to refresh the $transfers array
+			 * to get the updated time_tracking data, or else we'll lose the last 
+			 * 'end_time' for the old status.
+			 */
+			$transfers = $this->get_option( $this->transfers_option_name, array() );
 		}
 
 		$transfers[ $transfer_id ][ $key ] = $value;
@@ -548,7 +620,17 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		$this->update_transfer_heartbeat();
 
 		wp_cache_delete( $this->transfers_option_name, 'options' );
-		return update_option( $this->transfers_option_name, $transfers, false );
+		$option_updated = update_option( $this->transfers_option_name, $transfers, false );
+
+		/*
+		 * Anytime we update a transfer, we also want to update
+		 * the elapsed time for the transfer. In the event that
+		 * the status was changed, this will mark the 'start_time'
+		 * of the new status
+		 */
+		if ( 'time_tracking' !== $key ) {
+			$this->update_elapsed_time( $transfer_id );
+		}
 	}
 
 	/**
@@ -1257,10 +1339,16 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * 
 	 * @since 1.17.0
 	 */
-	public function convert_to_mmss( $seconds ) {
-		if ( $seconds >= 3600 ) { // Check if time is 1 hour or more
+	public function format_time( $seconds ) {
+		if ( $seconds >= 86400 ) { // 24 hours or more
+			$days = floor( $seconds / 86400 );
+			$remaining_seconds = $seconds % 86400;
+			$time = date_i18n( 'H:i:s', mktime( 0, 0, $remaining_seconds ) );
+			return $days . 'd ' . $time;
+		} elseif ( $seconds >= 3600 ) { // 1 hour or more, but less than 24 hours
 			return date_i18n( 'H:i:s', mktime( 0, 0, $seconds ) );
 		}
+		// Less than 1 hour
 		return date_i18n( 'i:s', mktime( 0, 0, $seconds ) );
 	}
 }

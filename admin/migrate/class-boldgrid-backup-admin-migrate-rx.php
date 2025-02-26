@@ -272,9 +272,9 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		$site_rest_url = $this->util->get_site_rest_url( $site_url );
 
-		if ( is_wp_error( $rest_url ) ) {
-			$this->migrate_core->log->add( 'Error getting site rest url: ' . $rest_url->get_error_message() );
-			wp_send_json_error( array( 'error' => true, 'message' => $rest_url->get_error_message() ) );
+		if ( is_wp_error( $site_rest_url ) ) {
+			$this->migrate_core->log->add( 'Error getting site rest url: ' . $site_rest_url->get_error_message() );
+			wp_send_json_error( array( 'error' => true, 'message' => $site_rest_url->get_error_message() ) );
 			wp_die();
 		}
 
@@ -299,9 +299,11 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			'source_wp_version'  => $source_wp_version,
 			'rx_max_upload_size' => $max_upload_size,
 			'transfer_rate'      => 0,
-			'start_time'         => microtime( true ), 
-			'end_time'           => 0,
-			'time_elapsed'       => 0,
+			'time_tracking'      => array(
+				'pending' => array(
+					'start_time' => microtime( true )
+				)
+			),
 		);
 
 		$transfer_list = $this->util->get_option( $this->transfers_option_name, array() );
@@ -447,7 +449,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		$db_dump_info = $response['db_dump_info'];
 
-		if ( 'pending' === $transfer['db_dump_info']['status'] && 'pending' === $db_dump_info['status'] ) {
+		if ( isset( $transfer['db_dump_info']['status'] ) && 'pending' === $transfer['db_dump_info']['status'] && 'pending' === $db_dump_info['status'] ) {
 			$time_since_last_heartbeat = time() - $this->util->get_transfer_heartbeat();
 
 			if ( $this->migrate_core->configs['stalled_timeout'] < $time_since_last_heartbeat ) {
@@ -646,7 +648,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			return;
 		}
 
-		$time_since_last_heartbeat = $this->util->convert_to_mmss( $time_since_last_heartbeat );
+		$time_since_last_heartbeat = $this->util->format_time( $time_since_last_heartbeat );
 		$this->migrate_core->log->add( 'Transfer Status: ' . $transfer['status'] );
 		$this->migrate_core->log->add( 'Transfer has likely stalled: Time Since Last Heartbeat: ' . $time_since_last_heartbeat );
 
@@ -825,13 +827,14 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		} else if ( $completed_count === $total_file_count && 'transferring-large-files' === $status ) {
 			$this->util->update_transfer_prop( $transfer_id, 'status', 'transferring-small-files' );
 			$status = 'transferring-small-files';
-			$elapsed_time = $this->update_elapsed_time( $transfer_id );
 		}
 
-		$elapsed_time         = $this->update_elapsed_time( $transfer_id, false );
+		$total_elapsed_time   = $this->util->get_elapsed_time( $transfer_id );
 		$progress_status_text = $this->get_progress_status_text( $status );
 		$bytes_received       = $this->util->get_option( $this->bytes_received_option_name, 0 );
-		$transfer_rate        = $bytes_received / $elapsed_time;
+		$transfer_rate        = $bytes_received / $total_elapsed_time;
+
+		$formatted_elapsed_time = $this->util->get_elapsed_time( $transfer_id, true );
 
 		$this->migrate_core->log->add(
 			sprintf(
@@ -840,7 +843,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 				'Avg Transfer Rate: %4$s',
 				$transfer_id,
 				$progress_text,
-				$this->util->convert_to_mmss( $elapsed_time ),
+				$formatted_elapsed_time,
 				size_format( $transfer_rate, 2 ) . '/s',
 				10,
 				9
@@ -853,7 +856,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			'progress'             => $progress,
 			'progress_text'        => $progress_text,
 			'progress_status_text' => $progress_status_text,
-			'elapsed_time'         => $this->migrate_core->util->convert_to_mmss( $elapsed_time ),
+			'elapsed_time'         => $formatted_elapsed_time,
 			'status_counts'        => $file_status_counts,
 		);
 
@@ -877,38 +880,27 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 */
 	public function complete_transfer( $transfer_id ) {
 		$this->util->update_transfer_prop( $transfer_id, 'status', 'completed' );
-		$elapsed_time = microtime( true ) - intval( $this->util->get_transfer_prop( $transfer_id, 'start_time', 0 ) );
 		$resyncing_db = $this->util->get_transfer_prop( $transfer_id, 'resyncing_db', false );
 		if ( $resyncing_db ) {
 			$resync_elapsed_time = microtime( true ) - intval(
 				$this->util->get_transfer_prop( $transfer_id, 'resync_db_start_time', 0 )
 			);
 
-			$this->migrate_core->log->add(
-				sprintf(
-					'Resyncing Database Completed.%2$c%3$c' .
-					'Time Elapsed: %1$s%2$c%3$c',
-					$this->util->convert_to_mmss( $resync_elapsed_time ),
-					10,
-					9
-				)
-			);
+			$this->migrate_core->log->add( 'Resyncing Database Completed' );
 
 			$this->util->update_transfer_prop( $transfer_id, 'resyncing_db', false );
-			$this->util->update_transfer_prop( $transfer_id, 'resync_db_elapsed_time', $resync_elapsed_time );
 
 			return;
 		}
-		$this->util->update_transfer_prop( $transfer_id, 'end_time', microtime( true ) );
-		$this->util->update_transfer_prop( $transfer_id, 'time_elapsed', $elapsed_time );
 		$bytes_rcvd   = $this->util->get_option( $this->bytes_received_option_name, 0 );
 		
 		// Count the number of files transferred.
-		$transfer      = $this->util->get_transfer_from_id( $transfer_id );
-		$file_lists    = $this->util->get_option( $this->lists_option_name, array() );
-		$file_list     = $file_lists[ $transfer_id ];
-		$file_count    = count( json_decode( $file_list['small'], true ) ) + count( json_decode( $file_list['large'], true ) );
-		$bytes_per_sec = $bytes_rcvd / $elapsed_time;
+		$transfer            = $this->util->get_transfer_from_id( $transfer_id );
+		$file_lists          = $this->util->get_option( $this->lists_option_name, array() );
+		$file_list           = $file_lists[ $transfer_id ];
+		$file_count          = count( json_decode( $file_list['small'], true ) ) + count( json_decode( $file_list['large'], true ) );
+		$total_elapsed_time  = $this->util->get_elapsed_time( $transfer_id );
+		$bytes_per_sec       = $bytes_rcvd / $total_elapsed_time;
 		
 		$this->migrate_core->log->add(
 			sprintf( 
@@ -920,7 +912,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 				$transfer_id,
 				size_format( $bytes_rcvd, 2 ),
 				$file_count,
-				$this->util->convert_to_mmss( $elapsed_time ),
+				$this->util->get_elapsed_time( $transfer_id, true ),
 				size_format( $bytes_per_sec ) . '/s',
 				10,
 				9
@@ -1920,26 +1912,5 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		}
 
 		return $output_file;
-	}
-
-	/**
-	 * Update Elapsed Time
-	 * 
-	 * @since 1.17.0
-	 *
-	 * @param string  $transfer_id Transfer ID
-	 * @param boolean $save        Whether or not to save the elapsed time
-	 * 
-	 * @return float Elapsed time
-	 */
-	public function update_elapsed_time( $transfer_id, $save = true ) {
-		$microtime    = microtime( true );
-		$elapsed_time = $microtime - $this->util->get_transfer_prop( $transfer_id, 'start_time', 0 );
-
-		if ( $save ) {
-			$this->util->update_transfer_prop( $transfer_id, 'time_elapsed', $elapsed_time );
-		}
-
-		return $elapsed_time;
 	}
 }

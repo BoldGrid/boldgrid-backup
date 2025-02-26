@@ -112,35 +112,22 @@ if ( empty( $transfers ) ) {
 	);
 } else {
 	foreach ( $transfers as $transfer ) {
-		$time_elapsed   = 'restore-completed' === $transfer['status'] ?
-			$transfer['time_to_restore'] :
-			$transfer['time_elapsed'];
-		$minutes        = floor( $time_elapsed / 60 );
-		$seconds        = $time_elapsed % 60;
+		$time_elapsed   = $this->core->migrate->util->get_elapsed_time( $transfer['transfer_id'], true );
 		$status         = str_replace( '-', ' ', $transfer['status'] );
 		$action_buttons = $this->core->migrate->util->transfer_action_buttons( $transfer['status'], $transfer['transfer_id'] );
-
-		if ( false !== strpos( $transfer['status'], 'restor' ) ) {
-			$time_elapsed = isset( $transfer['restore_start_time'] ) ?
-				microtime( true ) - $transfer['restore_start_time'] :
-				0;
-			$minutes      = floor( $time_elapsed / 60 );
-			$seconds      = $time_elapsed % 60;
-		}
 	
 		$escaped_transfer_table .= sprintf(
-			'<tr class="transfer-info %7$s" data-transfer-id="%1$s">
+			'<tr class="transfer-info %6$s" data-transfer-id="%1$s">
 				<td class="transfer_id">%1$s</td>
 				<td class="source_url">%2$s</td>
 				<td class="status">%3$s</td>
-				<td class="time_elapsed">%4$s:%5$02d</td>
-				<td class="actions">%6$s</td>
+				<td class="time_elapsed">%4$s</td>
+				<td class="actions">%5$s</td>
 			</tr>',
 			esc_attr( $transfer['transfer_id'] ),
 			esc_html( $transfer['source_site_url'] ),
 			esc_html( ucwords( $status ) ),
-			esc_html( $minutes ),
-			esc_html( $seconds ),
+			esc_html( $time_elapsed ),
 			wp_kses_post( $action_buttons ),
 			esc_attr( $status )
 		);

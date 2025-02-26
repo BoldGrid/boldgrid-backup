@@ -500,10 +500,11 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 			$deleted = wp_delete_file( $db_dump_path );
 		}
 
-		$this->util->update_transfer_prop( $transfer_id, 'status', 'pending-db-dump' );
+		$this->util->reset_status_time( $transfer_id, 'resyncing-db' );
 		$this->util->update_transfer_prop( $transfer_id, 'resyncing_db', true );
-		$this->util->update_transfer_prop( $transfer_id, 'resync_db_start_time', microtime( true ) );
+		$this->util->update_transfer_prop( $transfer_id, 'status', 'pending-db-dump' );
 		$this->migrate_core->log->add( 'Database dump file deleted and pending re-sync: ' . $transfer_id );
+
 		wp_send_json_success( array( 'message' => 'Database dump file deleted and pending re-sync' ) );
 	}
 
@@ -607,15 +608,8 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 
 		$progress_data = array();
 
-		if ( isset( $transfer['resyncing_db'] ) && $transfer['resyncing_db'] ) {
-			$elapsed_time = microtime( true ) - intval( $transfer['resync_db_start_time'] );
-		} else if ( isset( $transfer['restore_start_time'] ) ) {
-			$elapsed_time = microtime( true ) - intval( $transfer['restore_start_time'] );
-		} else {
-			$elapsed_time = microtime( true ) - intval( $this->util->get_transfer_prop( $transfer_id, 'start_time', 0 ) );
-		}
 		$progress_data['status']       = $transfer['status'];
-		$progress_data['elapsed_time'] = $this->util->convert_to_mmss( $elapsed_time );
+		$progress_data['elapsed_time'] = $this->util->get_elapsed_time( $transfer_id, true );
 		switch( $status ) {
 			case 'failed':
 				$progress_text = $this->util->get_transfer_prop( $transfer_id, 'failed_message', 'Transfer Failed' );
@@ -631,8 +625,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				$progress_data['progress_status_text'] = 'Completed';
 				break;
 			case 'restore-completed':
-				$elapsed_time = intval( $this->util->get_transfer_prop( $transfer_id, 'time_to_restore', 0 ) );
-				$progress_data['elapsed_time'] = $this->util->convert_to_mmss( $elapsed_time );
 				$progress_data['status'] = 'completed';
 				$progress_data['progress'] = 100;
 				$progress_data['progress_text'] = 'Restoration Complete';
@@ -708,8 +700,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				}
 				break;
 			case 'pending-restore':
-				$elapsed_time = microtime( true ) - intval( $this->util->get_transfer_prop( $transfer_id, 'restore_start_time', microtime( true ) ) );
-				$progress_data['elapsed_time'] = $this->util->convert_to_mmss( $elapsed_time );
 				$progress_data['status'] = 'pending-restore';
 				$progress_data['progress'] = 0;
 				$progress_data['progress_text'] = 'Pending Restore';
@@ -717,8 +707,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				$this->migrate_core->rx->process_transfers();
 				break;
 			case 'restoring-files':
-				$elapsed_time = microtime( true ) - intval( $this->util->get_transfer_prop( $transfer_id, 'restore_start_time', 0 ) );
-				$progress_data['elapsed_time'] = $this->util->convert_to_mmss( $elapsed_time );
 				$progress_data['status'] = 'restoring-files';
 				$progress_data['progress'] = 0;
 				$progress_data['progress_text'] = 'Restoring Files';
@@ -735,7 +723,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				}
 				break;
 			case 'restoring-db':
-				$elapsed_time = microtime( true ) - intval( $this->util->get_transfer_prop( $transfer_id, 'restore_start_time', 0 ) );
 				$settings     = $this->util->get_option( 'boldgrid_backup_settings', array() );
 				$backup_dir   = isset( $settings['backup_directory'] ) ? $settings['backup_directory'] : '/var/www/boldgrid_backup';
 				$log_file     = $backup_dir . '/active-import.log';
@@ -753,7 +740,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 					$progress_data['progress'] = 0;
 					$progress_data['progress_text'] = 'Restoring Database';
 				}
-				$progress_data['elapsed_time'] = $this->util->convert_to_mmss( $elapsed_time );
 				$progress_data['status'] = 'restoring-db';
 				$progress_data['progress_status_text'] = 'Restoring Database';
 				break;
