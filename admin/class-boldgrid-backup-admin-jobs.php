@@ -274,7 +274,24 @@ class Boldgrid_Backup_Admin_Jobs {
 	public function maybe_fix_stalled() {
 		$made_changes = false;
 
-		foreach ( $this->jobs as &$job ) {
+		foreach ( $this->jobs as $key => &$job ) {
+			if ( preg_match('/-(\d{8})-\d{6}\.zip$/', $job['filepath'], $matches ) ) {
+				$date_str = $matches[1];
+			
+				// Create a DateTime object from the date string (format: YYYYMMDD)
+				$file_date = DateTime::createFromFormat( 'Ymd', $date_str );
+				
+				// Get the date for one week ago from now
+				$one_week_ago = new DateTime('-1 week');
+			
+				// Compare dates
+				if ( $file_date < $one_week_ago ) {
+					unset( $this->jobs[ $key ] );
+					$this->save_jobs();
+					continue;
+				}
+			}
+
 			if ( 'running' !== $job['status'] ) {
 				continue;
 			}
@@ -340,23 +357,6 @@ class Boldgrid_Backup_Admin_Jobs {
 		foreach ( $this->jobs as $key => &$job ) {
 			if ( 'pending' !== $job['status'] ) {
 				continue;
-			}
-
-			if ( preg_match('/-(\d{8})-\d{6}\.zip$/', $job['filepath'], $matches ) ) {
-				$date_str = $matches[1];
-			
-				// Create a DateTime object from the date string (format: YYYYMMDD)
-				$file_date = DateTime::createFromFormat( 'Ymd', $date_str );
-				
-				// Get the date for one week ago from now
-				$one_week_ago = new DateTime('-1 week');
-			
-				// Compare dates
-				if ($file_date < $one_week_ago ) {
-					unset( $this->jobs[ $key ] );
-					$this->save_jobs();
-					continue;
-				}
 			}
 
 			$this->logger->add( 'Running job: ' . json_encode( $job, JSON_PRETTY_PRINT ) );
