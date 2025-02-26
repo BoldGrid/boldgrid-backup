@@ -269,7 +269,6 @@ class Boldgrid_Backup_Admin_Jobs {
 	public function maybe_fix_stalled() {
 		$made_changes = false;
 
-		error_log( 'job count: ' . count( $this->jobs ) );
 		foreach ( $this->jobs as $key => &$job ) {
 			// Maybe delete old job if it's older than one week.
 			if ( preg_match('/-(\d{8})-\d{6}\.zip$/', $job['filepath'], $matches ) ) {
