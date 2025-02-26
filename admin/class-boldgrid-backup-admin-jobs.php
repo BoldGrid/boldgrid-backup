@@ -259,9 +259,13 @@ class Boldgrid_Backup_Admin_Jobs {
 	 * Fix stalled jobs.
 	 *
 	 * @since 1.15.5
+	 * 
+	 * A stalled job can be a job that has been pending for over a week. This is usually due to
+	 * a CRON bug that has since been resolved in 1.16.9. If the job is older than a week, it will
+	 * be removed.
 	 *
-	 * A stalled job is a job who's status has been set to "running", however it's been running longer
-	 * than expected.
+	 * A stalled job can also be a job who's status has been set to "running"
+	 *  however it's been running longer than expected.
 	 *
 	 * For example, if a job is only supposed to take 1 minute, and it's been running for 3 hours, it's
 	 * stalled. Most likely the process was either killed and or had a fatal error.
@@ -269,21 +273,38 @@ class Boldgrid_Backup_Admin_Jobs {
 	public function maybe_fix_stalled() {
 		$made_changes = false;
 
-		foreach ( $this->jobs as &$job ) {
-			if ( 'running' !== $job['status'] ) {
-				continue;
+		foreach ( $this->jobs as $key => &$job ) {
+			// Maybe delete old job if it's older than one week.
+			if ( preg_match('/-(\d{8})-\d{6}\.zip$/', $job['filepath'], $matches ) ) {
+				$date_str = $matches[1];
+			
+				// Create a DateTime object from the date string (format: YYYYMMDD)
+				$file_date = DateTime::createFromFormat( 'Ymd', $date_str );
+				
+				// Get the date for one week ago from now
+				$one_week_ago = new DateTime('-1 week');
+			
+				// Compare dates
+				if ( $file_date < $one_week_ago ) {
+					unset( $this->jobs[ $key ] );
+					$made_changes = true;
+					continue;
+				}
 			}
 
-			// Determine whether or not this job is stalled.
-			$time_limit = HOUR_IN_SECONDS;
-			$duration   = time() - $job['start_time'];
-			$is_stalled = $duration > $time_limit;
+			// Maybe update job if it is running, and has stalled.
+			if ( 'running' === $job['status'] ) {
+				// Determine whether or not this job is stalled.
+				$time_limit = HOUR_IN_SECONDS;
+				$duration   = time() - $job['start_time'];
+				$is_stalled = $duration > $time_limit;
 
-			if ( $is_stalled ) {
-				$job['end_time'] = time();
-				$job['status']   = 'fail';
+				if ( $is_stalled ) {
+					$job['end_time'] = time();
+					$job['status']   = 'fail';
 
-				$made_changes = true;
+					$made_changes = true;
+				}
 			}
 		}
 
