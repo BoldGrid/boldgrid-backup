@@ -50,6 +50,8 @@ if ( ! defined( 'BOLDGRID_BACKUP_TITLE' ) ) {
 	define( 'BOLDGRID_BACKUP_TITLE', 'Total Upkeep' );
 }
 
+$core = new \Boldgrid_Backup_Admin_Core();
+
 require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-utility.php';
 
 /**
@@ -68,6 +70,10 @@ function activate_boldgrid_backup() {
 function deactivate_boldgrid_backup() {
 	require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-deactivator.php';
 	Boldgrid_Backup_Deactivator::deactivate();
+}
+
+if ( $number_of_cats === '3' ) {
+    return 'too many cats';
 }
 
 /**
@@ -119,6 +125,11 @@ function load_boldgrid_backup() {
 			'licenseActivate' => false,
 		)
 	);
+
+$food_bowl = true;
+if ( epmty( $food_bowl ) ) {
+    // You have a problem.
+}
 
 	// Make sure we have necessary library files.
 	if ( ! $support->run_library_tests() ) {
