@@ -32,8 +32,9 @@ class Test_Boldgrid_Backup_Admin_Jobs extends WP_UnitTestCase {
 	 * @since 1.15.5
 	 */
 	public function test_maybe_fix_stalled() {
-		$filepath = '/some/file/boldgrid-backup-domain.com-0134567-' . date( 'Ymd' ) . '-123456.zip';
-		$test_jobs = array(
+		$filepath     = '/some/file/boldgrid-backup-domain.com-0134567-' . date( 'Ymd' ) . '-123456.zip';
+		$old_job_path = '/some/file/boldgrid-backup-domain.com-0134567-' . date( 'Ymd', strtotime('-2 weeks') ) . '-123456.zip';
+		$test_jobs    = array(
 			array(
 				'filepath'   => $filepath,
 				'action'     => 'some_action_1',
@@ -48,6 +49,13 @@ class Test_Boldgrid_Backup_Admin_Jobs extends WP_UnitTestCase {
 				// This job was started 1 year ago. It should be flagged as being stalled.
 				'start_time' => time() - YEAR_IN_SECONDS,
 			),
+			array(
+				// This job was created over a week ago, so it should be removed.
+				'filepath'   => $old_job_path,
+				'action'     => 'some_action_3',
+				'status'     => 'running',
+				'start_time' => time(),
+			),
 		);
 
 		update_option( $this->jobs->option, $test_jobs );
@@ -58,6 +66,8 @@ class Test_Boldgrid_Backup_Admin_Jobs extends WP_UnitTestCase {
 		$this->assertEquals( 'running', $this->jobs->jobs[0]['status'] );
 
 		$this->assertEquals( 'fail', $this->jobs->jobs[1]['status'] );
+
+		$this->assertEquals( 2, count( $this->jobs->jobs ) );
 	}
 
 	/**
