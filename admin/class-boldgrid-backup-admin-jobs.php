@@ -353,7 +353,6 @@ class Boldgrid_Backup_Admin_Jobs {
 			
 				// Compare dates
 				if ($file_date < $one_week_ago ) {
-					$job['status'] = 'skipped';
 					unset( $this->jobs[ $key ] );
 					$this->save_jobs();
 					continue;
