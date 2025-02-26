@@ -259,9 +259,13 @@ class Boldgrid_Backup_Admin_Jobs {
 	 * Fix stalled jobs.
 	 *
 	 * @since 1.15.5
+	 * 
+	 * A stalled job can be a job that has been pending for over a week. This is usually due to
+	 * a CRON bug that has since been resolved in 1.16.9. If the job is older than a week, it will
+	 * be removed.
 	 *
-	 * A stalled job is a job who's status has been set to "running", however it's been running longer
-	 * than expected.
+	 * A stalled job can also be a job who's status has been set to "running"
+	 *  however it's been running longer than expected.
 	 *
 	 * For example, if a job is only supposed to take 1 minute, and it's been running for 3 hours, it's
 	 * stalled. Most likely the process was either killed and or had a fatal error.
