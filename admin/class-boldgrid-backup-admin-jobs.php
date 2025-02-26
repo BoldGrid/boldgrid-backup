@@ -246,11 +246,6 @@ class Boldgrid_Backup_Admin_Jobs {
 
 		$this->save_jobs();
 
-		// If this email job is more than 2 weeks old, don't send it.
-		if( time() - 1209600 > $info['timestamp'] ) {
-			return;
-		}
-
 		if ( $post_jobs > 0 ) {
 			$email_parts['body']['main'] .= implode( "\n\n", $job_summary ) . "\n\n";
 		}
