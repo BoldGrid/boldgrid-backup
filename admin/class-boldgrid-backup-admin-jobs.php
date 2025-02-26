@@ -271,6 +271,7 @@ class Boldgrid_Backup_Admin_Jobs {
 
 		error_log( 'job count: ' . count( $this->jobs ) );
 		foreach ( $this->jobs as $key => &$job ) {
+			// Maybe delete old job if it's older than one week.
 			if ( preg_match('/-(\d{8})-\d{6}\.zip$/', $job['filepath'], $matches ) ) {
 				$date_str = $matches[1];
 			
@@ -288,20 +289,19 @@ class Boldgrid_Backup_Admin_Jobs {
 				}
 			}
 
-			if ( 'running' !== $job['status'] ) {
-				continue;
-			}
+			// Maybe update job if it is running, and has stalled.
+			if ( 'running' === $job['status'] ) {
+				// Determine whether or not this job is stalled.
+				$time_limit = HOUR_IN_SECONDS;
+				$duration   = time() - $job['start_time'];
+				$is_stalled = $duration > $time_limit;
 
-			// Determine whether or not this job is stalled.
-			$time_limit = HOUR_IN_SECONDS;
-			$duration   = time() - $job['start_time'];
-			$is_stalled = $duration > $time_limit;
+				if ( $is_stalled ) {
+					$job['end_time'] = time();
+					$job['status']   = 'fail';
 
-			if ( $is_stalled ) {
-				$job['end_time'] = time();
-				$job['status']   = 'fail';
-
-				$made_changes = true;
+					$made_changes = true;
+				}
 			}
 		}
 
