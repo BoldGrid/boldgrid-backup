@@ -98,7 +98,8 @@ BoldGrid.DirectTransfers = function($) {
 			$authError = $('.bgbkup-transfers-rx .authentication-error'),
 			$closeModal = $('.direct-transfer-modal-close');
 
-		self_bindCancelButton = self._bindCancelButton($cancelButton);
+		self._bindCancelButton($cancelButton);
+		self._bindDeleteButton($deleteButton);
 
 		// Hide the authentication error message on load.
 		$authError.hide();
@@ -165,24 +166,6 @@ BoldGrid.DirectTransfers = function($) {
 				'POST',
 				{ transfer_id: transferId },
 				self._resyncCallback
-			);
-		});
-
-		// Bind the Delete button
-		$deleteButton.on('click', function(e) {
-			var $this = $(e.currentTarget),
-				transferId = $this.data('transferId');
-
-			e.preventDefault();
-			$this.prop('disabled', true);
-			$this.text(self.lang.deleting + '...');
-
-			self._restRequest(
-				'delete-transfer',
-				'POST',
-				{ transfer_id: transferId },
-				self._deleteCallback,
-				{ $deleteButton: $this }
 			);
 		});
 
@@ -265,6 +248,26 @@ BoldGrid.DirectTransfers = function($) {
 				{ transfer_id: transferId },
 				self._cancelCallback,
 				{ $cancelButton: $this }
+			);
+		});
+	};
+
+	self._bindDeleteButton = function($deleteButton) {
+		// Bind the Delete button
+		$deleteButton.on('click', function(e) {
+			var $this = $(e.currentTarget),
+				transferId = $this.data('transferId');
+
+			e.preventDefault();
+			$this.prop('disabled', true);
+			$this.text(self.lang.deleting + '...');
+
+			self._restRequest(
+				'delete-transfer',
+				'POST',
+				{ transfer_id: transferId },
+				self._deleteCallback,
+				{ $deleteButton: $this }
 			);
 		});
 	};
@@ -427,6 +430,7 @@ BoldGrid.DirectTransfers = function($) {
 			$progressStatusText = args.$progressStatusText,
 			$timeElapsedText = args.$timeElapsedText,
 			$progressText = args.$progressText,
+			transferId = args.transferId,
 			$row = args.$row;
 
 		if (response.success) {
@@ -435,7 +439,13 @@ BoldGrid.DirectTransfers = function($) {
 				progressText = response.data.progress_text,
 				progressStatusText = response.data.progress_status_text,
 				timeElapsed = response.data.elapsed_time,
+				$cancelButton = $(
+					'.bgbkup-transfers-rx tr.transfer-info[data-transfer-id=' + transferId + ']'
+				).find('.cancel-transfer')
 				borderRadius = '10';
+			
+			console.log( transferId );
+			console.log( $cancelButton );
 
 			if ('completed' === status) {
 				$row.addClass('completed');
@@ -475,6 +485,10 @@ BoldGrid.DirectTransfers = function($) {
 				$row.addClass('error');
 				$row.find('td').empty();
 				$row.find('td').append('<p class="notice notice-error">' + progressText + '</p>');
+				// Change the cancel button to a delete button, and bind the delete action to it.
+				$cancelButton.removeClass( 'cancel-transfer' ).addClass( 'delete-transfer' ).text( self.lang.delete );
+				$cancelButton.off( 'click' );
+				self._bindDeleteButton( $cancelButton );
 			}
 		} else {
 			console.log('Update Progress Error: ', { response });
@@ -776,6 +790,7 @@ BoldGrid.DirectTransfers = function($) {
 				$progressBarFill: $progressBarFill,
 				$progressStatusText: $progressStatusText,
 				$timeElapsedText: $timeElapsedText,
+				transferId: transferId,
 				status: status
 			}
 		);

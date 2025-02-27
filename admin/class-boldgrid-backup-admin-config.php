@@ -290,6 +290,7 @@ class Boldgrid_Backup_Admin_Config {
 			'cancel'            => esc_html__( 'Cancel', 'boldgrid-backup' ),
 			'restore'           => esc_html__( 'Restore', 'boldgrid-backup' ),
 			'restoring'         => esc_html__( 'Restoring', 'boldgrid-backup' ),
+			'delete'            => esc_html__( 'Delete', 'boldgrid-backup' ),
 			'deleting'          => esc_html__( 'Deleting', 'boldgrid-backup' ),
 			'deleted'           => esc_html__( 'Deleted', 'boldgrid-backup' ),
 			'completed'         => esc_html__( 'Completed', 'boldgrid-backup' ),
