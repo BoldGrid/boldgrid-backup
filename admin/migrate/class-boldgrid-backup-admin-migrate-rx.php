@@ -123,7 +123,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		$this->lists_option_name               = $this->migrate_core->configs['option_names']['file_lists'];
 		$this->open_batches_option_name        = $this->migrate_core->configs['option_names']['open_batches'];
 		$this->authd_sites_option_name         = $this->migrate_core->configs['option_names']['authd_sites'];
-		$this->bytes_received_option_name      = $this->migrate_core->configs['option_names']['bytes_received'];
 		$this->active_transfer_option_name     = $this->migrate_core->configs['option_names']['active_transfer'];
 		$this->cancelled_transfers_option_name = $this->migrate_core->configs['option_names']['cancelled_transfers'];
 		
@@ -294,11 +293,12 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			'transfer_id'        => $transfer_id,
 			'status'             => $transfer_status,
 			'source_site_url'    => $site_url,
-			'source_rest_url'      => $site_rest_url,
+			'source_rest_url'    => $site_rest_url,
 			'dest_site_url'      => get_site_url(),
 			'source_wp_version'  => $source_wp_version,
 			'rx_max_upload_size' => $max_upload_size,
 			'transfer_rate'      => 0,
+			'bytes_received'     => 0,
 			'time_tracking'      => array(
 				'pending' => array(
 					'start_time' => microtime( true )
@@ -313,8 +313,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		update_option( $this->transfers_option_name, $transfer_list, false );
 
 		update_option( $this->open_batches_option_name, array(), false );
-
-		update_option( $this->bytes_received_option_name, 0, false );
 
 		$this->migrate_core->log->init( 'direct-transfer-' . $transfer_id );
 
@@ -831,7 +829,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		$total_elapsed_time   = $this->util->get_elapsed_time( $transfer_id );
 		$progress_status_text = $this->get_progress_status_text( $status );
-		$bytes_received       = $this->util->get_option( $this->bytes_received_option_name, 0 );
+		$bytes_received       = $this->util->get_transfer_prop( $transfer_id, 'bytes_received', 0 );
 		$transfer_rate        = $bytes_received / $total_elapsed_time;
 
 		$formatted_elapsed_time = $this->util->get_elapsed_time( $transfer_id, true );
@@ -892,7 +890,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 			return;
 		}
-		$bytes_rcvd   = $this->util->get_option( $this->bytes_received_option_name, 0 );
+		$bytes_rcvd = $this->util->get_transfer_prop( $transfer_id, 'bytes_received', 0 );
 		
 		// Count the number of files transferred.
 		$transfer            = $this->util->get_transfer_from_id( $transfer_id );
@@ -1284,8 +1282,8 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			$body     = json_decode( $response, true );
 
 			// Get transfer info
-			$info                  = curl_getinfo( $ch );
-			$total_bytes_received += intval( $info['size_upload'] );
+			$bytes_received        = curl_getinfo( $ch, CURLINFO_SIZE_DOWNLOAD );
+			$total_bytes_received += intval( $bytes_received );
 
 			if ( isset( $body['success'] ) ) {
 				if ( isset( $body['files'] ) ) {
@@ -1324,9 +1322,9 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			wp_cache_delete( 'boldgrid_transfer_cancelled_transfers', 'options' );
 		}
 
-		$bytes_received_before_batch = $this->util->get_option( $this->bytes_received_option_name, 0 );
+		$bytes_received_before_batch = $this->util->get_transfer_prop( $transfer_id, 'bytes_received', 0 );
 
-		update_option( $this->bytes_received_option_name, $bytes_received_before_batch + $total_bytes_received, false );
+		$this->util->update_transfer_prop( $transfer_id, 'bytes_received', $bytes_received_before_batch + $total_bytes_received );
 
 		curl_multi_close( $mh );
 	}
@@ -1487,18 +1485,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 				break;
 			}
 
-			$stat_before = fstat( $handle );
-			$size_before = $stat_before['size'];
 			fwrite( $handle, base64_decode( $response['file_part'] ) );
-			$stat_after = fstat( $handle );
-			$size_after = $stat_after['size'];
-
-			$bytes_received = $this->util->get_option( $this->bytes_received_option_name, 0 );
-
-			$bytes_received += intval( $size_after - $size_before );
-
-			update_option( $this->bytes_received_option_name, $bytes_received, false );
-
 			$this->util->update_transfer_heartbeat();
 		}
 

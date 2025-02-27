@@ -148,7 +148,6 @@ return [
 			'authd_sites'         => 'boldgrid_backup_xfer_authd_sites',
 			'heartbeat'           => 'boldgrid_backup_xfer_heartbeat',
 			'cancelled_transfers' => 'boldgrid_backup_xfer_cancelled',
-			'bytes_received'      => 'boldgrid_backup_xfer_bytes_received',
 			'active_transfer'     => 'boldgrid_backup_active_transfer',
 			'db_dump_status'      => 'boldgrid_backup_db_dump_status',
 		)

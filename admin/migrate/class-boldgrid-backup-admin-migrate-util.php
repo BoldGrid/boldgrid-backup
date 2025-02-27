@@ -762,7 +762,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 			return $data[ $key ];
 		} else {
 			$this->migrate_core->log->add( 'Get Rest Error: ' . $request_url );
-			$this->migrate_core->log->add( 'Get Rest Error Headers: ' . json_encode( $body, JSON_PRETTY_PRINT ) );
+			$this->migrate_core->log->add( 'Get Rest Error Headers: ' . json_encode( $headers, JSON_PRETTY_PRINT ) );
 			$this->migrate_core->log->add( 'Get Rest Error Body: ' . $body );
 			
 			return new WP_Error( 'rest_error', 'Requested Key: ' . $key . ' not found in response' );
@@ -1065,6 +1065,13 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		$body      = wp_remote_retrieve_body( $response );
 		$body_data = json_decode( $body, true );
 
+		$bytes = (int) strlen( $body );
+		$this->update_transfer_prop(
+			$transfer['transfer_id'],
+			'bytes_received',
+			$this->get_transfer_prop( $transfer['transfer_id'], 'bytes_received', 0 ) + $bytes
+		);
+
 		if ( isset ( $body_data[ 'success' ] ) && ! $return ) {
 			return $body_data[ 'success' ];
 		} else if ( isset( $body_data[ 'success' ] ) && $return ) {
@@ -1075,6 +1082,34 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 			return new WP_Error( 'rest_error', 'No Success Response' );
 		}
 	}
+
+	/**
+	 * Reset Status Time.
+	 * 
+	 * Reset the tracking time for a given status
+	 * so the start time is equal to the current time,
+	 * and remove the 'end_time' array key if it exists.
+	 * 
+	 * @since 1.17.0
+	 *
+	 * @param string $transfer_id The transfer id
+	 * @param string $status      The status to reset
+	 */
+	public function reset_status_time( $transfer_id, $status ) {
+		$transfer = $this->get_transfer_from_id( $transfer_id );
+
+		if ( ! $transfer ) {
+			return;
+		}
+
+		$time_tracking = $transfer['time_tracking'];
+
+		if ( isset( $time_tracking[ $status ] ) ) {
+			$time_tracking[ $status ]['start_time'] = time();
+			unset( $time_tracking[ $status ]['end_time'] );
+		}
+	}
+
 
 	public function install_total_upkeep( $url ) {
 		$site_url    = $url;
