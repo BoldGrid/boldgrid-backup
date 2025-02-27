@@ -361,8 +361,15 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 				$this->migrate_core->log->add( 'Database dump has likely stalled: Time Since Last Heartbeat: ' . $time_since_last_heartbeat );
 				$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'failed' );
 				$this->util->update_transfer_prop( $transfer['transfer_id'], 'failed_message', 'Database dump has likely stalled' );
+				return;
+			} else {
+				$this->migrate_core->log->add(
+					'Waiting for source site to start dumping database tables.' .
+					'This process is started by a cron job, so depending on the timing ' .
+					'of this request, it can take a few minutes to start.'
+				);
+				return;
 			}
-			return;
 		}
 
 		$this->util->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', $db_dump_info );

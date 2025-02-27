@@ -634,7 +634,22 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				break;
 			case 'dumping-db-tables':
 				$this->migrate_core->rx->check_dump_status( $transfer );
-				error_log( 'db_dump_info' . json_encode( $transfer['db_dump_info'] ) );
+				/*
+				 * While the transfer status may technically be
+				 * 'dumping-db-tables', until the source site actually
+				 * starts the dumping process, the status should be displayed
+				 * to the user as pending to avoid confusion.
+				*/
+				if ( ! is_array( $transfer['db_dump_info'] ) ||
+				( isset( $transfer['db_dump_info']['status'] ) && 'pending' === $transfer['db_dump_info']['status'] )
+				) {
+					$progress_data['status']               = 'pending-db-dump';
+					$progress_data['progress']             = 0;
+					$progress_data['progress_text']        = __( 'Waiting for Source site to dump database tables');;
+					$progress_data['progress_status_text'] = 'Pending DB Dump';
+					break;
+				}
+
 				$db_size   = $transfer['db_dump_info']['db_size'];
 				$dump_size = isset( $transfer['db_dump_info']['file_size'] ) ? $transfer['db_dump_info']['file_size'] : 0;
 				$progress  = $db_size > 0 ? ( $dump_size / $db_size ) * 100 : 0;
