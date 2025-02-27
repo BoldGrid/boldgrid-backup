@@ -202,8 +202,6 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 
 		$db_dump_file   = $this->migrate_core->tx->create_dump_status_file( $transfer_id, $dest_url );
 
-		$this->migrate_core->log->add( 'Scheduling db dump cron ' );
-
 		$scheduled = $this->migrate_core->backup_core->cron->schedule_direct_transfer();
 
 		return new WP_REST_Response( array(

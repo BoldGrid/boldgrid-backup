@@ -82,11 +82,20 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 	}
 
 	public function db_dump_is_pending() {
-		if ( ! get_option( $this->db_dump_status_option_name ) ) {
+		$dump_status_option = $this->migrate_core->util->get_option( $this->db_dump_status_option_name, '' );
+		if ( ! $dump_status_option ) {
 			return false;
 		}
 
-		$status = json_decode( get_option( $this->db_dump_status_option_name ), true );
+		$status_file = $dump_status_option['db_status_file'];
+
+		if ( ! file_exists( $status_file ) ) {
+			error_log( 'File Does not exist: ' . $status_file );
+			return false;
+		}
+
+		$status = json_decode( file_get_contents( $status_file ), true );
+		error_log( 'DB Dump Status: ' . json_encode( $status, JSON_PRETTY_PRINT ) );
 
 		return ( 'pending' === $status['status'] );
 	}
@@ -97,16 +106,21 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 		$dump_dir       = $this->migrate_core->util->get_transfer_dir() . '/' . $dest_dir . '/' . $transfer_id;
 		$db_size        = WP_Debug_Data::get_database_size();
 		$db_dump_file   = $dump_dir . '/db-' . DB_NAME . '-export-' . gmdate('Y-m-d-H-i-s');
-		update_option( $this->db_dump_status_option_name, $db_dump_file );
 		$response       = json_encode( array(
 			'status'  => 'pending',
 			'file'    => $db_dump_file,
 			'db_size' => $db_size,
 		) );
 		$this->migrate_core->log->init( 'direct-transfer-' . $transfer_id );
+		$this->migrate_core->log->add( 'Creating DB Dump Status File: ' . $db_dump_file );
+		error_log( 'Creating DB Dump Status File: ' . $db_dump_file );
 
 		$this->migrate_core->util->create_dirpath( $dump_dir . '/db-dump-status.json' );
 		file_put_contents( $dump_dir . '/db-dump-status.json', $response );
+		update_option( $this->db_dump_status_option_name, array(
+			'db_dump_file'   => $db_dump_file,
+			'db_status_file' => $dump_dir . '/db-dump-status.json',
+		) );
 	}
 
 		/**
@@ -115,7 +129,9 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 	 * @since 1.17.0
 	 */
 	public function generate_db_dump() {
-		$db_dump_file = $this->migrate_core->util->get_option( $this->db_dump_status_option_name, '' );
+		$db_status_option = $this->migrate_core->util->get_option( $this->db_dump_status_option_name, array() );
+
+		$db_dump_file = $db_status_option['db_dump_file'];
 
 		$this->migrate_core->log->add( 'Generating DB Dump: ' . $db_dump_file );
 
