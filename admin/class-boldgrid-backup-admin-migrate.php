@@ -95,6 +95,11 @@ class Boldgrid_Backup_Admin_Migrate {
 		$this->tx      = new Boldgrid_Backup_Admin_Migrate_Tx( $this );
 		$this->rx      = new Boldgrid_Backup_Admin_Migrate_Rx( $this );
 		$this->restore = new Boldgrid_Backup_Admin_Migrate_Restore( $this );
+
+		add_action(
+			'wp_ajax_nopriv_boldgrid_backup_process_direct_transfer',
+			array( $this, 'ajax_process_direct_transfer' )
+		);
 	}
 
 	/**
@@ -124,5 +129,39 @@ class Boldgrid_Backup_Admin_Migrate {
 			update_option( $this->configs['option_names']['active_transfer'], false, false );
 			$this->log->init( 'direct-transfers' );
 		}
+	}
+
+		/**
+	 * Ajax Process Direct Transfer
+	 * 
+	 * This is run from the system cron
+	 * to process transfers.
+	 * 
+	 * @since 1.17.0
+	 */
+	public function ajax_process_direct_transfer() {
+		$this->log->add( 'Processing Transfers via System Cron.' );
+
+		if ( ! $this->migrate_core->backup_core->cron->is_valid_call() ) {
+			error_log( 'Invalid Cron Request' );
+			wp_send_json_error( array( 'error' => true, 'message' => 'Invalid Cron Request' ) );
+			wp_die();
+		}
+
+		if ( ! empty( $this->rx->get_incomplete_transfers() ) ) {
+			$this->rx->process_transfers();
+			wp_send_json_success();
+			wp_die();
+		}
+
+		if ( $this->tx->db_dump_is_pending() ) {
+			error_log( 'Beginning DB Dump via CRON' );
+			$this->tx->generate_db_dump();
+			wp_send_json_success();
+			wp_die();
+		}
+
+		wp_send_json_success();
+		wp_die();
 	}
 }

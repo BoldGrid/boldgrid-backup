@@ -138,14 +138,10 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 */
 	public function add_hooks() {
 		add_action( 'wp_ajax_boldgrid_transfer_resync_database', array( $this, 'ajax_resync_database' ) );
-		add_action( 'boldgrid_transfer_process_transfers', array( $this, 'wp_cron_process_transfers' ) );
 
 		add_action( 'rest_api_init', array( $this->rest, 'register_routes' ) );
 
-		add_filter( 'cron_schedules', array( $this, 'add_cron_interval' ) );
-		add_action( 'init', array( $this, 'cron_activation' ) );
 		add_action( 'init', array( $this, 'handle_fatal_errors' ) );
-		add_action( 'shutdown', array( $this, 'cron_deactivation' ) );
 	}
 
 	public function handle_fatal_errors() {
@@ -158,97 +154,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 			$this->migrate_core->log->add( 'Fatal Error: ' . json_encode( $error, JSON_PRETTY_PRINT ) );
 		} );
-	}
-
-
-	/**
-	 * WP Cron Process Transfers.
-	 * 
-	 * This is just a wrapper for the 'process_transfers' method
-	 * but I was having trouble confirming that an action was being
-	 * called in the cron job, so I added this method to confirm that
-	 * in the backtrace.
-	 *
-	 * @return void
-	 * 
-	 * @since 1.17.0
-	 */
-	public function wp_cron_process_transfers() {
-		$this->migrate_core->log->add( 'Processing Transfers via WP Cron.' );
-
-		$php_sapi_name = php_sapi_name();
-
-		if ( 'cli' === $php_sapi_name ) {
-			$this->migrate_core->log->add( 'Processing via CLI....' );
-			$namespace   = $this->migrate_core->configs['rest_api_namespace'] . '/';
-			$prefix      = $this->migrate_core->configs['rest_api_prefix'] . '/';
-			$nonce       = wp_create_nonce( 'boldgrid_transfer_cron_resume_transfer' );
-			$request = new WP_REST_Request( 'GET', $namespace . $prefix . 'cron-resume-transfer' );
-			rest_do_request( $request );
-		} else {
-			$this->process_transfers();
-		}
-	}
-
-
-	/**
-	 * Add cron interval
-	 * 
-	 * @param array $schedules Cron schedules
-	 * 
-	 * @since 1.17.0
-	 * 
-	 * @return array Cron schedules
-	 */
-	public function add_cron_interval( $schedules ) {
-		$schedules['every_minute'] = array(
-			'interval' => $this->migrate_core->configs['cron_interval'],
-			'display'  => esc_html__( 'Every Minute', 'boldgrid-backup' ),
-		);
-
-		return $schedules;
-	}
-
-	/**
-	 * Cron Deactivation
-	 * 
-	 * Check the transfers list for any pending or active
-	 * transfers. If there are none, then deactivate the cron
-	 * job.
-	 * 
-	 * @since 1.17.00
-	 */
-	public function cron_deactivation() {
-		$incomplete_transfers = $this->get_incomplete_transfers();
-
-		if ( wp_next_scheduled( 'boldgrid_transfer_process_transfers' ) && empty( $incomplete_transfers ) ) {
-			wp_clear_scheduled_hook( 'boldgrid_transfer_process_transfers' );
-			$this->migrate_core->log->add( 'Cron Deactivated: boldgrid_transfer_process_transfers' );
-		}
-	}
-
-	/**
-	 * cron_activation
-	 * 
-	 * @since 1.17.0
-	 */
-	public function cron_activation() {
-		$incomplete_transfers = $this->get_incomplete_transfers();
-
-		if ( empty( $incomplete_transfers ) ) {
-			return;
-		}
-
-		$active_transfer = array_shift( $incomplete_transfers );
-
-		$transfer_id = $active_transfer['transfer_id'];
-
-		$this->migrate_core->log->init( 'direct-transfer-' . $transfer_id );
-
-		if ( ! wp_next_scheduled( 'boldgrid_transfer_process_transfers' ) ) {
-			$scheduled = wp_schedule_event( time(), 'every_minute', 'boldgrid_transfer_process_transfers' );
-			$this->migrate_core->log->add( 'Cron Activation: ' . json_encode( $scheduled ) );
-		}
 	}
 
 	/**
@@ -318,6 +223,8 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		$this->migrate_core->log->add( 'Created new transfer: ' . $transfer_id );
 		$this->migrate_core->log->add( 'Transfer Info: ' . json_encode( $transfer ) );
+
+		$this->migrate_core->backup_core->cron->schedule_direct_transfer();
 
 		wp_send_json_success( array( 'success' => true, 'transfer_id' => $transfer_id ) );
 	}
@@ -625,6 +532,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		if ( empty( $incomplete_transfers ) ) {
 			$this->migrate_core->log->add( 'No Incomplete Transfers to process' );
+			$this->migrate_core->backup_core->cron->entry_delete_contains( 'direct-transfer.php' );
 			return;
 		}
 
@@ -816,6 +724,10 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			$total_file_count,
 			number_format( $progress, 2 )
 		);
+
+		if ( 0 === $total_file_count ) {
+			$progress_text = __( 'Creating file list', 'boldgrid-backup' );
+		}
 
 		$status = $transfer['status'];
 

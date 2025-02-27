@@ -177,11 +177,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	 */
 	public function register_routes() {
 		$rest_routes = array(
-			'cron-resume-transfer'  => array(
-				'method'              => 'GET',
-				'endpoint'            => 'cron-resume-transfer',
-				'permission_callback' => 'authenticate_local_request',
-			),
 			'transfer-status'       => array(
 				'method'   => 'PUT',
 				'endpoint' => 'transfer-status/(?P<transfer_id>[A-Za-z0-9]+)/(?P<status>[A-Za-z0-9\-]+)',
@@ -807,18 +802,5 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 			'success' => true,
 			'transfer_id' => $transfers[ $transfer_id ]
 		), 200 );
-	}
-
-	/**
-	 * Cron Resume Transfer
-	 * 
-	 * Callback for endpoint: cron-resume-transfer
-	 * 
-	 * @param WP_REST_Request $request The request object.
-	 * 
-	 * @since 1.17.0
-	 */
-	public function cron_resume_transfer( $request ) {
-		$this->migrate_core->rx->process_transfers();
 	}
 }

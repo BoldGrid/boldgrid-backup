@@ -196,61 +196,20 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 * @return WP_Rest_Response
 	 */
 	public function start_db_dump( $request ) {
-		require_once ABSPATH . 'wp-admin/includes/class-wp-debug-data.php';
 		$request_params = $request->get_params();
 		$transfer_id    = $request_params['transfer_id'];
 		$dest_url       = $request_params['dest_url'];
-		$dest_dir       = $this->migrate_core->util->url_to_safe_directory_name( $dest_url );
-		$dump_dir       = $this->migrate_core->util->get_transfer_dir() . '/' . $dest_dir . '/' . $transfer_id;
-		$db_size        = WP_Debug_Data::get_database_size();
-		$db_dump_file   = $dump_dir . '/db-' . DB_NAME . '-export-' . gmdate('Y-m-d-H-i-s');
-		update_option( $this->db_dump_status_option_name, $db_dump_file );
-		$response       = json_encode( array(
-			'status'  => 'pending',
-			'file'    => $db_dump_file,
-			'db_size' => $db_size,
-		) );
-		$this->migrate_core->log->init( 'direct-transfer-' . $transfer_id );
 
-		$this->migrate_core->util->create_dirpath( $dump_dir . '/db-dump-status.json' );
-		file_put_contents( $dump_dir . '/db-dump-status.json', $response );
+		$db_dump_file   = $this->migrate_core->tx->create_dump_status_file( $transfer_id, $dest_url );
 
-        $cron_disabled = defined( 'DISABLE_WP_CRON' ) ? DISABLE_WP_CRON : false;
-        $this->migrate_core->log->add( 'DISABLE_WP_CRON: ' . json_encode( $cron_disabled ) );
 		$this->migrate_core->log->add( 'Scheduling db dump cron ' );
-		$scheduled = wp_schedule_single_event( time() + 10, 'boldgrid_transfer_db_dump_cron' );
-		$this->migrate_core->log->add( 'Scheduled: ' . json_encode( $scheduled, JSON_PRETTY_PRINT ) );
+
+		$scheduled = $this->migrate_core->backup_core->cron->schedule_direct_transfer();
 
 		return new WP_REST_Response( array(
 			'success' => true,
-			'db_dump_info' => $response,
+			'db_dump_info' => $scheduled,
 		) );
-	}
-
-	/**
-	 * Generate a database dump
-	 * 
-	 * @since 1.17.0
-	 */
-	public function generate_db_dump() {
-		$db_dump_file = $this->migrate_core->util->get_option( $this->db_dump_status_option_name, '' );
-
-		$this->migrate_core->log->add( 'Generating DB Dump: ' . $db_dump_file );
-
-		$dump_dir = dirname( $db_dump_file );
-		$progress = json_decode( file_get_contents( $dump_dir . '/db-dump-status.json' ), true );
-
-		$progress['status'] = 'dumping';
-
-		file_put_contents( $dump_dir . '/db-dump-status.json', json_encode( $progress ) );
-
-		$db_dump = new Boldgrid_Backup_Admin_Db_Dump( $this->migrate_core->backup_core );
-
-		$db_dump->dump( $db_dump_file );
-
-		$progress['status'] = 'complete';
-
-		file_put_contents( $dump_dir . '/db-dump-status.json', json_encode( $progress ) );
 	}
 
 	/** 

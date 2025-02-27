@@ -38,6 +38,14 @@ class Boldgrid_Backup_Admin_Cron {
 	public $run_jobs = 'cron/run-jobs.php';
 
 	/**
+	 * Path to direct-transfer.php
+	 * 
+	 * @since 1.17.0
+	 * @var string
+	 */
+	public $direct_transfer = 'cron/direct-transfer.php';
+
+	/**
 	 * Path to the bgbkup-cli script.
 	 *
 	 * @since 1.10.0
@@ -323,6 +331,30 @@ class Boldgrid_Backup_Admin_Cron {
 			'%7$s %6$s "%1$s/%2$s" siteurl=%3$s id=%4$s secret=%5$s > /dev/null 2>&1',
 			dirname( dirname( __FILE__ ) ),
 			$this->run_jobs,
+			get_site_url(),
+			$this->core->get_backup_identifier(),
+			$this->get_cron_secret(),
+			$this->cron_command,
+			$cron_interval
+		);
+
+		return $this->update_cron( $entry );
+	}
+
+	/**
+	 * Schedule Direct Transfer Cron.
+	 * 
+	 * This method will be run after starting a new
+	 * direct transfer job.
+	 * 
+	 * @since 1.17.0
+	 */
+	public function schedule_direct_transfer() {
+		$cron_interval = '*/1 * * * *';
+		$entry         = sprintf(
+			'%7$s %6$s "%1$s/%2$s" siteurl=%3$s id=%4$s secret=%5$s > /dev/null 2>&1',
+			dirname( dirname( __FILE__ ) ),
+			$this->direct_transfer,
 			get_site_url(),
 			$this->core->get_backup_identifier(),
 			$this->get_cron_secret(),
