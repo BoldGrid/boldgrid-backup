@@ -76,7 +76,7 @@ BoldGrid.DirectTransfers = function($) {
 					window.location.reload();
 				}
 				if ( 500 === response.status ) {
-					callback( { success: false, data: { error: self.lang.server_error } } );
+					callback( { success: false, data: { error: self.lang.server_error } }, callbackArgs );
 				}
 			});
 	};
@@ -512,9 +512,9 @@ BoldGrid.DirectTransfers = function($) {
 		} else {
 			$errorDiv.empty();
 			if ( response.data.message ) {
-				$errorDiv.append(response.data.message );
+				$errorDiv.append( '<p class="notice notice-error">' + response.data.message + '</p>' );
 			} else {
-				$errorDiv.append(response.data.error);
+				$errorDiv.append( '<p class="notice notice-error">' + response.data.error + '</p>' );
 			}
 			$errorsRow.show();
 			self._bindInstallTotalUpkeepButton($errorDiv.find('button.install-total-upkeep'));
