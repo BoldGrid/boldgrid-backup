@@ -499,8 +499,6 @@ BoldGrid.DirectTransfers = function($) {
 			$errorDiv = $errorsRow.find('.errors');
 		$button.prop('disabled', true);
 
-		console.log( 'response', response );
-
 		if (response.success) {
 			var transferId = response.data.transfer_id;
 			$button.text(self.lang.transfer_started);
@@ -513,8 +511,10 @@ BoldGrid.DirectTransfers = function($) {
 			$errorDiv.empty();
 			if ( response.data.message ) {
 				$errorDiv.append( '<p class="notice notice-error">' + response.data.message + '</p>' );
-			} else {
+			} else if ( ! response.data.error.includes( 'notice-error' ) ) {
 				$errorDiv.append( '<p class="notice notice-error">' + response.data.error + '</p>' );
+			} else {
+				$errorDiv.append( response.data.error );
 			}
 			$errorsRow.show();
 			self._bindInstallTotalUpkeepButton($errorDiv.find('button.install-total-upkeep'));

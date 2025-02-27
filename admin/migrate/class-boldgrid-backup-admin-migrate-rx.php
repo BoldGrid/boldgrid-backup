@@ -1282,6 +1282,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			$body     = json_decode( $response, true );
 
 			// Get transfer info
+			$info                  = curl_getinfo( $ch );
 			$bytes_received        = curl_getinfo( $ch, CURLINFO_SIZE_DOWNLOAD );
 			$total_bytes_received += intval( $bytes_received );
 
@@ -1303,11 +1304,23 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 					}
 				}
 			} else {
-				$this->migrate_core->log->add( 'Error Receiving Batch: ' . json_encode( $info, JSON_PRETTY_PRINT ) );
 				if ( 403 === $info['http_code'] ) {
-					$this->migrate_core->log->add( '403 error: ' . $response );
+					$this->migrate_core->log->add( '403 error Reveiving Batch' );
+				}
+				if ( false !== strpos( $info['content_type'], 'application/json' ) ) {
+					if ( isset( $body['code'] ) && 'rest_no_route' === $body['code'] ) {
+						$this->migrate_core->log->add( '404 Error Receiving Batch: ' . json_encode( $body, JSON_PRETTY_PRINT ) );
+						$this->migrate_core->log->add( 'No Rest route found. Total Upkeep has likely been disabled on the source site.' );
+						$this->util->update_transfer_prop(
+							$transfer['transfer_id'],
+							'failed_message',
+							__( 'Total Upkeep has likely been disabled on the source site. Please re-enable and try again', 'boldgrid-backup' )
+						);
+						$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'failed' );
+					}
 				}
 				$this->util->update_bulk_file_status( $transfer_id, $file_batch[ $batch_id ], 'failed' );
+				$this->remove_open_batch( $batch_id );
 			}
 
 			if ( isset( $body['batch_id'] ) ) {
