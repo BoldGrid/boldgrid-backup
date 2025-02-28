@@ -259,7 +259,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				array(
 					'message' => sprintf(
 						'<p class="notice notice-success">%s</p>',
-						__( 'Total Upkeep has been successfully installed on the source site.', 'boldgrid-backup' )
+						esc_html__( 'Total Upkeep has been successfully installed on the source site.', 'boldgrid-backup' )
 					)
 				)
 			);
@@ -287,7 +287,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				array(
 					'message' => sprintf(
 						'<p class="notice notice-success">%s</p>',
-						__( 'Total Upkeep has been successfully activated on the source site.', 'boldgrid-backup' )
+						esc_html__( 'Total Upkeep has been successfully activated on the source site.', 'boldgrid-backup' )
 					)
 				)
 			);
@@ -315,7 +315,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				array(
 					'message' => sprintf(
 						'<p class="notice notice-success">%s</p>',
-						__( 'Total Upkeep has been successfully updated on the source site.', 'boldgrid-backup' )
+						esc_html__( 'Total Upkeep has been successfully updated on the source site.', 'boldgrid-backup' )
 					)
 				)
 			);
@@ -446,7 +446,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 		$transfer = $this->util->get_transfer_from_id( $transfer_id );
 
 		if ( ! $transfer ) {
-			wp_send_json_error( array( 'message' => 'Invalid transfer ID.' ) );
+			wp_send_json_error( array( 'message' => esc_html__( 'Invalid transfer ID.', 'boldgrid-backup' ) ) );
 		}
 
 		// Verify that the database file is valid.
@@ -454,7 +454,10 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 			$this->migrate_core->log->add( 'Database resync was not completed.' );
 			wp_send_json_error( array(
 				'success' => false,
-				'error'   => 'Database resync had started but was not completed. Please Resync database.'
+				'error'   => esc_html__(
+					'Database resync had started but was not completed. Please Resync database.',
+					'boldgrid-backup'
+				)
 			) );
 		}
 
@@ -478,7 +481,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 		$transfer    = $this->util->get_transfer_from_id( $transfer_id );
 
 		if ( ! $transfer ) {
-			wp_send_json_error( array( 'message' => 'Invalid transfer ID.' ) );
+			wp_send_json_error( array( 'message' => esc_html__( 'Invalid transfer ID.', 'boldgrid-backup' ) ) );
 		}
 
 		$transfer_dir = $this->util->get_transfer_dir();
@@ -500,7 +503,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 		$this->util->update_transfer_prop( $transfer_id, 'status', 'pending-db-dump' );
 		$this->migrate_core->log->add( 'Database dump file deleted and pending re-sync: ' . $transfer_id );
 
-		wp_send_json_success( array( 'message' => 'Database dump file deleted and pending re-sync' ) );
+		wp_send_json_success( array( 'message' => esc_html__( 'Database dump file deleted and pending re-sync', 'boldgrid-backup' ) ) );
 	}
 
 	/**
@@ -521,7 +524,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 		$transfer    = $this->util->get_transfer_from_id( $transfer_id );
 
 		if ( ! $transfer ) {
-			wp_send_json_error( array( 'message' => 'Invalid transfer ID.' ) );
+			wp_send_json_error( array( 'message' => esc_html__( 'Invalid transfer ID.', 'boldgrid-backup' ) ) );
 		}
 
 		$transfer_dir = $this->util->get_transfer_dir();
@@ -543,10 +546,10 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 
 			update_option( $this->cancelled_transfers_option_name, array_values( $cancelled_transfers ), false );
 			$this->migrate_core->log->add( 'Transfer ' . $transfer_id . ' deleted.' );
-			wp_send_json_success( array( 'message' => 'Transfer Deleted' ) );
+			wp_send_json_success( array( 'message' => esc_html__( 'Transfer Deleted', 'boldgrid-backup' ) ) );
 		} else {
 			$this->migrate_core->log->add( 'Error deleting transfer: ' . $transfer_id );
-			wp_send_json_error( array( 'message' => 'Error Deleting Transfer' ) );
+			wp_send_json_error( array( 'message' => esc_html__( 'Error Deleting Transfer', 'boldgrid-backup' ) ) );
 		}
 
 	}
@@ -566,12 +569,12 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 		$transfer    = $this->util->get_transfer_from_id( $transfer_id );
 
 		if ( ! $transfer ) {
-			wp_send_json_error( array( 'message' => 'Invalid transfer ID.' ) );
+			wp_send_json_error( array( 'message' => esc_html__( 'Invalid transfer ID.', 'boldgrid-backup' ) ) );
 		}
 
 		$this->util->cancel_transfer( $transfer_id );
 
-		wp_send_json_success( array( 'message' => 'Transfer Cancelled' ) );
+		wp_send_json_success( array( 'message' => esc_html__( 'Transfer Cancelled', 'boldgrid-backup' ) ) );
 	}
 
 	/**
@@ -607,29 +610,54 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 		$progress_data['elapsed_time'] = $this->util->get_elapsed_time( $transfer_id, true );
 		switch( $status ) {
 			case 'failed':
-				$progress_text = $this->util->get_transfer_prop( $transfer_id, 'failed_message', 'Transfer Failed' );
-				$progress_data['status'] = 'failed';
-				$progress_data['progress'] = 0;
-				$progress_data['progress_text'] = $progress_text;
-				$progress_data['progress_status_text'] = 'Failed';
+				$progress_text = $this->util->get_transfer_prop(
+					$transfer_id,
+					'failed_message',
+					__( 'Transfer Failed', 'boldgrid-backup' )
+				);
+				$progress_data['status']               = 'failed';
+				$progress_data['progress']             = 0;
+				$progress_data['progress_text']        = esc_html( $progress_text );
+				$progress_data['progress_status_text'] = esc_html__(
+					'Failed',
+					'boldgrid-backup'
+				);
 				break;
 			case 'completed':
-				$progress_data['status'] = 'completed';
-				$progress_data['progress'] = 100;
-				$progress_data['progress_text'] = 'Transfer Complete';
-				$progress_data['progress_status_text'] = 'Completed';
+				$progress_data['status']               = 'completed';
+				$progress_data['progress']             = 100;
+				$progress_data['progress_text']        = esc_html__(
+					'Transfer Complete',
+					'boldgrid-backup'
+				);
+				$progress_data['progress_status_text'] = esc_html__(
+					'Completed',
+					'boldgrid-backup'
+				);
 				break;
 			case 'restore-completed':
-				$progress_data['status'] = 'completed';
-				$progress_data['progress'] = 100;
-				$progress_data['progress_text'] = 'Restoration Complete';
-				$progress_data['progress_status_text'] = 'Restoration Complete';
+				$progress_data['status']               = 'completed';
+				$progress_data['progress']             = 100;
+				$progress_data['progress_text']        = esc_html__(
+					'Restoration Complete',
+					'boldgrid-backup'
+				);
+				$progress_data['progress_status_text'] = esc_html__(
+					'Restoration Complete',
+					'boldgrid-backup'
+				);
 				break;
 			case 'pending':
-				$progress_data['status'] = 'pending';
-				$progress_data['progress'] = 0;
-				$progress_data['progress_text'] = 'Transfer Still Pending';
-				$progress_data['progress_status_text'] = 'Pending';
+				$progress_data['status']               = 'pending';
+				$progress_data['progress']             = 0;
+				$progress_data['progress_text']        = esc_html__(
+					'Transfer Still Pending',
+					'boldgrid-backup'
+				);
+				$progress_data['progress_status_text'] = esc_html__(
+					'Pending',
+					'boldgrid-backup'
+				);
 				$this->migrate_core->rx->process_transfers();
 				break;
 			case 'dumping-db-tables':
@@ -645,8 +673,14 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				) {
 					$progress_data['status']               = 'pending-db-dump';
 					$progress_data['progress']             = 0;
-					$progress_data['progress_text']        = __( 'Waiting for Source site to dump database tables');;
-					$progress_data['progress_status_text'] = 'Pending DB Dump';
+					$progress_data['progress_text']        = esc_html__(
+						'Waiting for Source site to dump database tables',
+						'boldgrid-backup'
+					);
+					$progress_data['progress_status_text'] = esc_html__(
+						'Pending DB Dump',
+						'boldgrid-backup'
+					);
 					break;
 				}
 
@@ -660,28 +694,42 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 					size_format( $db_size, 2 ),
 					number_format( $progress, 2 )
 				);
-				$progress_data['status'] = 'dumping-db-tables';
-				$progress_data['progress']             = $progress;
-				$progress_data['progress_text']        = $progress_text;
-				$progress_data['progress_status_text'] = 'Dumping Database Tables';
+				$progress_data['status']               = 'dumping-db-tables';
+				$progress_data['progress']             = esc_html( $progress );
+				$progress_data['progress_text']        = esc_html( $progress_text );
+				$progress_data['progress_status_text'] = esc_html__(
+					'Dumping Database Tables',
+					'boldgrid-backup'
+				);
 				break;
 			case 'db-dump-complete':
-				$db_size   = $transfer['db_dump_info']['db_size'];
-				$progress_data['status'] = 'db-dump-complete';
-				$progress_data['progress'] = 100;
-				$progress_data['progress_text'] = $progress_text = sprintf(
-					'%1$s / %2$s (%3$s%%)',
-					size_format( $db_size, 2 ),
-					size_format( $db_size, 2 ),
-					number_format( 100, 2 )
+				$db_size                               = $transfer['db_dump_info']['db_size'];
+				$progress_data['status']               = 'db-dump-complete';
+				$progress_data['progress']             = 100;
+				$progress_data['progress_text']        = esc_html(
+					sprintf(
+						'%1$s / %2$s (%3$s%%)',
+						size_format( $db_size, 2 ),
+						size_format( $db_size, 2 ),
+						number_format( 100, 2 )
+					)
 				);
-				$progress_data['progress_status_text'] = 'Database Dump Complete. Pending Transfer';
+				$progress_data['progress_status_text'] = esc_html__(
+					'Database Dump Complete. Pending Transfer',
+					'boldgrid-backup'
+				);
 				break;
 			case 'db-ready-for-transfer':
-				$progress_data['status'] = 'db-ready-for-transfer';
-				$progress_data['progress'] = 0;
-				$progress_data['progress_text'] = 'Database Pending Transfer';
-				$progress_data['progress_status_text'] = 'Database Pending Transfer';
+				$progress_data['status']               = 'db-ready-for-transfer';
+				$progress_data['progress']             = 0;
+				$progress_data['progress_text']        = esc_html__(
+					'Database Pending Transfer',
+					'boldgrid-backup'
+				);
+				$progress_data['progress_status_text'] = esc_html__(
+					'Database Pending Transfer',
+					'boldgrid-backup'
+				);
 				break;
 			case 'db-transferring':
 				$db_part_count = count( $transfer['db_dump_info']['split_files'] );
@@ -690,45 +738,63 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 						return 'transferred' === $file['status'];
 					} )
 				);
-				$progress = $db_part_count > 0 ? ( $completed_count / $db_part_count ) * 100 : 0;
-				$progress_data['status'] = 'db-transferring';
-				$progress_data['progress'] = $db_part_count > 0 ? ( $completed_count / $db_part_count ) * 100 : 0;
-				$progress_data['progress_text'] = $progress_text = sprintf(
+				$progress                              = $db_part_count > 0 ? ( $completed_count / $db_part_count ) * 100 : 0;
+				$progress_data['status']               = 'db-transferring';
+				$progress_data['progress']             = $db_part_count > 0 ? ( $completed_count / $db_part_count ) * 100 : 0;
+				$progress_data['progress_text']        = esc_html( sprintf(
 					'%1$s / %2$s Files (%3$s%%)',
 					$completed_count,
 					$db_part_count,
 					number_format( $progress, 2 )
+				) );
+				$progress_data['progress_status_text'] = esc_html__(
+					'Transferring Database',
+					'boldgrid-backup'
 				);
-				$progress_data['progress_status_text'] = 'Transferring Database';
 				$this->migrate_core->rx->process_transfers();
 				break;
 			case 'transferring-small-files':
 			case 'transferring-large-files':
 				$progress_data = $this->migrate_core->rx->verify_files( $transfer_id );
 				if ( isset ( $verification_data['error'] ) && $verification_data['error'] ) {
-					wp_send_json_error( array( 'message' => $verification_data['message'] ) );
+					wp_send_json_error( array( 'message' => esc_html( $verification_data['message'] ) ) );
 				}
 				break;
 			case 'pending-restore':
-				$progress_data['status'] = 'pending-restore';
-				$progress_data['progress'] = 0;
-				$progress_data['progress_text'] = 'Pending Restore';
-				$progress_data['progress_status_text'] = 'Pending Restore';
+				$progress_data['status']               = 'pending-restore';
+				$progress_data['progress']             = 0;
+				$progress_data['progress_text']        = esc_html__(
+					'Pending Restore',
+					'boldgrid-backup'
+				);
+				$progress_data['progress_status_text'] = esc_html__(
+					'Pending Restore',
+					'boldgrid-backup'
+				);
 				$this->migrate_core->rx->process_transfers();
 				break;
 			case 'restoring-files':
-				$progress_data['status'] = 'restoring-files';
-				$progress_data['progress'] = 0;
-				$progress_data['progress_text'] = 'Restoring Files';
-				$progress_data['progress_status_text'] = 'Restoring Files';
+				$progress_data['status']               = 'restoring-files';
+				$progress_data['progress']             = 0;
+				$progress_data['progress_text']        = esc_html__(
+					'Restoring Files',
+					'boldgrid-backup'
+				);
+				$progress_data['progress_status_text'] = esc_html__(
+					'Restoring Files',
+					'boldgrid-backup'
+				);
+
 				$copy_files_stats = $this->util->get_transfer_prop( $transfer_id, 'copy_files_stats', array() );
 				if ( ! empty( $copy_files_stats ) ) {
-					$progress_data['progress'] = $copy_files_stats['files_copied'] / $copy_files_stats['total_files'] * 100;
-					$progress_data['progress_text'] = sprintf(
-						'%1$s / %2$s files (%3$s%%)',
-						$copy_files_stats['files_copied'],
-						$copy_files_stats['total_files'],
-						number_format( $progress_data['progress'], 2 )
+					$progress_data['progress']      = $copy_files_stats['files_copied'] / $copy_files_stats['total_files'] * 100;
+					$progress_data['progress_text'] = esc_html(
+						sprintf(
+							'%1$s / %2$s files (%3$s%%)',
+							$copy_files_stats['files_copied'],
+							$copy_files_stats['total_files'],
+							number_format( $progress_data['progress'], 2 )
+						)
 					);
 				}
 				break;
@@ -737,25 +803,50 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				$backup_dir   = isset( $settings['backup_directory'] ) ? $settings['backup_directory'] : '/var/www/boldgrid_backup';
 				$log_file     = $backup_dir . '/active-import.log';
 				if ( file_exists( $log_file ) ) {
-					$log_data = file_get_contents( $log_file );
-					$import_stats = json_decode( $log_data, true );
-					$progress_data['progress'] = intval( $import_stats['completed_lines'] ) / intval( $import_stats['number_of_lines'] ) * 100;
-					$progress_data['progress_text'] = sprintf(
-						'%1$s / %2$s lines (%3$s%%)',
-						$import_stats['completed_lines'],
-						$import_stats['number_of_lines'],
-						number_format( $progress_data['progress'], 2 )
+					$log_data                       = file_get_contents( $log_file );
+					$import_stats                   = json_decode( $log_data, true );
+					$progress_data['progress']      = intval( $import_stats['completed_lines'] ) / intval( $import_stats['number_of_lines'] ) * 100;
+					$progress_data['progress_text'] = esc_html(
+						sprintf(
+							'%1$s / %2$s lines (%3$s%%)',
+							$import_stats['completed_lines'],
+							$import_stats['number_of_lines'],
+							number_format( $progress_data['progress'], 2 )
+						)
 					);
 				} else {
-					$progress_data['progress'] = 0;
-					$progress_data['progress_text'] = 'Restoring Database';
+					$progress_data['progress']      = 0;
+					$progress_data['progress_text'] = esc_html__(
+						'Restoring Database',
+						'boldgrid-backup'
+					);
 				}
-				$progress_data['status'] = 'restoring-db';
-				$progress_data['progress_status_text'] = 'Restoring Database';
+				$progress_data['status']               = 'restoring-db';
+				$progress_data['progress_status_text'] = esc_html__(
+					'Restoring Database',
+					'boldgrid-backup'
+				);
+				break;
+			case 'pending-db-dump':
+				$progress_data['status']               = 'pending-db-dump';
+				$progress_data['progress']             = 0;
+				$progress_data['progress_text']        = esc_html__(
+					'Waiting for Source site to dump database tables',
+					'boldgrid-backup'
+				);
+				$progress_data['progress_status_text'] = esc_html__(
+					'Pending Database Dump',
+					'boldgrid-backup'
+				);
 				break;
 			default:
-				$progress_data['progress_text']        = ucfirst( str_replace( '-', ' ', $transfer['status'] ) );
-				$progress_data['progress_status_text'] = ucfirst( str_replace( '-', ' ', $transfer['status'] ) );
+				$progress_data['progress_text']        = ucwords(
+					str_replace( '-', ' ', esc_html( $transfer['status'] ) )
+				);
+				$progress_data['progress_status_text'] = ucwords(
+					str_replace( '-', ' ', esc_html( $transfer['status'] ) )
+				);
+				$progress_data['progress']             = 0;
 				break;
 		}
 
@@ -779,7 +870,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 		
 		if ( ! isset( $authd_sites[ $site_url ] ) ) {
 			$this->migrate_core->log->add( 'Site ' . $site_url . ' not authenticated.' );
-			wp_send_json_error( array( 'message' => 'Site not authenticated' ) );
+			wp_send_json_error( array( 'message' => esc_html__( 'Site not authenticated', 'boldgrid-backup' ) ) );
 		}
 
 		$auth = $authd_sites[ $site_url ];
@@ -808,7 +899,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 
 
 		if ( $transfer ) {
-			wp_send_json_error( array( 'message' => 'Invalid transfer ID.' ) );
+			wp_send_json_error( array( 'message' => esc_html__( 'Invalid transfer ID.', 'boldgrid-backup' ) ) );
 		}
 
 		$this->util->update_transfer_prop( $transfer_id, 'status', $status );

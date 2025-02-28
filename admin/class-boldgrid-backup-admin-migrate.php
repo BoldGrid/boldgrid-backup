@@ -144,7 +144,7 @@ class Boldgrid_Backup_Admin_Migrate {
 
 		if ( ! $this->backup_core->cron->is_valid_call() ) {
 			error_log( 'Invalid Cron Request' );
-			wp_send_json_error( array( 'error' => true, 'message' => 'Invalid Cron Request' ) );
+			wp_send_json_error( array( 'error' => true, 'message' => esc_html__( 'Invalid Cron Request', 'boldgrid-backup' ) ) );
 			wp_die();
 		}
 
@@ -155,7 +155,6 @@ class Boldgrid_Backup_Admin_Migrate {
 		}
 
 		if ( $this->tx->db_dump_is_pending() ) {
-			error_log( 'Beginning DB Dump via CRON' );
 			$this->tx->generate_db_dump();
 			wp_send_json_success();
 			wp_die();

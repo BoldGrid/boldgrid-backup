@@ -1168,7 +1168,14 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 
 		if ( is_wp_error( $total_upkeep_status ) ) {
 			$this->migrate_core->log->add( 'Error getting Total Upkeep Status: ' . $total_upkeep_status->get_error_message() );
-			wp_send_json_error( array( 'success' => false, 'error' => 'Error getting Total Upkeep Status' ) );
+			wp_send_json_error(
+				array(
+					'success' => false,
+					'error'   => esc_html__(
+						'Error getting Total Upkeep Status', 'boldgrid-backup'
+					)
+				)
+			);
 		}
 
 		if ( empty( $total_upkeep_status ) ) {
@@ -1179,11 +1186,20 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 					'error'   => sprintf(
 						'<p class="notice notice-error">%1$s %2$s %3$s</p>
 						<button class="install-total-upkeep button-primary" data-url="%4$s">%5$s</button>',
-						'Total Upkeep is not installed on the source site.',
-						'Total Upkeep must be installed on the source site in order to transfer the site.',
-						'You may click the button below to install Total Upkeep on the source site.',
+						esc_html__(
+							'Total Upkeep is not installed on the source site.',
+							'boldgrid-backup'
+						),
+						esc_html__(
+							'Total Upkeep must be installed on the source site in order to transfer the site.',
+							'boldgrid-backup'
+						),
+						esc_html__(
+							'You may click the button below to install Total Upkeep on the source site.',
+							'boldgrid-backup'
+						),
 						esc_url( $site_url ),
-						'Install Total Upkeep'
+						esc_html__( 'Install Total Upkeep', 'boldgrid-backup' )
 						)
 					)
 				);
@@ -1200,13 +1216,21 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 				array(
 					'success' => false,
 					'error'   => sprintf(
-						'<p class="notice notice-error">%1$s %2$s %3$s</p>
-						<button class="update-total-upkeep button-primary" data-url="%4$s">%5$s</button>',
-						'Total Upkeep Version is not compatible with this site.',
-						'Total Upkeep must be version ' . $this->min_tu_version . ' or higher in order to transfer the site.',
-						'You may click the button below to update Total Upkeep to the newest version on the source site.',
+						'<p class="notice notice-error">%1$s %2$s %3$s %4$s %5$s</p>
+						<button class="update-total-upkeep button-primary" data-url="%6$s">%7$s</button>',
+						esc_html__(
+							'Total Upkeep Version is not compatible with this site.',
+							'boldgrid-backup'
+						),
+						esc_html__( 'Total Upkeep must be version', 'boldgrid-backup' ),
+						esc_html( $this->min_tu_version ),
+						esc_html__( 'or higher in order to transfer the site.', 'boldgrid-backup' ),
+						esc_html__(
+							'You may click the button below to update Total Upkeep to the newest version on the source site.',
+							'boldgrid-backup'
+						),
 						esc_url( $site_url ),
-						'Update Total Upkeep'
+						esc_html__( 'Update Total Upkeep', 'boldgrid-backup' )
 						)
 					)
 				);
@@ -1219,11 +1243,20 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 					'error'   => sprintf(
 						'<p class="notice notice-error">%1$s %2$s %3$s</p>
 						<button class="activate-total-upkeep button-primary" data-url="%4$s">%5$s</button>',
-						'Total Upkeep is installed but is not active on the source site.',
-						'Total Upkeep must be active on the source site in order to transfer the site.',
-						'You may click the button below to activate Total Upkeep on the source site.',
+						esc_html__(
+							'Total Upkeep is installed but is not active on the source site.',
+							'boldgrid-backup'
+						),
+						esc_html__(
+							'Total Upkeep must be active on the source site in order to transfer the site.',
+							'boldgrid-backup'
+						),
+						esc_html__(
+							'You may click the button below to activate Total Upkeep on the source site.',
+							'boldgrid-backup'
+						),
 						esc_url( $site_url ),
-						'Activate Total Upkeep'
+						esc_html__( 'Activate Total Upkeep', 'boldgrid-backup' )
 						)
 					)
 				);
