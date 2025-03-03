@@ -88,21 +88,31 @@ BoldGrid.DirectTransfers = function($) {
 	 * @since 1.17.0
 	 */
 	self._bindEvents = function() {
-		var $authButton = $('#auth_transfer'),
-			$xferButtons = $('button.start-transfer'),
-			$restoreButton = $('button.restore-site'),
+		var $authButton     = $('#auth_transfer'),
+			$xferButtons    = $('button.start-transfer'),
+			$restoreButton  = $('button.restore-site'),
 			$resyncDbButton = $('button.resync-database'),
-			$cancelButton = $('button.cancel-transfer'),
-			$deleteButton = $('button.delete-transfer'),
-			$sectionLinks = $('.bg-left-nav li[data-section-id]'),
-			$authError = $('.bgbkup-transfers-rx .authentication-error'),
-			$closeModal = $('.direct-transfer-modal-close');
+			$cancelButton   = $('button.cancel-transfer'),
+			$deleteButton   = $('button.delete-transfer'),
+			$sectionLinks   = $('.bg-left-nav li[data-section-id]'),
+			$authError      = $('.bgbkup-transfers-rx .authentication-error'),
+			$closeModal     = $('.direct-transfer-modal-close'),
+			url             = new URL(window.location);
+
+		// Check if the URL contains a sucess=false query arg, if so, show the error message.
+		if (url.searchParams.has('success') && 'false' === url.searchParams.get('success')) {
+			$authError.text(self.lang.auth_error);
+			$authError.show();
+		}
+
+		// Check if the URL contains a sucess arg, and if so, clear the query args from the URL.
+		if (url.searchParams.has('user_login') ) {
+			self._clearQueryArgs();
+			window.location.reload();
+		}
 
 		self._bindCancelButton($cancelButton);
 		self._bindDeleteButton($deleteButton);
-
-		// Hide the authentication error message on load.
-		$authError.hide();
 
 		$closeModal.on('click', self._closeModal);
 
@@ -196,6 +206,24 @@ BoldGrid.DirectTransfers = function($) {
 			}
 		});
 	};
+
+	/**
+	 * Clear Query Args
+	 * 
+	 * Clear the query args from the URL.
+	 * 
+	 * @since 1.17.0
+	 */
+	self._clearQueryArgs = function() {
+		var url = new URL(window.location);
+		url.searchParams.delete('success');
+		url.searchParams.delete('_wpnonce');
+		url.searchParams.delete('site_url');
+		url.searchParams.delete('user_login');
+		url.searchParams.delete('password');
+		url.searchParams.delete('app_uuid');
+		window.history.pushState({}, '', url);
+	}
 
 	/**
 	 * Open Modal
@@ -720,11 +748,22 @@ BoldGrid.DirectTransfers = function($) {
 	 */
 	self._authTransfer = function(authEndpoint, appUuid) {
 		var authNonce = $('#auth_nonce').val(),
-			params = $.param({
-				app_name: 'Total Upkeep',
-				app_id: appUuid,
-				success_url: window.location.href + '&_wpnonce=' + authNonce
-			});
+			successUrl,
+			params;
+
+		self._clearQueryArgs();
+
+		successUrl = window.location.href + '&_wpnonce=' + authNonce;
+
+		params = $.param( {
+			app_name: 'Total Upkeep',
+			app_id: appUuid,
+			success_url: successUrl
+		} );
+
+		console.log( {
+			successUrl: successUrl
+		} );
 
 		window.location.href = authEndpoint + '?' + params;
 	};

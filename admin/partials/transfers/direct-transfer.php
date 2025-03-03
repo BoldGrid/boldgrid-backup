@@ -6,20 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $option_names = $this->core->configs['direct_transfer']['option_names'];
 
-if ( isset( $_GET['_wpnonce'] ) &&
-	wp_verify_nonce( sanitize_text_field( wp_unslash($_GET['_wpnonce'] ) ), 'boldgrid_backup_direct_transfer_auth' ) &&
-	isset( $_GET['user_login'] ) ) {
-		$site_url = sanitize_url( wp_unslash( $_GET['site_url'] ) );
-		$user     = sanitize_text_field( wp_unslash( $_GET['user_login'] ) );
-		$pass     = sanitize_text_field( wp_unslash( $_GET['password'] ) );
-	$authd_sites = get_option( $option_names['authd_sites'], array() );
-	$authd_sites[ $site_url ] = array(
-		'user' => $user,
-		'pass' => Boldgrid_Backup_Admin_Crypt::crypt( $pass, 'e' )
-	);
-
-	update_option( $option_names['authd_sites'], $authd_sites, false );
-}
+$this->core->migrate->util->handle_new_auth();
 
 $authd_sites = get_option( $option_names['authd_sites'], array() );
 $transfers   = get_option( $option_names['transfers'], array() );

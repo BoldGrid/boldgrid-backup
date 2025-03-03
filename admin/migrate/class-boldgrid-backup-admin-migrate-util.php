@@ -1084,6 +1084,39 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	}
 
 	/**
+	 * Handle New Auth
+	 * 
+	 * Process the return from authorizing a new site.
+	 * 
+	 * @since 1.17.0
+	 */
+	public function handle_new_auth() {
+		if ( ! isset( $_GET['_wpnonce'] ) ) {
+			return;
+		}
+
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash($_GET['_wpnonce'] ) ), 'boldgrid_backup_direct_transfer_auth' ) ) {
+			return;
+		}
+
+		if ( ! isset( $_GET['site_url'] ) ) {
+			return;
+		}
+		
+		$site_url = sanitize_url( wp_unslash( $_GET['site_url'] ) );
+		$user     = sanitize_text_field( wp_unslash( $_GET['user_login'] ) );
+		$pass     = sanitize_text_field( wp_unslash( $_GET['password'] ) );
+
+		$authd_sites              = get_option( $this->authd_sites_option_name, array() );
+		$authd_sites[ $site_url ] = array(
+			'user' => $user,
+			'pass' => Boldgrid_Backup_Admin_Crypt::crypt( $pass, 'e' )
+		);
+
+		update_option( $this->authd_sites_option_name, $authd_sites, false );
+	}
+
+	/**
 	 * Reset Status Time.
 	 * 
 	 * Reset the tracking time for a given status
