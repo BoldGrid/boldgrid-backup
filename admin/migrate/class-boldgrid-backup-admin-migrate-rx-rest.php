@@ -498,9 +498,11 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 			$deleted = wp_delete_file( $db_dump_path );
 		}
 
+		update_option( $this->migrate_core->configs['option_names']['active_transfer'], $transfer_id );
 		$this->util->reset_status_time( $transfer_id, 'resyncing-db' );
 		$this->util->update_transfer_prop( $transfer_id, 'resyncing_db', true );
 		$this->util->update_transfer_prop( $transfer_id, 'status', 'pending-db-dump' );
+		$this->migrate_core->backup_core->cron->schedule_direct_transfer();
 		$this->migrate_core->log->add( 'Database dump file deleted and pending re-sync: ' . $transfer_id );
 
 		wp_send_json_success( array( 'message' => esc_html__( 'Database dump file deleted and pending re-sync', 'boldgrid-backup' ) ) );
