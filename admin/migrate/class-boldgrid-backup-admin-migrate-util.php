@@ -156,7 +156,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 			return;
 		}
 
-		if ( ! isset( $time_tracking[ $status ] )  ) {
+		if ( ! isset( $time_tracking[ $status ] ) ) {
 			$time_tracking[ $status ] = array(
 				'start_time' => microtime( true ),
 			);
@@ -628,7 +628,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		 * the status was changed, this will mark the 'start_time'
 		 * of the new status
 		 */
-		if ( 'time_tracking' !== $key ) {
+		if ( 'time_tracking' !== $key && 'resyncing_db' !== $key ) {
 			$this->update_elapsed_time( $transfer_id );
 		}
 	}
@@ -834,8 +834,8 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	
 		if ( ( isset( $transfer['resyncing_db'] ) && $transfer['resyncing_db'] ) ||
 			 isset( $transfer['restore_start_time'] ) ) {
-			$this->update_transfer_prop( $transfer_id, 'resyncing_db', false );
-			return $this->update_transfer_prop( $transfer_id, 'status', 'completed' );
+				$this->update_transfer_prop( $transfer_id, 'status', 'completed' );
+				return $this->update_transfer_prop( $transfer_id, 'resyncing_db', false );
 		}
 	
 		$cancelled_transfers = $this->get_option( $this->cancelled_transfers_option_name, array() );
