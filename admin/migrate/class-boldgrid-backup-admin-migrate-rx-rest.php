@@ -835,7 +835,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 					'boldgrid-backup'
 				);
 				$progress_data['progress_status_text'] = esc_html__(
-					'Pending Database Dump',
+					'Pending DB Dump',
 					'boldgrid-backup'
 				);
 				break;
