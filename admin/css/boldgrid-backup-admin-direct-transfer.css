@@ -101,7 +101,8 @@ table.bgbkup-transfers-tx-table {
 .direct-transfer-modal .modal-panel {
     position: absolute;
     left: calc( 50% - 250px );
-    top: 50%;
+    top: calc( 50% - 125px );
+    height: 250px;
     background-color: white;
     border-radius: 8px;
     max-width: 500px;
