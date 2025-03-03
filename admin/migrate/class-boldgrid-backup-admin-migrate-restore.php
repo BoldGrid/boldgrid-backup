@@ -169,7 +169,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 	 * 
 	 * @since 1.17.0
 	 */
-	public function seperate_db_from_files( $files, $db_dump_path ) {
+	public function seperate_db_from_files( &$files, $db_dump_path ) {
 		$db_dump_basename = basename( $db_dump_path );
 		$db_file          = array();
 		//Find the database dump file, and remove it from the list.
@@ -316,7 +316,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 	 */
 	public function copy_files( $files, $transfer_id, $transfer_dir ) {
 		$this->migrate_core->log->add( 'Copying files from transfer directory to site root directory.' );
-		$failed_copies = array();
+		$failed_copies     = array();
 		$total_files_count = count( $files );
 		$count = 0;
 		$this->util->update_transfer_prop(
