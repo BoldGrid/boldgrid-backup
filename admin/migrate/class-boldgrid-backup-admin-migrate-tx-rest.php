@@ -175,7 +175,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 			),
 			'delete-transfer' => array(
 				'methods'             => 'POST',
-				'endpoint'            => 'delete-transfer',
+				'endpoint'            => 'delete-transfer-files',
 			),
 		);
 
@@ -205,7 +205,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 * 
 	 * @since 1.17.0
 	 */
-	public function delete_transfer( $request ) {
+	public function delete_transfer_files( $request ) {
 		$params = $request->get_params();
 
 		$transfer_id = $params['transfer_id'];
