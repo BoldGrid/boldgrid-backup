@@ -115,6 +115,10 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 			return false;
 		}
 
+		if ( isset( $params['transfer_id'] ) ) {
+			$this->migrate_core->log->init( 'direct-transfer-' . $params['transfer_id'] );
+		}
+
 		return true;
 	}
 
@@ -200,12 +204,12 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 		$transfer_id    = $request_params['transfer_id'];
 		$dest_url       = $request_params['dest_url'];
 
-		$db_dump_file   = $this->migrate_core->tx->create_dump_status_file( $transfer_id, $dest_url );
+		$db_dump_file = $this->migrate_core->tx->create_dump_status_file( $transfer_id, $dest_url );
 
 		$scheduled = $this->migrate_core->backup_core->cron->schedule_direct_transfer();
 
 		return new WP_REST_Response( array(
-			'success' => true,
+			'success'      => true,
 			'db_dump_info' => $scheduled,
 		) );
 	}
@@ -295,11 +299,6 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 		if ( file_exists( $status['file'] ) ) {
 			wp_delete_file( $status['file'] );
 		}
-		
-		// Reschedule the cron
-		if ( ! wp_next_scheduled( 'boldgrid_transfer_db_dump_cron' ) ) {
-			wp_schedule_single_event( time() + 10, 'boldgrid_transfer_db_dump_cron' );
-		}
 
 		return true;
 	}
@@ -342,12 +341,16 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 		$transfer_id = $params['transfer_id'];
 		$part_path   = $params['file_part'];
 
+
 		if ( ! file_exists( $part_path ) ) {
+			$this->migrate_core->log->add( 'Large File part not found: ' . $part_path );
 			return new WP_REST_Response( array(
 				'success' => false,
 				'error'   => 'File part not found',
 			) );
 		}
+
+		$this->migrate_core->log->add( 'Large File part being sent: ' . $part_path );
 
 		Boldgrid_Backup_Admin_Utility::bump_memory_limit( '1G' );
 
@@ -392,6 +395,8 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 
 		$split_files = $this->migrate_core->util->split_large_file( $transfer_id, $db_file, $relative_path, $max_upload_size * 2 );
 
+		$this->migrate_core->log->add( 'Split DB File: ' . $db_file . ' into ' . count( $split_files ) . ' parts' );
+
 		return new WP_REST_Response( array(
 			'success'     => true,
 			'split_files' => json_encode( $split_files ),
@@ -428,6 +433,8 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 
 			$split_files[] = $file;
 		}
+
+		$this->migrate_core->log->add( 'Split Large Files: ' . json_encode( $split_files ) );
 
 		return new WP_REST_Response( array(
 			'success'      => true,
@@ -471,6 +478,8 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 			);
 		}
 
+		$this->migrate_core->log->add( 'Returning files for batch ID: ' . $batch_id );
+
 		return new WP_REST_Response( array(
 			'success'  => true,
 			'batch_id' => $batch_id,
@@ -498,6 +507,8 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 			) );
 		}
 
+		$this->migrate_core->log->add( 'Returning DB Dump: ' . $db_path );
+
 		return new WP_REST_Response( array(
 			'success' => true,
 			'file'    => file_get_contents( $db_path ),
@@ -513,6 +524,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 * @return WP_Rest_Response
 	 */
 	public function get_wp_version() {
+		$this->migrate_core->log->add( 'Returning WP Version: ' . get_bloginfo( 'version' ) );
 		return new WP_REST_Response( array(
 			'success'    => true,
 			'wp_version' => get_bloginfo( 'version' ),
@@ -520,7 +532,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	}
 
 	/**
-	 * Get the wp version info
+	 * Get the db prefix
 	 * 
 	 * @since 1.17.0
 	 * 
@@ -528,6 +540,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 */
 	public function get_db_prefix() {
 		global $wpdb;
+		$this->migrate_core->log->add( 'Returning DB Prefix: ' . $wpdb->get_blog_prefix() );
 		return new WP_REST_Response( array(
 			'success'   => true,
 			'db_prefix' => $wpdb->get_blog_prefix(),
@@ -544,6 +557,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 * @return WP_Rest_Response
 	 */
 	public function generate_file_list( $request ) {
+		$this->migrate_core->log->add( 'Generating File List' );
 		$file_list = $this->migrate_core->util->generate_file_list();
 
 		// Sort filelist ascending by size

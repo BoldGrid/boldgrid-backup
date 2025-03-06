@@ -317,7 +317,14 @@ BoldGrid.DirectTransfers = function($) {
 	 */
 	self._validateUrl = function(url, appUuid, $authButton) {
 		var $error = $('.bgbkup-transfers-rx .authentication-error'),
+			currentSiteUrl,
 			urlObj;
+
+		// In case the user tries to enter a URL with wp-admin after it
+		// remove the wp-admin from the URL.
+		if (url.includes('wp-admin')) {
+			url = url.split('wp-admin')[0];
+		}
 
 		// Try to create a URL object from the string.
 		try {
@@ -331,7 +338,9 @@ BoldGrid.DirectTransfers = function($) {
 		}
 
 		// Get Current Site URL Base by getting everything that comes before the wp-admin
-		var currentSiteUrl = window.location.href.split('wp-admin')[0];
+		currentSiteUrl = window.location.href.split('wp-admin')[0];
+
+		console.log( urlObj );
 
 		// Check if url contains the currentSiteUrl
 		if (urlObj.href.includes(currentSiteUrl)) {

@@ -112,8 +112,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 			'db_size' => $db_size,
 		) );
 		$this->migrate_core->log->init( 'direct-transfer-' . $transfer_id );
-		$this->migrate_core->log->add( 'Creating DB Dump Status File: ' . $db_dump_file );
-		error_log( 'Creating DB Dump Status File: ' . $db_dump_file );
+		$this->migrate_core->log->add( 'Creating DB Dump Status File: ' . $dump_dir . '/db-dump-status.json' );
 
 		$this->migrate_core->util->create_dirpath( $dump_dir . '/db-dump-status.json' );
 		file_put_contents( $dump_dir . '/db-dump-status.json', $response );
@@ -123,7 +122,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 		) );
 	}
 
-		/**
+	/**
 	 * Generate a database dump
 	 * 
 	 * @since 1.17.0
@@ -143,6 +142,18 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 		file_put_contents( $dump_dir . '/db-dump-status.json', json_encode( $progress ) );
 
 		$db_dump = new Boldgrid_Backup_Admin_Db_Dump( $this->migrate_core->backup_core );
+
+		$increased_max_execution = set_time_limit( 0);
+
+		if ( $increased_max_execution ) {
+			$this->migrate_core->log->add( 'Increased Max Execution Time for db dumping process' );
+		} else {
+			$this->migrate_core->log->add(
+				'Failed to Increase Max Execution Time for db dumping process. ' .
+				'Database dumping may fail if the database is too large. ' .
+				'Consider increasing the max_execution_time in your php configuration'
+			);
+		}
 
 		$db_dump->dump( $db_dump_file );
 

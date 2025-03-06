@@ -534,7 +534,12 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * @return string|WP_Error The REST URL or a WP_Error if unable to get the URL
 	 */
 	public function get_site_rest_url( $site_url ) {
-		$response     = wp_remote_get( $site_url );
+		$response     = wp_remote_get(
+			$site_url,
+			array(
+				'timeout' => $this->migrate_core->configs['conn_timeout']
+			)
+		);
 		if ( is_wp_error( $response ) ) {
 			return $response;
 		}
@@ -741,7 +746,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		$response = wp_remote_get(
 			$request_url . '?user=' . $user . '&pass=' . base64_encode( $pass ),
 			array(
-				'timeout' => 600,
+				'timeout' => $this->migrate_core->configs['conn_timeout'],
 				'headers' => array(
 					'Accept' => 'application/json',
 				),
@@ -1174,7 +1179,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 					'Authorization' => 'Basic ' . base64_encode( $user . ':' . $pass ),
 					'Accept' => 'application/json',
 				),
-				'timeout' => 600,
+				'timeout' => $this->migrate_core->configs['conn_timeout'],
 			)
 		);
 
@@ -1333,7 +1338,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 					'Authorization' => 'Basic ' . base64_encode( $user . ':' . $pass ),
 					'Accept' => 'application/json',
 				),
-				'timeout' => 600,
+				'timeout' => $this->migrate_core->configs['conn_timeout'],
 			)
 		);
 
@@ -1382,7 +1387,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 					'Authorization' => 'Basic ' . base64_encode( $user . ':' . $pass ),
 					'Accept' => 'application/json',
 				),
-				'timeout' => 600,
+				'timeout' => $this->migrate_core->configs['conn_timeout'],
 			)
 		); 
 
@@ -1410,7 +1415,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 					'Authorization' => 'Basic ' . base64_encode( $user . ':' . $pass ),
 					'Accept' => 'application/json',
 				),
-				'timeout' => 600,
+				'timeout' => $this->migrate_core->configs['conn_timeout'],
 			)
 		);
 

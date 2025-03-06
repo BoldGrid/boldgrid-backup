@@ -341,7 +341,12 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 	public function validate_url( $request ) {
 		$url = $request->get_param( 'url' );
 
-		$response = wp_remote_get( $url );
+		$response = wp_remote_get(
+			$url,
+			array(
+				'timeout' => $this->migrate_core->configs['conn_timeout'],
+			)
+		);
 
 		if ( is_wp_error( $response ) ) {
 			return new WP_REST_Response( array(
@@ -395,6 +400,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				'headers' => array(
 					'Accept' => 'application/json',
 				),
+				'timeout' => $this->migrate_core->configs['conn_timeout'],
 			)
 		);
 		
