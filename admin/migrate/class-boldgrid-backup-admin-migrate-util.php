@@ -1107,7 +1107,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 			WP_Filesystem();
 		}
 
-		$wp_filesystem->rmdir( $dir, true );
+		return $wp_filesystem->rmdir( $dir, true );
 	}
 
 	/**

@@ -173,7 +173,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 				'methods'             => 'POST',
 				'endpoint'            => 'split-large-files',
 			),
-			'delete-transfer' => array(
+			'delete-transfer-files' => array(
 				'methods'             => 'POST',
 				'endpoint'            => 'delete-transfer-files',
 			),
@@ -216,13 +216,18 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 		$transfer_dir = $this->migrate_core->util->get_transfer_dir() . '/' . $dest_dir . '/' . $transfer_id;
 
 		$this->migrate_core->log->add( 'Deleting Transfer files: ' . $transfer_dir );
+
+		$files_deleted = false;
 		
 		if ( file_exists( $transfer_dir ) ) {
-			$this->migrate_core->util->delete_directory( $transfer_dir );
+			$files_deleted = $this->migrate_core->util->delete_directory( $transfer_dir );
+		} else {
+			$this->migrate_core->log->add( 'Transfer directory not found: ' . $transfer_dir );
+			$files_deleted = true;
 		}
 
 		return new WP_REST_Response( array(
-			'success' => true,
+			'success' => $files_deleted,
 		) );
 	}
 
