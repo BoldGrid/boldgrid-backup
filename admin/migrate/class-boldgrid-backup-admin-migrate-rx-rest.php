@@ -550,7 +550,13 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 
 		$this->util->cleanup_filelists();
 
-		$files_deleted_from_source = $this->util->rest_post( $transfer, 'delete-transfer-files', array( 'transfer_id' => $transfer_id ) );
+		$files_deleted_from_source = $this->util->rest_post(
+			$transfer, 'delete-transfer-files',
+			array(
+				'transfer_id' => $transfer_id,
+				'dest_url'    => $transfer['dest_site_url'],
+			)
+		);
 
 		$this->migrate_core->log->add( 'Files deleted from source: ' . json_encode( $files_deleted_from_source ) );
 
@@ -705,6 +711,9 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 
 				$db_size   = $transfer['db_dump_info']['db_size'];
 				$dump_size = isset( $transfer['db_dump_info']['file_size'] ) ? $transfer['db_dump_info']['file_size'] : 0;
+				if ( $dump_size > $db_size ) {
+					$db_size = $dump_size;
+				}
 				
 				$progress  = $db_size > 0 ? ( $dump_size / $db_size ) * 100 : 0;
 

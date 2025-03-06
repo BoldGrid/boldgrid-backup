@@ -307,7 +307,6 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 		if ( 'complete' === $response['status'] ) {
 			$response['db_size'] = $file_size;
 			$this->migrate_core->log->add( 'Generating MD5 for completed dump file: ' . $response['file'] );
-			$response['db_hash'] = md5_file( $response['file'] );
 		}
 
 		$this->migrate_core->log->add( 'DB Dump Status: ' . json_encode( $response, JSON_PRETTY_PRINT ) );

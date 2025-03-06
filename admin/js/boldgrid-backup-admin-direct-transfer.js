@@ -51,8 +51,8 @@ BoldGrid.DirectTransfers = function($) {
 	 * @return {void}
 	 * @since 1.17.0
 	 */
-	self._restRequest = function(endpoint, method, data, callback, callbackArgs = {}) {
-		if ( window.bgbckupProcessingRequest ) {
+	self._restRequest = function(endpoint, method, data, callback, callbackArgs = {}, wait = true ) {
+		if ( wait && window.bgbckupProcessingRequest ) {
 			return;
 		}
 
@@ -283,7 +283,8 @@ BoldGrid.DirectTransfers = function($) {
 				'POST',
 				{ transfer_id: transferId },
 				self._cancelCallback,
-				{ $cancelButton: $this }
+				{ $cancelButton: $this },
+				false
 			);
 		});
 	};
