@@ -95,9 +95,61 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 		}
 
 		$status = json_decode( file_get_contents( $status_file ), true );
-		error_log( 'DB Dump Status: ' . json_encode( $status, JSON_PRETTY_PRINT ) );
+		$this->migrate_core->log->add( 'DB Dump Status: ' . json_encode( $status, JSON_PRETTY_PRINT ) );
 
-		return ( 'pending' === $status['status'] );
+		if ( 'pending' === $status['status'] ) {
+			return true;
+		}
+
+		if ( 'dumping' === $status['status'] ) {
+			return $this->maybe_restart_dump( $status, $status_file );
+		}
+	}
+
+	public function maybe_restart_dump( $status, $status_file ) {
+		if ( 'complete' === $status['status'] || 'pending' === $status['status'] ) {
+			return false;
+		}
+
+		$time_since_modified = time() - filemtime( $status['file'] );
+
+		if ( $this->migrate_core->configs['stalled_timeout'] > $time_since_modified ) {
+			return false;
+		}
+
+		$times_restarted = isset( $status['restarted'] ) ? $status['restarted'] : 0;
+
+		// IF we've restarted 5 times already, then fail
+		if ( 5 <= $times_restarted ) {
+			$this->migrate_core->log->add( 'Failed to restart DB Dump. Time since modified: ' . $time_since_modified );
+			// Update Status File
+			file_put_contents( $status_file, json_encode( array(
+				'status'    => 'failed',
+				'file'      => $status['file'],
+				'db_size'   => $status['db_size'],
+				'restarted' => $times_restarted,
+			) ) );
+			return false;
+		}
+
+		$times_restarted = $times_restarted + 1;
+
+		$this->migrate_core->log->add( 'Restarting DB Dump. Time since modified: ' . $time_since_modified );
+
+		// Update Status File
+		file_put_contents( $status_file, json_encode( array(
+			'status'    => 'pending',
+			'file'      => $status['file'],
+			'db_size'   => $status['db_size'],
+			'restarted' => $times_restarted,
+		) ) );
+	
+		// Delete the failed file if it exists
+		if ( file_exists( $status['file'] ) ) {
+			wp_delete_file( $status['file'] );
+		}
+
+		return true;
 	}
 
 	public function create_dump_status_file( $transfer_id, $dest_url ) {

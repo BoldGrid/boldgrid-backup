@@ -288,17 +288,13 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 			$file_size = filesize( $response['file'] );
 			/*
 			 * If the file is not complete and it has been more
-			 * than 15 seconds since the last modification, then
+			 * than 'stalled_timeout' since the last modification, then
 			 * set the status to pending and reschedule the cron
 			 * to start the dump again.
 			 */
-			$restarted = $this->maybe_restart_dump( $response, $status_file );
+			$restarted = $this->tx->maybe_restart_dump( $response, $status_file );
 		} else {
 			$file_size = 0;
-		}
-
-		if ( $restarted ) {
-			$response['restarted'] = true;
 		}
 
 		$response['file_size'] = $file_size;
@@ -314,34 +310,6 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 			'success'      => true,
 			'db_dump_info' => $response,
 		) );
-	}
-
-	public function maybe_restart_dump( $status, $status_file ) {
-		if ( 'complete' === $status['status'] || 'pending' === $status['status'] ) {
-			return false;
-		}
-
-		$time_since_modified = time() - filemtime( $status['file'] );
-
-		if ( 60 > $time_since_modified ) {
-			return false;
-		}
-
-		$this->migrate_core->log->add( 'Restarting DB Dump. Time since modified: ' . $time_since_modified );
-
-		// Update Status File
-		file_put_contents( $status_file, json_encode( array(
-			'status'  => 'pending',
-			'file'    => $status['file'],
-			'db_size' => $status['db_size'],
-		) ) );
-	
-		// Delete the failed file if it exists
-		if ( file_exists( $status['file'] ) ) {
-			wp_delete_file( $status['file'] );
-		}
-
-		return true;
 	}
 
 	/**

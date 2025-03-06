@@ -550,7 +550,9 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 
 		$this->util->cleanup_filelists();
 
-		$this->util->rest_post( $transfer, 'delete-transfer', array( 'transfer_id' => $transfer_id ) );
+		$files_deleted_from_source = $this->util->rest_post( $transfer, 'delete-transfer-files', array( 'transfer_id' => $transfer_id ) );
+
+		$this->migrate_core->log->add( 'Files deleted from source: ' . json_encode( $files_deleted_from_source ) );
 
 		if ( $deleted ) {
 			unset( $transfers[ $transfer_id ] );
