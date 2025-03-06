@@ -173,6 +173,10 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 				'methods'             => 'POST',
 				'endpoint'            => 'split-large-files',
 			),
+			'delete-transfer' => array(
+				'methods'             => 'POST',
+				'endpoint'            => 'delete-transfer',
+			),
 		);
 
 		foreach( $rest_routes as $route => $args ) {
@@ -188,6 +192,36 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 				'permission_callback' => array( $this, $permission_cb_name ),
 			) );
 		}
+	}
+
+	/**
+	 * Delete Transfer
+	 * 
+	 * Delete a transfer and all
+	 * associated files to clean up used
+	 * space.
+	 * 
+	 * @param $request WP_REST_Request
+	 * 
+	 * @since 1.17.0
+	 */
+	public function delete_transfer( $request ) {
+		$params = $request->get_params();
+
+		$transfer_id = $params['transfer_id'];
+		$dest_url    = $params['dest_url'];
+
+		$dest_dir = $this->migrate_core->util->url_to_safe_directory_name( $dest_url );
+
+		$transfer_dir = $this->migrate_core->util->get_transfer_dir() . '/' . $dest_dir . '/' . $transfer_id;
+
+		if ( file_exists( $transfer_dir ) ) {
+			$this->migrate_core->util->delete_directory( $transfer_dir );
+		}
+
+		return new WP_REST_Response( array(
+			'success' => true,
+		) );
 	}
 
 	/**
@@ -282,7 +316,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 
 		$time_since_modified = time() - filemtime( $status['file'] );
 
-		if ( 15 > $time_since_modified ) {
+		if ( 60 > $time_since_modified ) {
 			return false;
 		}
 

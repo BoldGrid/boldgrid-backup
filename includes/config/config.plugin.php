@@ -140,7 +140,7 @@ return [
 		'chunk_size'                  => 50,
 		'stalled_timeout'             => 120,
 		'cron_interval'               => 60,
-		'conn_timeout'                => 60,
+		'conn_timeout'                => 600,
 		'option_names'                => array(
 			'transfers'           => 'boldgrid_backup_direct_transfers',
 			'file_lists'          => 'boldgrid_backup_xfer_file_lists',

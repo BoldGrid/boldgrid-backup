@@ -1064,7 +1064,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 
 		if ( is_wp_error( $response ) ) {
 			$this->migrate_core->log->add( 'Error posting REST data: ' . $response->get_error_message() );
-			return new WP_Error( 'rest_error', $response->get_error_message() );
+			return $response;
 		}
 
 		$body      = wp_remote_retrieve_body( $response );
@@ -1086,6 +1086,26 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 			$this->migrate_core->log->add( 'Post Rest Error: ' . $body );
 			return new WP_Error( 'rest_error', 'No Success Response' );
 		}
+	}
+
+	/**
+	 * Delete a directory
+	 * 
+	 * Delete a directory and it's contents
+	 * 
+	 * @since 1.17.0
+	 * 
+	 * @param string $dir The directory to delete
+	 */
+	public function delete_directory( $dir ) {
+		global $wp_filesystem;
+		
+		if ( ! $wp_filesystem ) {
+			require_once ABSPATH . '/wp-admin/includes/file.php';
+			WP_Filesystem();
+		}
+
+		$wp_filesystem->rmdir( $dir, true );
 	}
 
 	/**

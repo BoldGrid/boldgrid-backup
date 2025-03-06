@@ -52,6 +52,12 @@ BoldGrid.DirectTransfers = function($) {
 	 * @since 1.17.0
 	 */
 	self._restRequest = function(endpoint, method, data, callback, callbackArgs = {}) {
+		if ( window.bgbckupProcessingRequest ) {
+			return;
+		}
+
+		window.bgbckupProcessingRequest = true;
+
 		wp.apiRequest({
 			path: '/boldgrid-backup/v1/direct-transfer/' + endpoint,
 			method: method,
@@ -59,9 +65,11 @@ BoldGrid.DirectTransfers = function($) {
 		})
 			.then(function(response) {
 				console.log('API Response', { response, callback, callbackArgs });
+				window.bgbckupProcessingRequest = false;
 				callback(response, callbackArgs);
 			})
 			.fail(function(response, responseText) {
+				window.bgbckupProcessingRequest = false;
 				console.log('API Error', { endpoint, response, responseText, callback, callback });
 				/*
 				 * If we are checking the status, and the status contains the string 'restor' as in
@@ -340,8 +348,6 @@ BoldGrid.DirectTransfers = function($) {
 		// Get Current Site URL Base by getting everything that comes before the wp-admin
 		currentSiteUrl = window.location.href.split('wp-admin')[0];
 
-		console.log( urlObj );
-
 		// Check if url contains the currentSiteUrl
 		if (urlObj.href.includes(currentSiteUrl)) {
 			$error.text(self.lang.same_site_error);
@@ -480,9 +486,6 @@ BoldGrid.DirectTransfers = function($) {
 					'.bgbkup-transfers-rx tr.transfer-info[data-transfer-id=' + transferId + ']'
 				).find('.cancel-transfer')
 				borderRadius = '10';
-			
-			console.log( transferId );
-			console.log( $cancelButton );
 
 			if ('completed' === status) {
 				$row.addClass('completed');
@@ -768,10 +771,6 @@ BoldGrid.DirectTransfers = function($) {
 			app_name: 'Total Upkeep',
 			app_id: appUuid,
 			success_url: successUrl
-		} );
-
-		console.log( {
-			successUrl: successUrl
 		} );
 
 		window.location.href = authEndpoint + '?' + params;

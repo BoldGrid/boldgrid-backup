@@ -338,7 +338,11 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			true
 		);
 
-		if ( is_wp_error( $response ) ) {
+		if ( is_wp_error( $response ) && false !== strpos( $response->get_error_message(), 'Operation timed out' ) ) {
+			$response = array(
+				'db_dump_info' => $transfer['db_dump_info']
+			);
+		} else if ( is_wp_error( $response ) ) {
 			$this->migrate_core->log->add( 'Error checking database dump status: ' . $response->get_error_message() );
 			$this->util->update_transfer_prop(
 				$transfer['transfer_id'],
@@ -374,12 +378,25 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		$this->util->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', $db_dump_info );
 
+		/*
+		 * The 'db_size' is an estimate. Sometimes the actual file size can be larger.
+		 * This is a check to prevent progress amounts greater than 100% on the progress
+		 * bar.
+		 */
+		if ( $db_dump_info['file_size'] > $db_dump_info['db_size' ] ) {
+			$db_dump_info['file_size'] = $db_dump_info['db_size'];
+		}
+
+		$progress_perc = 0 !== $db_dump_info['db_size'] ?
+			( $db_dump_info['file_size'] / $db_dump_info['db_size'] * 100 ) :
+			0;
+
 		$this->migrate_core->log->add(
 			sprintf(
 				'Database Dump Status: %1$s / %2$s (%3$s%%)',
 				size_format( $db_dump_info['file_size'], 2 ),
 				size_format( $db_dump_info['db_size'], 2 ),
-				number_format( ( $db_dump_info['file_size'] / $db_dump_info['db_size'] ) * 100, 2 )
+				number_format( $progress_perc, 2 )
 			)
 		);
 

@@ -550,6 +550,8 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 
 		$this->util->cleanup_filelists();
 
+		$this->util->rest_post( $transfer, 'delete-transfer', array( 'transfer_id' => $transfer_id ) );
+
 		if ( $deleted ) {
 			unset( $transfers[ $transfer_id ] );
 			update_option( $this->transfers_option_name, $transfers, false );
@@ -912,8 +914,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 		$status      = $params['status'];
 		$transfer    = $this->util->get_transfer_from_id( $transfer_id );
 
-
-		if ( $transfer ) {
+		if ( ! $transfer ) {
 			wp_send_json_error( array( 'message' => esc_html__( 'Invalid transfer ID.', 'boldgrid-backup' ) ) );
 		}
 
@@ -921,7 +922,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 
 		return new WP_REST_Response( array(
 			'success' => true,
-			'transfer_id' => $transfers[ $transfer_id ]
+			'transfer_id' => $transfer
 		), 200 );
 	}
 }
