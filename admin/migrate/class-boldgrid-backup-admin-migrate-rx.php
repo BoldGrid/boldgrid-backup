@@ -295,7 +295,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		// Get DB Info.
 		$db_file_path = $db_dump_info['file'];
 		$db_file_size = $db_dump_info['db_size'];
-		$db_file_hash = $db_dump_info['db_hash'];
 		
 		$max_upload_size = $this->util->get_max_upload_size();
 		if ( $db_file_size > ( $max_upload_size / 10 ) ) {
@@ -399,7 +398,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 				'status'    => 'complete',
 				'db_size'   => $db_dump_info['db_size'],
 				'file_size' => $db_dump_info['db_size'],
-				'db_hash'   => $db_dump_info['db_hash'],
 			) );
 			$this->maybe_split_dump( $transfer['transfer_id'] );
 		}
@@ -1711,15 +1709,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		
 		$new_file_hash = md5_file( $db_dump_file );
 
-		if ( $new_file_hash !== $db_dump_info['db_hash'] ) {
-			//$wp_filesystem->delete( $db_dump_file );
-			$this->migrate_core->log->add( 'DB Dump file hash mismatch. Expected: ' . $db_dump_info['db_hash'] . ' Got: ' . $new_file_hash );
-			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'db-dump-complete' );
-			$this->reset_db_transfer( $transfer['transfer_id'] );
-			return new WP_Error( 'boldgrid_transfer_rx_db_hash_mismatch', __( 'The database dump file hash does not match the expected hash.', 'boldgrid-backup' ) );
-		} else {
-			$this->complete_transfer( $transfer['transfer_id'] );
-			return true;
+		$this->complete_transfer( $transfer['transfer_id'] );
 		}
 	}
 
