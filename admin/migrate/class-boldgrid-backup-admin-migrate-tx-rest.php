@@ -272,6 +272,8 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 		$dump_dir    = $this->migrate_core->util->get_transfer_dir() . '/' . $dest_dir . '/' . $transfer_id;
 		$status_file = $dump_dir . '/db-dump-status.json';
 
+		$this->migrate_core->log->add( 'Checking dump status from file ' . $status_file );
+
 		if ( ! file_exists( $status_file ) ) {
 			$this->migrate_core->log->add( 'Status file not found: ' . $status_file );
 			return new WP_REST_Response( array(
@@ -283,8 +285,11 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 		$response  = json_decode( file_get_contents( $status_file ), true );
 		$restarted = false;
 
+		$this->migrate_core->log->add( 'Status File Contents ' . json_encode( $response, JSON_PRETTY_PRINT ) );
+
 		if ( file_exists( $response['file'] ) ) {
 			clearstatcache();
+			$this->migrate_core->log->add( 'Obtaining File Size of ' . $response['file'] );
 			$file_size = filesize( $response['file'] );
 			/*
 			 * If the file is not complete and it has been more
@@ -292,7 +297,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 			 * set the status to pending and reschedule the cron
 			 * to start the dump again.
 			 */
-			$restarted = $this->tx->maybe_restart_dump( $response, $status_file );
+			$restarted = $this->migrate_core->tx->maybe_restart_dump( $response, $status_file );
 		} else {
 			$file_size = 0;
 		}
@@ -301,6 +306,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 
 		if ( 'complete' === $response['status'] ) {
 			$response['db_size'] = $file_size;
+			$this->migrate_core->log->add( 'Generating MD5 for completed dump file: ' . $response['file'] );
 			$response['db_hash'] = md5_file( $response['file'] );
 		}
 

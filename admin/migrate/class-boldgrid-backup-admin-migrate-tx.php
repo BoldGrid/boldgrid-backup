@@ -87,6 +87,10 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 			return false;
 		}
 
+		$transfer_id = $dump_status_option['transfer_id'];
+
+		$this->migrate_core->log->init( 'direct-transfer-' . $transfer_id );
+
 		$status_file = $dump_status_option['db_status_file'];
 
 		if ( ! file_exists( $status_file ) ) {
@@ -169,6 +173,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 		$this->migrate_core->util->create_dirpath( $dump_dir . '/db-dump-status.json' );
 		file_put_contents( $dump_dir . '/db-dump-status.json', $response );
 		update_option( $this->db_dump_status_option_name, array(
+			'transfer_id'    => $transfer_id,
 			'db_dump_file'   => $db_dump_file,
 			'db_status_file' => $dump_dir . '/db-dump-status.json',
 		) );

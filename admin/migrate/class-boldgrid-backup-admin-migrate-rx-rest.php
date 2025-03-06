@@ -705,6 +705,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 
 				$db_size   = $transfer['db_dump_info']['db_size'];
 				$dump_size = isset( $transfer['db_dump_info']['file_size'] ) ? $transfer['db_dump_info']['file_size'] : 0;
+				
 				$progress  = $db_size > 0 ? ( $dump_size / $db_size ) * 100 : 0;
 
 				$progress_text = sprintf(

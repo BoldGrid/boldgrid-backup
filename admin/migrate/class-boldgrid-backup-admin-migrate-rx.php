@@ -338,19 +338,11 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			true
 		);
 
-		if ( is_wp_error( $response ) && false !== strpos( $response->get_error_message(), 'Operation timed out' ) ) {
+		if ( is_wp_error( $response ) ) {
+			$this->migrate_core->log->add( 'An attempt to check the dump status has timed out. Don\'t worry, this is normal for large databases.');
 			$response = array(
 				'db_dump_info' => $transfer['db_dump_info']
 			);
-		} else if ( is_wp_error( $response ) ) {
-			$this->migrate_core->log->add( 'Error checking database dump status: ' . $response->get_error_message() );
-			$this->util->update_transfer_prop(
-				$transfer['transfer_id'],
-				'failed_message',
-				'Error checking database dump status: ' . $response->get_error_message()
-			);
-			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'failed' );
-			return $response;
 		} else if ( ! isset( $response['db_dump_info'] ) ) {
 			$this->migrate_core->log->add( 'No db_dump_info in response: ' . json_encode( $response ) );
 			return;
@@ -384,7 +376,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		 * bar.
 		 */
 		if ( $db_dump_info['file_size'] > $db_dump_info['db_size' ] ) {
-			$db_dump_info['file_size'] = $db_dump_info['db_size'];
+			$db_dump_info['db_size'] = $db_dump_info['file_size'];
 		}
 
 		$progress_perc = 0 !== $db_dump_info['db_size'] ?

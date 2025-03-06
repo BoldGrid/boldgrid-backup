@@ -141,7 +141,6 @@ class Boldgrid_Backup_Admin_Migrate {
 	 */
 	public function ajax_process_direct_transfer() {
 		$this->log->add( 'Processing Transfers via System Cron.' );
-
 		if ( ! $this->backup_core->cron->is_valid_call() ) {
 			error_log( 'Invalid Cron Request' );
 			wp_send_json_error( array( 'error' => true, 'message' => esc_html__( 'Invalid Cron Request', 'boldgrid-backup' ) ) );
