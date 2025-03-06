@@ -733,6 +733,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		$site_url    = $transfer['source_site_url'];
 		$rest_url    = $transfer['source_rest_url'];
 		$request_url = $rest_url . $namespace . $prefix . $route;
+		$transfer_id = isset( $transfer['transfer_id'] ) ? $transfer['transfer_id'] : 'unset';
 
 		$authd_sites = $this->get_option( $this->authd_sites_option_name, array() );
 		$auth        = isset( $authd_sites[ $site_url ] ) ? $authd_sites[ $site_url ] : false;
@@ -744,7 +745,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		$user = $auth['user'];
 		$pass = Boldgrid_Backup_Admin_Crypt::crypt( $auth['pass'], 'd' );
 		$response = wp_remote_get(
-			$request_url . '?user=' . $user . '&pass=' . base64_encode( $pass ),
+			$request_url . '?user=' . $user . '&pass=' . base64_encode( $pass ) . '&transfer_id=' . $transfer_id,
 			array(
 				'timeout' => $this->migrate_core->configs['conn_timeout'],
 				'headers' => array(
@@ -1048,8 +1049,9 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 			return new WP_Error( 'site_not_authenticated', 'Site not authenticated' );
 		}
 
-		$data['user'] = $auth['user'];
-		$data['pass'] = base64_encode( Boldgrid_Backup_Admin_Crypt::crypt( $auth['pass'], 'd' ) );
+		$data['user']        = $auth['user'];
+		$data['pass']        = base64_encode( Boldgrid_Backup_Admin_Crypt::crypt( $auth['pass'], 'd' ) );
+		$data['transfer_id'] = isset( $transfer['transfer_id'] ) ? $transfer['transfer_id'] : 'unset';
 		
 		$response = wp_remote_post(
 			$request_url,

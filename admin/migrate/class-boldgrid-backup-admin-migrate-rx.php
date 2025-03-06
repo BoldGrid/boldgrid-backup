@@ -1185,10 +1185,11 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			curl_setopt( $ch, CURLOPT_URL, $request_url );
 			curl_setopt( $ch, CURLOPT_POST, 1 );
 			curl_setopt( $ch, CURLOPT_POSTFIELDS, array(
-				'user'     => $user,
-				'pass'     => base64_encode( $pass ),
-				'batch_id' => $batch_id,
-				'files'    => json_encode( $files, true ),
+				'user'        => $user,
+				'pass'        => base64_encode( $pass ),
+				'transfer_id' => $transfer_id,
+				'batch_id'    => $batch_id,
+				'files'       => json_encode( $files, true ),
 			) );
 			curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 			curl_setopt( $ch, CURLOPT_HTTPHEADER, array( 'Accept: application/json' ) );
