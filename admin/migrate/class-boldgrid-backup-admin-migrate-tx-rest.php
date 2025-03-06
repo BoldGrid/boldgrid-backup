@@ -215,6 +215,8 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 
 		$transfer_dir = $this->migrate_core->util->get_transfer_dir() . '/' . $dest_dir . '/' . $transfer_id;
 
+		$this->migrate_core->log->add( 'Deleting Transfer files: ' . $transfer_dir );
+		
 		if ( file_exists( $transfer_dir ) ) {
 			$this->migrate_core->util->delete_directory( $transfer_dir );
 		}
