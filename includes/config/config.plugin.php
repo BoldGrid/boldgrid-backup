@@ -143,6 +143,7 @@ return [
 		'conn_timeout'                => 600,
 		'option_names'                => array(
 			'transfers'           => 'boldgrid_backup_direct_transfers',
+			'active_tx'           => 'boldgrid_backup_active_direct_tx',
 			'file_lists'          => 'boldgrid_backup_xfer_file_lists',
 			'open_batches'        => 'boldgrid_backup_open_xfer_batches',
 			'authd_sites'         => 'boldgrid_backup_xfer_authd_sites',

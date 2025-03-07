@@ -96,6 +96,15 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	public $heartbeat_option_name;
 
 	/**
+	 * Active Tx Option Name
+	 * 
+	 * @var string
+	 * 
+	 * @since 1.17.0
+	 */
+	public $active_tx_option_name;
+
+	/**
 	 * Boldgrid_Transfer_Admin constructor.
 	 * 
 	 * @param Boldgrid_Backup_Admin_Migrate $core
@@ -110,6 +119,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		$this->authd_sites_option_name         = $this->migrate_core->configs['option_names']['authd_sites'];
 		$this->heartbeat_option_name           = $this->migrate_core->configs['option_names']['heartbeat'];
 		$this->cancelled_transfers_option_name = $this->migrate_core->configs['option_names']['cancelled_transfers'];
+		$this->active_tx_option_name           = $this->migrate_core->configs['option_names']['active_tx'];
 	}
 
 	public function get_elapsed_time( $transfer_id, $formatted = false, $return_total = true ) {
@@ -308,16 +318,21 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * 
 	 * @since 1.17.0
 	 * 
-	 * @param string $transfer_id     The transfer id
-	 * @param string $file_path       The path to the file to split
-	 * @param string $relative_path   The path relative to the doc root
-	 * @param int    $max_upload_size The max upload size
+	 * @param string $transfer_id          The transfer id
+	 * @param string $file_path            The path to the file to split
+	 * @param string $relative_path        The path relative to the doc root
+	 * @param int    $max_upload_size      The max upload size
+	 * @param string $status               Status to store in progress
 	 * 
 	 * @return array of file paths to the chunks
 	 */
-	public function split_large_file( $transfer_id, $file_path, $relative_path, $max_upload_size ) {
+	public function split_large_file( $transfer_id, $file_path, $relative_path, $max_upload_size, $status ) {
 		$transfer_dir = $this->get_transfer_dir();
 		$chunk_size   = $max_upload_size / 10;
+
+		// determine how many chunks based on chunk size and file size
+		$file_size   = filesize( $file_path );
+		$chunk_count = ceil( $file_size / $chunk_size );
 
 		$chunk_dir = $transfer_dir . '/temp-file-chunks/' . $transfer_id;
 		$this->create_dirpath( $chunk_dir . '/' . $relative_path );
@@ -333,12 +348,20 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		$handle       = fopen( $file_path, 'rb' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 		$chunk_number = 0;
 
+		set_time_limit( 0 );
+
 		while ( ! feof( $handle ) ) {
 			$chunk = fread( $handle, $chunk_size ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fread
 			$chunk_file = $chunk_dir . '/' . $relative_path . '.part-' . $chunk_number;
 			file_put_contents( $chunk_file, $chunk );
 			$chunk_paths[] = $chunk_file;
 			$chunk_number++;
+			update_option( $this->active_tx_option_name, array(
+				'transfer_id'  => $transfer_id,
+				'status'	   => $status,
+				'chunk_number' => $chunk_number,
+				'chunk_count'  => $chunk_count,
+			), false );
 		}
 
 		return $chunk_paths;

@@ -748,6 +748,22 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 					'boldgrid-backup'
 				);
 				break;
+			case 'splitting-db-dump':
+				$progress = $this->migrate_core->rx->check_split_status( $transfer );
+				$progress = 0 !== $progress['chunk_count'] ? $progress['chunk_number'] / $progress['chunk_count'] * 100 : 0;	
+				$progress_data['status']               = 'splitting-db-dump';
+				$progress_data['progress']             = $progress;
+				$progress_data['progress_text']        = esc_html( sprintf(
+					'%1$s / %2$s Files (%3$s%%)',
+					$completed_count,
+					$db_part_count,
+					number_format( $progress, 2 )
+				) );
+				$progress_data['progress_status_text'] = esc_html__(
+					'Splitting Database Dump',
+					'boldgrid-backup'
+				);
+				break;
 			case 'db-ready-for-transfer':
 				$progress_data['status']               = 'db-ready-for-transfer';
 				$progress_data['progress']             = 0;

@@ -47,6 +47,15 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	public $db_dump_status_option_name;
 
 	/**
+	 * Active Tx Option Name
+	 * 
+	 * @var string
+	 * 
+	 * @since 1.17.0
+	 */
+	public $active_tx_option_name;
+
+	/**
 	 * Rest API Namespace
 	 * 
 	 * @var string
@@ -76,6 +85,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 
 		$this->transfers_option_name      = $this->migrate_core->configs['option_names']['transfers'];
 		$this->db_dump_status_option_name = $this->migrate_core->configs['option_names']['db_dump_status'];
+		$this->active_tx_option_name      = $this->migrate_core->configs['option_names']['active_tx'];
 
 		$this->namespace = $this->migrate_core->configs['rest_api_namespace'];
 		$this->prefix    = $this->migrate_core->configs['rest_api_prefix'];
@@ -173,6 +183,14 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 				'methods'             => 'POST',
 				'endpoint'            => 'split-large-files',
 			),
+			'start-db-split' => array(
+				'methods'             => 'POST',
+				'endpoint'            => 'start-db-split',
+			),
+			'check-split-status' => array(
+				'methods'             => 'POST',
+				'endpoint'            => 'check-split-status',
+			),
 			'delete-transfer-files' => array(
 				'methods'             => 'POST',
 				'endpoint'            => 'delete-transfer-files',
@@ -192,6 +210,35 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 				'permission_callback' => array( $this, $permission_cb_name ),
 			) );
 		}
+	}
+
+	/**
+	 * Start DB Split
+	 * 
+	 * @param $request WP_REST_Request
+	 * 
+	 * @since 1.17.0
+	 */
+	public function start_db_split( $request ) {
+		$params = $request->get_params();
+
+		$transfer_id = $params['transfer_id'];
+		$db_path     = $params['db_path'];
+		$max_size    = min( $this->util->get_max_upload_size(), $params['max_size'] );
+
+		update_option( $this->active_tx_option_name, array(
+			'transfer_id' => $transfer_id,
+			'status'      => 'pending-db-split',
+			'db_path'     => $db_path,
+			'max_size'    => $max_size,
+		) );
+
+		$scheduled = $this->migrate_core->backup_core->cron->schedule_direct_transfer();
+
+		return new WP_REST_Response( array(
+			'success'    => true,
+			'split_info' => $scheduled,
+		) );
 	}
 
 	/**
@@ -218,6 +265,8 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 		$this->migrate_core->log->add( 'Deleting Transfer files: ' . $transfer_dir );
 
 		$files_deleted = false;
+
+		update_option( $this->active_tx_option_name, array() );
 		
 		if ( file_exists( $transfer_dir ) ) {
 			$files_deleted = $this->migrate_core->util->delete_directory( $transfer_dir );
@@ -245,6 +294,11 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 		$transfer_id    = $request_params['transfer_id'];
 		$dest_url       = $request_params['dest_url'];
 
+		update_option( $this->active_tx_option_name, array(
+			'transfer_id' => $transfer_id,
+			'status'      => 'pending-db-dump',
+		) );
+
 		$db_dump_file = $this->migrate_core->tx->create_dump_status_file( $transfer_id, $dest_url );
 
 		$scheduled = $this->migrate_core->backup_core->cron->schedule_direct_transfer();
@@ -252,6 +306,33 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 		return new WP_REST_Response( array(
 			'success'      => true,
 			'db_dump_info' => $scheduled,
+		) );
+	}
+
+	/**
+	 * Check Split DB Status
+	 * 
+	 * Check the $active_tx option to determine
+	 * if the db split is complete, and if not,
+	 * how many parts out of the total are complete
+	 * 
+	 * @param $request WP_REST_Request
+	 */
+	public function check_split_status( $request ) {
+		$params      = $request->get_params();
+
+		$active_tx = get_option( $this->active_tx_option_name, false );
+
+		if ( ! $active_tx ) {
+			return new WP_REST_Response( array(
+				'success' => false,
+				'error'   => 'No active transfer found',
+			) );
+		}
+
+		return new WP_REST_Response( array(
+			'success'          => true,
+			'dump_status_info' => $active_tx['status'],
 		) );
 	}
 
@@ -355,7 +436,6 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 		$transfer_id = $params['transfer_id'];
 		$part_path   = $params['file_part'];
 
-
 		if ( ! file_exists( $part_path ) ) {
 			$this->migrate_core->log->add( 'Large File part not found: ' . $part_path );
 			return new WP_REST_Response( array(
@@ -377,47 +457,6 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	}
 
 	/**
-	 * Split db file
-	 * 
-	 * Rest API request to split the database dump file into smaller parts
-	 * The request should contain the following parameters:
-	 * - transfer_id: The transfer id
-	 * - db_file: The path to the database dump file
-	 * - max_upload_size: The maximum upload size for the parts
-	 * 
-	 * Compare the remote max_upload_size with the local max_upload_size
-	 * Use the smaller of the two values to split the file.
-	 * 
-	 * @param $request WP_REST_Request
-	 * 
-	 * @since 1.17.00
-	 * 
-	 * @return WP_Rest_Response
-	 */
-	public function split_db_file( $request ) {
-		$params = $request->get_params();
-
-		$db_file         = $params['db_file'];
-		$transfer_id     = $params['transfer_id'];
-		$max_upload_size = $params['max_upload_size'];
-		$memory_limit    = $this->migrate_core->util->convert_to_bytes( ini_get('memory_limit') );
-		
-		$max_upload_size = min( $max_upload_size, $memory_limit );
-
-		// extract the file name, from the absolute path in $db_file
-		$relative_path = basename( $db_file );
-
-		$split_files = $this->migrate_core->util->split_large_file( $transfer_id, $db_file, $relative_path, $max_upload_size * 2 );
-
-		$this->migrate_core->log->add( 'Split DB File: ' . $db_file . ' into ' . count( $split_files ) . ' parts' );
-
-		return new WP_REST_Response( array(
-			'success'     => true,
-			'split_files' => json_encode( $split_files ),
-		) );
-	}
-
-	/**
 	 * Split large files
 	 * 
 	 * @since 1.17.0
@@ -433,6 +472,11 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 		$transfer_id     = $params['transfer_id'];
 		$max_upload_size = $params['max_upload_size'];
 
+		update_option( $this->active_tx_option_name, array(
+			'transfer_id' => $transfer_id,
+			'status'      => 'splitting-large-files',
+		) );
+
 		$split_files = array();
 
 		foreach( $files as $file ) {
@@ -441,7 +485,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 
 			$file['md5'] = md5_file( $file_path );
 
-			$file[ 'parts' ]  = $this->migrate_core->util->split_large_file( $transfer_id, $file_path, $relative_path, $max_upload_size );
+			$file[ 'parts' ]  = $this->migrate_core->util->split_large_file( $transfer_id, $file_path, $relative_path, $max_upload_size, 'splitting-large-files' );
 
 			$file[ 'status' ] = 'ready-to-transfer';
 
@@ -470,6 +514,11 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 
 		$files    = json_decode( $params['files'], true );
 		$batch_id = $params['batch_id'];
+
+		update_option( $this->active_tx_option_name, array(
+			'transfer_id' => $params['transfer_id'],
+			'status'      => 'sending-files',
+		) );
 
 		$files_data = array();
 
@@ -520,6 +569,11 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 				'error'   => 'File not found',
 			) );
 		}
+
+		update_option( $this->active_tx_option_name, array(
+			'transfer_id' => $request_params['transfer_id'],
+			'status'      => 'sending-db-file',
+		) );
 
 		$this->migrate_core->log->add( 'Returning DB Dump: ' . $db_path );
 
@@ -578,6 +632,11 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 		usort( $file_list, function( $a, $b ) {
 			return $a['size'] - $b['size'];
 		} );
+
+		update_option( $this->active_tx_option_name, array(
+			'transfer_id' => $request['transfer_id'],
+			'status'      => 'generating-file-list',
+		) );
 
 		$largest_file = $this->migrate_core->util->get_largest_file_size( $file_list, 0 );
 

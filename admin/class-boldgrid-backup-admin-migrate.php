@@ -153,8 +153,8 @@ class Boldgrid_Backup_Admin_Migrate {
 			wp_die();
 		}
 
-		if ( $this->tx->db_dump_is_pending() ) {
-			$this->tx->generate_db_dump();
+		if ( ! empty( get_option( $this->configs['option_names']['active_tx'], false ) ) ) {
+			$this->tx->process_transfers();
 			wp_send_json_success();
 			wp_die();
 		}

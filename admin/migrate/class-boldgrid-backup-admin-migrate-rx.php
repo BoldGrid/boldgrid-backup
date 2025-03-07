@@ -269,6 +269,9 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			case 'db-dump-complete':
 				$this->maybe_split_dump( $transfer_id );
 				break;
+			case 'splitting-db-file':
+				$this->check_split_status( $transfer_id );
+				break;
 			case 'db-ready-for-transfer':
 			case 'db-transferring':
 				$this->process_db_rx( $transfer_id );
@@ -276,6 +279,67 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			case 'pending-restore':
 				$this->migrate_core->restore->restore_site( $transfer, $transfer_id );
 				break;
+		}
+	}
+
+	/*
+	 * Check status of splitting database files
+	 * 
+	 * Query the source site to determine if the
+	 * database dump file is done splitting,
+	 * and if so store the list of split files
+	 * in the transfer data.
+	 * 
+	 * @since 1.17.0
+	 * 
+	 * @param array $transfer Transfer data
+	 */
+	public function check_split_status( $transfer_id ) {
+		$transfer = $this->util->get_transfer_from_id( $transfer_id );
+		$db_dump_info = $transfer['db_dump_info'];
+
+		$response = $this->util->rest_post(
+			$transfer,
+			'check-split-status',
+			array(
+				'transfer_id'  => $transfer['transfer_id'],
+				'db_dump_info' => $db_dump_info,
+			),
+			true
+		);
+
+		if ( is_wp_error( $response ) ) {
+			$this->migrate_core->log->add( 'An attempt to check the split status has timed out. Don\'t worry, this is normal for large databases.' );
+			return;
+		} else if ( ! isset( $response['db_dump_info'] ) ) {
+			$this->migrate_core->log->add( 'No db_dump_info in response: ' . json_encode( $response ) );
+			return;
+		}
+
+		$response_info = $response['db_dump_info'];
+
+		switch( $response_info['status'] ) {
+			case 'splitting-db-file':
+				$chunk_number = isset( $db_dump_info['chunk_number'] ) ? $db_dump_info['chunk_number'] : 0;
+				$chunk_count  = isset( $db_dump_info['chunk_count'] ) ? $db_dump_info['chunk_count'] : 0;
+
+				$this->migrate_core->log->add( 'Splitting DB File: ' . $chunk_number . ' / ' . $chunk_count );
+				return array(
+					'status'       => 'splitting-db-file',
+					'chunk_number' => $chunk_number,
+					'chunk_count'  => $chunk_count
+				);
+			case 'splitting-db-complete':
+				$this->migrate_core->log->add( 'DB File Split Complete' );
+				$db_dump_info['split_files'] = $response_info['split_files'];
+				$this->util->update_transfer_prop( $transfer_id, 'db_dump_info', $db_dump_info );
+				$this->util->update_transfer_prop( $transfer_id, 'status', 'db-ready-for-transfer' );
+				$this->process_db_rx( $transfer_id );
+				return array(
+					'status'       => 'splitting-db-complete',
+					'chunk_number' => count( $response_info['split_files'] ),
+					'chunk_count'  => count( $response_info['split_files'] )
+				);
 		}
 	}
 
@@ -299,9 +363,10 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		$max_upload_size = $this->util->get_max_upload_size();
 		if ( $db_file_size > ( $max_upload_size / 10 ) ) {
 			$this->migrate_core->log->add( 'Database dump file size exceeds the maximum upload size and must be split' );
-			$db_files = $this->split_db_file( $transfer );
+			$this->start_db_split( $transfer, $db_file_path );
+			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'splitting-db-file' );
 		} else {
-			$this->migrate_core->log->add( 'Databse dump file does not need to be split' );
+			$this->migrate_core->log->add( 'Database dump file does not need to be split' );
 			$db_files = array( 'part-0' => array( 'path' => $db_file_path, 'status' => 'pending' ) );
 		}
 
@@ -317,6 +382,41 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		$this->util->update_transfer_prop( $transfer_id, 'status', 'db-ready-for-transfer' );
 
 		$this->process_db_rx( $transfer_id );
+	}
+
+	/**
+	 * Start DB Split
+	 * 
+	 * @since 1.17.0
+	 * 
+	 * @param array $transfer Transfer data
+	 */
+	public function start_db_split( $transfer, $db_file_path ) {
+		$response = $this->util->rest_post(
+			$transfer,
+			'start-db-split',
+			array(
+				'transfer_id' => $transfer['transfer_id'],
+				'db_path'     => $db_file_path,
+				'max_size'    => $this->util->get_max_upload_size(),
+			),
+			true
+		);
+
+		if ( is_wp_error( $response ) ) {
+			$this->migrate_core->log->add( 'Error starting database split: ' . $response->get_error_message() );
+			$this->util->update_transfer_prop(
+				$transfer['transfer_id'],
+				'failed_message',
+				'Error starting database split: ' . $response->get_error_message()
+			);
+			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'failed' );
+			return $response;
+		} else if ( isset( $response['db_dump_info'] ) ) {
+			$this->util->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', json_decode( $response['db_dump_info'], true ) );
+			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'splitting-db' );
+			$this->check_split_status( $transfer );
+		}
 	}
 
 	/**
@@ -1710,7 +1810,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		$new_file_hash = md5_file( $db_dump_file );
 
 		$this->complete_transfer( $transfer['transfer_id'] );
-		}
 	}
 
 	/**

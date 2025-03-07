@@ -56,6 +56,15 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 	public $db_dump_status_option_name;
 
 	/**
+	 * Active Tx Option Name
+	 * 
+	 * @var string
+	 * 
+	 * @since 1.17.0
+	 */
+	public $active_tx_option_name;
+
+	/**
 	 * Boldgrid_Transfer_Admin constructor.
 	 * 
 	 * @param Boldgrid_Backup_Admin_Migrate $migrate_core
@@ -68,8 +77,43 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 		$this->rest          = new Boldgrid_Backup_Admin_Migrate_Tx_Rest( $migrate_core );
 
 		$this->db_dump_status_option_name = $this->migrate_core->configs['option_names']['db_dump_status'];
+		$this->active_tx_option_name      = $this->migrate_core->configs['option_names']['active_tx'];
 
 		$this->add_hooks();
+	}
+
+	/**
+	 * Process Transfers
+	 * 
+	 * There are some long running processes
+	 * that have to be handled in the background
+	 * triggered via cron. These are handled here.
+	 * 
+	 * @since 1.17.0
+	 */
+	public function process_transfers() {
+		$active_tx = $this->migrate_core->util->get_option( $this->active_tx_option_name, array() );
+
+		if ( empty( $active_tx ) ) {
+			$this->migrate_core->log->add( 'No Active Transfer Found.' );
+			$this->migrate_core->backup_core->cron->entry_delete_contains( 'direct-transfer.php' );
+			return;
+		}
+
+		$transfer_id = $active_tx['transfer_id'];
+		$status      = $active_tx['status'];
+
+		$this->migrate_core->log->init( 'direct-transfer-' . $transfer_id );
+
+		$this->migrate_core->log->add( 'Processing Transfer: ' . $transfer_id );
+
+		switch( $status ) {
+			case 'pending-db-dump':
+					$this->generate_db_dump( $active_tx );
+			case 'pending-db-split':
+				$this->split_db_file( $active_tx );
+				break;
+		}
 	}
 
 	/**
@@ -108,6 +152,43 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 		if ( 'dumping' === $status['status'] ) {
 			return $this->maybe_restart_dump( $status, $status_file );
 		}
+	}
+
+	/**
+	 * Split db file
+	 * 
+	 * 
+	 * @param $request WP_REST_Request
+	 * 
+	 * @since 1.17.00
+	 */
+	public function split_db_file( $active_rx ) {
+		$db_file         = $active_rx['db_path'];
+		$transfer_id     = $active_rx['transfer_id'];
+		$max_upload_size = $active_rx['max_size'];
+
+		// extract the file name, from the absolute path in $db_file
+		$relative_path = basename( $db_file );
+
+		update_option( $this->active_tx_option_name, array(
+			'transfer_id' => $transfer_id,
+			'status'      => 'splitting-db-file',
+		) );
+
+		$split_files = $this->migrate_core->util->split_large_file( $transfer_id, $db_file, $relative_path, $max_upload_size * 2, 'splitting-db-file' );
+
+		$this->migrate_core->log->add( 'Split DB File: ' . $db_file . ' into ' . count( $split_files ) . ' parts' );
+
+		update_option( $this->active_tx_option_name, array(
+			'transfer_id' => $transfer_id,
+			'status'      => 'splitting-db-complete',
+			'split_files' => json_encode( $split_files ),
+		) );
+
+		return new WP_REST_Response( array(
+			'success'     => true,
+			'split_files' => json_encode( $split_files ),
+		) );
 	}
 
 	public function maybe_restart_dump( $status, $status_file ) {
