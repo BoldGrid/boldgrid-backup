@@ -109,9 +109,12 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 
 		switch( $status ) {
 			case 'pending-db-dump':
-					$this->generate_db_dump( $active_tx );
+				$this->generate_db_dump( $active_tx );
 			case 'pending-db-split':
 				$this->split_db_file( $active_tx );
+				break;
+			case 'dumping-db-tables':
+				$this->maybe_restart_dump();
 				break;
 		}
 	}
@@ -191,7 +194,23 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 		) );
 	}
 
-	public function maybe_restart_dump( $status, $status_file ) {
+	public function maybe_restart_dump() {
+		$dump_status_option = $this->migrate_core->util->get_option( $this->db_dump_status_option_name, '' );
+		if ( ! $dump_status_option ) {
+			return false;
+		}
+
+		$transfer_id = $dump_status_option['transfer_id'];
+
+		$this->migrate_core->log->init( 'direct-transfer-' . $transfer_id );
+
+		$status_file = $dump_status_option['db_status_file'];
+
+		if ( ! file_exists( $status_file ) ) {
+			error_log( 'File Does not exist: ' . $status_file );
+			return false;
+		}
+
 		if ( 'complete' === $status['status'] || 'pending' === $status['status'] ) {
 			return false;
 		}
@@ -234,6 +253,11 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 			wp_delete_file( $status['file'] );
 		}
 
+		update_option( $this->active_tx_option_name, array(
+			'transfer_id' => $transfer_id,
+			'status'      => 'pending-db-dump',
+		) );
+
 		return true;
 	}
 
@@ -265,7 +289,14 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 	 * 
 	 * @since 1.17.0
 	 */
-	public function generate_db_dump() {
+	public function generate_db_dump( $active_tx ) {
+		$transfer_id = $active_tx['transfer_id'];
+
+		update_option( $this->active_tx_option_name, array(
+			'transfer_id' => $transfer_id,
+			'status'      => 'dumping-db-tables',
+		) );
+
 		$db_status_option = $this->migrate_core->util->get_option( $this->db_dump_status_option_name, array() );
 
 		$db_dump_file = $db_status_option['db_dump_file'];
