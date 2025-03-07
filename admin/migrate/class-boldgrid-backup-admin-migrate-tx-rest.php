@@ -378,7 +378,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 			 * set the status to pending and reschedule the cron
 			 * to start the dump again.
 			 */
-			$restarted = $this->migrate_core->tx->maybe_restart_dump( $response, $status_file );
+			$restarted = $this->migrate_core->tx->maybe_restart_dump();
 		} else {
 			$file_size = 0;
 		}

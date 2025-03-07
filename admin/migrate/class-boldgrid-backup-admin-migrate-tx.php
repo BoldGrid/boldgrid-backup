@@ -128,35 +128,6 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 		add_action( 'rest_api_init', array( $this->rest, 'register_routes' ) );
 	}
 
-	public function db_dump_is_pending() {
-		$dump_status_option = $this->migrate_core->util->get_option( $this->db_dump_status_option_name, '' );
-		if ( ! $dump_status_option ) {
-			return false;
-		}
-
-		$transfer_id = $dump_status_option['transfer_id'];
-
-		$this->migrate_core->log->init( 'direct-transfer-' . $transfer_id );
-
-		$status_file = $dump_status_option['db_status_file'];
-
-		if ( ! file_exists( $status_file ) ) {
-			error_log( 'File Does not exist: ' . $status_file );
-			return false;
-		}
-
-		$status = json_decode( file_get_contents( $status_file ), true );
-		$this->migrate_core->log->add( 'DB Dump Status: ' . json_encode( $status, JSON_PRETTY_PRINT ) );
-
-		if ( 'pending' === $status['status'] ) {
-			return true;
-		}
-
-		if ( 'dumping' === $status['status'] ) {
-			return $this->maybe_restart_dump( $status, $status_file );
-		}
-	}
-
 	/**
 	 * Split db file
 	 * 
@@ -210,6 +181,8 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 			error_log( 'File Does not exist: ' . $status_file );
 			return false;
 		}
+
+		$status = json_decode( file_get_contents( $status_file ), true );
 
 		if ( 'complete' === $status['status'] || 'pending' === $status['status'] ) {
 			return false;

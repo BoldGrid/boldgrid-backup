@@ -478,7 +478,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			$db_dump_info['db_size'] = $db_dump_info['file_size'];
 		}
 
-		$progress_perc = 0 !== $db_dump_info['db_size'] ?
+		$progress_perc = 0 !== intval( $db_dump_info['db_size'] ) ?
 			( $db_dump_info['file_size'] / $db_dump_info['db_size'] * 100 ) :
 			0;
 
