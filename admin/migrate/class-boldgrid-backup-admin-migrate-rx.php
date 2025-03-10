@@ -303,7 +303,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			'check-split-status',
 			array(
 				'transfer_id'  => $transfer['transfer_id'],
-				'db_dump_info' => $db_dump_info,
+				'dump_status_info' => $db_dump_info,
 			),
 			true
 		);
@@ -311,12 +311,12 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		if ( is_wp_error( $response ) ) {
 			$this->migrate_core->log->add( 'An attempt to check the split status has timed out. Don\'t worry, this is normal for large databases.' );
 			return;
-		} else if ( ! isset( $response['db_dump_info'] ) ) {
+		} else if ( ! isset( $response['dump_status_info'] ) ) {
 			$this->migrate_core->log->add( 'No db_dump_info in response: ' . json_encode( $response ) );
 			return;
 		}
 
-		$response_info = $response['db_dump_info'];
+		$response_info = $response['dump_status_info'];
 
 		switch( $response_info['status'] ) {
 			case 'splitting-db-file':
@@ -331,7 +331,11 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 				);
 			case 'splitting-db-complete':
 				$this->migrate_core->log->add( 'DB File Split Complete' );
-				$db_dump_info['split_files'] = $response_info['split_files'];
+				$split_files = array();
+				foreach( json_decode( $response_info['split_files'], true ) as $index => $split_file ) {
+					$split_files[ 'part-' . $index ] = array( 'path' => $split_file, 'status' => 'pending' );
+				}
+				$db_dump_info['split_files'] = $split_files;
 				$this->util->update_transfer_prop( $transfer_id, 'db_dump_info', $db_dump_info );
 				$this->util->update_transfer_prop( $transfer_id, 'status', 'db-ready-for-transfer' );
 				$this->process_db_rx( $transfer_id );
@@ -365,6 +369,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			$this->migrate_core->log->add( 'Database dump file size exceeds the maximum upload size and must be split' );
 			$this->start_db_split( $transfer, $db_file_path );
 			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'splitting-db-file' );
+			return;
 		} else {
 			$this->migrate_core->log->add( 'Database dump file does not need to be split' );
 			$db_files = array( 'part-0' => array( 'path' => $db_file_path, 'status' => 'pending' ) );
@@ -1751,7 +1756,9 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			return new WP_Error( 'boldgrid_transfer_rx_db_dir_error', __( 'There was an error creating the directory path for the database dump.', 'boldgrid-backup' ) );
 		}
 
-		$db_files = $db_dump_info['split_files'];
+		$db_files = is_array( $db_dump_info['split_files'] ) ?
+			$db_dump_info['split_files'] :
+			json_decode( $db_dump_info['split_files'], true );
 
 		// loop through the split files and return true if any of them are marked 'transferring'
 		$transferring = array_filter( $db_files, function( $file, $key ) {
@@ -1904,25 +1911,25 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * @return void
 	 */
 	public function merge_db_files( $db_files, $output_file ) {
-		$outHandle = fopen( $output_file, 'wb' );
-		if ( ! $outHandle ) {
+		$out_handle = fopen( $output_file, 'wb' );
+		if ( ! $out_handle ) {
 			// handle error opening output file
 		}
 
 		foreach ( $db_files as $db_file ) {
-			$inHandle = fopen( $db_file['path'], 'rb' );
-			if ( ! $inHandle ) {
+			$in_handle = fopen( $db_file['path'], 'rb' );
+			if ( ! $in_handle ) {
 				// handle error opening input file
 			}
 
-			while ( ! feof( $inHandle ) ) {
-				$chunk = fread( $inHandle, 1024 * 1024 ); // read 1 MB at a time
-				fwrite( $outHandle, $chunk );
+			while ( ! feof( $in_handle ) ) {
+				$chunk = fread( $in_handle, 1024 * 1024 ); // read 1 MB at a time
+				fwrite( $out_handle, $chunk );
 			}
-			fclose( $inHandle );
+			fclose( $in_handle );
 		}
 
-		fclose( $outHandle );
+		fclose( $out_handle );
 
 		// Delete the individual db files
 		foreach( $db_files as $db_file ) {

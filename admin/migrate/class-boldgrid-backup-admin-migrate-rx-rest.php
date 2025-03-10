@@ -747,9 +747,10 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 					'Database Dump Complete. Pending Transfer',
 					'boldgrid-backup'
 				);
+				$this->migrate_core->backup_core->cron->schedule_direct_transfer();
 				break;
 			case 'splitting-db-dump':
-				$progress = $this->migrate_core->rx->check_split_status( $transfer );
+				$progress = $this->migrate_core->rx->check_split_status( $transfer_id );
 				$progress = 0 !== $progress['chunk_count'] ? $progress['chunk_number'] / $progress['chunk_count'] * 100 : 0;	
 				$progress_data['status']               = 'splitting-db-dump';
 				$progress_data['progress']             = $progress;
