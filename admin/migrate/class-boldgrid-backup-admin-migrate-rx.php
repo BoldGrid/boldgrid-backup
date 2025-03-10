@@ -1932,9 +1932,9 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		fclose( $out_handle );
 
 		// Delete the individual db files
-		// foreach( $db_files as $db_file ) {
-		// 	wp_delete_file( $db_file['path'] );
-		// }
+		foreach( $db_files as $db_file ) {
+			wp_delete_file( $db_file['path'] );
+		}
 
 		return $output_file;
 	}
