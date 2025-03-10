@@ -320,8 +320,8 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		switch( $response_info['status'] ) {
 			case 'splitting-db-file':
-				$chunk_number = isset( $db_dump_info['chunk_number'] ) ? $db_dump_info['chunk_number'] : 0;
-				$chunk_count  = isset( $db_dump_info['chunk_count'] ) ? $db_dump_info['chunk_count'] : 0;
+				$chunk_number = isset( $response_info['chunk_number'] ) ? $response_info['chunk_number'] : 0;
+				$chunk_count  = isset( $response_info['chunk_count'] ) ? $response_info['chunk_count'] : 0;
 
 				$this->migrate_core->log->add( 'Splitting DB File: ' . $chunk_number . ' / ' . $chunk_count );
 				return array(
@@ -1932,9 +1932,9 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		fclose( $out_handle );
 
 		// Delete the individual db files
-		foreach( $db_files as $db_file ) {
-			wp_delete_file( $db_file['path'] );
-		}
+		// foreach( $db_files as $db_file ) {
+		// 	wp_delete_file( $db_file['path'] );
+		// }
 
 		return $output_file;
 	}

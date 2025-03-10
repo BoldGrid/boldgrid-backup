@@ -224,7 +224,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 
 		$transfer_id = $params['transfer_id'];
 		$db_path     = $params['db_path'];
-		$max_size    = min( $this->util->get_max_upload_size(), $params['max_size'] );
+		$max_size    = min( $this->migrate_core->util->get_max_upload_size(), $params['max_size'] );
 
 		update_option( $this->active_tx_option_name, array(
 			'transfer_id' => $transfer_id,
@@ -332,7 +332,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 
 		return new WP_REST_Response( array(
 			'success'          => true,
-			'dump_status_info' => $active_tx['status'],
+			'dump_status_info' => $active_tx,
 		) );
 	}
 
@@ -578,8 +578,8 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 		$this->migrate_core->log->add( 'Returning DB Dump: ' . $db_path );
 
 		return new WP_REST_Response( array(
-			'success' => true,
-			'file'    => file_get_contents( $db_path ),
+			'success'   => true,
+			'file'      => file_get_contents( $db_path ),
 			'file_hash' => md5_file( $db_path ),
 		) );
 	}
