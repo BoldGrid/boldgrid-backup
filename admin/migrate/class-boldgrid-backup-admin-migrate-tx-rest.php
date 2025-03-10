@@ -260,7 +260,8 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 
 		$dest_dir = $this->migrate_core->util->url_to_safe_directory_name( $dest_url );
 
-		$transfer_dir = $this->migrate_core->util->get_transfer_dir() . '/' . $dest_dir . '/' . $transfer_id;
+		$transfer_dir   = $this->migrate_core->util->get_transfer_dir() . '/' . $dest_dir . '/' . $transfer_id;
+		$temp_files_dir = $this->migrate_core->util->get_transfer_dir() . '/temp-file-chunks/' . '/' . $transfer_id;
 
 		$this->migrate_core->log->add( 'Deleting Transfer files: ' . $transfer_dir );
 
@@ -269,9 +270,20 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 		update_option( $this->active_tx_option_name, array() );
 		
 		if ( file_exists( $transfer_dir ) ) {
-			$files_deleted = $this->migrate_core->util->delete_directory( $transfer_dir );
+			$transfer_files_deleted = $this->migrate_core->util->delete_directory( $transfer_dir );
 		} else {
 			$this->migrate_core->log->add( 'Transfer directory not found: ' . $transfer_dir );
+			$transfer_files_deleted = true;
+		}
+
+		if ( file_exists( $temp_files_dir ) ) {
+			$temp_files_deleted = $this->migrate_core->util->delete_directory( $temp_files_dir );
+		} else {
+			$this->migrate_core->log->add( 'Temp file directory not found: ' . $temp_files_dir );
+			$temp_files_deleted = true;
+		}
+
+		if ( $transfer_files_deleted && $temp_files_deleted ) {
 			$files_deleted = true;
 		}
 

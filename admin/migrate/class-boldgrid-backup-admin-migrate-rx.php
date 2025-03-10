@@ -341,8 +341,8 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 				$this->process_db_rx( $transfer_id );
 				return array(
 					'status'       => 'splitting-db-complete',
-					'chunk_number' => count( $response_info['split_files'] ),
-					'chunk_count'  => count( $response_info['split_files'] )
+					'chunk_number' => count( $split_files ),
+					'chunk_count'  => count( $split_files )
 				);
 		}
 	}

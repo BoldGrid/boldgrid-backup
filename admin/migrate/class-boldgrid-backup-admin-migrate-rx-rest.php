@@ -749,15 +749,17 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 				);
 				$this->migrate_core->backup_core->cron->schedule_direct_transfer();
 				break;
-			case 'splitting-db-dump':
-				$progress = $this->migrate_core->rx->check_split_status( $transfer_id );
-				$progress = 0 !== $progress['chunk_count'] ? $progress['chunk_number'] / $progress['chunk_count'] * 100 : 0;	
+			case 'splitting-db-file':
+				$progress     = $this->migrate_core->rx->check_split_status( $transfer_id );
+				$chunk_count  = $progress['chunk_count'];
+				$chunk_number = $progress['chunk_number'];
+				$progress     = 0 !== $chunk_count ? $chunk_number / $chunk_count * 100 : 0;	
 				$progress_data['status']               = 'splitting-db-dump';
 				$progress_data['progress']             = $progress;
 				$progress_data['progress_text']        = esc_html( sprintf(
 					'%1$s / %2$s Files (%3$s%%)',
-					$completed_count,
-					$db_part_count,
+					$chunk_number,
+					$chunk_count,
 					number_format( $progress, 2 )
 				) );
 				$progress_data['progress_status_text'] = esc_html__(
@@ -797,6 +799,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 					'Transferring Database',
 					'boldgrid-backup'
 				);
+				$this->migrate_core->log->add( 'Transferring DB Files: ' . $progress_data['progress_text'] );
 				$this->migrate_core->rx->process_transfers();
 				break;
 			case 'transferring-small-files':
