@@ -94,13 +94,7 @@ class Boldgrid_Backup_Admin_Log {
 
 		/*
 		 * Append the message to the log.
-		 *
-		 * WP_Filesystem does not have a way to append to a file, so we're rewriting the file each
-		 * time. Best route would be to fopen the file and append. This may need to be revisited.
 		 */
-		// $file_content = $this->get_contents() . PHP_EOL . $message;
-		// $this->core->wp_filesystem->put_contents( $this->filepath, $file_content );
-		// Open the file in append mode
 		$handle = fopen( $this->filepath, 'a+' );
 		if ( $handle ) {
 			// Append the new message with a line break at the beginning

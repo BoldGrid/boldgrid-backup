@@ -142,7 +142,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param  array $lines Lines to import.
+	 * @param  array $lines MySQL dump file lines.
 	 * @return bool
 	 */
 	public function import_lines( $lines ) {
