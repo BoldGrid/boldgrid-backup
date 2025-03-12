@@ -378,11 +378,8 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 		$response  = json_decode( file_get_contents( $status_file ), true );
 		$restarted = false;
 
-		$this->migrate_core->log->add( 'Status File Contents ' . json_encode( $response, JSON_PRETTY_PRINT ) );
-
 		if ( file_exists( $response['file'] ) ) {
 			clearstatcache();
-			$this->migrate_core->log->add( 'Obtaining File Size of ' . $response['file'] );
 			$file_size = filesize( $response['file'] );
 			/*
 			 * If the file is not complete and it has been more
@@ -399,7 +396,6 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 
 		if ( 'complete' === $response['status'] ) {
 			$response['db_size'] = $file_size;
-			$this->migrate_core->log->add( 'Generating MD5 for completed dump file: ' . $response['file'] );
 		}
 
 		if ( 'pending' === $response['status'] ) {
