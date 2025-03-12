@@ -141,10 +141,11 @@ if ( empty( $transfers ) ) {
 $escaped_transfer_table .= '</tbody></table>';
 
 $escaped_headings = sprintf(
-	'<h2>%1$s</h2>
-	<p>%2$s</p>
-	<p>%3$s</p>',
+	'<h2>%1$s <span class="boldgrid-backup-beta-span>%2$s!</span></h2>
+	<p>%3$s</p>
+	<p>%4$s</p>',
 	esc_html__( 'Direct Transfer', 'boldgrid-backup' ),
+	esc_html__( 'Beta', 'boldgrid-backup' ),
 	esc_html__(
 		'The direct transfer feature allows you to transfer files from another website to this site without having to make a backup first.',
 		'boldgrid-backup'
