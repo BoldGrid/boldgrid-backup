@@ -292,7 +292,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * 
 	 * @since 1.17.0
 	 * 
-	 * @param array $transfer Transfer data
+	 * @param string $transfer_id Transfer ID
 	 */
 	public function check_split_status( $transfer_id ) {
 		$transfer = $this->util->get_transfer_from_id( $transfer_id );
@@ -394,7 +394,8 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * 
 	 * @since 1.17.0
 	 * 
-	 * @param array $transfer Transfer data
+	 * @param array  $transfer     Transfer data
+	 * @param string $db_file_path Database file path
 	 */
 	public function start_db_split( $transfer, $db_file_path ) {
 		$response = $this->util->rest_post(
@@ -539,36 +540,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			$this->util->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', json_decode( $response['db_dump_info'], true ) );
 			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'dumping-db-tables' );
 			$this->check_dump_status( $transfer );
-		}
-	}
-
-	/**
-	 * Generate Database Dump
-	 * 
-	 * @since 1.17.0
-	 * 
-	 * @param array $transfer Transfer data
-	 */
-	public function generate_db_dump( $transfer ) {
-		if ( $transfer['status'] === 'pending' ) {
-			
-		} else if ( $transfer['status'] === 'dumping-db-tables' ) 
-		// Generate Database Dump
-		$generate_db_dump = $this->util->rest_get(
-			$transfer,
-			'generate-db-dump',
-			'generate_db_dump'
-		);
-
-		if ( is_wp_error( $generate_db_dump ) ) {
-			$this->migrate_core->log->add( 'Error generating database dump: ' . $generate_db_dump->get_error_message() );
-			$this->util->update_transfer_prop(
-				$transfer['transfer_id'],
-				'failed_message',
-				'Error generating database dump: ' . $generate_db_dump->get_error_message()
-			);
-			$this->util->update_transfer_prop( $transfer_id, 'status', 'failed' );
-			return $generate_db_dump;
 		}
 	}
 
