@@ -122,6 +122,20 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		$this->active_tx_option_name           = $this->migrate_core->configs['option_names']['active_tx'];
 	}
 
+	/**
+	 * Get Elapsed Time
+	 * 
+	 * Gets the elapsed time for a transfer, or
+	 * for just the current status.
+	 * 
+	 * @since 1.17.0
+	 *
+	 * @param string  $transfer_id  The transfer id
+	 * @param boolean $formatted    Whether to format the time
+	 * @param boolean $return_total Whether to return the total time
+	 *
+	 * @return float|string The elapsed time as either a float or a formatted string
+	 */
 	public function get_elapsed_time( $transfer_id, $formatted = false, $return_total = true ) {
 		$transfer = $this->get_transfer_from_id( $transfer_id );
 
@@ -154,6 +168,13 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		return $formatted ? $this->format_time( $elapsed_time ) : $elapsed_time;
 	}
 
+	/**
+	 * Update Elapsed Time
+	 * 
+	 * Updates the elapsed time for a transfer.
+	 *
+	 * @param string $transfer_id The transfer id
+	 */
 	public function update_elapsed_time( $transfer_id ) {
 		$transfer      = $this->get_transfer_from_id( $transfer_id );
 		$resyncing_db  = isset( $transfer['resyncing_db'] ) ? $transfer['resyncing_db'] : false;
@@ -182,6 +203,16 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		$option_updated = update_option( $this->transfers_option_name, $transfers, true );
 	}
 
+	/**
+	 * Generate transfer action buttons
+	 * 
+	 * @since 1.17.0
+	 *
+	 * @param string $transfer_status The transfer status
+	 * @param string $transfer_id     Transfer ID
+	 *
+	 * @return string HTML Markup for the action buttons
+	 */
 	public function transfer_action_buttons( $transfer_status, $transfer_id ) {
 		$buttons = array(
 			'restore' => array(
@@ -429,25 +460,6 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	}
 
 	/**
-	 * Generate DB Dump
-	 * 
-	 * Generate a database dump file.
-	 * 
-	 * @since 1.17.0
-	 * 
-	 * @return string The path to the database dump file
-	 */
-	public function generate_db_dump() {
-		$backup_file = $this->get_transfer_dir() . '/db-' . DB_NAME . '-export-' . gmdate('Y-m-d-H-i-s') . '.sql';
-
-		$db_dump = new Boldgrid_Backup_Admin_Db_Dump( $this->transfer_core->backup_core );
-
-		$db_dump->dump( $backup_file );
-
-		return $backup_file;
-	}
-
-	/**
 	 * Get all files in a directory
 	 * 
 	 * Note: This file excludes anything in the
@@ -596,7 +608,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * @return string|WP_Error The REST URL or a WP_Error if unable to get the URL
 	 */
 	public function get_site_rest_url( $site_url ) {
-		$response     = wp_remote_get(
+		$response = wp_remote_get(
 			$site_url,
 			array(
 				'timeout' => $this->migrate_core->configs['conn_timeout']
@@ -1232,7 +1244,15 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		}
 	}
 
-
+	/**
+	 * Install Total Upkeep
+	 * 
+	 * Install Total Upkeep on a site
+	 * 
+	 * @since 1.17.0
+	 *
+	 * @param url $url The site url
+	 */
 	public function install_total_upkeep( $url ) {
 		$site_url    = $url;
 		$rest_url    = $this->get_site_rest_url( $site_url );
@@ -1280,6 +1300,14 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		return true;
 	}
 
+	/**
+	 * Validate Total Upkeep Status
+	 * 
+	 * @since 1.17.0
+	 *
+	 * @param string $site_rest_url The site REST URL
+	 * @param string $site_url      The site URL
+	 */
 	public function validate_total_upkeep_status( $site_rest_url, $site_url ) {
 		$total_upkeep_status = $this->get_total_upkeep_status(
 			array(
@@ -1389,8 +1417,13 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 
 	/**
 	 * Edit Total Upkeep Status
-	 * 
+	 *
+	 * Edit the activation status of Total Upkeep
+	 *
+	 * @since 1.17.0
+	 *
 	 * @param string $site_url The site URL
+	 * @param string $status   The status to set
 	 */
 	public function edit_total_upkeep_status( $site_url, $status ) {
 		$rest_url    = $this->get_site_rest_url( $site_url );
@@ -1441,7 +1474,9 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 
 	/**
 	 * Update the Total Upkeep Plugin
-	 * 
+	 *
+	 * @since 1.17.0
+	 *
 	 * @param string $site_url The site URL
 	 */
 	public function update_total_upkeep( $site_url ) {
@@ -1478,6 +1513,13 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		return $this->install_total_upkeep( $site_url );
 	}
 
+	/**
+	 * Get Total Upkeep Status
+	 * 
+	 * @since 1.17.0
+	 *
+	 * @param array $transfer The transfer data
+	 */
 	public function get_total_upkeep_status( $transfer ) {
 		$site_url    = $transfer['source_site_url'];
 		$rest_url    = $transfer['source_rest_url'];
