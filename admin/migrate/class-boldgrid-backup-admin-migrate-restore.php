@@ -556,6 +556,7 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 		}
 
 		$this->migrate_core->log->add( 'Finished restoring options.' );
+		wp_delete_file( $options_file );
 	}
 
 	/**
