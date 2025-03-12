@@ -47,6 +47,7 @@ BoldGrid.DirectTransfers = function($) {
 	 * @param {object} data               The data to be sent
 	 * @param {CallableFunction} callback Function to call on completion
 	 * @param {object} callbackArgs       Arguments to pass to the callback function
+	 * @param {boolean} wait              Whether or not to wait if there is another request in progress
 	 *
 	 * @return {void}
 	 * @since 1.17.0
@@ -92,7 +93,6 @@ BoldGrid.DirectTransfers = function($) {
 	/**
 	 * Bind Events
 	 *
-	 * @return {void}
 	 * @since 1.17.0
 	 */
 	self._bindEvents = function() {
@@ -289,6 +289,13 @@ BoldGrid.DirectTransfers = function($) {
 		});
 	};
 
+	/**
+	 * Bind Delete Button
+	 *
+	 * @since 1.17.0
+	 *
+	 * @param {jQuery} $deleteButton The delete button
+	 */
 	self._bindDeleteButton = function($deleteButton) {
 		// Bind the Delete button
 		$deleteButton.on('click', function(e) {
@@ -580,6 +587,16 @@ BoldGrid.DirectTransfers = function($) {
 		}
 	};
 
+	/**
+	 * Activate Total Upkeep Callback
+	 * 
+	 * Callback for endpoint: /activate-total-upkeep
+	 * 
+	 * @param {object} response The response from the REST API
+	 * @param {object} args     The arguments passed to the callback
+	 * 
+	 * @since 1.17.0
+	 */
 	self._activateTotalUpkeepCallback = function(response, args) {
 		if (response.success) {
 			args.$startTransferButton.prop('disabled', false);
@@ -591,6 +608,12 @@ BoldGrid.DirectTransfers = function($) {
 
 	/**
 	 * Bind Activate Total Upkeep Button
+	 * 
+	 * Binds the Activate Total Upkeep button to the REST API endpoint.
+	 * 
+	 * @param {jQuery} $button Activate TU Button
+	 * 
+	 * @since 1.17.0
 	 */
 	self._bindActivateTotalUpkeepButton = function($button) {
 		var url = $button.data('url'),
@@ -621,6 +644,8 @@ BoldGrid.DirectTransfers = function($) {
 	 * Binds the Update Total Upkeep button to the REST API endpoint.
 	 *
 	 * @param {jQuery} $button Update TU Button
+	 * 
+	 * @since 1.17.0
 	 */
 	self._bindUpdateTotalUpkeepButton = function($button) {
 		var url = $button.data('url'),
@@ -651,6 +676,8 @@ BoldGrid.DirectTransfers = function($) {
 	 * Callback for endpoint: /update-total-upkeep
 	 * @param {object} response The response from the REST API
 	 * @param {object} args     The arguments passed to the callback
+	 * 
+	 * @since 1.17.0
 	 */
 	self._updateTotalUpkeepCallback = function(response, args) {
 		if (response.success) {
@@ -760,6 +787,8 @@ BoldGrid.DirectTransfers = function($) {
 	 *
 	 * @param {string} authAdminUrl WP-Admin URL of source site
 	 * @param {string} appUuid      App UUID to be passed to the source site
+	 * 
+	 * @since 1.17.0
 	 */
 	self._authTransfer = function(authEndpoint, appUuid) {
 		var authNonce = $('#auth_nonce').val(),
