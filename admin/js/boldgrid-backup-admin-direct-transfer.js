@@ -51,8 +51,8 @@ BoldGrid.DirectTransfers = function($) {
 	 * @return {void}
 	 * @since 1.17.0
 	 */
-	self._restRequest = function(endpoint, method, data, callback, callbackArgs = {}, wait = true ) {
-		if ( wait && window.bgbckupProcessingRequest ) {
+	self._restRequest = function(endpoint, method, data, callback, callbackArgs = {}, wait = true) {
+		if (wait && window.bgbckupProcessingRequest) {
 			return;
 		}
 
@@ -83,8 +83,8 @@ BoldGrid.DirectTransfers = function($) {
 				) {
 					window.location.reload();
 				}
-				if ( 500 === response.status ) {
-					callback( { success: false, data: { error: self.lang.server_error } }, callbackArgs );
+				if (500 === response.status) {
+					callback({ success: false, data: { error: self.lang.server_error } }, callbackArgs);
 				}
 			});
 	};
@@ -96,16 +96,16 @@ BoldGrid.DirectTransfers = function($) {
 	 * @since 1.17.0
 	 */
 	self._bindEvents = function() {
-		var $authButton     = $('#auth_transfer'),
-			$xferButtons    = $('button.start-transfer'),
-			$restoreButton  = $('button.restore-site'),
+		var $authButton = $('#auth_transfer'),
+			$xferButtons = $('button.start-transfer'),
+			$restoreButton = $('button.restore-site'),
 			$resyncDbButton = $('button.resync-database'),
-			$cancelButton   = $('button.cancel-transfer'),
-			$deleteButton   = $('button.delete-transfer'),
-			$sectionLinks   = $('.bg-left-nav li[data-section-id]'),
-			$authError      = $('.bgbkup-transfers-rx .authentication-error'),
-			$closeModal     = $('.direct-transfer-modal-close'),
-			url             = new URL(window.location);
+			$cancelButton = $('button.cancel-transfer'),
+			$deleteButton = $('button.delete-transfer'),
+			$sectionLinks = $('.bg-left-nav li[data-section-id]'),
+			$authError = $('.bgbkup-transfers-rx .authentication-error'),
+			$closeModal = $('.direct-transfer-modal-close'),
+			url = new URL(window.location);
 
 		// Check if the URL contains a sucess=false query arg, if so, show the error message.
 		if (url.searchParams.has('success') && 'false' === url.searchParams.get('success')) {
@@ -114,7 +114,7 @@ BoldGrid.DirectTransfers = function($) {
 		}
 
 		// Check if the URL contains a sucess arg, and if so, clear the query args from the URL.
-		if (url.searchParams.has('user_login') ) {
+		if (url.searchParams.has('user_login')) {
 			self._clearQueryArgs();
 			window.location.reload();
 		}
@@ -217,9 +217,9 @@ BoldGrid.DirectTransfers = function($) {
 
 	/**
 	 * Clear Query Args
-	 * 
+	 *
 	 * Clear the query args from the URL.
-	 * 
+	 *
 	 * @since 1.17.0
 	 */
 	self._clearQueryArgs = function() {
@@ -231,7 +231,7 @@ BoldGrid.DirectTransfers = function($) {
 		url.searchParams.delete('password');
 		url.searchParams.delete('app_uuid');
 		window.history.pushState({}, '', url);
-	}
+	};
 
 	/**
 	 * Open Modal
@@ -485,8 +485,8 @@ BoldGrid.DirectTransfers = function($) {
 				timeElapsed = response.data.elapsed_time,
 				$cancelButton = $(
 					'.bgbkup-transfers-rx tr.transfer-info[data-transfer-id=' + transferId + ']'
-				).find('.cancel-transfer')
-				borderRadius = '10';
+				).find('.cancel-transfer');
+			borderRadius = '10';
 
 			if ('completed' === status) {
 				$row.addClass('completed');
@@ -527,9 +527,12 @@ BoldGrid.DirectTransfers = function($) {
 				$row.find('td').empty();
 				$row.find('td').append('<p class="notice notice-error">' + progressText + '</p>');
 				// Change the cancel button to a delete button, and bind the delete action to it.
-				$cancelButton.removeClass( 'cancel-transfer' ).addClass( 'delete-transfer' ).text( self.lang.delete );
-				$cancelButton.off( 'click' );
-				self._bindDeleteButton( $cancelButton );
+				$cancelButton
+					.removeClass('cancel-transfer')
+					.addClass('delete-transfer')
+					.text(self.lang.delete);
+				$cancelButton.off('click');
+				self._bindDeleteButton($cancelButton);
 			}
 		} else {
 			$row.addClass('error');
@@ -563,12 +566,12 @@ BoldGrid.DirectTransfers = function($) {
 			}, 3000);
 		} else {
 			$errorDiv.empty();
-			if ( response.data.message ) {
-				$errorDiv.append( '<p class="notice notice-error">' + response.data.message + '</p>' );
-			} else if ( ! response.data.error.includes( 'notice-error' ) ) {
-				$errorDiv.append( '<p class="notice notice-error">' + response.data.error + '</p>' );
+			if (response.data.message) {
+				$errorDiv.append('<p class="notice notice-error">' + response.data.message + '</p>');
+			} else if (!response.data.error.includes('notice-error')) {
+				$errorDiv.append('<p class="notice notice-error">' + response.data.error + '</p>');
 			} else {
-				$errorDiv.append( response.data.error );
+				$errorDiv.append(response.data.error);
 			}
 			$errorsRow.show();
 			self._bindInstallTotalUpkeepButton($errorDiv.find('button.install-total-upkeep'));
@@ -767,11 +770,11 @@ BoldGrid.DirectTransfers = function($) {
 
 		successUrl = window.location.href + '&_wpnonce=' + authNonce;
 
-		params = $.param( {
+		params = $.param({
 			app_name: 'Total Upkeep',
 			app_id: appUuid,
 			success_url: successUrl
-		} );
+		});
 
 		window.location.href = authEndpoint + '?' + params;
 	};
