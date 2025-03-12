@@ -499,9 +499,10 @@ class Boldgrid_Backup_Admin_In_Progress {
 		 */
 		$response['log'] = esc_html( $log->get_contents() );
 
+		$response['is_running'] = self::is_running();
+
 		// If support is available, add info about whether the backup process is running.
 		if ( Boldgrid_Backup_Admin_Test::is_getpgid_supported() ) {
-			$response['is_running'] = self::is_running();
 			$log->add( 'Backup process running: ' . ( ! $response['is_running'] ? 'No' : 'Yes (pgid = ' . self::getpgid() . ')' ) );
 		}
 
