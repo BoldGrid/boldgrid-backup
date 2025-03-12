@@ -921,32 +921,11 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 			return;
 		}
-		$bytes_rcvd = $this->util->get_transfer_prop( $transfer_id, 'bytes_received', 0 );
 		
-		// Count the number of files transferred.
-		$transfer            = $this->util->get_transfer_from_id( $transfer_id );
-		$file_lists          = $this->util->get_option( $this->lists_option_name, array() );
-		$file_list           = $file_lists[ $transfer_id ];
-		$file_count          = count( json_decode( $file_list['small'], true ) ) + count( json_decode( $file_list['large'], true ) );
-		$total_elapsed_time  = $this->util->get_elapsed_time( $transfer_id );
-		$bytes_per_sec       = $bytes_rcvd / $total_elapsed_time;
+		$this->migrate_core->log->add( 'Transfer ' . $transfer_id . ' completed' );
+		$this->migrate_core->log->add( $this->util->get_transfer_report( $transfer_id ) );
 		
-		$this->migrate_core->log->add(
-			sprintf( 
-				'Transfer %1$s completed.%6$c%7$c' .
-				'Total Size Transferred: %2$s%6$c%7$c' .
-				'Total Files Transferred: %3$s%6$c%7$c' .
-				'Time Elapsed: %4$s%6$c%7$c'.
-				'Average Transfer Rate: %5$s',
-				$transfer_id,
-				size_format( $bytes_rcvd, 2 ),
-				$file_count,
-				$this->util->get_elapsed_time( $transfer_id, true ),
-				size_format( $bytes_per_sec ) . '/s',
-				10,
-				9
-			)
-		);
+		
 		update_option( $this->active_transfer_option_name, false, false );
 	}
 

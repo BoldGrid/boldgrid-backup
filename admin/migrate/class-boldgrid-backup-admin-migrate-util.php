@@ -309,6 +309,45 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	}
 
 	/**
+	 * Get Transfer Report
+	 * 
+	 * Get the transfer report for a transfer id.
+	 * 
+	 * @since 1.17.0
+	 * 
+	 * @param string $transfer_id The transfer id
+	 * 
+	 * @return string Json encoded transfer report
+	 */
+	public function get_transfer_report( $transfer_id ) {
+		$bytes_rcvd = $this->get_transfer_prop( $transfer_id, 'bytes_received', 0 );
+		
+		// Count the number of files transferred.
+		$transfer            = $this->get_transfer_from_id( $transfer_id );
+		$file_lists          = $this->get_option( $this->lists_option_name, array() );
+		$file_list           = $file_lists[ $transfer_id ];
+		$file_count          = count( json_decode( $file_list['small'], true ) ) + count( json_decode( $file_list['large'], true ) );
+		$total_elapsed_time  = $this->get_elapsed_time( $transfer_id );
+		$bytes_per_sec       = $bytes_rcvd / $total_elapsed_time;
+
+		$time_tracking_report = array();
+
+		foreach ( $transfer['time_tracking'] as $status => $time ) {
+			$time_tracking_report[ $status ] = $this->format_time( $time['end_time'] - $time['start_time'] );
+		}
+
+		$report = array(
+			'Total Size Transferred'   => size_format( $bytes_rcvd, 2 ),
+			'Total Files Transferred'  => $file_count,
+			'Average Transfer Rate'    => size_format( $bytes_per_sec ) . '/s',
+			'Total Time Elapsed'       => $this->get_elapsed_time( $transfer_id, true ),
+			'Time Tracking'            => $time_tracking_report,
+		);
+
+		return json_encode( $report, JSON_PRETTY_PRINT );
+	}
+
+	/**
 	 * Split Large File
 	 * 
 	 * Given a file path, this function will split the large file
