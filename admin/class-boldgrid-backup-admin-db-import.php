@@ -95,7 +95,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 			);
 		}
 
-		$success = $this->import_lines( $handle, $file );
+		$success = $this->import_lines( $file );
 		fclose( $handle );
 
 		return $success;
@@ -143,95 +143,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * @param  string   $file   File path.
 	 * @return bool
 	 */
-	public function import_lines( $handle, $file = null ) {
-		/* phpcs:disable WordPress.DB.RestrictedClasses */
-		$db = new PDO( $this->get_connection_string(), DB_USER, DB_PASSWORD );
-
-		$templine    = '';
-
-		$import_stats = array(
-			'total_bytes'     => $file ? filesize( $file ) : 0,
-			'completed_bytes' => 0,
-		);
-
-		// If we're in cli, get_option isn't defined, so we'll skip the logging.
-		if ( 'cli' !== php_sapi_name() ) {
-			$settings   = get_option( 'boldgrid_backup_settings', array() );
-			$backup_dir = isset( $settings['backup_directory']) ? $settings['backup_directory'] : '/var/www/boldgrid_backup';
-			$log_file   = $backup_dir . '/active-import.log';
-		}
-
-		while ( ( $line = fgets( $handle ) ) !== false ) {
-			// Skip comments and empty lines.
-			if ( substr( $line, 0, 2 ) === '--' || empty( trim( $line ) ) ) {
-				continue;
-			}
-
-			$templine .= $line;
-
-			// Check if this is the end of the query.
-			if ( ';' === substr( trim( $line ), -1, 1 ) ) {
-				// Fix the view statements if needed
-				$templine = $this->fix_view_statements_line( $templine );
-
-				$affected_rows = $this->exec_import( $db, $templine );
-				if ( $affected_rows === false ) {
-					return false;
-				}
-
-				// Update the import stats only when finishing a query.
-				$import_stats['completed_bytes'] = ftell( $handle );
-
-				$templine = '';
-			}
-		}
-
-		return true;
-	}
-
-	/**
-	 * Fix View Statements Line.
-	 *
-	 * Fixes view statements to ensure the definer matches the current db user.
-	 *
-	 * @since 1.14.0
-	 *
-	 * @param string $line The line from db dump file to fix.
-	 * @return string
-	 */
-	public function fix_view_statements_line( $line ) {
-		if ( strpos( $line, 'DEFINER=' ) !== false ) {
-			return $this->fix_definer( $line );
-		}
-		return $line;
-	}
-
-	/**
-	 * Import a string into a database.
-	 *
-	 * Generally this method is used when we grab a .sql file from within a .zip file and import it.
-	 * Instead of saving the .sql file then importing, it comes straight from the .zip file as a string to here.
-	 *
-	 * @since 1.6.0
-	 *
-	 * @param  string $string MySQL dump file as a string.
-	 * @return bool
-	 */
-	public function import_string( $string ) {
-		$lines = preg_split( "/\\r\\n|\\r|\\n/", $string );
-
-		$lines = $this->fix_view_statements( $lines );
-
-		if ( true === empty( $lines ) ) {
-			return __( 'The Database User does not have the necessary priviliges to restore this database.', 'boldgrid-backup' );
-		}
-
-		$success = $this->import_lines_from_string( $lines );
-
-		return $success;
-	}
-
-	public function import_lines_from_string( $lines ) {
+	public function import_lines( $file ) {
 		if ( empty( $lines ) ) {
 			return false;
 		}
@@ -290,6 +202,33 @@ class Boldgrid_Backup_Admin_Db_Import {
 				$templine = '';
 			}
 		}
+
+		return true;
+	}
+
+	/**
+	 * Import a string into a database.
+	 *
+	 * Generally this method is used when we grab a .sql file from within a .zip file and import it.
+	 * Instead of saving the .sql file then importing, it comes straight from the .zip file as a string to here.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param  string $string MySQL dump file as a string.
+	 * @return bool
+	 */
+	public function import_string( $string ) {
+		$lines = preg_split( "/\\r\\n|\\r|\\n/", $string );
+
+		$lines = $this->fix_view_statements( $lines );
+
+		if ( true === empty( $lines ) ) {
+			return __( 'The Database User does not have the necessary priviliges to restore this database.', 'boldgrid-backup' );
+		}
+
+		$success = $this->import_lines( $lines );
+
+		return $success;
 	}
 
 	/**
