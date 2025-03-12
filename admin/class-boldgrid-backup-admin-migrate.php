@@ -41,6 +41,8 @@ class Boldgrid_Backup_Admin_Migrate {
 	 * Log
 	 *
 	 * @var Boldgrid_Backup_Admin_Log
+	 * 
+	 * @since 1.17.0
 	 */
 	public $log;
 
@@ -82,6 +84,8 @@ class Boldgrid_Backup_Admin_Migrate {
 
 	/**
 	 * Constructor
+	 * 
+	 * @param Boldgrid_Backup_Admin_Core $backup_core Backup Core object.
 	 *
 	 * @since 1.17.0
 	 */
@@ -112,10 +116,12 @@ class Boldgrid_Backup_Admin_Migrate {
 
 		$active_transfer = get_option( $this->configs['option_names']['active_transfer'], false );
 
-		// Check the boldgrid_transfer_xfers option.
-		// if the active transfer is not in the list,
-		// or it is marked completed or cancelled, then
-		// reset the active transfer.
+		/*
+		 * Check the boldgrid_transfer_xfers option.
+		 * if the active transfer is not in the list,
+		 * or it is marked completed or cancelled, then
+		 * reset the active transfer.
+		 */
 		$transfers = get_option( $this->configs['option_names']['transfers'], array() );
 		if ( ! empty( $active_transfer ) && ! isset( $transfers[ $active_transfer ] ) ) {
 			$active_transfer = false;
@@ -131,11 +137,13 @@ class Boldgrid_Backup_Admin_Migrate {
 		}
 	}
 
-		/**
+	/**
 	 * Ajax Process Direct Transfer
 	 * 
 	 * This is run from the system cron
-	 * to process transfers.
+	 * to process transfers. This is run from both the
+	 * sending and receiving sites, and depending on the conditions
+	 * in the method, will process accordingly.
 	 * 
 	 * @since 1.17.0
 	 */
@@ -147,12 +155,14 @@ class Boldgrid_Backup_Admin_Migrate {
 			wp_die();
 		}
 
+		// If there are incomplete transfers on the receiving site, process them.
 		if ( ! empty( $this->rx->get_incomplete_transfers() ) ) {
 			$this->rx->process_transfers();
 			wp_send_json_success();
 			wp_die();
 		}
 
+		// If there are incomplete transfers on the sending site, process them.
 		if ( ! empty( get_option( $this->configs['option_names']['active_tx'], false ) ) ) {
 			$this->tx->process_transfers();
 			wp_send_json_success();
