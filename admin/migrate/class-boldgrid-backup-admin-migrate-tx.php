@@ -110,6 +110,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 		switch( $status ) {
 			case 'pending-db-dump':
 				$this->generate_db_dump( $active_tx );
+				break;
 			case 'pending-db-split':
 				$this->split_db_file( $active_tx );
 				break;
