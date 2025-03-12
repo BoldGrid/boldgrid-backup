@@ -80,7 +80,7 @@ class Test_Boldgrid_Backup_Admin_Migrate_Util extends WP_UnitTestCase {
 		fclose( $file_handle );
 
 		// Act
-		$this->chunk_paths = $util->split_large_file( $transfer_id, $this->test_file_path, $relative_path, 1024 * 1024 ); // Test with a valid max upload size
+		$this->chunk_paths = $util->split_large_file( $transfer_id, $this->test_file_path, $relative_path, 1024 * 1024, 'transferring-large-files' ); // Test with a valid max upload size
 
 		// Assert
 		$this->assertCount( 6, $this->chunk_paths ); // This should be split into 6 chunks. 5 full and 1 partial.

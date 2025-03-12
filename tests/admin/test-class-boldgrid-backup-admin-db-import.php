@@ -106,11 +106,11 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 	 *
 	 * @since 1.14.0
 	 */
-	public function test_import_lines_from_string() {
+	public function test_import_lines() {
 		$db_import = new \Boldgrid_Backup_Admin_Db_Import();
 
 		// @todo This is a basic test and should be expanded upon to thoroughly test import_lines().
-		$this->assertFalse( $db_import->import_lines_from_string( array() ) );
+		$this->assertFalse( $db_import->import_lines( array() ) );
 	}
 	/**
 	 * Test Import String.
