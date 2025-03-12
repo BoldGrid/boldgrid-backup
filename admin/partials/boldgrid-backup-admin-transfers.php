@@ -57,7 +57,11 @@ $sections = [
 		],
 		[
 			'id'      => 'section_direct_transfer',
-			'title'   => __( 'Direct Transfer', 'boldgrid-backup' ),
+			'title'   => sprintf(
+				'%1$s <span class="boldgrid-backup-beta-span">%2$s!</span>',
+				__( 'Direct Transfer', 'boldgrid-backup' ),
+				__( 'Beta', 'boldgrid-backup' )
+			),
 			'content' => $direct_transfer,
 		],
 	],

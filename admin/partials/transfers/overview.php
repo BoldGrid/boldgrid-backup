@@ -25,7 +25,7 @@ return sprintf(
 			<p>%4$s</p>
 		</div>
 		<div class="bgbkup-transfers-overview-option-2">
-			<h3>%5$s</h3>
+			<h3>%5$s <span class="boldgrid-backup-beta-span">%13$s!</span></h3>
 			<p>%6$s</p>
 		</div>
 	</div>
@@ -44,5 +44,6 @@ return sprintf(
 	esc_html__( 'ZIP Transfer', 'boldgrid-backup' ),
 	esc_html__( 'if you have a small to medium-sized site and your server has the resources to handle the backup process.', 'boldgrid-backup' ),
 	esc_html__( 'Direct Transfer', 'boldgrid-backup' ),
-	esc_html__( 'if you have a large site or are on a resource-limited server.', 'boldgrid-backup' )
+	esc_html__( 'if you have a large site or are on a resource-limited server.', 'boldgrid-backup' ),
+	esc_html__( 'Beta', 'boldgrid-backup' )
 );
