@@ -132,10 +132,11 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 	/**
 	 * Split db file
 	 * 
-	 * 
-	 * @param $request WP_REST_Request
+	 * @param array $active_rx Active RX data
 	 * 
 	 * @since 1.17.00
+	 * 
+	 * @return WP_REST_Response $response
 	 */
 	public function split_db_file( $active_rx ) {
 		$db_file         = $active_rx['db_path'];
@@ -166,6 +167,13 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 		) );
 	}
 
+	/**
+	 * Maybe Restart Dump
+	 * 
+	 * If the dump has stalled, restart it
+	 *
+	 * @return bool True if the dump was restarted, false otherwise
+	 */
 	public function maybe_restart_dump() {
 		$dump_status_option = $this->migrate_core->util->get_option( $this->db_dump_status_option_name, '' );
 		if ( ! $dump_status_option ) {
@@ -235,6 +243,17 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 		return true;
 	}
 
+	/**
+	 * Create Dump Status File
+	 * 
+	 * Because we're dumping the db, the status
+	 * has to be stored in a file, not the DB, so
+	 * we're creating a file to store the status.
+	 *
+	 * @param string $transfer_id Transfer ID
+	 * @param string $dest_url    Destination URL
+	 * @return void
+	 */
 	public function create_dump_status_file( $transfer_id, $dest_url ) {
 		require_once ABSPATH . 'wp-admin/includes/class-wp-debug-data.php';
 		$dest_dir       = $this->migrate_core->util->url_to_safe_directory_name( $dest_url );
@@ -260,6 +279,8 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 
 	/**
 	 * Generate a database dump
+	 * 
+	 * @param array $active_tx Active TX data
 	 * 
 	 * @since 1.17.0
 	 */
