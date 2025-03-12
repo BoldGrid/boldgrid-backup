@@ -402,6 +402,10 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 			$this->migrate_core->log->add( 'Generating MD5 for completed dump file: ' . $response['file'] );
 		}
 
+		if ( 'pending' === $response['status'] ) {
+			$this->migrate_core->backup_core->cron->schedule_direct_transfer();
+		}
+
 		$this->migrate_core->log->add( 'DB Dump Status: ' . json_encode( $response, JSON_PRETTY_PRINT ) );
 
 		return new WP_REST_Response( array(
