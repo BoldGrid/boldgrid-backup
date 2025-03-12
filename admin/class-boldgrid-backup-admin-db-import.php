@@ -75,7 +75,9 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * @return bool TRUE on success.
 	 */
 	public function import( $file ) {
-		if ( ! file_exists( $file ) ) {
+		$lines = $this->get_lines( $file );
+
+		if ( false === $lines ) {
 			return array(
 				'error' => sprintf(
 					// translators: 1: File path.
@@ -85,18 +87,19 @@ class Boldgrid_Backup_Admin_Db_Import {
 			);
 		}
 
-		$handle = fopen( $file, 'r' );
-		if ( ! $handle ) {
+		$lines = $this->fix_view_statements( $lines );
+
+		if ( true === empty( $lines ) ) {
 			return array(
 				'error' => sprintf(
-					__( 'Unable to open mysqldump, %1$s.', 'boldgrid-backup' ),
+					/* translators: 1: Database File Name */
+					__( 'MySQL Database User does not have necessary priviliges to restore mysqldump, %1$s.', 'boldgrid-backup' ),
 					$file
 				),
 			);
 		}
 
-		$success = $this->import_lines( $file );
-		fclose( $handle );
+		$success = $this->import_lines( $lines );
 
 		return $success;
 	}
@@ -139,11 +142,10 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param  resource $handle File handle.
-	 * @param  string   $file   File path.
+	 * @param  array $lines Lines to import.
 	 * @return bool
 	 */
-	public function import_lines( $file ) {
+	public function import_lines( $lines ) {
 		if ( empty( $lines ) ) {
 			return false;
 		}

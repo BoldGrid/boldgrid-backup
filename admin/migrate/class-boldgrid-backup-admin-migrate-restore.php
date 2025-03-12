@@ -132,11 +132,14 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 
 		// 6. Restore the WordPress database from the dump file.
 		if ( ! $this->restore_database( $db_file['path'], $transfer ) ) {
-			$this->migrate_core->log->add( 'Failed to restore the database.' );
-			return array(
-				'success' => false,
-				'error'   => 'Failed to restore the database.'
+			$this->migrate_core->log->add( 'Failed to restore Database.' );
+			$this->util->update_transfer_prop( $transfer_id, 'status', 'failed' );
+			$this->util->update_transfer_prop(
+				$transfer_id,
+				'failed_message',
+				esc_html__( 'Failed to restore database.', 'boldgrid-backup' )
 			);
+			return false;
 		}
 
 		// 7. Restore the options that were exported before the migration.
@@ -425,6 +428,12 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 
 		$this->migrate_core->log->add( 'New database prefix: ' . json_encode( $new_db_prefix ) );
 
+		// If the import failed, return false.
+		if ( ! $status ) {
+			$this->migrate_core->log->add( 'Failed to import the database dump file.' );
+			return false;
+		}
+
 		// Connect to the WordPress database via $wpdb.
 		global $wpdb;
 
@@ -461,8 +470,8 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 		$wp_rewrite->init();
 
 		// Get the restored "siteurl" and "home".
-		$restored_wp_siteurl = $this->util->get_option( 'siteurl' );
-		$restored_wp_home    = $this->util->get_option( 'home' );
+		$restored_wp_siteurl = get_option( 'siteurl' );
+		$restored_wp_home    = get_option( 'home' );
 		
 		$this->migrate_core->log->add( json_encode( array(
 		    'site_url' => $wp_siteurl,
