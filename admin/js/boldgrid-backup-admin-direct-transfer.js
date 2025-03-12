@@ -532,7 +532,6 @@ BoldGrid.DirectTransfers = function($) {
 				self._bindDeleteButton( $cancelButton );
 			}
 		} else {
-			console.log('Update Progress Error: ', { response });
 			$row.addClass('error');
 		}
 	};

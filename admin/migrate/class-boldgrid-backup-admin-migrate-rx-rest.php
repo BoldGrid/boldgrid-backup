@@ -468,6 +468,8 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 		}
 
 		$result = $this->util->update_transfer_prop( $transfer_id, 'status', 'pending-restore' );
+
+		$this->migrate_core->backup_core->cron->schedule_direct_transfer();
 		
 		wp_send_json_success( $result );
 	}
@@ -820,7 +822,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 					'Pending Restore',
 					'boldgrid-backup'
 				);
-				$this->migrate_core->rx->process_transfers();
 				break;
 			case 'restoring-files':
 				$progress_data['status']               = 'restoring-files';
