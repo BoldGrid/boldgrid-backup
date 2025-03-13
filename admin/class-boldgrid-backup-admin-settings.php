@@ -704,7 +704,13 @@ class Boldgrid_Backup_Admin_Settings {
 			 * @since 1.14.0
 			 */
 			if ( isset( $_POST['compression_level'] ) ) {
-				$settings['compression_level'] = $_POST['compression_level'];
+				// Validate the compression level must be a digit between 0-9.
+				if ( ! is_numeric( $_POST['compression_level'] ) || $_POST['compression_level'] < 0 || $_POST['compression_level'] > 9 ) {
+					$update_error    = true;
+					$update_errors[] = __( 'The compression level you entered is invalid. Please enter a number between 0 and 9.', 'boldgrid-backup' );
+				} else {
+					$settings['compression_level'] = $_POST['compression_level'];
+				}
 			}
 
 			/*

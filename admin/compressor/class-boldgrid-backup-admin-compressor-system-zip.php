@@ -401,6 +401,11 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 
 		$compression_level = $this->get_compression_level();
 
+		// Validate the compression level must be a digit between 0-9.
+		if ( ! is_numeric( $compression_level ) || $compression_level < 0 || $compression_level > 9 ) {
+			$compression_level = $this->default_compression_level;
+		}
+
 		$this->core->execute_command( 'cd ' . $dir . '; zip -' . $compression_level . ' -g -q ' . $this->filepath . ' ' . basename( $this->core->db_dump_filepath ) . ';' );
 
 		$this->core->logger->add( 'Finished adding db dump to the zip file.' );
