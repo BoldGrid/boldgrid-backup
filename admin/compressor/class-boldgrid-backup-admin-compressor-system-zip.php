@@ -420,6 +420,6 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 	 * @return bool
 	 */
 	public static function is_valid_compression_level( $compression_level ) {
-		return ctype_digit( $compression_level ) && $compression_level >= 0 && $compression_level <= 9;
+		return ctype_digit( (string) $compression_level ) && $compression_level >= 0 && $compression_level <= 9;
 	}
 }
