@@ -138,7 +138,7 @@ class Boldgrid_Backup_Archive_Fetcher {
 
 		$this->filepath = $this->core->upload->get_save_path( basename( $this->url ) );
 
-		$this->response = wp_remote_get(
+		$this->response = wp_safe_remote_get(
 			$this->url,
 			[
 				'filename'  => $this->filepath,

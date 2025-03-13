@@ -137,6 +137,69 @@ class Boldgrid_Backup_Admin_Cron_Log {
 	}
 
 	/**
+	 * Get our scheduled jobs.
+	 *
+	 * @since 1.17.0
+	 *
+	 * @return string The markup displaying our scheduled jobs.
+	 */
+	public function get_jobs() {
+		$jobs = get_option(
+			$this->core->jobs->option,
+			array(),
+		);
+
+		/*
+		 * Filter out any jobs without a 'action_title' key, and add it
+		 * by replacing underscores with spaces and capitalizing each word.
+		 */
+		$jobs = array_map( function( $job ) {
+			if ( ! isset( $job['action_title'] ) ) {
+				$job['action_title'] = ucwords( str_replace( '_', ' ', $job['action'] ) );
+			}
+			return $job;
+		}, $jobs );
+
+		// Return a message if there are no jobs.
+		if ( empty( $jobs ) ) {
+			return '<p style="font-style:italic">' . esc_html__( 'No jobs scheduled.', 'boldgrid-backup' ) . '</p>';
+		}
+
+		// Generate table heading
+		$markup = sprintf(
+			'<table class="wp-list-table widefat striped">
+				<thead>
+					<tr>
+						<th><strong>%1$s</strong></th>
+						<th><strong>%2$s</strong></th>
+					</tr>
+				</thead>
+				<tbody>',
+			esc_html__( 'Action', 'boldgrid-backup' ),
+			esc_html__( 'Status', 'boldgrid-backup' )
+		);
+
+		// Generate table rows
+		foreach ( $jobs as $job ) {
+			$title = esc_html( $job['action_title'] );
+			$status = esc_html( ucfirst( $job['status'] ) );
+
+			$markup .= sprintf(
+				'<tr>
+					<th>%1$s</th>
+					<td>%2$s</td>
+				</tr>',
+				$title,
+				$status
+			);
+		}
+
+		$markup .= '</tbody></table>';
+
+		return $markup;
+	}
+
+	/**
 	 * Generate and return the markup displaying our log entries.
 	 *
 	 * @since 1.6.5
@@ -146,9 +209,23 @@ class Boldgrid_Backup_Admin_Cron_Log {
 		// If we're getting the markup, the user is looking at it. Mark it as read.
 		$this->set_as_read();
 
+		$jobs = $this->get_jobs();
+
 		$log = $this->get_log();
 
-		$markup = '<h2>' . __( 'Latest Cron Notices', 'boldgrid-backup' ) . '</h2>
+		$markup = sprintf(
+			'<h2>%1$s</h2>
+			<p>%2$s %3$s</p>
+			%4$s
+			</tbody>
+			</table>',
+			__( 'Scheduled Jobs', 'boldgrid-backup' ),
+			__( 'If there are any jobs scheduled to run, they will be displayed below.', 'boldgrid-backup' ),
+			__( 'Successfully completed jobs will be removed from the list the next time the cron runs.', 'boldgrid-backup' ),
+			wp_kses_post( $jobs ),
+		);
+
+		$markup .= '<h2>' . __( 'Latest Cron Notices', 'boldgrid-backup' ) . '</h2>
 			<p>' . __( 'If a scheduled backup cron fails, an error message will be logged to the <em>cron notices</em> log file. You can view those log entries below:', 'boldgrid-backup' ) . '</p>';
 
 		if ( empty( $log ) ) {

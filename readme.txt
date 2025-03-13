@@ -132,6 +132,16 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
+= 1.16.10 =
+Release Date: Feb 26, 2025
+* Bug Fix: Prevent old backlogged jobs from running due to a previous CRON bug.
+
+= 1.16.9 =
+Release Date: Feb 25, 2025
+* Bug Fix: PHP Warning: Undefined array key “is_running” [#614](https://github.com/BoldGrid/boldgrid-backup/issues/614)
+* Bug Fix: Fix scheduled jobs not running, and add extra logging [#612](https://github.com/BoldGrid/boldgrid-backup/issues/612)
+* Security Update: Change from wp_remote_get to wp_safe_remote_get [#616](https://github.com/BoldGrid/boldgrid-backup/issues/616)
+
 = 1.16.8 =
 Release Date: Jan 15, 2025
 * Bug Fix: Schedule settings shows no options when no cron is available. [#563](https://github.com/BoldGrid/boldgrid-backup/issues/563)
