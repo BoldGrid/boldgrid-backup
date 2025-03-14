@@ -401,9 +401,25 @@ class Boldgrid_Backup_Admin_Compressor_System_Zip extends Boldgrid_Backup_Admin_
 
 		$compression_level = $this->get_compression_level();
 
+		// Validate the compression level must be a digit between 0-9.
+		if ( ! self::is_valid_compression_level( $compression_level ) ) {
+			$compression_level = $this->default_compression_level;
+		}
+
 		$this->core->execute_command( 'cd ' . $dir . '; zip -' . $compression_level . ' -g -q ' . $this->filepath . ' ' . basename( $this->core->db_dump_filepath ) . ';' );
 
 		$this->core->logger->add( 'Finished adding db dump to the zip file.' );
 		$this->core->logger->add_memory();
+	}
+
+	/**
+	 * Is Valide Comporession Level.
+	 *
+	 * @param string $compression_level Compression Level.
+	 *
+	 * @return bool
+	 */
+	public static function is_valid_compression_level( $compression_level ) {
+		return ctype_digit( (string) $compression_level ) && $compression_level >= 0 && $compression_level <= 9;
 	}
 }
