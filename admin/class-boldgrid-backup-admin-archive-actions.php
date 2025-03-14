@@ -100,6 +100,16 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 		wp_enqueue_script( $handle );
 
 		wp_enqueue_script( 'clipboard' );
+
+		wp_register_script(
+			'boldgrid-backup-direct-transfer',
+			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-direct-transfer.js',
+			array( 'jquery', 'wp-api' ),
+			BOLDGRID_BACKUP_VERSION,
+			true
+		);
+		
+		wp_enqueue_script( 'boldgrid-backup-direct-transfer' );
 	}
 
 	/**
