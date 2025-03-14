@@ -94,12 +94,14 @@ class Boldgrid_Backup_Admin_Log {
 
 		/*
 		 * Append the message to the log.
-		 *
-		 * WP_Filesystem does not have a way to append to a file, so we're rewriting the file each
-		 * time. Best route would be to fopen the file and append. This may need to be revisited.
 		 */
-		$file_content = $this->get_contents() . PHP_EOL . $message;
-		$this->core->wp_filesystem->put_contents( $this->filepath, $file_content );
+		$handle = fopen( $this->filepath, 'a+' );
+		if ( $handle ) {
+			// Append the new message with a line break at the beginning
+			fwrite( $handle, PHP_EOL . $message );
+			// Close the file handle
+			fclose( $handle );
+		}
 	}
 
 	/**
@@ -258,8 +260,11 @@ class Boldgrid_Backup_Admin_Log {
 			return;
 		}
 
+		/*
+		 * Removed logging that 'pcntl_async_signals' is not available,
+		 * because it was filling up the logs on sites that don't have it available.
+		 */
 		if ( ! function_exists( 'pcntl_async_signals' ) ) {
-			$this->add( 'Cannot add signal handlers, pcntl_async_signals function does not exist.' );
 			return;
 		}
 

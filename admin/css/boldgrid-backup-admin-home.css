@@ -18,3 +18,14 @@
 .page-title-actions {
 	display: inline-block;
 }
+
+.bgbkup-transfers-overview-options {
+	display: flex;
+}
+.bgbkup-transfers-overview-option-1 {
+	padding-right: 10px;
+}
+
+.bgbkup-transfers-overview-option-2 {
+	padding-right: 10px;
+}

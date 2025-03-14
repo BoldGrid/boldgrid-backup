@@ -651,6 +651,15 @@ class Boldgrid_Backup_Admin_Core {
 	public $premium;
 
 	/**
+	 * An instance of the Migrate Class
+	 * 
+	 * @since 1.17.0
+	 * 
+	 * @var Boldgrid_Backup_Admin_Migrate
+	 */
+	public $migrate;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.0
@@ -820,6 +829,9 @@ class Boldgrid_Backup_Admin_Core {
 		if ( class_exists( '\Boldgrid\Library\Library\Activity' ) ) {
 			$this->activity = new \Boldgrid\Library\Library\Activity( BOLDGRID_BACKUP_KEY );
 		}
+
+		// Instantiate the new Boldgrid_Backup_Admin_Migrate class.
+		$this->migrate = new Boldgrid_Backup_Admin_Migrate( $this );
 	}
 
 	/**

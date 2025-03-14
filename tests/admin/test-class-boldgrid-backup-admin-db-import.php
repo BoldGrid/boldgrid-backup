@@ -158,7 +158,7 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 	public function test_fix_definer() {
 		$db_import = new \Boldgrid_Backup_Admin_Db_Import();
 
-		$expected_line = '/*!50013 DEFINER=`' . DB_USER . '`@`%` SQL SECURITY DEFINER */';
+		$expected_line = '/*!50013 DEFINER=`' . DB_USER . '`@`' . DB_HOST . '` SQL SECURITY DEFINER */';
 		$original_line = '/*!50013 DEFINER=`original_user`@`%` SQL SECURITY DEFINER */';
 		$this->assertEquals( $expected_line, $db_import->fix_definer( $original_line ) );
 
