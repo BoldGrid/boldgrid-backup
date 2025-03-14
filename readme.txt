@@ -132,6 +132,11 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 == Changelog ==
 
+= 1.17.0 =
+Release Date: Mar 14, 2025
+* New Feature: Direct Transfer feature added for live beta [#611](https://github.com/BoldGrid/boldgrid-backup/pull/611)
+* Security Update: Add Compression Level validation to settings [#622](https://github.com/BoldGrid/boldgrid-backup/pull/622)
+
 = 1.16.10 =
 Release Date: Feb 26, 2025
 * Bug Fix: Prevent old backlogged jobs from running due to a previous CRON bug.
