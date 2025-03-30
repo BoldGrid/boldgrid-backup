@@ -341,7 +341,7 @@ Release date: August 26th, 2020
 
 = 1.14.3 =
 
-Release date: August 12th, 2020
+Release date: August 13th, 2020
 
 * Update: Updated Auto Update features to utilize the WordPress 5.5+ Auto Update UI.
 
