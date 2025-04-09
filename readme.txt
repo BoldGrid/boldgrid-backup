@@ -133,7 +133,7 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 == Changelog ==
 
 = 1.17.1 =
-Release Date: TBD
+Release Date: Apr 14, 2025
 * Bug Fix: Fix _load_textdomain_just_in_time notices [#624](https://github.com/BoldGrid/boldgrid-backup/issues/624)
 
 = 1.17.0 =
