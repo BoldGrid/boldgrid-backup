@@ -60,9 +60,9 @@ class Boldgrid_Backup_Admin_Jobs {
 
 	/**
 	 * Logger
-	 * 
+	 *
 	 * @since 1.17.0
-	 * 
+	 *
 	 * @var Boldgrid_Backup_Admin_Log
 	 */
 	public $logger;
@@ -105,7 +105,7 @@ class Boldgrid_Backup_Admin_Jobs {
 		 * The cron entry is removed whenever the cron list is empty,
 		 * therefore, when adding a new job, we need to make sure
 		 * we re-add the entry to the crontab. There is no need to check
-		 * if the cron entry already exists, as that is done in the 
+		 * if the cron entry already exists, as that is done in the
 		 * 'schedule_jobs' methods.
 		 */
 		$settings = $this->core->settings->get_settings();
@@ -259,7 +259,7 @@ class Boldgrid_Backup_Admin_Jobs {
 	 * Fix stalled jobs.
 	 *
 	 * @since 1.15.5
-	 * 
+	 *
 	 * A stalled job can be a job that has been pending for over a week. This is usually due to
 	 * a CRON bug that has since been resolved in 1.16.9. If the job is older than a week, it will
 	 * be removed.
@@ -275,17 +275,24 @@ class Boldgrid_Backup_Admin_Jobs {
 
 		foreach ( $this->jobs as $key => &$job ) {
 			// Maybe delete old job if it's older than one week.
-			if ( preg_match('/-(\d{8})-\d{6}\.zip$/', $job['filepath'], $matches ) ) {
+			if ( isset( $job['filepath'] ) &&
+				preg_match( '/-(\d{8})-\d{6}\.zip$/', $job['filepath'], $matches ) ) {
 				$date_str = $matches[1];
-			
+
 				// Create a DateTime object from the date string (format: YYYYMMDD)
 				$file_date = DateTime::createFromFormat( 'Ymd', $date_str );
-				
+
 				// Get the date for one week ago from now
 				$one_week_ago = new DateTime('-1 week');
-			
+
 				// Compare dates
 				if ( $file_date < $one_week_ago ) {
+					unset( $this->jobs[ $key ] );
+					$made_changes = true;
+					continue;
+				}
+			} elseif ( isset( $job['end_time'] ) ) {
+				if ( $job['end_time'] < time() - WEEK_IN_SECONDS ) {
 					unset( $this->jobs[ $key ] );
 					$made_changes = true;
 					continue;
