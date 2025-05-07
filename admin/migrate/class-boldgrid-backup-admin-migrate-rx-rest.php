@@ -373,10 +373,33 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 			), 200 );
 		}
 
-		$links = explode( ',', $headers['link'] );
-		$wp_json_link = array_filter( $links, function( $link ) {
-			return false !== strpos( $link, 'rel="https://api.w.org/"' );
-		} );
+		// Make sure we have an array of link‐headers.
+		$raw_links = isset( $headers['link'] )
+		    ? (array) $headers['link']
+		    : [];
+		
+		// Flatten all comma-separated links into one array.
+		$all_links = [];
+		foreach ( $raw_links as $header ) {
+		    // explode may yield spaces around each link, so trim().
+		    $parts = array_map( 'trim', explode( ',', $header ) );
+		    $all_links = array_merge( $all_links, $parts );
+		}
+		
+		// Find the first link with rel="https://api.w.org/".
+		$wp_json_link = null;
+		foreach ( $all_links as $link ) {
+		    if ( false !== strpos( $link, 'rel="https://api.w.org/"' ) ) {
+		        $wp_json_link = $link;
+		        break;
+		    }
+		}
+
+		if ( $wp_json_link ) {
+		    if ( preg_match( '/<([^>]+)>/', $wp_json_link, $m ) ) {
+		        $wp_json_url = $m[1];
+		    }
+		}
 
 		$rest_api_error_response = new WP_REST_Response( array(
 			'error'   => true,
@@ -389,10 +412,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 		if ( empty( $wp_json_link ) ) {
 			return $rest_api_error_response;
 		}
-
-		preg_match('/<([^>]+)>/', $wp_json_link[0], $matches );
-
-		$wp_json_url = $matches[1];
 
 		$wp_json_response = wp_remote_get(
 			$wp_json_url,
