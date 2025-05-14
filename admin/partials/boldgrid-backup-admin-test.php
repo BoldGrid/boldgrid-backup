@@ -133,6 +133,10 @@ $tests = array(
 		'v' => get_current_user(),
 	),
 	array(
+		'k' => __( 'PHP Verion:', 'boldgrid-backup' ),
+		'v' => phpversion(),
+	),
+	array(
 		'k' => __( 'PHP in safe mode?', 'boldgrid-backup' ),
 		'v' => $this->test->is_php_safemode() ? sprintf( $error_span, $lang['yes'], '' ) : $lang['no'],
 	),
