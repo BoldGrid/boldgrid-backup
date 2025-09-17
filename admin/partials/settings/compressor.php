@@ -65,7 +65,7 @@ foreach ( range( 0, 9 ) as $level ) {
 		'<option value="%1$s" %2$s>%3$s</option>',
 		esc_attr( $level ),
 		$is_selected ? 'selected="selected"' : '',
-		$is_default ? $default_compression_level . ' ( ' . __( 'default' ) . ' )' : esc_html( $level )
+		$is_default ? $default_compression_level . ' ( ' . __( 'default', 'boldgrid-backup' ) . ' )' : esc_html( $level )
 	);
 }
 
@@ -81,7 +81,7 @@ ob_start();
 <div class="bg-box">
 	<div class="bg-box-top">
 		<?php esc_html_e( 'Compressor', 'boldgrid-backup' ); ?>
-		<span class="bgb-unbold">(<?php esc_html_e( 'Advanced', 'boldgrid-bacup' ); ?>)</span>
+		<span class="bgb-unbold">(<?php esc_html_e( 'Advanced', 'boldgrid-backup' ); ?>)</span>
 		<span class='dashicons dashicons-editor-help' data-id='compressor'></span>
 	</div>
 	<div class="bg-box-bottom">
