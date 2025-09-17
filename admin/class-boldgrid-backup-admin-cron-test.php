@@ -109,7 +109,7 @@ class Boldgrid_Backup_Admin_Cron_Test {
 		$no = sprintf(
 			'<span class="warning">%1$s</span><br />%2$s',
 			__( 'No', 'boldgrid-backup' ),
-			__( 'Please contact your server administrator for assistance with troubleshooting.' )
+			__( 'Please contact your server administrator for assistance with troubleshooting.', 'boldgrid-backup' )
 		);
 
 		if ( $this->is_running() ) {
@@ -121,7 +121,7 @@ class Boldgrid_Backup_Admin_Cron_Test {
 			$markup       = $match_markup . $markup;
 
 			$markup .= '<p>' . __( 'Server offset', 'boldgrid-backup' ) . ': ' . $server_offset . '<br />';
-			$markup .= __( 'Cron offset' ) . ': ' . $cron_offset . '</p>';
+			$markup .= __( 'Cron offset', 'boldgrid-backup' ) . ': ' . $cron_offset . '</p>';
 
 			$markup .= sprintf( $run_test, esc_attr( __( 'Run test again', 'boldgrid-backup' ) ) );
 		}
