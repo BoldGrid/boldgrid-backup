@@ -224,7 +224,7 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 	 * @since 1.6.0
 	 */
 	public function wp_ajax_download() {
-		$error = __( 'Unable to download backup from FTP', 'bolgrid-bakcup' );
+		$error = __( 'Unable to download backup from FTP', 'boldgrid-backup' );
 
 		$allowed_html = array(
 			'h2'     => array(),
