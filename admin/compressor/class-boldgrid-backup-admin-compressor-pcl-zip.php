@@ -498,7 +498,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 			$php_zip_set = $this->core->compressors->set_php_zip();
 
 			if ( $php_zip_set ) {
-				$messages[] = __( 'We have changed your compressor from PclZip to ZipArchive. Please try to create a backup again.' );
+				$messages[] = __( 'We have changed your compressor from PclZip to ZipArchive. Please try to create a backup again.', 'boldgrid-backup' );
 			}
 		}
 
