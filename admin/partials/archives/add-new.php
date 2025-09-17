@@ -106,15 +106,15 @@ printf(
 		<div class="error_messages">
 
 			<p id="file_too_large" class="hidden">
-				<span class="dashicons dashicons-warning yellow"></span> <?php esc_html_e( 'The file you selected is too large.', 'boldgrid-bacup' ); ?>
+				<span class="dashicons dashicons-warning yellow"></span> <?php esc_html_e( 'The file you selected is too large.', 'boldgrid-backup' ); ?>
 			</p>
 
 			<p id="bad_filename" class="hidden">
-				<span class="dashicons dashicons-warning yellow"></span> <?php esc_html_e( 'Invalid file name. Please choose a valid backup file.', 'boldgrid-bacup' ); ?>
+				<span class="dashicons dashicons-warning yellow"></span> <?php esc_html_e( 'Invalid file name. Please choose a valid backup file.', 'boldgrid-backup' ); ?>
 			</p>
 
 			<p id="bad_extension" class="hidden">
-				<span class="dashicons dashicons-warning yellow"></span> <?php esc_html_e( 'Invalid file format. Please choose a .zip file.', 'boldgrid-bacup' ); ?>
+				<span class="dashicons dashicons-warning yellow"></span> <?php esc_html_e( 'Invalid file format. Please choose a .zip file.', 'boldgrid-backup' ); ?>
 			</p>
 		</div>
 	</div>
