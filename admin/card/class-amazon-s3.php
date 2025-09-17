@@ -45,9 +45,9 @@ class Amazon_S3 extends \Boldgrid\Library\Library\Ui\Card {
 
 		$this->links = '
 			<a class="video button thickbox" href=' . esc_url( $video ) . '" data-id="' . $this->id . '" title="Store Backups on Amazon S3"><span class="dashicons dashicons-video-alt3"></span>' .
-			esc_html__( 'Learn More' ) .
+			esc_html__( 'Learn More', 'boldgrid-backup' ) .
 			'<a target="_blank" href="' . esc_url( $url ) . '">' .
-			esc_html__( 'Setup Guide' ) . '
+			esc_html__( 'Setup Guide', 'boldgrid-backup' ) . '
 			</a>';
 
 		$this->icon = '<img src="' . plugin_dir_url( __FILE__ ) . '../image/remote/amazon-s3-logo.png"></img>';
