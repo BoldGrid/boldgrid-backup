@@ -297,7 +297,7 @@ function get_plugins_update_markup( $auto_update_settings, $translations ) {
 						<td colspan=1>
 							<p style="position:relative;z-index=-1">' . esc_html__(
 						'This plugin was not installed through the WordPress Plugins Repository. If auto updates are enabled, they will take place immediately.',
-						'boldrid-backup'
+						'boldgrid-backup'
 					) . ' </p>
 						</td>
 						<td></td>

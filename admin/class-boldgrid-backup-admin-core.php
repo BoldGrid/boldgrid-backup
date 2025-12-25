@@ -1011,7 +1011,7 @@ class Boldgrid_Backup_Admin_Core {
 		$lang = [
 			'backup_archive'  => esc_html__( 'Backup Archives', 'boldgrid-backup' ),
 			'boldgrid_backup' => BOLDGRID_BACKUP_TITLE,
-			'get_premium'     => esc_html__( 'Get Premium', 'boldgrid-bacukp' ),
+			'get_premium'     => esc_html__( 'Get Premium', 'boldgrid-backup' ),
 			'preflight_check' => esc_html__( 'Preflight Check', 'boldgrid-backup' ),
 			'settings'        => esc_html__( 'Settings', 'boldgrid-backup' ),
 			'tools'           => esc_html__( 'Tools', 'boldgrid-backup' ),
@@ -1250,7 +1250,7 @@ class Boldgrid_Backup_Admin_Core {
 		if ( ! $this->test->run_functionality_tests() ) {
 			// Display an error notice.
 			$this->notice->functionality_fail_notice();
-			return [ 'error' => esc_html__( 'Unable to create backup, functionality test failed.', 'boldgrid_backup' ) ];
+			return [ 'error' => esc_html__( 'Unable to create backup, functionality test failed.', 'boldgrid-backup' ) ];
 		}
 
 		// Get the backup directory path.
@@ -1781,7 +1781,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Determine how this backup was triggered.
 		if ( $this->pre_auto_update ) {
-			$info['trigger'] = esc_html__( 'Auto update', 'boldgrid-bakcup' );
+			$info['trigger'] = esc_html__( 'Auto update', 'boldgrid-backup' );
 		} elseif ( $this->doing_ajax && is_user_logged_in() ) {
 			$current_user    = wp_get_current_user();
 			$info['trigger'] = $current_user->user_login . ' (' . $current_user->user_email . ')';
@@ -3149,13 +3149,13 @@ class Boldgrid_Backup_Admin_Core {
 			$message = [
 				'message' => esc_html__( 'The selected archive file has been successfully restored.', 'boldgrid-backup' ),
 				'class'   => 'notice notice-success is-dismissible',
-				'header'  => BOLDGRID_BACKUP_TITLE . ' - ' . esc_html__( 'Restoration complete' ),
+				'header'  => BOLDGRID_BACKUP_TITLE . ' - ' . esc_html__( 'Restoration complete', 'boldgrid-backup' ),
 			];
 		} else {
 			$message = [
-				'message' => ! empty( $archive_info['error'] ) ? $archive_info['error'] : esc_html__( 'Unknown error when attempting to restore archive.', 'bolcgrid-backup' ),
+				'message' => ! empty( $archive_info['error'] ) ? $archive_info['error'] : esc_html__( 'Unknown error when attempting to restore archive.', 'boldgrid-backup' ),
 				'class'   => 'notice notice-error is-dismissible',
-				'header'  => BOLDGRID_BACKUP_TITLE . ' - ' . esc_html__( 'Restoration failed' ),
+				'header'  => BOLDGRID_BACKUP_TITLE . ' - ' . esc_html__( 'Restoration failed', 'boldgrid-backup' ),
 			];
 		}
 		$this->notice->add_user_notice( $message['message'], $message['class'], $message['header'] );

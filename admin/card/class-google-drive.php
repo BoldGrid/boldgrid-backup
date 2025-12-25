@@ -48,9 +48,9 @@ class Google_Drive extends \Boldgrid\Library\Library\Ui\Card {
 
 		$this->links = '
 			<a class="video button thickbox" href=' . esc_url( $video ) . '" data-id="' . $this->id . '" title="Store Backups on Google Drive" ><span class="dashicons dashicons-video-alt3"></span>' .
-			esc_html__( 'Learn More' ) .
+			esc_html__( 'Learn More', 'boldgrid-backup' ) .
 			'<a target="_blank" href="' . esc_url( $url ) . '">' .
-			esc_html__( 'Setup Guide' ) . '
+			esc_html__( 'Setup Guide', 'boldgrid-backup' ) . '
 			</a>';
 	}
 }

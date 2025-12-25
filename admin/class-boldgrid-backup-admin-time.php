@@ -328,7 +328,7 @@ class Boldgrid_Backup_Admin_Time {
 				$timezone_info['name'] = $tz->getName();
 
 				/* translators: 1: timezone name, 2: timezone abbreviation, 3: gmt offset  */
-				$timezone_info['description'] = sprintf( __( 'Timezone is %1$s (%2$s), currently %3$s.' ), $tz_name, $timezone_info['abbr'], $formatted_gmt_offset );
+				$timezone_info['description'] = sprintf( __( 'Timezone is %1$s (%2$s), currently %3$s.', 'boldgrid-backup' ), $tz_name, $timezone_info['abbr'], $formatted_gmt_offset );
 			} else {
 				$timezone_info['description'] = '';
 			}
@@ -348,7 +348,7 @@ class Boldgrid_Backup_Admin_Time {
 			$timezone_info['abbr'] = sprintf( 'UTC%s', $formatted_gmt_offset );
 
 			/* translators: %s: UTC offset  */
-			$timezone_info['description'] = sprintf( __( 'Timezone is %s.' ), $timezone_info['abbr'] );
+			$timezone_info['description'] = sprintf( __( 'Timezone is %s.', 'boldgrid-backup' ), $timezone_info['abbr'] );
 		}
 
 		// This set of code is not in core.

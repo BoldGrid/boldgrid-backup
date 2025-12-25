@@ -43,7 +43,7 @@ class Find_Modified_Files extends \Boldgrid\Library\Library\Ui\Card {
 
 		$this->links = '
 				<a target="_blank" href=" ' . $url . '">' .
-				esc_html__( 'Setup Guide' ) . '
+				esc_html__( 'Setup Guide', 'boldgrid-backup' ) . '
 				</a>';
 	}
 }

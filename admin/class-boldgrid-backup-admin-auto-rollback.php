@@ -743,10 +743,10 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 
 		switch ( $this->core->pagenow ) {
 			case 'update-core.php':
-				$notice_text .= __( 'On this page you are able to update WordPress, Plugins, and Themes.' ) . ' ';
+				$notice_text .= __( 'On this page you are able to update WordPress, Plugins, and Themes.', 'boldgrid-backup' ) . ' ';
 				break;
 			case 'plugins.php':
-				$notice_text .= __( 'On this page you are able to update plugins.' ) . ' ';
+				$notice_text .= __( 'On this page you are able to update plugins.', 'boldgrid-backup' ) . ' ';
 				break;
 		}
 

@@ -84,9 +84,9 @@ $table_legend = sprintf(
 		</tr>
 	</table>
 	',
-	/* 1 */ wp_kses( __( 'Use an asterisk(*) as a wildcard.', 'boldgrid-inspirations' ), $tags ),
-	/* 2 */ wp_kses( __( 'For example, <strong>wp-*</strong> will match <strong>wp-</strong>content, <strong>wp-</strong>admin, and <strong>wp-</strong>includes.', 'boldgrid-inspirations' ), $tags ),
-	/* 3 */ wp_kses( __( 'Use WPCORE to specify WordPress core files.', 'boldgrid-bacukp' ), $tags ),
+	/* 1 */ wp_kses( __( 'Use an asterisk(*) as a wildcard.', 'boldgrid-backup' ), $tags ),
+	/* 2 */ wp_kses( __( 'For example, <strong>wp-*</strong> will match <strong>wp-</strong>content, <strong>wp-</strong>admin, and <strong>wp-</strong>includes.', 'boldgrid-backup' ), $tags ),
+	/* 3 */ wp_kses( __( 'Use WPCORE to specify WordPress core files.', 'boldgrid-backup' ), $tags ),
 	/* 4 */ wp_kses( __( 'This includes the wp-admin and wp-includes folders, as well as all of the core WordPress files in the root directory of WordPress.', 'boldgrid-backup' ), $tags ),
 	/* 5 */ wp_kses( __( 'Begin a filter with a forward slash(/) to specify the file or folder must be in the root WordPress directory.', 'boldgrid-backup' ), $tags ),
 	/* 6 */ wp_kses( __( 'For example, <strong>/index.php</strong> will not match index.php files in subdirectories, such as wp-includes/index.php', 'boldgrid-backup' ), $tags ),
