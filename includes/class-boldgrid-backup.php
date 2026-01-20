@@ -147,8 +147,8 @@ class Boldgrid_Backup {
 		 * The class responsible for the admin notices for the plugin.
 		 */
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-notice.php';
-
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-auto-updates.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-auto-updates-logger.php';
 
 		/**
 		 * The class responsible for the cron functionality in the admin area.

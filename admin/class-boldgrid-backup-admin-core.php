@@ -805,6 +805,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		if ( Boldgrid_Backup_Admin_Utility::is_active() ) {
 			$this->auto_updates = new Boldgrid_Backup_Admin_Auto_Updates();
+			new Boldgrid_Backup_Admin_Auto_Updates_Logger();
 		}
 
 		// Ensure there is a backup identifier.
