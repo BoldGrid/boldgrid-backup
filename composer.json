@@ -21,6 +21,7 @@
 	"require-dev" : {
 		"lox/xhprof" : "dev-master",
 		"phpunit/phpunit": "^9",
+		"doctrine/instantiator": "^1.5",
 		"yoast/phpunit-polyfills": "^2.0"
 	},
 	"scripts" : {
