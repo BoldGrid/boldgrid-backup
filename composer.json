@@ -20,7 +20,7 @@
 	},
 	"require-dev" : {
 		"lox/xhprof" : "dev-master",
-		"phpunit/phpunit": "^7",
+		"phpunit/phpunit": "^9",
 		"yoast/phpunit-polyfills": "^2.0"
 	},
 	"scripts" : {

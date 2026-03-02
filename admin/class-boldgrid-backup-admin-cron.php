@@ -778,6 +778,10 @@ class Boldgrid_Backup_Admin_Cron {
 		$settings  = $this->core->settings->get_settings();
 		$backup_id = $this->core->get_backup_identifier();
 
+		// Generate and store a one-time random secret for the CLI cancel endpoint.
+		$cli_cancel_secret = wp_generate_password( 32, false );
+		update_site_option( 'boldgrid_backup_cli_cancel_secret', $cli_cancel_secret );
+
 		$entry_parts = [
 			date( $time['minute'] . ' ' . $time['hour'], $time['deadline'] ) . ' * * ' . date( 'w' ),
 			$this->cron_command,
@@ -795,6 +799,7 @@ class Boldgrid_Backup_Admin_Cron {
 			'mode=restore restore',
 			'notify email=' . $settings['notification_email'],
 			'backup_id=' . $backup_id,
+			'cli_cancel_secret=' . $cli_cancel_secret,
 			'zip=' . $this->core->archive->filepath,
 		];
 

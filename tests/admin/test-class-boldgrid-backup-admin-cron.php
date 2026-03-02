@@ -134,6 +134,84 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Ensure at least one backup archive exists on disk so that get_restore_command()
+	 * can successfully initialize an archive via init_by_key(0).
+	 *
+	 * @since 1.17.2
+	 */
+	private function maybe_create_backup() {
+		$latest_backup = get_option( 'boldgrid_backup_latest_backup' );
+		if ( empty( $latest_backup ) ) {
+			$this->core->archive_files( true );
+		}
+	}
+
+	/**
+	 * Test that get_restore_command() generates a secret, stores it in the site option,
+	 * and embeds the same value in the returned cron entry string.
+	 *
+	 * @since 1.17.2
+	 */
+	public function test_get_restore_command_stores_secret() {
+		$this->maybe_create_backup();
+
+		delete_site_option( 'boldgrid_backup_cli_cancel_secret' );
+
+		$entry = $this->core->cron->get_restore_command();
+
+		$this->assertNotEmpty( $entry );
+
+		$stored_secret = get_site_option( 'boldgrid_backup_cli_cancel_secret', false );
+		$this->assertNotFalse( $stored_secret );
+		$this->assertNotEmpty( $stored_secret );
+
+		$this->assertStringContainsString( 'cli_cancel_secret=' . $stored_secret, $entry );
+	}
+
+	/**
+	 * Test that each call to get_restore_command() generates a fresh secret.
+	 *
+	 * The previous secret must not be reusable after a new restore is scheduled.
+	 *
+	 * @since 1.17.2
+	 */
+	public function test_get_restore_command_secret_rotates() {
+		$this->maybe_create_backup();
+
+		$this->core->cron->get_restore_command();
+		$first_secret = get_site_option( 'boldgrid_backup_cli_cancel_secret', false );
+
+		$this->core->cron->get_restore_command();
+		$second_secret = get_site_option( 'boldgrid_backup_cli_cancel_secret', false );
+
+		$this->assertNotFalse( $first_secret );
+		$this->assertNotFalse( $second_secret );
+		$this->assertNotEquals( $first_secret, $second_secret );
+	}
+
+	/**
+	 * Test that get_restore_command() returns an empty string and does not store a
+	 * secret when no backup archive is available.
+	 *
+	 * @since 1.17.2
+	 */
+	public function test_get_restore_command_no_archive() {
+		// Redirect the backup dir to a non-existent path so get_archive_list() returns [].
+		$original_dir                             = $this->core->backup_dir->backup_directory;
+		$this->core->backup_dir->backup_directory = '/nonexistent/path/that/does/not/exist';
+
+		delete_site_option( 'boldgrid_backup_cli_cancel_secret' );
+
+		$entry = $this->core->cron->get_restore_command();
+
+		// Restore the backup dir before any assertions that could fail.
+		$this->core->backup_dir->backup_directory = $original_dir;
+
+		$this->assertEmpty( $entry );
+		$this->assertFalse( get_site_option( 'boldgrid_backup_cli_cancel_secret', false ) );
+	}
+
+	/**
 	 * Test filtering crontab contents with mode "" (backup).
 	 *
 	 * @since 1.11.1
