@@ -20,4 +20,5 @@ cron/restore-info-*
 boldgrid-backup-cron.log
 .ea-php-cli.cache
 .vscode
+.phpunit.result.cache
 reports/
