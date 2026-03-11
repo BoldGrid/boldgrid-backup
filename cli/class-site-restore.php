@@ -360,7 +360,8 @@ class Site_Restore {
 	private function cancel_rollback() {
 		require_once dirname( dirname( __FILE__ ) ) . '/cron/class-boldgrid-backup-url-helper.php';
 		$url     = Info::get_info()['siteurl'] . '/wp-admin/admin-ajax.php?action=boldgrid_cli_cancel_rollback&backup_id=' .
-			Info::get_arg_value( 'backup_id' );
+			rawurlencode( (string) Info::get_arg_value( 'backup_id' ) ) .
+			'&cli_cancel_secret=' . rawurlencode( (string) Info::get_arg_value( 'cli_cancel_secret' ) );
 		$success = ( new \Boldgrid_Backup_Url_Helper() )->call_url( $url, $status, $errorno, $error );
 	}
 }
