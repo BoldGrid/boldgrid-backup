@@ -134,7 +134,7 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 = 1.17.2 =
 Release Date: Mar 11, 2026
-* Security Update: Require a cryptographically random one-time secret alongside the backup_id on the boldgrid_cli_cancel_rollback nopriv AJAX endpoint, preventing unauthenticated attackers from canceling a pending auto-rollback via CRC32 brute-force or discoverable site metadata.
+* Security Update: Increased security for canceling a pending rollback.
 
 = 1.17.1 =
 Release Date: Apr 14, 2025
