@@ -4,7 +4,7 @@ Tags: backup, cloud backup, database backup, restore, wordpress backup
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 5.4
-Stable tag: 1.17.1
+Stable tag: 1.17.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -131,6 +131,10 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 1. Activate the plugin through the Plugins menu in WordPress.
 
 == Changelog ==
+
+= 1.17.2 =
+Release Date: Mar 11, 2026
+* Security Update: Require a cryptographically random one-time secret alongside the backup_id on the boldgrid_cli_cancel_rollback nopriv AJAX endpoint, preventing unauthenticated attackers from canceling a pending auto-rollback via CRC32 brute-force or discoverable site metadata.
 
 = 1.17.1 =
 Release Date: Apr 14, 2025
