@@ -205,6 +205,9 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 
 		// Remove WP option boldgrid_backup_pending_rollback.
 		$this->core->settings->delete_rollback_option();
+
+		// Remove the one-time CLI cancel secret.
+		delete_site_option( 'boldgrid_backup_cli_cancel_secret' );
 	}
 
 	/**
@@ -1194,16 +1197,22 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	/**
 	 * Callback function for canceling a pending rollback from the cli process.
 	 *
-	 * This admin-ajax call is unprovileged, so that the CLI script can make the call.
-	 * The only validation that we use is the backup identifier.
-	 * Nobody will be trying to cancel rollbacks (with a 15-minute window) anyways.
+	 * This admin-ajax call is unprivileged, so that the CLI script can make the call.
+	 * Validation requires both the backup identifier and a one-time random secret that
+	 * was generated when the restore cron job was scheduled.
 	 *
 	 * @since 1.10.7
 	 */
 	public function wp_ajax_cli_cancel() {
-		$backup_id_match = ! empty( $_GET['backup_id'] ) && $this->core->get_backup_identifier() === sanitize_key( $_GET['backup_id'] ); // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		// phpcs:ignore WordPress.CSRF.NonceVerification.Recommended
+		$backup_id_match = ! empty( $_GET['backup_id'] ) && $this->core->get_backup_identifier() === sanitize_key( $_GET['backup_id'] );
 
-		if ( $backup_id_match ) {
+		$stored_secret  = get_site_option( 'boldgrid_backup_cli_cancel_secret', '' );
+		// phpcs:ignore WordPress.CSRF.NonceVerification.Recommended
+		$secret_match = ! empty( $stored_secret ) && ! empty( $_GET['cli_cancel_secret'] ) &&
+			hash_equals( $stored_secret, sanitize_text_field( wp_unslash( $_GET['cli_cancel_secret'] ) ) );
+
+		if ( $backup_id_match && $secret_match ) {
 			$this->cancel();
 			wp_send_json_success( __( 'Rollback canceled', 'boldgrid-backup' ) );
 		} else {
