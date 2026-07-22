@@ -373,12 +373,24 @@ class Boldgrid_Backup_Admin_Db_Import {
 			$is_string_all_grant     = ( false !== strpos( $result[0], 'ON *.*' ) );
 			$is_grant_all_privileges = ( false !== strpos( $result[0], 'GRANT ALL PRIVILEGES' ) );
 
-			if ( ( $is_string_db_grant || $is_string_all_grant ) && $is_grant_all_privileges ) {
+			if ( ! $is_string_db_grant && ! $is_string_all_grant ) {
+				continue;
+			}
+
+			if ( $is_grant_all_privileges ) {
 				return array( 'ALL' );
 			}
-			if ( ( $is_string_db_grant ) && false === $is_grant_all_privileges ) {
-				return $this->get_grants_array( $result[0] );
+
+			/*
+			 * MySQL 8 often enumerates privileges on *.* instead of "GRANT ALL PRIVILEGES".
+			 * Parse those lists too; skip the default USAGE-only row so later grants are seen.
+			 */
+			$grants = $this->get_grants_array( $result[0] );
+			if ( array( 'USAGE' ) === $grants ) {
+				continue;
 			}
+
+			return $grants;
 		}
 		return array();
 	}

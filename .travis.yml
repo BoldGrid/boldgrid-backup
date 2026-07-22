@@ -67,7 +67,13 @@ install:
 
 script:
   - find . \( -name composer -o -name node_modules -o -name phpunit -o -name phpunit-polyfills -o -name code-unit-reverse-lookup \) -prune -o -name '*.php' -exec php -lf {} \; > /dev/null
-  - vendor/phpunit/phpunit/phpunit --debug --verbose
+  # PHP 8.5: avoid --debug/--verbose (deprecation traces dump huge TestCase graphs and exceed Travis log limits).
+  - |
+    if [[ "${TRAVIS_PHP_VERSION:0:3}" == "7.4" ]]; then
+      vendor/phpunit/phpunit/phpunit --debug --verbose
+    else
+      php -d display_errors=1 -d error_reporting=22527 vendor/phpunit/phpunit/phpunit
+    fi
   - yarn run js-lint
   # Remove dev dependencies before packaging / final lint.
   - composer install --no-dev --no-interaction --prefer-dist -o

@@ -13,6 +13,7 @@
 		}
 	],
 	"require" : {
+		"php": ">=7.4",
 		"boldgrid/library" : "^2.13.15",
 		"boldgrid/tdcron" : "dev-master",
 		"phpseclib/phpseclib" : "~3.0",

@@ -25,7 +25,7 @@ class Boldgrid_Backup_Admin_Support {
 	 *
 	 * @var string
 	 */
-	const PHP_MIN_VER = '5.4.0';
+	const PHP_MIN_VER = '7.4.0';
 
 	/**
 	 * The core class object.

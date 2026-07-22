@@ -3,7 +3,7 @@ Contributors: boldgrid, joemoto, imh_brad, rramo012, bgnicolepaschen, jamesros16
 Tags: backup, cloud backup, database backup, restore, wordpress backup
 Requires at least: 5.0
 Tested up to: 7.0
-Requires PHP: 5.4
+Requires PHP: 7.4
 Stable tag: 1.17.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -121,7 +121,7 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 = Minimum Requirements =
 
-* PHP 5.4 or higher.  PHP 7.4 or higher is recommended.
+* PHP 7.4 or higher.
 * At least one of the following PHP execution functions enabled: "popen", "proc_open", "exec", "shell_exec", "passthru", or "system".
 * A Cron system with the "crontab" utility, or WP Cron.
 * A WP_Filesystem FS_METHOD being "direct".

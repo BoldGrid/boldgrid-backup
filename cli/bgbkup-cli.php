@@ -24,7 +24,7 @@
 
 namespace Boldgrid\Backup\Cli;
 
-$php_min_version = '5.4';
+$php_min_version = '7.4';
 
 if ( version_compare( PHP_VERSION, $php_min_version, '<' ) ) {
 	echo 'Error: Incompatible PHP version "' . PHP_VERSION . '".  This utility requires "' .

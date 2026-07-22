@@ -20,6 +20,41 @@
 class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 
 	/**
+	 * Core.
+	 *
+	 * @var \Boldgrid_Backup_Admin_Core
+	 */
+	public $core;
+
+	/**
+	 * Sample lines without view statements.
+	 *
+	 * @var array
+	 */
+	public $test_lines;
+
+	/**
+	 * Original view dump string.
+	 *
+	 * @var string
+	 */
+	public $original_view_string;
+
+	/**
+	 * Original view dump lines.
+	 *
+	 * @var array
+	 */
+	public $original_view_lines;
+
+	/**
+	 * Expected fixed view dump lines.
+	 *
+	 * @var array
+	 */
+	public $expected_view_lines;
+
+	/**
 	 * Setup.
 	 *
 	 * @since xxx
@@ -235,17 +270,24 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 		$no_privileges      = array(
 			array( "GRANT USAGE ON *.* TO '" . DB_USER . "'@'" . DB_HOST . "' IDENTIFIED BY PASSWORD '*7276EE768CF087FAAB5448F508F79DA704CB5CE9' WITH GRANT OPTION" ),
 		);
+		// MySQL 8 style: enumerated privileges on *.* without "GRANT ALL PRIVILEGES".
+		$mysql8_star_privileges = array(
+			array( "GRANT USAGE ON *.* TO '" . DB_USER . "'@'" . DB_HOST . "'" ),
+			array( 'GRANT SELECT, INSERT, CREATE VIEW, SHOW VIEW ON *.* TO \'' . DB_USER . '\'@\'' . DB_HOST . '\' WITH GRANT OPTION' ),
+		);
 
 		$mock_db_import->method( 'show_grants_query' )
 			->will(
 				$this->onConsecutiveCalls(
 					$not_all_privileges,
-					$no_privileges
+					$no_privileges,
+					$mysql8_star_privileges
 				)
 			);
 
 		$this->assertEquals( array( 'SHOW', 'VIEW', 'CREATE', 'SHOW VIEW', 'CREATE' ), $mock_db_import->get_db_privileges() );
 		$this->assertEquals( array(), $mock_db_import->get_db_privileges() );
+		$this->assertEquals( array( 'SELECT', 'INSERT', 'CREATE VIEW', 'SHOW VIEW' ), $mock_db_import->get_db_privileges() );
 
 	}
 }
