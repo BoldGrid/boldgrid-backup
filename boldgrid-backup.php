@@ -109,16 +109,70 @@ function load_boldgrid_backup() {
 	// Include the autoloader to set plugin options and create instance.
 	$loader = require plugin_dir_path( __FILE__ ) . 'vendor/autoload.php';
 
+	/*
+	 * Register BoldGrid Library version before Load (Composer 2 installed.json format).
+	 *
+	 * Library Version.php only understands Composer 1's flat installed.json. Composer 2 wraps
+	 * packages under a "packages" key (and adds non-package keys like "dev"), so version
+	 * detection returns null, Load never registers the PSR-4 path, and classes such as
+	 * Boldgrid\Library\Library\Ui\Card are missing.
+	 */
+	$plugin_file = plugin_basename( __FILE__ );
+	\Boldgrid\Library\Util\Option::init();
+	$libraries = \Boldgrid\Library\Util\Option::get( 'library' );
+	if ( empty( $libraries[ $plugin_file ] ) ) {
+		$installed_file = plugin_dir_path( __FILE__ ) . 'vendor/composer/installed.json';
+		if ( is_readable( $installed_file ) ) {
+			$installed = json_decode( file_get_contents( $installed_file ), true ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			if ( is_array( $installed ) ) {
+				$packages = isset( $installed['packages'] ) ? $installed['packages'] : $installed;
+				foreach ( $packages as $package ) {
+					if (
+						! empty( $package['name'] ) &&
+						'boldgrid/library' === $package['name'] &&
+						! empty( $package['version_normalized'] )
+					) {
+						\Boldgrid\Library\Util\Option::set( $plugin_file, $package['version_normalized'] );
+						break;
+					}
+				}
+			}
+		}
+	}
+
 	// Load Library.
 	$load = new Boldgrid\Library\Util\Load(
 		array(
 			'type'            => 'plugin',
-			'file'            => plugin_basename( __FILE__ ),
+			'file'            => $plugin_file,
 			'loader'          => $loader,
 			'keyValidate'     => true,
 			'licenseActivate' => false,
 		)
 	);
+
+	/*
+	 * Drop Library's activation register callback.
+	 *
+	 * It re-reads Composer 1-only installed.json, stores a null version, and emits PHP warnings.
+	 * Version is already registered above for Composer 2.
+	 */
+	$activate_hook = 'activate_' . $plugin_file;
+	global $wp_filter;
+	if ( isset( $wp_filter[ $activate_hook ] ) ) {
+		foreach ( $wp_filter[ $activate_hook ]->callbacks as $priority => $callbacks ) {
+			foreach ( $callbacks as $callback ) {
+				if (
+					is_array( $callback['function'] ) &&
+					isset( $callback['function'][0], $callback['function'][1] ) &&
+					$callback['function'][0] instanceof \Boldgrid\Library\Util\Registration\Plugin &&
+					'register' === $callback['function'][1]
+				) {
+					remove_action( $activate_hook, $callback['function'], $priority );
+				}
+			}
+		}
+	}
 
 	// Make sure we have necessary library files.
 	if ( ! $support->run_library_tests() ) {
