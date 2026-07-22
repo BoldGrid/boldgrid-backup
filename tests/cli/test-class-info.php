@@ -190,6 +190,45 @@ class Test_Boldgrid_Backup_Cli_Info extends WP_UnitTestCase {
 		$path = $this->info->get_results_filepath();
 
 		$this->assertTrue( ! empty( $path ) );
+		$this->assertStringContainsString( 'restore-info-', $path );
+	}
+
+	/**
+	 * Test ensure_secure_storage migrates away from webroot verify files.
+	 *
+	 * @since 1.17.3
+	 */
+	public function test_ensure_secure_storage_rotates_legacy_verify_secret() {
+		$storage_dir = sys_get_temp_dir() . '/bgbak-secure-' . wp_generate_password( 8, false );
+		mkdir( $storage_dir, 0700 );
+
+		$legacy_secret = md5( 'legacy-shipped-secret' );
+		$legacy_verify = BOLDGRID_BACKUP_PATH . '/cli/verify-' . $legacy_secret . '.php';
+		$legacy_info   = BOLDGRID_BACKUP_PATH . '/cron/restore-info-' . $legacy_secret . '.json';
+
+		file_put_contents( $legacy_verify, "<?php // phpcs:disable\n" ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+		file_put_contents( $legacy_info, wp_json_encode( [ 'cron_secret' => 'abc123' ] ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+
+		$dir = \Boldgrid\Backup\Cli\Info::ensure_secure_storage( $storage_dir );
+		$this->assertSame( $storage_dir, $dir );
+
+		$new_secret = \Boldgrid\Backup\Cli\Info::get_secret();
+		$this->assertNotSame( $legacy_secret, $new_secret );
+		$this->assertFileExists( $storage_dir . '/.boldgrid-cli-secret' );
+		$this->assertFileExists( \Boldgrid\Backup\Cli\Info::get_restore_locator_filepath() );
+		$this->assertFileDoesNotExist( $legacy_verify );
+		$this->assertFileDoesNotExist( $legacy_info );
+
+		$results = \Boldgrid\Backup\Cli\Info::get_results_filepath();
+		$this->assertStringStartsWith( $storage_dir, $results );
+
+		// Cleanup.
+		@unlink( \Boldgrid\Backup\Cli\Info::get_restore_locator_filepath() ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		@unlink( $storage_dir . '/.boldgrid-cli-secret' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		foreach ( glob( $storage_dir . '/restore-info-*.json' ) as $file ) {
+			@unlink( $file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+		@rmdir( $storage_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 	}
 
 	/**

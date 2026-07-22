@@ -1070,14 +1070,16 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @return bool
 	 */
 	public function is_valid_call() {
-		// phpcs:disable WordPress.CSRF.NonceVerification.NoNonceVerification
-		$backup_id_match = ! empty( $_GET['id'] ) &&
-			$this->core->get_backup_identifier() === sanitize_key( $_GET['id'] );
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended,WordPress.CSRF.NonceVerification.NoNonceVerification
+		$provided_id     = isset( $_GET['id'] ) ? sanitize_key( wp_unslash( $_GET['id'] ) ) : '';
+		$provided_secret = isset( $_GET['secret'] ) ? wp_unslash( $_GET['secret'] ) : '';
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended,WordPress.CSRF.NonceVerification.NoNonceVerification
 
-		$cron_secret_match = ! empty( $_GET['secret'] ) &&
-			$this->get_cron_secret() === $_GET['secret'];
+		$backup_id_match = '' !== $provided_id &&
+			hash_equals( (string) $this->core->get_backup_identifier(), $provided_id );
 
-		// phpcs:enable WordPress.CSRF.NonceVerification.NoNonceVerification
+		$cron_secret_match = is_string( $provided_secret ) && '' !== $provided_secret &&
+			hash_equals( (string) $this->get_cron_secret(), $provided_secret );
 
 		return current_user_can( 'update_plugins' ) || ( $backup_id_match && $cron_secret_match );
 	}

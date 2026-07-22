@@ -4,7 +4,7 @@ Tags: backup, cloud backup, database backup, restore, wordpress backup
 Requires at least: 5.0
 Tested up to: 7.0
 Requires PHP: 5.4
-Stable tag: 1.17.2
+Stable tag: 1.17.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -131,6 +131,10 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 1. Activate the plugin through the Plugins menu in WordPress.
 
 == Changelog ==
+
+= 1.17.3 =
+Release Date: Jul 22, 2026
+* Security Update: Harden emergency restore metadata storage and cron restore authentication. Thanks to Jakub Herman for responsibly reporting this issue.
 
 = 1.17.2 =
 Release Date: Mar 11, 2026
@@ -960,6 +964,9 @@ Release Date: June 21st, 2016
 * Initial public release.
 
 == Upgrade Notice ==
+
+= 1.17.3 =
+Security update recommended for all users.
 
 = 1.12.0 =
 BoldGrid Backup has become Total Upkeep.  Different name with the same great features.

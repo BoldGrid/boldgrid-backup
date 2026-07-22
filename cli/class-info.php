@@ -46,51 +46,420 @@ class Info {
 	private static $results_file_path;
 
 	/**
+	 * Per-install CLI/file secret.
+	 *
+	 * @since 1.17.3
+	 * @access private
+	 * @staticvar
+	 *
+	 * @var string|null
+	 */
+	private static $secret;
+
+	/**
+	 * Filename of the restore locator (points CLI at the backup directory).
+	 *
+	 * @since 1.17.3
+	 * @var string
+	 */
+	const RESTORE_LOCATOR_FILE = 'restore-locator.php';
+
+	/**
+	 * Filename used to persist the per-install secret in the backup directory.
+	 *
+	 * @since 1.17.3
+	 * @var string
+	 */
+	const SECRET_FILENAME = '.boldgrid-cli-secret';
+
+	/**
 	 * Get the results file path.
+	 *
+	 * Stored in the backup directory (typically outside the web root) when possible.
+	 * Falls back to a legacy plugin-relative cron/ path only when no secure storage
+	 * directory is available yet.
 	 *
 	 * @since 1.9.0
 	 * @static
+	 *
+	 * @see self::get_secret()
+	 * @see self::get_secure_storage_dir()
 	 *
 	 * @return string
 	 */
 	public static function get_results_filepath() {
 		if ( null === self::$results_file_path ) {
-			self::$results_file_path = dirname( __DIR__ ) . '/cron/restore-info-' . self::get_secret() . '.json';
+			$secret      = self::get_secret();
+			$storage_dir = self::get_secure_storage_dir();
+
+			if ( $storage_dir ) {
+				self::$results_file_path = self::trailingslashit_path( $storage_dir ) . 'restore-info-' . $secret . '.json';
+			} else {
+				// Legacy fallback; callers with WordPress should migrate via ensure_secure_storage().
+				self::$results_file_path = dirname( __DIR__ ) . '/cron/restore-info-' . $secret . '.json';
+			}
 		}
 
 		return self::$results_file_path;
 	}
 
 	/**
+	 * Get the path to the restore locator file.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @return string
+	 */
+	public static function get_restore_locator_filepath() {
+		return __DIR__ . '/' . self::RESTORE_LOCATOR_FILE;
+	}
+
+	/**
+	 * Read the backup/storage directory from the restore locator.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @return string|null Absolute directory path, or null if unavailable.
+	 */
+	public static function get_dir_from_locator() {
+		$locator = self::get_restore_locator_filepath();
+
+		if ( ! file_exists( $locator ) || ! is_readable( $locator ) ) {
+			return null;
+		}
+
+		$dir = include $locator;
+
+		if ( ! is_string( $dir ) || '' === $dir ) {
+			return null;
+		}
+
+		$dir = self::untrailingslashit_path( $dir );
+
+		return is_dir( $dir ) ? $dir : null;
+	}
+
+	/**
+	 * Trim trailing directory separators (WP-independent).
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string $path Path.
+	 * @return string
+	 */
+	public static function untrailingslashit_path( $path ) {
+		return rtrim( (string) $path, '/\\' );
+	}
+
+	/**
+	 * Add a trailing directory separator (WP-independent).
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string $path Path.
+	 * @return string
+	 */
+	public static function trailingslashit_path( $path ) {
+		return self::untrailingslashit_path( $path ) . '/';
+	}
+
+	/**
+	 * Get a directory suitable for storing restore-info and the CLI secret.
+	 *
+	 * Prefer the backup directory via the restore locator. WordPress callers that
+	 * already know the backup directory should pass it to ensure_secure_storage()
+	 * / write_restore_locator() instead of relying on this method to bootstrap Core.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @return string|null
+	 */
+	public static function get_secure_storage_dir() {
+		return self::get_dir_from_locator();
+	}
+
+	/**
+	 * Write the restore locator file used by CLI (and env-info) to find storage.
+	 *
+	 * The locator refuses direct HTTP execution; it only returns a path when included.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string $storage_dir Absolute backup/storage directory.
+	 * @return bool
+	 */
+	public static function write_restore_locator( $storage_dir ) {
+		$storage_dir = self::untrailingslashit_path( (string) $storage_dir );
+		if ( '' === $storage_dir || ! is_dir( $storage_dir ) ) {
+			return false;
+		}
+
+		$contents = '<?php' . "\n" .
+			'// phpcs:disable' . "\n" .
+			'if ( count( get_included_files() ) <= 1 ) {' . "\n" .
+			"\t" . 'header( \'HTTP/1.1 403 Forbidden\' );' . "\n" .
+			"\t" . 'exit;' . "\n" .
+			'}' . "\n" .
+			'return ' . var_export( $storage_dir, true ) . ";\n"; // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_export
+
+		$written = (false !== file_put_contents( self::get_restore_locator_filepath(), $contents ) );
+
+		if ( $written ) {
+			// Reset cached path so the next get_results_filepath() uses the locator.
+			self::$results_file_path = null;
+		}
+
+		return $written;
+	}
+
+	/**
+	 * Persist the per-install secret into the secure storage directory.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string $secret      Secret string.
+	 * @param string $storage_dir Absolute storage directory.
+	 * @return bool
+	 */
+	public static function persist_secret( $secret, $storage_dir ) {
+		$storage_dir = self::untrailingslashit_path( (string) $storage_dir );
+		if ( '' === $storage_dir || ! is_dir( $storage_dir ) || ! self::is_valid_secret_format( $secret ) ) {
+			return false;
+		}
+
+		$filepath = $storage_dir . '/' . self::SECRET_FILENAME;
+		$written  = ( false !== file_put_contents( $filepath, $secret ) );
+
+		if ( $written ) {
+			@chmod( $filepath, 0600 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			self::$secret            = $secret;
+			self::$results_file_path = null;
+		}
+
+		return $written;
+	}
+
+	/**
+	 * Whether a secret string matches the expected format.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string $secret Secret.
+	 * @return bool
+	 */
+	public static function is_valid_secret_format( $secret ) {
+		return is_string( $secret ) && (bool) preg_match( '/^[0-9a-f]{32}$/', $secret );
+	}
+
+	/**
+	 * Read secret from secure storage (backup directory).
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string|null $storage_dir Optional storage directory.
+	 * @return string|null
+	 */
+	public static function read_secret_from_storage( $storage_dir = null ) {
+		$storage_dir = $storage_dir ? self::untrailingslashit_path( $storage_dir ) : self::get_secure_storage_dir();
+		if ( ! $storage_dir ) {
+			return null;
+		}
+
+		$filepath = $storage_dir . '/' . self::SECRET_FILENAME;
+		if ( ! file_exists( $filepath ) || ! is_readable( $filepath ) ) {
+			return null;
+		}
+
+		$secret = trim( (string) file_get_contents( $filepath ) );
+
+		return self::is_valid_secret_format( $secret ) ? $secret : null;
+	}
+
+	/**
+	 * Find a legacy webroot verify-*.php secret (pre-1.17.3).
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @return string|null
+	 */
+	public static function get_legacy_verify_secret() {
+		$files = @scandir( __DIR__ ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		if ( empty( $files ) ) {
+			return null;
+		}
+
+		$matches = preg_grep( '/^verify-[0-9a-f]{32}\.php$/', $files );
+		if ( empty( $matches ) ) {
+			return null;
+		}
+
+		$matches = array_values( $matches );
+		if ( ! preg_match( '/^verify-([0-9a-f]{32})\.php$/', $matches[0], $match ) ) {
+			return null;
+		}
+
+		return $match[1];
+	}
+
+	/**
+	 * Delete legacy cli/verify-*.php files from the plugin directory.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @return int Number of files deleted.
+	 */
+	public static function delete_legacy_verify_files() {
+		$files   = @scandir( __DIR__ ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		$deleted = 0;
+
+		if ( empty( $files ) ) {
+			return 0;
+		}
+
+		foreach ( preg_grep( '/^verify-[0-9a-f]{32}\.php$/', $files ) as $file ) {
+			$path = __DIR__ . '/' . $file;
+			if ( is_file( $path ) && @unlink( $path ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+				++$deleted;
+			}
+		}
+
+		return $deleted;
+	}
+
+	/**
+	 * Delete legacy cron/restore-info-*.json files from the plugin directory.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @return int Number of files deleted.
+	 */
+	public static function delete_legacy_cron_restore_info_files() {
+		$cron_dir = dirname( __DIR__ ) . '/cron';
+		$files    = @scandir( $cron_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		$deleted  = 0;
+
+		if ( empty( $files ) ) {
+			return 0;
+		}
+
+		foreach ( preg_grep( '/^restore-info-.*\.json$/', $files ) as $file ) {
+			$path = $cron_dir . '/' . $file;
+			if ( is_file( $path ) && @unlink( $path ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+				++$deleted;
+			}
+		}
+
+		return $deleted;
+	}
+
+	/**
+	 * Ensure per-install secret and restore-info live outside the web-served plugin tree.
+	 *
+	 * Always generates a fresh secret when only a legacy webroot verify file exists, because
+	 * release packaging has historically shipped a static verify file for all installs.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string|null $storage_dir Optional backup directory override.
+	 * @return string|null The storage directory used, or null on failure.
+	 */
+	public static function ensure_secure_storage( $storage_dir = null ) {
+		$storage_dir = $storage_dir ? self::untrailingslashit_path( (string) $storage_dir ) : self::get_secure_storage_dir();
+
+		if ( ! $storage_dir || ! is_dir( $storage_dir ) || ! is_writable( $storage_dir ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable
+			return null;
+		}
+
+		self::write_restore_locator( $storage_dir );
+
+		$secret         = self::read_secret_from_storage( $storage_dir );
+		$legacy_secret  = self::get_legacy_verify_secret();
+		$had_legacy     = ! empty( $legacy_secret );
+		$legacy_results = dirname( __DIR__ ) . '/cron/restore-info-' . (string) $legacy_secret . '.json';
+
+		/*
+		 * If we only have a legacy webroot verify file, do not reuse it — it may be the
+		 * publicly distributed release copy. Generate a new per-install secret instead.
+		 */
+		if ( empty( $secret ) ) {
+			$secret = md5( openssl_random_pseudo_bytes( 32 ) );
+			self::persist_secret( $secret, $storage_dir );
+		}
+
+		self::$secret            = $secret;
+		self::$results_file_path = null;
+
+		// Migrate restore-info from cron/ into secure storage when present.
+		$secure_results = self::trailingslashit_path( $storage_dir ) . 'restore-info-' . $secret . '.json';
+		if ( $had_legacy && file_exists( $legacy_results ) && is_readable( $legacy_results ) ) {
+			$contents = file_get_contents( $legacy_results );
+			if ( false !== $contents && ! file_exists( $secure_results ) ) {
+				file_put_contents( $secure_results, $contents );
+				@chmod( $secure_results, 0600 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			}
+		}
+
+		self::delete_legacy_verify_files();
+		self::delete_legacy_cron_restore_info_files();
+
+		return $storage_dir;
+	}
+
+	/**
 	 * Get secret.
 	 *
-	 * Used to secure scripts used outside of WordPress.
+	 * Used to secure scripts used outside of WordPress and to name restore-info files.
+	 * Stored per-install in the backup directory (via locator), not as a webroot verify file.
 	 *
 	 * @since 1.14.10
 	 *
 	 * @return string
 	 */
 	public static function get_secret() {
-		$secret = null;
-
-		// First, attempt to get our secret.
-		$files   = scandir( __DIR__ );
-		$pattern = '/^verify-[0-9a-f]{32}\.php/';
-		$matches = preg_grep( $pattern, $files );
-		if ( ! empty( $matches ) ) {
-			$matches = array_values( $matches );
-			preg_match( '/^verify-(.*).php/', $matches[0], $match );
-
-			if ( ! empty( $match[1] ) ) {
-				$secret = $match[1];
-			}
+		if ( self::is_valid_secret_format( (string) self::$secret ) ) {
+			return self::$secret;
 		}
 
-		// If we don't have a secret, make one.
-		if ( empty( $secret ) ) {
-			$secret   = md5( openssl_random_pseudo_bytes( 32 ) );
-			$filepath = __DIR__ . '/verify-' . $secret . '.php';
-			file_put_contents( $filepath, '<?php // phpcs:disable' );
+		$secret = self::read_secret_from_storage();
+		if ( $secret ) {
+			self::$secret = $secret;
+			return $secret;
+		}
+
+		/*
+		 * Legacy webroot verify-*.php: readable for one request so emergency CLI can still
+		 * locate an old restore-info file, but callers with a backup directory should run
+		 * ensure_secure_storage() to rotate away from any shipped/static secret.
+		 */
+		$secret = self::get_legacy_verify_secret();
+		if ( $secret ) {
+			self::$secret = $secret;
+			return $secret;
+		}
+
+		// Generate a new secret. Prefer secure storage; avoid writing verify files into cli/.
+		$secret      = md5( openssl_random_pseudo_bytes( 32 ) );
+		$storage_dir = self::get_secure_storage_dir();
+
+		if ( $storage_dir ) {
+			self::persist_secret( $secret, $storage_dir );
+			self::write_restore_locator( $storage_dir );
+		} else {
+			// Last resort before first backup directory exists (should be rare).
+			self::$secret = $secret;
 		}
 
 		return $secret;

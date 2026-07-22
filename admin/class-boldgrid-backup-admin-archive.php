@@ -697,6 +697,14 @@ class Boldgrid_Backup_Admin_Archive {
 	public function write_results_file( $info ) {
 		$success          = false;
 		$archive_filepath = ! empty( $info['filepath'] ) ? $info['filepath'] : null;
+		$backup_dir       = $this->core->backup_dir->get();
+
+		if ( empty( $backup_dir ) ) {
+			return false;
+		}
+
+		\Boldgrid\Backup\Cli\Info::ensure_secure_storage( $backup_dir );
+
 		$results_filepath = \Boldgrid\Backup\Cli\Info::get_results_filepath();
 		$is_dir_writable  = $this->core->wp_filesystem->is_writable( dirname( $results_filepath ) );
 

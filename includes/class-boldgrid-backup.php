@@ -525,6 +525,8 @@ class Boldgrid_Backup {
 
 		$this->loader->add_action( 'admin_init', $plugin_admin_core->cron, 'upgrade_crontab_entries' );
 
+		$this->loader->add_action( 'admin_init', $plugin_admin_core, 'ensure_secure_cli_storage', 5 );
+
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_generate_download_link', $plugin_admin_core->archive_actions, 'wp_ajax_generate_download_link' );
 
 		/* FTP */

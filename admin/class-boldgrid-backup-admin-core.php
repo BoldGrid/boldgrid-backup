@@ -832,6 +832,26 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Instantiate the new Boldgrid_Backup_Admin_Migrate class.
 		$this->migrate = new Boldgrid_Backup_Admin_Migrate( $this );
+
+		// Migrate CLI secret / restore-info out of the web-served plugin directory when possible.
+		$this->ensure_secure_cli_storage();
+	}
+
+	/**
+	 * Ensure CLI secret and restore-info are stored outside the web-served plugin directory.
+	 *
+	 * @since 1.17.3
+	 *
+	 * @see \Boldgrid\Backup\Cli\Info::ensure_secure_storage()
+	 */
+	public function ensure_secure_cli_storage() {
+		$backup_dir = $this->backup_dir->get();
+		if ( empty( $backup_dir ) ) {
+			return;
+		}
+
+		require_once BOLDGRID_BACKUP_PATH . '/cli/class-info.php';
+		\Boldgrid\Backup\Cli\Info::ensure_secure_storage( $backup_dir );
 	}
 
 	/**
