@@ -200,15 +200,22 @@ class Info {
 			return false;
 		}
 
+		/*
+		 * Refuse direct HTTP/CLI execution of the locator. Prefer SCRIPT_FILENAME vs
+		 * __FILE__ so auto_prepend_file (and similar pre-includes) cannot bypass the
+		 * older get_included_files() <= 1 check; keep that check as a fallback.
+		 */
 		$contents = '<?php' . "\n" .
 			'// phpcs:disable' . "\n" .
-			'if ( count( get_included_files() ) <= 1 ) {' . "\n" .
+			'$__bg_script = isset( $_SERVER[\'SCRIPT_FILENAME\'] ) ? (string) $_SERVER[\'SCRIPT_FILENAME\'] : \'\';' . "\n" .
+			'$__bg_direct = ( \'\' !== $__bg_script && @realpath( $__bg_script ) === @realpath( __FILE__ ) );' . "\n" .
+			'if ( $__bg_direct || count( get_included_files() ) <= 1 ) {' . "\n" .
 			"\t" . 'header( \'HTTP/1.1 403 Forbidden\' );' . "\n" .
 			"\t" . 'exit;' . "\n" .
 			'}' . "\n" .
 			'return ' . var_export( $storage_dir, true ) . ";\n"; // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_export
 
-		$written = (false !== file_put_contents( self::get_restore_locator_filepath(), $contents ) );
+		$written = ( false !== file_put_contents( self::get_restore_locator_filepath(), $contents ) );
 
 		if ( $written ) {
 			// Reset cached path so the next get_results_filepath() uses the locator.
@@ -257,6 +264,102 @@ class Info {
 	 */
 	public static function is_valid_secret_format( $secret ) {
 		return is_string( $secret ) && (bool) preg_match( '/^[0-9a-f]{32}$/', $secret );
+	}
+
+	/**
+	 * Generate a per-install 32-hex secret via a CSPRNG.
+	 *
+	 * Fail closed (null) when no cryptographically strong source is available —
+	 * never fall back to a deterministic value such as md5(false).
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @return string|null
+	 */
+	public static function generate_secret() {
+		if ( ! function_exists( 'random_bytes' ) ) {
+			$compat = dirname( __DIR__ ) . '/vendor/paragonie/random_compat/lib/random.php';
+			if ( is_readable( $compat ) ) {
+				require_once $compat; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingVariable
+			}
+		}
+
+		if ( function_exists( 'random_bytes' ) ) {
+			try {
+				return bin2hex( random_bytes( 16 ) );
+			} catch ( \Exception $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+				// Fall through to openssl.
+			}
+		}
+
+		if ( function_exists( 'openssl_random_pseudo_bytes' ) ) {
+			$strong = false;
+			$bytes  = openssl_random_pseudo_bytes( 16, $strong );
+			if ( false !== $bytes && $strong && 16 === strlen( $bytes ) ) {
+				return bin2hex( $bytes );
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Copy a legacy cron/restore-info-*.json into secure storage when needed.
+	 *
+	 * Migrates using the legacy verify secret, the current secret, or any remaining
+	 * restore-info file under cron/ (verify may already be gone).
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string      $storage_dir   Absolute storage directory.
+	 * @param string      $secret        Current secret (destination filename).
+	 * @param string|null $legacy_secret Optional legacy verify secret.
+	 * @return bool True when secure restore-info exists after this call.
+	 */
+	public static function migrate_legacy_restore_info( $storage_dir, $secret, $legacy_secret = null ) {
+		$storage_dir    = self::untrailingslashit_path( (string) $storage_dir );
+		$secure_results = self::trailingslashit_path( $storage_dir ) . 'restore-info-' . $secret . '.json';
+
+		if ( file_exists( $secure_results ) ) {
+			return true;
+		}
+
+		$cron_dir   = dirname( __DIR__ ) . '/cron';
+		$candidates = [];
+
+		if ( self::is_valid_secret_format( (string) $legacy_secret ) ) {
+			$candidates[] = $cron_dir . '/restore-info-' . $legacy_secret . '.json';
+		}
+		if ( self::is_valid_secret_format( $secret ) ) {
+			$candidates[] = $cron_dir . '/restore-info-' . $secret . '.json';
+		}
+
+		$files = @scandir( $cron_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		if ( ! empty( $files ) ) {
+			foreach ( preg_grep( '/^restore-info-.*\.json$/', $files ) as $file ) {
+				$candidates[] = $cron_dir . '/' . $file;
+			}
+		}
+
+		foreach ( array_unique( $candidates ) as $legacy_results ) {
+			if ( ! file_exists( $legacy_results ) || ! is_readable( $legacy_results ) ) {
+				continue;
+			}
+
+			$contents = file_get_contents( $legacy_results );
+			if ( false === $contents ) {
+				continue;
+			}
+
+			if ( false !== file_put_contents( $secure_results, $contents ) ) {
+				@chmod( $secure_results, 0600 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -385,32 +488,27 @@ class Info {
 
 		self::write_restore_locator( $storage_dir );
 
-		$secret         = self::read_secret_from_storage( $storage_dir );
-		$legacy_secret  = self::get_legacy_verify_secret();
-		$had_legacy     = ! empty( $legacy_secret );
-		$legacy_results = dirname( __DIR__ ) . '/cron/restore-info-' . (string) $legacy_secret . '.json';
+		$secret        = self::read_secret_from_storage( $storage_dir );
+		$legacy_secret = self::get_legacy_verify_secret();
 
 		/*
 		 * If we only have a legacy webroot verify file, do not reuse it — it may be the
 		 * publicly distributed release copy. Generate a new per-install secret instead.
 		 */
 		if ( empty( $secret ) ) {
-			$secret = md5( openssl_random_pseudo_bytes( 32 ) );
+			$secret = self::generate_secret();
+			if ( empty( $secret ) ) {
+				// Fail closed; leave legacy files in place until a CSPRNG is available.
+				return null;
+			}
 			self::persist_secret( $secret, $storage_dir );
 		}
 
 		self::$secret            = $secret;
 		self::$results_file_path = null;
 
-		// Migrate restore-info from cron/ into secure storage when present.
-		$secure_results = self::trailingslashit_path( $storage_dir ) . 'restore-info-' . $secret . '.json';
-		if ( $had_legacy && file_exists( $legacy_results ) && is_readable( $legacy_results ) ) {
-			$contents = file_get_contents( $legacy_results );
-			if ( false !== $contents && ! file_exists( $secure_results ) ) {
-				file_put_contents( $secure_results, $contents );
-				@chmod( $secure_results, 0600 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-			}
-		}
+		// Migrate restore-info from cron/ before deleting legacy plugin-tree copies.
+		self::migrate_legacy_restore_info( $storage_dir, $secret, $legacy_secret );
 
 		self::delete_legacy_verify_files();
 		self::delete_legacy_cron_restore_info_files();
@@ -451,7 +549,12 @@ class Info {
 		}
 
 		// Generate a new secret. Prefer secure storage; avoid writing verify files into cli/.
-		$secret      = md5( openssl_random_pseudo_bytes( 32 ) );
+		$secret = self::generate_secret();
+		if ( empty( $secret ) ) {
+			// Fail closed: do not invent a weak/deterministic secret.
+			return '';
+		}
+
 		$storage_dir = self::get_secure_storage_dir();
 
 		if ( $storage_dir ) {
