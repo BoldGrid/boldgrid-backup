@@ -747,16 +747,27 @@ class Boldgrid_Backup_Admin_Ftp {
 		 * Some ftp servers respond with slightly different formats. In some scenarious on a Windows
 		 * FTP server, the folders will be prepended with a "./" (See comment in this method's
 		 * docblock). Before returning the data, remove "./" from the beginning of all items.
+		 *
+		 * Pure-FTPd (and some others) return ftp_nlist( $dir ) entries as "dir/file.zip" rather
+		 * than "file.zip". Strip the requested directory prefix so callers can match basenames.
 		 */
-		$fix_windows = function( $item ) {
+		$fix_nlist_path = function( $item ) use ( $raw, $dir ) {
 			if ( './' === substr( $item, 0, 2 ) ) {
 				$item = substr( $item, 2 );
 			}
+
+			if ( ! $raw && '.' !== $dir && '' !== $dir ) {
+				$prefix = rtrim( $dir, '/' ) . '/';
+				if ( 0 === strpos( $item, $prefix ) ) {
+					$item = substr( $item, strlen( $prefix ) );
+				}
+			}
+
 			return $item;
 		};
 
 		if ( ( 'ftp' === $this->type || 'ftpes' === $this->type ) && is_array( $contents ) ) {
-			$contents = array_map( $fix_windows, $contents );
+			$contents = array_map( $fix_nlist_path, $contents );
 		}
 
 		return $contents;
@@ -1124,7 +1135,18 @@ class Boldgrid_Backup_Admin_Ftp {
 	public function is_uploaded( $filepath ) {
 		$contents = $this->get_contents( false, $this->get_folder_name() );
 
-		return ! is_array( $contents ) ? false : in_array( basename( $filepath ), $contents, true );
+		if ( ! is_array( $contents ) ) {
+			return false;
+		}
+
+		/*
+		 * Compare basenames so directory-prefixed nlist entries (e.g. Pure-FTPd
+		 * "folder/archive.zip") still match the local archive filename.
+		 */
+		$filename = basename( $filepath );
+		$names    = array_map( 'basename', $contents );
+
+		return in_array( $filename, $names, true );
 	}
 
 	/**
