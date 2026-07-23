@@ -50,7 +50,7 @@ if ( ! function_exists( 'hash_equals' ) ) {
 $provided_secret = isset( $_REQUEST['secret'] ) ? (string) $_REQUEST['secret'] : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.CSRF.NonceVerification.NoNonceVerification,WordPress.Security.ValidatedSanitizedInput
 if ( '' === $provided_secret ||
 	! hash_equals( (string) \Boldgrid\Backup\Cli\Info::get_secret(), $provided_secret ) ) {
-	header( 'HTTP/1.1 403 Unauthorized' );
+	header( 'HTTP/1.1 403 Forbidden' );
 	exit;
 }
 

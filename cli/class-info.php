@@ -501,7 +501,10 @@ class Info {
 				// Fail closed; leave legacy files in place until a CSPRNG is available.
 				return null;
 			}
-			self::persist_secret( $secret, $storage_dir );
+			if ( ! self::persist_secret( $secret, $storage_dir ) ) {
+				// Fail closed; leave legacy files in place until the secret can be stored.
+				return null;
+			}
 		}
 
 		self::$secret            = $secret;
@@ -558,7 +561,10 @@ class Info {
 		$storage_dir = self::get_secure_storage_dir();
 
 		if ( $storage_dir ) {
-			self::persist_secret( $secret, $storage_dir );
+			if ( ! self::persist_secret( $secret, $storage_dir ) ) {
+				// Fail closed: do not cache an unpersisted secret that would drift on retry.
+				return '';
+			}
 			self::write_restore_locator( $storage_dir );
 		} else {
 			// Last resort before first backup directory exists (should be rare).

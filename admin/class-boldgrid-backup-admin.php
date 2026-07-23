@@ -260,7 +260,7 @@ class Boldgrid_Backup_Admin {
 	/**
 	 * Get configs by reference so init-time localization updates all consumers.
 	 *
-	 * @since 1.17.4
+	 * @since 1.17.3
 	 *
 	 * @return array
 	 */
@@ -272,7 +272,7 @@ class Boldgrid_Backup_Admin {
 	/**
 	 * Localize translatable strings in the plugin config.
 	 *
-	 * @since 1.17.4
+	 * @since 1.17.3
 	 */
 	public static function localize_configs() {
 		if ( empty( self::$configs ) || ! empty( self::$configs['_localized'] ) ) {

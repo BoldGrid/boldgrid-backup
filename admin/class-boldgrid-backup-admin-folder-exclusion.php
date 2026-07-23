@@ -157,12 +157,9 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 			return false;
 		}
 
-		// Do not allow restore-info JSON used for emergency restorations (legacy cron/ path
-		// or current backup-directory path). Backup dir contents are already excluded above.
-		if ( $this->is_match( 'cron/' . $this->restore_info_filename, $file ) ) {
-			return false;
-		}
-		if ( $this->is_match( $this->restore_info_filename, $file ) && false !== strpos( $file, 'restore-info-' ) ) {
+		// Do not allow restore-info JSON used for emergency restorations (any cron/restore-info*
+		// orphan/legacy secret names). Backup dir contents are already excluded above.
+		if ( $this->is_match( 'cron/restore-info*', $file ) ) {
 			return false;
 		}
 
