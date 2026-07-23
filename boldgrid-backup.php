@@ -195,12 +195,19 @@ function load_boldgrid_backup() {
  * The initial loading of this plugin is done below.
  *
  * Run the plugin only if on a wp-admin page or when DOING_CRON.
+ *
+ * Instantiation is deferred to init so constructors that call translation
+ * functions do not trigger WP 6.7+ just-in-time textdomain notices.
  */
 if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) || defined( 'WP_CLI' ) && WP_CLI || Boldgrid_Backup_Rest_Utility::is_rest() ) {
 	// If we could not load boldgrid_backup (missing system requirements), abort.
 	if ( load_boldgrid_backup() ) {
 		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup.php';
-		run_boldgrid_backup();
+		if ( did_action( 'init' ) ) {
+			run_boldgrid_backup();
+		} else {
+			add_action( 'init', 'run_boldgrid_backup', 1 );
+		}
 	}
 }
 

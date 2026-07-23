@@ -687,8 +687,8 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->pagenow = $pagenow;
 
-		// Instantiate Configs Array
-		$this->configs = Boldgrid_Backup_Admin::get_configs();
+		// Instantiate Configs Array (by reference so init localization applies).
+		$this->configs =& Boldgrid_Backup_Admin::get_configs_ref();
 
 		// Instantiate Boldgrid_Backup_Admin_Settings.
 		$this->settings = new Boldgrid_Backup_Admin_Settings( $this );
@@ -810,7 +810,17 @@ class Boldgrid_Backup_Admin_Core {
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
 
-		$this->set_lang();
+		/*
+		 * Defer translated strings until init (WP 6.7+).
+		 *
+		 * Calling esc_html__() during plugin bootstrap triggers
+		 * _load_textdomain_just_in_time too early.
+		 */
+		if ( did_action( 'init' ) ) {
+			$this->set_lang();
+		} else {
+			add_action( 'init', array( $this, 'set_lang' ) );
+		}
 
 		// Log system.
 		$this->logger   = new Boldgrid_Backup_Admin_Log( $this );
