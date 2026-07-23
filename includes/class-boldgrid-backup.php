@@ -480,7 +480,18 @@ class Boldgrid_Backup {
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core, 'admin_enqueue_scripts' );
 
-		$this->loader->add_filter( 'plugins_loaded', $plugin_admin_core, 'init_premium' );
+		/*
+		 * Initialize Premium after free plugin hooks are registered.
+		 *
+		 * Bootstrap is deferred to init (WP 6.7+ textdomain), so plugins_loaded
+		 * has already fired by the time this runs. Call immediately when that
+		 * hook has passed; otherwise keep the historical plugins_loaded hook.
+		 */
+		if ( did_action( 'plugins_loaded' ) ) {
+			$plugin_admin_core->init_premium();
+		} else {
+			$this->loader->add_action( 'plugins_loaded', $plugin_admin_core, 'init_premium' );
+		}
 
 		$this->loader->add_action( 'boldgrid_backup_delete_local', $plugin_admin_core->local, 'delete_local' );
 
