@@ -356,11 +356,33 @@ class Boldgrid_Backup_Admin_Ftp {
 	 * @since 1.6.0
 	 */
 	public function disconnect() {
-		if ( ( 'ftp' === $this->type || 'ftpes' === $this->type ) && is_resource( $this->connection ) ) {
+		if ( ( 'ftp' === $this->type || 'ftpes' === $this->type ) && $this->is_ftp_connection( $this->connection ) ) {
 			ftp_close( $this->connection );
 			$this->connection = null;
 			$this->logged_in  = false;
 		}
+	}
+
+	/**
+	 * Whether a value is an open PHP FTP/FTPES connection handle.
+	 *
+	 * PHP 7 returns a resource; PHP 8.0+ returns an FTP\Connection object.
+	 * Without this check, disconnect() never calls ftp_close() on PHP 8+, and
+	 * request shutdown then emits:
+	 * "SSL_read on shutdown: error:0A000126:SSL routines::unexpected eof while reading"
+	 * when the FTPS peer closes without a TLS close_notify (common with Pure-FTPd).
+	 *
+	 * @since 1.17.3
+	 *
+	 * @param mixed $connection Connection handle.
+	 * @return bool
+	 */
+	protected function is_ftp_connection( $connection ) {
+		if ( is_resource( $connection ) ) {
+			return true;
+		}
+
+		return is_object( $connection ) && $connection instanceof \FTP\Connection;
 	}
 
 	/**
