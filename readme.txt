@@ -133,8 +133,12 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 == Changelog ==
 
 = 1.17.3 =
-Release Date: Jul 22, 2026
+Release Date: Jul 23, 2026
 * Security Update: Harden emergency restore metadata storage and cron restore authentication. Thanks to Jakub Herman for responsibly reporting this issue.
+* Bug Fix: Fix FTP / FTPS disconnect handling on PHP 8.
+* Bug Fix: Fix FTP remote upload status when directory listings include path prefixes.
+* Bug Fix: Fix BoldGrid Library loading when using Composer 2.
+* Bug Fix: Fix early translation loading notices on WordPress 6.7+.
 
 = 1.17.2 =
 Release Date: Mar 11, 2026
