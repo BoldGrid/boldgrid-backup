@@ -275,19 +275,27 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 			array( "GRANT USAGE ON *.* TO '" . DB_USER . "'@'" . DB_HOST . "'" ),
 			array( 'GRANT SELECT, INSERT, CREATE VIEW, SHOW VIEW ON *.* TO \'' . DB_USER . '\'@\'' . DB_HOST . '\' WITH GRANT OPTION' ),
 		);
+		// Partial global grant must not hide a later DB-specific ALL.
+		$global_then_db_all = array(
+			array( "GRANT USAGE ON *.* TO '" . DB_USER . "'@'" . DB_HOST . "'" ),
+			array( 'GRANT SELECT, INSERT ON *.* TO \'' . DB_USER . '\'@\'' . DB_HOST . '\'' ),
+			array( 'GRANT ALL PRIVILEGES ON `' . DB_NAME . '`.* TO \'' . DB_USER . '\'@\'' . DB_HOST . '\'' ),
+		);
 
 		$mock_db_import->method( 'show_grants_query' )
 			->will(
 				$this->onConsecutiveCalls(
 					$not_all_privileges,
 					$no_privileges,
-					$mysql8_star_privileges
+					$mysql8_star_privileges,
+					$global_then_db_all
 				)
 			);
 
-		$this->assertEquals( array( 'SHOW', 'VIEW', 'CREATE', 'SHOW VIEW', 'CREATE' ), $mock_db_import->get_db_privileges() );
+		$this->assertEquals( array( 'SHOW', 'VIEW', 'CREATE', 'SHOW VIEW' ), $mock_db_import->get_db_privileges() );
 		$this->assertEquals( array(), $mock_db_import->get_db_privileges() );
 		$this->assertEquals( array( 'SELECT', 'INSERT', 'CREATE VIEW', 'SHOW VIEW' ), $mock_db_import->get_db_privileges() );
+		$this->assertEquals( array( 'ALL' ), $mock_db_import->get_db_privileges() );
 
 	}
 }

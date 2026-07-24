@@ -65,6 +65,14 @@ class Info {
 	const RESTORE_LOCATOR_FILE = 'restore-locator.php';
 
 	/**
+	 * Filename of the restore locator stored in wp-content (survives plugin updates).
+	 *
+	 * @since 1.17.3
+	 * @var string
+	 */
+	const WP_CONTENT_LOCATOR_FILE = '.boldgrid-backup-locator.php';
+
+	/**
 	 * Filename used to persist the per-install secret in the backup directory.
 	 *
 	 * @since 1.17.3
@@ -104,7 +112,7 @@ class Info {
 	}
 
 	/**
-	 * Get the path to the restore locator file.
+	 * Get the path to the restore locator file (plugin tree).
 	 *
 	 * @since 1.17.3
 	 * @static
@@ -116,17 +124,52 @@ class Info {
 	}
 
 	/**
-	 * Read the backup/storage directory from the restore locator.
+	 * Get the path to the restore locator file in wp-content (survives plugin updates).
 	 *
 	 * @since 1.17.3
 	 * @static
 	 *
+	 * @return string|null Path or null if wp-content cannot be determined.
+	 */
+	public static function get_wp_content_locator_filepath() {
+		$wp_content = self::get_wp_content_dir();
+		if ( ! $wp_content ) {
+			return null;
+		}
+		return $wp_content . '/' . self::WP_CONTENT_LOCATOR_FILE;
+	}
+
+	/**
+	 * Determine the wp-content directory from the plugin location.
+	 *
+	 * This works even when WordPress is not loaded, by walking up from cli/.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @return string|null
+	 */
+	public static function get_wp_content_dir() {
+		// cli/ -> boldgrid-backup/ -> plugins/ -> wp-content/
+		$wp_content  = dirname( dirname( dirname( __DIR__ ) ) );
+		$plugins_dir = dirname( __DIR__ );
+		if ( 'plugins' === basename( dirname( $plugins_dir ) ) ) {
+			return $wp_content;
+		}
+		return null;
+	}
+
+	/**
+	 * Read the backup/storage directory from a locator file.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string $locator Path to locator file.
 	 * @return string|null Absolute directory path, or null if unavailable.
 	 */
-	public static function get_dir_from_locator() {
-		$locator = self::get_restore_locator_filepath();
-
-		if ( ! file_exists( $locator ) || ! is_readable( $locator ) ) {
+	private static function read_locator_file( $locator ) {
+		if ( ! $locator || ! file_exists( $locator ) || ! is_readable( $locator ) ) {
 			return null;
 		}
 
@@ -139,6 +182,27 @@ class Info {
 		$dir = self::untrailingslashit_path( $dir );
 
 		return is_dir( $dir ) ? $dir : null;
+	}
+
+	/**
+	 * Read the backup/storage directory from the restore locator.
+	 *
+	 * Checks the plugin tree first, then falls back to wp-content (survives updates).
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @return string|null Absolute directory path, or null if unavailable.
+	 */
+	public static function get_dir_from_locator() {
+		// Primary: plugin tree (fastest, but lost on plugin update).
+		$dir = self::read_locator_file( self::get_restore_locator_filepath() );
+		if ( $dir ) {
+			return $dir;
+		}
+
+		// Fallback: wp-content (survives plugin updates).
+		return self::read_locator_file( self::get_wp_content_locator_filepath() );
 	}
 
 	/**
@@ -187,6 +251,7 @@ class Info {
 	 * Write the restore locator file used by CLI (and env-info) to find storage.
 	 *
 	 * The locator refuses direct HTTP execution; it only returns a path when included.
+	 * Writes to both the plugin tree (fast lookup) and wp-content (survives updates).
 	 *
 	 * @since 1.17.3
 	 * @static
@@ -215,7 +280,14 @@ class Info {
 			'}' . "\n" .
 			'return ' . var_export( $storage_dir, true ) . ";\n"; // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_export
 
+		// Write to plugin tree (primary, fast lookup).
 		$written = ( false !== file_put_contents( self::get_restore_locator_filepath(), $contents ) );
+
+		// Also write to wp-content (survives plugin updates for CLI emergency restore).
+		$wp_content_locator = self::get_wp_content_locator_filepath();
+		if ( $wp_content_locator ) {
+			@file_put_contents( $wp_content_locator, $contents ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged,WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+		}
 
 		if ( $written ) {
 			// Reset cached path so the next get_results_filepath() uses the locator.
@@ -511,10 +583,14 @@ class Info {
 		self::$results_file_path = null;
 
 		// Migrate restore-info from cron/ before deleting legacy plugin-tree copies.
-		self::migrate_legacy_restore_info( $storage_dir, $secret, $legacy_secret );
+		$migrated = self::migrate_legacy_restore_info( $storage_dir, $secret, $legacy_secret );
 
+		// Only delete legacy restore-info after successful migration (or when secure
+		// restore-info already exists). Prevents data loss if migration fails.
 		self::delete_legacy_verify_files();
-		self::delete_legacy_cron_restore_info_files();
+		if ( $migrated ) {
+			self::delete_legacy_cron_restore_info_files();
+		}
 
 		return $storage_dir;
 	}

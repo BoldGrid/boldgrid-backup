@@ -224,6 +224,9 @@ class Test_Boldgrid_Backup_Cli_Info extends WP_UnitTestCase {
 		$this->assertNotSame( $legacy_secret, $new_secret );
 		$this->assertFileExists( $storage_dir . '/.boldgrid-cli-secret' );
 		$this->assertFileExists( \Boldgrid\Backup\Cli\Info::get_restore_locator_filepath() );
+		$wp_locator = \Boldgrid\Backup\Cli\Info::get_wp_content_locator_filepath();
+		$this->assertNotEmpty( $wp_locator );
+		$this->assertFileExists( $wp_locator );
 		$this->assertFileDoesNotExist( $legacy_verify );
 		$this->assertFileDoesNotExist( $legacy_info );
 
@@ -235,8 +238,13 @@ class Test_Boldgrid_Backup_Cli_Info extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'SCRIPT_FILENAME', $locator );
 		$this->assertStringContainsString( '__FILE__', $locator );
 
+		// Plugin-tree locator may be gone after a plugin update; wp-content fallback remains.
+		@unlink( \Boldgrid\Backup\Cli\Info::get_restore_locator_filepath() ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		$this->assertSame( $storage_dir, \Boldgrid\Backup\Cli\Info::get_dir_from_locator() );
+
 		// Cleanup.
 		@unlink( \Boldgrid\Backup\Cli\Info::get_restore_locator_filepath() ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		@unlink( $wp_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 		@unlink( $storage_dir . '/.boldgrid-cli-secret' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 		foreach ( glob( $storage_dir . '/restore-info-*.json' ) as $file ) {
 			@unlink( $file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
@@ -270,6 +278,10 @@ class Test_Boldgrid_Backup_Cli_Info extends WP_UnitTestCase {
 
 		// Cleanup.
 		@unlink( \Boldgrid\Backup\Cli\Info::get_restore_locator_filepath() ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		$wp_locator = \Boldgrid\Backup\Cli\Info::get_wp_content_locator_filepath();
+		if ( $wp_locator ) {
+			@unlink( $wp_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
 		@unlink( $storage_dir . '/.boldgrid-cli-secret' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 		foreach ( glob( $storage_dir . '/restore-info-*.json' ) as $file ) {
 			@unlink( $file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
