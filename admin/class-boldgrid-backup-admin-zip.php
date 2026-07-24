@@ -203,7 +203,9 @@ class Boldgrid_Backup_Admin_Zip {
 		);
 
 		if ( $entry_count < 1 ) {
-			return 0 === $eocd['total_entries'];
+			// A truly empty archive has cd_size = 0. If the EOCD claims 0 entries
+			// but cd_size is non-zero, the cd_offset may be wrong and enumeration failed.
+			return 0 === $eocd['total_entries'] && 0 === $eocd['cd_size'];
 		}
 
 		$needs_zip64_count = $entry_count > 0xffff;

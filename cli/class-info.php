@@ -866,20 +866,35 @@ class Info {
 			$has_legacy_data = false;
 			$cron_dir        = dirname( __DIR__ ) . '/cron';
 			$cron_files      = @scandir( $cron_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-			if ( ! empty( $cron_files ) && ! empty( preg_grep( '/^restore-info-.*\.json$/', $cron_files ) ) ) {
-				$has_legacy_data = true;
+			if ( ! empty( $cron_files ) ) {
+				foreach ( preg_grep( '/^restore-info-.*\.json$/', $cron_files ) as $file ) {
+					if ( is_readable( $cron_dir . '/' . $file ) ) {
+						$has_legacy_data = true;
+						break;
+					}
+				}
 			}
 			if ( ! $has_legacy_data && $previous_dir && $previous_dir !== $storage_dir && is_dir( $previous_dir ) ) {
 				$prev_files = @scandir( $previous_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-				if ( ! empty( $prev_files ) && ! empty( preg_grep( '/^restore-info-.*\.json$/', $prev_files ) ) ) {
-					$has_legacy_data = true;
+				if ( ! empty( $prev_files ) ) {
+					foreach ( preg_grep( '/^restore-info-.*\.json$/', $prev_files ) as $file ) {
+						if ( is_readable( $previous_dir . '/' . $file ) ) {
+							$has_legacy_data = true;
+							break;
+						}
+					}
 				}
 			}
 			// Check for orphan restore-info files in the storage directory itself (e.g. after secret was lost).
 			if ( ! $has_legacy_data && is_dir( $storage_dir ) ) {
 				$storage_files = @scandir( $storage_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-				if ( ! empty( $storage_files ) && ! empty( preg_grep( '/^restore-info-.*\.json$/', $storage_files ) ) ) {
-					$has_legacy_data = true;
+				if ( ! empty( $storage_files ) ) {
+					foreach ( preg_grep( '/^restore-info-.*\.json$/', $storage_files ) as $file ) {
+						if ( is_readable( $storage_dir . '/' . $file ) ) {
+							$has_legacy_data = true;
+							break;
+						}
+					}
 				}
 			}
 
@@ -986,14 +1001,24 @@ class Info {
 				$has_legacy_data = false;
 				$cron_dir        = dirname( __DIR__ ) . '/cron';
 				$cron_files      = @scandir( $cron_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-				if ( ! empty( $cron_files ) && ! empty( preg_grep( '/^restore-info-.*\.json$/', $cron_files ) ) ) {
-					$has_legacy_data = true;
+				if ( ! empty( $cron_files ) ) {
+					foreach ( preg_grep( '/^restore-info-.*\.json$/', $cron_files ) as $file ) {
+						if ( is_readable( $cron_dir . '/' . $file ) ) {
+							$has_legacy_data = true;
+							break;
+						}
+					}
 				}
 				// Check for orphan restore-info files in the storage directory itself.
 				if ( ! $has_legacy_data && is_dir( $storage_dir ) ) {
 					$storage_files = @scandir( $storage_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-					if ( ! empty( $storage_files ) && ! empty( preg_grep( '/^restore-info-.*\.json$/', $storage_files ) ) ) {
-						$has_legacy_data = true;
+					if ( ! empty( $storage_files ) ) {
+						foreach ( preg_grep( '/^restore-info-.*\.json$/', $storage_files ) as $file ) {
+							if ( is_readable( $storage_dir . '/' . $file ) ) {
+								$has_legacy_data = true;
+								break;
+							}
+						}
 					}
 				}
 				if ( $has_legacy_data ) {

@@ -495,6 +495,14 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 				if ( empty( $stat['name'] ) || '.' === $stat['name'] || './' === $stat['name'] ) {
 					continue;
 				}
+				$is_folder = '/' === substr( $stat['name'], -1 );
+				if ( ! $is_folder && method_exists( $zip_archive, 'getExternalAttributesIndex' ) ) {
+					$opsys = 0;
+					$attr  = 0;
+					if ( $zip_archive->getExternalAttributesIndex( $i, $opsys, $attr ) ) {
+						$is_folder = (bool) ( $attr & 0x10 );
+					}
+				}
 				$list[] = array(
 					'filename'        => $stat['name'],
 					'stored_filename' => $stat['name'],
@@ -502,7 +510,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 					'compressed_size' => $stat['comp_size'],
 					'mtime'           => $stat['mtime'],
 					'comment'         => '',
-					'folder'          => '/' === substr( $stat['name'], -1 ),
+					'folder'          => $is_folder,
 					'index'           => $i,
 					'status'          => 'ok',
 					'crc'             => $stat['crc'],
