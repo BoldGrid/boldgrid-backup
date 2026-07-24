@@ -96,7 +96,7 @@ class Info {
 	 * @return string
 	 */
 	public static function get_results_filepath() {
-		if ( null === self::$results_file_path ) {
+		if ( null === self::$results_file_path || '' === self::$results_file_path ) {
 			$secret = self::get_secret();
 			if ( ! self::is_valid_secret_format( $secret ) ) {
 				// Fail closed: never emit restore-info-.json for an empty/invalid secret.

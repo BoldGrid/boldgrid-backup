@@ -497,9 +497,11 @@ class Boldgrid_Backup_Admin_Zip {
 		if ( class_exists( 'ZipArchive' ) ) {
 			$zip    = new ZipArchive();
 			$status = $zip->open( $filepath );
-			if ( true === $status ) {
+			if ( true === $status && $zip->numFiles > 0 ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName
 				$zip->close();
 				$verified = true;
+			} elseif ( true === $status ) {
+				$zip->close();
 			}
 		} else {
 			/*
