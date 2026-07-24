@@ -382,14 +382,17 @@ class Info {
 		}
 
 		/*
-		 * If only one locator was updated, remove the other when it still exists so a
-		 * stale path cannot win in get_dir_from_locator() after a partial write.
+		 * If only the plugin-tree locator was updated, leave any existing wp-content
+		 * locator in place — it is the durable copy that survives plugin updates.
+		 * A failed wp-content write (permissions, disk space) does not mean the
+		 * existing wp-content locator is stale, and removing it would lose the only
+		 * locator that persists across plugin updates.
+		 *
+		 * Conversely, if only the wp-content locator was updated, remove the stale
+		 * plugin-tree locator so get_dir_from_locator() does not read an old path.
 		 */
 		if ( ! $plugin_written && $wp_content_written && file_exists( $plugin_locator ) ) {
 			@unlink( $plugin_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
-		}
-		if ( $plugin_written && ! $wp_content_written && $wp_content_locator && file_exists( $wp_content_locator ) ) {
-			@unlink( $wp_content_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
 		}
 
 		$written = $plugin_written || $wp_content_written;
@@ -591,20 +594,20 @@ class Info {
 			return true;
 		}
 
-		if ( false !== file_put_contents( $secure_results, $best_contents ) ) {
-			@chmod( $secure_results, 0600 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-
-			// Drop storage-dir orphans after renaming onto the current secret.
-			// Leave files in previous_dir / cron/ for separate cleanup paths.
-			if ( dirname( $best_candidate ) === $storage_dir ) {
-				@unlink( $best_candidate ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-			}
-
-			return true;
+		if ( false === file_put_contents( $secure_results, $best_contents ) ) {
+			// Write failed; do not claim success even if an older destination exists.
+			return false;
 		}
 
-		// Destination already existed even if the newer copy could not be written.
-		return file_exists( $secure_results );
+		@chmod( $secure_results, 0600 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+
+		// Drop storage-dir orphans after renaming onto the current secret.
+		// Leave files in previous_dir / cron/ for separate cleanup paths.
+		if ( dirname( $best_candidate ) === $storage_dir ) {
+			@unlink( $best_candidate ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+
+		return true;
 	}
 
 	/**
