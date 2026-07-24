@@ -2113,7 +2113,10 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Actions to take if we're creating a full site backup.
 		if ( ! $dryrun && $this->archiver_utility->is_full_backup() ) {
-			$this->archive->write_results_file( $info );
+			$restore_info_written = $this->archive->write_results_file( $info );
+			if ( ! $restore_info_written ) {
+				$this->logger->add( 'Warning: Failed to write restore-info file. Emergency CLI restore may not work until a successful write.' );
+			}
 		}
 
 		if ( isset( $this->activity ) ) {

@@ -584,6 +584,29 @@ class Info {
 	}
 
 	/**
+	 * Check if a directory is writable.
+	 *
+	 * Uses WP_Filesystem when available (matching Boldgrid_Backup_Admin_Backup_Dir::get),
+	 * with a PHP-native is_writable fallback for standalone CLI.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string $dir Directory path.
+	 * @return bool
+	 */
+	public static function is_directory_writable( $dir ) {
+		global $wp_filesystem;
+
+		if ( ! empty( $wp_filesystem ) && is_object( $wp_filesystem ) && method_exists( $wp_filesystem, 'is_writable' ) ) {
+			return $wp_filesystem->is_writable( $dir );
+		}
+
+		// Fallback to PHP-native check for standalone CLI (emergency restore).
+		return is_writable( $dir ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable
+	}
+
+	/**
 	 * Ensure per-install secret and restore-info live outside the web-served plugin tree.
 	 *
 	 * Always generates a fresh secret when only a legacy webroot verify file exists, because
@@ -606,7 +629,7 @@ class Info {
 
 		$storage_dir = $storage_dir ? self::untrailingslashit_path( (string) $storage_dir ) : self::get_secure_storage_dir();
 
-		if ( ! $storage_dir || ! is_dir( $storage_dir ) || ! is_writable( $storage_dir ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable
+		if ( ! $storage_dir || ! is_dir( $storage_dir ) || ! self::is_directory_writable( $storage_dir ) ) {
 			return null;
 		}
 
