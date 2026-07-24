@@ -874,10 +874,17 @@ class Info {
 			}
 		}
 
-		// Only delete legacy files after successful migration (or when secure
-		// restore-info already exists). Prevents data loss if migration fails.
+		/*
+		 * Legacy verify-*.php files are obsolete once a secret is persisted in
+		 * secure storage. Delete them even when there was no restore-info to
+		 * migrate (empty migrate returns false) so historically shipped static
+		 * secrets do not remain under the web-served plugin tree.
+		 *
+		 * Cron restore-info is different: only delete after successful migration
+		 * so a failed copy cannot drop the only emergency-restore metadata.
+		 */
+		self::delete_legacy_verify_files();
 		if ( $migrated ) {
-			self::delete_legacy_verify_files();
 			self::delete_legacy_cron_restore_info_files();
 		}
 

@@ -259,6 +259,43 @@ class Test_Boldgrid_Backup_Cli_Info extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test verify files are removed even when there is no restore-info to migrate.
+	 *
+	 * Empty migrate returns false; verify-*.php must still leave the web tree.
+	 *
+	 * @since 1.17.3
+	 */
+	public function test_ensure_secure_storage_deletes_verify_without_restore_info() {
+		$storage_dir = sys_get_temp_dir() . '/bgbak-verify-only-' . wp_generate_password( 8, false );
+		mkdir( $storage_dir, 0700 );
+
+		$legacy_secret = md5( 'verify-only-shipped-secret' );
+		$legacy_verify = BOLDGRID_BACKUP_PATH . '/cli/verify-' . $legacy_secret . '.php';
+
+		file_put_contents( $legacy_verify, "<?php // phpcs:disable\n" ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+
+		$dir = \Boldgrid\Backup\Cli\Info::ensure_secure_storage( $storage_dir );
+		$this->assertSame( $storage_dir, $dir );
+		$this->assertFileExists( $storage_dir . '/.boldgrid-cli-secret' );
+		$this->assertFileDoesNotExist( $legacy_verify );
+
+		$new_secret = \Boldgrid\Backup\Cli\Info::get_secret();
+		$this->assertNotSame( $legacy_secret, $new_secret );
+
+		// Cleanup.
+		@unlink( \Boldgrid\Backup\Cli\Info::get_restore_locator_filepath() ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		$wp_locator = \Boldgrid\Backup\Cli\Info::get_wp_content_locator_filepath();
+		if ( $wp_locator ) {
+			@unlink( $wp_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+		@unlink( $storage_dir . '/.boldgrid-cli-secret' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		foreach ( glob( $storage_dir . '/restore-info-*.json' ) as $file ) {
+			@unlink( $file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+		@rmdir( $storage_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+	}
+
+	/**
 	 * Test restore-info migrates even when the legacy verify file is already gone.
 	 *
 	 * @since 1.17.3
