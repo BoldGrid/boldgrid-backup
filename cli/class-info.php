@@ -646,7 +646,9 @@ class Info {
 			return null;
 		}
 
-		self::write_restore_locator( $storage_dir );
+		if ( ! self::write_restore_locator( $storage_dir ) ) {
+			return null;
+		}
 
 		$secret        = self::read_secret_from_storage( $storage_dir );
 		$legacy_secret = self::get_legacy_verify_secret();

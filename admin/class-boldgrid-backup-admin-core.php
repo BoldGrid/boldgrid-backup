@@ -2107,8 +2107,6 @@ class Boldgrid_Backup_Admin_Core {
 
 			// Enforce retention setting.
 			$this->enforce_retention();
-
-			update_option( 'boldgrid_backup_latest_backup', $info );
 		}
 
 		// Actions to take if we're creating a full site backup.
@@ -2125,6 +2123,11 @@ class Boldgrid_Backup_Admin_Core {
 			}
 		}
 
+		// Store latest backup info after restore-info processing so restore_info_error is included.
+		if ( ! $dryrun ) {
+			update_option( 'boldgrid_backup_latest_backup', $info );
+		}
+
 		if ( isset( $this->activity ) ) {
 			$this->activity->add( 'any_backup_created', 1, $this->rating_prompt_config );
 		}
@@ -2139,10 +2142,11 @@ class Boldgrid_Backup_Admin_Core {
 		 * manual backups are not reported as fully healthy when emergency metadata is missing.
 		 */
 		Boldgrid_Backup_Admin_In_Progress_Data::set_args( array(
-			'status'  => $restore_info_error
+			'status'        => $restore_info_error
 				? $restore_info_error
 				: esc_html__( 'Backup complete!', 'boldgrid-backup' ),
-			'success' => empty( $restore_info_error ),
+			'success'       => empty( $restore_info_error ),
+			'process_error' => $restore_info_error ? $restore_info_error : null,
 		) );
 
 		// Return the array of archive information.
