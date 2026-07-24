@@ -812,10 +812,10 @@ class Info {
 		// Migrate restore-info from cron/ or previous backup dir before deleting legacy copies.
 		$migrated = self::migrate_legacy_restore_info( $storage_dir, $secret, $legacy_secret, $previous_dir );
 
-		// Only delete legacy restore-info after successful migration (or when secure
+		// Only delete legacy files after successful migration (or when secure
 		// restore-info already exists). Prevents data loss if migration fails.
-		self::delete_legacy_verify_files();
 		if ( $migrated ) {
+			self::delete_legacy_verify_files();
 			self::delete_legacy_cron_restore_info_files();
 		}
 

@@ -224,7 +224,7 @@ if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) || defined( 'WP_CLI
 $oldname = BOLDGRID_BACKUP_PATH . '/cron/restore-info.json';
 if ( file_exists( $oldname ) ) {
 	require_once BOLDGRID_BACKUP_PATH . '/cli/class-info.php';
-	$has_stable_secret = \Boldgrid\Backup\Cli\Info::get_secure_storage_dir()
+	$has_stable_secret = \Boldgrid\Backup\Cli\Info::read_secret_from_storage()
 		|| \Boldgrid\Backup\Cli\Info::get_legacy_verify_secret();
 	if ( $has_stable_secret ) {
 		$results_path = \Boldgrid\Backup\Cli\Info::get_results_filepath();
