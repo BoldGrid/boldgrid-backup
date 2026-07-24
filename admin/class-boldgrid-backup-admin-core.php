@@ -2830,14 +2830,20 @@ class Boldgrid_Backup_Admin_Core {
 		 * If there were any errors encountered during the backup, save them to the In Progress data.
 		 *
 		 * A "process error" is when the archive_files() method successfully returns info, and it includes
-		 * an error.
+		 * an error — or when it returns false.
 		 */
-		if ( ! empty( $archive_info['error'] ) ) {
+		if ( false === $archive_info ) {
+			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'process_error', __( 'Backup failed.', 'boldgrid-backup' ) );
+			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'success', false );
+		} elseif ( is_array( $archive_info ) && ! empty( $archive_info['error'] ) ) {
 			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'process_error', $archive_info['error'] );
+			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'success', false );
+		} elseif ( is_array( $archive_info ) && ! empty( $archive_info['restore_info_error'] ) ) {
+			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'process_error', $archive_info['restore_info_error'] );
 			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'success', false );
 		}
 
-		if ( $this->is_archiving_update_protection ) {
+		if ( $this->is_archiving_update_protection && is_array( $archive_info ) ) {
 			update_site_option( 'boldgrid_backup_pending_rollback', $archive_info );
 		}
 

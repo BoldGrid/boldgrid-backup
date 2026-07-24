@@ -65,7 +65,7 @@ class Boldgrid_Backup_Archiver {
 	public function complete() {
 		/*
 		 * archive_files() can return:
-		 * - false: when backup directory is not writable
+		 * - false: hard failure (e.g. backup directory not writable)
 		 * - array with 'error' key: various failure conditions
 		 * - valid info array: success (may contain 'restore_info_error' for partial success)
 		 */
@@ -73,7 +73,7 @@ class Boldgrid_Backup_Archiver {
 
 		if ( $is_failure ) {
 			$error_message = false === $this->info
-				? __( 'Backup failed: backup directory is not writable.', 'boldgrid-backup' )
+				? __( 'Backup failed.', 'boldgrid-backup' )
 				: $this->info['error'];
 
 			$this->core->logger->add( 'Error: ' . $error_message );
@@ -99,7 +99,7 @@ class Boldgrid_Backup_Archiver {
 		/*
 		 * Cron / Archiver backups must not report unqualified success when emergency
 		 * restore metadata failed to write. Persist the error on the task and keep
-		 * In Progress marked unsuccessful (archive_files() already set this for UI).
+		 * In Progress marked unsuccessful.
 		 */
 		if ( $restore_info_error ) {
 			$this->core->logger->add( 'Warning: ' . $restore_info_error );
