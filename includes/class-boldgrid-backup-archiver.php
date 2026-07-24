@@ -66,6 +66,14 @@ class Boldgrid_Backup_Archiver {
 		$this->core->logger->add( 'Backup complete!' );
 		$this->core->logger->add_memory();
 
+		/*
+		 * If restore-info failed to write, store the error in the task data so that
+		 * cron-driven backups do not report as fully successful when emergency metadata is missing.
+		 */
+		if ( ! empty( $this->info['restore_info_error'] ) ) {
+			$this->task->update_data( 'restore_info_error', $this->info['restore_info_error'] );
+		}
+
 		$this->task->end();
 	}
 

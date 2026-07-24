@@ -469,6 +469,14 @@ class Info {
 			}
 		}
 
+		/*
+		 * Find the newest candidate by comparing the timestamp field inside each JSON file.
+		 * This prevents migrating stale restore-info when multiple legacy files exist.
+		 */
+		$best_candidate  = null;
+		$best_timestamp  = 0;
+		$best_contents   = null;
+
 		foreach ( array_unique( $candidates ) as $legacy_results ) {
 			if ( $legacy_results === $secure_results ) {
 				continue;
@@ -482,17 +490,30 @@ class Info {
 				continue;
 			}
 
-			if ( false !== file_put_contents( $secure_results, $contents ) ) {
-				@chmod( $secure_results, 0600 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			$data      = json_decode( $contents, true );
+			$timestamp = isset( $data['timestamp'] ) ? (int) $data['timestamp'] : 0;
 
-				// Drop storage-dir orphans after renaming onto the current secret.
-				// Leave files in previous_dir / cron/ for separate cleanup paths.
-				if ( dirname( $legacy_results ) === $storage_dir ) {
-					@unlink( $legacy_results ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-				}
-
-				return true;
+			if ( null === $best_candidate || $timestamp > $best_timestamp ) {
+				$best_candidate = $legacy_results;
+				$best_timestamp = $timestamp;
+				$best_contents  = $contents;
 			}
+		}
+
+		if ( null === $best_candidate || null === $best_contents ) {
+			return false;
+		}
+
+		if ( false !== file_put_contents( $secure_results, $best_contents ) ) {
+			@chmod( $secure_results, 0600 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+
+			// Drop storage-dir orphans after renaming onto the current secret.
+			// Leave files in previous_dir / cron/ for separate cleanup paths.
+			if ( dirname( $best_candidate ) === $storage_dir ) {
+				@unlink( $best_candidate ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			}
+
+			return true;
 		}
 
 		return false;

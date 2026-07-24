@@ -2045,6 +2045,36 @@ class Boldgrid_Backup_Admin_Core {
 		$info['db_duration'] = number_format( ( $db_time_stop - $time_start ), 2, '.', '' );
 		$info['db_filename'] = basename( $this->db_dump_filepath );
 
+		// If not a dry-run test, update the last backup option and enforce retention.
+		if ( ! $dryrun ) {
+			// Update WP option for "boldgrid_backup_last_backup".
+			update_site_option( 'boldgrid_backup_last_backup', time() );
+
+			$this->archive_log->write( $info );
+
+			// Enforce retention setting.
+			$this->enforce_retention();
+		}
+
+		// Actions to take if we're creating a full site backup.
+		$restore_info_error = '';
+		if ( ! $dryrun && $this->archiver_utility->is_full_backup() ) {
+			$restore_info_written = $this->archive->write_results_file( $info );
+			if ( ! $restore_info_written ) {
+				$restore_info_error = __(
+					'Backup archive created, but failed to write restore-info. Emergency CLI restore may not work until a successful write.',
+					'boldgrid-backup'
+				);
+				$info['restore_info_error'] = $restore_info_error;
+				$this->logger->add( 'Warning: ' . $restore_info_error );
+			}
+		}
+
+		// Store latest backup info after restore-info processing so restore_info_error is included.
+		if ( ! $dryrun ) {
+			update_option( 'boldgrid_backup_latest_backup', $info );
+		}
+
 		/**
 		 * Actions to take after a backup has been created.
 		 *
@@ -2074,6 +2104,7 @@ class Boldgrid_Backup_Admin_Core {
 		 *     @type int    $duration     57.08
 		 *     @type int    $db_duration  0.35
 		 *     @type bool   $mail_success
+		 *     @type string $restore_info_error (optional) Error message if restore-info failed to write.
 		 * }
 		 */
 		do_action( 'boldgrid_backup_post_archive_files', $info );
@@ -2096,36 +2127,6 @@ class Boldgrid_Backup_Admin_Core {
 			$info['mail_success'] = $this->email->send( $email_parts['subject'], $email_body );
 
 			$this->logger->add( 'Sending of email complete! Status: ' . $info['mail_success'] );
-		}
-
-		// If not a dry-run test, update the last backup option and enforce retention.
-		if ( ! $dryrun ) {
-			// Update WP option for "boldgrid_backup_last_backup".
-			update_site_option( 'boldgrid_backup_last_backup', time() );
-
-			$this->archive_log->write( $info );
-
-			// Enforce retention setting.
-			$this->enforce_retention();
-		}
-
-		// Actions to take if we're creating a full site backup.
-		$restore_info_error = '';
-		if ( ! $dryrun && $this->archiver_utility->is_full_backup() ) {
-			$restore_info_written = $this->archive->write_results_file( $info );
-			if ( ! $restore_info_written ) {
-				$restore_info_error = __(
-					'Backup archive created, but failed to write restore-info. Emergency CLI restore may not work until a successful write.',
-					'boldgrid-backup'
-				);
-				$info['restore_info_error'] = $restore_info_error;
-				$this->logger->add( 'Warning: ' . $restore_info_error );
-			}
-		}
-
-		// Store latest backup info after restore-info processing so restore_info_error is included.
-		if ( ! $dryrun ) {
-			update_option( 'boldgrid_backup_latest_backup', $info );
 		}
 
 		if ( isset( $this->activity ) ) {
