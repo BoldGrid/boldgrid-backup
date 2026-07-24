@@ -715,7 +715,7 @@ class Boldgrid_Backup_Admin_Archive {
 			return false;
 		}
 
-		$is_dir_writable = $this->core->wp_filesystem->is_writable( dirname( $results_filepath ) );
+		$is_dir_writable = \Boldgrid\Backup\Cli\Info::is_directory_writable( dirname( $results_filepath ) );
 
 		if ( $archive_filepath && $is_dir_writable ) {
 			$results_filepath = wp_normalize_path( $results_filepath );
