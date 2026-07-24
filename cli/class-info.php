@@ -382,17 +382,23 @@ class Info {
 		}
 
 		/*
-		 * If only the plugin-tree locator was updated, leave any existing wp-content
-		 * locator in place — it is the durable copy that survives plugin updates.
-		 * A failed wp-content write (permissions, disk space) does not mean the
-		 * existing wp-content locator is stale, and removing it would lose the only
-		 * locator that persists across plugin updates.
+		 * If only the wp-content locator was updated, remove a stale plugin-tree
+		 * locator so get_dir_from_locator() does not read an old path.
 		 *
-		 * Conversely, if only the wp-content locator was updated, remove the stale
-		 * plugin-tree locator so get_dir_from_locator() does not read an old path.
+		 * If the plugin-tree write succeeded but wp-content write failed, only remove
+		 * the durable locator when it still points at a different directory. Keeping a
+		 * same-path copy is fine (write failed but content is already correct); keeping
+		 * a disagreeing copy is worse — after a plugin update the stale path would be
+		 * the only remaining locator.
 		 */
 		if ( ! $plugin_written && $wp_content_written && file_exists( $plugin_locator ) ) {
 			@unlink( $plugin_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
+		}
+		if ( $plugin_written && ! $wp_content_written && $wp_content_locator && file_exists( $wp_content_locator ) ) {
+			$existing_wp = self::read_locator_file( $wp_content_locator );
+			if ( $existing_wp && self::untrailingslashit_path( $existing_wp ) !== $storage_dir ) {
+				@unlink( $wp_content_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
+			}
 		}
 
 		$written = $plugin_written || $wp_content_written;
