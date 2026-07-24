@@ -231,7 +231,8 @@ if ( file_exists( $oldname ) ) {
 		$new_basename = $results_path ? basename( $results_path ) : '';
 		// Only rename onto a valid secret-named file; never restore-info-.json.
 		if ( $new_basename && preg_match( '/^restore-info-[0-9a-f]{32}\.json$/', $new_basename ) ) {
-			$newname = BOLDGRID_BACKUP_PATH . '/cron/' . $new_basename;
+			// Use the directory from the resolved results path (backup dir or legacy cron/).
+			$newname = $results_path;
 			if ( ! file_exists( $newname ) ) {
 				rename( $oldname, $newname );
 			} elseif ( file_exists( $oldname ) ) {
