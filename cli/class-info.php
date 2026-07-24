@@ -824,17 +824,38 @@ class Info {
 		$migrated = self::migrate_legacy_restore_info( $storage_dir, $secret, $legacy_secret, $previous_dir );
 
 		/*
-		 * If we generated a new secret but migration failed, restore-info remains under the
-		 * old secret filename. The new secret would orphan that data. Remove the new secret
+		 * If we generated a new secret but migration failed because legacy restore-info
+		 * could not be copied, the new secret would orphan that data. Remove the new secret
 		 * and fail so callers retry once legacy restore-info is writable or can fall back
 		 * to legacy paths.
+		 *
+		 * However, when there is simply nothing to migrate (fresh install with no cron or
+		 * legacy files), migration returns false but the new secret should be kept so that
+		 * write_results_file() can proceed.
 		 */
 		if ( $generated_secret && ! $migrated ) {
-			$secret_file = $storage_dir . '/' . self::SECRET_FILENAME;
-			@unlink( $secret_file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
-			self::$secret            = null;
-			self::$results_file_path = null;
-			return null;
+			// Check if legacy restore-info actually exists but could not be migrated.
+			$has_legacy_data = false;
+			$cron_dir        = dirname( __DIR__ ) . '/cron';
+			$cron_files      = @scandir( $cron_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			if ( ! empty( $cron_files ) && ! empty( preg_grep( '/^restore-info-.*\.json$/', $cron_files ) ) ) {
+				$has_legacy_data = true;
+			}
+			if ( ! $has_legacy_data && $previous_dir && $previous_dir !== $storage_dir && is_dir( $previous_dir ) ) {
+				$prev_files = @scandir( $previous_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+				if ( ! empty( $prev_files ) && ! empty( preg_grep( '/^restore-info-.*\.json$/', $prev_files ) ) ) {
+					$has_legacy_data = true;
+				}
+			}
+
+			// Only rollback when legacy data exists but migration failed.
+			if ( $has_legacy_data ) {
+				$secret_file = $storage_dir . '/' . self::SECRET_FILENAME;
+				@unlink( $secret_file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
+				self::$secret            = null;
+				self::$results_file_path = null;
+				return null;
+			}
 		}
 
 		// Only delete legacy files after successful migration (or when secure
