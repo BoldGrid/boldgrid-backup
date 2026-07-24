@@ -847,11 +847,27 @@ class Info {
 					$has_legacy_data = true;
 				}
 			}
+			// Check for orphan restore-info files in the storage directory itself (e.g. after secret was lost).
+			if ( ! $has_legacy_data && is_dir( $storage_dir ) ) {
+				$storage_files = @scandir( $storage_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+				if ( ! empty( $storage_files ) && ! empty( preg_grep( '/^restore-info-.*\.json$/', $storage_files ) ) ) {
+					$has_legacy_data = true;
+				}
+			}
 
 			// Only rollback when legacy data exists but migration failed.
 			if ( $has_legacy_data ) {
 				$secret_file = $storage_dir . '/' . self::SECRET_FILENAME;
 				@unlink( $secret_file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
+				// Also remove the locator to prevent pointing at a directory without a valid secret.
+				$plugin_locator     = self::get_restore_locator_filepath();
+				$wp_content_locator = self::get_wp_content_locator_filepath();
+				if ( file_exists( $plugin_locator ) ) {
+					@unlink( $plugin_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
+				}
+				if ( $wp_content_locator && file_exists( $wp_content_locator ) ) {
+					@unlink( $wp_content_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
+				}
 				self::$secret            = null;
 				self::$results_file_path = null;
 				return null;
@@ -915,6 +931,10 @@ class Info {
 				return '';
 			}
 			self::write_restore_locator( $storage_dir );
+
+			// Remigrate any orphan restore-info files onto the new secret name so CLI restore works.
+			$legacy_secret = self::get_legacy_verify_secret();
+			self::migrate_legacy_restore_info( $storage_dir, $secret, $legacy_secret, null );
 		} else {
 			// No storage directory: fail closed to avoid unstable secrets that drift across requests.
 			return '';

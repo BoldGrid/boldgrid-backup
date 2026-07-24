@@ -388,6 +388,9 @@ class Boldgrid_Backup_Admin_Zip {
 	/**
 	 * Rewrite end-of-archive records with ZIP64 EOCD + locator + classic EOCD.
 	 *
+	 * Backs up the original trailer before writing and restores it if verification
+	 * fails, preventing corruption of previously valid backups.
+	 *
 	 * @since 1.17.3
 	 *
 	 * @param string $filepath    Archive path.
@@ -402,9 +405,26 @@ class Boldgrid_Backup_Admin_Zip {
 			return false;
 		}
 
-		$zip64_offset = $eocd['eocd_offset'];
-		$cd_size      = $eocd['cd_size'];
-		$cd_offset    = $eocd['cd_offset'];
+		$zip64_offset  = $eocd['eocd_offset'];
+		$cd_size       = $eocd['cd_size'];
+		$cd_offset     = $eocd['cd_offset'];
+		$original_size = filesize( $filepath );
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fseek
+		if ( 0 !== fseek( $handle, $zip64_offset ) ) {
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+			fclose( $handle );
+			return false;
+		}
+
+		// Backup the original trailer bytes before modifying.
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fread
+		$original_trailer = fread( $handle, $original_size - $zip64_offset );
+		if ( false === $original_trailer ) {
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+			fclose( $handle );
+			return false;
+		}
 
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fseek
 		if ( 0 !== fseek( $handle, $zip64_offset ) ) {
@@ -467,6 +487,22 @@ class Boldgrid_Backup_Admin_Zip {
 		if ( true === $status ) {
 			$zip->close();
 			return true;
+		}
+
+		// Verification failed: restore the original trailer bytes to prevent corruption.
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
+		$restore_handle = fopen( $filepath, 'r+b' );
+		if ( false !== $restore_handle ) {
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fseek
+			if ( 0 === fseek( $restore_handle, $zip64_offset ) ) {
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite
+				fwrite( $restore_handle, $original_trailer );
+				fflush( $restore_handle );
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_ftruncate
+				ftruncate( $restore_handle, $original_size );
+			}
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+			fclose( $restore_handle );
 		}
 
 		return false;
