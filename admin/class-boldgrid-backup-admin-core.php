@@ -2132,7 +2132,11 @@ class Boldgrid_Backup_Admin_Core {
 			$this->activity->add( 'any_backup_created', 1, $this->rating_prompt_config );
 		}
 
-		$this->logger->add( 'Backup complete!' );
+		if ( $restore_info_error ) {
+			$this->logger->add( 'Backup finished with restore-info errors.' );
+		} else {
+			$this->logger->add( 'Backup complete!' );
+		}
 		$this->logger->add_memory();
 
 		$this->archiving_files = false;
