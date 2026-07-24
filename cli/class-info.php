@@ -507,9 +507,9 @@ class Info {
 		$best_contents  = null;
 
 		/*
-		 * Seed with any existing destination file. If there is no previous backup dir
-		 * to compare, keep the early return. Otherwise continue so a newer restore-info
-		 * from previous_dir can replace a stale destination copy after a dir switch-back.
+		 * Seed with any existing destination file. Continue to scan all candidates
+		 * (cron/, orphans, previous_dir) so a newer restore-info can replace a stale
+		 * destination copy.
 		 */
 		if ( file_exists( $secure_results ) && is_readable( $secure_results ) ) {
 			$contents = file_get_contents( $secure_results );
@@ -518,10 +518,6 @@ class Info {
 				$best_candidate = $secure_results;
 				$best_timestamp = isset( $data['timestamp'] ) ? (int) $data['timestamp'] : 0;
 				$best_contents  = $contents;
-			}
-
-			if ( ! $previous_dir || $previous_dir === $storage_dir ) {
-				return true;
 			}
 		}
 
