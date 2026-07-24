@@ -97,7 +97,12 @@ class Info {
 	 */
 	public static function get_results_filepath() {
 		if ( null === self::$results_file_path ) {
-			$secret      = self::get_secret();
+			$secret = self::get_secret();
+			if ( ! self::is_valid_secret_format( $secret ) ) {
+				// Fail closed: never emit restore-info-.json for an empty/invalid secret.
+				return '';
+			}
+
 			$storage_dir = self::get_secure_storage_dir();
 
 			if ( $storage_dir ) {
@@ -140,9 +145,11 @@ class Info {
 	}
 
 	/**
-	 * Determine the wp-content directory from the plugin location.
+	 * Determine the wp-content directory.
 	 *
-	 * This works even when WordPress is not loaded, by walking up from cli/.
+	 * Prefers WP_CONTENT_DIR when WordPress is loaded (including CI checkouts that are
+	 * not under wp-content/plugins/). Falls back to walking up from cli/ for standalone
+	 * emergency restore when the plugin lives under wp-content/plugins/.
 	 *
 	 * @since 1.17.3
 	 * @static
@@ -150,12 +157,16 @@ class Info {
 	 * @return string|null
 	 */
 	public static function get_wp_content_dir() {
-		// cli/ -> boldgrid-backup/ -> plugins/ -> wp-content/
-		$wp_content  = dirname( dirname( dirname( __DIR__ ) ) );
-		$plugins_dir = dirname( __DIR__ );
-		if ( 'plugins' === basename( dirname( $plugins_dir ) ) ) {
-			return $wp_content;
+		if ( defined( 'WP_CONTENT_DIR' ) && is_string( WP_CONTENT_DIR ) && '' !== WP_CONTENT_DIR ) {
+			return self::untrailingslashit_path( WP_CONTENT_DIR );
 		}
+
+		// Standalone CLI: cli/ -> boldgrid-backup/ -> plugins/ -> wp-content/
+		$plugin_root = dirname( __DIR__ );
+		if ( 'plugins' === basename( dirname( $plugin_root ) ) ) {
+			return dirname( dirname( $plugin_root ) );
+		}
+
 		return null;
 	}
 
@@ -377,10 +388,10 @@ class Info {
 	}
 
 	/**
-	 * Copy a legacy cron/restore-info-*.json into secure storage when needed.
+	 * Copy a legacy restore-info-*.json into secure storage when needed.
 	 *
-	 * Migrates using the legacy verify secret, the current secret, or any remaining
-	 * restore-info file under cron/ (verify may already be gone).
+	 * Prefers cron/ legacy files, then any orphan restore-info already in the backup
+	 * directory (e.g. after .boldgrid-cli-secret was lost and a new secret was issued).
 	 *
 	 * @since 1.17.3
 	 * @static
@@ -398,24 +409,37 @@ class Info {
 			return true;
 		}
 
+		if ( ! self::is_valid_secret_format( $secret ) ) {
+			return false;
+		}
+
 		$cron_dir   = dirname( __DIR__ ) . '/cron';
 		$candidates = [];
 
 		if ( self::is_valid_secret_format( (string) $legacy_secret ) ) {
 			$candidates[] = $cron_dir . '/restore-info-' . $legacy_secret . '.json';
 		}
-		if ( self::is_valid_secret_format( $secret ) ) {
-			$candidates[] = $cron_dir . '/restore-info-' . $secret . '.json';
-		}
+		$candidates[] = $cron_dir . '/restore-info-' . $secret . '.json';
 
-		$files = @scandir( $cron_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-		if ( ! empty( $files ) ) {
-			foreach ( preg_grep( '/^restore-info-.*\.json$/', $files ) as $file ) {
+		$cron_files = @scandir( $cron_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		if ( ! empty( $cron_files ) ) {
+			foreach ( preg_grep( '/^restore-info-.*\.json$/', $cron_files ) as $file ) {
 				$candidates[] = $cron_dir . '/' . $file;
 			}
 		}
 
+		// Remigrate orphans left in the backup directory under a previous secret name.
+		$storage_files = @scandir( $storage_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		if ( ! empty( $storage_files ) ) {
+			foreach ( preg_grep( '/^restore-info-.*\.json$/', $storage_files ) as $file ) {
+				$candidates[] = $storage_dir . '/' . $file;
+			}
+		}
+
 		foreach ( array_unique( $candidates ) as $legacy_results ) {
+			if ( $legacy_results === $secure_results ) {
+				continue;
+			}
 			if ( ! file_exists( $legacy_results ) || ! is_readable( $legacy_results ) ) {
 				continue;
 			}
@@ -427,6 +451,12 @@ class Info {
 
 			if ( false !== file_put_contents( $secure_results, $contents ) ) {
 				@chmod( $secure_results, 0600 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+
+				// Drop storage-dir orphans after renaming onto the current secret.
+				if ( dirname( $legacy_results ) === $storage_dir ) {
+					@unlink( $legacy_results ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+				}
+
 				return true;
 			}
 		}

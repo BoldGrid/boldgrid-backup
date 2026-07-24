@@ -109,9 +109,10 @@ class Site_Restore {
 		if ( $wpconfig ) {
 			preg_match_all( '/define\(.+DB_(NAME|USER|PASSWORD|HOST).+\);/', $wpconfig, $matches1 );
 			foreach ( $matches1[0] as $match1 ) {
-				preg_match_all( '/\'(.+?)\'/', $match1, $matches2 );
-				if ( ! empty( $matches2[1] ) ) {
-						define( $matches2[1][0], $matches2[1][1] );
+				// Allow empty values (common for DB_PASSWORD).
+				preg_match_all( '/\'([^\']*)\'/', $match1, $matches2 );
+				if ( isset( $matches2[1][0], $matches2[1][1] ) && ! defined( $matches2[1][0] ) ) {
+					define( $matches2[1][0], $matches2[1][1] );
 				}
 			}
 		}

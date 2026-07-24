@@ -219,10 +219,15 @@ if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) || defined( 'WP_CLI
 $oldname = BOLDGRID_BACKUP_PATH . '/cron/restore-info.json';
 if ( file_exists( $oldname ) ) {
 	require_once BOLDGRID_BACKUP_PATH . '/cli/class-info.php';
-	$newname = BOLDGRID_BACKUP_PATH . '/cron/' . basename( \Boldgrid\Backup\Cli\Info::get_results_filepath() );
-	if ( ! file_exists( $newname ) ) {
-		rename( $oldname, $newname );
-	} elseif ( file_exists( $oldname ) ) {
-		unlink( $oldname );
+	$results_path = \Boldgrid\Backup\Cli\Info::get_results_filepath();
+	$new_basename = $results_path ? basename( $results_path ) : '';
+	// Only rename onto a valid secret-named file; never restore-info-.json.
+	if ( $new_basename && preg_match( '/^restore-info-[0-9a-f]{32}\.json$/', $new_basename ) ) {
+		$newname = BOLDGRID_BACKUP_PATH . '/cron/' . $new_basename;
+		if ( ! file_exists( $newname ) ) {
+			rename( $oldname, $newname );
+		} elseif ( file_exists( $oldname ) ) {
+			unlink( $oldname );
+		}
 	}
 }
