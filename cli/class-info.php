@@ -814,12 +814,14 @@ class Info {
 		$secret             = self::read_secret_from_storage( $storage_dir );
 		$legacy_secret      = self::get_legacy_verify_secret();
 		$generated_secret   = false;
+		$copied_from_prev   = false;
 
 		// On backup-directory change, reuse the previous dir's secret when possible.
 		if ( empty( $secret ) && $previous_dir && $previous_dir !== $storage_dir ) {
 			$from_previous = self::read_secret_from_storage( $previous_dir );
 			if ( $from_previous && self::persist_secret( $from_previous, $storage_dir ) ) {
-				$secret = $from_previous;
+				$secret           = $from_previous;
+				$copied_from_prev = true;
 			}
 		}
 
@@ -851,16 +853,16 @@ class Info {
 		$migrated = self::migrate_legacy_restore_info( $storage_dir, $secret, $legacy_secret, $previous_dir );
 
 		/*
-		 * If we generated a new secret but migration failed because legacy restore-info
-		 * could not be copied, the new secret would orphan that data. Remove the new secret
-		 * and fail so callers retry once legacy restore-info is writable or can fall back
-		 * to legacy paths.
+		 * If we generated a new secret (or copied one from a previous directory) but
+		 * migration failed because legacy restore-info could not be copied, the new
+		 * secret would orphan that data. Remove the new secret and fail so callers
+		 * retry once legacy restore-info is writable or can fall back to legacy paths.
 		 *
 		 * However, when there is simply nothing to migrate (fresh install with no cron or
 		 * legacy files), migration returns false but the new secret should be kept so that
 		 * write_results_file() can proceed.
 		 */
-		if ( $generated_secret && ! $migrated ) {
+		if ( ( $generated_secret || $copied_from_prev ) && ! $migrated ) {
 			// Check if legacy restore-info actually exists but could not be migrated.
 			$has_legacy_data = false;
 			$cron_dir        = dirname( __DIR__ ) . '/cron';
@@ -961,7 +963,32 @@ class Info {
 
 			// Remigrate any orphan restore-info files onto the new secret name so CLI restore works.
 			$legacy_secret = self::get_legacy_verify_secret();
-			self::migrate_legacy_restore_info( $storage_dir, $secret, $legacy_secret, null );
+			$migrated      = self::migrate_legacy_restore_info( $storage_dir, $secret, $legacy_secret, null );
+
+			// Rollback if migration failed but legacy data exists.
+			if ( ! $migrated ) {
+				$has_legacy_data = false;
+				$cron_dir        = dirname( __DIR__ ) . '/cron';
+				$cron_files      = @scandir( $cron_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+				if ( ! empty( $cron_files ) && ! empty( preg_grep( '/^restore-info-.*\.json$/', $cron_files ) ) ) {
+					$has_legacy_data = true;
+				}
+				// Check for orphan restore-info files in the storage directory itself.
+				if ( ! $has_legacy_data && is_dir( $storage_dir ) ) {
+					$storage_files = @scandir( $storage_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+					if ( ! empty( $storage_files ) && ! empty( preg_grep( '/^restore-info-.*\.json$/', $storage_files ) ) ) {
+						$has_legacy_data = true;
+					}
+				}
+				if ( $has_legacy_data ) {
+					$secret_file = $storage_dir . '/' . self::SECRET_FILENAME;
+					@unlink( $secret_file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
+					self::remove_restore_locators();
+					self::$secret            = null;
+					self::$results_file_path = null;
+					return '';
+				}
+			}
 		} else {
 			// No storage directory: fail closed to avoid unstable secrets that drift across requests.
 			return '';
