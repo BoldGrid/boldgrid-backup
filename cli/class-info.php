@@ -100,7 +100,8 @@ class Info {
 			$secret = self::get_secret();
 			if ( ! self::is_valid_secret_format( $secret ) ) {
 				// Fail closed: never emit restore-info-.json for an empty/invalid secret.
-				return '';
+				self::$results_file_path = '';
+				return self::$results_file_path;
 			}
 
 			$storage_dir = self::get_secure_storage_dir();
@@ -198,10 +199,9 @@ class Info {
 	/**
 	 * Read the backup/storage directory from the restore locator.
 	 *
-	 * Prefers the plugin-tree locator when it is the only source or agrees with
-	 * wp-content. When both exist and disagree (e.g. plugin-tree write failed after
-	 * a backup-dir change), prefer wp-content — it is the durable source rewritten
-	 * by ensure_secure_storage() and survives plugin updates.
+	 * When plugin-tree and wp-content locators agree (or only one exists), use that path.
+	 * On disagreement, prefer the directory that has a CLI secret and/or newer restore-info
+	 * so a stale locator left after a partial write cannot win.
 	 *
 	 * @since 1.17.3
 	 * @static
@@ -215,11 +215,82 @@ class Info {
 		if ( $plugin_dir && $wp_dir ) {
 			$plugin_dir = self::untrailingslashit_path( $plugin_dir );
 			$wp_dir     = self::untrailingslashit_path( $wp_dir );
-			// Disagreement: wp-content is authoritative after a partial locator write.
-			return ( $plugin_dir === $wp_dir ) ? $plugin_dir : $wp_dir;
+			if ( $plugin_dir === $wp_dir ) {
+				return $plugin_dir;
+			}
+			return self::prefer_storage_dir( $plugin_dir, $wp_dir );
 		}
 
 		return $plugin_dir ? $plugin_dir : $wp_dir;
+	}
+
+	/**
+	 * Prefer a storage directory that has a CLI secret and/or newer restore-info.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string $dir_a First candidate (usually plugin-tree locator).
+	 * @param string $dir_b Second candidate (usually wp-content locator).
+	 * @return string
+	 */
+	public static function prefer_storage_dir( $dir_a, $dir_b ) {
+		$dir_a = self::untrailingslashit_path( (string) $dir_a );
+		$dir_b = self::untrailingslashit_path( (string) $dir_b );
+
+		$a_secret = self::read_secret_from_storage( $dir_a );
+		$b_secret = self::read_secret_from_storage( $dir_b );
+		if ( $a_secret && ! $b_secret ) {
+			return $dir_a;
+		}
+		if ( $b_secret && ! $a_secret ) {
+			return $dir_b;
+		}
+
+		$a_ts = self::newest_restore_info_timestamp( $dir_a );
+		$b_ts = self::newest_restore_info_timestamp( $dir_b );
+		if ( $a_ts !== $b_ts ) {
+			return ( $a_ts > $b_ts ) ? $dir_a : $dir_b;
+		}
+
+		// Tie / neither has evidence: prefer wp-content candidate (durable across updates).
+		return $dir_b;
+	}
+
+	/**
+	 * Newest restore-info JSON timestamp in a storage directory, or 0.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string $storage_dir Absolute storage directory.
+	 * @return int
+	 */
+	public static function newest_restore_info_timestamp( $storage_dir ) {
+		$storage_dir = self::untrailingslashit_path( (string) $storage_dir );
+		if ( ! $storage_dir || ! is_dir( $storage_dir ) ) {
+			return 0;
+		}
+
+		$newest = 0;
+		$files  = @scandir( $storage_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		if ( empty( $files ) ) {
+			return 0;
+		}
+
+		foreach ( preg_grep( '/^restore-info-.*\.json$/', $files ) as $file ) {
+			$contents = @file_get_contents( $storage_dir . '/' . $file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			if ( false === $contents ) {
+				continue;
+			}
+			$data = json_decode( $contents, true );
+			$ts   = isset( $data['timestamp'] ) ? (int) $data['timestamp'] : 0;
+			if ( $ts > $newest ) {
+				$newest = $ts;
+			}
+		}
+
+		return $newest;
 	}
 
 	/**
@@ -311,11 +382,14 @@ class Info {
 		}
 
 		/*
-		 * If only wp-content was updated, remove a stale plugin-tree locator so it
-		 * cannot keep pointing CLI / get_results_filepath() at a previous backup dir.
+		 * If only one locator was updated, remove the other when it still exists so a
+		 * stale path cannot win in get_dir_from_locator() after a partial write.
 		 */
 		if ( ! $plugin_written && $wp_content_written && file_exists( $plugin_locator ) ) {
 			@unlink( $plugin_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
+		}
+		if ( $plugin_written && ! $wp_content_written && $wp_content_locator && file_exists( $wp_content_locator ) ) {
+			@unlink( $wp_content_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
 		}
 
 		$written = $plugin_written || $wp_content_written;
@@ -426,13 +500,33 @@ class Info {
 	public static function migrate_legacy_restore_info( $storage_dir, $secret, $legacy_secret = null, $previous_dir = null ) {
 		$storage_dir    = self::untrailingslashit_path( (string) $storage_dir );
 		$secure_results = self::trailingslashit_path( $storage_dir ) . 'restore-info-' . $secret . '.json';
+		$previous_dir   = self::untrailingslashit_path( (string) $previous_dir );
 
-		if ( file_exists( $secure_results ) ) {
-			return true;
+		$best_candidate = null;
+		$best_timestamp = -1;
+		$best_contents  = null;
+
+		/*
+		 * Seed with any existing destination file. If there is no previous backup dir
+		 * to compare, keep the early return. Otherwise continue so a newer restore-info
+		 * from previous_dir can replace a stale destination copy after a dir switch-back.
+		 */
+		if ( file_exists( $secure_results ) && is_readable( $secure_results ) ) {
+			$contents = file_get_contents( $secure_results );
+			if ( false !== $contents ) {
+				$data           = json_decode( $contents, true );
+				$best_candidate = $secure_results;
+				$best_timestamp = isset( $data['timestamp'] ) ? (int) $data['timestamp'] : 0;
+				$best_contents  = $contents;
+			}
+
+			if ( ! $previous_dir || $previous_dir === $storage_dir ) {
+				return true;
+			}
 		}
 
 		if ( ! self::is_valid_secret_format( $secret ) ) {
-			return false;
+			return null !== $best_candidate;
 		}
 
 		$cron_dir   = dirname( __DIR__ ) . '/cron';
@@ -451,7 +545,6 @@ class Info {
 		}
 
 		// Include restore-info from the previous backup directory (on path change).
-		$previous_dir = self::untrailingslashit_path( (string) $previous_dir );
 		if ( $previous_dir && $previous_dir !== $storage_dir && is_dir( $previous_dir ) ) {
 			$previous_files = @scandir( $previous_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 			if ( ! empty( $previous_files ) ) {
@@ -473,14 +566,7 @@ class Info {
 		 * Find the newest candidate by comparing the timestamp field inside each JSON file.
 		 * This prevents migrating stale restore-info when multiple legacy files exist.
 		 */
-		$best_candidate  = null;
-		$best_timestamp  = 0;
-		$best_contents   = null;
-
 		foreach ( array_unique( $candidates ) as $legacy_results ) {
-			if ( $legacy_results === $secure_results ) {
-				continue;
-			}
 			if ( ! file_exists( $legacy_results ) || ! is_readable( $legacy_results ) ) {
 				continue;
 			}
@@ -504,6 +590,11 @@ class Info {
 			return false;
 		}
 
+		// Destination already holds the newest copy.
+		if ( $best_candidate === $secure_results ) {
+			return true;
+		}
+
 		if ( false !== file_put_contents( $secure_results, $best_contents ) ) {
 			@chmod( $secure_results, 0600 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 
@@ -516,7 +607,8 @@ class Info {
 			return true;
 		}
 
-		return false;
+		// Destination already existed even if the newer copy could not be written.
+		return file_exists( $secure_results );
 	}
 
 	/**
