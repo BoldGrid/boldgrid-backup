@@ -515,6 +515,117 @@ class Test_Boldgrid_Backup_Cli_Info extends WP_UnitTestCase {
 	}
 
 	/**
+	 * restore_previous_locators should restore a prior path instead of wiping both locators.
+	 *
+	 * @since 1.17.3
+	 */
+	public function test_restore_previous_locators_keeps_prior_path() {
+		$old_dir = sys_get_temp_dir() . '/bgbak-prev-loc-' . wp_generate_password( 8, false );
+		$new_dir = sys_get_temp_dir() . '/bgbak-new-loc-' . wp_generate_password( 8, false );
+		mkdir( $old_dir, 0700 );
+		mkdir( $new_dir, 0700 );
+
+		$this->assertTrue( \Boldgrid\Backup\Cli\Info::write_restore_locator( $old_dir ) );
+		$this->assertSame( $old_dir, \Boldgrid\Backup\Cli\Info::get_dir_from_locator() );
+
+		$this->assertTrue( \Boldgrid\Backup\Cli\Info::write_restore_locator( $new_dir ) );
+		$this->assertSame( $new_dir, \Boldgrid\Backup\Cli\Info::get_dir_from_locator() );
+
+		\Boldgrid\Backup\Cli\Info::restore_previous_locators( $old_dir );
+		$this->assertSame( $old_dir, \Boldgrid\Backup\Cli\Info::get_dir_from_locator() );
+
+		\Boldgrid\Backup\Cli\Info::restore_previous_locators( null );
+		$this->assertNull( \Boldgrid\Backup\Cli\Info::get_dir_from_locator() );
+
+		@rmdir( $old_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		@rmdir( $new_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+	}
+
+	/**
+	 * get_secret() should delete cron restore-info after a successful CLI-side migrate.
+	 *
+	 * @since 1.17.3
+	 */
+	public function test_get_secret_deletes_cron_restore_info_after_migrate() {
+		$storage_dir = sys_get_temp_dir() . '/bgbak-get-secret-' . wp_generate_password( 8, false );
+		mkdir( $storage_dir, 0700 );
+
+		$this->assertTrue( \Boldgrid\Backup\Cli\Info::write_restore_locator( $storage_dir ) );
+
+		$orphan_secret = md5( 'get-secret-orphan-cron' );
+		$cron_info     = BOLDGRID_BACKUP_PATH . '/cron/restore-info-' . $orphan_secret . '.json';
+		file_put_contents( $cron_info, wp_json_encode( array( // phpcs:ignore WordPress.WP.AlternativeFunctions
+			'cron_secret' => 'xyz',
+			'timestamp'   => time(),
+		) ) );
+
+		$ref = new ReflectionClass( \Boldgrid\Backup\Cli\Info::class );
+		foreach ( array( 'secret', 'results_file_path', 'info' ) as $prop_name ) {
+			$prop = $ref->getProperty( $prop_name );
+			$prop->setAccessible( true );
+			$prop->setValue( null, 'info' === $prop_name ? array() : null );
+		}
+
+		$secret = \Boldgrid\Backup\Cli\Info::get_secret();
+		$this->assertTrue( \Boldgrid\Backup\Cli\Info::is_valid_secret_format( $secret ) );
+		$this->assertFileExists( $storage_dir . '/.boldgrid-cli-secret' );
+		$this->assertFileExists( $storage_dir . '/restore-info-' . $secret . '.json' );
+		$this->assertFileDoesNotExist( $cron_info );
+
+		@unlink( \Boldgrid\Backup\Cli\Info::get_restore_locator_filepath() ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		$wp_locator = \Boldgrid\Backup\Cli\Info::get_wp_content_locator_filepath();
+		if ( $wp_locator ) {
+			@unlink( $wp_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+		@unlink( $storage_dir . '/.boldgrid-cli-secret' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		foreach ( glob( $storage_dir . '/restore-info-*.json' ) as $file ) {
+			@unlink( $file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+		@rmdir( $storage_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+	}
+
+	/**
+	 * open_backup_zip should repair broken EOCD archives for CLI restore.
+	 *
+	 * @since 1.17.3
+	 */
+	public function test_open_backup_zip_repairs_broken_eocd() {
+		if ( ! class_exists( 'ZipArchive' ) ) {
+			$this->markTestSkipped( 'ZipArchive required.' );
+		}
+
+		$zip_path = wp_tempnam( 'bgbak-cli-zip-' );
+		unlink( $zip_path );
+		$zip_path .= '.zip';
+
+		$zip = new ZipArchive();
+		$this->assertTrue( $zip->open( $zip_path, ZipArchive::CREATE ) );
+		for ( $i = 0; $i < 15; $i++ ) {
+			$zip->addFromString( 'c-' . $i . '.txt', 'z' );
+		}
+		$this->assertTrue( $zip->close() );
+
+		$size = filesize( $zip_path );
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
+		$handle = fopen( $zip_path, 'r+b' );
+		fseek( $handle, $size - 22 ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fseek
+		$eocd = fread( $handle, 22 ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fread
+		$eocd[8]  = "\x00";
+		$eocd[9]  = "\x00";
+		$eocd[10] = "\x00";
+		$eocd[11] = "\x00";
+		fseek( $handle, $size - 22 ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fseek
+		fwrite( $handle, $eocd ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite
+		fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+
+		$opened = \Boldgrid\Backup\Cli\Info::open_backup_zip( $zip_path );
+		$this->assertInstanceOf( ZipArchive::class, $opened );
+		$this->assertSame( 15, $opened->numFiles ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName
+		$opened->close();
+		unlink( $zip_path );
+	}
+
+	/**
 	 * Test get_zip_arg().
 	 *
 	 * @since 1.9.0

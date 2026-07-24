@@ -153,13 +153,16 @@ class Boldgrid_Backup_Admin_Zip {
 			return $zip;
 		}
 
-		$opened_empty = ( true === $status );
-		if ( $opened_empty ) {
+		if ( true === $status ) {
 			$zip->close();
 		}
 
-		$repaired = self::maybe_repair_zip64_eocd( $filepath );
-		if ( ! $repaired && ! $opened_empty ) {
+		/*
+		 * Fail closed when repair cannot confirm a usable archive. Do not return an
+		 * empty ZipArchive after a successful empty open — that masked the same
+		 * zero-EOCD failure this repair exists to fix.
+		 */
+		if ( ! self::maybe_repair_zip64_eocd( $filepath ) ) {
 			return false;
 		}
 

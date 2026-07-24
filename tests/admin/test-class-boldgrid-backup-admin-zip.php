@@ -110,6 +110,29 @@ class Test_Boldgrid_Backup_Admin_Zip extends WP_UnitTestCase {
 	}
 
 	/**
+	 * open_zip_archive must not return an empty ZipArchive when repair fails.
+	 *
+	 * A successful open with numFiles=0 plus a failed repair previously fell through
+	 * and returned the empty archive; callers must get false instead.
+	 */
+	public function test_open_zip_archive_returns_false_when_repair_fails() {
+		$zip = new ZipArchive();
+		$this->assertTrue( $zip->open( $this->zip_path, ZipArchive::CREATE ) );
+		for ( $i = 0; $i < 10; $i++ ) {
+			$zip->addFromString( 'r-' . $i . '.txt', 'z' );
+		}
+		$this->assertTrue( $zip->close() );
+
+		$this->corrupt_eocd_entry_counts( $this->zip_path );
+		$this->assertTrue( chmod( $this->zip_path, 0444 ) );
+
+		$opened = Boldgrid_Backup_Admin_Zip::open_zip_archive( $this->zip_path );
+		$this->assertFalse( $opened );
+
+		chmod( $this->zip_path, 0644 );
+	}
+
+	/**
 	 * open_zip_archive should repair even when ZipArchive::open succeeds with 0 files.
 	 *
 	 * Production large-archive failures can open "successfully" with an empty listing;

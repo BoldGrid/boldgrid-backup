@@ -435,6 +435,28 @@ class Info {
 	}
 
 	/**
+	 * Restore locators to a previous storage directory, or remove them.
+	 *
+	 * Prefer restoring a known-good previous path so a failed migrate/setup on a
+	 * new backup directory cannot wipe the only pointer CLI emergency restore has.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string|null $previous_dir Absolute previous storage directory, if any.
+	 * @return void
+	 */
+	public static function restore_previous_locators( $previous_dir ) {
+		$previous_dir = self::untrailingslashit_path( (string) $previous_dir );
+		if ( $previous_dir && is_dir( $previous_dir ) ) {
+			self::write_restore_locator( $previous_dir );
+			return;
+		}
+
+		self::remove_restore_locators();
+	}
+
+	/**
 	 * Persist the per-install secret into the secure storage directory.
 	 *
 	 * @since 1.17.3
@@ -833,14 +855,14 @@ class Info {
 			$secret = self::generate_secret();
 			if ( empty( $secret ) ) {
 				// Fail closed; leave legacy files in place until a CSPRNG is available.
-				// Remove locators to prevent pointing at a directory without a valid secret.
-				self::remove_restore_locators();
+				// Restore prior locators so a dir change cannot orphan the old path.
+				self::restore_previous_locators( $previous_dir );
 				return null;
 			}
 			if ( ! self::persist_secret( $secret, $storage_dir ) ) {
 				// Fail closed; leave legacy files in place until the secret can be stored.
-				// Remove locators to prevent pointing at a directory without a valid secret.
-				self::remove_restore_locators();
+				// Restore prior locators so a dir change cannot orphan the old path.
+				self::restore_previous_locators( $previous_dir );
 				return null;
 			}
 			$generated_secret = true;
@@ -904,24 +926,11 @@ class Info {
 					// Rollback: remove the new secret and restore locators to previous directory.
 					$secret_file = $storage_dir . '/' . self::SECRET_FILENAME;
 					@unlink( $secret_file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
-					if ( $previous_dir && is_dir( $previous_dir ) ) {
-						self::write_restore_locator( $previous_dir );
-					} else {
-						self::remove_restore_locators();
-					}
-					self::$secret            = null;
-					self::$results_file_path = null;
-				} else {
-					// Pre-existing secret: restore locators so CLI resolution uses the old path
-					// where restore-info still resides, preventing a stuck migration state.
-					if ( $previous_dir && is_dir( $previous_dir ) ) {
-						self::write_restore_locator( $previous_dir );
-					} else {
-						self::remove_restore_locators();
-					}
-					self::$secret            = null;
-					self::$results_file_path = null;
 				}
+				// Restore prior locators (or remove if none) so CLI can still find old metadata.
+				self::restore_previous_locators( $previous_dir );
+				self::$secret            = null;
+				self::$results_file_path = null;
 				// Return failure so callers know restore-info is not fully migrated.
 				return null;
 			}
@@ -1024,11 +1033,21 @@ class Info {
 				if ( $has_legacy_data ) {
 					$secret_file = $storage_dir . '/' . self::SECRET_FILENAME;
 					@unlink( $secret_file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
-					self::remove_restore_locators();
+					// Keep locators pointing at $storage_dir (already the resolved path);
+					// wiping them would orphan restore-info that still lives there.
 					self::$secret            = null;
 					self::$results_file_path = null;
 					return '';
 				}
+			}
+
+			/*
+			 * Match ensure_secure_storage(): once a secret is persisted, strip webroot
+			 * verify files. Only delete cron restore-info after a successful migrate.
+			 */
+			self::delete_legacy_verify_files();
+			if ( $migrated ) {
+				self::delete_legacy_cron_restore_info_files();
 			}
 		} else {
 			// No storage directory: fail closed to avoid unstable secrets that drift across requests.
@@ -1516,6 +1535,70 @@ class Info {
 	}
 
 	/**
+	 * Load ZIP helpers used by admin and emergency CLI restore.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @return bool True when Boldgrid_Backup_Admin_Zip is available.
+	 */
+	public static function load_zip_helper() {
+		if ( class_exists( 'Boldgrid_Backup_Admin_Zip', false ) ) {
+			return true;
+		}
+
+		$path = dirname( __DIR__ ) . '/admin/class-boldgrid-backup-admin-zip.php';
+		if ( ! file_exists( $path ) ) {
+			return false;
+		}
+
+		require_once $path; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingVariable
+
+		return class_exists( 'Boldgrid_Backup_Admin_Zip', false );
+	}
+
+	/**
+	 * Repair a backup ZIP EOCD when needed, then open it with ZipArchive.
+	 *
+	 * Used by emergency CLI restore so large archives missing ZIP64 end records
+	 * remain extractable outside WordPress admin.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string $filepath Archive path.
+	 * @return \ZipArchive|false
+	 */
+	public static function open_backup_zip( $filepath ) {
+		if ( ! self::load_zip_helper() ) {
+			if ( ! class_exists( 'ZipArchive' ) ) {
+				return false;
+			}
+			$zip = new \ZipArchive();
+			return true === $zip->open( $filepath ) ? $zip : false;
+		}
+
+		return \Boldgrid_Backup_Admin_Zip::open_zip_archive( $filepath );
+	}
+
+	/**
+	 * Best-effort ZIP64 EOCD repair for CLI ZipArchive / PclZip / unzip paths.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string $filepath Archive path.
+	 * @return bool True when the archive is usable (already valid or repaired).
+	 */
+	public static function maybe_repair_backup_zip( $filepath ) {
+		if ( ! self::load_zip_helper() ) {
+			return false;
+		}
+
+		return \Boldgrid_Backup_Admin_Zip::maybe_repair_zip64_eocd( $filepath );
+	}
+
+	/**
 	 * Extarct a file from a backup archive ZIP file.
 	 *
 	 * @since 1.9.0
@@ -1534,8 +1617,8 @@ class Info {
 
 		switch ( true ) {
 			case class_exists( 'ZipArchive' ):
-				$zip = new \ZipArchive();
-				if ( true === $zip->open( self::$info['filepath'] ) ) {
+				$zip = self::open_backup_zip( self::$info['filepath'] );
+				if ( $zip ) {
 					$success = $zip->extractTo( $extract_dir, $file );
 					$zip->close();
 				} else {

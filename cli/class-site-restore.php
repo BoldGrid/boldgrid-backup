@@ -63,9 +63,9 @@ class Site_Restore {
 	private function set_writable_permissions() {
 		if ( class_exists( 'ZipArchive' ) ) {
 			Log::write( 'Setting file permissions.', LOG_DEBUG );
-			$zip = new \ZipArchive();
+			$zip = Info::open_backup_zip( Info::get_info()['filepath'] );
 
-			if ( $zip->open( Info::get_info()['filepath'] ) ) {
+			if ( $zip ) {
 				for ( $i = 0; $i < $zip->numFiles; $i++ ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName
 					$data = $zip->statIndex( $i );
 
@@ -73,6 +73,7 @@ class Site_Restore {
 						chmod( Info::get_info()['ABSPATH'] . $data['name'], 0644 );
 					}
 				}
+				$zip->close();
 			}
 		}
 	}
@@ -190,8 +191,8 @@ class Site_Restore {
 				$message = 'Attempting file restoration using PHP ZipArchive...';
 				echo $message . PHP_EOL;
 				Log::write( $message, LOG_INFO );
-				$archive = new \ZipArchive();
-				if ( true === $archive->open( $info['filepath'] ) ) {
+				$archive = Info::open_backup_zip( $info['filepath'] );
+				if ( $archive ) {
 					$success = $archive->extractTo( $info['ABSPATH'] );
 					$archive->close();
 				}
@@ -201,6 +202,7 @@ class Site_Restore {
 				$message = 'Attempting file restoration using PHP PCLZip...';
 				echo $message . PHP_EOL;
 				Log::write( $message, LOG_INFO );
+				Info::maybe_repair_backup_zip( $info['filepath'] );
 				require $info['ABSPATH'] . 'wp-admin/includes/class-pclzip.php';
 				$archive = new \PclZip( $info['filepath'] );
 				$result  = $archive->extract(
@@ -218,6 +220,7 @@ class Site_Restore {
 				$message = 'Attempting file restoration using unzip (CLI)...';
 				echo $message . PHP_EOL;
 				Log::write( $message, LOG_INFO );
+				Info::maybe_repair_backup_zip( $info['filepath'] );
 				$cmd = 'cd ' . $info['ABSPATH'] . ';unzip -oqq ' . $info['filepath'];
 				\Boldgrid_Backup_Admin_Cli::call_command(
 					$cmd,

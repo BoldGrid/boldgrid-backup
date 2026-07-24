@@ -155,8 +155,11 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 		/*
 		 * Locators embed absolute backup-directory paths that are wrong after restore
 		 * to another host; exclude plugin-tree and durable wp-content copies.
+		 * Legacy verify-*.php may still exist until ensure_secure_storage() runs —
+		 * never ship those secrets inside a site backup.
 		 */
 		if ( $this->is_match( 'cli/restore-locator.php', $file )
+			|| $this->is_match( 'cli/verify-*.php', $file )
 			|| '.boldgrid-backup-locator.php' === basename( $file ) ) {
 			return false;
 		}

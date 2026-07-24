@@ -279,10 +279,16 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 		/*
 		 * ZipArchive has closed archives with >65535 entries using a classic EOCD
 		 * that reports 0 entries and omits ZIP64 records. Repair those end records
-		 * so browse/restore via ZipArchive and PclZip keep working.
+		 * so browse/restore via ZipArchive and PclZip keep working. Fail the backup
+		 * when repair cannot confirm a usable archive — a "successful" backup that
+		 * cannot be browsed or extracted is worse than a hard failure here.
 		 */
 		if ( ! Boldgrid_Backup_Admin_Zip::maybe_repair_zip64_eocd( $info['filepath'] ) ) {
-			$this->core->logger->add( 'Warning: unable to verify/repair ZIP64 end-of-central-directory for ' . $info['filepath'] );
+			$message = 'Unable to verify or repair ZIP64 end-of-central-directory for "' . $info['filepath'] . '".';
+			$this->core->logger->add( 'Error: ' . $message );
+			return array(
+				'error' => $message,
+			);
 		}
 
 		return true;
