@@ -586,8 +586,10 @@ class Info {
 	/**
 	 * Check if a directory is writable.
 	 *
-	 * Uses WP_Filesystem when available (matching Boldgrid_Backup_Admin_Backup_Dir::get),
-	 * with a PHP-native is_writable fallback for standalone CLI.
+	 * Prefer WP_Filesystem when available so this matches Boldgrid_Backup_Admin_Backup_Dir::get().
+	 * Fall back to PHP is_writable() for standalone CLI, then to an actual write probe —
+	 * PHP and WP_Filesystem can disagree with real write ability on some hosts
+	 * (see Boldgrid_Backup_Admin_Test::is_writable).
 	 *
 	 * @since 1.17.3
 	 * @static
@@ -599,11 +601,22 @@ class Info {
 		global $wp_filesystem;
 
 		if ( ! empty( $wp_filesystem ) && is_object( $wp_filesystem ) && method_exists( $wp_filesystem, 'is_writable' ) ) {
-			return $wp_filesystem->is_writable( $dir );
+			if ( $wp_filesystem->is_writable( $dir ) ) {
+				return true;
+			}
+		} elseif ( is_writable( $dir ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable
+			return true;
 		}
 
-		// Fallback to PHP-native check for standalone CLI (emergency restore).
-		return is_writable( $dir ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable
+		// Last resort: probe a real write when the preferred check returned false.
+		$probe   = self::trailingslashit_path( $dir ) . '.boldgrid-write-probe-' . md5( uniqid( '', true ) );
+		$written = @file_put_contents( $probe, '1' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+		if ( false !== $written ) {
+			@unlink( $probe ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
+			return true;
+		}
+
+		return false;
 	}
 
 	/**

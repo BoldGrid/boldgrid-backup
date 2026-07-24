@@ -2112,10 +2112,16 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Actions to take if we're creating a full site backup.
+		$restore_info_error = '';
 		if ( ! $dryrun && $this->archiver_utility->is_full_backup() ) {
 			$restore_info_written = $this->archive->write_results_file( $info );
 			if ( ! $restore_info_written ) {
-				$this->logger->add( 'Warning: Failed to write restore-info file. Emergency CLI restore may not work until a successful write.' );
+				$restore_info_error = __(
+					'Backup archive created, but failed to write restore-info. Emergency CLI restore may not work until a successful write.',
+					'boldgrid-backup'
+				);
+				$info['restore_info_error'] = $restore_info_error;
+				$this->logger->add( 'Warning: ' . $restore_info_error );
 			}
 		}
 
@@ -2128,9 +2134,15 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->archiving_files = false;
 
+		/*
+		 * Archive itself succeeded; surface restore-info write failures in status so
+		 * manual backups are not reported as fully healthy when emergency metadata is missing.
+		 */
 		Boldgrid_Backup_Admin_In_Progress_Data::set_args( array(
-			'status'  => esc_html__( 'Backup complete!', 'boldgrid-backup' ),
-			'success' => true,
+			'status'  => $restore_info_error
+				? $restore_info_error
+				: esc_html__( 'Backup complete!', 'boldgrid-backup' ),
+			'success' => empty( $restore_info_error ),
 		) );
 
 		// Return the array of archive information.
