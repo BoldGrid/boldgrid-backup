@@ -535,6 +535,8 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 	 * @return array|false
 	 */
 	protected function get_file_via_zip_archive( $filepath, $file ) {
+		Boldgrid_Backup_Admin_Zip::maybe_repair_zip64_eocd( $filepath );
+
 		$zip = Boldgrid_Backup_Admin_Zip::open_zip_archive( $filepath );
 		if ( ! $zip ) {
 			return false;

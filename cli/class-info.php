@@ -853,16 +853,15 @@ class Info {
 		$migrated = self::migrate_legacy_restore_info( $storage_dir, $secret, $legacy_secret, $previous_dir );
 
 		/*
-		 * If we generated a new secret (or copied one from a previous directory) but
-		 * migration failed because legacy restore-info could not be copied, the new
-		 * secret would orphan that data. Remove the new secret and fail so callers
-		 * retry once legacy restore-info is writable or can fall back to legacy paths.
+		 * If migration failed, check whether there's legacy data that could not be promoted.
+		 * For newly generated/copied secrets, rollback completely so callers retry.
+		 * For pre-existing secrets, still return failure so callers know the storage is incomplete.
 		 *
 		 * However, when there is simply nothing to migrate (fresh install with no cron or
-		 * legacy files), migration returns false but the new secret should be kept so that
+		 * legacy files), migration returns false but the secret should be kept so that
 		 * write_results_file() can proceed.
 		 */
-		if ( ( $generated_secret || $copied_from_prev ) && ! $migrated ) {
+		if ( ! $migrated ) {
 			// Check if legacy restore-info actually exists but could not be migrated.
 			$has_legacy_data = false;
 			$cron_dir        = dirname( __DIR__ ) . '/cron';
@@ -884,14 +883,21 @@ class Info {
 				}
 			}
 
-			// Only rollback when legacy data exists but migration failed.
+			// If legacy data exists but migration failed, handle based on secret origin.
 			if ( $has_legacy_data ) {
-				$secret_file = $storage_dir . '/' . self::SECRET_FILENAME;
-				@unlink( $secret_file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
-				// Also remove the locators to prevent pointing at a directory without a valid secret.
-				self::remove_restore_locators();
-				self::$secret            = null;
-				self::$results_file_path = null;
+				if ( $generated_secret || $copied_from_prev ) {
+					// Rollback: remove the new secret and restore locators to previous directory.
+					$secret_file = $storage_dir . '/' . self::SECRET_FILENAME;
+					@unlink( $secret_file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
+					if ( $previous_dir && is_dir( $previous_dir ) ) {
+						self::write_restore_locator( $previous_dir );
+					} else {
+						self::remove_restore_locators();
+					}
+					self::$secret            = null;
+					self::$results_file_path = null;
+				}
+				// Return failure so callers know restore-info is not fully migrated.
 				return null;
 			}
 		}

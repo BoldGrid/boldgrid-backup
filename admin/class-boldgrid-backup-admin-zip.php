@@ -466,6 +466,15 @@ class Boldgrid_Backup_Admin_Zip {
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite
 		$written = fwrite( $handle, $zip64_eocd . $locator . $classic_eocd );
 		if ( false === $written ) {
+			// fwrite failed; restore original trailer to prevent corruption.
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fseek
+			if ( 0 === fseek( $handle, $zip64_offset ) ) {
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite
+				fwrite( $handle, $original_trailer );
+				fflush( $handle );
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_ftruncate
+				ftruncate( $handle, $original_size );
+			}
 			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 			fclose( $handle );
 			return false;
