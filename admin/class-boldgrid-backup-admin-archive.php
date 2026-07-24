@@ -706,7 +706,13 @@ class Boldgrid_Backup_Admin_Archive {
 		\Boldgrid\Backup\Cli\Info::ensure_secure_storage( $backup_dir );
 
 		$results_filepath = \Boldgrid\Backup\Cli\Info::get_results_filepath();
-		$is_dir_writable  = $this->core->wp_filesystem->is_writable( dirname( $results_filepath ) );
+
+		// Fail closed when no valid secret/path is available (never dirname( '' )).
+		if ( empty( $results_filepath ) ) {
+			return false;
+		}
+
+		$is_dir_writable = $this->core->wp_filesystem->is_writable( dirname( $results_filepath ) );
 
 		if ( $archive_filepath && $is_dir_writable ) {
 			$results_filepath = wp_normalize_path( $results_filepath );

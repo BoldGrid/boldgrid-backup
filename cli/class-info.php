@@ -391,7 +391,8 @@ class Info {
 	 * Copy a legacy restore-info-*.json into secure storage when needed.
 	 *
 	 * Prefers cron/ legacy files, then any orphan restore-info already in the backup
-	 * directory (e.g. after .boldgrid-cli-secret was lost and a new secret was issued).
+	 * directory (e.g. after .boldgrid-cli-secret was lost and a new secret was issued),
+	 * then restore-info from a previous backup directory after a path change.
 	 *
 	 * @since 1.17.3
 	 * @static
@@ -399,9 +400,10 @@ class Info {
 	 * @param string      $storage_dir   Absolute storage directory.
 	 * @param string      $secret        Current secret (destination filename).
 	 * @param string|null $legacy_secret Optional legacy verify secret.
+	 * @param string|null $previous_dir  Optional previous backup directory (path change).
 	 * @return bool True when secure restore-info exists after this call.
 	 */
-	public static function migrate_legacy_restore_info( $storage_dir, $secret, $legacy_secret = null ) {
+	public static function migrate_legacy_restore_info( $storage_dir, $secret, $legacy_secret = null, $previous_dir = null ) {
 		$storage_dir    = self::untrailingslashit_path( (string) $storage_dir );
 		$secure_results = self::trailingslashit_path( $storage_dir ) . 'restore-info-' . $secret . '.json';
 
@@ -425,6 +427,17 @@ class Info {
 		if ( ! empty( $cron_files ) ) {
 			foreach ( preg_grep( '/^restore-info-.*\.json$/', $cron_files ) as $file ) {
 				$candidates[] = $cron_dir . '/' . $file;
+			}
+		}
+
+		// Include restore-info from the previous backup directory (on path change).
+		$previous_dir = self::untrailingslashit_path( (string) $previous_dir );
+		if ( $previous_dir && $previous_dir !== $storage_dir && is_dir( $previous_dir ) ) {
+			$previous_files = @scandir( $previous_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			if ( ! empty( $previous_files ) ) {
+				foreach ( preg_grep( '/^restore-info-.*\.json$/', $previous_files ) as $file ) {
+					$candidates[] = $previous_dir . '/' . $file;
+				}
 			}
 		}
 
@@ -453,6 +466,7 @@ class Info {
 				@chmod( $secure_results, 0600 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 
 				// Drop storage-dir orphans after renaming onto the current secret.
+				// Leave files in previous_dir / cron/ for separate cleanup paths.
 				if ( dirname( $legacy_results ) === $storage_dir ) {
 					@unlink( $legacy_results ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 				}
@@ -574,6 +588,8 @@ class Info {
 	 *
 	 * Always generates a fresh secret when only a legacy webroot verify file exists, because
 	 * release packaging has historically shipped a static verify file for all installs.
+	 * When the backup directory changes, carries secret + restore-info from the previous
+	 * locator path into the new directory before rewriting the locator.
 	 *
 	 * @since 1.17.3
 	 * @static
@@ -582,6 +598,12 @@ class Info {
 	 * @return string|null The storage directory used, or null on failure.
 	 */
 	public static function ensure_secure_storage( $storage_dir = null ) {
+		// Capture previous directory from locator before updating it.
+		$previous_dir = self::get_dir_from_locator();
+		if ( $previous_dir ) {
+			$previous_dir = self::untrailingslashit_path( $previous_dir );
+		}
+
 		$storage_dir = $storage_dir ? self::untrailingslashit_path( (string) $storage_dir ) : self::get_secure_storage_dir();
 
 		if ( ! $storage_dir || ! is_dir( $storage_dir ) || ! is_writable( $storage_dir ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable
@@ -592,6 +614,14 @@ class Info {
 
 		$secret        = self::read_secret_from_storage( $storage_dir );
 		$legacy_secret = self::get_legacy_verify_secret();
+
+		// On backup-directory change, reuse the previous dir's secret when possible.
+		if ( empty( $secret ) && $previous_dir && $previous_dir !== $storage_dir ) {
+			$from_previous = self::read_secret_from_storage( $previous_dir );
+			if ( $from_previous && self::persist_secret( $from_previous, $storage_dir ) ) {
+				$secret = $from_previous;
+			}
+		}
 
 		/*
 		 * If we only have a legacy webroot verify file, do not reuse it — it may be the
@@ -612,8 +642,8 @@ class Info {
 		self::$secret            = $secret;
 		self::$results_file_path = null;
 
-		// Migrate restore-info from cron/ before deleting legacy plugin-tree copies.
-		$migrated = self::migrate_legacy_restore_info( $storage_dir, $secret, $legacy_secret );
+		// Migrate restore-info from cron/ or previous backup dir before deleting legacy copies.
+		$migrated = self::migrate_legacy_restore_info( $storage_dir, $secret, $legacy_secret, $previous_dir );
 
 		// Only delete legacy restore-info after successful migration (or when secure
 		// restore-info already exists). Prevents data loss if migration fails.

@@ -335,6 +335,46 @@ class Test_Boldgrid_Backup_Cli_Info extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test ensure_secure_storage carries secret + restore-info across backup dir changes.
+	 *
+	 * @since 1.17.3
+	 */
+	public function test_ensure_secure_storage_migrates_on_backup_dir_change() {
+		$old_dir = sys_get_temp_dir() . '/bgbak-old-' . wp_generate_password( 8, false );
+		$new_dir = sys_get_temp_dir() . '/bgbak-new-' . wp_generate_password( 8, false );
+		mkdir( $old_dir, 0700 );
+		mkdir( $new_dir, 0700 );
+
+		$this->assertSame( $old_dir, \Boldgrid\Backup\Cli\Info::ensure_secure_storage( $old_dir ) );
+		$secret  = \Boldgrid\Backup\Cli\Info::get_secret();
+		$payload = wp_json_encode( [ 'cron_secret' => 'dir-change', 'filepath' => '/tmp/old.zip' ] );
+		file_put_contents( $old_dir . '/restore-info-' . $secret . '.json', $payload ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+
+		$this->assertSame( $new_dir, \Boldgrid\Backup\Cli\Info::ensure_secure_storage( $new_dir ) );
+		$this->assertSame( $secret, \Boldgrid\Backup\Cli\Info::get_secret() );
+		$this->assertFileExists( $new_dir . '/.boldgrid-cli-secret' );
+		$this->assertSame( $secret, trim( (string) file_get_contents( $new_dir . '/.boldgrid-cli-secret' ) ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+		$migrated = $new_dir . '/restore-info-' . $secret . '.json';
+		$this->assertFileExists( $migrated );
+		$this->assertSame( $payload, file_get_contents( $migrated ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+		$this->assertSame( $new_dir, \Boldgrid\Backup\Cli\Info::get_dir_from_locator() );
+
+		// Cleanup.
+		@unlink( \Boldgrid\Backup\Cli\Info::get_restore_locator_filepath() ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		$wp_locator = \Boldgrid\Backup\Cli\Info::get_wp_content_locator_filepath();
+		if ( $wp_locator ) {
+			@unlink( $wp_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+		foreach ( [ $old_dir, $new_dir ] as $dir ) {
+			@unlink( $dir . '/.boldgrid-cli-secret' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			foreach ( glob( $dir . '/restore-info-*.json' ) as $file ) {
+				@unlink( $file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			}
+			@rmdir( $dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+	}
+
+	/**
 	 * Test generate_secret returns a 32-hex CSPRNG value.
 	 *
 	 * @since 1.17.3
