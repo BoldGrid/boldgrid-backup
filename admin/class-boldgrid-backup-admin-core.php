@@ -2068,12 +2068,6 @@ class Boldgrid_Backup_Admin_Core {
 			}
 		}
 
-		// Store latest backup info / log after restore-info so restore_info_error is included.
-		if ( ! $dryrun ) {
-			$this->archive_log->write( $info );
-			update_option( 'boldgrid_backup_latest_backup', $info );
-		}
-
 		/**
 		 * Actions to take after a backup has been created.
 		 *
@@ -2126,6 +2120,16 @@ class Boldgrid_Backup_Admin_Core {
 			$info['mail_success'] = $this->email->send( $email_parts['subject'], $email_body );
 
 			$this->logger->add( 'Sending of email complete! Status: ' . $info['mail_success'] );
+		}
+
+		/*
+		 * Persist latest backup after restore-info and email so the option matches the returned
+		 * $info (including restore_info_error and mail_success). Writing earlier caused
+		 * Test_Boldgrid_Backup_Admin_Core::test_archive_files to fail strict equality.
+		 */
+		if ( ! $dryrun ) {
+			$this->archive_log->write( $info );
+			update_option( 'boldgrid_backup_latest_backup', $info );
 		}
 
 		if ( isset( $this->activity ) ) {

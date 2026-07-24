@@ -20,6 +20,14 @@
 class Test_Boldgrid_Backup_Admin_Remote_Settings extends WP_UnitTestCase {
 
 	/**
+	 * Core instance.
+	 *
+	 * @since 1.7.2
+	 * @var Boldgrid_Backup_Admin_Core
+	 */
+	public $core;
+
+	/**
 	 * Initial settings.
 	 *
 	 * @since 1.7.2

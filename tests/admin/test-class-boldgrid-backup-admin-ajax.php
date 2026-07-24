@@ -24,6 +24,14 @@
  */
 class Test_Boldgrid_Backup_Admin_Ajax extends WP_Ajax_UnitTestCase {
 	/**
+	 * Core instance.
+	 *
+	 * @since 1.10.7
+	 * @var Boldgrid_Backup_Admin_Core
+	 */
+	public $core;
+
+	/**
 	 * Setup.
 	 *
 	 * @since 1.10.7
