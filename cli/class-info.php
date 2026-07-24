@@ -263,6 +263,8 @@ class Info {
 	 *
 	 * The locator refuses direct HTTP execution; it only returns a path when included.
 	 * Writes to both the plugin tree (fast lookup) and wp-content (survives updates).
+	 * Returns true if at least one locator was written successfully; the wp-content
+	 * locator is more durable across plugin updates, so success there alone is sufficient.
 	 *
 	 * @since 1.17.3
 	 * @static
@@ -291,14 +293,17 @@ class Info {
 			'}' . "\n" .
 			'return ' . var_export( $storage_dir, true ) . ";\n"; // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_export
 
-		// Write to plugin tree (primary, fast lookup).
-		$written = ( false !== file_put_contents( self::get_restore_locator_filepath(), $contents ) );
+		// Write to plugin tree (primary, fast lookup). Best-effort; may be read-only after plugin update.
+		$plugin_written = ( false !== @file_put_contents( self::get_restore_locator_filepath(), $contents ) ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged,WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
 
-		// Also write to wp-content (survives plugin updates for CLI emergency restore).
+		// Write to wp-content (survives plugin updates for CLI emergency restore).
+		$wp_content_written = false;
 		$wp_content_locator = self::get_wp_content_locator_filepath();
 		if ( $wp_content_locator ) {
-			@file_put_contents( $wp_content_locator, $contents ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged,WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+			$wp_content_written = ( false !== @file_put_contents( $wp_content_locator, $contents ) ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged,WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
 		}
+
+		$written = $plugin_written || $wp_content_written;
 
 		if ( $written ) {
 			// Reset cached path so the next get_results_filepath() uses the locator.
