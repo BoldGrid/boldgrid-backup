@@ -184,7 +184,7 @@ class Boldgrid_Backup_Admin_Zip {
 	 * @return bool True when the archive is usable (already valid or repaired).
 	 */
 	public static function maybe_repair_zip64_eocd( $filepath ) {
-		if ( empty( $filepath ) || ! is_writable( $filepath ) ) {
+		if ( empty( $filepath ) || ! is_readable( $filepath ) ) {
 			return false;
 		}
 
@@ -211,15 +211,18 @@ class Boldgrid_Backup_Admin_Zip {
 			return 0 === $eocd['total_entries'] && 0 === $eocd['cd_size'];
 		}
 
-		$needs_zip64_count = $entry_count > 0xffff;
-		$broken_zero_count = ( 0 === $eocd['total_entries'] && $entry_count > 0 );
+		$needs_zip64_count  = $entry_count > 0xffff;
+		$counts_match       = $eocd['total_entries'] === $entry_count;
+		$needs_classic_fix  = ! $counts_match && $entry_count <= 0xffff;
 
-		if ( ! $needs_zip64_count && ! $broken_zero_count ) {
+		// Archive is valid: counts match and no ZIP64 needed.
+		if ( $counts_match && ! $needs_zip64_count ) {
 			return true;
 		}
 
-		if ( ! $needs_zip64_count && $eocd['total_entries'] === $entry_count ) {
-			return true;
+		// Repair is needed. Check writability only when we actually need to write.
+		if ( ! is_writable( $filepath ) ) {
+			return false;
 		}
 
 		return self::write_zip64_eocd( $filepath, $eocd, $entry_count );

@@ -247,7 +247,7 @@ class Boldgrid_Backup_Admin {
 		 * Keep raw English there and localize here so translations are not
 		 * loaded too early.
 		 */
-		if ( did_action( 'init' ) ) {
+		if ( did_action( 'init' ) && ! doing_action( 'init' ) ) {
 			self::localize_configs();
 		} else {
 			add_action( 'init', array( __CLASS__, 'localize_configs' ) );

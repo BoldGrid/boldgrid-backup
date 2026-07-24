@@ -203,7 +203,7 @@ if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) || defined( 'WP_CLI
 	// If we could not load boldgrid_backup (missing system requirements), abort.
 	if ( load_boldgrid_backup() ) {
 		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup.php';
-		if ( did_action( 'init' ) ) {
+		if ( did_action( 'init' ) && ! doing_action( 'init' ) ) {
 			run_boldgrid_backup();
 		} else {
 			add_action( 'init', 'run_boldgrid_backup', 1 );
