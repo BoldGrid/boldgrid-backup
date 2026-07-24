@@ -896,6 +896,16 @@ class Info {
 					}
 					self::$secret            = null;
 					self::$results_file_path = null;
+				} else {
+					// Pre-existing secret: restore locators so CLI resolution uses the old path
+					// where restore-info still resides, preventing a stuck migration state.
+					if ( $previous_dir && is_dir( $previous_dir ) ) {
+						self::write_restore_locator( $previous_dir );
+					} else {
+						self::remove_restore_locators();
+					}
+					self::$secret            = null;
+					self::$results_file_path = null;
 				}
 				// Return failure so callers know restore-info is not fully migrated.
 				return null;
