@@ -63,16 +63,33 @@ class Boldgrid_Backup_Archiver {
 	 * @since SINCEVERSION
 	 */
 	public function complete() {
-		$this->core->logger->add( 'Backup complete!' );
-		$this->core->logger->add_memory();
+		$restore_info_error = ! empty( $this->info['restore_info_error'] )
+			? $this->info['restore_info_error']
+			: '';
 
 		/*
-		 * If restore-info failed to write, store the error in the task data so that
-		 * cron-driven backups do not report as fully successful when emergency metadata is missing.
+		 * Cron / Archiver backups must not report unqualified success when emergency
+		 * restore metadata failed to write. Persist the error on the task and keep
+		 * In Progress marked unsuccessful (archive_files() already set this for UI).
 		 */
-		if ( ! empty( $this->info['restore_info_error'] ) ) {
-			$this->task->update_data( 'restore_info_error', $this->info['restore_info_error'] );
+		if ( $restore_info_error ) {
+			$this->core->logger->add( 'Warning: ' . $restore_info_error );
+			$this->task->update_data( 'restore_info_error', $restore_info_error );
+			$this->task->update_data( 'success', false );
+			Boldgrid_Backup_Admin_In_Progress_Data::set_args(
+				array(
+					'status'        => $restore_info_error,
+					'success'       => false,
+					'process_error' => $restore_info_error,
+				)
+			);
+			$this->core->logger->add( 'Backup finished with restore-info errors.' );
+		} else {
+			$this->task->update_data( 'success', true );
+			$this->core->logger->add( 'Backup complete!' );
 		}
+
+		$this->core->logger->add_memory();
 
 		$this->task->end();
 	}

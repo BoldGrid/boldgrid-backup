@@ -2050,8 +2050,6 @@ class Boldgrid_Backup_Admin_Core {
 			// Update WP option for "boldgrid_backup_last_backup".
 			update_site_option( 'boldgrid_backup_last_backup', time() );
 
-			$this->archive_log->write( $info );
-
 			// Enforce retention setting.
 			$this->enforce_retention();
 		}
@@ -2070,8 +2068,9 @@ class Boldgrid_Backup_Admin_Core {
 			}
 		}
 
-		// Store latest backup info after restore-info processing so restore_info_error is included.
+		// Store latest backup info / log after restore-info so restore_info_error is included.
 		if ( ! $dryrun ) {
+			$this->archive_log->write( $info );
 			update_option( 'boldgrid_backup_latest_backup', $info );
 		}
 

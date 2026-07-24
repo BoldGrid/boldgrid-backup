@@ -116,7 +116,9 @@ class Boldgrid_Backup_Admin_Email {
 		$site_id = Boldgrid_Backup_Admin_Utility::create_site_id();
 
 		// translators: 1: Site identifier.
-		$parts['subject'] = sprintf( __( 'Backup completed for %1$s', 'boldgrid-backup' ), $site_id );
+		$parts['subject'] = ! empty( $info['restore_info_error'] )
+			? sprintf( __( 'Backup completed with warnings for %1$s', 'boldgrid-backup' ), $site_id )
+			: sprintf( __( 'Backup completed for %1$s', 'boldgrid-backup' ), $site_id );
 
 		$parts['body']['main'] = esc_html__( 'Hello', 'boldgrid-backup' ) . ",\n\n";
 
@@ -129,6 +131,12 @@ class Boldgrid_Backup_Admin_Email {
 			esc_html__( 'A backup archive has been created for %1$s', 'boldgrid-backup' ),
 			$site_id
 		) . ".\n\n";
+
+		if ( ! empty( $info['restore_info_error'] ) ) {
+			$parts['body']['main'] .= esc_html__( 'Warning', 'boldgrid-backup' ) . ': ' .
+				$info['restore_info_error'] . "\n\n";
+		}
+
 		$parts['body']['main'] .= esc_html__( 'Backup details', 'boldgrid-backup' ) . ":\n";
 		$parts['body']['main'] .= sprintf( $this->core->configs['lang']['est_pause'], $info['db_duration'] ) . "\n";
 
