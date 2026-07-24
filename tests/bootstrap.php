@@ -82,6 +82,7 @@ $files = array(
 	'/admin/class-boldgrid-backup-admin-db-import.php',
 	'/admin/class-boldgrid-backup-admin-db-get.php',
 	'/admin/class-boldgrid-backup-admin-utility.php',
+	'/admin/class-boldgrid-backup-admin-zip.php',
 	'/admin/class-boldgrid-backup-admin-folder-exclusion.php',
 	'/admin/class-boldgrid-backup-admin-core-files.php',
 	'/admin/class-boldgrid-backup-admin-in-progress.php',

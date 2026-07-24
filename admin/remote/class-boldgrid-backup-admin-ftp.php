@@ -357,7 +357,14 @@ class Boldgrid_Backup_Admin_Ftp {
 	 */
 	public function disconnect() {
 		if ( ( 'ftp' === $this->type || 'ftpes' === $this->type ) && $this->is_ftp_connection( $this->connection ) ) {
-			ftp_close( $this->connection );
+			/*
+			 * Pure-FTPd often closes FTPS without TLS close_notify. ftp_close() still
+			 * tears the handle down correctly, but PHP/OpenSSL may emit:
+			 * "SSL_read on shutdown: error:0A000126:SSL routines::unexpected eof while reading"
+			 * Suppress that known-benign warning (same approach as W3 Total Cache's FTP CDN).
+			 */
+			// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			@ftp_close( $this->connection );
 			$this->connection = null;
 			$this->logged_in  = false;
 		}
@@ -986,7 +993,8 @@ class Boldgrid_Backup_Admin_Ftp {
 						}
 						$ftp_listing_success = is_array( ftp_nlist( $connection, '.' ) );
 					}
-					ftp_close( $connection );
+					// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+					@ftp_close( $connection );
 					break;
 				case 'sftp':
 					$logged_in = $connection->login( $user, $pass );

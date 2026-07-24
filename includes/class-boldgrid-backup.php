@@ -111,6 +111,7 @@ class Boldgrid_Backup {
 		 * Include a utility class.
 		 */
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-utility.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-zip.php';
 
 		/**
 		 * The class responsible for the configuration of the plugin.
