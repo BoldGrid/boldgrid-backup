@@ -110,6 +110,40 @@ class Test_Boldgrid_Backup_Admin_Zip extends WP_UnitTestCase {
 	}
 
 	/**
+	 * open_zip_archive should repair even when ZipArchive::open succeeds with 0 files.
+	 *
+	 * Production large-archive failures can open "successfully" with an empty listing;
+	 * repair must not be gated only on open() failure.
+	 */
+	public function test_open_zip_archive_repairs_successful_empty_open() {
+		$zip = new ZipArchive();
+		$this->assertTrue( $zip->open( $this->zip_path, ZipArchive::CREATE ) );
+		for ( $i = 0; $i < 20; $i++ ) {
+			$zip->addFromString( 'n-' . $i . '.txt', 'y' );
+		}
+		$this->assertTrue( $zip->close() );
+
+		$this->corrupt_eocd_entry_counts( $this->zip_path );
+
+		$probe = new ZipArchive();
+		$open  = $probe->open( $this->zip_path );
+		if ( true === $open && 0 === $probe->numFiles ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName
+			$probe->close();
+		} elseif ( true === $open ) {
+			$probe->close();
+			$this->markTestSkipped( 'This PHP ZipArchive did not reproduce empty successful open.' );
+		} else {
+			// ER_INCONS / other failure still exercises the repair-after-failed-open path.
+			$this->assertNotTrue( $open );
+		}
+
+		$fixed = Boldgrid_Backup_Admin_Zip::open_zip_archive( $this->zip_path );
+		$this->assertInstanceOf( ZipArchive::class, $fixed );
+		$this->assertSame( 20, $fixed->numFiles ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName
+		$fixed->close();
+	}
+
+	/**
 	 * Zero out classic EOCD entry-count fields to mimic the production failure.
 	 *
 	 * @param string $filepath Zip path.

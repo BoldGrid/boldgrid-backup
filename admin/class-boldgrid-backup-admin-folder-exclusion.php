@@ -152,6 +152,15 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 			return false;
 		}
 
+		/*
+		 * Locators embed absolute backup-directory paths that are wrong after restore
+		 * to another host; exclude plugin-tree and durable wp-content copies.
+		 */
+		if ( $this->is_match( 'cli/restore-locator.php', $file )
+			|| '.boldgrid-backup-locator.php' === basename( $file ) ) {
+			return false;
+		}
+
 		if ( $this->is_banned( $file ) ) {
 			return false;
 		}

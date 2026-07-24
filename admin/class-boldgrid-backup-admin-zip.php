@@ -144,11 +144,22 @@ class Boldgrid_Backup_Admin_Zip {
 		$zip    = new ZipArchive();
 		$status = $zip->open( $filepath );
 
-		if ( true === $status ) {
+		/*
+		 * Open can succeed with numFiles=0 when a classic EOCD reports zero entries
+		 * despite a populated central directory (large-archive ZIP64 omission).
+		 * Only treat a successful open with files as done; otherwise attempt repair.
+		 */
+		if ( true === $status && $zip->numFiles > 0 ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName
 			return $zip;
 		}
 
-		if ( ! self::maybe_repair_zip64_eocd( $filepath ) ) {
+		$opened_empty = ( true === $status );
+		if ( $opened_empty ) {
+			$zip->close();
+		}
+
+		$repaired = self::maybe_repair_zip64_eocd( $filepath );
+		if ( ! $repaired && ! $opened_empty ) {
 			return false;
 		}
 
@@ -463,38 +474,43 @@ class Boldgrid_Backup_Admin_Zip {
 			0
 		);
 
+		$payload  = $zip64_eocd . $locator . $classic_eocd;
+		$expected = strlen( $payload );
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite
-		$written = fwrite( $handle, $zip64_eocd . $locator . $classic_eocd );
-		if ( false === $written ) {
-			// fwrite failed; restore original trailer to prevent corruption.
-			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fseek
-			if ( 0 === fseek( $handle, $zip64_offset ) ) {
-				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite
-				fwrite( $handle, $original_trailer );
-				fflush( $handle );
-				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_ftruncate
-				ftruncate( $handle, $original_size );
-			}
+		$written = fwrite( $handle, $payload );
+		if ( false === $written || $written !== $expected ) {
+			// Short write or failure: restore original trailer before closing.
+			self::restore_zip_trailer( $handle, $zip64_offset, $original_trailer, $original_size );
 			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 			fclose( $handle );
 			return false;
 		}
 
-		$new_size = $zip64_offset + strlen( $zip64_eocd ) + strlen( $locator ) + strlen( $classic_eocd );
+		$new_size = $zip64_offset + $expected;
 		fflush( $handle );
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_ftruncate
 		ftruncate( $handle, $new_size );
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 		fclose( $handle );
 
-		if ( ! class_exists( 'ZipArchive' ) ) {
-			return true;
+		$verified = false;
+		if ( class_exists( 'ZipArchive' ) ) {
+			$zip    = new ZipArchive();
+			$status = $zip->open( $filepath );
+			if ( true === $status ) {
+				$zip->close();
+				$verified = true;
+			}
+		} else {
+			/*
+			 * Without ZipArchive, require a readable EOCD plus ZIP64 locator so a
+			 * short/partial write cannot be reported as success.
+			 */
+			$check    = self::read_eocd( $filepath );
+			$verified = ! empty( $check ) && self::has_zip64_locator( $filepath, $check['eocd_offset'] );
 		}
 
-		$zip    = new ZipArchive();
-		$status = $zip->open( $filepath );
-		if ( true === $status ) {
-			$zip->close();
+		if ( $verified ) {
 			return true;
 		}
 
@@ -502,18 +518,35 @@ class Boldgrid_Backup_Admin_Zip {
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 		$restore_handle = fopen( $filepath, 'r+b' );
 		if ( false !== $restore_handle ) {
-			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fseek
-			if ( 0 === fseek( $restore_handle, $zip64_offset ) ) {
-				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite
-				fwrite( $restore_handle, $original_trailer );
-				fflush( $restore_handle );
-				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_ftruncate
-				ftruncate( $restore_handle, $original_size );
-			}
+			self::restore_zip_trailer( $restore_handle, $zip64_offset, $original_trailer, $original_size );
 			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 			fclose( $restore_handle );
 		}
 
 		return false;
+	}
+
+	/**
+	 * Restore original end-of-archive bytes after a failed ZIP64 write.
+	 *
+	 * @since 1.17.3
+	 *
+	 * @param resource $handle           Open file handle positioned anywhere.
+	 * @param int      $zip64_offset     Offset where the trailer began.
+	 * @param string   $original_trailer Bytes to restore.
+	 * @param int      $original_size    Original archive size.
+	 * @return void
+	 */
+	protected static function restore_zip_trailer( $handle, $zip64_offset, $original_trailer, $original_size ) {
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fseek
+		if ( 0 !== fseek( $handle, $zip64_offset ) ) {
+			return;
+		}
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite
+		fwrite( $handle, $original_trailer );
+		fflush( $handle );
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_ftruncate
+		ftruncate( $handle, $original_size );
 	}
 }
