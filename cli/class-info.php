@@ -1125,7 +1125,7 @@ class Info {
 	 * @since 1.9.0
 	 * @static
 	 *
-	 * @return array;
+	 * @return array
 	 */
 	public static function get_cli_args() {
 		if ( empty( self::$info['cli_args'] ) ) {
@@ -1367,7 +1367,7 @@ class Info {
 						case class_exists( 'ZipArchive' ):
 							self::$info['method'] = 'ziparchive';
 							break;
-						case file_exists( $info['ABSPATH'] . 'wp-admin/includes/class-pclzip.php' ):
+						case file_exists( self::$info['ABSPATH'] . 'wp-admin/includes/class-pclzip.php' ):
 							self::$info['method'] = 'pclzip';
 							break;
 						case \Boldgrid_Backup_Admin_Cli::call_command( 'unzip', $success, $return_var ) || $success || 0 === $return_var:
@@ -1398,7 +1398,7 @@ class Info {
 	 *
 	 * @see Boldgrid_Backup_Url_Helper::call_url()
 	 *
-	 * @return array;
+	 * @return array
 	 */
 	public static function get_env_info() {
 		if ( empty( self::$info['env'] ) ) {
