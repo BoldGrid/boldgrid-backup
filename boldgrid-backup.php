@@ -231,10 +231,21 @@ if ( file_exists( $oldname ) ) {
 		$new_basename = $results_path ? basename( $results_path ) : '';
 		// Only rename onto a valid secret-named file; never restore-info-.json.
 		if ( $new_basename && preg_match( '/^restore-info-[0-9a-f]{32}\.json$/', $new_basename ) ) {
-			// Use the directory from the resolved results path (backup dir or legacy cron/).
+			// Use the full resolved path (backup dir when a locator exists; else legacy cron/).
 			$newname = $results_path;
 			if ( ! file_exists( $newname ) ) {
-				rename( $oldname, $newname );
+				$moved = @rename( $oldname, $newname ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+				/*
+				 * rename() can fail across filesystems (plugin tree vs backup volume).
+				 * Fall back to copy + unlink so the file still lands where CLI looks.
+				 */
+				if ( ! $moved && @copy( $oldname, $newname ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+					@unlink( $oldname ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+					$moved = true;
+				}
+				if ( $moved ) {
+					@chmod( $newname, 0600 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+				}
 			} elseif ( file_exists( $oldname ) ) {
 				unlink( $oldname );
 			}
