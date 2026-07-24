@@ -788,8 +788,9 @@ class Info {
 			return null;
 		}
 
-		$secret        = self::read_secret_from_storage( $storage_dir );
-		$legacy_secret = self::get_legacy_verify_secret();
+		$secret             = self::read_secret_from_storage( $storage_dir );
+		$legacy_secret      = self::get_legacy_verify_secret();
+		$generated_secret   = false;
 
 		// On backup-directory change, reuse the previous dir's secret when possible.
 		if ( empty( $secret ) && $previous_dir && $previous_dir !== $storage_dir ) {
@@ -813,6 +814,7 @@ class Info {
 				// Fail closed; leave legacy files in place until the secret can be stored.
 				return null;
 			}
+			$generated_secret = true;
 		}
 
 		self::$secret            = $secret;
@@ -820,6 +822,20 @@ class Info {
 
 		// Migrate restore-info from cron/ or previous backup dir before deleting legacy copies.
 		$migrated = self::migrate_legacy_restore_info( $storage_dir, $secret, $legacy_secret, $previous_dir );
+
+		/*
+		 * If we generated a new secret but migration failed, restore-info remains under the
+		 * old secret filename. The new secret would orphan that data. Remove the new secret
+		 * and fail so callers retry once legacy restore-info is writable or can fall back
+		 * to legacy paths.
+		 */
+		if ( $generated_secret && ! $migrated ) {
+			$secret_file = $storage_dir . '/' . self::SECRET_FILENAME;
+			@unlink( $secret_file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
+			self::$secret            = null;
+			self::$results_file_path = null;
+			return null;
+		}
 
 		// Only delete legacy files after successful migration (or when secure
 		// restore-info already exists). Prevents data loss if migration fails.
@@ -879,8 +895,8 @@ class Info {
 			}
 			self::write_restore_locator( $storage_dir );
 		} else {
-			// Last resort before first backup directory exists (should be rare).
-			self::$secret = $secret;
+			// No storage directory: fail closed to avoid unstable secrets that drift across requests.
+			return '';
 		}
 
 		return $secret;
