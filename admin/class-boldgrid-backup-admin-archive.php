@@ -753,11 +753,25 @@ class Boldgrid_Backup_Admin_Archive {
 				'timestamp'   => time(),
 			);
 
-			$success = $this->core->wp_filesystem->put_contents(
+			$payload = wp_json_encode( $results );
+			$success = (bool) $this->core->wp_filesystem->put_contents(
 				$results_filepath,
-				wp_json_encode( $results ),
+				$payload,
 				0600
 			);
+
+			/*
+			 * If WP_Filesystem cannot write but the shared writability probe could,
+			 * fall back to a direct write (same approach Info uses for secrets /
+			 * migrated restore-info).
+			 */
+			if ( ! $success ) {
+				$written = @file_put_contents( $results_filepath, $payload ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+				if ( false !== $written ) {
+					@chmod( $results_filepath, 0600 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+					$success = true;
+				}
+			}
 		}
 
 		return $success;
