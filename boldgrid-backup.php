@@ -214,20 +214,29 @@ if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) || defined( 'WP_CLI
 /*
  * Legacy migration for pre-1.14.10 restore-info.json (kept for old installs).
  *
+ * Only run when we have a stable secret source (locator or legacy verify file),
+ * otherwise front-end requests can generate a one-off in-memory secret that drifts
+ * on retry and orphans the renamed file. Admin/cron paths call ensure_secure_storage()
+ * which handles migration properly.
+ *
  * @todo This fix can be removed in the future.
  */
 $oldname = BOLDGRID_BACKUP_PATH . '/cron/restore-info.json';
 if ( file_exists( $oldname ) ) {
 	require_once BOLDGRID_BACKUP_PATH . '/cli/class-info.php';
-	$results_path = \Boldgrid\Backup\Cli\Info::get_results_filepath();
-	$new_basename = $results_path ? basename( $results_path ) : '';
-	// Only rename onto a valid secret-named file; never restore-info-.json.
-	if ( $new_basename && preg_match( '/^restore-info-[0-9a-f]{32}\.json$/', $new_basename ) ) {
-		$newname = BOLDGRID_BACKUP_PATH . '/cron/' . $new_basename;
-		if ( ! file_exists( $newname ) ) {
-			rename( $oldname, $newname );
-		} elseif ( file_exists( $oldname ) ) {
-			unlink( $oldname );
+	$has_stable_secret = \Boldgrid\Backup\Cli\Info::get_secure_storage_dir()
+		|| \Boldgrid\Backup\Cli\Info::get_legacy_verify_secret();
+	if ( $has_stable_secret ) {
+		$results_path = \Boldgrid\Backup\Cli\Info::get_results_filepath();
+		$new_basename = $results_path ? basename( $results_path ) : '';
+		// Only rename onto a valid secret-named file; never restore-info-.json.
+		if ( $new_basename && preg_match( '/^restore-info-[0-9a-f]{32}\.json$/', $new_basename ) ) {
+			$newname = BOLDGRID_BACKUP_PATH . '/cron/' . $new_basename;
+			if ( ! file_exists( $newname ) ) {
+				rename( $oldname, $newname );
+			} elseif ( file_exists( $oldname ) ) {
+				unlink( $oldname );
+			}
 		}
 	}
 }
