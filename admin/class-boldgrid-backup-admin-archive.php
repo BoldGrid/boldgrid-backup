@@ -703,7 +703,12 @@ class Boldgrid_Backup_Admin_Archive {
 			return false;
 		}
 
-		\Boldgrid\Backup\Cli\Info::ensure_secure_storage( $backup_dir );
+		$secure_dir = \Boldgrid\Backup\Cli\Info::ensure_secure_storage( $backup_dir );
+
+		// Fail closed: do not fall back to cron/ when secure storage setup fails.
+		if ( null === $secure_dir ) {
+			return false;
+		}
 
 		$results_filepath = \Boldgrid\Backup\Cli\Info::get_results_filepath();
 
