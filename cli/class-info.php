@@ -412,6 +412,29 @@ class Info {
 	}
 
 	/**
+	 * Remove restore locator files from both plugin tree and wp-content.
+	 *
+	 * Used to undo locator writes when secret generation or persistence fails,
+	 * preventing locators from pointing at a directory without a valid secret.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @return void
+	 */
+	public static function remove_restore_locators() {
+		$plugin_locator     = self::get_restore_locator_filepath();
+		$wp_content_locator = self::get_wp_content_locator_filepath();
+
+		if ( file_exists( $plugin_locator ) ) {
+			@unlink( $plugin_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
+		}
+		if ( $wp_content_locator && file_exists( $wp_content_locator ) ) {
+			@unlink( $wp_content_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
+		}
+	}
+
+	/**
 	 * Persist the per-install secret into the secure storage directory.
 	 *
 	 * @since 1.17.3
@@ -808,10 +831,14 @@ class Info {
 			$secret = self::generate_secret();
 			if ( empty( $secret ) ) {
 				// Fail closed; leave legacy files in place until a CSPRNG is available.
+				// Remove locators to prevent pointing at a directory without a valid secret.
+				self::remove_restore_locators();
 				return null;
 			}
 			if ( ! self::persist_secret( $secret, $storage_dir ) ) {
 				// Fail closed; leave legacy files in place until the secret can be stored.
+				// Remove locators to prevent pointing at a directory without a valid secret.
+				self::remove_restore_locators();
 				return null;
 			}
 			$generated_secret = true;
@@ -859,15 +886,8 @@ class Info {
 			if ( $has_legacy_data ) {
 				$secret_file = $storage_dir . '/' . self::SECRET_FILENAME;
 				@unlink( $secret_file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
-				// Also remove the locator to prevent pointing at a directory without a valid secret.
-				$plugin_locator     = self::get_restore_locator_filepath();
-				$wp_content_locator = self::get_wp_content_locator_filepath();
-				if ( file_exists( $plugin_locator ) ) {
-					@unlink( $plugin_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
-				}
-				if ( $wp_content_locator && file_exists( $wp_content_locator ) ) {
-					@unlink( $wp_content_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
-				}
+				// Also remove the locators to prevent pointing at a directory without a valid secret.
+				self::remove_restore_locators();
 				self::$secret            = null;
 				self::$results_file_path = null;
 				return null;
