@@ -63,6 +63,35 @@ class Boldgrid_Backup_Archiver {
 	 * @since SINCEVERSION
 	 */
 	public function complete() {
+		/*
+		 * archive_files() can return:
+		 * - false: when backup directory is not writable
+		 * - array with 'error' key: various failure conditions
+		 * - valid info array: success (may contain 'restore_info_error' for partial success)
+		 */
+		$is_failure = false === $this->info || ( is_array( $this->info ) && ! empty( $this->info['error'] ) );
+
+		if ( $is_failure ) {
+			$error_message = false === $this->info
+				? __( 'Backup failed: backup directory is not writable.', 'boldgrid-backup' )
+				: $this->info['error'];
+
+			$this->core->logger->add( 'Error: ' . $error_message );
+			$this->task->update_data( 'error', $error_message );
+			$this->task->update_data( 'success', false );
+			Boldgrid_Backup_Admin_In_Progress_Data::set_args(
+				array(
+					'status'        => $error_message,
+					'success'       => false,
+					'process_error' => $error_message,
+				)
+			);
+			$this->core->logger->add( 'Backup failed.' );
+			$this->core->logger->add_memory();
+			$this->task->end();
+			return;
+		}
+
 		$restore_info_error = ! empty( $this->info['restore_info_error'] )
 			? $this->info['restore_info_error']
 			: '';
