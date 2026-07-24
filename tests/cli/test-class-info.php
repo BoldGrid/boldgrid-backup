@@ -375,6 +375,38 @@ class Test_Boldgrid_Backup_Cli_Info extends WP_UnitTestCase {
 	}
 
 	/**
+	 * When plugin-tree and wp-content locators disagree, prefer wp-content.
+	 *
+	 * @since 1.17.3
+	 */
+	public function test_get_dir_from_locator_prefers_wp_content_on_disagreement() {
+		$wp_locator = \Boldgrid\Backup\Cli\Info::get_wp_content_locator_filepath();
+		if ( ! $wp_locator ) {
+			$this->markTestSkipped( 'wp-content locator path unavailable in this environment.' );
+		}
+
+		$old_dir = sys_get_temp_dir() . '/bgbak-stale-' . wp_generate_password( 8, false );
+		$new_dir = sys_get_temp_dir() . '/bgbak-fresh-' . wp_generate_password( 8, false );
+		mkdir( $old_dir, 0700 );
+		mkdir( $new_dir, 0700 );
+
+		$plugin_locator = \Boldgrid\Backup\Cli\Info::get_restore_locator_filepath();
+		$make_locator   = static function ( $dir ) {
+			return "<?php\nreturn " . var_export( $dir, true ) . ";\n"; // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_export
+		};
+
+		file_put_contents( $plugin_locator, $make_locator( $old_dir ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+		file_put_contents( $wp_locator, $make_locator( $new_dir ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+
+		$this->assertSame( $new_dir, \Boldgrid\Backup\Cli\Info::get_dir_from_locator() );
+
+		@unlink( $plugin_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		@unlink( $wp_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		@rmdir( $old_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		@rmdir( $new_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+	}
+
+	/**
 	 * Test generate_secret returns a 32-hex CSPRNG value.
 	 *
 	 * @since 1.17.3

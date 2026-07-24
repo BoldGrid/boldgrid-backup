@@ -704,18 +704,19 @@ class Boldgrid_Backup_Admin_Archive {
 		}
 
 		// Require secure storage; do not fall back to writing restore-info under cron/.
+		$backup_dir = \Boldgrid\Backup\Cli\Info::untrailingslashit_path( (string) $backup_dir );
 		if ( ! \Boldgrid\Backup\Cli\Info::ensure_secure_storage( $backup_dir ) ) {
 			return false;
 		}
 
-		$results_filepath = \Boldgrid\Backup\Cli\Info::get_results_filepath();
-
-		// Fail closed when no valid secret/path is available (never dirname( '' )).
-		if ( empty( $results_filepath ) ) {
+		$secret = \Boldgrid\Backup\Cli\Info::get_secret();
+		if ( ! \Boldgrid\Backup\Cli\Info::is_valid_secret_format( $secret ) ) {
 			return false;
 		}
 
-		$is_dir_writable = \Boldgrid\Backup\Cli\Info::is_directory_writable( dirname( $results_filepath ) );
+		// Always write into the known backup directory — never the legacy cron/ fallback.
+		$results_filepath = \Boldgrid\Backup\Cli\Info::trailingslashit_path( $backup_dir ) . 'restore-info-' . $secret . '.json';
+		$is_dir_writable  = \Boldgrid\Backup\Cli\Info::is_directory_writable( $backup_dir );
 
 		if ( $archive_filepath && $is_dir_writable ) {
 			$results_filepath = wp_normalize_path( $results_filepath );

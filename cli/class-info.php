@@ -198,7 +198,10 @@ class Info {
 	/**
 	 * Read the backup/storage directory from the restore locator.
 	 *
-	 * Checks the plugin tree first, then falls back to wp-content (survives updates).
+	 * Prefers the plugin-tree locator when it is the only source or agrees with
+	 * wp-content. When both exist and disagree (e.g. plugin-tree write failed after
+	 * a backup-dir change), prefer wp-content — it is the durable source rewritten
+	 * by ensure_secure_storage() and survives plugin updates.
 	 *
 	 * @since 1.17.3
 	 * @static
@@ -206,14 +209,17 @@ class Info {
 	 * @return string|null Absolute directory path, or null if unavailable.
 	 */
 	public static function get_dir_from_locator() {
-		// Primary: plugin tree (fastest, but lost on plugin update).
-		$dir = self::read_locator_file( self::get_restore_locator_filepath() );
-		if ( $dir ) {
-			return $dir;
+		$plugin_dir = self::read_locator_file( self::get_restore_locator_filepath() );
+		$wp_dir     = self::read_locator_file( self::get_wp_content_locator_filepath() );
+
+		if ( $plugin_dir && $wp_dir ) {
+			$plugin_dir = self::untrailingslashit_path( $plugin_dir );
+			$wp_dir     = self::untrailingslashit_path( $wp_dir );
+			// Disagreement: wp-content is authoritative after a partial locator write.
+			return ( $plugin_dir === $wp_dir ) ? $plugin_dir : $wp_dir;
 		}
 
-		// Fallback: wp-content (survives plugin updates).
-		return self::read_locator_file( self::get_wp_content_locator_filepath() );
+		return $plugin_dir ? $plugin_dir : $wp_dir;
 	}
 
 	/**
@@ -294,13 +300,22 @@ class Info {
 			'return ' . var_export( $storage_dir, true ) . ";\n"; // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_export
 
 		// Write to plugin tree (primary, fast lookup). Best-effort; may be read-only after plugin update.
-		$plugin_written = ( false !== @file_put_contents( self::get_restore_locator_filepath(), $contents ) ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged,WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+		$plugin_locator = self::get_restore_locator_filepath();
+		$plugin_written = ( false !== @file_put_contents( $plugin_locator, $contents ) ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged,WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
 
 		// Write to wp-content (survives plugin updates for CLI emergency restore).
 		$wp_content_written = false;
 		$wp_content_locator = self::get_wp_content_locator_filepath();
 		if ( $wp_content_locator ) {
 			$wp_content_written = ( false !== @file_put_contents( $wp_content_locator, $contents ) ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged,WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+		}
+
+		/*
+		 * If only wp-content was updated, remove a stale plugin-tree locator so it
+		 * cannot keep pointing CLI / get_results_filepath() at a previous backup dir.
+		 */
+		if ( ! $plugin_written && $wp_content_written && file_exists( $plugin_locator ) ) {
+			@unlink( $plugin_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
 		}
 
 		$written = $plugin_written || $wp_content_written;
