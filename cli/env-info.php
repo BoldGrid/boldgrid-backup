@@ -15,9 +15,42 @@
 
 require_once 'class-info.php';
 
-// Protect access to this script.
-if ( empty( $_REQUEST['secret'] ) || \Boldgrid\Backup\Cli\Info::get_secret() !== $_REQUEST['secret'] ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
-	header( 'HTTP/1.1 403 Unauthorized' );
+/*
+ * Standalone script: WordPress (and its hash_equals polyfill) is not loaded.
+ * Provide a timing-safe compare for PHP < 5.6.
+ */
+if ( ! function_exists( 'hash_equals' ) ) {
+	/**
+	 * Timing-attack safe string comparison.
+	 *
+	 * @param string $a Expected.
+	 * @param string $b Provided.
+	 * @return bool
+	 */
+	function hash_equals( $a, $b ) {
+		if ( ! is_string( $a ) || ! is_string( $b ) ) {
+			return false;
+		}
+
+		$len = strlen( $a );
+		if ( $len !== strlen( $b ) ) {
+			return false;
+		}
+
+		$status = 0;
+		for ( $i = 0; $i < $len; $i++ ) {
+			$status |= ord( $a[ $i ] ) ^ ord( $b[ $i ] );
+		}
+
+		return 0 === $status;
+	}
+}
+
+// Protect access to this script (standalone; WordPress is not loaded).
+$provided_secret = isset( $_REQUEST['secret'] ) ? (string) $_REQUEST['secret'] : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.CSRF.NonceVerification.NoNonceVerification,WordPress.Security.ValidatedSanitizedInput
+if ( '' === $provided_secret ||
+	! hash_equals( (string) \Boldgrid\Backup\Cli\Info::get_secret(), $provided_secret ) ) {
+	header( 'HTTP/1.1 403 Forbidden' );
 	exit;
 }
 

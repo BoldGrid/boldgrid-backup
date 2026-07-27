@@ -1,0 +1,12 @@
+# Deny direct web access to sensitive CLI support files (Apache).
+# env-info.php remains reachable for emergency restore probes (secret-protected).
+<FilesMatch "^(verify-.*|restore-locator\.php)$">
+	<IfModule mod_authz_core.c>
+		Require all denied
+	</IfModule>
+	<IfModule !mod_authz_core.c>
+		Order Allow,Deny
+		Deny from all
+	</IfModule>
+</FilesMatch>
+Options -Indexes

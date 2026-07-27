@@ -66,6 +66,13 @@ class Boldgrid_Backup_Activator {
 			$settings  = $core->settings->get_settings();
 			$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
 
+			// Ensure per-install CLI secret lives outside the web-served plugin directory.
+			$backup_dir = $core->backup_dir->get();
+			if ( ! empty( $backup_dir ) ) {
+				require_once BOLDGRID_BACKUP_PATH . '/cli/class-info.php';
+				\Boldgrid\Backup\Cli\Info::ensure_secure_storage( $backup_dir );
+			}
+
 			/*
 			 * Add all previous crons.
 			 *

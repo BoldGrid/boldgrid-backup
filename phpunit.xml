@@ -1,21 +1,38 @@
 <?xml version="1.0"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="tests/bootstrap.php" backupGlobals="false" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
-  <coverage>
-    <include>
-      <directory>./</directory>
-    </include>
-  </coverage>
-  <testsuites>
-    <testsuite name="tests">
-      <directory suffix=".php">./tests/</directory>
-    </testsuite>
-  </testsuites>
-  <groups>
-    <exclude>
-      <group>ajax</group>
-    </exclude>
-  </groups>
-  <php>
-    <ini name="display_errors" value="true"/>
-  </php>
+<phpunit
+	bootstrap="tests/bootstrap.php"
+	backupGlobals="false"
+	colors="true"
+	convertErrorsToExceptions="true"
+	convertNoticesToExceptions="true"
+	convertWarningsToExceptions="true"
+>
+	<!--
+		Use the PHPUnit 7-compatible filter/whitelist schema so the locked
+		PHPUnit 7.5 config validates on PHP 7.4. PHPUnit 9 (PHP 8.5 CI job)
+		still accepts this form.
+	-->
+	<filter>
+		<whitelist>
+			<directory suffix=".php">./</directory>
+			<exclude>
+				<directory>./node_modules</directory>
+				<directory>./tests</directory>
+				<directory>./vendor</directory>
+			</exclude>
+		</whitelist>
+	</filter>
+	<testsuites>
+		<testsuite name="tests">
+			<directory suffix=".php">./tests/</directory>
+		</testsuite>
+	</testsuites>
+	<groups>
+		<exclude>
+			<group>ajax</group>
+		</exclude>
+	</groups>
+	<php>
+		<ini name="display_errors" value="true"/>
+	</php>
 </phpunit>

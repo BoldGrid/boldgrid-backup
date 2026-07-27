@@ -358,6 +358,9 @@ class Boldgrid_Backup_Admin_Db_Import {
 	/**
 	 * Get database user privileges.
 	 *
+	 * Parses SHOW GRANTS results, preferring DB-specific grants over global ones.
+	 * This handles common setups where a user has USAGE on *.* plus ALL on the site DB.
+	 *
 	 * @since 1.14.0
 	 *
 	 * @global wpdb $wpdb The WordPress database class object.
@@ -367,20 +370,52 @@ class Boldgrid_Backup_Admin_Db_Import {
 	public function get_db_privileges() {
 		$results = $this->show_grants_query();
 
+		$db_grants     = array();
+		$global_grants = array();
+
 		foreach ( $results as $result ) {
 			$result[0]               = str_replace( '\\', '', $result[0] );
 			$is_string_db_grant      = ( false !== strpos( $result[0], 'ON `' . DB_NAME . '`' ) );
 			$is_string_all_grant     = ( false !== strpos( $result[0], 'ON *.*' ) );
 			$is_grant_all_privileges = ( false !== strpos( $result[0], 'GRANT ALL PRIVILEGES' ) );
 
-			if ( ( $is_string_db_grant || $is_string_all_grant ) && $is_grant_all_privileges ) {
+			if ( ! $is_string_db_grant && ! $is_string_all_grant ) {
+				continue;
+			}
+
+			// DB-specific ALL is definitive.
+			if ( $is_string_db_grant && $is_grant_all_privileges ) {
 				return array( 'ALL' );
 			}
-			if ( ( $is_string_db_grant ) && false === $is_grant_all_privileges ) {
-				return $this->get_grants_array( $result[0] );
+
+			// Global ALL is definitive.
+			if ( $is_string_all_grant && $is_grant_all_privileges ) {
+				return array( 'ALL' );
+			}
+
+			/*
+			 * MySQL 8 often enumerates privileges on *.* instead of "GRANT ALL PRIVILEGES".
+			 * Parse those lists; skip the default USAGE-only row.
+			 */
+			$grants = $this->get_grants_array( $result[0] );
+			if ( array( 'USAGE' ) === $grants ) {
+				continue;
+			}
+
+			// Collect grants, preferring DB-specific over global.
+			if ( $is_string_db_grant ) {
+				$db_grants = array_unique( array_merge( $db_grants, $grants ) );
+			} else {
+				$global_grants = array_unique( array_merge( $global_grants, $grants ) );
 			}
 		}
-		return array();
+
+		// Prefer DB-specific grants; fall back to global.
+		if ( ! empty( $db_grants ) ) {
+			return $db_grants;
+		}
+
+		return $global_grants;
 	}
 
 	/**

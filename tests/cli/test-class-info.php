@@ -38,6 +38,14 @@ class Test_Boldgrid_Backup_Cli_Info extends WP_UnitTestCase {
 	public $original_argv;
 
 	/**
+	 * CLI Info helper under test.
+	 *
+	 * @since 1.9.0
+	 * @var \Boldgrid\Backup\Cli\Info
+	 */
+	public $info;
+
+	/**
 	 * Setup.
 	 *
 	 * @since 1.9.0
@@ -190,6 +198,431 @@ class Test_Boldgrid_Backup_Cli_Info extends WP_UnitTestCase {
 		$path = $this->info->get_results_filepath();
 
 		$this->assertTrue( ! empty( $path ) );
+		$this->assertStringContainsString( 'restore-info-', $path );
+	}
+
+	/**
+	 * Test ensure_secure_storage migrates away from webroot verify files.
+	 *
+	 * @since 1.17.3
+	 */
+	public function test_ensure_secure_storage_rotates_legacy_verify_secret() {
+		$storage_dir = sys_get_temp_dir() . '/bgbak-secure-' . wp_generate_password( 8, false );
+		mkdir( $storage_dir, 0700 );
+
+		$legacy_secret = md5( 'legacy-shipped-secret' );
+		$legacy_verify = BOLDGRID_BACKUP_PATH . '/cli/verify-' . $legacy_secret . '.php';
+		$legacy_info   = BOLDGRID_BACKUP_PATH . '/cron/restore-info-' . $legacy_secret . '.json';
+
+		file_put_contents( $legacy_verify, "<?php // phpcs:disable\n" ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+		file_put_contents( $legacy_info, wp_json_encode( [ 'cron_secret' => 'abc123' ] ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+
+		$dir = \Boldgrid\Backup\Cli\Info::ensure_secure_storage( $storage_dir );
+		$this->assertSame( $storage_dir, $dir );
+
+		$new_secret = \Boldgrid\Backup\Cli\Info::get_secret();
+		$this->assertNotSame( $legacy_secret, $new_secret );
+		$this->assertFileExists( $storage_dir . '/.boldgrid-cli-secret' );
+		$this->assertFileExists( \Boldgrid\Backup\Cli\Info::get_restore_locator_filepath() );
+		$wp_locator = \Boldgrid\Backup\Cli\Info::get_wp_content_locator_filepath();
+		// Available when WP_CONTENT_DIR is defined or the plugin lives under wp-content/plugins/.
+		if ( $wp_locator ) {
+			$this->assertFileExists( $wp_locator );
+		}
+		$this->assertFileDoesNotExist( $legacy_verify );
+		$this->assertFileDoesNotExist( $legacy_info );
+
+		$results = \Boldgrid\Backup\Cli\Info::get_results_filepath();
+		$this->assertStringStartsWith( $storage_dir, $results );
+		$this->assertFileExists( $storage_dir . '/restore-info-' . $new_secret . '.json' );
+
+		$locator = file_get_contents( \Boldgrid\Backup\Cli\Info::get_restore_locator_filepath() ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+		$this->assertStringContainsString( 'SCRIPT_FILENAME', $locator );
+		$this->assertStringContainsString( '__FILE__', $locator );
+
+		// Plugin-tree locator may be gone after a plugin update; wp-content fallback remains.
+		if ( $wp_locator && file_exists( $wp_locator ) ) {
+			@unlink( \Boldgrid\Backup\Cli\Info::get_restore_locator_filepath() ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			$this->assertSame( $storage_dir, \Boldgrid\Backup\Cli\Info::get_dir_from_locator() );
+		}
+
+		// Cleanup.
+		@unlink( \Boldgrid\Backup\Cli\Info::get_restore_locator_filepath() ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		if ( $wp_locator ) {
+			@unlink( $wp_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+		@unlink( $storage_dir . '/.boldgrid-cli-secret' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		foreach ( glob( $storage_dir . '/restore-info-*.json' ) as $file ) {
+			@unlink( $file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+		@rmdir( $storage_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+	}
+
+	/**
+	 * Test verify files are removed even when there is no restore-info to migrate.
+	 *
+	 * Empty migrate returns false; verify-*.php must still leave the web tree.
+	 *
+	 * @since 1.17.3
+	 */
+	public function test_ensure_secure_storage_deletes_verify_without_restore_info() {
+		$storage_dir = sys_get_temp_dir() . '/bgbak-verify-only-' . wp_generate_password( 8, false );
+		mkdir( $storage_dir, 0700 );
+
+		$legacy_secret = md5( 'verify-only-shipped-secret' );
+		$legacy_verify = BOLDGRID_BACKUP_PATH . '/cli/verify-' . $legacy_secret . '.php';
+
+		file_put_contents( $legacy_verify, "<?php // phpcs:disable\n" ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+
+		$dir = \Boldgrid\Backup\Cli\Info::ensure_secure_storage( $storage_dir );
+		$this->assertSame( $storage_dir, $dir );
+		$this->assertFileExists( $storage_dir . '/.boldgrid-cli-secret' );
+		$this->assertFileDoesNotExist( $legacy_verify );
+
+		$new_secret = \Boldgrid\Backup\Cli\Info::get_secret();
+		$this->assertNotSame( $legacy_secret, $new_secret );
+
+		// Cleanup.
+		@unlink( \Boldgrid\Backup\Cli\Info::get_restore_locator_filepath() ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		$wp_locator = \Boldgrid\Backup\Cli\Info::get_wp_content_locator_filepath();
+		if ( $wp_locator ) {
+			@unlink( $wp_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+		@unlink( $storage_dir . '/.boldgrid-cli-secret' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		foreach ( glob( $storage_dir . '/restore-info-*.json' ) as $file ) {
+			@unlink( $file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+		@rmdir( $storage_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+	}
+
+	/**
+	 * Test restore-info migrates even when the legacy verify file is already gone.
+	 *
+	 * @since 1.17.3
+	 */
+	public function test_ensure_secure_storage_migrates_orphan_restore_info() {
+		$storage_dir = sys_get_temp_dir() . '/bgbak-orphan-' . wp_generate_password( 8, false );
+		mkdir( $storage_dir, 0700 );
+
+		$orphan_secret = md5( 'orphan-restore-info' );
+		$legacy_info   = BOLDGRID_BACKUP_PATH . '/cron/restore-info-' . $orphan_secret . '.json';
+		$payload       = wp_json_encode( [ 'cron_secret' => 'orphan-cron', 'filepath' => '/tmp/backup.zip' ] );
+
+		file_put_contents( $legacy_info, $payload ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+
+		$dir = \Boldgrid\Backup\Cli\Info::ensure_secure_storage( $storage_dir );
+		$this->assertSame( $storage_dir, $dir );
+		$this->assertFileDoesNotExist( $legacy_info );
+
+		$new_secret = \Boldgrid\Backup\Cli\Info::get_secret();
+		$migrated   = $storage_dir . '/restore-info-' . $new_secret . '.json';
+		$this->assertFileExists( $migrated );
+		$this->assertSame( $payload, file_get_contents( $migrated ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+
+		// Cleanup.
+		@unlink( \Boldgrid\Backup\Cli\Info::get_restore_locator_filepath() ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		$wp_locator = \Boldgrid\Backup\Cli\Info::get_wp_content_locator_filepath();
+		if ( $wp_locator ) {
+			@unlink( $wp_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+		@unlink( $storage_dir . '/.boldgrid-cli-secret' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		foreach ( glob( $storage_dir . '/restore-info-*.json' ) as $file ) {
+			@unlink( $file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+		@rmdir( $storage_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+	}
+
+	/**
+	 * Test remigration of restore-info already in the backup directory after secret loss.
+	 *
+	 * @since 1.17.3
+	 */
+	public function test_ensure_secure_storage_remigrates_backup_dir_restore_info() {
+		$storage_dir = sys_get_temp_dir() . '/bgbak-remigrate-' . wp_generate_password( 8, false );
+		mkdir( $storage_dir, 0700 );
+
+		$old_secret = md5( 'previous-install-secret' );
+		$payload    = wp_json_encode( [ 'cron_secret' => 'kept-cron', 'filepath' => '/tmp/last.zip' ] );
+		$orphan     = $storage_dir . '/restore-info-' . $old_secret . '.json';
+
+		file_put_contents( $orphan, $payload ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+		// No .boldgrid-cli-secret — forces a new secret and remigration of the orphan.
+
+		$dir = \Boldgrid\Backup\Cli\Info::ensure_secure_storage( $storage_dir );
+		$this->assertSame( $storage_dir, $dir );
+
+		$new_secret = \Boldgrid\Backup\Cli\Info::get_secret();
+		$this->assertNotSame( $old_secret, $new_secret );
+		$this->assertFileDoesNotExist( $orphan );
+		$migrated = $storage_dir . '/restore-info-' . $new_secret . '.json';
+		$this->assertFileExists( $migrated );
+		$this->assertSame( $payload, file_get_contents( $migrated ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+
+		// Cleanup.
+		@unlink( \Boldgrid\Backup\Cli\Info::get_restore_locator_filepath() ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		$wp_locator = \Boldgrid\Backup\Cli\Info::get_wp_content_locator_filepath();
+		if ( $wp_locator ) {
+			@unlink( $wp_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+		@unlink( $storage_dir . '/.boldgrid-cli-secret' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		foreach ( glob( $storage_dir . '/restore-info-*.json' ) as $file ) {
+			@unlink( $file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+		@rmdir( $storage_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+	}
+
+	/**
+	 * Test ensure_secure_storage carries secret + restore-info across backup dir changes.
+	 *
+	 * @since 1.17.3
+	 */
+	public function test_ensure_secure_storage_migrates_on_backup_dir_change() {
+		$old_dir = sys_get_temp_dir() . '/bgbak-old-' . wp_generate_password( 8, false );
+		$new_dir = sys_get_temp_dir() . '/bgbak-new-' . wp_generate_password( 8, false );
+		mkdir( $old_dir, 0700 );
+		mkdir( $new_dir, 0700 );
+
+		$this->assertSame( $old_dir, \Boldgrid\Backup\Cli\Info::ensure_secure_storage( $old_dir ) );
+		$secret  = \Boldgrid\Backup\Cli\Info::get_secret();
+		$payload = wp_json_encode( [ 'cron_secret' => 'dir-change', 'filepath' => '/tmp/old.zip' ] );
+		file_put_contents( $old_dir . '/restore-info-' . $secret . '.json', $payload ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+
+		$this->assertSame( $new_dir, \Boldgrid\Backup\Cli\Info::ensure_secure_storage( $new_dir ) );
+		$this->assertSame( $secret, \Boldgrid\Backup\Cli\Info::get_secret() );
+		$this->assertFileExists( $new_dir . '/.boldgrid-cli-secret' );
+		$this->assertSame( $secret, trim( (string) file_get_contents( $new_dir . '/.boldgrid-cli-secret' ) ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+		$migrated = $new_dir . '/restore-info-' . $secret . '.json';
+		$this->assertFileExists( $migrated );
+		$this->assertSame( $payload, file_get_contents( $migrated ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+		$this->assertSame( $new_dir, \Boldgrid\Backup\Cli\Info::get_dir_from_locator() );
+
+		// Cleanup.
+		@unlink( \Boldgrid\Backup\Cli\Info::get_restore_locator_filepath() ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		$wp_locator = \Boldgrid\Backup\Cli\Info::get_wp_content_locator_filepath();
+		if ( $wp_locator ) {
+			@unlink( $wp_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+		foreach ( [ $old_dir, $new_dir ] as $dir ) {
+			@unlink( $dir . '/.boldgrid-cli-secret' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			foreach ( glob( $dir . '/restore-info-*.json' ) as $file ) {
+				@unlink( $file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			}
+			@rmdir( $dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+	}
+
+	/**
+	 * When plugin-tree and wp-content locators disagree, prefer evidence (secret / newer restore-info).
+	 *
+	 * @since 1.17.3
+	 */
+	public function test_get_dir_from_locator_prefers_wp_content_on_disagreement() {
+		$wp_locator = \Boldgrid\Backup\Cli\Info::get_wp_content_locator_filepath();
+		if ( ! $wp_locator ) {
+			$this->markTestSkipped( 'wp-content locator path unavailable in this environment.' );
+		}
+
+		$old_dir = sys_get_temp_dir() . '/bgbak-stale-' . wp_generate_password( 8, false );
+		$new_dir = sys_get_temp_dir() . '/bgbak-fresh-' . wp_generate_password( 8, false );
+		mkdir( $old_dir, 0700 );
+		mkdir( $new_dir, 0700 );
+
+		$plugin_locator = \Boldgrid\Backup\Cli\Info::get_restore_locator_filepath();
+		$make_locator   = static function ( $dir ) {
+			return "<?php\nreturn " . var_export( $dir, true ) . ";\n"; // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_export
+		};
+
+		// Neither dir has a secret/restore-info: durable wp-content candidate wins.
+		file_put_contents( $plugin_locator, $make_locator( $old_dir ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+		file_put_contents( $wp_locator, $make_locator( $new_dir ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+		$this->assertSame( $new_dir, \Boldgrid\Backup\Cli\Info::get_dir_from_locator() );
+
+		// Plugin points at new dir with secret + newer restore-info; wp-content is stale.
+		$secret = md5( 'locator-evidence' );
+		file_put_contents( $plugin_locator, $make_locator( $new_dir ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+		file_put_contents( $wp_locator, $make_locator( $old_dir ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+		file_put_contents( $new_dir . '/.boldgrid-cli-secret', $secret ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+		file_put_contents( // phpcs:ignore WordPress.WP.AlternativeFunctions
+			$new_dir . '/restore-info-' . $secret . '.json',
+			wp_json_encode( [ 'timestamp' => 200, 'filepath' => '/tmp/new.zip' ] )
+		);
+		file_put_contents( $old_dir . '/.boldgrid-cli-secret', $secret ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+		file_put_contents( // phpcs:ignore WordPress.WP.AlternativeFunctions
+			$old_dir . '/restore-info-' . $secret . '.json',
+			wp_json_encode( [ 'timestamp' => 100, 'filepath' => '/tmp/old.zip' ] )
+		);
+		$this->assertSame( $new_dir, \Boldgrid\Backup\Cli\Info::get_dir_from_locator() );
+
+		@unlink( $plugin_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		@unlink( $wp_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		foreach ( [ $old_dir, $new_dir ] as $dir ) {
+			@unlink( $dir . '/.boldgrid-cli-secret' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			foreach ( glob( $dir . '/restore-info-*.json' ) as $file ) {
+				@unlink( $file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			}
+			@rmdir( $dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+	}
+
+	/**
+	 * Switching back to a previous backup dir refreshes stale same-secret restore-info.
+	 *
+	 * @since 1.17.3
+	 */
+	public function test_ensure_secure_storage_refreshes_stale_restore_info_on_dir_switch_back() {
+		$dir_a = sys_get_temp_dir() . '/bgbak-a-' . wp_generate_password( 8, false );
+		$dir_b = sys_get_temp_dir() . '/bgbak-b-' . wp_generate_password( 8, false );
+		mkdir( $dir_a, 0700 );
+		mkdir( $dir_b, 0700 );
+
+		$this->assertSame( $dir_a, \Boldgrid\Backup\Cli\Info::ensure_secure_storage( $dir_a ) );
+		$secret = \Boldgrid\Backup\Cli\Info::get_secret();
+
+		$old_payload = wp_json_encode( [ 'timestamp' => 100, 'filepath' => '/tmp/a-old.zip' ] );
+		$new_payload = wp_json_encode( [ 'timestamp' => 200, 'filepath' => '/tmp/b-new.zip' ] );
+		file_put_contents( $dir_a . '/restore-info-' . $secret . '.json', $old_payload ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+
+		$this->assertSame( $dir_b, \Boldgrid\Backup\Cli\Info::ensure_secure_storage( $dir_b ) );
+		file_put_contents( $dir_b . '/restore-info-' . $secret . '.json', $new_payload ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+
+		// Switch back to A: stale same-secret file must be replaced with B's newer copy.
+		$this->assertSame( $dir_a, \Boldgrid\Backup\Cli\Info::ensure_secure_storage( $dir_a ) );
+		$this->assertSame( $new_payload, file_get_contents( $dir_a . '/restore-info-' . $secret . '.json' ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+
+		@unlink( \Boldgrid\Backup\Cli\Info::get_restore_locator_filepath() ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		$wp_locator = \Boldgrid\Backup\Cli\Info::get_wp_content_locator_filepath();
+		if ( $wp_locator ) {
+			@unlink( $wp_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+		foreach ( [ $dir_a, $dir_b ] as $dir ) {
+			@unlink( $dir . '/.boldgrid-cli-secret' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			foreach ( glob( $dir . '/restore-info-*.json' ) as $file ) {
+				@unlink( $file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			}
+			@rmdir( $dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+	}
+
+	/**
+	 * Test generate_secret returns a 32-hex CSPRNG value.
+	 *
+	 * @since 1.17.3
+	 */
+	public function test_generate_secret() {
+		$secret = \Boldgrid\Backup\Cli\Info::generate_secret();
+		$this->assertTrue( \Boldgrid\Backup\Cli\Info::is_valid_secret_format( $secret ) );
+		$this->assertNotSame( $secret, \Boldgrid\Backup\Cli\Info::generate_secret() );
+	}
+
+	/**
+	 * restore_previous_locators should restore a prior path instead of wiping both locators.
+	 *
+	 * @since 1.17.3
+	 */
+	public function test_restore_previous_locators_keeps_prior_path() {
+		$old_dir = sys_get_temp_dir() . '/bgbak-prev-loc-' . wp_generate_password( 8, false );
+		$new_dir = sys_get_temp_dir() . '/bgbak-new-loc-' . wp_generate_password( 8, false );
+		mkdir( $old_dir, 0700 );
+		mkdir( $new_dir, 0700 );
+
+		$this->assertTrue( \Boldgrid\Backup\Cli\Info::write_restore_locator( $old_dir ) );
+		$this->assertSame( $old_dir, \Boldgrid\Backup\Cli\Info::get_dir_from_locator() );
+
+		$this->assertTrue( \Boldgrid\Backup\Cli\Info::write_restore_locator( $new_dir ) );
+		$this->assertSame( $new_dir, \Boldgrid\Backup\Cli\Info::get_dir_from_locator() );
+
+		\Boldgrid\Backup\Cli\Info::restore_previous_locators( $old_dir );
+		$this->assertSame( $old_dir, \Boldgrid\Backup\Cli\Info::get_dir_from_locator() );
+
+		\Boldgrid\Backup\Cli\Info::restore_previous_locators( null );
+		$this->assertNull( \Boldgrid\Backup\Cli\Info::get_dir_from_locator() );
+
+		@rmdir( $old_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		@rmdir( $new_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+	}
+
+	/**
+	 * get_secret() should delete cron restore-info after a successful CLI-side migrate.
+	 *
+	 * @since 1.17.3
+	 */
+	public function test_get_secret_deletes_cron_restore_info_after_migrate() {
+		$storage_dir = sys_get_temp_dir() . '/bgbak-get-secret-' . wp_generate_password( 8, false );
+		mkdir( $storage_dir, 0700 );
+
+		$this->assertTrue( \Boldgrid\Backup\Cli\Info::write_restore_locator( $storage_dir ) );
+
+		$orphan_secret = md5( 'get-secret-orphan-cron' );
+		$cron_info     = BOLDGRID_BACKUP_PATH . '/cron/restore-info-' . $orphan_secret . '.json';
+		file_put_contents( $cron_info, wp_json_encode( array( // phpcs:ignore WordPress.WP.AlternativeFunctions
+			'cron_secret' => 'xyz',
+			'timestamp'   => time(),
+		) ) );
+
+		$ref = new ReflectionClass( \Boldgrid\Backup\Cli\Info::class );
+		foreach ( array( 'secret', 'results_file_path', 'info' ) as $prop_name ) {
+			$prop = $ref->getProperty( $prop_name );
+			$prop->setAccessible( true );
+			$prop->setValue( null, 'info' === $prop_name ? array() : null );
+		}
+
+		$secret = \Boldgrid\Backup\Cli\Info::get_secret();
+		$this->assertTrue( \Boldgrid\Backup\Cli\Info::is_valid_secret_format( $secret ) );
+		$this->assertFileExists( $storage_dir . '/.boldgrid-cli-secret' );
+		$this->assertFileExists( $storage_dir . '/restore-info-' . $secret . '.json' );
+		$this->assertFileDoesNotExist( $cron_info );
+
+		@unlink( \Boldgrid\Backup\Cli\Info::get_restore_locator_filepath() ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		$wp_locator = \Boldgrid\Backup\Cli\Info::get_wp_content_locator_filepath();
+		if ( $wp_locator ) {
+			@unlink( $wp_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+		@unlink( $storage_dir . '/.boldgrid-cli-secret' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		foreach ( glob( $storage_dir . '/restore-info-*.json' ) as $file ) {
+			@unlink( $file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+		@rmdir( $storage_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+	}
+
+	/**
+	 * open_backup_zip should repair broken EOCD archives for CLI restore.
+	 *
+	 * @since 1.17.3
+	 */
+	public function test_open_backup_zip_repairs_broken_eocd() {
+		if ( ! class_exists( 'ZipArchive' ) ) {
+			$this->markTestSkipped( 'ZipArchive required.' );
+		}
+
+		$zip_path = wp_tempnam( 'bgbak-cli-zip-' );
+		unlink( $zip_path );
+		$zip_path .= '.zip';
+
+		$zip = new ZipArchive();
+		$this->assertTrue( $zip->open( $zip_path, ZipArchive::CREATE ) );
+		for ( $i = 0; $i < 15; $i++ ) {
+			$zip->addFromString( 'c-' . $i . '.txt', 'z' );
+		}
+		$this->assertTrue( $zip->close() );
+
+		$size = filesize( $zip_path );
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
+		$handle = fopen( $zip_path, 'r+b' );
+		fseek( $handle, $size - 22 ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fseek
+		$eocd = fread( $handle, 22 ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fread
+		$eocd[8]  = "\x00";
+		$eocd[9]  = "\x00";
+		$eocd[10] = "\x00";
+		$eocd[11] = "\x00";
+		fseek( $handle, $size - 22 ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fseek
+		fwrite( $handle, $eocd ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite
+		fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+
+		$opened = \Boldgrid\Backup\Cli\Info::open_backup_zip( $zip_path );
+		$this->assertInstanceOf( ZipArchive::class, $opened );
+		$this->assertSame( 15, $opened->numFiles ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName
+		$opened->close();
+		unlink( $zip_path );
 	}
 
 	/**

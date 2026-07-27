@@ -13,6 +13,7 @@
 		}
 	],
 	"require" : {
+		"php": ">=7.4",
 		"boldgrid/library" : "^2.13.15",
 		"boldgrid/tdcron" : "dev-master",
 		"phpseclib/phpseclib" : "~3.0",
@@ -22,6 +23,16 @@
 		"lox/xhprof" : "dev-master",
 		"phpunit/phpunit": "^7",
 		"yoast/phpunit-polyfills": "^2.0"
+	},
+	"config" : {
+		"platform" : {
+			"php" : "7.4"
+		},
+		"audit" : {
+			"ignore" : {
+				"PKSA-z3gr-8qht-p93v" : "phpunit/phpunit is require-dev only; advisory is PHPT coverage deserialization (CVE-2026-24765). No patched 7.x release exists; revisit when upgrading PHPUnit."
+			}
+		}
 	},
 	"scripts" : {
 		"post-autoload-dump" : "composer run-script post-autoload-dump -d ./vendor/boldgrid/library"

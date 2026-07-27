@@ -76,7 +76,7 @@ class Test_Boldgrid_Backup_Admin_Migrate_Util extends WP_UnitTestCase {
 		// Create the large file to be split
 		$large_file_size = 1024 * 1024 * 5; // 5MB
 		$file_handle     = fopen( $this->test_file_path, 'wb' );
-		fwrite( $file_handle, str_repeat( 'Hello World!', $large_file_size / 100 ) );
+		fwrite( $file_handle, str_repeat( 'Hello World!', (int) ( $large_file_size / 100 ) ) );
 		fclose( $file_handle );
 
 		// Act

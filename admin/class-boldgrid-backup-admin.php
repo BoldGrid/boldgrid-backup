@@ -240,8 +240,77 @@ class Boldgrid_Backup_Admin {
 		// Set the configuration array in the class property.
 		self::$configs = $configs;
 
+		/*
+		 * Translate user-facing config strings on init (WP 6.7+).
+		 *
+		 * config.plugin.php is required during plugin bootstrap, before init.
+		 * Keep raw English there and localize here so translations are not
+		 * loaded too early.
+		 */
+		if ( did_action( 'init' ) && ! doing_action( 'init' ) ) {
+			self::localize_configs();
+		} else {
+			add_action( 'init', array( __CLASS__, 'localize_configs' ) );
+		}
+
 		// Return the configuration array.
-		return $configs;
+		return self::$configs;
+	}
+
+	/**
+	 * Get configs by reference so init-time localization updates all consumers.
+	 *
+	 * @since 1.17.3
+	 *
+	 * @return array
+	 */
+	public static function &get_configs_ref() {
+		self::get_configs();
+		return self::$configs;
+	}
+
+	/**
+	 * Localize translatable strings in the plugin config.
+	 *
+	 * @since 1.17.3
+	 */
+	public static function localize_configs() {
+		if ( empty( self::$configs ) || ! empty( self::$configs['_localized'] ) ) {
+			return;
+		}
+
+		// translators: 1: Number of seconds.
+		self::$configs['lang']['est_pause'] = esc_html__( 'Estimated Pause: %s seconds', 'boldgrid-backup' );
+
+		if ( isset( self::$configs['premium_remote']['google_drive']['title'] ) ) {
+			self::$configs['premium_remote']['google_drive']['title'] = __( 'Google Drive', 'boldgrid-backup' );
+		}
+		if ( isset( self::$configs['premium_remote']['amazon_s3']['title'] ) ) {
+			self::$configs['premium_remote']['amazon_s3']['title'] = __( 'Amazon S3', 'boldgrid-backup' );
+		}
+		if ( isset( self::$configs['premium_remote']['dreamobjects']['title'] ) ) {
+			self::$configs['premium_remote']['dreamobjects']['title'] = __( 'DreamObjects', 'boldgrid-backup' );
+		}
+
+		$default_intervals = array(
+			'*/5 * * * *'  => esc_html__( 'Every 5 Minutes', 'boldgrid-backup' ),
+			'*/10 * * * *' => esc_html__( 'Every 10 Minutes', 'boldgrid-backup' ),
+			'*/30 * * * *' => esc_html__( 'Every 30 Minutes', 'boldgrid-backup' ),
+			'0 * * * *'    => esc_html__( 'Once Every Hour', 'boldgrid-backup' ),
+		);
+
+		if ( ! empty( self::$configs['cron_intervals'] ) && is_array( self::$configs['cron_intervals'] ) ) {
+			// Translate known default labels while preserving any custom intervals from config.local.php.
+			foreach ( self::$configs['cron_intervals'] as $key => $label ) {
+				if ( isset( $default_intervals[ $key ] ) ) {
+					self::$configs['cron_intervals'][ $key ] = $default_intervals[ $key ];
+				}
+			}
+		} else {
+			self::$configs['cron_intervals'] = $default_intervals;
+		}
+
+		self::$configs['_localized'] = true;
 	}
 
 	/**

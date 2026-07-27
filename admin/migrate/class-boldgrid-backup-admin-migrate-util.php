@@ -398,11 +398,11 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 */
 	public function split_large_file( $transfer_id, $file_path, $relative_path, $max_upload_size, $status ) {
 		$transfer_dir = $this->get_transfer_dir();
-		$chunk_size   = $max_upload_size / 10;
+		$chunk_size   = max( 1, (int) floor( $max_upload_size / 10 ) );
 
 		// determine how many chunks based on chunk size and file size
 		$file_size   = filesize( $file_path );
-		$chunk_count = ceil( $file_size / $chunk_size );
+		$chunk_count = (int) ceil( $file_size / $chunk_size );
 
 		$chunk_dir = $transfer_dir . '/temp-file-chunks/' . $transfer_id;
 		$this->create_dirpath( $chunk_dir . '/' . $relative_path );

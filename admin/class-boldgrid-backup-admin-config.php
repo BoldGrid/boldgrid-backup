@@ -139,7 +139,17 @@ class Boldgrid_Backup_Admin_Config {
 			$this->is_premium = $this->license->isPremium( 'boldgrid-backup' );
 		}
 
-		$this->set_lang();
+		/*
+		 * Defer translated strings until init (WP 6.7+).
+		 *
+		 * Calling esc_html__() during plugin bootstrap triggers
+		 * _load_textdomain_just_in_time too early.
+		 */
+		if ( did_action( 'init' ) ) {
+			$this->set_lang();
+		} else {
+			add_action( 'init', array( $this, 'set_lang' ) );
+		}
 	}
 
 	/**

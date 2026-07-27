@@ -46,51 +46,1012 @@ class Info {
 	private static $results_file_path;
 
 	/**
+	 * Per-install CLI/file secret.
+	 *
+	 * @since 1.17.3
+	 * @access private
+	 * @staticvar
+	 *
+	 * @var string|null
+	 */
+	private static $secret;
+
+	/**
+	 * Filename of the restore locator (points CLI at the backup directory).
+	 *
+	 * @since 1.17.3
+	 * @var string
+	 */
+	const RESTORE_LOCATOR_FILE = 'restore-locator.php';
+
+	/**
+	 * Filename of the restore locator stored in wp-content (survives plugin updates).
+	 *
+	 * @since 1.17.3
+	 * @var string
+	 */
+	const WP_CONTENT_LOCATOR_FILE = '.boldgrid-backup-locator.php';
+
+	/**
+	 * Filename used to persist the per-install secret in the backup directory.
+	 *
+	 * @since 1.17.3
+	 * @var string
+	 */
+	const SECRET_FILENAME = '.boldgrid-cli-secret';
+
+	/**
 	 * Get the results file path.
+	 *
+	 * Stored in the backup directory (typically outside the web root) when possible.
+	 * Falls back to a legacy plugin-relative cron/ path only when no secure storage
+	 * directory is available yet.
 	 *
 	 * @since 1.9.0
 	 * @static
 	 *
+	 * @see self::get_secret()
+	 * @see self::get_secure_storage_dir()
+	 *
 	 * @return string
 	 */
 	public static function get_results_filepath() {
-		if ( null === self::$results_file_path ) {
-			self::$results_file_path = dirname( __DIR__ ) . '/cron/restore-info-' . self::get_secret() . '.json';
+		if ( null === self::$results_file_path || '' === self::$results_file_path ) {
+			$secret = self::get_secret();
+			if ( ! self::is_valid_secret_format( $secret ) ) {
+				// Fail closed: never emit restore-info-.json for an empty/invalid secret.
+				self::$results_file_path = '';
+				return self::$results_file_path;
+			}
+
+			$storage_dir = self::get_secure_storage_dir();
+
+			if ( $storage_dir ) {
+				self::$results_file_path = self::trailingslashit_path( $storage_dir ) . 'restore-info-' . $secret . '.json';
+			} else {
+				// Legacy fallback; callers with WordPress should migrate via ensure_secure_storage().
+				self::$results_file_path = dirname( __DIR__ ) . '/cron/restore-info-' . $secret . '.json';
+			}
 		}
 
 		return self::$results_file_path;
 	}
 
 	/**
+	 * Get the path to the restore locator file (plugin tree).
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @return string
+	 */
+	public static function get_restore_locator_filepath() {
+		return __DIR__ . '/' . self::RESTORE_LOCATOR_FILE;
+	}
+
+	/**
+	 * Get the path to the restore locator file in wp-content (survives plugin updates).
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @return string|null Path or null if wp-content cannot be determined.
+	 */
+	public static function get_wp_content_locator_filepath() {
+		$wp_content = self::get_wp_content_dir();
+		if ( ! $wp_content ) {
+			return null;
+		}
+		return $wp_content . '/' . self::WP_CONTENT_LOCATOR_FILE;
+	}
+
+	/**
+	 * Determine the wp-content directory.
+	 *
+	 * Prefers WP_CONTENT_DIR when WordPress is loaded (including CI checkouts that are
+	 * not under wp-content/plugins/). Falls back to walking up from cli/ for standalone
+	 * emergency restore when the plugin lives under wp-content/plugins/.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @return string|null
+	 */
+	public static function get_wp_content_dir() {
+		if ( defined( 'WP_CONTENT_DIR' ) && is_string( WP_CONTENT_DIR ) && '' !== WP_CONTENT_DIR ) {
+			return self::untrailingslashit_path( WP_CONTENT_DIR );
+		}
+
+		// Standalone CLI: cli/ -> boldgrid-backup/ -> plugins/ -> wp-content/
+		$plugin_root = dirname( __DIR__ );
+		if ( 'plugins' === basename( dirname( $plugin_root ) ) ) {
+			return dirname( dirname( $plugin_root ) );
+		}
+
+		return null;
+	}
+
+	/**
+	 * Read the backup/storage directory from a locator file.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string $locator Path to locator file.
+	 * @return string|null Absolute directory path, or null if unavailable.
+	 */
+	private static function read_locator_file( $locator ) {
+		if ( ! $locator || ! file_exists( $locator ) || ! is_readable( $locator ) ) {
+			return null;
+		}
+
+		$dir = include $locator;
+
+		if ( ! is_string( $dir ) || '' === $dir ) {
+			return null;
+		}
+
+		$dir = self::untrailingslashit_path( $dir );
+
+		return is_dir( $dir ) ? $dir : null;
+	}
+
+	/**
+	 * Read the backup/storage directory from the restore locator.
+	 *
+	 * When plugin-tree and wp-content locators agree (or only one exists), use that path.
+	 * On disagreement, prefer the directory that has a CLI secret and/or newer restore-info
+	 * so a stale locator left after a partial write cannot win.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @return string|null Absolute directory path, or null if unavailable.
+	 */
+	public static function get_dir_from_locator() {
+		$plugin_dir = self::read_locator_file( self::get_restore_locator_filepath() );
+		$wp_dir     = self::read_locator_file( self::get_wp_content_locator_filepath() );
+
+		if ( $plugin_dir && $wp_dir ) {
+			$plugin_dir = self::untrailingslashit_path( $plugin_dir );
+			$wp_dir     = self::untrailingslashit_path( $wp_dir );
+			if ( $plugin_dir === $wp_dir ) {
+				return $plugin_dir;
+			}
+			return self::prefer_storage_dir( $plugin_dir, $wp_dir );
+		}
+
+		return $plugin_dir ? $plugin_dir : $wp_dir;
+	}
+
+	/**
+	 * Prefer a storage directory that has a CLI secret and/or newer restore-info.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string $dir_a First candidate (usually plugin-tree locator).
+	 * @param string $dir_b Second candidate (usually wp-content locator).
+	 * @return string
+	 */
+	public static function prefer_storage_dir( $dir_a, $dir_b ) {
+		$dir_a = self::untrailingslashit_path( (string) $dir_a );
+		$dir_b = self::untrailingslashit_path( (string) $dir_b );
+
+		$a_secret = self::read_secret_from_storage( $dir_a );
+		$b_secret = self::read_secret_from_storage( $dir_b );
+		if ( $a_secret && ! $b_secret ) {
+			return $dir_a;
+		}
+		if ( $b_secret && ! $a_secret ) {
+			return $dir_b;
+		}
+
+		$a_ts = self::newest_restore_info_timestamp( $dir_a );
+		$b_ts = self::newest_restore_info_timestamp( $dir_b );
+		if ( $a_ts !== $b_ts ) {
+			return ( $a_ts > $b_ts ) ? $dir_a : $dir_b;
+		}
+
+		// Tie / neither has evidence: prefer wp-content candidate (durable across updates).
+		return $dir_b;
+	}
+
+	/**
+	 * Newest restore-info JSON timestamp in a storage directory, or 0.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string $storage_dir Absolute storage directory.
+	 * @return int
+	 */
+	public static function newest_restore_info_timestamp( $storage_dir ) {
+		$storage_dir = self::untrailingslashit_path( (string) $storage_dir );
+		if ( ! $storage_dir || ! is_dir( $storage_dir ) ) {
+			return 0;
+		}
+
+		$newest = 0;
+		$files  = @scandir( $storage_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		if ( empty( $files ) ) {
+			return 0;
+		}
+
+		foreach ( preg_grep( '/^restore-info-.*\.json$/', $files ) as $file ) {
+			$contents = @file_get_contents( $storage_dir . '/' . $file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			if ( false === $contents ) {
+				continue;
+			}
+			$data = json_decode( $contents, true );
+			$ts   = isset( $data['timestamp'] ) ? (int) $data['timestamp'] : 0;
+			if ( $ts > $newest ) {
+				$newest = $ts;
+			}
+		}
+
+		return $newest;
+	}
+
+	/**
+	 * Trim trailing directory separators (WP-independent).
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string $path Path.
+	 * @return string
+	 */
+	public static function untrailingslashit_path( $path ) {
+		return rtrim( (string) $path, '/\\' );
+	}
+
+	/**
+	 * Add a trailing directory separator (WP-independent).
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string $path Path.
+	 * @return string
+	 */
+	public static function trailingslashit_path( $path ) {
+		return self::untrailingslashit_path( $path ) . '/';
+	}
+
+	/**
+	 * Get a directory suitable for storing restore-info and the CLI secret.
+	 *
+	 * Prefer the backup directory via the restore locator. WordPress callers that
+	 * already know the backup directory should pass it to ensure_secure_storage()
+	 * / write_restore_locator() instead of relying on this method to bootstrap Core.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @return string|null
+	 */
+	public static function get_secure_storage_dir() {
+		return self::get_dir_from_locator();
+	}
+
+	/**
+	 * Write the restore locator file used by CLI (and env-info) to find storage.
+	 *
+	 * The locator refuses direct HTTP execution; it only returns a path when included.
+	 * Writes to both the plugin tree (fast lookup) and wp-content (survives updates).
+	 * Returns true if at least one locator was written successfully; the wp-content
+	 * locator is more durable across plugin updates, so success there alone is sufficient.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string $storage_dir Absolute backup/storage directory.
+	 * @return bool
+	 */
+	public static function write_restore_locator( $storage_dir ) {
+		$storage_dir = self::untrailingslashit_path( (string) $storage_dir );
+		if ( '' === $storage_dir || ! is_dir( $storage_dir ) ) {
+			return false;
+		}
+
+		/*
+		 * Refuse direct HTTP/CLI execution of the locator. Prefer SCRIPT_FILENAME vs
+		 * __FILE__ so auto_prepend_file (and similar pre-includes) cannot bypass the
+		 * older get_included_files() <= 1 check; keep that check as a fallback.
+		 */
+		$contents = '<?php' . "\n" .
+			'// phpcs:disable' . "\n" .
+			'$__bg_script = isset( $_SERVER[\'SCRIPT_FILENAME\'] ) ? (string) $_SERVER[\'SCRIPT_FILENAME\'] : \'\';' . "\n" .
+			'$__bg_direct = ( \'\' !== $__bg_script && @realpath( $__bg_script ) === @realpath( __FILE__ ) );' . "\n" .
+			'if ( $__bg_direct || count( get_included_files() ) <= 1 ) {' . "\n" .
+			"\t" . 'header( \'HTTP/1.1 403 Forbidden\' );' . "\n" .
+			"\t" . 'exit;' . "\n" .
+			'}' . "\n" .
+			'return ' . var_export( $storage_dir, true ) . ";\n"; // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_export
+
+		// Write to plugin tree (primary, fast lookup). Best-effort; may be read-only after plugin update.
+		$plugin_locator = self::get_restore_locator_filepath();
+		$plugin_written = ( false !== @file_put_contents( $plugin_locator, $contents ) ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged,WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+
+		// Write to wp-content (survives plugin updates for CLI emergency restore).
+		$wp_content_written = false;
+		$wp_content_locator = self::get_wp_content_locator_filepath();
+		if ( $wp_content_locator ) {
+			$wp_content_written = ( false !== @file_put_contents( $wp_content_locator, $contents ) ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged,WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+		}
+
+		/*
+		 * If only the wp-content locator was updated, remove a stale plugin-tree
+		 * locator so get_dir_from_locator() does not read an old path.
+		 *
+		 * If the plugin-tree write succeeded but wp-content write failed, only remove
+		 * the durable locator when it still points at a different directory. Keeping a
+		 * same-path copy is fine (write failed but content is already correct); keeping
+		 * a disagreeing copy is worse — after a plugin update the stale path would be
+		 * the only remaining locator.
+		 */
+		if ( ! $plugin_written && $wp_content_written && file_exists( $plugin_locator ) ) {
+			@unlink( $plugin_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
+		}
+		if ( $plugin_written && ! $wp_content_written && $wp_content_locator && file_exists( $wp_content_locator ) ) {
+			$existing_wp = self::read_locator_file( $wp_content_locator );
+			if ( $existing_wp && self::untrailingslashit_path( $existing_wp ) !== $storage_dir ) {
+				@unlink( $wp_content_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
+			}
+		}
+
+		$written = $plugin_written || $wp_content_written;
+
+		if ( $written ) {
+			// Reset cached path so the next get_results_filepath() uses the locator.
+			self::$results_file_path = null;
+		}
+
+		return $written;
+	}
+
+	/**
+	 * Remove restore locator files from both plugin tree and wp-content.
+	 *
+	 * Used to undo locator writes when secret generation or persistence fails,
+	 * preventing locators from pointing at a directory without a valid secret.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @return void
+	 */
+	public static function remove_restore_locators() {
+		$plugin_locator     = self::get_restore_locator_filepath();
+		$wp_content_locator = self::get_wp_content_locator_filepath();
+
+		if ( file_exists( $plugin_locator ) ) {
+			@unlink( $plugin_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
+		}
+		if ( $wp_content_locator && file_exists( $wp_content_locator ) ) {
+			@unlink( $wp_content_locator ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
+		}
+	}
+
+	/**
+	 * Restore locators to a previous storage directory, or remove them.
+	 *
+	 * Prefer restoring a known-good previous path so a failed migrate/setup on a
+	 * new backup directory cannot wipe the only pointer CLI emergency restore has.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string|null $previous_dir Absolute previous storage directory, if any.
+	 * @return void
+	 */
+	public static function restore_previous_locators( $previous_dir ) {
+		$previous_dir = self::untrailingslashit_path( (string) $previous_dir );
+		if ( $previous_dir && is_dir( $previous_dir ) ) {
+			self::write_restore_locator( $previous_dir );
+			return;
+		}
+
+		self::remove_restore_locators();
+	}
+
+	/**
+	 * Persist the per-install secret into the secure storage directory.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string $secret      Secret string.
+	 * @param string $storage_dir Absolute storage directory.
+	 * @return bool
+	 */
+	public static function persist_secret( $secret, $storage_dir ) {
+		$storage_dir = self::untrailingslashit_path( (string) $storage_dir );
+		if ( '' === $storage_dir || ! is_dir( $storage_dir ) || ! self::is_valid_secret_format( $secret ) ) {
+			return false;
+		}
+
+		$filepath = $storage_dir . '/' . self::SECRET_FILENAME;
+		$written  = ( false !== file_put_contents( $filepath, $secret ) );
+
+		if ( $written ) {
+			@chmod( $filepath, 0600 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			self::$secret            = $secret;
+			self::$results_file_path = null;
+		}
+
+		return $written;
+	}
+
+	/**
+	 * Whether a secret string matches the expected format.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string $secret Secret.
+	 * @return bool
+	 */
+	public static function is_valid_secret_format( $secret ) {
+		return is_string( $secret ) && (bool) preg_match( '/^[0-9a-f]{32}$/', $secret );
+	}
+
+	/**
+	 * Generate a per-install 32-hex secret via a CSPRNG.
+	 *
+	 * Fail closed (null) when no cryptographically strong source is available —
+	 * never fall back to a deterministic value such as md5(false).
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @return string|null
+	 */
+	public static function generate_secret() {
+		if ( ! function_exists( 'random_bytes' ) ) {
+			$compat = dirname( __DIR__ ) . '/vendor/paragonie/random_compat/lib/random.php';
+			if ( is_readable( $compat ) ) {
+				require_once $compat; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingVariable
+			}
+		}
+
+		if ( function_exists( 'random_bytes' ) ) {
+			try {
+				return bin2hex( random_bytes( 16 ) );
+			} catch ( \Exception $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+				// Fall through to openssl.
+			}
+		}
+
+		if ( function_exists( 'openssl_random_pseudo_bytes' ) ) {
+			$strong = false;
+			$bytes  = openssl_random_pseudo_bytes( 16, $strong );
+			if ( false !== $bytes && $strong && 16 === strlen( $bytes ) ) {
+				return bin2hex( $bytes );
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Copy a legacy restore-info-*.json into secure storage when needed.
+	 *
+	 * Prefers cron/ legacy files, then any orphan restore-info already in the backup
+	 * directory (e.g. after .boldgrid-cli-secret was lost and a new secret was issued),
+	 * then restore-info from a previous backup directory after a path change.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string      $storage_dir   Absolute storage directory.
+	 * @param string      $secret        Current secret (destination filename).
+	 * @param string|null $legacy_secret Optional legacy verify secret.
+	 * @param string|null $previous_dir  Optional previous backup directory (path change).
+	 * @return bool True when secure restore-info exists after this call.
+	 */
+	public static function migrate_legacy_restore_info( $storage_dir, $secret, $legacy_secret = null, $previous_dir = null ) {
+		$storage_dir    = self::untrailingslashit_path( (string) $storage_dir );
+		$secure_results = self::trailingslashit_path( $storage_dir ) . 'restore-info-' . $secret . '.json';
+		$previous_dir   = self::untrailingslashit_path( (string) $previous_dir );
+
+		$best_candidate = null;
+		$best_timestamp = -1;
+		$best_contents  = null;
+
+		/*
+		 * Seed with any existing destination file. Continue to scan all candidates
+		 * (cron/, orphans, previous_dir) so a newer restore-info can replace a stale
+		 * destination copy.
+		 */
+		if ( file_exists( $secure_results ) && is_readable( $secure_results ) ) {
+			$contents = file_get_contents( $secure_results );
+			if ( false !== $contents ) {
+				$data           = json_decode( $contents, true );
+				$best_candidate = $secure_results;
+				$best_timestamp = isset( $data['timestamp'] ) ? (int) $data['timestamp'] : 0;
+				$best_contents  = $contents;
+			}
+		}
+
+		if ( ! self::is_valid_secret_format( $secret ) ) {
+			return null !== $best_candidate;
+		}
+
+		$cron_dir   = dirname( __DIR__ ) . '/cron';
+		$candidates = [];
+
+		if ( self::is_valid_secret_format( (string) $legacy_secret ) ) {
+			$candidates[] = $cron_dir . '/restore-info-' . $legacy_secret . '.json';
+		}
+		$candidates[] = $cron_dir . '/restore-info-' . $secret . '.json';
+
+		$cron_files = @scandir( $cron_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		if ( ! empty( $cron_files ) ) {
+			foreach ( preg_grep( '/^restore-info-.*\.json$/', $cron_files ) as $file ) {
+				$candidates[] = $cron_dir . '/' . $file;
+			}
+		}
+
+		// Include restore-info from the previous backup directory (on path change).
+		if ( $previous_dir && $previous_dir !== $storage_dir && is_dir( $previous_dir ) ) {
+			$previous_files = @scandir( $previous_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			if ( ! empty( $previous_files ) ) {
+				foreach ( preg_grep( '/^restore-info-.*\.json$/', $previous_files ) as $file ) {
+					$candidates[] = $previous_dir . '/' . $file;
+				}
+			}
+		}
+
+		// Remigrate orphans left in the backup directory under a previous secret name.
+		$storage_files = @scandir( $storage_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		if ( ! empty( $storage_files ) ) {
+			foreach ( preg_grep( '/^restore-info-.*\.json$/', $storage_files ) as $file ) {
+				$candidates[] = $storage_dir . '/' . $file;
+			}
+		}
+
+		/*
+		 * Find the newest candidate by comparing the timestamp field inside each JSON file.
+		 * This prevents migrating stale restore-info when multiple legacy files exist.
+		 */
+		foreach ( array_unique( $candidates ) as $legacy_results ) {
+			if ( ! file_exists( $legacy_results ) || ! is_readable( $legacy_results ) ) {
+				continue;
+			}
+
+			$contents = file_get_contents( $legacy_results );
+			if ( false === $contents ) {
+				continue;
+			}
+
+			$data      = json_decode( $contents, true );
+			$timestamp = isset( $data['timestamp'] ) ? (int) $data['timestamp'] : 0;
+
+			if ( null === $best_candidate || $timestamp > $best_timestamp ) {
+				$best_candidate = $legacy_results;
+				$best_timestamp = $timestamp;
+				$best_contents  = $contents;
+			}
+		}
+
+		if ( null === $best_candidate || null === $best_contents ) {
+			return false;
+		}
+
+		// Destination already holds the newest copy.
+		if ( $best_candidate === $secure_results ) {
+			return true;
+		}
+
+		if ( false === file_put_contents( $secure_results, $best_contents ) ) {
+			// Write failed; do not claim success even if an older destination exists.
+			return false;
+		}
+
+		@chmod( $secure_results, 0600 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+
+		// Drop storage-dir orphans after renaming onto the current secret.
+		// Leave files in previous_dir / cron/ for separate cleanup paths.
+		if ( dirname( $best_candidate ) === $storage_dir ) {
+			@unlink( $best_candidate ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+
+		return true;
+	}
+
+	/**
+	 * Read secret from secure storage (backup directory).
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string|null $storage_dir Optional storage directory.
+	 * @return string|null
+	 */
+	public static function read_secret_from_storage( $storage_dir = null ) {
+		$storage_dir = $storage_dir ? self::untrailingslashit_path( $storage_dir ) : self::get_secure_storage_dir();
+		if ( ! $storage_dir ) {
+			return null;
+		}
+
+		$filepath = $storage_dir . '/' . self::SECRET_FILENAME;
+		if ( ! file_exists( $filepath ) || ! is_readable( $filepath ) ) {
+			return null;
+		}
+
+		$secret = trim( (string) file_get_contents( $filepath ) );
+
+		return self::is_valid_secret_format( $secret ) ? $secret : null;
+	}
+
+	/**
+	 * Find a legacy webroot verify-*.php secret (pre-1.17.3).
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @return string|null
+	 */
+	public static function get_legacy_verify_secret() {
+		$files = @scandir( __DIR__ ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		if ( empty( $files ) ) {
+			return null;
+		}
+
+		$matches = preg_grep( '/^verify-[0-9a-f]{32}\.php$/', $files );
+		if ( empty( $matches ) ) {
+			return null;
+		}
+
+		$matches = array_values( $matches );
+		if ( ! preg_match( '/^verify-([0-9a-f]{32})\.php$/', $matches[0], $match ) ) {
+			return null;
+		}
+
+		return $match[1];
+	}
+
+	/**
+	 * Delete legacy cli/verify-*.php files from the plugin directory.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @return int Number of files deleted.
+	 */
+	public static function delete_legacy_verify_files() {
+		$files   = @scandir( __DIR__ ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		$deleted = 0;
+
+		if ( empty( $files ) ) {
+			return 0;
+		}
+
+		foreach ( preg_grep( '/^verify-[0-9a-f]{32}\.php$/', $files ) as $file ) {
+			$path = __DIR__ . '/' . $file;
+			if ( is_file( $path ) && @unlink( $path ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+				++$deleted;
+			}
+		}
+
+		return $deleted;
+	}
+
+	/**
+	 * Delete legacy cron/restore-info-*.json files from the plugin directory.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @return int Number of files deleted.
+	 */
+	public static function delete_legacy_cron_restore_info_files() {
+		$cron_dir = dirname( __DIR__ ) . '/cron';
+		$files    = @scandir( $cron_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		$deleted  = 0;
+
+		if ( empty( $files ) ) {
+			return 0;
+		}
+
+		foreach ( preg_grep( '/^restore-info-.*\.json$/', $files ) as $file ) {
+			$path = $cron_dir . '/' . $file;
+			if ( is_file( $path ) && @unlink( $path ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+				++$deleted;
+			}
+		}
+
+		return $deleted;
+	}
+
+	/**
+	 * Check if a directory is writable.
+	 *
+	 * Prefer WP_Filesystem when available so this matches Boldgrid_Backup_Admin_Backup_Dir::get().
+	 * Fall back to PHP is_writable() for standalone CLI, then to an actual write probe —
+	 * PHP and WP_Filesystem can disagree with real write ability on some hosts
+	 * (see Boldgrid_Backup_Admin_Test::is_writable).
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string $dir Directory path.
+	 * @return bool
+	 */
+	public static function is_directory_writable( $dir ) {
+		global $wp_filesystem;
+
+		if ( ! empty( $wp_filesystem ) && is_object( $wp_filesystem ) && method_exists( $wp_filesystem, 'is_writable' ) ) {
+			if ( $wp_filesystem->is_writable( $dir ) ) {
+				return true;
+			}
+		} elseif ( is_writable( $dir ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable
+			return true;
+		}
+
+		// Last resort: probe a real write when the preferred check returned false.
+		$probe   = self::trailingslashit_path( $dir ) . '.boldgrid-write-probe-' . md5( uniqid( '', true ) );
+		$written = @file_put_contents( $probe, '1' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+		if ( false !== $written ) {
+			@unlink( $probe ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Ensure per-install secret and restore-info live outside the web-served plugin tree.
+	 *
+	 * Always generates a fresh secret when only a legacy webroot verify file exists, because
+	 * release packaging has historically shipped a static verify file for all installs.
+	 * When the backup directory changes, carries secret + restore-info from the previous
+	 * locator path into the new directory before rewriting the locator.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string|null $storage_dir Optional backup directory override.
+	 * @return string|null The storage directory used, or null on failure.
+	 */
+	public static function ensure_secure_storage( $storage_dir = null ) {
+		// Capture previous directory from locator before updating it.
+		$previous_dir = self::get_dir_from_locator();
+		if ( $previous_dir ) {
+			$previous_dir = self::untrailingslashit_path( $previous_dir );
+		}
+
+		$storage_dir = $storage_dir ? self::untrailingslashit_path( (string) $storage_dir ) : self::get_secure_storage_dir();
+
+		if ( ! $storage_dir || ! is_dir( $storage_dir ) || ! self::is_directory_writable( $storage_dir ) ) {
+			return null;
+		}
+
+		if ( ! self::write_restore_locator( $storage_dir ) ) {
+			return null;
+		}
+
+		$secret             = self::read_secret_from_storage( $storage_dir );
+		$legacy_secret      = self::get_legacy_verify_secret();
+		$generated_secret   = false;
+		$copied_from_prev   = false;
+
+		// On backup-directory change, reuse the previous dir's secret when possible.
+		if ( empty( $secret ) && $previous_dir && $previous_dir !== $storage_dir ) {
+			$from_previous = self::read_secret_from_storage( $previous_dir );
+			if ( $from_previous && self::persist_secret( $from_previous, $storage_dir ) ) {
+				$secret           = $from_previous;
+				$copied_from_prev = true;
+			}
+		}
+
+		/*
+		 * If we only have a legacy webroot verify file, do not reuse it — it may be the
+		 * publicly distributed release copy. Generate a new per-install secret instead.
+		 */
+		if ( empty( $secret ) ) {
+			$secret = self::generate_secret();
+			if ( empty( $secret ) ) {
+				// Fail closed; leave legacy files in place until a CSPRNG is available.
+				// Restore prior locators so a dir change cannot orphan the old path.
+				self::restore_previous_locators( $previous_dir );
+				return null;
+			}
+			if ( ! self::persist_secret( $secret, $storage_dir ) ) {
+				// Fail closed; leave legacy files in place until the secret can be stored.
+				// Restore prior locators so a dir change cannot orphan the old path.
+				self::restore_previous_locators( $previous_dir );
+				return null;
+			}
+			$generated_secret = true;
+		}
+
+		self::$secret            = $secret;
+		self::$results_file_path = null;
+
+		// Migrate restore-info from cron/ or previous backup dir before deleting legacy copies.
+		$migrated = self::migrate_legacy_restore_info( $storage_dir, $secret, $legacy_secret, $previous_dir );
+
+		/*
+		 * If migration failed, check whether there's legacy data that could not be promoted.
+		 * For newly generated/copied secrets, rollback completely so callers retry.
+		 * For pre-existing secrets, still return failure so callers know the storage is incomplete.
+		 *
+		 * However, when there is simply nothing to migrate (fresh install with no cron or
+		 * legacy files), migration returns false but the secret should be kept so that
+		 * write_results_file() can proceed.
+		 */
+		if ( ! $migrated ) {
+			// Check if legacy restore-info actually exists but could not be migrated.
+			$has_legacy_data = false;
+			$cron_dir        = dirname( __DIR__ ) . '/cron';
+			$cron_files      = @scandir( $cron_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			if ( ! empty( $cron_files ) ) {
+				foreach ( preg_grep( '/^restore-info-.*\.json$/', $cron_files ) as $file ) {
+					if ( is_readable( $cron_dir . '/' . $file ) ) {
+						$has_legacy_data = true;
+						break;
+					}
+				}
+			}
+			if ( ! $has_legacy_data && $previous_dir && $previous_dir !== $storage_dir && is_dir( $previous_dir ) ) {
+				$prev_files = @scandir( $previous_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+				if ( ! empty( $prev_files ) ) {
+					foreach ( preg_grep( '/^restore-info-.*\.json$/', $prev_files ) as $file ) {
+						if ( is_readable( $previous_dir . '/' . $file ) ) {
+							$has_legacy_data = true;
+							break;
+						}
+					}
+				}
+			}
+			// Check for orphan restore-info files in the storage directory itself (e.g. after secret was lost).
+			if ( ! $has_legacy_data && is_dir( $storage_dir ) ) {
+				$storage_files = @scandir( $storage_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+				if ( ! empty( $storage_files ) ) {
+					foreach ( preg_grep( '/^restore-info-.*\.json$/', $storage_files ) as $file ) {
+						if ( is_readable( $storage_dir . '/' . $file ) ) {
+							$has_legacy_data = true;
+							break;
+						}
+					}
+				}
+			}
+
+			// If legacy data exists but migration failed, handle based on secret origin.
+			if ( $has_legacy_data ) {
+				if ( $generated_secret || $copied_from_prev ) {
+					// Rollback: remove the new secret and restore locators to previous directory.
+					$secret_file = $storage_dir . '/' . self::SECRET_FILENAME;
+					@unlink( $secret_file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
+				}
+				// Restore prior locators (or remove if none) so CLI can still find old metadata.
+				self::restore_previous_locators( $previous_dir );
+				self::$secret            = null;
+				self::$results_file_path = null;
+				// Return failure so callers know restore-info is not fully migrated.
+				return null;
+			}
+		}
+
+		/*
+		 * Legacy verify-*.php files are obsolete once a secret is persisted in
+		 * secure storage. Delete them even when there was no restore-info to
+		 * migrate (empty migrate returns false) so historically shipped static
+		 * secrets do not remain under the web-served plugin tree.
+		 *
+		 * Cron restore-info is different: only delete after successful migration
+		 * so a failed copy cannot drop the only emergency-restore metadata.
+		 */
+		self::delete_legacy_verify_files();
+		if ( $migrated ) {
+			self::delete_legacy_cron_restore_info_files();
+		}
+
+		return $storage_dir;
+	}
+
+	/**
 	 * Get secret.
 	 *
-	 * Used to secure scripts used outside of WordPress.
+	 * Used to secure scripts used outside of WordPress and to name restore-info files.
+	 * Stored per-install in the backup directory (via locator), not as a webroot verify file.
 	 *
 	 * @since 1.14.10
 	 *
 	 * @return string
 	 */
 	public static function get_secret() {
-		$secret = null;
-
-		// First, attempt to get our secret.
-		$files   = scandir( __DIR__ );
-		$pattern = '/^verify-[0-9a-f]{32}\.php/';
-		$matches = preg_grep( $pattern, $files );
-		if ( ! empty( $matches ) ) {
-			$matches = array_values( $matches );
-			preg_match( '/^verify-(.*).php/', $matches[0], $match );
-
-			if ( ! empty( $match[1] ) ) {
-				$secret = $match[1];
-			}
+		if ( self::is_valid_secret_format( (string) self::$secret ) ) {
+			return self::$secret;
 		}
 
-		// If we don't have a secret, make one.
+		$secret = self::read_secret_from_storage();
+		if ( $secret ) {
+			self::$secret = $secret;
+			return $secret;
+		}
+
+		/*
+		 * Legacy webroot verify-*.php: readable for one request so emergency CLI can still
+		 * locate an old restore-info file, but callers with a backup directory should run
+		 * ensure_secure_storage() to rotate away from any shipped/static secret.
+		 */
+		$secret = self::get_legacy_verify_secret();
+		if ( $secret ) {
+			self::$secret = $secret;
+			return $secret;
+		}
+
+		// Generate a new secret. Prefer secure storage; avoid writing verify files into cli/.
+		$secret = self::generate_secret();
 		if ( empty( $secret ) ) {
-			$secret   = md5( openssl_random_pseudo_bytes( 32 ) );
-			$filepath = __DIR__ . '/verify-' . $secret . '.php';
-			file_put_contents( $filepath, '<?php // phpcs:disable' );
+			// Fail closed: do not invent a weak/deterministic secret.
+			return '';
+		}
+
+		$storage_dir = self::get_secure_storage_dir();
+
+		if ( $storage_dir ) {
+			if ( ! self::persist_secret( $secret, $storage_dir ) ) {
+				// Fail closed: do not cache an unpersisted secret that would drift on retry.
+				return '';
+			}
+			self::write_restore_locator( $storage_dir );
+
+			// Remigrate any orphan restore-info files onto the new secret name so CLI restore works.
+			$legacy_secret = self::get_legacy_verify_secret();
+			$migrated      = self::migrate_legacy_restore_info( $storage_dir, $secret, $legacy_secret, null );
+
+			// Rollback if migration failed but legacy data exists.
+			if ( ! $migrated ) {
+				$has_legacy_data = false;
+				$cron_dir        = dirname( __DIR__ ) . '/cron';
+				$cron_files      = @scandir( $cron_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+				if ( ! empty( $cron_files ) ) {
+					foreach ( preg_grep( '/^restore-info-.*\.json$/', $cron_files ) as $file ) {
+						if ( is_readable( $cron_dir . '/' . $file ) ) {
+							$has_legacy_data = true;
+							break;
+						}
+					}
+				}
+				// Check for orphan restore-info files in the storage directory itself.
+				if ( ! $has_legacy_data && is_dir( $storage_dir ) ) {
+					$storage_files = @scandir( $storage_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+					if ( ! empty( $storage_files ) ) {
+						foreach ( preg_grep( '/^restore-info-.*\.json$/', $storage_files ) as $file ) {
+							if ( is_readable( $storage_dir . '/' . $file ) ) {
+								$has_legacy_data = true;
+								break;
+							}
+						}
+					}
+				}
+				if ( $has_legacy_data ) {
+					$secret_file = $storage_dir . '/' . self::SECRET_FILENAME;
+					@unlink( $secret_file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
+					// Keep locators pointing at $storage_dir (already the resolved path);
+					// wiping them would orphan restore-info that still lives there.
+					self::$secret            = null;
+					self::$results_file_path = null;
+					return '';
+				}
+			}
+
+			/*
+			 * Match ensure_secure_storage(): once a secret is persisted, strip webroot
+			 * verify files. Only delete cron restore-info after a successful migrate.
+			 */
+			self::delete_legacy_verify_files();
+			if ( $migrated ) {
+				self::delete_legacy_cron_restore_info_files();
+			}
+		} else {
+			// No storage directory: fail closed to avoid unstable secrets that drift across requests.
+			return '';
 		}
 
 		return $secret;
@@ -271,7 +1232,7 @@ class Info {
 	 * @since 1.9.0
 	 * @static
 	 *
-	 * @return array;
+	 * @return array
 	 */
 	public static function get_cli_args() {
 		if ( empty( self::$info['cli_args'] ) ) {
@@ -513,7 +1474,7 @@ class Info {
 						case class_exists( 'ZipArchive' ):
 							self::$info['method'] = 'ziparchive';
 							break;
-						case file_exists( $info['ABSPATH'] . 'wp-admin/includes/class-pclzip.php' ):
+						case file_exists( self::$info['ABSPATH'] . 'wp-admin/includes/class-pclzip.php' ):
 							self::$info['method'] = 'pclzip';
 							break;
 						case \Boldgrid_Backup_Admin_Cli::call_command( 'unzip', $success, $return_var ) || $success || 0 === $return_var:
@@ -544,7 +1505,7 @@ class Info {
 	 *
 	 * @see Boldgrid_Backup_Url_Helper::call_url()
 	 *
-	 * @return array;
+	 * @return array
 	 */
 	public static function get_env_info() {
 		if ( empty( self::$info['env'] ) ) {
@@ -574,6 +1535,70 @@ class Info {
 	}
 
 	/**
+	 * Load ZIP helpers used by admin and emergency CLI restore.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @return bool True when Boldgrid_Backup_Admin_Zip is available.
+	 */
+	public static function load_zip_helper() {
+		if ( class_exists( 'Boldgrid_Backup_Admin_Zip', false ) ) {
+			return true;
+		}
+
+		$path = dirname( __DIR__ ) . '/admin/class-boldgrid-backup-admin-zip.php';
+		if ( ! file_exists( $path ) ) {
+			return false;
+		}
+
+		require_once $path; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingVariable
+
+		return class_exists( 'Boldgrid_Backup_Admin_Zip', false );
+	}
+
+	/**
+	 * Repair a backup ZIP EOCD when needed, then open it with ZipArchive.
+	 *
+	 * Used by emergency CLI restore so large archives missing ZIP64 end records
+	 * remain extractable outside WordPress admin.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string $filepath Archive path.
+	 * @return \ZipArchive|false
+	 */
+	public static function open_backup_zip( $filepath ) {
+		if ( ! self::load_zip_helper() ) {
+			if ( ! class_exists( 'ZipArchive' ) ) {
+				return false;
+			}
+			$zip = new \ZipArchive();
+			return true === $zip->open( $filepath ) ? $zip : false;
+		}
+
+		return \Boldgrid_Backup_Admin_Zip::open_zip_archive( $filepath );
+	}
+
+	/**
+	 * Best-effort ZIP64 EOCD repair for CLI ZipArchive / PclZip / unzip paths.
+	 *
+	 * @since 1.17.3
+	 * @static
+	 *
+	 * @param string $filepath Archive path.
+	 * @return bool True when the archive is usable (already valid or repaired).
+	 */
+	public static function maybe_repair_backup_zip( $filepath ) {
+		if ( ! self::load_zip_helper() ) {
+			return false;
+		}
+
+		return \Boldgrid_Backup_Admin_Zip::maybe_repair_zip64_eocd( $filepath );
+	}
+
+	/**
 	 * Extarct a file from a backup archive ZIP file.
 	 *
 	 * @since 1.9.0
@@ -592,8 +1617,8 @@ class Info {
 
 		switch ( true ) {
 			case class_exists( 'ZipArchive' ):
-				$zip = new \ZipArchive();
-				if ( true === $zip->open( self::$info['filepath'] ) ) {
+				$zip = self::open_backup_zip( self::$info['filepath'] );
+				if ( $zip ) {
 					$success = $zip->extractTo( $extract_dir, $file );
 					$zip->close();
 				} else {

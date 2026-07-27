@@ -687,8 +687,8 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->pagenow = $pagenow;
 
-		// Instantiate Configs Array
-		$this->configs = Boldgrid_Backup_Admin::get_configs();
+		// Instantiate Configs Array (by reference so init localization applies).
+		$this->configs =& Boldgrid_Backup_Admin::get_configs_ref();
 
 		// Instantiate Boldgrid_Backup_Admin_Settings.
 		$this->settings = new Boldgrid_Backup_Admin_Settings( $this );
@@ -810,7 +810,17 @@ class Boldgrid_Backup_Admin_Core {
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
 
-		$this->set_lang();
+		/*
+		 * Defer translated strings until init (WP 6.7+).
+		 *
+		 * Calling esc_html__() during plugin bootstrap triggers
+		 * _load_textdomain_just_in_time too early.
+		 */
+		if ( did_action( 'init' ) && ! doing_action( 'init' ) ) {
+			$this->set_lang();
+		} else {
+			add_action( 'init', array( $this, 'set_lang' ) );
+		}
 
 		// Log system.
 		$this->logger   = new Boldgrid_Backup_Admin_Log( $this );
@@ -832,6 +842,26 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Instantiate the new Boldgrid_Backup_Admin_Migrate class.
 		$this->migrate = new Boldgrid_Backup_Admin_Migrate( $this );
+
+		// Migrate CLI secret / restore-info out of the web-served plugin directory when possible.
+		$this->ensure_secure_cli_storage();
+	}
+
+	/**
+	 * Ensure CLI secret and restore-info are stored outside the web-served plugin directory.
+	 *
+	 * @since 1.17.3
+	 *
+	 * @see \Boldgrid\Backup\Cli\Info::ensure_secure_storage()
+	 */
+	public function ensure_secure_cli_storage() {
+		$backup_dir = $this->backup_dir->get();
+		if ( empty( $backup_dir ) ) {
+			return;
+		}
+
+		require_once BOLDGRID_BACKUP_PATH . '/cli/class-info.php';
+		\Boldgrid\Backup\Cli\Info::ensure_secure_storage( $backup_dir );
 	}
 
 	/**
@@ -2015,6 +2045,29 @@ class Boldgrid_Backup_Admin_Core {
 		$info['db_duration'] = number_format( ( $db_time_stop - $time_start ), 2, '.', '' );
 		$info['db_filename'] = basename( $this->db_dump_filepath );
 
+		// If not a dry-run test, update the last backup option and enforce retention.
+		if ( ! $dryrun ) {
+			// Update WP option for "boldgrid_backup_last_backup".
+			update_site_option( 'boldgrid_backup_last_backup', time() );
+
+			// Enforce retention setting.
+			$this->enforce_retention();
+		}
+
+		// Actions to take if we're creating a full site backup.
+		$restore_info_error = '';
+		if ( ! $dryrun && $this->archiver_utility->is_full_backup() ) {
+			$restore_info_written = $this->archive->write_results_file( $info );
+			if ( ! $restore_info_written ) {
+				$restore_info_error = __(
+					'Backup archive created, but failed to write restore-info. Emergency CLI restore may not work until a successful write.',
+					'boldgrid-backup'
+				);
+				$info['restore_info_error'] = $restore_info_error;
+				$this->logger->add( 'Warning: ' . $restore_info_error );
+			}
+		}
+
 		/**
 		 * Actions to take after a backup has been created.
 		 *
@@ -2044,6 +2097,7 @@ class Boldgrid_Backup_Admin_Core {
 		 *     @type int    $duration     57.08
 		 *     @type int    $db_duration  0.35
 		 *     @type bool   $mail_success
+		 *     @type string $restore_info_error (optional) Error message if restore-info failed to write.
 		 * }
 		 */
 		do_action( 'boldgrid_backup_post_archive_files', $info );
@@ -2068,36 +2122,39 @@ class Boldgrid_Backup_Admin_Core {
 			$this->logger->add( 'Sending of email complete! Status: ' . $info['mail_success'] );
 		}
 
-		// If not a dry-run test, update the last backup option and enforce retention.
+		/*
+		 * Persist latest backup after restore-info and email so the option matches the returned
+		 * $info (including restore_info_error and mail_success). Writing earlier caused
+		 * Test_Boldgrid_Backup_Admin_Core::test_archive_files to fail strict equality.
+		 */
 		if ( ! $dryrun ) {
-			// Update WP option for "boldgrid_backup_last_backup".
-			update_site_option( 'boldgrid_backup_last_backup', time() );
-
 			$this->archive_log->write( $info );
-
-			// Enforce retention setting.
-			$this->enforce_retention();
-
 			update_option( 'boldgrid_backup_latest_backup', $info );
-		}
-
-		// Actions to take if we're creating a full site backup.
-		if ( ! $dryrun && $this->archiver_utility->is_full_backup() ) {
-			$this->archive->write_results_file( $info );
 		}
 
 		if ( isset( $this->activity ) ) {
 			$this->activity->add( 'any_backup_created', 1, $this->rating_prompt_config );
 		}
 
-		$this->logger->add( 'Backup complete!' );
+		if ( $restore_info_error ) {
+			$this->logger->add( 'Backup finished with restore-info errors.' );
+		} else {
+			$this->logger->add( 'Backup complete!' );
+		}
 		$this->logger->add_memory();
 
 		$this->archiving_files = false;
 
+		/*
+		 * Archive itself succeeded; surface restore-info write failures in status so
+		 * manual backups are not reported as fully healthy when emergency metadata is missing.
+		 */
 		Boldgrid_Backup_Admin_In_Progress_Data::set_args( array(
-			'status'  => esc_html__( 'Backup complete!', 'boldgrid-backup' ),
-			'success' => true,
+			'status'        => $restore_info_error
+				? $restore_info_error
+				: esc_html__( 'Backup complete!', 'boldgrid-backup' ),
+			'success'       => empty( $restore_info_error ),
+			'process_error' => $restore_info_error ? $restore_info_error : null,
 		) );
 
 		// Return the array of archive information.
@@ -2781,14 +2838,20 @@ class Boldgrid_Backup_Admin_Core {
 		 * If there were any errors encountered during the backup, save them to the In Progress data.
 		 *
 		 * A "process error" is when the archive_files() method successfully returns info, and it includes
-		 * an error.
+		 * an error — or when it returns false.
 		 */
-		if ( ! empty( $archive_info['error'] ) ) {
+		if ( false === $archive_info ) {
+			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'process_error', __( 'Backup failed.', 'boldgrid-backup' ) );
+			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'success', false );
+		} elseif ( is_array( $archive_info ) && ! empty( $archive_info['error'] ) ) {
 			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'process_error', $archive_info['error'] );
+			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'success', false );
+		} elseif ( is_array( $archive_info ) && ! empty( $archive_info['restore_info_error'] ) ) {
+			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'process_error', $archive_info['restore_info_error'] );
 			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'success', false );
 		}
 
-		if ( $this->is_archiving_update_protection ) {
+		if ( $this->is_archiving_update_protection && is_array( $archive_info ) ) {
 			update_site_option( 'boldgrid_backup_pending_rollback', $archive_info );
 		}
 
