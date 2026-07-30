@@ -89,6 +89,16 @@ class Boldgrid_Backup_Activator {
 			$archives = $core->get_archive_list();
 			if ( 'cron' === $scheduler ) {
 				$core->cron->add_all_crons( $settings );
+
+				/*
+				 * add_all_crons clears every crontab entry, including an active direct-transfer
+				 * job that is managed separately. Reschedule it so an in-progress transfer is
+				 * not left stalled after activation (the same follow-up rotation already does).
+				 */
+				if ( $core->cron->has_active_direct_transfer() ) {
+					$core->cron->schedule_direct_transfer();
+				}
+
 				if ( get_site_option( 'boldgrid_backup_pending_rollback' ) && ! empty( $archives ) ) {
 					$core->cron->add_restore_cron();
 				}

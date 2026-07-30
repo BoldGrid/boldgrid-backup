@@ -283,15 +283,16 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 		$property->setValue( $this->core->cron, $old_secret );
 
 		/*
-		 * Force add_all_crons to fail after remint by pointing backup_dir at a missing path
-		 * (update_cron bails when backup dir is empty/unavailable).
+		 * Crontab writes are blocked suite-wide by the bootstrap, so add_all_crons() cannot
+		 * succeed here. Assert that precondition so this test cannot silently stop covering
+		 * the failed-rewrite path.
 		 */
-		$original_dir                             = $this->core->backup_dir->backup_directory;
-		$this->core->backup_dir->backup_directory = '/nonexistent/path/that/does/not/exist';
+		$this->assertFalse(
+			( new \Boldgrid\Backup\Admin\Cron\Crontab() )->write_crontab( '# no-op' ),
+			'Crontab writes must be blocked for this test to cover a failed rewrite.'
+		);
 
 		$ran = $this->core->cron->maybe_rotate_cron_secrets();
-
-		$this->core->backup_dir->backup_directory = $original_dir;
 
 		$this->assertTrue( $ran );
 		$this->assertSame(
@@ -420,6 +421,114 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'secret=' . $old_secret, $decoded['restore_cmd'] );
 
 		@unlink( $path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions
+	}
+
+	/**
+	 * Takeover recovery must refresh restore-info even when the prior cron_secret is gone.
+	 *
+	 * After a failed request clears settings['cron_secret'], refresh cannot match by the old
+	 * value. An empty $old_secret must rewrite any file still holding a different secret.
+	 *
+	 * @since 1.17.4
+	 */
+	public function test_refresh_restore_info_cron_secret_rewrites_without_old_secret() {
+		$backup_dir = $this->core->backup_dir->get();
+		$this->assertNotEmpty( $backup_dir );
+
+		require_once BOLDGRID_BACKUP_PATH . '/cli/class-info.php';
+		$storage = \Boldgrid\Backup\Cli\Info::ensure_secure_storage( $backup_dir );
+		$this->assertNotEmpty( $storage );
+
+		$cli_secret = \Boldgrid\Backup\Cli\Info::get_secret();
+		$this->assertTrue( \Boldgrid\Backup\Cli\Info::is_valid_secret_format( $cli_secret ) );
+
+		$harvested  = 'harvested_secret_unknown_to_takeover';
+		$new_secret = 'takeover_recovery_cron_secret';
+		$path       = trailingslashit( $storage ) . 'restore-info-' . $cli_secret . '.json';
+
+		$payload = wp_json_encode(
+			array(
+				'cron_secret' => $harvested,
+				'filepath'    => '/tmp/example.zip',
+				'restore_cmd' => 'php -qf "boldgrid-backup-cron.php" mode=restore secret=' . $harvested . ' archive_key=0',
+			)
+		);
+		$this->assertNotFalse( file_put_contents( $path, $payload ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+
+		$updated = $this->core->cron->refresh_restore_info_cron_secret( '', $new_secret );
+		$this->assertTrue( $updated );
+
+		$decoded = json_decode( file_get_contents( $path ), true ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+		$this->assertSame( $new_secret, $decoded['cron_secret'] );
+		$this->assertStringContainsString( 'secret=' . $new_secret, $decoded['restore_cmd'] );
+		$this->assertStringNotContainsString( 'secret=' . $harvested, $decoded['restore_cmd'] );
+
+		@unlink( $path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions
+	}
+
+	/**
+	 * Abandoned-claim takeover must rewrite restore-info after settings lost the old secret.
+	 *
+	 * @since 1.17.4
+	 */
+	public function test_maybe_rotate_cron_secrets_takeover_refreshes_restore_info() {
+		$backup_dir = $this->core->backup_dir->get();
+		$this->assertNotEmpty( $backup_dir );
+
+		require_once BOLDGRID_BACKUP_PATH . '/cli/class-info.php';
+		$storage = \Boldgrid\Backup\Cli\Info::ensure_secure_storage( $backup_dir );
+		$this->assertNotEmpty( $storage );
+
+		$cli_secret = \Boldgrid\Backup\Cli\Info::get_secret();
+		$this->assertTrue( \Boldgrid\Backup\Cli\Info::is_valid_secret_format( $cli_secret ) );
+
+		$harvested = 'harvested_secret_left_in_restore_info';
+		$path      = trailingslashit( $storage ) . 'restore-info-' . $cli_secret . '.json';
+		$payload   = wp_json_encode(
+			array(
+				'cron_secret' => $harvested,
+				'filepath'    => '/tmp/example.zip',
+				'restore_cmd' => 'php -qf "boldgrid-backup-cron.php" mode=restore secret=' . $harvested . ' archive_key=0',
+			)
+		);
+		$this->assertNotFalse( file_put_contents( $path, $payload ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+
+		/*
+		 * Simulate a request that died after clearing secrets but before the gate / restore-info
+		 * rewrite: settings no longer hold the harvested value, yet restore-info still does.
+		 */
+		$settings = get_site_option( 'boldgrid_backup_settings', array() );
+		if ( ! is_array( $settings ) ) {
+			$settings = array();
+		}
+		unset( $settings['cron_secret'] );
+		$settings['scheduler'] = 'cron';
+		update_site_option( 'boldgrid_backup_settings', $settings );
+		delete_site_option( 'boldgrid_backup_cli_cancel_secret' );
+		delete_site_option( Boldgrid_Backup_Admin_Cron::SECRETS_ROTATED_OPTION );
+
+		$reflection = new ReflectionClass( $this->core->cron );
+		$property   = $reflection->getProperty( 'cron_secret' );
+		$property->setAccessible( true );
+		$property->setValue( $this->core->cron, null );
+
+		update_site_option(
+			Boldgrid_Backup_Admin_Cron::SECRETS_ROTATING_OPTION,
+			time() - ( Boldgrid_Backup_Admin_Cron::SECRETS_ROTATING_TIMEOUT + 1 )
+		);
+
+		$this->assertTrue( $this->core->cron->maybe_rotate_cron_secrets() );
+
+		$new_secret = $this->core->cron->get_cron_secret();
+		$decoded    = json_decode( file_get_contents( $path ), true ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+
+		@unlink( $path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions
+
+		$this->assertNotEmpty( $new_secret );
+		$this->assertIsArray( $decoded );
+		$this->assertSame( $new_secret, $decoded['cron_secret'] );
+		$this->assertStringContainsString( 'secret=' . $new_secret, $decoded['restore_cmd'] );
+		$this->assertStringNotContainsString( 'secret=' . $harvested, $decoded['restore_cmd'] );
 	}
 
 	/**

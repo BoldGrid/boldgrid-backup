@@ -1143,7 +1143,9 @@ class Boldgrid_Backup_Admin_Cron {
 	 * updates are best-effort; a failed rewrite can be repaired by re-saving settings or
 	 * reactivating the plugin (activation always calls add_all_crons). Concurrent
 	 * requests are serialized by a claim, since two remints would leave crontab and
-	 * settings holding different secrets.
+	 * settings holding different secrets. Abandoned-claim takeover remints even when
+	 * settings already lost the old secret, and refreshes restore-info without requiring
+	 * that prior value.
 	 *
 	 * @since 1.17.4
 	 *
@@ -1232,7 +1234,12 @@ class Boldgrid_Backup_Admin_Cron {
 			}
 		}
 
-		if ( '' !== $old_secret && '' !== $new_secret ) {
+		/*
+		 * Normal rotation knows the harvested secret from settings. On takeover the prior
+		 * request may already have deleted it, so refresh with an empty $old_secret to rewrite
+		 * any restore-info still holding a different value.
+		 */
+		if ( '' !== $new_secret && ( '' !== $old_secret || $is_takeover ) ) {
 			$this->refresh_restore_info_cron_secret( $old_secret, $new_secret );
 		}
 
@@ -1281,9 +1288,13 @@ class Boldgrid_Backup_Admin_Cron {
 	 * legacy plugin cron/ directory is rewritten only when it is still the live metadata
 	 * (no secure storage), and otherwise has its retired copies deleted.
 	 *
+	 * When $old_secret is empty (abandoned-claim takeover), any file whose cron_secret
+	 * is not already $new_secret is rewritten, since settings no longer hold the prior
+	 * value to match against.
+	 *
 	 * @since 1.17.4
 	 *
-	 * @param string $old_secret Prior cron secret.
+	 * @param string $old_secret Prior cron secret, or empty to rewrite any non-matching file.
 	 * @param string $new_secret Fresh cron secret.
 	 * @return bool True when a restore-info file was updated.
 	 */
@@ -1291,7 +1302,7 @@ class Boldgrid_Backup_Admin_Cron {
 		$old_secret = (string) $old_secret;
 		$new_secret = (string) $new_secret;
 
-		if ( '' === $old_secret || '' === $new_secret || hash_equals( $old_secret, $new_secret ) ) {
+		if ( '' === $new_secret || ( '' !== $old_secret && hash_equals( $old_secret, $new_secret ) ) ) {
 			return false;
 		}
 
@@ -1321,7 +1332,7 @@ class Boldgrid_Backup_Admin_Cron {
 		$legacy_paths = $this->get_restore_info_paths( BOLDGRID_BACKUP_PATH . '/cron' );
 
 		if ( \Boldgrid\Backup\Cli\Info::get_secure_storage_dir() ) {
-			$this->delete_stale_restore_info( $legacy_paths, $old_secret );
+			$this->delete_stale_restore_info( $legacy_paths, $old_secret, $new_secret );
 		} else {
 			$paths = array_merge( $paths, $legacy_paths );
 		}
@@ -1335,7 +1346,13 @@ class Boldgrid_Backup_Admin_Cron {
 				continue;
 			}
 
-			if ( ! hash_equals( (string) $data['cron_secret'], $old_secret ) ) {
+			$file_secret = (string) $data['cron_secret'];
+
+			if ( '' !== $old_secret ) {
+				if ( ! hash_equals( $file_secret, $old_secret ) ) {
+					continue;
+				}
+			} elseif ( hash_equals( $file_secret, $new_secret ) ) {
 				continue;
 			}
 
@@ -1343,7 +1360,7 @@ class Boldgrid_Backup_Admin_Cron {
 
 			if ( ! empty( $data['restore_cmd'] ) && is_string( $data['restore_cmd'] ) ) {
 				$data['restore_cmd'] = str_replace(
-					'secret=' . $old_secret,
+					'secret=' . $file_secret,
 					'secret=' . $new_secret,
 					$data['restore_cmd']
 				);
@@ -1402,16 +1419,21 @@ class Boldgrid_Backup_Admin_Cron {
 	 * Delete restore-info copies that still hold a rotated-out cron secret.
 	 *
 	 * Used for copies the CLI can no longer reach, so the retired secret does not linger
-	 * on disk. Files holding any other secret are left alone.
+	 * on disk. Files holding any other secret are left alone, unless $old_secret is empty
+	 * (takeover recovery) in which case any file whose cron_secret is not $new_secret is
+	 * removed.
 	 *
 	 * @since 1.17.4
 	 *
 	 * @param  array  $paths      Restore-info paths to consider.
-	 * @param  string $old_secret Rotated-out cron secret.
+	 * @param  string $old_secret Rotated-out cron secret, or empty for takeover recovery.
+	 * @param  string $new_secret Fresh cron secret (used when $old_secret is empty).
 	 * @return int Number of files deleted.
 	 */
-	private function delete_stale_restore_info( array $paths, $old_secret ) {
-		$deleted = 0;
+	private function delete_stale_restore_info( array $paths, $old_secret, $new_secret = '' ) {
+		$deleted    = 0;
+		$old_secret = (string) $old_secret;
+		$new_secret = (string) $new_secret;
 
 		foreach ( $paths as $path ) {
 			$data = $this->read_restore_info( $path );
@@ -1419,7 +1441,13 @@ class Boldgrid_Backup_Admin_Cron {
 				continue;
 			}
 
-			if ( ! hash_equals( (string) $data['cron_secret'], (string) $old_secret ) ) {
+			$file_secret = (string) $data['cron_secret'];
+
+			if ( '' !== $old_secret ) {
+				if ( ! hash_equals( $file_secret, $old_secret ) ) {
+					continue;
+				}
+			} elseif ( '' === $new_secret || hash_equals( $file_secret, $new_secret ) ) {
 				continue;
 			}
 
