@@ -73,14 +73,24 @@ class Boldgrid_Backup_Activator {
 				\Boldgrid\Backup\Cli\Info::ensure_secure_storage( $backup_dir );
 			}
 
+			// Invalidate any previously exposable cron / CLI cancel secrets once.
+			$core->cron->maybe_rotate_cron_secrets();
+
 			/*
 			 * Add all previous crons.
 			 *
 			 * The add_all_crons methods called include proper checks to ensure
 			 * scheduler is available and $settings include a schedule.
+			 *
+			 * Re-read settings after secret rotation so crontab lines embed the new secret.
+			 * add_all_crons clears schedules, so re-add a pending rollback restore cron after.
 			 */
+			$settings = $core->settings->get_settings();
 			if ( 'cron' === $scheduler ) {
 				$core->cron->add_all_crons( $settings );
+				if ( get_site_option( 'boldgrid_backup_pending_rollback' ) ) {
+					$core->cron->add_restore_cron();
+				}
 			} elseif ( 'wp-cron' === $scheduler ) {
 				$core->wp_cron->add_all_crons( $settings );
 			}

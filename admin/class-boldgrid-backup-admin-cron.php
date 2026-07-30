@@ -1031,6 +1031,22 @@ class Boldgrid_Backup_Admin_Cron {
 	}
 
 	/**
+	 * Site option key for the one-time secrets rotation gate.
+	 *
+	 * @since 1.17.4
+	 * @var string
+	 */
+	const SECRETS_ROTATED_OPTION = 'boldgrid_backup_secrets_rotated';
+
+	/**
+	 * Plugin version that introduced one-time cron/CLI secret rotation.
+	 *
+	 * @since 1.17.4
+	 * @var string
+	 */
+	const SECRETS_ROTATED_VERSION = '1.17.4';
+
+	/**
 	 * Get the cron secret used to validate unauthenticated crontab jobs.
 	 *
 	 * @since 1.6.1-rc.1
@@ -1053,6 +1069,166 @@ class Boldgrid_Backup_Admin_Cron {
 		}
 
 		return $this->cron_secret;
+	}
+
+	/**
+	 * One-time rotation of previously exposable cron / CLI cancel secrets.
+	 *
+	 * Sites that ran 1.14.10–1.17.2 may have had cron_secret published at a predictable
+	 * URL. 1.17.3 stopped the leak but left any already-stored secret valid. On upgrade
+	 * to 1.17.4 this method clears those secrets once, mints a fresh cron_secret, and
+	 * rewrites crontab / restore-info that still embedded the old value.
+	 *
+	 * @since 1.17.4
+	 *
+	 * @see Boldgrid_Backup_Admin_Cron::get_cron_secret()
+	 * @see Boldgrid_Backup_Admin_Cron::add_all_crons()
+	 *
+	 * @return bool True when rotation ran (or was a no-op that set the gate); false if already done.
+	 */
+	public function maybe_rotate_cron_secrets() {
+		if ( self::SECRETS_ROTATED_VERSION === get_site_option( self::SECRETS_ROTATED_OPTION ) ) {
+			return false;
+		}
+
+		$settings   = $this->core->settings->get_settings( true );
+		$old_secret = ! empty( $settings['cron_secret'] ) ? (string) $settings['cron_secret'] : '';
+
+		if ( '' !== $old_secret ) {
+			unset( $settings['cron_secret'] );
+			$this->cron_secret = null;
+			update_site_option( 'boldgrid_backup_settings', $settings );
+		}
+
+		delete_site_option( 'boldgrid_backup_cli_cancel_secret' );
+
+		if ( '' !== $old_secret ) {
+			$new_secret = $this->get_cron_secret();
+
+			$settings  = $this->core->settings->get_settings( true );
+			$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
+
+			if ( 'cron' === $scheduler && $this->core->scheduler->is_available( 'cron' ) ) {
+				$this->add_all_crons( $settings );
+			}
+
+			/*
+			 * Pending auto-rollback restore crons embed cli_cancel_secret. Re-issue so
+			 * cancel still works for an in-flight rollback after the option was cleared.
+			 */
+			if ( get_site_option( 'boldgrid_backup_pending_rollback' ) ) {
+				$this->add_restore_cron();
+			}
+
+			$this->refresh_restore_info_cron_secret( $old_secret, $new_secret );
+		}
+
+		update_site_option( self::SECRETS_ROTATED_OPTION, self::SECRETS_ROTATED_VERSION );
+
+		return true;
+	}
+
+	/**
+	 * Rewrite cron_secret inside the secure restore-info JSON after rotation.
+	 *
+	 * Emergency CLI restore builds its admin-ajax call from this file. Leaving the
+	 * old secret would either fail is_valid_call() or (worse) leave a harvested value
+	 * as the only copy trusted by the CLI path.
+	 *
+	 * @since 1.17.4
+	 *
+	 * @param string $old_secret Prior cron secret.
+	 * @param string $new_secret Fresh cron secret.
+	 * @return bool True when a restore-info file was updated.
+	 */
+	public function refresh_restore_info_cron_secret( $old_secret, $new_secret ) {
+		$old_secret = (string) $old_secret;
+		$new_secret = (string) $new_secret;
+
+		if ( '' === $old_secret || '' === $new_secret || hash_equals( $old_secret, $new_secret ) ) {
+			return false;
+		}
+
+		$backup_dir = $this->core->backup_dir->get();
+		if ( empty( $backup_dir ) ) {
+			return false;
+		}
+
+		require_once BOLDGRID_BACKUP_PATH . '/cli/class-info.php';
+
+		$backup_dir = \Boldgrid\Backup\Cli\Info::untrailingslashit_path( (string) $backup_dir );
+		$paths      = array();
+
+		$cli_secret = \Boldgrid\Backup\Cli\Info::get_secret();
+		if ( \Boldgrid\Backup\Cli\Info::is_valid_secret_format( $cli_secret ) ) {
+			$paths[] = \Boldgrid\Backup\Cli\Info::trailingslashit_path( $backup_dir ) .
+				'restore-info-' . $cli_secret . '.json';
+		}
+
+		// Also scan for any restore-info-*.json in the backup directory (orphan names).
+		$listing = @scandir( $backup_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		if ( ! empty( $listing ) ) {
+			foreach ( preg_grep( '/^restore-info-.*\.json$/', $listing ) as $file ) {
+				$paths[] = $backup_dir . '/' . $file;
+			}
+		}
+
+		$paths   = array_unique( $paths );
+		$updated = false;
+
+		foreach ( $paths as $path ) {
+			if ( ! is_readable( $path ) ) {
+				continue;
+			}
+
+			$contents = file_get_contents( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			if ( false === $contents ) {
+				continue;
+			}
+
+			$data = json_decode( $contents, true );
+			if ( ! is_array( $data ) || empty( $data['cron_secret'] ) ) {
+				continue;
+			}
+
+			if ( ! hash_equals( (string) $data['cron_secret'], $old_secret ) ) {
+				continue;
+			}
+
+			$data['cron_secret'] = $new_secret;
+
+			if ( ! empty( $data['restore_cmd'] ) && is_string( $data['restore_cmd'] ) ) {
+				$data['restore_cmd'] = str_replace(
+					'secret=' . $old_secret,
+					'secret=' . $new_secret,
+					$data['restore_cmd']
+				);
+			}
+
+			$payload = wp_json_encode( $data );
+			if ( false === $payload ) {
+				continue;
+			}
+
+			$written = false;
+			if ( ! empty( $this->core->wp_filesystem ) ) {
+				$written = (bool) $this->core->wp_filesystem->put_contents( $path, $payload, 0600 );
+			}
+
+			if ( ! $written ) {
+				$bytes = @file_put_contents( $path, $payload ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+				if ( false !== $bytes ) {
+					@chmod( $path, 0600 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+					$written = true;
+				}
+			}
+
+			if ( $written ) {
+				$updated = true;
+			}
+		}
+
+		return $updated;
 	}
 
 	/**

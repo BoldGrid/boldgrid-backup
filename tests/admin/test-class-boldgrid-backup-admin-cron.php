@@ -212,6 +212,122 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test one-time rotation clears stored secrets and mints a new cron_secret.
+	 *
+	 * @since 1.17.4
+	 */
+	public function test_maybe_rotate_cron_secrets_rotates_once() {
+		$old_secret = 'leaked_cron_secret_from_pre_1_17_3';
+		$settings   = get_site_option( 'boldgrid_backup_settings', array() );
+		if ( ! is_array( $settings ) ) {
+			$settings = array();
+		}
+		$settings['cron_secret'] = $old_secret;
+		update_site_option( 'boldgrid_backup_settings', $settings );
+		update_site_option( 'boldgrid_backup_cli_cancel_secret', 'old_cli_cancel_secret' );
+		delete_site_option( Boldgrid_Backup_Admin_Cron::SECRETS_ROTATED_OPTION );
+
+		// Ensure in-memory cache does not short-circuit rotation.
+		$reflection = new ReflectionClass( $this->core->cron );
+		$property   = $reflection->getProperty( 'cron_secret' );
+		$property->setAccessible( true );
+		$property->setValue( $this->core->cron, $old_secret );
+
+		$ran = $this->core->cron->maybe_rotate_cron_secrets();
+		$this->assertTrue( $ran );
+
+		$new_secret = $this->core->cron->get_cron_secret();
+		$this->assertNotEmpty( $new_secret );
+		$this->assertNotEquals( $old_secret, $new_secret );
+		$this->assertFalse(
+			hash_equals( $old_secret, $new_secret ),
+			'Harvested pre-upgrade secret must no longer match the stored cron_secret.'
+		);
+		$this->assertFalse( get_site_option( 'boldgrid_backup_cli_cancel_secret', false ) );
+		$this->assertSame(
+			Boldgrid_Backup_Admin_Cron::SECRETS_ROTATED_VERSION,
+			get_site_option( Boldgrid_Backup_Admin_Cron::SECRETS_ROTATED_OPTION )
+		);
+
+		// Second call is a no-op and must not rotate again.
+		$second_ran = $this->core->cron->maybe_rotate_cron_secrets();
+		$this->assertFalse( $second_ran );
+		$this->assertSame( $new_secret, $this->core->cron->get_cron_secret() );
+	}
+
+	/**
+	 * Test greenfield installs with no prior secret only set the rotation gate.
+	 *
+	 * @since 1.17.4
+	 */
+	public function test_maybe_rotate_cron_secrets_greenfield_sets_flag_only() {
+		$settings = get_site_option( 'boldgrid_backup_settings', array() );
+		if ( ! is_array( $settings ) ) {
+			$settings = array();
+		}
+		unset( $settings['cron_secret'] );
+		update_site_option( 'boldgrid_backup_settings', $settings );
+		delete_site_option( 'boldgrid_backup_cli_cancel_secret' );
+		delete_site_option( Boldgrid_Backup_Admin_Cron::SECRETS_ROTATED_OPTION );
+
+		$reflection = new ReflectionClass( $this->core->cron );
+		$property   = $reflection->getProperty( 'cron_secret' );
+		$property->setAccessible( true );
+		$property->setValue( $this->core->cron, null );
+
+		$ran = $this->core->cron->maybe_rotate_cron_secrets();
+		$this->assertTrue( $ran );
+		$this->assertSame(
+			Boldgrid_Backup_Admin_Cron::SECRETS_ROTATED_VERSION,
+			get_site_option( Boldgrid_Backup_Admin_Cron::SECRETS_ROTATED_OPTION )
+		);
+
+		// No secret should have been minted solely by the greenfield gate.
+		$settings_after = get_site_option( 'boldgrid_backup_settings', array() );
+		$this->assertTrue( empty( $settings_after['cron_secret'] ) );
+	}
+
+	/**
+	 * Test restore-info JSON is rewritten to the new cron_secret after rotation.
+	 *
+	 * @since 1.17.4
+	 */
+	public function test_refresh_restore_info_cron_secret() {
+		$backup_dir = $this->core->backup_dir->get();
+		$this->assertNotEmpty( $backup_dir );
+
+		require_once BOLDGRID_BACKUP_PATH . '/cli/class-info.php';
+		$storage = \Boldgrid\Backup\Cli\Info::ensure_secure_storage( $backup_dir );
+		$this->assertNotEmpty( $storage );
+
+		$cli_secret = \Boldgrid\Backup\Cli\Info::get_secret();
+		$this->assertTrue( \Boldgrid\Backup\Cli\Info::is_valid_secret_format( $cli_secret ) );
+
+		$old_secret = 'old_restore_info_cron_secret';
+		$new_secret = 'new_restore_info_cron_secret';
+		$path       = trailingslashit( $storage ) . 'restore-info-' . $cli_secret . '.json';
+
+		$payload = wp_json_encode(
+			array(
+				'cron_secret' => $old_secret,
+				'filepath'    => '/tmp/example.zip',
+				'restore_cmd' => 'php -qf "boldgrid-backup-cron.php" mode=restore secret=' . $old_secret . ' archive_key=0',
+			)
+		);
+		$this->assertNotFalse( file_put_contents( $path, $payload ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+
+		$updated = $this->core->cron->refresh_restore_info_cron_secret( $old_secret, $new_secret );
+		$this->assertTrue( $updated );
+
+		$decoded = json_decode( file_get_contents( $path ), true ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+		$this->assertSame( $new_secret, $decoded['cron_secret'] );
+		$this->assertStringContainsString( 'secret=' . $new_secret, $decoded['restore_cmd'] );
+		$this->assertStringNotContainsString( 'secret=' . $old_secret, $decoded['restore_cmd'] );
+
+		@unlink( $path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions
+	}
+
+	/**
 	 * Test filtering crontab contents with mode "" (backup).
 	 *
 	 * @since 1.11.1
