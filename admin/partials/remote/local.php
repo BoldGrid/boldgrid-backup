@@ -13,8 +13,10 @@
  * @version    $Id$
  * @author     BoldGrid <support@boldgrid.com>
  *
- * phpcs:disable WordPress.XSS.EscapeOutput
+ * phpcs:disable WordPress.Security.EscapeOutput
  */
+
+defined( 'WPINC' ) || die;
 
 ?>
 

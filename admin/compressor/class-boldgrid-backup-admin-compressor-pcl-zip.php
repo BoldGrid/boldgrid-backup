@@ -609,7 +609,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 			$php_zip_set = $this->core->compressors->set_php_zip();
 
 			if ( $php_zip_set ) {
-				$messages[] = __( 'We have changed your compressor from PclZip to ZipArchive. Please try to create a backup again.' );
+				$messages[] = __( 'We have changed your compressor from PclZip to ZipArchive. Please try to create a backup again.', 'boldgrid-backup' );
 			}
 		}
 
@@ -644,7 +644,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 			'%1$s%5$s%2$s-%3$s-%4$s',
 			$backup_dir,
 			$test_zip_file,
-			mt_rand(),
+			wp_rand(),
 			$safe_to_delete,
 			DIRECTORY_SEPARATOR
 		);

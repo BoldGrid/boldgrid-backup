@@ -12,7 +12,6 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP
 
 /**
  * Class: Boldgrid_Backup_Admin
@@ -173,7 +172,7 @@ class Boldgrid_Backup_Admin {
 		wp_enqueue_script( 'jquery-effects-bounce' );
 
 		// Enqueue CSS for the home page.
-		if ( isset( $_REQUEST['page'] ) && 'boldgrid-backup' === $_REQUEST['page'] ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		if ( isset( $_REQUEST['page'] ) && 'boldgrid-backup' === $_REQUEST['page'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only page check used to decide which assets to enqueue.
 			wp_enqueue_style(
 				'boldgrid-backup-admin-home',
 				plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-home.css', array(),

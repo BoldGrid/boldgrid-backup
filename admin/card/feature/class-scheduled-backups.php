@@ -55,7 +55,7 @@ class Scheduled_Backups extends \Boldgrid\Library\Library\Ui\Feature {
 				sprintf(
 					// Translators: 1 An opening span tag, 2 the date of the next backup, 3 its closing span tag.
 					__( 'Next backup in: %1$s%2$s%3$s', 'boldgrid-backup' ),
-					'<span class="bglib-feature-value" title="' . esc_attr( date( 'M j, Y h:i a', $next_runtime ) ) . '">',
+					'<span class="bglib-feature-value" title="' . esc_attr( gmdate( 'M j, Y h:i a', $next_runtime ) ) . '">',
 					human_time_diff( time(), $next_runtime ),
 					'</span>'
 				),

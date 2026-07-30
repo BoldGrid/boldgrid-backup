@@ -12,7 +12,7 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.XSS.EscapeOutput.OutputNotEscaped
+// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped
 
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
@@ -233,9 +233,9 @@ class Boldgrid_Backup_Admin_Wpcli {
 			'dow_thursday'  => in_array( '4', $days, true ) ? 1 : 0,
 			'dow_friday'    => in_array( '5', $days, true ) ? 1 : 0,
 			'dow_saturday'  => in_array( '6', $days, true ) ? 1 : 0,
-			'tod_h'         => (int) date( 'g', $time ),
-			'tod_m'         => date( 'i', $time ),
-			'tod_a'         => date( 'A', $time ),
+			'tod_h'         => (int) gmdate( 'g', $time ),
+			'tod_m'         => gmdate( 'i', $time ),
+			'tod_a'         => gmdate( 'A', $time ),
 		];
 
 		$settings = self::$core->settings->update_cron( $settings );

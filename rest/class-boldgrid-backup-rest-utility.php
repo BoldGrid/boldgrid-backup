@@ -27,8 +27,10 @@ class Boldgrid_Backup_Rest_Utility {
 	public static function get_current_url() {
 		$url = '';
 
-		if ( ! empty( $_SERVER['HTTP_HOST'] ) ) {
-			$url = ( is_ssl() ? 'https' : 'http' ) . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+		if ( ! empty( $_SERVER['HTTP_HOST'] ) && isset( $_SERVER['REQUEST_URI'] ) ) {
+			$host        = sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) );
+			$request_uri = sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) );
+			$url         = ( is_ssl() ? 'https' : 'http' ) . '://' . $host . $request_uri;
 		}
 
 		return $url;

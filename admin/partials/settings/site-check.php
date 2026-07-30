@@ -13,6 +13,12 @@
  */
 
 defined( 'WPINC' ) || die;
+
+$bgbkup_wp_content = \Boldgrid\Backup\Cli\Info::get_wp_content_dir();
+$bgbkup_cli_log    = $bgbkup_wp_content
+	? $bgbkup_wp_content . '/bgbkup-cli.log'
+	: BOLDGRID_BACKUP_PATH . '/cli/bgbkup-cli.log';
+
 ob_start();
 ?>
 <div class="bg-box">
@@ -37,7 +43,7 @@ ob_start();
 						],
 					]
 				),
-				esc_url( BOLDGRID_BACKUP_PATH . '/cli/bgbkup-cli.log' ),
+				esc_html( $bgbkup_cli_log ),
 				esc_url( 'https://github.com/BoldGrid/boldgrid-backup/wiki/CLI-Commands' )
 			);
 			?>

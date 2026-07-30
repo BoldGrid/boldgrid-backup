@@ -11,7 +11,6 @@
  * @version    $Id$
  * @author     BoldGrid <support@boldgrid.com>
  *
- * phpcs:disable WordPress.VIP
  */
 
 /**

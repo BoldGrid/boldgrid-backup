@@ -37,7 +37,8 @@ class Boldgrid_Backup_File {
 
 		if ( empty( $filepath ) || ! $core->wp_filesystem->exists( $filepath ) ) {
 			$log->add( 'Invalid filepath.' );
-			wp_redirect( get_site_url(), 404 );
+			wp_safe_redirect( get_site_url(), 404 );
+			exit;
 		}
 
 		$filename = basename( $filepath );
@@ -54,7 +55,7 @@ class Boldgrid_Backup_File {
 		header( 'Content-Length: ' . $filesize );
 
 		// Clean up output buffering.
-		while ( $ob_level = ob_get_level() ) { // phpcs:ignore WordPress.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
+		while ( $ob_level = ob_get_level() ) { // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
 			$buffer_contents = ob_get_contents();
 			$log->add( 'ob level ' . $ob_level . ' contents preview: ' . substr( $buffer_contents, 0, 100 ) );
 
@@ -98,7 +99,7 @@ class Boldgrid_Backup_File {
 			$duration_read   = microtime( true ) - $time_start_read;
 
 			$time_start_send = microtime( true );
-			echo $buffer; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+			echo $buffer; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Raw binary chunk of the archive being streamed to the browser.
 			$duration_send = microtime( true ) - $time_start_send;
 
 			$log->add( 'Buffer read in ' . round( $duration_read, 4 ) . ' seconds and sent in ' . round( $duration_send, 4 ) . ' seconds.' );

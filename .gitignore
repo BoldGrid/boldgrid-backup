@@ -10,6 +10,7 @@ boldgrid-backup-cron.log
 bower_components
 build/
 cli/bgbkup-cli.log
+/bgbkup-cli.log
 cli/verify-*
 cli/restore-locator.php
 config.php

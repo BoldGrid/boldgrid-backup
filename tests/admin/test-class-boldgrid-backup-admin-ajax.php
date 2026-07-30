@@ -10,7 +10,7 @@
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
  *
- * // phpcs:disable Generic.PHP.NoSilencedErrors,WordPress.VIP
+ * // phpcs:disable Generic.PHP.NoSilencedErrors
  */
 
 /**

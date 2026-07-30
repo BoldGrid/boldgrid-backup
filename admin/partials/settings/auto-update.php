@@ -13,6 +13,8 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
+defined( 'WPINC' ) || die;
+
 // Get BoldGrid settings.
 \Boldgrid\Library\Util\Option::init();
 $boldgrid_backup_settings     = get_site_option( 'boldgrid_backup_settings', array() );
@@ -37,12 +39,12 @@ $translations                 = array(
  * @param array $auto_update_settings Auto Update Settings from DB.
  * @return string
  */
-function get_heading_markup( $boldgrid_backup_settings, $auto_update_settings ) {
+function boldgrid_backup_get_heading_markup( $boldgrid_backup_settings, $auto_update_settings ) {
 	if ( empty( $auto_update_settings ) || 0 === $boldgrid_backup_settings['auto_backup'] ) {
 		$bbs_link_open  = '';
 		$bbs_link_close = '';
 
-		if ( empty( $_GET['page'] ) || 'boldgrid-backup-settings' !== $_GET['page'] ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		if ( empty( $_GET['page'] ) || 'boldgrid-backup-settings' !== $_GET['page'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$bbs_link_open  = '<a href="' . admin_url( 'admin.php?page=boldgrid-backup-settings&section=section_auto_rollback' ) . '">';
 			$bbs_link_close = '</a>';
 		}
@@ -72,7 +74,7 @@ function get_heading_markup( $boldgrid_backup_settings, $auto_update_settings ) 
  *
  * @return string
  */
-function get_premium_markup() {
+function boldgrid_backup_get_premium_markup() {
 	$core        = apply_filters( 'boldgrid_backup_get_core', null );
 	$premium_url = $core->go_pro->get_premium_url( 'bgbkup-settings-auto-update' );
 
@@ -99,7 +101,7 @@ function get_premium_markup() {
  * @param array $auto_update_settings Auto Update Settings from DB.
  * @return string
  */
-function get_wpcore_update_markup( $auto_update_settings ) {
+function boldgrid_backup_get_wpcore_update_markup( $auto_update_settings ) {
 	$wpcore_auto_updates = ! empty( $auto_update_settings['wpcore'] ) ?
 		$auto_update_settings['wpcore'] : array();
 	$wpcore_major        = ! empty( $wpcore_auto_updates['major'] );
@@ -203,7 +205,7 @@ function get_wpcore_update_markup( $auto_update_settings ) {
  * @param array $translations Translations.
  * @return string
  */
-function get_plugins_update_markup( $auto_update_settings, $translations ) {
+function boldgrid_backup_get_plugins_update_markup( $auto_update_settings, $translations ) {
 	$plugins_default    = ! empty( $auto_update_settings['plugins']['default'] );
 	$plugin_auto_update = (bool) \Boldgrid\Library\Util\Option::get( 'plugin_autoupdate' );
 	$plugins            = get_plugins();
@@ -297,7 +299,7 @@ function get_plugins_update_markup( $auto_update_settings, $translations ) {
 						<td colspan=1>
 							<p style="position:relative;z-index=-1">' . esc_html__(
 						'This plugin was not installed through the WordPress Plugins Repository. If auto updates are enabled, they will take place immediately.',
-						'boldrid-backup'
+						'boldgrid-backup'
 					) . ' </p>
 						</td>
 						<td></td>
@@ -319,7 +321,7 @@ function get_plugins_update_markup( $auto_update_settings, $translations ) {
  * @param array $translations Translations.
  * @return string
  */
-function get_themes_update_markup( $auto_update_settings, $translations ) {
+function boldgrid_backup_get_themes_update_markup( $auto_update_settings, $translations ) {
 	$themes_default    = ! empty( $auto_update_settings['themes']['default'] );
 	$active_stylesheet = get_option( 'stylesheet' );
 	$active_template   = get_option( 'template' );
@@ -413,7 +415,7 @@ function get_themes_update_markup( $auto_update_settings, $translations ) {
 	return $themes_update_markup;
 }
 
-$auto_update_markup = ' ' . get_heading_markup( $boldgrid_backup_settings, $auto_update_settings );
+$auto_update_markup = ' ' . boldgrid_backup_get_heading_markup( $boldgrid_backup_settings, $auto_update_settings );
 
 $auto_update_markup .= '
 	<div class="bg-box">
@@ -446,13 +448,13 @@ if ( $this->core->config->is_premium_done && $timely_update_markup === $auto_upd
 } elseif ( $this->core->config->is_premium_done ) {
 	$auto_update_markup .= $timely_update_markup;
 } else {
-	$auto_update_markup .= get_premium_markup( $auto_update_settings );
+	$auto_update_markup .= boldgrid_backup_get_premium_markup( $auto_update_settings );
 	$auto_update_markup .= '</div></div>';
 }
 
-$auto_update_markup .= get_wpcore_update_markup( $auto_update_settings, $translations ) .
-	get_plugins_update_markup( $auto_update_settings, $translations ) .
-	get_themes_update_markup( $auto_update_settings, $translations ) .
+$auto_update_markup .= boldgrid_backup_get_wpcore_update_markup( $auto_update_settings, $translations ) .
+	boldgrid_backup_get_plugins_update_markup( $auto_update_settings, $translations ) .
+	boldgrid_backup_get_themes_update_markup( $auto_update_settings, $translations ) .
 	'</table></div></div>';
 
 return $auto_update_markup;

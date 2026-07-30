@@ -19,7 +19,7 @@
  * @see \Boldgrid\Backup\Cli\Site_Restore::run()
  * @see \Boldgrid\Backup\Cli\Log::write()
  *
- * phpcs:disable WordPress.VIP,WordPress.XSS.EscapeOutput
+ * phpcs:disable WordPress.Security.EscapeOutput
  */
 
 namespace Boldgrid\Backup\Cli;

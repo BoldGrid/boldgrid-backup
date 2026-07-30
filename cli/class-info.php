@@ -12,7 +12,7 @@
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
  *
- * phpcs:disable WordPress.VIP,WordPress.WP.AlternativeFunctions,WordPress.XSS.EscapeOutput
+ * phpcs:disable WordPress.WP.AlternativeFunctions, WordPress.Security.EscapeOutput
  */
 
 namespace Boldgrid\Backup\Cli;
@@ -512,7 +512,7 @@ class Info {
 		if ( ! function_exists( 'random_bytes' ) ) {
 			$compat = dirname( __DIR__ ) . '/vendor/paragonie/random_compat/lib/random.php';
 			if ( is_readable( $compat ) ) {
-				require_once $compat; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingVariable
+				require_once $compat; //
 			}
 		}
 
@@ -1238,7 +1238,13 @@ class Info {
 		if ( empty( self::$info['cli_args'] ) ) {
 			if ( ! empty( $_SERVER['argv'] ) ) {
 				parse_str(
-					implode( '&', array_slice( $_SERVER['argv'], 1 ) ),
+					implode(
+						'&',
+						array_slice(
+							array_map( 'sanitize_text_field', wp_unslash( $_SERVER['argv'] ) ),
+							1
+						)
+					),
 					self::$info['cli_args']
 				);
 			} else {
@@ -1552,7 +1558,7 @@ class Info {
 			return false;
 		}
 
-		require_once $path; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingVariable
+		require_once $path; //
 
 		return class_exists( 'Boldgrid_Backup_Admin_Zip', false );
 	}

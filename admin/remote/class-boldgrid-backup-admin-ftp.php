@@ -12,7 +12,6 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP
 
 /**
  * Class: Boldgrid_Backup_Admin_Ftp
@@ -584,14 +583,14 @@ class Boldgrid_Backup_Admin_Ftp {
 			],
 		];
 
-		// phpcs:disable WordPress.CSRF.NonceVerification.NoNonceVerification, WordPress.Security.NonceVerification.NoNonceVerification
+		// phpcs:disable WordPress.Security.NonceVerification -- Nonce is verified by the callers in Boldgrid_Backup_Admin_Ftp_Page.
 
 		foreach ( $values as $value ) {
 			$key      = $value['key'];
 			$callback = ! empty( $value['callback'] ) ? $value['callback'] : null;
 
 			if ( ! empty( $_POST[ $key ] ) ) {
-				$data[ $key ] = $_POST[ $key ];
+				$data[ $key ] = sanitize_text_field( wp_unslash( $_POST[ $key ] ) );
 			} elseif ( ! empty( $settings['remote'][ $this->key ][ $key ] ) ) {
 				$data[ $key ] = $settings['remote'][ $this->key ][ $key ];
 			} else {
@@ -604,7 +603,7 @@ class Boldgrid_Backup_Admin_Ftp {
 			}
 		}
 
-		// phpcs:enable WordPress.CSRF.NonceVerification.NoNonceVerification, WordPress.Security.NonceVerification.NoNonceVerification
+		// phpcs:enable WordPress.Security.NonceVerification
 
 		return $data;
 	}
@@ -1219,7 +1218,7 @@ class Boldgrid_Backup_Admin_Ftp {
 				 * Not 100% accurate however. In testing, when setting a remote file's timestamp to
 				 * 11am UTC, that remote server convereted the UTC time to local time.
 				 */
-				$cmd = 'MFMT ' . date( 'YmdHis', $timestamp ) . ' ' . $remote_file;
+				$cmd = 'MFMT ' . gmdate( 'YmdHis', $timestamp ) . ' ' . $remote_file;
 				ftp_raw( $this->connection, $cmd );
 				break;
 			case 'sftp':

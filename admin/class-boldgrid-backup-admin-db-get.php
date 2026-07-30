@@ -12,7 +12,6 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP
 
 /**
  * Class: Boldgrid_Backup_Admin_Db_Get
@@ -161,7 +160,7 @@ class Boldgrid_Backup_Admin_Db_Get {
 		$tables = $this->prefixed();
 
 		foreach ( $tables as $table ) {
-			$num = $wpdb->get_var( 'SELECT COUNT(*) FROM `' . $table . '`;' ); // phpcs:ignore WordPress.WP.PreparedSQL.NotPrepared
+			$num = $wpdb->get_var( 'SELECT COUNT(*) FROM `' . $table . '`;' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 
 			$return[ $table ] = $num;
 		}

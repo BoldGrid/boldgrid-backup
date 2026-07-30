@@ -30,7 +30,7 @@ ob_start();
 				?>
 			<option value='<?php echo esc_attr( $x ); ?>'
 				<?php
-				if ( ! empty( $settings['schedule']['tod_h'] ) && $x == $settings['schedule']['tod_h'] ) { // phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
+				if ( ! empty( $settings['schedule']['tod_h'] ) && $x == $settings['schedule']['tod_h'] ) { //
 					echo ' selected';
 				}
 				?>
@@ -77,11 +77,11 @@ ob_start();
 
 		<div style="vertical-align:middle;display:inline-block;">
 			<?php
-			echo $tz_info['markup_timezone'] . ' <em>' . $tz_info['markup_change'] . '</em>'; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+			echo $tz_info['markup_timezone'] . ' <em>' . $tz_info['markup_change'] . '</em>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup built by the plugin from escaped parts.
 			?>
 		</div>
 
-		<p class="wp-cron-notice hidden"><em>WP Cron runs on GMT time, which is currently <?php echo esc_html( date( 'l g:i a e' ) ); ?>.</em></p>
+		<p class="wp-cron-notice hidden"><em>WP Cron runs on GMT time, which is currently <?php echo esc_html( gmdate( 'l g:i a e' ) ); ?>.</em></p>
 	</div>
 </div>
 
