@@ -860,8 +860,10 @@ class Boldgrid_Backup_Admin_Cron {
 		// Convert from 24H to 12H time format.
 		$unix_time = strtotime( $schedule['tod_h'] . ':' . $schedule['tod_m'] );
 
-		$schedule['tod_h'] = intval( gmdate( 'g', $unix_time ) );
-		$schedule['tod_a'] = gmdate( 'A', $unix_time );
+		// phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date -- Server-local time for crontab.
+		$schedule['tod_h'] = intval( date( 'g', $unix_time ) );
+		// phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date -- Server-local time for crontab.
+		$schedule['tod_a'] = date( 'A', $unix_time );
 
 		// Days of the week.
 		if ( isset( $matches[0][4] ) ) {
