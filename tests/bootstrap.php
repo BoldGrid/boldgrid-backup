@@ -18,6 +18,15 @@ if ( ! $_tests_dir ) {
 
 require_once $_tests_dir . '/includes/functions.php';
 
+/*
+ * Never replace the crontab of the account running the tests.
+ *
+ * Scheduling paths such as add_all_crons() operate on the real system crontab, so without
+ * this any test that reaches them wipes the developer's entries and rewrites them using the
+ * test environment's siteurl (http://example.org) and secrets.
+ */
+tests_add_filter( 'boldgrid_backup_can_write_crontab', '__return_false' );
+
 if ( ! defined( 'BOLDGRID_BACKUP_PATH' ) ) {
 	define( 'BOLDGRID_BACKUP_PATH', dirname( dirname( __FILE__ ) ) );
 }
