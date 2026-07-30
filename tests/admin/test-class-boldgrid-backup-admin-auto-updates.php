@@ -105,12 +105,13 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 		);
 
 		$installed_themes = wp_get_themes();
-		$theme_slug       = 'twentytwentytwo'; // Replace with your desired theme slug
-		$installed        = isset( $installed_themes[$theme_slug] );
+		$theme_slug       = 'twentytwentytwo';
+		$installed        = isset( $installed_themes[ $theme_slug ] );
 
 		if ( ! $installed ) {
-			$upgrader  = new Theme_Upgrader();
-			$installed = $upgrader->install("https://downloads.wordpress.org/theme/{$theme_slug}.latest-stable.zip");
+			// Use Automatic_Upgrader_Skin so Theme_Upgrader does not echo HTML or leave output buffers open (PHPUnit marks that as a risky test).
+			$upgrader  = new Theme_Upgrader( new Automatic_Upgrader_Skin() );
+			$installed = $upgrader->install( "https://downloads.wordpress.org/theme/{$theme_slug}.latest-stable.zip" );
 		}
 	}
 
