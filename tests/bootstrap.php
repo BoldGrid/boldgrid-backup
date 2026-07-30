@@ -19,6 +19,25 @@ if ( ! $_tests_dir ) {
 require_once $_tests_dir . '/includes/functions.php';
 
 /*
+ * Give the suite a private temp directory.
+ *
+ * download_url() renames its download to the name given in the response's Content-Disposition
+ * header, so every account running these tests on one machine targets the same path (for
+ * example /tmp/akismet.4.0.zip). Because /tmp is sticky, the rename fails with EPERM once
+ * another user owns that file, and the resulting warning fails the test.
+ */
+if ( ! defined( 'WP_TEMP_DIR' ) ) {
+	$_bgbkup_temp_dir = rtrim( sys_get_temp_dir(), '/' ) . '/boldgrid-backup-tests-' .
+		( function_exists( 'posix_geteuid' ) ? posix_geteuid() : get_current_user() );
+
+	if ( ! is_dir( $_bgbkup_temp_dir ) ) {
+		mkdir( $_bgbkup_temp_dir, 0700, true );
+	}
+
+	define( 'WP_TEMP_DIR', $_bgbkup_temp_dir );
+}
+
+/*
  * Never replace the crontab of the account running the tests.
  *
  * Scheduling paths such as add_all_crons() operate on the real system crontab, so without
