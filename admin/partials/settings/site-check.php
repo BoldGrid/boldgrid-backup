@@ -14,6 +14,8 @@
 
 defined( 'WPINC' ) || die;
 
+require_once BOLDGRID_BACKUP_PATH . '/cli/class-info.php';
+
 $bgbkup_wp_content = \Boldgrid\Backup\Cli\Info::get_wp_content_dir();
 $bgbkup_cli_log    = $bgbkup_wp_content
 	? $bgbkup_wp_content . '/bgbkup-cli.log'
