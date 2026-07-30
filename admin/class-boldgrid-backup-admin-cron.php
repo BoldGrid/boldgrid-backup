@@ -1116,16 +1116,25 @@ class Boldgrid_Backup_Admin_Cron {
 			return false;
 		}
 
-		if ( ! $this->claim_secrets_rotation() ) {
+		$claim_result = $this->claim_secrets_rotation();
+		if ( false === $claim_result ) {
 			return false;
 		}
+
+		/*
+		 * When taking over an abandoned claim, the failed request may have already
+		 * deleted cron_secret and cli_cancel_secret before dying. In that case
+		 * $old_secret would be empty and we would skip remint/rewrite, leaving
+		 * crontab broken. Force a full rotation on takeover to ensure recovery.
+		 */
+		$is_takeover = 'takeover' === $claim_result;
 
 		$settings   = $this->core->settings->get_settings( true );
 		$old_secret = ! empty( $settings['cron_secret'] ) ? (string) $settings['cron_secret'] : '';
 		$new_secret = '';
-		$rotating   = '' !== $old_secret;
+		$rotating   = '' !== $old_secret || $is_takeover;
 
-		if ( $rotating ) {
+		if ( '' !== $old_secret ) {
 			unset( $settings['cron_secret'] );
 			$this->cron_secret = null;
 			update_site_option( 'boldgrid_backup_settings', $settings );
@@ -1156,10 +1165,11 @@ class Boldgrid_Backup_Admin_Cron {
 		 * A pending rollback's restore cron embeds cli_cancel_secret, which was just
 		 * deleted. Re-issue so the emailed cancel link keeps working; a site can hold a
 		 * cancel secret without ever having stored a cron_secret, so this cannot be
-		 * limited to the rotation path.
+		 * limited to the rotation path. On takeover, always re-issue since the
+		 * failed request may have already deleted cli_cancel_secret.
 		 */
 		$archives = $this->core->get_archive_list();
-		if ( ( $rotating || $had_cancel_secret ) && get_site_option( 'boldgrid_backup_pending_rollback' ) && ! empty( $archives ) ) {
+		if ( ( $rotating || $had_cancel_secret || $is_takeover ) && get_site_option( 'boldgrid_backup_pending_rollback' ) && ! empty( $archives ) ) {
 			switch ( $scheduler ) {
 				case 'cron':
 					$this->add_restore_cron();
@@ -1170,7 +1180,7 @@ class Boldgrid_Backup_Admin_Cron {
 			}
 		}
 
-		if ( $rotating ) {
+		if ( '' !== $old_secret && '' !== $new_secret ) {
 			$this->refresh_restore_info_cron_secret( $old_secret, $new_secret );
 		}
 
@@ -1191,11 +1201,12 @@ class Boldgrid_Backup_Admin_Cron {
 	 *
 	 * @since 1.17.4
 	 *
-	 * @return bool True when this request owns the rotation.
+	 * @return string|false 'fresh' when this request is the first claimer, 'takeover' when
+	 *                      claiming an abandoned rotation, false when another request owns it.
 	 */
 	private function claim_secrets_rotation() {
 		if ( add_site_option( self::SECRETS_ROTATING_OPTION, time() ) ) {
-			return true;
+			return 'fresh';
 		}
 
 		$claimed_at = (int) get_site_option( self::SECRETS_ROTATING_OPTION );
@@ -1206,7 +1217,7 @@ class Boldgrid_Backup_Admin_Cron {
 
 		update_site_option( self::SECRETS_ROTATING_OPTION, time() );
 
-		return true;
+		return 'takeover';
 	}
 
 	/**
