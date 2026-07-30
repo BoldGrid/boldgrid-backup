@@ -354,7 +354,10 @@ class Test_Boldgrid_Backup_Admin_Core extends WP_UnitTestCase {
 		$cron = strstr( $cron, ' > /dev/null', true );
 
 		// Restore.
-		exec( $cron, $output ); // phpcs:ignore
+		exec( $cron . ' 2>&1', $output, $status ); // phpcs:ignore
+
+		// Report what the CLI actually said; otherwise a fatal there surfaces as a bare failed assertion below.
+		$this->assertSame( 0, $status, "Restore CLI failed:\n" . implode( "\n", $output ) );
 
 		$this->deleteBasic( 'restore' );
 	}

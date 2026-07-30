@@ -13,10 +13,10 @@ description: >-
 | Role | Path |
 |------|------|
 | Test library | `~/wordpress-tests-lib` → `WP_TESTS_DIR` |
-| WordPress core under test | `~/wordpress` |
+| WordPress core under test | `~/wordpress` (currently **7.0.2**) |
 | Plugin under test | this repo (usually `~/public_html/wp-content/plugins/boldgrid-backup`) |
 
-Do not assume `/tmp/wordpress` or `/tmp/wordpress-tests-lib`.
+Do not assume `/tmp/wordpress` or `/tmp/wordpress-tests-lib`. Stage upgrade/repair downloads under `~/tmp/` — never system `/tmp/`.
 
 ## Commands
 

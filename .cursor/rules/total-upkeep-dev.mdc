@@ -7,7 +7,7 @@ alwaysApply: true
 
 - Product name: **Total Upkeep**; slug / text domain: **`boldgrid-backup`**. Do not rename either for lint cosmetics.
 - Follow [`phpcs.xml.dist`](phpcs.xml.dist) and [`AGENTS.md`](AGENTS.md).
-- Scratch files go in `.cursor/working/` (not `/tmp/`).
+- Scratch: `.cursor/working/` in-repo; `~/tmp/` for cross-project downloads/clones. Never system `/tmp/`.
 - Public GitHub surfaces: no devel hostnames, QA accounts, internal paths, or security-embargo detail — put that on Jira (`imh-internal`).
 - Prefer minimal diffs; do not drive-by reformat unrelated code.
 - When opening PRs for internal work: Jira parent + Dev/Review sub-tasks; branch `ENG7-####-short-slug`; PR title includes the Jira key.

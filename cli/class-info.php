@@ -512,7 +512,7 @@ class Info {
 		if ( ! function_exists( 'random_bytes' ) ) {
 			$compat = dirname( __DIR__ ) . '/vendor/paragonie/random_compat/lib/random.php';
 			if ( is_readable( $compat ) ) {
-				require_once $compat; //
+				require_once $compat;
 			}
 		}
 
@@ -1237,14 +1237,16 @@ class Info {
 	public static function get_cli_args() {
 		if ( empty( self::$info['cli_args'] ) ) {
 			if ( ! empty( $_SERVER['argv'] ) ) {
+				/*
+				 * This file runs outside of WordPress, so WordPress sanitizing helpers such as
+				 * wp_unslash() and sanitize_text_field() are unavailable. bgbkup-cli.php refuses
+				 * to run under any non command-line SAPI, so argv is never request input.
+				 */
+				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
+				$argv = (array) $_SERVER['argv'];
+
 				parse_str(
-					implode(
-						'&',
-						array_slice(
-							array_map( 'sanitize_text_field', wp_unslash( $_SERVER['argv'] ) ),
-							1
-						)
-					),
+					implode( '&', array_slice( $argv, 1 ) ),
 					self::$info['cli_args']
 				);
 			} else {
@@ -1558,7 +1560,7 @@ class Info {
 			return false;
 		}
 
-		require_once $path; //
+		require_once $path;
 
 		return class_exists( 'Boldgrid_Backup_Admin_Zip', false );
 	}

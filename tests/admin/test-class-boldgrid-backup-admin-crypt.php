@@ -67,7 +67,7 @@ class Test_Boldgrid_Backup_Admin_Crypt extends WP_UnitTestCase {
 			$decrypted = Boldgrid_Backup_Admin_Crypt::crypt( $encrypted, 'd' );
 
 			// Decrypt a non-string and you'll get a string.
-			$this->assertTrue( $decrypted == $string ); //
+			$this->assertTrue( $decrypted == $string ); // phpcs:ignore Universal.Operators.StrictComparisons.LooseEqual
 		}
 
 		$invalids = array(

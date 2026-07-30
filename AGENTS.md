@@ -52,12 +52,12 @@ See also Cursor commands under [`.cursor/commands/`](.cursor/commands/).
 
 | Piece | Path / note |
 |-------|-------------|
-| WP tests lib | `WP_TESTS_DIR` → `~/wordpress-tests-lib` |
-| WP core under test | `~/wordpress` |
+| WP tests lib | `WP_TESTS_DIR` → `~/wordpress-tests-lib` (PHPUnit includes/data for the same WP version) |
+| WP core under test | `~/wordpress` (currently **WordPress 7.0.2**) |
 | Bootstrap | `tests/bootstrap.php` |
 | Suite | `tests/` |
 
-If the test core is missing files (e.g. `wp-includes/theme.php`), restore the WordPress test install before trusting archive/restore failures — those tests can leave the tree damaged.
+If the test core is missing files (e.g. `wp-includes/theme.php`), restore the WordPress test install before trusting archive/restore failures — those tests can leave the tree damaged. When re-downloading core or the tests lib, stage archives under `~/tmp/` — never system `/tmp/`.
 
 ## Agent skills & rules
 
@@ -71,7 +71,8 @@ If the test core is missing files (e.g. `wp-includes/theme.php`), restore the Wo
 
 ## Scratch & privacy
 
-- Agent scratch: `.cursor/working/` (gitignored). Do not use `/tmp/`.
+- Agent scratch: `.cursor/working/` (gitignored) for repo-local work; `~/tmp/` for cross-project downloads, clones, and probes.
+- **Never use system `/tmp/`** for agent downloads, WordPress tarballs, clones, PHPUnit probes, or intermediate files (shared host; other users' files can block renames).
 - Public GitHub (PRs, commits, issues): no devel hostnames, QA usernames, internal paths, or security-embargo detail. Put full diagnosis on Jira (`imh-internal`).
 - Jira + PR workflow: parent Task/Bug/Story + Dev / Review sub-tasks; reference the Jira key in the PR title.
 
