@@ -309,6 +309,48 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A pending rollback must keep a usable cancel secret even with no cron_secret to rotate.
+	 *
+	 * The CLI cancel secret is minted independently of cron_secret, so clearing it without
+	 * re-issuing the restore cron would leave the rollback running and uncancellable.
+	 *
+	 * @since 1.17.4
+	 */
+	public function test_maybe_rotate_cron_secrets_reissues_cancel_secret_without_old_cron_secret() {
+		$this->maybe_create_backup();
+
+		$settings = get_site_option( 'boldgrid_backup_settings', array() );
+		if ( ! is_array( $settings ) ) {
+			$settings = array();
+		}
+		unset( $settings['cron_secret'] );
+		$settings['scheduler'] = 'cron';
+		update_site_option( 'boldgrid_backup_settings', $settings );
+
+		$old_cancel_secret = 'cancel_secret_from_pre_upgrade';
+		update_site_option( 'boldgrid_backup_cli_cancel_secret', $old_cancel_secret );
+		update_site_option( 'boldgrid_backup_pending_rollback', array( 'deadline' => time() + 300 ) );
+		delete_site_option( Boldgrid_Backup_Admin_Cron::SECRETS_ROTATED_OPTION );
+
+		$reflection = new ReflectionClass( $this->core->cron );
+		$property   = $reflection->getProperty( 'cron_secret' );
+		$property->setAccessible( true );
+		$property->setValue( $this->core->cron, null );
+
+		$this->assertTrue( $this->core->cron->maybe_rotate_cron_secrets() );
+
+		$new_cancel_secret = get_site_option( 'boldgrid_backup_cli_cancel_secret', '' );
+
+		delete_site_option( 'boldgrid_backup_pending_rollback' );
+
+		$this->assertNotEmpty(
+			$new_cancel_secret,
+			'A pending rollback must be left with a usable cancel secret.'
+		);
+		$this->assertNotEquals( $old_cancel_secret, $new_cancel_secret );
+	}
+
+	/**
 	 * Test greenfield installs with no prior secret only set the rotation gate.
 	 *
 	 * @since 1.17.4

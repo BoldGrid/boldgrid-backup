@@ -1088,6 +1088,7 @@ class Boldgrid_Backup_Admin_Cron {
 	 *
 	 * @see Boldgrid_Backup_Admin_Cron::get_cron_secret()
 	 * @see Boldgrid_Backup_Admin_Cron::add_all_crons()
+	 * @see Boldgrid_Backup_Admin_Cron::add_restore_cron()
 	 *
 	 * @return bool True when rotation ran (or was a no-op that set the gate); false if already done.
 	 */
@@ -1098,50 +1099,55 @@ class Boldgrid_Backup_Admin_Cron {
 
 		$settings   = $this->core->settings->get_settings( true );
 		$old_secret = ! empty( $settings['cron_secret'] ) ? (string) $settings['cron_secret'] : '';
+		$new_secret = '';
+		$rotating   = '' !== $old_secret;
 
-		if ( '' !== $old_secret ) {
+		if ( $rotating ) {
 			unset( $settings['cron_secret'] );
 			$this->cron_secret = null;
 			update_site_option( 'boldgrid_backup_settings', $settings );
 		}
 
+		$had_cancel_secret = ! empty( get_site_option( 'boldgrid_backup_cli_cancel_secret' ) );
 		delete_site_option( 'boldgrid_backup_cli_cancel_secret' );
 
-		if ( '' !== $old_secret ) {
+		if ( $rotating ) {
 			$new_secret = $this->get_cron_secret();
+		}
 
-			/*
-			 * Persist the gate before crontab/restore-info rewrites. Remint already
-			 * invalidated the harvested secret; failing to set the gate here would
-			 * treat the fresh secret as "old" on the next init and rotate forever.
-			 */
-			update_site_option( self::SECRETS_ROTATED_OPTION, self::SECRETS_ROTATED_VERSION );
+		/*
+		 * Persist the gate before crontab/restore-info rewrites. Remint already
+		 * invalidated the harvested secret; failing to set the gate here would
+		 * treat the fresh secret as "old" on the next init and rotate forever.
+		 */
+		update_site_option( self::SECRETS_ROTATED_OPTION, self::SECRETS_ROTATED_VERSION );
 
-			$settings  = $this->core->settings->get_settings( true );
-			$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
+		$settings  = $this->core->settings->get_settings( true );
+		$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
 
-			if ( 'cron' === $scheduler && $this->core->scheduler->is_available( 'cron' ) ) {
-				$this->add_all_crons( $settings );
+		if ( $rotating && 'cron' === $scheduler && $this->core->scheduler->is_available( 'cron' ) ) {
+			$this->add_all_crons( $settings );
+		}
+
+		/*
+		 * A pending rollback's restore cron embeds cli_cancel_secret, which was just
+		 * deleted. Re-issue so the emailed cancel link keeps working; a site can hold a
+		 * cancel secret without ever having stored a cron_secret, so this cannot be
+		 * limited to the rotation path.
+		 */
+		if ( ( $rotating || $had_cancel_secret ) && get_site_option( 'boldgrid_backup_pending_rollback' ) ) {
+			switch ( $scheduler ) {
+				case 'cron':
+					$this->add_restore_cron();
+					break;
+				case 'wp-cron':
+					$this->core->wp_cron->add_restore_cron();
+					break;
 			}
+		}
 
-			/*
-			 * Pending auto-rollback restore crons embed cli_cancel_secret. Re-issue so
-			 * cancel still works for an in-flight rollback after the option was cleared.
-			 */
-			if ( get_site_option( 'boldgrid_backup_pending_rollback' ) ) {
-				switch ( $scheduler ) {
-					case 'cron':
-						$this->add_restore_cron();
-						break;
-					case 'wp-cron':
-						$this->core->wp_cron->add_restore_cron();
-						break;
-				}
-			}
-
+		if ( $rotating ) {
 			$this->refresh_restore_info_cron_secret( $old_secret, $new_secret );
-		} else {
-			update_site_option( self::SECRETS_ROTATED_OPTION, self::SECRETS_ROTATED_VERSION );
 		}
 
 		return true;
