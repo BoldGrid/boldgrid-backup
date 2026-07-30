@@ -1274,7 +1274,17 @@ class Boldgrid_Backup_Admin_Cron {
 			return false;
 		}
 
-		update_site_option( self::SECRETS_ROTATING_OPTION, time() );
+		/*
+		 * Delete the stale claim and re-add atomically. add_site_option() only succeeds
+		 * for the first inserter, so concurrent takeover attempts are serialized the
+		 * same way fresh claims are. If another request wins the race, fall back to
+		 * waiting for it to complete.
+		 */
+		delete_site_option( self::SECRETS_ROTATING_OPTION );
+
+		if ( ! add_site_option( self::SECRETS_ROTATING_OPTION, time() ) ) {
+			return false;
+		}
 
 		return 'takeover';
 	}
