@@ -423,6 +423,148 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Write a legacy plugin-tree restore-info file holding the given cron secret.
+	 *
+	 * @since 1.17.4
+	 *
+	 * @param  string $cron_secret Cron secret to embed.
+	 * @return string Absolute path to the file written.
+	 */
+	private function write_legacy_restore_info( $cron_secret ) {
+		$path = BOLDGRID_BACKUP_PATH . '/cron/restore-info-' . str_repeat( 'a', 32 ) . '.json';
+
+		$payload = wp_json_encode(
+			array(
+				'cron_secret' => $cron_secret,
+				'filepath'    => '/tmp/example.zip',
+				'restore_cmd' => 'php -qf "boldgrid-backup-cron.php" mode=restore secret=' . $cron_secret . ' archive_key=0',
+			)
+		);
+
+		$this->assertNotFalse( file_put_contents( $path, $payload ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+
+		return $path;
+	}
+
+	/**
+	 * A retired plugin-tree copy must be deleted rather than given the new secret.
+	 *
+	 * The CLI cannot reach it once secure storage exists, and the plugin tree is not a
+	 * guaranteed-private location, so the fresh secret must not be written there.
+	 *
+	 * @since 1.17.4
+	 */
+	public function test_refresh_restore_info_cron_secret_deletes_retired_legacy_copy() {
+		require_once BOLDGRID_BACKUP_PATH . '/cli/class-info.php';
+		$this->assertNotEmpty( \Boldgrid\Backup\Cli\Info::ensure_secure_storage( $this->core->backup_dir->get() ) );
+
+		$old_secret = 'old_legacy_cron_restore_info_secret';
+		$path       = $this->write_legacy_restore_info( $old_secret );
+
+		$this->core->cron->refresh_restore_info_cron_secret( $old_secret, 'new_legacy_cron_restore_info_secret' );
+
+		$exists    = file_exists( $path );
+		$remaining = $exists ? file_get_contents( $path ) : ''; // phpcs:ignore WordPress.WP.AlternativeFunctions
+
+		@unlink( $path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions
+
+		$this->assertFalse( $exists, 'A retired plugin-tree restore-info copy must be deleted.' );
+		$this->assertStringNotContainsString( 'new_legacy_cron_restore_info_secret', $remaining );
+	}
+
+	/**
+	 * A live plugin-tree copy must be rewritten so emergency restore keeps working.
+	 *
+	 * Sites where secure storage is unavailable keep their live restore metadata in the
+	 * plugin's cron/ directory, so skipping it would leave emergency CLI restore calling
+	 * admin-ajax with a secret that is no longer valid.
+	 *
+	 * @since 1.17.4
+	 */
+	public function test_refresh_restore_info_cron_secret_rewrites_live_legacy_copy() {
+		require_once BOLDGRID_BACKUP_PATH . '/cli/class-info.php';
+
+		$old_secret = 'old_live_legacy_cron_secret';
+		$new_secret = 'new_live_legacy_cron_secret';
+		$path       = $this->write_legacy_restore_info( $old_secret );
+
+		/*
+		 * Hide the restore locators so Info reports no secure storage, which is the state
+		 * that leaves the plugin tree serving as the live metadata location.
+		 */
+		$hidden = array();
+		foreach ( array( \Boldgrid\Backup\Cli\Info::get_restore_locator_filepath(), \Boldgrid\Backup\Cli\Info::get_wp_content_locator_filepath() ) as $locator ) {
+			if ( ! empty( $locator ) && file_exists( $locator ) && rename( $locator, $locator . '.test-bak' ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename
+				$hidden[] = $locator;
+			}
+		}
+
+		$updated = $this->core->cron->refresh_restore_info_cron_secret( $old_secret, $new_secret );
+
+		foreach ( $hidden as $locator ) {
+			rename( $locator . '.test-bak', $locator ); // phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename
+		}
+
+		$decoded = file_exists( $path ) ? json_decode( file_get_contents( $path ), true ) : null; // phpcs:ignore WordPress.WP.AlternativeFunctions
+
+		@unlink( $path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions
+
+		$this->assertTrue( $updated );
+		$this->assertIsArray( $decoded, 'The live plugin-tree copy must be kept, not deleted.' );
+		$this->assertSame( $new_secret, $decoded['cron_secret'] );
+		$this->assertStringContainsString( 'secret=' . $new_secret, $decoded['restore_cmd'] );
+		$this->assertStringNotContainsString( 'secret=' . $old_secret, $decoded['restore_cmd'] );
+	}
+
+	/**
+	 * Rotation must not run while another request holds a fresh claim.
+	 *
+	 * Without the claim, two concurrent requests can both pass the gate check and remint,
+	 * leaving crontab and settings holding different secrets. An abandoned claim must
+	 * still be taken over so a request that died mid-rotation cannot block the upgrade.
+	 *
+	 * @since 1.17.4
+	 */
+	public function test_maybe_rotate_cron_secrets_respects_rotation_claim() {
+		$old_secret = 'secret_guarded_by_rotation_claim';
+		$settings   = get_site_option( 'boldgrid_backup_settings', array() );
+		if ( ! is_array( $settings ) ) {
+			$settings = array();
+		}
+		$settings['cron_secret'] = $old_secret;
+		update_site_option( 'boldgrid_backup_settings', $settings );
+		delete_site_option( Boldgrid_Backup_Admin_Cron::SECRETS_ROTATED_OPTION );
+
+		$reflection = new ReflectionClass( $this->core->cron );
+		$property   = $reflection->getProperty( 'cron_secret' );
+		$property->setAccessible( true );
+		$property->setValue( $this->core->cron, $old_secret );
+
+		// Another request just claimed the rotation.
+		update_site_option( Boldgrid_Backup_Admin_Cron::SECRETS_ROTATING_OPTION, time() );
+
+		$this->assertFalse( $this->core->cron->maybe_rotate_cron_secrets() );
+		$this->assertFalse( get_site_option( Boldgrid_Backup_Admin_Cron::SECRETS_ROTATED_OPTION, false ) );
+
+		$settings_after = get_site_option( 'boldgrid_backup_settings', array() );
+		$this->assertSame(
+			$old_secret,
+			$settings_after['cron_secret'],
+			'A claimed rotation must not remint in a second request.'
+		);
+
+		// An abandoned claim must not block the upgrade forever.
+		update_site_option(
+			Boldgrid_Backup_Admin_Cron::SECRETS_ROTATING_OPTION,
+			time() - ( Boldgrid_Backup_Admin_Cron::SECRETS_ROTATING_TIMEOUT + 1 )
+		);
+
+		$this->assertTrue( $this->core->cron->maybe_rotate_cron_secrets() );
+		$this->assertNotEquals( $old_secret, $this->core->cron->get_cron_secret() );
+		$this->assertFalse( get_site_option( Boldgrid_Backup_Admin_Cron::SECRETS_ROTATING_OPTION, false ) );
+	}
+
+	/**
 	 * Test filtering crontab contents with mode "" (backup).
 	 *
 	 * @since 1.11.1

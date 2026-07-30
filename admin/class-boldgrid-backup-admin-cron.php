@@ -1047,6 +1047,22 @@ class Boldgrid_Backup_Admin_Cron {
 	const SECRETS_ROTATED_VERSION = '1.17.4';
 
 	/**
+	 * Site option key used to claim an in-progress secrets rotation.
+	 *
+	 * @since 1.17.4
+	 * @var string
+	 */
+	const SECRETS_ROTATING_OPTION = 'boldgrid_backup_secrets_rotating';
+
+	/**
+	 * Seconds after which an abandoned rotation claim may be taken over.
+	 *
+	 * @since 1.17.4
+	 * @var int
+	 */
+	const SECRETS_ROTATING_TIMEOUT = 300;
+
+	/**
 	 * Get the cron secret used to validate unauthenticated crontab jobs.
 	 *
 	 * @since 1.6.1-rc.1
@@ -1082,10 +1098,13 @@ class Boldgrid_Backup_Admin_Cron {
 	 * The one-shot gate is written immediately after remint so a later crontab rewrite
 	 * failure cannot cause another rotation on the next request. Crontab / restore-info
 	 * updates are best-effort; a failed rewrite can be repaired by re-saving settings or
-	 * reactivating the plugin (activation always calls add_all_crons).
+	 * reactivating the plugin (activation always calls add_all_crons). Concurrent
+	 * requests are serialized by a claim, since two remints would leave crontab and
+	 * settings holding different secrets.
 	 *
 	 * @since 1.17.4
 	 *
+	 * @see Boldgrid_Backup_Admin_Cron::claim_secrets_rotation()
 	 * @see Boldgrid_Backup_Admin_Cron::get_cron_secret()
 	 * @see Boldgrid_Backup_Admin_Cron::add_all_crons()
 	 * @see Boldgrid_Backup_Admin_Cron::add_restore_cron()
@@ -1094,6 +1113,10 @@ class Boldgrid_Backup_Admin_Cron {
 	 */
 	public function maybe_rotate_cron_secrets() {
 		if ( self::SECRETS_ROTATED_VERSION === get_site_option( self::SECRETS_ROTATED_OPTION ) ) {
+			return false;
+		}
+
+		if ( ! $this->claim_secrets_rotation() ) {
 			return false;
 		}
 
@@ -1150,6 +1173,38 @@ class Boldgrid_Backup_Admin_Cron {
 			$this->refresh_restore_info_cron_secret( $old_secret, $new_secret );
 		}
 
+		delete_site_option( self::SECRETS_ROTATING_OPTION );
+
+		return true;
+	}
+
+	/**
+	 * Claim the one-time rotation so concurrent requests do not both remint.
+	 *
+	 * Two requests can pass the gate check before either persists it, which would remint
+	 * twice and leave crontab and settings holding different secrets. add_site_option()
+	 * only reports success for the request that inserts the row, so it serializes the
+	 * common case. A claim older than SECRETS_ROTATING_TIMEOUT is assumed abandoned by a
+	 * request that died mid-rotation and may be taken over, otherwise a fatal during
+	 * rotation would block the upgrade permanently.
+	 *
+	 * @since 1.17.4
+	 *
+	 * @return bool True when this request owns the rotation.
+	 */
+	private function claim_secrets_rotation() {
+		if ( add_site_option( self::SECRETS_ROTATING_OPTION, time() ) ) {
+			return true;
+		}
+
+		$claimed_at = (int) get_site_option( self::SECRETS_ROTATING_OPTION );
+
+		if ( $claimed_at && ( time() - $claimed_at ) < self::SECRETS_ROTATING_TIMEOUT ) {
+			return false;
+		}
+
+		update_site_option( self::SECRETS_ROTATING_OPTION, time() );
+
 		return true;
 	}
 
@@ -1158,7 +1213,9 @@ class Boldgrid_Backup_Admin_Cron {
 	 *
 	 * Emergency CLI restore builds its admin-ajax call from this file. Leaving the
 	 * old secret would either fail is_valid_call() or (worse) leave a harvested value
-	 * as the only copy trusted by the CLI path.
+	 * as the only copy trusted by the CLI path. Secure storage is always scanned; the
+	 * legacy plugin cron/ directory is rewritten only when it is still the live metadata
+	 * (no secure storage), and otherwise has its retired copies deleted.
 	 *
 	 * @since 1.17.4
 	 *
@@ -1174,45 +1231,43 @@ class Boldgrid_Backup_Admin_Cron {
 			return false;
 		}
 
-		$backup_dir = $this->core->backup_dir->get();
-		if ( empty( $backup_dir ) ) {
-			return false;
-		}
-
 		require_once BOLDGRID_BACKUP_PATH . '/cli/class-info.php';
 
-		$backup_dir = \Boldgrid\Backup\Cli\Info::untrailingslashit_path( (string) $backup_dir );
 		$paths      = array();
+		$backup_dir = $this->core->backup_dir->get();
 
-		$cli_secret = \Boldgrid\Backup\Cli\Info::get_secret();
-		if ( \Boldgrid\Backup\Cli\Info::is_valid_secret_format( $cli_secret ) ) {
-			$paths[] = \Boldgrid\Backup\Cli\Info::trailingslashit_path( $backup_dir ) .
-				'restore-info-' . $cli_secret . '.json';
+		if ( ! empty( $backup_dir ) ) {
+			$backup_dir = \Boldgrid\Backup\Cli\Info::untrailingslashit_path( (string) $backup_dir );
+
+			$cli_secret = \Boldgrid\Backup\Cli\Info::get_secret();
+			if ( \Boldgrid\Backup\Cli\Info::is_valid_secret_format( $cli_secret ) ) {
+				$paths[] = $backup_dir . '/restore-info-' . $cli_secret . '.json';
+			}
+
+			// Also scan for any restore-info-*.json in the backup directory (orphan names).
+			$paths = array_merge( $paths, $this->get_restore_info_paths( $backup_dir ) );
 		}
 
-		// Also scan for any restore-info-*.json in the backup directory (orphan names).
-		$listing = @scandir( $backup_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-		if ( ! empty( $listing ) ) {
-			foreach ( preg_grep( '/^restore-info-.*\.json$/', $listing ) as $file ) {
-				$paths[] = $backup_dir . '/' . $file;
-			}
+		/*
+		 * The CLI only reads the legacy plugin-tree copy when secure storage is
+		 * unavailable, and the plugin tree is not a guaranteed-private location. Rewrite
+		 * it only while it is the live metadata; otherwise the CLI cannot reach it, so
+		 * delete it instead of storing a fresh secret there.
+		 */
+		$legacy_paths = $this->get_restore_info_paths( BOLDGRID_BACKUP_PATH . '/cron' );
+
+		if ( \Boldgrid\Backup\Cli\Info::get_secure_storage_dir() ) {
+			$this->delete_stale_restore_info( $legacy_paths, $old_secret );
+		} else {
+			$paths = array_merge( $paths, $legacy_paths );
 		}
 
 		$paths   = array_unique( $paths );
 		$updated = false;
 
 		foreach ( $paths as $path ) {
-			if ( ! is_readable( $path ) ) {
-				continue;
-			}
-
-			$contents = file_get_contents( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
-			if ( false === $contents ) {
-				continue;
-			}
-
-			$data = json_decode( $contents, true );
-			if ( ! is_array( $data ) || empty( $data['cron_secret'] ) ) {
+			$data = $this->read_restore_info( $path );
+			if ( null === $data || empty( $data['cron_secret'] ) ) {
 				continue;
 			}
 
@@ -1243,7 +1298,7 @@ class Boldgrid_Backup_Admin_Cron {
 			if ( ! $written ) {
 				$bytes = @file_put_contents( $path, $payload ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
 				if ( false !== $bytes ) {
-					@chmod( $path, 0600 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+					@chmod( $path, 0600 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.file_system_operations_chmod
 					$written = true;
 				}
 			}
@@ -1254,6 +1309,90 @@ class Boldgrid_Backup_Admin_Cron {
 		}
 
 		return $updated;
+	}
+
+	/**
+	 * Read and decode a restore-info JSON file.
+	 *
+	 * @since 1.17.4
+	 *
+	 * @param  string $path Absolute path to a restore-info file.
+	 * @return array|null Decoded data, or null when unreadable / not JSON.
+	 */
+	private function read_restore_info( $path ) {
+		if ( ! is_readable( $path ) ) {
+			return null;
+		}
+
+		$contents = file_get_contents( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		if ( false === $contents ) {
+			return null;
+		}
+
+		$data = json_decode( $contents, true );
+
+		return is_array( $data ) ? $data : null;
+	}
+
+	/**
+	 * Delete restore-info copies that still hold a rotated-out cron secret.
+	 *
+	 * Used for copies the CLI can no longer reach, so the retired secret does not linger
+	 * on disk. Files holding any other secret are left alone.
+	 *
+	 * @since 1.17.4
+	 *
+	 * @param  array  $paths      Restore-info paths to consider.
+	 * @param  string $old_secret Rotated-out cron secret.
+	 * @return int Number of files deleted.
+	 */
+	private function delete_stale_restore_info( array $paths, $old_secret ) {
+		$deleted = 0;
+
+		foreach ( $paths as $path ) {
+			$data = $this->read_restore_info( $path );
+			if ( null === $data || empty( $data['cron_secret'] ) ) {
+				continue;
+			}
+
+			if ( ! hash_equals( (string) $data['cron_secret'], (string) $old_secret ) ) {
+				continue;
+			}
+
+			if ( @unlink( $path ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
+				++$deleted;
+			}
+		}
+
+		return $deleted;
+	}
+
+	/**
+	 * List restore-info-*.json files in a directory.
+	 *
+	 * @since 1.17.4
+	 *
+	 * @param  string $dir Directory to scan.
+	 * @return array Absolute paths, empty when the directory is unreadable.
+	 */
+	private function get_restore_info_paths( $dir ) {
+		$dir   = \Boldgrid\Backup\Cli\Info::untrailingslashit_path( (string) $dir );
+		$paths = array();
+
+		if ( '' === $dir || ! is_dir( $dir ) ) {
+			return $paths;
+		}
+
+		$listing = @scandir( $dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		if ( empty( $listing ) ) {
+			return $paths;
+		}
+
+		foreach ( preg_grep( '/^restore-info-.*\.json$/', $listing ) as $file ) {
+			$paths[] = $dir . '/' . $file;
+		}
+
+		return $paths;
 	}
 
 	/**
