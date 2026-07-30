@@ -1079,6 +1079,11 @@ class Boldgrid_Backup_Admin_Cron {
 	 * to 1.17.4 this method clears those secrets once, mints a fresh cron_secret, and
 	 * rewrites crontab / restore-info that still embedded the old value.
 	 *
+	 * The one-shot gate is written immediately after remint so a later crontab rewrite
+	 * failure cannot cause another rotation on the next request. Crontab / restore-info
+	 * updates are best-effort; a failed rewrite can be repaired by re-saving settings or
+	 * reactivating the plugin (activation always calls add_all_crons).
+	 *
 	 * @since 1.17.4
 	 *
 	 * @see Boldgrid_Backup_Admin_Cron::get_cron_secret()
@@ -1105,14 +1110,18 @@ class Boldgrid_Backup_Admin_Cron {
 		if ( '' !== $old_secret ) {
 			$new_secret = $this->get_cron_secret();
 
+			/*
+			 * Persist the gate before crontab/restore-info rewrites. Remint already
+			 * invalidated the harvested secret; failing to set the gate here would
+			 * treat the fresh secret as "old" on the next init and rotate forever.
+			 */
+			update_site_option( self::SECRETS_ROTATED_OPTION, self::SECRETS_ROTATED_VERSION );
+
 			$settings  = $this->core->settings->get_settings( true );
 			$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
 
-			$cron_needs_rewrite = 'cron' === $scheduler && $this->core->scheduler->is_available( 'cron' );
-			$crons_ok           = true;
-
-			if ( $cron_needs_rewrite ) {
-				$crons_ok = $this->add_all_crons( $settings );
+			if ( 'cron' === $scheduler && $this->core->scheduler->is_available( 'cron' ) ) {
+				$this->add_all_crons( $settings );
 			}
 
 			/*
@@ -1131,13 +1140,9 @@ class Boldgrid_Backup_Admin_Cron {
 			}
 
 			$this->refresh_restore_info_cron_secret( $old_secret, $new_secret );
-
-			if ( ! $crons_ok ) {
-				return false;
-			}
+		} else {
+			update_site_option( self::SECRETS_ROTATED_OPTION, self::SECRETS_ROTATED_VERSION );
 		}
-
-		update_site_option( self::SECRETS_ROTATED_OPTION, self::SECRETS_ROTATED_VERSION );
 
 		return true;
 	}

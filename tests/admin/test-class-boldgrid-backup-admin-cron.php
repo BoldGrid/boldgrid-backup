@@ -256,6 +256,59 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Gate must be set even when crontab rewrite fails, so the next init does not re-mint.
+	 *
+	 * @since 1.17.4
+	 */
+	public function test_maybe_rotate_cron_secrets_sets_gate_when_crontab_rewrite_fails() {
+		$old_secret = 'secret_before_failed_crontab_rewrite';
+		$settings   = get_site_option( 'boldgrid_backup_settings', array() );
+		if ( ! is_array( $settings ) ) {
+			$settings = array();
+		}
+		$settings['cron_secret'] = $old_secret;
+		$settings['scheduler']   = 'cron';
+		$settings['schedule']    = array(
+			'dow_monday' => 1,
+			'tod_h'      => 3,
+			'tod_m'      => '15',
+			'tod_a'      => 'AM',
+		);
+		update_site_option( 'boldgrid_backup_settings', $settings );
+		delete_site_option( Boldgrid_Backup_Admin_Cron::SECRETS_ROTATED_OPTION );
+
+		$reflection = new ReflectionClass( $this->core->cron );
+		$property   = $reflection->getProperty( 'cron_secret' );
+		$property->setAccessible( true );
+		$property->setValue( $this->core->cron, $old_secret );
+
+		/*
+		 * Force add_all_crons to fail after remint by pointing backup_dir at a missing path
+		 * (update_cron bails when backup dir is empty/unavailable).
+		 */
+		$original_dir                             = $this->core->backup_dir->backup_directory;
+		$this->core->backup_dir->backup_directory = '/nonexistent/path/that/does/not/exist';
+
+		$ran = $this->core->cron->maybe_rotate_cron_secrets();
+
+		$this->core->backup_dir->backup_directory = $original_dir;
+
+		$this->assertTrue( $ran );
+		$this->assertSame(
+			Boldgrid_Backup_Admin_Cron::SECRETS_ROTATED_VERSION,
+			get_site_option( Boldgrid_Backup_Admin_Cron::SECRETS_ROTATED_OPTION ),
+			'Gate must be set after remint even if crontab rewrite fails.'
+		);
+
+		$mid_secret = $this->core->cron->get_cron_secret();
+		$this->assertNotEquals( $old_secret, $mid_secret );
+
+		// A subsequent call must not rotate again.
+		$this->assertFalse( $this->core->cron->maybe_rotate_cron_secrets() );
+		$this->assertSame( $mid_secret, $this->core->cron->get_cron_secret() );
+	}
+
+	/**
 	 * Test greenfield installs with no prior secret only set the rotation gate.
 	 *
 	 * @since 1.17.4
