@@ -160,7 +160,13 @@ class Boldgrid_Backup_Admin_Db_Get {
 		$tables = $this->prefixed();
 
 		foreach ( $tables as $table ) {
-			$num = $wpdb->get_var( 'SELECT COUNT(*) FROM `' . $table . '`;' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			/*
+			 * The table name comes from the SHOW TABLES result in prefixed().
+			 * esc_sql() is still required because WordPress 5.0, which this
+			 * plugin supports, predates the %i identifier placeholder.
+			 */
+			$escaped_table = esc_sql( $table );
+			$num           = $wpdb->get_var( 'SELECT COUNT(*) FROM `' . $escaped_table . '`;' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Identifier is database-derived and escaped above.
 
 			$return[ $table ] = $num;
 		}

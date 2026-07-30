@@ -13,8 +13,12 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// Abort if not being ran from the command line.
-if ( ! isset( $_SERVER['argv'], $_SERVER['argc'] ) || ! (int) $_SERVER['argc'] ) { // WPCS: input var ok; sanitization ok.
+// Abort unless this is a command-line invocation with arguments.
+if (
+	! in_array( PHP_SAPI, array( 'cli', 'phpdbg' ), true ) ||
+	! isset( $_SERVER['argv'], $_SERVER['argc'] ) ||
+	! (int) $_SERVER['argc']
+) { // WPCS: input var ok; sanitization ok.
 	die( 'Error: No parameters were passed.  A "siteurl" and "id" are required.' . PHP_EOL ); // WPCS: XSS ok.
 }
 
