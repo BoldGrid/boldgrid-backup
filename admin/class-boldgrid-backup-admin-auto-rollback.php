@@ -515,7 +515,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		}
 
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
-		$deadline         = ! empty( $pending_rollback['deadline'] ) ? sprintf( '(<em>%1$s</em>)', gmdate( 'g:i a', $this->core->utility->time( $pending_rollback['deadline'] ) ) ) : '';
+		$deadline         = ! empty( $pending_rollback['deadline'] ) ? sprintf( '(<em>%1$s</em>)', date_i18n( 'g:i a', $pending_rollback['deadline'] ) ) : '';
 
 		$update_trigger = $this->notice_trigger_get();
 		$update_trigger = ! empty( $update_trigger ) ? sprintf( '<p>%1$s</p>', $update_trigger ) : '';

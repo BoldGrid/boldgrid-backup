@@ -234,9 +234,9 @@ class Boldgrid_Backup_Admin_Jobs {
 				__( 'status', 'boldgrid-backup' ),
 				$job['status'],
 				__( 'start', 'boldgrid-backup' ),
-				gmdate( 'Y.m.d h:i:s a', $job['start_time'] ),
+				date_i18n( 'Y.m.d h:i:s a', $job['start_time'] ),
 				__( 'end', 'boldgrid-backup' ),
-				gmdate( 'Y.m.d h:i:s a', $job['end_time'] ),
+				date_i18n( 'Y.m.d h:i:s a', $job['end_time'] ),
 				"\t"
 			);
 			$post_jobs++;
