@@ -79,11 +79,11 @@ class Boldgrid_Backup_Activator {
 			/*
 			 * Add all previous crons.
 			 *
-			 * The add_all_crons methods called include proper checks to ensure
-			 * scheduler is available and $settings include a schedule.
+			 * add_all_crons checks that the scheduler is available, then clears existing
+			 * schedules and only re-adds a backup entry when $settings include a schedule.
 			 *
 			 * Re-read settings after secret rotation so crontab lines embed the new secret.
-			 * add_all_crons clears schedules, so re-add a pending rollback restore cron after.
+			 * Since add_all_crons clears schedules, re-add a pending rollback restore cron after.
 			 */
 			$settings = $core->settings->get_settings();
 			if ( 'cron' === $scheduler ) {
