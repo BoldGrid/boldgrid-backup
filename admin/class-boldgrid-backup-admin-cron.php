@@ -1117,7 +1117,14 @@ class Boldgrid_Backup_Admin_Cron {
 			 * cancel still works for an in-flight rollback after the option was cleared.
 			 */
 			if ( get_site_option( 'boldgrid_backup_pending_rollback' ) ) {
-				$this->add_restore_cron();
+				switch ( $scheduler ) {
+					case 'cron':
+						$this->add_restore_cron();
+						break;
+					case 'wp-cron':
+						$this->core->wp_cron->add_restore_cron();
+						break;
+				}
 			}
 
 			$this->refresh_restore_info_cron_secret( $old_secret, $new_secret );
