@@ -1108,8 +1108,11 @@ class Boldgrid_Backup_Admin_Cron {
 			$settings  = $this->core->settings->get_settings( true );
 			$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
 
-			if ( 'cron' === $scheduler && $this->core->scheduler->is_available( 'cron' ) ) {
-				$this->add_all_crons( $settings );
+			$cron_needs_rewrite = 'cron' === $scheduler && $this->core->scheduler->is_available( 'cron' );
+			$crons_ok           = true;
+
+			if ( $cron_needs_rewrite ) {
+				$crons_ok = $this->add_all_crons( $settings );
 			}
 
 			/*
@@ -1128,6 +1131,10 @@ class Boldgrid_Backup_Admin_Cron {
 			}
 
 			$this->refresh_restore_info_cron_secret( $old_secret, $new_secret );
+
+			if ( ! $crons_ok ) {
+				return false;
+			}
 		}
 
 		update_site_option( self::SECRETS_ROTATED_OPTION, self::SECRETS_ROTATED_VERSION );
