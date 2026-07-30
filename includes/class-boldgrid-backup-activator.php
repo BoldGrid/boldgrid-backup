@@ -86,14 +86,15 @@ class Boldgrid_Backup_Activator {
 			 * Since add_all_crons clears schedules, re-add a pending rollback restore cron after.
 			 */
 			$settings = $core->settings->get_settings();
+			$archives = $core->get_archive_list();
 			if ( 'cron' === $scheduler ) {
 				$core->cron->add_all_crons( $settings );
-				if ( get_site_option( 'boldgrid_backup_pending_rollback' ) ) {
+				if ( get_site_option( 'boldgrid_backup_pending_rollback' ) && ! empty( $archives ) ) {
 					$core->cron->add_restore_cron();
 				}
 			} elseif ( 'wp-cron' === $scheduler ) {
 				$core->wp_cron->add_all_crons( $settings );
-				if ( get_site_option( 'boldgrid_backup_pending_rollback' ) ) {
+				if ( get_site_option( 'boldgrid_backup_pending_rollback' ) && ! empty( $archives ) ) {
 					$core->wp_cron->add_restore_cron();
 				}
 			}

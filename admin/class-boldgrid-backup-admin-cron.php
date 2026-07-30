@@ -1158,7 +1158,8 @@ class Boldgrid_Backup_Admin_Cron {
 		 * cancel secret without ever having stored a cron_secret, so this cannot be
 		 * limited to the rotation path.
 		 */
-		if ( ( $rotating || $had_cancel_secret ) && get_site_option( 'boldgrid_backup_pending_rollback' ) ) {
+		$archives = $this->core->get_archive_list();
+		if ( ( $rotating || $had_cancel_secret ) && get_site_option( 'boldgrid_backup_pending_rollback' ) && ! empty( $archives ) ) {
 			switch ( $scheduler ) {
 				case 'cron':
 					$this->add_restore_cron();
