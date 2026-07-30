@@ -93,6 +93,9 @@ class Boldgrid_Backup_Activator {
 				}
 			} elseif ( 'wp-cron' === $scheduler ) {
 				$core->wp_cron->add_all_crons( $settings );
+				if ( get_site_option( 'boldgrid_backup_pending_rollback' ) ) {
+					$core->wp_cron->add_restore_cron();
+				}
 			}
 		}
 	}
