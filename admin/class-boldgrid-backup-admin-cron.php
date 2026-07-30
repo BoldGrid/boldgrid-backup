@@ -376,7 +376,7 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @return bool True if an active direct transfer exists.
 	 */
 	public function has_active_direct_transfer() {
-		$config       = $this->core->configs['direct_transfer'];
+		$config       = ! empty( $this->core->configs['direct_transfer'] ) ? $this->core->configs['direct_transfer'] : array();
 		$option_names = ! empty( $config['option_names'] ) ? $config['option_names'] : array();
 
 		$active_rx = ! empty( $option_names['active_transfer'] )
@@ -394,9 +394,16 @@ class Boldgrid_Backup_Admin_Cron {
 		$transfers_option = ! empty( $option_names['transfers'] ) ? $option_names['transfers'] : '';
 		$transfers        = '' !== $transfers_option ? get_option( $transfers_option, array() ) : array();
 
-		if ( ! empty( $active_rx ) ) {
-			if ( isset( $transfers[ $active_rx ] ) &&
-				! in_array( $transfers[ $active_rx ]['status'], array( 'completed', 'cancelled' ), true ) ) {
+		/*
+		 * Migrate writes "canceled"; some call sites historically checked "cancelled".
+		 * Treat both (and other terminal statuses) as inactive. Missing status is treated
+		 * as active so a corrupted option cannot drop an in-progress transfer cron.
+		 */
+		$inactive_statuses = array( 'completed', 'restore-completed', 'failed', 'canceled', 'cancelled' );
+
+		if ( ! empty( $active_rx ) && isset( $transfers[ $active_rx ] ) && is_array( $transfers[ $active_rx ] ) ) {
+			$status = isset( $transfers[ $active_rx ]['status'] ) ? $transfers[ $active_rx ]['status'] : '';
+			if ( ! in_array( $status, $inactive_statuses, true ) ) {
 				return true;
 			}
 		}
@@ -1204,15 +1211,18 @@ class Boldgrid_Backup_Admin_Cron {
 
 		if ( $rotating && 'cron' === $scheduler && $this->core->scheduler->is_available( 'cron' ) ) {
 			$this->add_all_crons( $settings );
+		}
 
-			/*
-			 * add_all_crons clears all crontab entries but does not recreate direct-transfer
-			 * schedules, which are managed separately. If an active transfer exists, reschedule
-			 * its cron so the transfer continues under the new secret.
-			 */
-			if ( $this->has_active_direct_transfer() ) {
-				$this->schedule_direct_transfer();
-			}
+		/*
+		 * Direct transfer always uses system crontab with an embedded cron_secret, even when
+		 * the configured backup scheduler is wp-cron. add_all_crons (system-cron path) clears
+		 * that entry and never recreates it; the wp-cron path never touches it, so the old
+		 * secret would keep working against settings that no longer accept it. Delete then
+		 * reschedule so only the new secret remains.
+		 */
+		if ( $rotating && $this->has_active_direct_transfer() ) {
+			$this->entry_delete_contains( 'direct-transfer.php' );
+			$this->schedule_direct_transfer();
 		}
 
 		/*

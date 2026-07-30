@@ -674,6 +674,100 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 	}
 
 	/**
+	 * has_active_direct_transfer must tolerate missing status and match migrate status values.
+	 *
+	 * @since 1.17.4
+	 */
+	public function test_has_active_direct_transfer() {
+		$config       = $this->core->configs['direct_transfer'];
+		$option_names = $config['option_names'];
+		$transfer_id  = 'xfer_status_guard_test';
+
+		delete_option( $option_names['active_transfer'] );
+		delete_option( $option_names['active_tx'] );
+		delete_option( $option_names['transfers'] );
+
+		$this->assertFalse( $this->core->cron->has_active_direct_transfer() );
+
+		update_option( $option_names['active_transfer'], $transfer_id, false );
+		update_option(
+			$option_names['transfers'],
+			array(
+				$transfer_id => array(
+					'transfer_id' => $transfer_id,
+					'status'      => 'transferring',
+				),
+			),
+			false
+		);
+		$this->assertTrue( $this->core->cron->has_active_direct_transfer() );
+
+		// Missing status must not warn/fatal; treat as active so upgrade cannot drop the cron.
+		update_option(
+			$option_names['transfers'],
+			array(
+				$transfer_id => array(
+					'transfer_id' => $transfer_id,
+				),
+			),
+			false
+		);
+		$this->assertTrue( $this->core->cron->has_active_direct_transfer() );
+
+		// Migrate writes "canceled"; also accept the historical "cancelled" spelling.
+		update_option(
+			$option_names['transfers'],
+			array(
+				$transfer_id => array(
+					'transfer_id' => $transfer_id,
+					'status'      => 'canceled',
+				),
+			),
+			false
+		);
+		$this->assertFalse( $this->core->cron->has_active_direct_transfer() );
+
+		update_option(
+			$option_names['transfers'],
+			array(
+				$transfer_id => array(
+					'transfer_id' => $transfer_id,
+					'status'      => 'cancelled',
+				),
+			),
+			false
+		);
+		$this->assertFalse( $this->core->cron->has_active_direct_transfer() );
+
+		update_option(
+			$option_names['transfers'],
+			array(
+				$transfer_id => array(
+					'transfer_id' => $transfer_id,
+					'status'      => 'completed',
+				),
+			),
+			false
+		);
+		$this->assertFalse( $this->core->cron->has_active_direct_transfer() );
+
+		delete_option( $option_names['active_transfer'] );
+		delete_option( $option_names['transfers'] );
+
+		update_option(
+			$option_names['active_tx'],
+			array(
+				'transfer_id' => $transfer_id,
+				'status'      => 'pending',
+			),
+			false
+		);
+		$this->assertTrue( $this->core->cron->has_active_direct_transfer() );
+
+		delete_option( $option_names['active_tx'] );
+	}
+
+	/**
 	 * Test filtering crontab contents with mode "" (backup).
 	 *
 	 * @since 1.11.1
