@@ -366,6 +366,49 @@ class Boldgrid_Backup_Admin_Cron {
 	}
 
 	/**
+	 * Check if there is an active direct transfer in progress.
+	 *
+	 * Direct transfers can be active on either the receiving side (active_transfer)
+	 * or the sending side (active_tx). This checks both.
+	 *
+	 * @since 1.17.4
+	 *
+	 * @return bool True if an active direct transfer exists.
+	 */
+	public function has_active_direct_transfer() {
+		$config       = $this->core->configs['direct_transfer'];
+		$option_names = ! empty( $config['option_names'] ) ? $config['option_names'] : array();
+
+		$active_rx = ! empty( $option_names['active_transfer'] )
+			? get_option( $option_names['active_transfer'], false )
+			: false;
+
+		$active_tx = ! empty( $option_names['active_tx'] )
+			? get_option( $option_names['active_tx'], false )
+			: false;
+
+		if ( empty( $active_rx ) && empty( $active_tx ) ) {
+			return false;
+		}
+
+		$transfers_option = ! empty( $option_names['transfers'] ) ? $option_names['transfers'] : '';
+		$transfers        = '' !== $transfers_option ? get_option( $transfers_option, array() ) : array();
+
+		if ( ! empty( $active_rx ) ) {
+			if ( isset( $transfers[ $active_rx ] ) &&
+				! in_array( $transfers[ $active_rx ]['status'], array( 'completed', 'cancelled' ), true ) ) {
+				return true;
+			}
+		}
+
+		if ( ! empty( $active_tx ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Schedule Site Check.
 	 *
 	 * This method is usually ran after saving the settings. If (after save) cron is our scheduler,
@@ -1159,6 +1202,15 @@ class Boldgrid_Backup_Admin_Cron {
 
 		if ( $rotating && 'cron' === $scheduler && $this->core->scheduler->is_available( 'cron' ) ) {
 			$this->add_all_crons( $settings );
+
+			/*
+			 * add_all_crons clears all crontab entries but does not recreate direct-transfer
+			 * schedules, which are managed separately. If an active transfer exists, reschedule
+			 * its cron so the transfer continues under the new secret.
+			 */
+			if ( $this->has_active_direct_transfer() ) {
+				$this->schedule_direct_transfer();
+			}
 		}
 
 		/*
