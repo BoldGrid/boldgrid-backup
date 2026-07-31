@@ -218,7 +218,13 @@ class Boldgrid_Backup_Admin_Cron {
 			$jobs_scheduled = $this->schedule_jobs( $settings );
 			$site_check     = $this->schedule_site_check( $settings );
 
-			$success = $scheduled && $jobs_scheduled;
+			/*
+			 * An empty schedule is success when jobs were written: there is no backup
+			 * entry to add. Requiring $scheduled here left crontab_version unset, so
+			 * upgrade_crontab_entries cleared restore/direct-transfer jobs on every
+			 * admin_init for sites with no backup schedule.
+			 */
+			$success = ( empty( $schedule ) || $scheduled ) && $jobs_scheduled;
 
 			if ( $success ) {
 				$settings['crontab_version'] = $this->crontab_version;
@@ -1558,14 +1564,16 @@ class Boldgrid_Backup_Admin_Cron {
 
 		if ( empty( $settings['crontab_version'] ) ||
 			$this->crontab_version !== $settings['crontab_version'] ) {
-				// Delete and recreate the crontab entries.
-				$upgraded = $this->add_all_crons( $settings );
+			// Delete and recreate the crontab entries.
+			$upgraded = $this->add_all_crons( $settings );
 
 			/*
 			 * add_all_crons clears all BoldGrid crontab entries and only re-adds
 			 * backup/jobs/site-check. Pending rollback restore crons and active
-			 * direct-transfer crons must be re-added afterward, regardless of
-			 * whether add_all_crons succeeded, to avoid dropping critical jobs.
+			 * direct-transfer crons must be re-added afterward — matching activation
+			 * and secret rotation. When the schedule is empty, add_all_crons may
+			 * return false without persisting crontab_version; without this follow-up
+			 * those jobs would be dropped again on every admin_init.
 			 */
 			$archives = $this->core->get_archive_list();
 			if ( get_site_option( 'boldgrid_backup_pending_rollback' ) && ! empty( $archives ) ) {
@@ -1579,12 +1587,12 @@ class Boldgrid_Backup_Admin_Cron {
 
 			if ( $upgraded ) {
 				/**
-					 * Action when the crontab entry upgrade is successfully completed.
-					 *
-					 * @since 1.6.1-rc.1
-					 *
-					 * @param string The new crontab entry version.
-					 */
+				 * Action when the crontab entry upgrade is successfully completed.
+				 *
+				 * @since 1.6.1-rc.1
+				 *
+				 * @param string The new crontab entry version.
+				 */
 				do_action(
 					'boldgrid_backup_upgrade_crontab_entries_complete',
 					$this->crontab_version

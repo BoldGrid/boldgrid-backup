@@ -979,4 +979,79 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 ';
 		$this->assertEquals( $crontab_expected, $crontab_filtered );
 	}
+
+	/**
+	 * upgrade_crontab_entries must re-add a pending rollback after add_all_crons clears.
+	 *
+	 * When crontab_version is missing and there is no backup schedule, add_all_crons
+	 * clears plugin crontab lines. The follow-up must call add_restore_cron so the
+	 * cancel secret is reminted (observable even when crontab writes are blocked).
+	 *
+	 * @since 1.17.4
+	 */
+	public function test_upgrade_crontab_entries_reissues_pending_rollback() {
+		$this->maybe_create_backup();
+
+		// Force the system-cron path so this assertion does not depend on host crontab probes.
+		$this->core->scheduler->available = array(
+			'cron' => array(
+				'title' => 'Cron',
+			),
+		);
+
+		$settings = get_site_option( 'boldgrid_backup_settings', array() );
+		if ( ! is_array( $settings ) ) {
+			$settings = array();
+		}
+		$settings['scheduler'] = 'cron';
+		unset( $settings['schedule'], $settings['crontab_version'] );
+		update_site_option( 'boldgrid_backup_settings', $settings );
+
+		$old_cancel_secret = 'cancel_secret_before_crontab_upgrade';
+		update_site_option( 'boldgrid_backup_cli_cancel_secret', $old_cancel_secret );
+		update_site_option( 'boldgrid_backup_pending_rollback', array( 'deadline' => time() + 300 ) );
+
+		$this->core->cron->upgrade_crontab_entries();
+
+		$new_cancel_secret = get_site_option( 'boldgrid_backup_cli_cancel_secret', '' );
+		delete_site_option( 'boldgrid_backup_pending_rollback' );
+
+		$this->assertNotEmpty( $new_cancel_secret );
+		$this->assertNotEquals(
+			$old_cancel_secret,
+			$new_cancel_secret,
+			'Pending rollback restore cron must be re-issued after upgrade_crontab_entries.'
+		);
+	}
+
+	/**
+	 * upgrade_crontab_entries must not schedule a system restore cron for wp-cron sites.
+	 *
+	 * @since 1.17.4
+	 */
+	public function test_upgrade_crontab_entries_skips_system_restore_for_wp_cron() {
+		$this->maybe_create_backup();
+
+		$settings = get_site_option( 'boldgrid_backup_settings', array() );
+		if ( ! is_array( $settings ) ) {
+			$settings = array();
+		}
+		$settings['scheduler'] = 'wp-cron';
+		unset( $settings['schedule'], $settings['crontab_version'] );
+		update_site_option( 'boldgrid_backup_settings', $settings );
+
+		$old_cancel_secret = 'cancel_secret_wp_cron_must_keep';
+		update_site_option( 'boldgrid_backup_cli_cancel_secret', $old_cancel_secret );
+		update_site_option( 'boldgrid_backup_pending_rollback', array( 'deadline' => time() + 300 ) );
+
+		$this->core->cron->upgrade_crontab_entries();
+
+		delete_site_option( 'boldgrid_backup_pending_rollback' );
+
+		$this->assertSame(
+			$old_cancel_secret,
+			get_site_option( 'boldgrid_backup_cli_cancel_secret', '' ),
+			'wp-cron sites must not get a system restore cron from upgrade_crontab_entries.'
+		);
+	}
 }
