@@ -1,5 +1,6 @@
 *.swp
 .buildpath
+.claude/settings.local.json
 .cursor/working/
 .ea-php-cli.cache
 .phpunit.result.cache

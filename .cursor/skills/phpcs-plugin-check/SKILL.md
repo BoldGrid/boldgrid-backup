@@ -18,10 +18,12 @@ description: >-
 ## Run
 
 ```bash
-# From plugin root
-~/.config/composer/vendor/bin/phpcs
-~/.config/composer/vendor/bin/phpcs --report=source
-~/.config/composer/vendor/bin/phpcs path/to/file.php
+# From plugin root (phpcs.xml.dist is the project ruleset)
+phpcs
+phpcs --report=source
+phpcs path/to/file.php
+# If phpcs is not on PATH after Composer install:
+./vendor/bin/phpcs
 ```
 
 The project ruleset is Plugin Check–aligned (security, i18n, prefixes, restricted functions). It intentionally excludes full WordPress style noise (Yoda, array syntax wars, etc.).
@@ -41,10 +43,10 @@ The project ruleset is Plugin Check–aligned (security, i18n, prefixes, restric
 
 ```bash
 phpcs --report=summary
-phplint   # or find … php -lf
-wpphpunit # if behavior changed
+find . -name vendor -prune -o -name node_modules -prune -o -name '*.php' -exec php -lf {} \;
+# If behavior changed, run PHPUnit (see phpunit-total-upkeep skill)
 ```
 
 ## Scratch
 
-Write intermediate reports under `.cursor/working/` (gitignored), e.g. `ENG7-4668-phpcs-source.txt`.
+Write intermediate reports under `.cursor/working/` (gitignored), e.g. `ENG7-4668-phpcs-source.txt`. Cross-project probes go under `$HOME/tmp/` — never system `/tmp/`.
