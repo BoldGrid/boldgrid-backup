@@ -1213,7 +1213,7 @@ class Boldgrid_Backup_Admin_Cron {
 		update_site_option( self::SECRETS_ROTATED_OPTION, self::SECRETS_ROTATED_VERSION );
 
 		$settings  = $this->core->settings->get_settings( true );
-		$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
+		$scheduler = $this->core->scheduler->get();
 
 		if ( $rotating && 'cron' === $scheduler && $this->core->scheduler->is_available( 'cron' ) ) {
 			$this->add_all_crons( $settings );
