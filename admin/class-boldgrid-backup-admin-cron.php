@@ -1555,6 +1555,22 @@ class Boldgrid_Backup_Admin_Cron {
 				// Delete and recreate the crontab entries.
 				$upgraded = $this->add_all_crons( $settings );
 
+			/*
+			 * add_all_crons clears all BoldGrid crontab entries and only re-adds
+			 * backup/jobs/site-check. Pending rollback restore crons and active
+			 * direct-transfer crons must be re-added afterward, regardless of
+			 * whether add_all_crons succeeded, to avoid dropping critical jobs.
+			 */
+			$archives = $this->core->get_archive_list();
+			if ( get_site_option( 'boldgrid_backup_pending_rollback' ) && ! empty( $archives ) ) {
+				$this->add_restore_cron();
+			}
+
+			if ( $this->has_active_direct_transfer() ) {
+				$this->entry_delete_contains( 'direct-transfer.php' );
+				$this->schedule_direct_transfer();
+			}
+
 			if ( $upgraded ) {
 				/**
 					 * Action when the crontab entry upgrade is successfully completed.
