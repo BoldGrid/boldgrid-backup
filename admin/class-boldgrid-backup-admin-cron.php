@@ -1550,6 +1550,12 @@ class Boldgrid_Backup_Admin_Cron {
 		$upgraded = false;
 		$settings = $this->core->settings->get_settings( true );
 
+		$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
+
+		if ( 'cron' !== $scheduler || ! $this->core->scheduler->is_available( $scheduler ) ) {
+			return false;
+		}
+
 		if ( empty( $settings['crontab_version'] ) ||
 			$this->crontab_version !== $settings['crontab_version'] ) {
 				// Delete and recreate the crontab entries.
