@@ -1054,4 +1054,55 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 			'wp-cron sites must not get a system restore cron from upgrade_crontab_entries.'
 		);
 	}
+
+	/**
+	 * Rotation must use scheduler->get() fallback when settings never saved a scheduler.
+	 *
+	 * Auto-rollback schedules via the fallback. Reading only settings['scheduler'] would
+	 * skip restore re-issue after clearing cli_cancel_secret on those sites.
+	 *
+	 * @since 1.17.4
+	 */
+	public function test_maybe_rotate_cron_secrets_uses_scheduler_fallback() {
+		$this->maybe_create_backup();
+
+		$this->core->scheduler->available = array(
+			'cron' => array(
+				'title' => 'Cron',
+			),
+		);
+
+		$old_secret = 'secret_with_no_scheduler_setting';
+		$settings   = get_site_option( 'boldgrid_backup_settings', array() );
+		if ( ! is_array( $settings ) ) {
+			$settings = array();
+		}
+		$settings['cron_secret'] = $old_secret;
+		unset( $settings['scheduler'] );
+		update_site_option( 'boldgrid_backup_settings', $settings );
+
+		$old_cancel_secret = 'cancel_secret_before_scheduler_fallback';
+		update_site_option( 'boldgrid_backup_cli_cancel_secret', $old_cancel_secret );
+		update_site_option( 'boldgrid_backup_pending_rollback', array( 'deadline' => time() + 300 ) );
+		delete_site_option( Boldgrid_Backup_Admin_Cron::SECRETS_ROTATED_OPTION );
+
+		$reflection = new ReflectionClass( $this->core->cron );
+		$property   = $reflection->getProperty( 'cron_secret' );
+		$property->setAccessible( true );
+		$property->setValue( $this->core->cron, $old_secret );
+
+		$this->assertSame( 'cron', $this->core->scheduler->get() );
+		$this->assertTrue( $this->core->cron->maybe_rotate_cron_secrets() );
+
+		$new_cancel_secret = get_site_option( 'boldgrid_backup_cli_cancel_secret', '' );
+		delete_site_option( 'boldgrid_backup_pending_rollback' );
+
+		$this->assertNotEmpty( $new_cancel_secret );
+		$this->assertNotEquals(
+			$old_cancel_secret,
+			$new_cancel_secret,
+			'Fallback system-cron sites must re-issue the pending rollback cancel secret.'
+		);
+		$this->assertNotEquals( $old_secret, $this->core->cron->get_cron_secret() );
+	}
 }

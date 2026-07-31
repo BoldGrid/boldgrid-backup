@@ -204,7 +204,12 @@ class Boldgrid_Backup_Admin_Cron {
 	public function add_all_crons( array $settings ) {
 		$success = false;
 
-		$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
+		/*
+		 * Prefer the saved setting, then the same fallback as scheduler->get() /
+		 * auto-rollback. Using only settings['scheduler'] would no-op when the key
+		 * was never saved even though system cron is the effective scheduler.
+		 */
+		$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : $this->core->scheduler->get();
 		$schedule  = ! empty( $settings['schedule'] ) ? $settings['schedule'] : null;
 
 		if ( 'cron' === $scheduler && $this->core->scheduler->is_available( $scheduler ) ) {
@@ -1212,7 +1217,12 @@ class Boldgrid_Backup_Admin_Cron {
 		 */
 		update_site_option( self::SECRETS_ROTATED_OPTION, self::SECRETS_ROTATED_VERSION );
 
-		$settings  = $this->core->settings->get_settings( true );
+		$settings = $this->core->settings->get_settings( true );
+		/*
+		 * Use scheduler->get() so a missing settings['scheduler'] still resolves via the
+		 * same fallback as auto-rollback. Reading the raw key left pending rollbacks
+		 * without a cancel re-issue and skipped crontab rewrite after remint.
+		 */
 		$scheduler = $this->core->scheduler->get();
 
 		if ( $rotating && 'cron' === $scheduler && $this->core->scheduler->is_available( 'cron' ) ) {
@@ -1556,7 +1566,8 @@ class Boldgrid_Backup_Admin_Cron {
 		$upgraded = false;
 		$settings = $this->core->settings->get_settings( true );
 
-		$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
+		// Match auto-rollback / rotation: fall back when settings never saved a scheduler.
+		$scheduler = $this->core->scheduler->get();
 
 		if ( 'cron' !== $scheduler || ! $this->core->scheduler->is_available( $scheduler ) ) {
 			return false;

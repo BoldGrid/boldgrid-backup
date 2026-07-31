@@ -62,9 +62,9 @@ class Boldgrid_Backup_Activator {
 		self::$just_activated = true;
 
 		if ( Boldgrid_Backup_Admin_Test::is_filesystem_supported() ) {
-			$core      = new Boldgrid_Backup_Admin_Core();
-			$settings  = $core->settings->get_settings();
-			$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
+			$core = new Boldgrid_Backup_Admin_Core();
+			// Fall back when settings never saved a scheduler (same as auto-rollback).
+			$scheduler = $core->scheduler->get();
 
 			// Ensure per-install CLI secret lives outside the web-served plugin directory.
 			$backup_dir = $core->backup_dir->get();
