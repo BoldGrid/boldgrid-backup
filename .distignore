@@ -1,6 +1,7 @@
 # Development / CI / packaging metadata.
 # wordpress-tag-sync does not read this file; bin/release.sh mirrors it.
 # Kept for documentation and future wp dist-archive use.
+/.claude/
 /.cursor/
 /.distignore
 /.eslintignore
@@ -9,6 +10,7 @@
 /.prettierrc
 /.travis.yml
 /AGENTS.md
+/CLAUDE.md
 /bin/
 /phpcs.xml.dist
 /phpunit.xml

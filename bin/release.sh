@@ -7,7 +7,7 @@
 # wordpress-tag-sync removes some of these again in its SVN staging tree;
 # removals here also cover items that tag-sync does not know about.
 echo "Removing development-only files from release tree."
-rm -rf .cursor .github tests
+rm -rf .claude .cursor .github tests
 rm -f \
 	.distignore \
 	.eslintignore \
@@ -16,6 +16,7 @@ rm -f \
 	.prettierrc \
 	.travis.yml \
 	AGENTS.md \
+	CLAUDE.md \
 	phpcs.xml.dist \
 	phpunit.xml
 
