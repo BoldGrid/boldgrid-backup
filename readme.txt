@@ -4,7 +4,7 @@ Tags: backup, cloud backup, database backup, restore, wordpress backup
 Requires at least: 5.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.17.3
+Stable tag: 1.17.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -131,6 +131,10 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 1. Activate the plugin through the Plugins menu in WordPress.
 
 == Changelog ==
+
+= 1.17.4 =
+Release Date: Jul 30, 2026
+* Security Update: Rotate stored cron and CLI cancel secrets on upgrade so previously exposed credentials are no longer valid. Thanks to Jakub Herman for responsibly reporting this issue.
 
 = 1.17.3 =
 Release Date: Jul 23, 2026
@@ -968,6 +972,9 @@ Release Date: June 21st, 2016
 * Initial public release.
 
 == Upgrade Notice ==
+
+= 1.17.4 =
+Security update recommended for all users. Rotates stored secrets on upgrade.
 
 = 1.17.3 =
 Security update recommended for all users.

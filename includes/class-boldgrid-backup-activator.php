@@ -62,9 +62,9 @@ class Boldgrid_Backup_Activator {
 		self::$just_activated = true;
 
 		if ( Boldgrid_Backup_Admin_Test::is_filesystem_supported() ) {
-			$core      = new Boldgrid_Backup_Admin_Core();
-			$settings  = $core->settings->get_settings();
-			$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
+			$core = new Boldgrid_Backup_Admin_Core();
+			// Fall back when settings never saved a scheduler (same as auto-rollback).
+			$scheduler = $core->scheduler->get();
 
 			// Ensure per-install CLI secret lives outside the web-served plugin directory.
 			$backup_dir = $core->backup_dir->get();
@@ -73,16 +73,41 @@ class Boldgrid_Backup_Activator {
 				\Boldgrid\Backup\Cli\Info::ensure_secure_storage( $backup_dir );
 			}
 
+			// Invalidate any previously exposable cron / CLI cancel secrets once.
+			$core->cron->maybe_rotate_cron_secrets();
+
 			/*
 			 * Add all previous crons.
 			 *
-			 * The add_all_crons methods called include proper checks to ensure
-			 * scheduler is available and $settings include a schedule.
+			 * add_all_crons checks that the scheduler is available, then clears existing
+			 * schedules and only re-adds a backup entry when $settings include a schedule.
+			 *
+			 * Re-read settings after secret rotation so crontab lines embed the new secret.
+			 * Since add_all_crons clears schedules, re-add a pending rollback restore cron after.
 			 */
+			$settings = $core->settings->get_settings();
+			$archives = $core->get_archive_list();
 			if ( 'cron' === $scheduler ) {
 				$core->cron->add_all_crons( $settings );
+
+				if ( get_site_option( 'boldgrid_backup_pending_rollback' ) && ! empty( $archives ) ) {
+					$core->cron->add_restore_cron();
+				}
 			} elseif ( 'wp-cron' === $scheduler ) {
 				$core->wp_cron->add_all_crons( $settings );
+				if ( get_site_option( 'boldgrid_backup_pending_rollback' ) && ! empty( $archives ) ) {
+					$core->wp_cron->add_restore_cron();
+				}
+			}
+
+			/*
+			 * Direct transfer uses system crontab regardless of backup scheduler. add_all_crons
+			 * on the system-cron path clears that entry; on the wp-cron path the harvested-secret
+			 * line would otherwise remain after rotation. Delete then reschedule when active.
+			 */
+			if ( $core->cron->has_active_direct_transfer() ) {
+				$core->cron->entry_delete_contains( 'direct-transfer.php' );
+				$core->cron->schedule_direct_transfer();
 			}
 		}
 	}
