@@ -46,6 +46,59 @@ if ( ! defined( 'WP_TEMP_DIR' ) ) {
  */
 tests_add_filter( 'boldgrid_backup_can_write_crontab', '__return_false' );
 
+/*
+ * Never write test archives into the backup directory of the site being developed against.
+ *
+ * Boldgrid_Backup_Admin_Backup_Dir::get() falls back to the account's boldgrid_backup
+ * directory, so archive, restore-info, log and compressor tests store hundreds of megabytes
+ * per run alongside a real site's backups. Point the suite at its own per-user directory
+ * instead; BGBKUP_TESTS_BACKUP_DIR overrides it.
+ */
+$_bgbkup_backup_dir = getenv( 'BGBKUP_TESTS_BACKUP_DIR' );
+if ( ! $_bgbkup_backup_dir ) {
+	$_bgbkup_home       = getenv( 'HOME' );
+	$_bgbkup_backup_dir = ( $_bgbkup_home ? $_bgbkup_home . '/tmp' : rtrim( sys_get_temp_dir(), '/' ) ) .
+		'/boldgrid-backup-tests-' .
+		( function_exists( 'posix_geteuid' ) ? posix_geteuid() : get_current_user() ) . '/backup-dir';
+}
+
+if ( ! is_dir( $_bgbkup_backup_dir ) ) {
+	mkdir( $_bgbkup_backup_dir, 0700, true );
+}
+
+$_bgbkup_backup_dir_filter = function( $settings ) use ( $_bgbkup_backup_dir ) {
+	$settings                     = is_array( $settings ) ? $settings : array();
+	$settings['backup_directory'] = $_bgbkup_backup_dir;
+
+	return $settings;
+};
+
+tests_add_filter( 'site_option_boldgrid_backup_settings', $_bgbkup_backup_dir_filter );
+
+/*
+ * Store the directory in the settings option as well.
+ *
+ * guess_and_set() used to persist this option as a side effect of falling back to the real
+ * directory, and code such as Boldgrid_Backup_Admin_Migrate_Util::get_option() queries
+ * wp_options directly, so filtering reads alone leaves it with no backup directory at all.
+ * The filter above is dropped for the write, otherwise update_site_option() compares against
+ * the filtered value, finds no change, and never creates the row.
+ */
+tests_add_filter(
+	'wp_loaded',
+	function() use ( $_bgbkup_backup_dir, $_bgbkup_backup_dir_filter ) {
+		remove_filter( 'site_option_boldgrid_backup_settings', $_bgbkup_backup_dir_filter );
+
+		$settings                     = get_site_option( 'boldgrid_backup_settings', array() );
+		$settings                     = is_array( $settings ) ? $settings : array();
+		$settings['backup_directory'] = $_bgbkup_backup_dir;
+
+		update_site_option( 'boldgrid_backup_settings', $settings );
+
+		add_filter( 'site_option_boldgrid_backup_settings', $_bgbkup_backup_dir_filter );
+	}
+);
+
 if ( ! defined( 'BOLDGRID_BACKUP_PATH' ) ) {
 	define( 'BOLDGRID_BACKUP_PATH', dirname( dirname( __FILE__ ) ) );
 }
