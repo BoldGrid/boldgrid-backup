@@ -233,6 +233,16 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 		$property->setAccessible( true );
 		$property->setValue( $this->core->cron, $old_secret );
 
+		$backup_id      = $this->core->get_backup_identifier();
+		$_GET['id']     = $backup_id;
+		$_GET['secret'] = $old_secret;
+		wp_set_current_user( 0 );
+
+		$this->assertTrue(
+			$this->core->cron->is_valid_call(),
+			'Pre-rotation secret must still authorize before upgrade rotation runs.'
+		);
+
 		$ran = $this->core->cron->maybe_rotate_cron_secrets();
 		$this->assertTrue( $ran );
 
@@ -248,6 +258,18 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 			Boldgrid_Backup_Admin_Cron::SECRETS_ROTATED_VERSION,
 			get_site_option( Boldgrid_Backup_Admin_Cron::SECRETS_ROTATED_OPTION )
 		);
+
+		$_GET['secret'] = $old_secret;
+		$this->assertFalse(
+			$this->core->cron->is_valid_call(),
+			'Harvested pre-upgrade secret must be rejected after rotation.'
+		);
+		$_GET['secret'] = $new_secret;
+		$this->assertTrue(
+			$this->core->cron->is_valid_call(),
+			'Fresh post-rotation secret must authorize legitimate cron calls.'
+		);
+		unset( $_GET['id'], $_GET['secret'] );
 
 		// Second call is a no-op and must not rotate again.
 		$second_ran = $this->core->cron->maybe_rotate_cron_secrets();
