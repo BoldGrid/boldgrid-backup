@@ -12,7 +12,6 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP
 
 /**
  * Class: Boldgrid_Backup_Admin_Auto_Rollback
@@ -140,7 +139,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		$this->core = $core;
 
 		$this->updating_core = 'update-core.php' === $this->core->pagenow &&
-			! empty( $_GET['action'] ) && 'do-core-upgrade' === $_GET['action']; // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+			! empty( $_GET['action'] ) && 'do-core-upgrade' === $_GET['action']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only check of which core page we are on.
 
 		$this->on_update_page = in_array( $this->core->pagenow, $this->update_pages, true );
 	}
@@ -335,7 +334,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		if ( ! empty( $deadline ) ) {
 			$localize_script_data = array(
 				// Include the time (in ISO 8601 format).
-				'rolloutDeadline' => date( 'c', $deadline ),
+				'rolloutDeadline' => gmdate( 'c', $deadline ),
 			);
 			wp_localize_script( $handle, 'boldgrid_backup_admin_rollback', $localize_script_data );
 		}
@@ -395,8 +394,8 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 */
 	public function notice_countdown_show() {
 		// Process GET / POST info.
-		$action      = ! empty( $_GET['action'] ) ? sanitize_key( $_GET['action'] ) : null; // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
-		$restore_now = ! empty( $_POST['restore_now'] ); // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		$action      = ! empty( $_GET['action'] ) ? sanitize_key( wp_unslash( $_GET['action'] ) ) : null; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only check used to decide whether to show a notice.
+		$restore_now = ! empty( $_POST['restore_now'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only check used to decide whether to show a notice.
 
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
 		$deadline         = ! empty( $pending_rollback['deadline'] ) ? $pending_rollback['deadline'] : null;
@@ -516,7 +515,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		}
 
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
-		$deadline         = ! empty( $pending_rollback['deadline'] ) ? sprintf( '(<em>%1$s</em>)', date( 'g:i a', $this->core->utility->time( $pending_rollback['deadline'] ) ) ) : '';
+		$deadline         = ! empty( $pending_rollback['deadline'] ) ? sprintf( '(<em>%1$s</em>)', date_i18n( 'g:i a', $pending_rollback['deadline'] ) ) : '';
 
 		$update_trigger = $this->notice_trigger_get();
 		$update_trigger = ! empty( $update_trigger ) ? sprintf( '<p>%1$s</p>', $update_trigger ) : '';
@@ -528,7 +527,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		);
 		$restore_button = $this->core->archive_actions->get_restore_button( $args['restore_filename'], $button_args );
 
-		$iso_time          = ! empty( $pending_rollback['deadline'] ) ? date( 'c', $pending_rollback['deadline'] ) : null;
+		$iso_time          = ! empty( $pending_rollback['deadline'] ) ? gmdate( 'c', $pending_rollback['deadline'] ) : null;
 		$rollback_deadline = sprintf( '<input type="hidden" id="rollback-deadline" value="%1$s" />', $iso_time );
 
 		$notice_markup = '
@@ -746,10 +745,10 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 
 		switch ( $this->core->pagenow ) {
 			case 'update-core.php':
-				$notice_text .= __( 'On this page you are able to update WordPress, Plugins, and Themes.' ) . ' ';
+				$notice_text .= __( 'On this page you are able to update WordPress, Plugins, and Themes.', 'boldgrid-backup' ) . ' ';
 				break;
 			case 'plugins.php':
-				$notice_text .= __( 'On this page you are able to update plugins.' ) . ' ';
+				$notice_text .= __( 'On this page you are able to update plugins.', 'boldgrid-backup' ) . ' ';
 				break;
 		}
 
@@ -935,7 +934,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 
 		// Print a hidden div with the time (in ISO 8601 format), so that JavaScript can read it.
 		?>
-		<div class="hidden" id="rollback-deadline"><?php echo esc_html( date( 'c', $deadline ) ); ?></div>
+		<div class="hidden" id="rollback-deadline"><?php echo esc_html( gmdate( 'c', $deadline ) ); ?></div>
 		<?php
 	}
 
@@ -1037,7 +1036,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		 * update-core.php?action=do-theme-upgrade
 		 * Then there's no need to show a message.
 		 */
-		if ( ! empty( $_GET['action'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		if ( ! empty( $_GET['action'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only check used to decide whether to show a notice.
 			return;
 		}
 
@@ -1109,7 +1108,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		}
 
 		// Convert the deadline to ISO time (in ISO 8601 format).
-		wp_die( esc_html( date( 'c', $deadline ) ) );
+		wp_die( esc_html( gmdate( 'c', $deadline ) ) );
 	}
 
 	/**
@@ -1204,13 +1203,14 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 * @since 1.10.7
 	 */
 	public function wp_ajax_cli_cancel() {
-		// phpcs:ignore WordPress.CSRF.NonceVerification.Recommended
-		$backup_id_match = ! empty( $_GET['backup_id'] ) && $this->core->get_backup_identifier() === sanitize_key( $_GET['backup_id'] );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Request is authenticated below by comparing a shared secret.
+		$backup_id_match = ! empty( $_GET['backup_id'] ) && $this->core->get_backup_identifier() === sanitize_key( wp_unslash( $_GET['backup_id'] ) );
 
 		$stored_secret  = get_site_option( 'boldgrid_backup_cli_cancel_secret', '' );
-		// phpcs:ignore WordPress.CSRF.NonceVerification.Recommended
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Request is authenticated by comparing a shared secret.
 		$secret_match = ! empty( $stored_secret ) && ! empty( $_GET['cli_cancel_secret'] ) &&
 			hash_equals( $stored_secret, sanitize_text_field( wp_unslash( $_GET['cli_cancel_secret'] ) ) );
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 		if ( $backup_id_match && $secret_match ) {
 			$this->cancel();

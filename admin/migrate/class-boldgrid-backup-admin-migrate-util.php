@@ -1200,7 +1200,7 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 			return;
 		}
 
-		if ( ! isset( $_GET['site_url'] ) ) {
+		if ( ! isset( $_GET['site_url'], $_GET['user_login'], $_GET['password'] ) ) {
 			return;
 		}
 		

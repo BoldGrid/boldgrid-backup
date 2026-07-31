@@ -112,7 +112,7 @@ class Boldgrid_Backup_Admin_Archive_Fail {
 	public function schedule_fail_email( $message ) {
 		$message = sprintf(
 			$this->unable_to_backup . "\n\n%1\$s",
-			strip_tags( $message )
+			wp_strip_all_tags( $message )
 		);
 
 		$email_body = $this->core->email->fill_generic_template( $message, false );

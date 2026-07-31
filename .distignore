@@ -1,0 +1,42 @@
+# Development / CI / packaging metadata.
+# wordpress-tag-sync does not read this file; bin/release.sh mirrors it.
+# Kept for documentation and future wp dist-archive use.
+/.claude/
+/.cursor/
+/.distignore
+/.eslintignore
+/.eslintrc.js
+/.github/
+/.prettierrc
+/.travis.yml
+/AGENTS.md
+/CLAUDE.md
+/bin/
+/phpcs.xml.dist
+/phpunit.xml
+/tests/
+
+# Package manager metadata (also stripped by wordpress-tag-sync).
+/composer.json
+/composer.lock
+/node_modules/
+/package.json
+/package-lock.json
+/yarn.lock
+/yarn-error.log
+
+# Per-install / runtime artifacts (never ship).
+/.phpunit.result.cache
+/build/
+/cli/bgbkup-cli.log
+/cli/restore-locator.php
+/cli/verify-*
+/config.php
+/cron/cron-test.config
+/cron/cron-test.result
+/cron/restore-info*
+/error_log
+/includes/config/*.local.php
+/logs*
+/reports/
+/boldgrid-backup-cron.log

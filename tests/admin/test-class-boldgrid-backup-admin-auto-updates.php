@@ -119,7 +119,12 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 		$installed        = isset( $installed_themes[ $theme_slug ] );
 
 		if ( ! $installed ) {
-			// Use Automatic_Upgrader_Skin so Theme_Upgrader does not echo HTML or leave output buffers open (PHPUnit marks that as a risky test).
+			/*
+			 * Automatic_Upgrader_Skin collects its feedback in memory. The default
+			 * WP_Upgrader_Skin echoes it through show_message(), which calls
+			 * wp_ob_end_flush_all() and tears down PHPUnit's own output buffer,
+			 * marking whichever test ran first as risky.
+			 */
 			$upgrader  = new Theme_Upgrader( new Automatic_Upgrader_Skin() );
 			$installed = $upgrader->install( "https://downloads.wordpress.org/theme/{$theme_slug}.latest-stable.zip" );
 		}

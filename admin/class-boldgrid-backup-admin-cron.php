@@ -12,7 +12,6 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP
 
 /**
  * Class: Boldgrid_Backup_Admin_Cron
@@ -844,6 +843,7 @@ class Boldgrid_Backup_Admin_Cron {
 		update_site_option( 'boldgrid_backup_cli_cancel_secret', $cli_cancel_secret );
 
 		$entry_parts = [
+			// phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date -- Server-local time for crontab.
 			date( $time['minute'] . ' ' . $time['hour'], $time['deadline'] ) . ' * * ' . date( 'w' ),
 			$this->cron_command,
 			'"' . dirname( dirname( __FILE__ ) ) . '/cli/bgbkup-cli.php"',
@@ -921,7 +921,9 @@ class Boldgrid_Backup_Admin_Cron {
 		// Convert from 24H to 12H time format.
 		$unix_time = strtotime( $schedule['tod_h'] . ':' . $schedule['tod_m'] );
 
+		// phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date -- Server-local time for crontab.
 		$schedule['tod_h'] = intval( date( 'g', $unix_time ) );
+		// phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date -- Server-local time for crontab.
 		$schedule['tod_a'] = date( 'A', $unix_time );
 
 		// Days of the week.
@@ -981,7 +983,7 @@ class Boldgrid_Backup_Admin_Cron {
 			printf(
 				// translators: 1: Archive mode ("backup" or "restore").
 				esc_html__( 'Error: Invalid mode "%s".', 'boldgrid-backup' ),
-				$archive_info['mode'] // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+				esc_html( $archive_info['mode'] )
 			);
 			wp_die();
 		}
@@ -1006,20 +1008,20 @@ class Boldgrid_Backup_Admin_Cron {
 			// Error.
 			printf(
 				esc_html__( 'There was an error $s backup archive file.', 'boldgrid-backup' ),
-				$action_name // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+				esc_html( $action_name )
 			) . PHP_EOL;
 
 			printf(
 				// translators: 1: Error message.
 				esc_html__( 'Error: %s', 'boldgrid-backup' ),
-				$archive_info['error'] // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+				esc_html( $archive_info['error'] )
 			) . PHP_EOL;
 
 			if ( isset( $archive_info['error_message'] ) ) {
 				printf(
 					// translators: 1: Error message.
 					esc_html__( 'Error Message: %s', 'boldgrid-backup' ),
-					$archive_info['error_message'] // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+					esc_html( $archive_info['error_message'] )
 				);
 			}
 
@@ -1035,7 +1037,7 @@ class Boldgrid_Backup_Admin_Cron {
 				printf(
 					// translators: 1: File path.
 					esc_html__( 'File Path: %s', 'boldgrid-backup' ),
-					$archive_info['filepath'] // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+					esc_html( $archive_info['filepath'] )
 				) . PHP_EOL;
 			}
 
@@ -1043,7 +1045,7 @@ class Boldgrid_Backup_Admin_Cron {
 				printf(
 					// translators: 1: File size.
 					esc_html__( 'File Size: %s', 'boldgrid-backup' ),
-					Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['filesize'] ) // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+					esc_html( Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['filesize'] ) )
 				) . PHP_EOL;
 			}
 
@@ -1051,7 +1053,7 @@ class Boldgrid_Backup_Admin_Cron {
 				printf(
 					// translators: 1: Total backup size.
 					esc_html__( 'Total size: %s', 'boldgrid-backup' ),
-					Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] ) // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+					esc_html( Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] ) )
 				) . PHP_EOL;
 			}
 
@@ -1059,7 +1061,7 @@ class Boldgrid_Backup_Admin_Cron {
 				printf(
 					// translators: 1: Compressor name.
 					esc_html__( 'Compressor: %s', 'boldgrid-backup' ),
-					$archive_info['compressor'] // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+					esc_html( $archive_info['compressor'] )
 				) . PHP_EOL;
 			}
 
@@ -1067,7 +1069,7 @@ class Boldgrid_Backup_Admin_Cron {
 			if ( isset( $archive_info['db_duration'] ) ) {
 				printf(
 					esc_html( $this->core->configs['lang']['est_pause'] ),
-					$archive_info['db_duration'] // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+					esc_html( $archive_info['db_duration'] )
 				) . PHP_EOL;
 			}
 
@@ -1075,7 +1077,7 @@ class Boldgrid_Backup_Admin_Cron {
 				printf(
 					// translators: 1: Backup duration.
 					esc_html__( 'Duration: %s seconds', 'boldgrid-backup' ),
-					$archive_info['duration'] // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+					esc_html( $archive_info['duration'] )
 				) . PHP_EOL;
 			}
 		} else {
@@ -1086,7 +1088,7 @@ class Boldgrid_Backup_Admin_Cron {
 					'There was an unknown error %s a backup archive file.',
 					'boldgrid-backup'
 				),
-				$action_name // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+				esc_html( $action_name )
 			) . PHP_EOL;
 		}
 	}
@@ -1538,10 +1540,11 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @return bool
 	 */
 	public function is_valid_call() {
-		// phpcs:disable WordPress.Security.NonceVerification.Recommended,WordPress.CSRF.NonceVerification.NoNonceVerification
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Request is authenticated below by comparing a shared secret.
 		$provided_id     = isset( $_GET['id'] ) ? sanitize_key( wp_unslash( $_GET['id'] ) ) : '';
-		$provided_secret = isset( $_GET['secret'] ) ? wp_unslash( $_GET['secret'] ) : '';
-		// phpcs:enable WordPress.Security.NonceVerification.Recommended,WordPress.CSRF.NonceVerification.NoNonceVerification
+		$provided_secret = isset( $_GET['secret'] ) ?
+			sanitize_text_field( wp_unslash( $_GET['secret'] ) ) : '';
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 		$backup_id_match = '' !== $provided_id &&
 			hash_equals( (string) $this->core->get_backup_identifier(), $provided_id );
@@ -1647,9 +1650,9 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @return array An array of archive file information.
 	 */
 	public function restore() {
-		// phpcs:disable WordPress.CSRF.NonceVerification.NoNonceVerification
-		$task_id = ! empty( $_POST['task_id'] ) ? $_POST['task_id'] : null;
-		// phpcs:enable WordPress.CSRF.NonceVerification.NoNonceVerification
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Request is authenticated by is_valid_call() below.
+		$task_id = ! empty( $_POST['task_id'] ) ? sanitize_key( wp_unslash( $_POST['task_id'] ) ) : null;
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 		if ( ! $this->is_valid_call() ) {
 			wp_die( esc_html__( 'Error: Invalid request.', 'boldgrid-backup' ) );

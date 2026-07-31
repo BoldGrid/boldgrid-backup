@@ -13,12 +13,11 @@
  * @version    $Id$
  * @author     BoldGrid <support@boldgrid.com>
  *
- * phpcs:disable WordPress.VIP
  */
 
 defined( 'WPINC' ) || die;
 
-$is_restore   = ! empty( $_POST['restore_now'] ) && '1' === $_POST['restore_now']; // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+$is_restore   = ! empty( $_POST['restore_now'] ) && '1' === $_POST['restore_now']; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Display-only check; the nonce was verified before this results page is rendered.
 $is_success   = ! empty( $archive_info ) && empty( $archive_info['error'] );
 $redirect_url = admin_url( 'admin.php?page=boldgrid-backup' );
 
@@ -136,7 +135,7 @@ if ( ! empty( $archive_info ) ) {
 			'header'  => sprintf(
 				'%1$s - %2$s',
 				BOLDGRID_BACKUP_TITLE,
-				empty( $_POST['restore_now'] ) ? // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+				empty( $_POST['restore_now'] ) ? // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Display-only check; the nonce was verified before this results page is rendered.
 				esc_html__( 'Error creating archive', 'boldgrid-backup' ) :
 				esc_html__( 'Error restoring archive', 'boldgrid-backup' )
 			),

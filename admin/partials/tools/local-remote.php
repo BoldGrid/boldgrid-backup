@@ -13,15 +13,17 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP
 
 defined( 'WPINC' ) || die;
 
 ob_start();
 
+$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ?
+	sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+
 preg_match(
 	'/\(([^\)]+)\).+?(MSIE|(?!Gecko.+)Firefox|(?!AppleWebKit.+Chrome.+)Safari|(?!AppleWebKit.+)Chrome|AppleWebKit(?!.+Chrome|.+Safari)|Gecko(?!.+Firefox))(?: |\/)([\d\.apre]+)/',
-	$_SERVER['HTTP_USER_AGENT'],
+	$user_agent,
 	$browser_info
 );
 
@@ -73,10 +75,12 @@ foreach ( $server_info as $info ) {
 		continue;
 	}
 
+	$value = sanitize_text_field( wp_unslash( $_SERVER[ $info['key'] ] ) );
+
 	$server_info_markup .= sprintf(
 		'<li><strong>%1$s</strong>: %2$s</li>',
 		$info['title'],
-		$_SERVER[ $info['key'] ]
+		$value
 	);
 }
 
@@ -148,7 +152,7 @@ if ( ! empty( $local_info_markup ) ) {
 			'<strong>',
 			'</strong>'
 		),
-		$local_info_markup // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+		$local_info_markup // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup built by the plugin from escaped parts.
 	);
 }
 
@@ -180,7 +184,7 @@ if ( ! empty( $server_info_markup ) ) {
 			'<strong>',
 			'</strong>'
 		),
-		$server_info_markup // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+		$server_info_markup // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup built by the plugin from escaped parts.
 	);
 }
 
@@ -212,7 +216,7 @@ if ( ! $this->core->config->is_premium_done ) {
 			<p>%2$s</p>
 			<p>%1$s</p>
 		</div>',
-		$this->core->go_pro->get_premium_button( $premium_url, esc_html__( 'Unlock Feature', 'boldgrid-backup' ) ), // phpcs:ignore WordPress.XSS.EscapeOutput, WordPress.Security.EscapeOutput
+		$this->core->go_pro->get_premium_button( $premium_url, esc_html__( 'Unlock Feature', 'boldgrid-backup' ) ), // phpcs:ignore WordPress.Security.EscapeOutput -- Button markup built by the plugin from escaped parts.
 		sprintf(
 			// translators: 1 Markup showing a "Google Drive" logo, 2 Markup showing an "Amazon S3" logo.
 			esc_html__( 'Catastrophic data loss can happen at any time. Storing your archives in multiple secure locations will keep your website data safe and put your mind at ease. Upgrade now to enable automated remote backups to %1$s and %2$s', 'boldgrid-backup' ),

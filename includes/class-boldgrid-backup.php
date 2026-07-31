@@ -12,7 +12,6 @@
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
  *
- * phpcs:disable WordPress.VIP
  */
 
 /**

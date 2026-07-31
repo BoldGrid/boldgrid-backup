@@ -12,7 +12,7 @@
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
  *
- * phpcs:disable WordPress.WP.AlternativeFunctions,WordPress.XSS.EscapeOutput
+ * phpcs:disable WordPress.WP.AlternativeFunctions,WordPress.Security.EscapeOutput
  */
 
 namespace Boldgrid\Backup\Cli;

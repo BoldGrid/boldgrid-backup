@@ -61,7 +61,9 @@ class Boldgrid_Backup_Admin_Log_Page {
 		}
 
 		// Validate nonce.
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'boldgrid_backup_view_log' ) ) {
+		$nonce = isset( $_POST['nonce'] ) ?
+			sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+		if ( ! wp_verify_nonce( $nonce, 'boldgrid_backup_view_log' ) ) {
 			$markup = '<div class="notice notice-error"><p>' . esc_html__( 'Invalid nonce. Please refresh the page and try again.', 'boldgrid-backup' ) . '</p></div>';
 			wp_send_json_error( $markup );
 		}

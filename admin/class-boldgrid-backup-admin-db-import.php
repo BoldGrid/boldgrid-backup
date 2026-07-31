@@ -173,7 +173,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 		}
 
 		if ( isset( $log_file ) ) {
-			file_put_contents( $log_file, json_encode( $import_stats ) );
+			file_put_contents( $log_file, wp_json_encode( $import_stats ) );
 		}
 
 		$line_number = 1;
@@ -198,7 +198,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 				// Update the import stats only when finishing a query.
 				$import_stats['completed_lines'] = $line_number;
 				if ( isset( $log_file ) ) {
-					file_put_contents( $log_file, json_encode( $import_stats ) );
+					file_put_contents( $log_file, wp_json_encode( $import_stats ) );
 				}
 
 				$templine = '';

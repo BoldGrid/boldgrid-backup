@@ -1,0 +1,52 @@
+---
+name: phpunit-total-upkeep
+description: >-
+  Run and extend PHPUnit for Total Upkeep (boldgrid-backup). Use when the user
+  asks to run tests, debug failing PHPUnit, add coverage for admin/CLI/cron
+  behavior, or set WP_TESTS_DIR for this plugin.
+---
+
+# PHPUnit (Total Upkeep)
+
+## Environment
+
+| Role | Path |
+|------|------|
+| Test library | `WP_TESTS_DIR` → account path (commonly `$HOME/wordpress-tests-lib`) |
+| WordPress core under test | account path (commonly `$HOME/wordpress`); keep version-aligned with the tests lib |
+| Plugin under test | this repository |
+
+Do not assume `/tmp/wordpress` or `/tmp/wordpress-tests-lib`. Stage upgrade/repair downloads under `$HOME/tmp/` — never system `/tmp/`.
+
+## Commands
+
+From the plugin root (after `composer install`):
+
+```bash
+export WP_TESTS_DIR="${WP_TESTS_DIR:-$HOME/wordpress-tests-lib}"
+
+# Full suite
+XDEBUG_MODE=off ./vendor/bin/phpunit --debug --no-coverage
+
+# With coverage (requires Xdebug)
+./vendor/bin/phpunit --debug
+
+# Single file
+XDEBUG_MODE=off ./vendor/bin/phpunit --debug --no-coverage \
+  tests/admin/test-class-boldgrid-backup-admin-auto-updates.php
+```
+
+Optional scaffold via `bin/install-wp-tests.sh` — set `TMPDIR`, `WP_TESTS_DIR`, and `WP_CORE_DIR` to account paths first (see [`CLAUDE.md`](../../../CLAUDE.md)).
+
+Config: [`phpunit.xml`](../../../phpunit.xml). Bootstrap: [`tests/bootstrap.php`](../../../tests/bootstrap.php).
+
+## Tips
+
+- Archive/restore tests can leave the test WordPress core missing files (e.g. `wp-includes/theme.php`). If bootstrap fatals after a suite, repair the test core before chasing product bugs.
+- Suite writes must not touch live crontab; existing tests block crontab writes — keep that invariant.
+- Prefer adding tests next to the area under change (`tests/admin/`, `tests/cli/`, `tests/rest/`).
+- Standalone CLI tests that do not bootstrap WordPress may run with plain `php` and need no `WP_TESTS_DIR`.
+
+## Scratch
+
+Log full suite output to `.cursor/working/ENG7-####-phpunit.log`. Use `$HOME/tmp/` only for cross-repo probes.

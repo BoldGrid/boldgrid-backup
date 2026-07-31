@@ -12,7 +12,7 @@
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
  *
- * phpcs:disable WordPress.VIP,WordPress.WP.AlternativeFunctions
+ * phpcs:disable WordPress.WP.AlternativeFunctions
  */
 
 namespace Boldgrid\Backup\Cli;
@@ -54,7 +54,9 @@ class Log {
 	];
 
 	/**
-	 * Log file path.
+	 * Log file basename.
+	 *
+	 * Stored under wp-content when possible so the log survives plugin upgrades.
 	 *
 	 * @since  1.10.0
 	 * @access private
@@ -62,7 +64,7 @@ class Log {
 	 * @var string
 	 * @staticvar
 	 */
-	private static $log_filename = '/bgbkup-cli.log';
+	private static $log_filename = 'bgbkup-cli.log';
 
 	/**
 	 * Log timestamp format.
@@ -76,7 +78,29 @@ class Log {
 	private static $date_format = 'Y-m-d H:i:s';
 
 	/**
-	 * Write a message to the log file.
+	 * Get the absolute path to the CLI log file.
+	 *
+	 * Prefers wp-content (survives plugin updates). Falls back to the cli/
+	 * directory only when wp-content cannot be resolved.
+	 *
+	 * @since 1.17.11
+	 * @static
+	 *
+	 * @see \Boldgrid\Backup\Cli\Info::get_wp_content_dir()
+	 *
+	 * @return string
+	 */
+	public static function get_log_filepath() {
+		$wp_content = Info::get_wp_content_dir();
+		if ( $wp_content ) {
+			return $wp_content . '/' . self::$log_filename;
+		}
+
+		return __DIR__ . '/' . self::$log_filename;
+	}
+
+	/**
+	 * Get a human-readable log level label.
 	 *
 	 * @since 1.10.0
 	 * @static
@@ -97,6 +121,7 @@ class Log {
 	 * @see \Boldgrid\Backup\Cli\Info::get_log_flag()
 	 * @see \Boldgrid\Backup\Cli\Info::get_log_level()
 	 * @see self::get_level_label()
+	 * @see self::get_log_filepath()
 	 *
 	 * @param  string $message Message.
 	 * @param  int    $log_level Log level. Default: LOG_NOTICE.
@@ -112,9 +137,10 @@ class Log {
 
 		// If logging is enabled and the message log level is included, then write to the log file.
 		if ( Info::get_log_flag() && Info::get_log_level() >= $log_level ) {
+			// phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date -- Server-local time for CLI log.
 			$message = date( self::$date_format ) . ' [' . self::get_level_label( $log_level ) . '] ' .
 				$message . PHP_EOL;
-			$success = false !== file_put_contents( __DIR__ . self::$log_filename, $message, FILE_APPEND );
+			$success = false !== file_put_contents( self::get_log_filepath(), $message, FILE_APPEND );
 		}
 
 		return $success;

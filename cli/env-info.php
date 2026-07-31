@@ -47,7 +47,7 @@ if ( ! function_exists( 'hash_equals' ) ) {
 }
 
 // Protect access to this script (standalone; WordPress is not loaded).
-$provided_secret = isset( $_REQUEST['secret'] ) ? (string) $_REQUEST['secret'] : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.CSRF.NonceVerification.NoNonceVerification,WordPress.Security.ValidatedSanitizedInput
+$provided_secret = isset( $_REQUEST['secret'] ) ? (string) $_REQUEST['secret'] : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput -- Standalone script; WordPress is not loaded and the value is only compared with hash_equals().
 if ( '' === $provided_secret ||
 	! hash_equals( (string) \Boldgrid\Backup\Cli\Info::get_secret(), $provided_secret ) ) {
 	header( 'HTTP/1.1 403 Forbidden' );

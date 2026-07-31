@@ -22,7 +22,7 @@ $dashboard = new \Boldgrid\Library\Library\Ui\Dashboard();
 
 $dashboard->cards = $this->get_cards();
 
-echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+echo $nav; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Nav markup built by the plugin from escaped parts.
 
 require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
 

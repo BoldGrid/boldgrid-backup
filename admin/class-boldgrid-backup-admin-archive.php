@@ -298,7 +298,7 @@ class Boldgrid_Backup_Admin_Archive {
 	 * @param string $filepath File path.
 	 */
 	public function init( $filepath ) {
-		$filepath = strip_tags( $filepath );
+		$filepath = wp_strip_all_tags( $filepath );
 
 		if ( ! empty( $this->filepath ) && $filepath === $this->filepath ) {
 			return;

@@ -19,7 +19,7 @@
  * @see \Boldgrid\Backup\Cli\Site_Restore::run()
  * @see \Boldgrid\Backup\Cli\Log::write()
  *
- * phpcs:disable WordPress.VIP,WordPress.XSS.EscapeOutput
+ * phpcs:disable WordPress.Security.EscapeOutput
  */
 
 namespace Boldgrid\Backup\Cli;
@@ -32,14 +32,8 @@ if ( version_compare( PHP_VERSION, $php_min_version, '<' ) ) {
 	exit( 1 );
 }
 
-/*
- * We need to ensure that this is only run from the command-line.
- * Some environments use different SAPI names for CLI, such as 'cli'
- * or 'cli-server'. Therefore we check for the first three characters.
- */
-$sapi_type = php_sapi_name();
-
-if ( is_string( $sapi_type ) && 'cli' !== substr( $sapi_type, 0, 3 ) ) {
+// Permit command-line SAPIs only; "cli-server" is a web server.
+if ( ! in_array( PHP_SAPI, array( 'cli', 'phpdbg' ), true ) ) {
 	throw new \Exception( 'This script must be run from the command line.' );
 }
 

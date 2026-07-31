@@ -197,7 +197,7 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 	 * @return bool
 	 */
 	public function prepare_restore() {
-		// phpcs:disable WordPress.CSRF.NonceVerification.NoNonceVerification,WordPress.VIP
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
 
 		if ( empty( $pending_rollback ) && empty( $_GET['archive_filename'] ) ) {
@@ -213,9 +213,9 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 		$_POST['archive_key']      = ( ! empty( $_GET['archive_key'] ) && is_numeric( $_GET['archive_key'] ) ) ?
 			(int) $_GET['archive_key'] : 0;
 		$_POST['archive_filename'] = ! empty( $pending_rollback['filepath'] ) ?
-			basename( $pending_rollback['filepath'] ) : $_GET['archive_filename'];
+			basename( $pending_rollback['filepath'] ) : sanitize_file_name( wp_unslash( $_GET['archive_filename'] ) );
 
-		// phpcs:enable WordPress.CSRF.NonceVerification.NoNonceVerification,WordPress.VIP
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 		return true;
 	}
 
@@ -329,7 +329,8 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 		$message = $error->get_error_message();
 		$data    = $error->get_error_data();
 
-		if ( __( 'Could not copy file.' ) === $message ) {
+		// Match a core-translated WP_Error message from copy_dir() (default text domain).
+		if ( __( 'Could not copy file.' ) === $message ) { // phpcs:ignore WordPress.WP.I18n.MissingArgDomain -- Matches core WP_Error text.
 
 			// Take action if we are having trouble restoring .git/objects/.
 			preg_match( '/(.*\.git\/objects\/).*/', $data, $matches );
