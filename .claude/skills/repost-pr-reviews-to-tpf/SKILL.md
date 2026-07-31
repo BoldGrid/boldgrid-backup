@@ -166,6 +166,7 @@ from pathlib import Path
 WORKING        = Path(".cursor/working")  # repo-relative project scratch
 TPF_REPO       = "{TPF-OWNER}/{TPF-REPO}"
 TPF_PR         = {TPF-PR}
+SOURCE_PR      = {SRC-PR}
 SOURCE_PR_URL  = "https://github.com/{SRC-OWNER}/{SRC-REPO}/pull/{SRC-PR}"
 JIRA_KEY       = "{KEY}"
 # Filename prefix per AGENTS.md "Working Files": {KEY}-{REPO-SLUG}-{TPF-PR}-...
@@ -174,12 +175,12 @@ PREFIX         = f"{JIRA_KEY}-{TPF_REPO.split('/', 1)[1]}-{TPF_PR}"
 
 
 def load_reviews():
-    with open(WORKING / f"{PREFIX}-source-pr-{{SRC-PR}}-reviews.json") as fh:
+    with open(WORKING / f"{PREFIX}-source-pr-{SOURCE_PR}-reviews.json") as fh:
         return json.load(fh)
 
 
 def load_comments():
-    with open(WORKING / f"{PREFIX}-source-pr-{{SRC-PR}}-comments.json") as fh:
+    with open(WORKING / f"{PREFIX}-source-pr-{SOURCE_PR}-comments.json") as fh:
         return json.load(fh)
 
 

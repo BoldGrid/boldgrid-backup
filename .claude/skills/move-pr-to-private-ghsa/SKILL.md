@@ -451,6 +451,7 @@ What to strip and how:
 ```bash
 PR=1315
 REPO=BoldGrid/boldgrid-backup
+REPO_OWNER="${REPO%/*}"   # → "BoldGrid"
 JIRA_KEY=ENG7-2909   # parent ticket from Phase 5b
 URL="https://imh-internal.atlassian.net/browse/$JIRA_KEY"
 
