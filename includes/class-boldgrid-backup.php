@@ -516,6 +516,17 @@ class Boldgrid_Backup {
 
 		$this->loader->add_action( 'admin_init', $plugin_admin_core->cron, 'upgrade_crontab_entries' );
 
+		/*
+		 * Rotate previously exposable cron secrets once on upgrade (not admin-only).
+		 *
+		 * Call directly rather than hooking init: run_boldgrid_backup() itself is
+		 * deferred to init priority 1, so registering another init:1 callback here
+		 * would miss the current request (WP does not invoke same-priority callbacks
+		 * added while that priority is already firing). Silent upgrades never hit
+		 * the activator, so this must run on the first admin/cron/CLI/REST boot.
+		 */
+		$plugin_admin_core->cron->maybe_rotate_cron_secrets();
+
 		$this->loader->add_action( 'admin_init', $plugin_admin_core, 'ensure_secure_cli_storage', 5 );
 
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_generate_download_link', $plugin_admin_core->archive_actions, 'wp_ajax_generate_download_link' );
