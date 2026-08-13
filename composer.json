@@ -20,6 +20,8 @@
 		"ifsnop/mysqldump-php": "^2.11"
 	},
 	"require-dev" : {
+		"squizlabs/php_codesniffer": "^3.11",
+		"wp-coding-standards/wpcs": "^3.1",
 		"lox/xhprof" : "dev-master",
 		"phpunit/phpunit": "^7",
 		"yoast/phpunit-polyfills": "^2.0"
@@ -32,6 +34,9 @@
 			"ignore" : {
 				"PKSA-z3gr-8qht-p93v" : "phpunit/phpunit is require-dev only; advisory is PHPT coverage deserialization (CVE-2026-24765). No patched 7.x release exists; revisit when upgrading PHPUnit."
 			}
+		},
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
 		}
 	},
 	"scripts" : {
