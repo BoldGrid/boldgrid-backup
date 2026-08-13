@@ -66,6 +66,8 @@ Set `WP_TESTS_DIR` to your account WordPress tests library (commonly `$HOME/word
 
 If the test core is missing files (e.g. `wp-includes/theme.php`), restore the WordPress test install before trusting archive/restore failures — those tests can leave the tree damaged. When re-downloading core or the tests lib, stage archives under the account cross-project scratch dir (`$HOME/tmp/`) — never system `/tmp/`.
 
+MockBuilder: use `setMethods()` (not `onlyMethods()` / `addMethods()`). Travis PHP 7.4 runs PHPUnit 7; PHP 8.5 runs 9.6 — see [`.cursor/skills/phpunit-total-upkeep/SKILL.md`](.cursor/skills/phpunit-total-upkeep/SKILL.md) and [`.cursor/rules/phpunit-mock-api.mdc`](.cursor/rules/phpunit-mock-api.mdc).
+
 ## Contribution process
 
 - All changes must be submitted via pull requests.
