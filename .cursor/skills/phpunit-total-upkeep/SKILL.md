@@ -47,6 +47,14 @@ Config: [`phpunit.xml`](../../../phpunit.xml). Bootstrap: [`tests/bootstrap.php`
 - Prefer adding tests next to the area under change (`tests/admin/`, `tests/cli/`, `tests/rest/`).
 - Standalone CLI tests that do not bootstrap WordPress may run with plain `php` and need no `WP_TESTS_DIR`.
 
+## MockBuilder API (PHPUnit 7 + 9)
+
+Travis runs **PHPUnit 7** on PHP 7.4 (locked via `composer.json` / `platform.php`) and **PHPUnit 9.6** on PHP 8.5. Mock helpers must work on both.
+
+- Use `setMethods( array( '…' ) )` — present in PHPUnit 7 and still works on 9.6.
+- Do **not** use `onlyMethods()` / `addMethods()` — those are PHPUnit 8+ and fatal on the 7.4 job (`Call to undefined method …::onlyMethods()`).
+- Prefer matching existing suite mocks in `tests/admin/test-class-boldgrid-backup-admin-auto-updates.php` and `tests/admin/test-class-boldgrid-backup-admin-db-import.php`.
+
 ## Scratch
 
 Log full suite output to `.cursor/working/ENG7-####-phpunit.log`. Use `$HOME/tmp/` only for cross-repo probes.

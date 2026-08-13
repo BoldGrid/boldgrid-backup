@@ -562,9 +562,9 @@ copy-props@^2.0.1:
     is-plain-object "^5.0.0"
 
 core-js@^3.1.4:
-  version "3.49.0"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.49.0.tgz#8b4d520ac034311fa21aa616f017ada0e0dbbddd"
-  integrity sha512-es1U2+YTtzpwkxVLwAFdSpaIMyQaq0PBgm3YD1W3Qpsn1NAmO3KSgZfu+oGSWVu6NvLHoHCV/aYcsE5wiB7ALg==
+  version "3.50.0"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.50.0.tgz#a18646fcb0097650189b4504c803e887bcae4c0a"
+  integrity sha512-BRWgOLKkFeCgRudR6zrs8p9XJZcE14grzKMMssoYrk6krtuEZ7MTKPIY5RzOnqsEKIR9kst7wNzphttraT+Yqw==
 
 core-util-is@~1.0.0:
   version "1.0.3"
@@ -1938,9 +1938,9 @@ js-tokens@^4.0.0:
   integrity sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==
 
 js-yaml@^3.13.0, js-yaml@^3.13.1:
-  version "3.15.0"
-  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.15.0.tgz#586e5214eafe3e893756a41e979b50d89d3e4a67"
-  integrity sha512-ttBQIIQPDeLjpPOohtUdXuXUVoA2uIB6fEH9HyJ7234s5mBJ5wTx20njxplLZQgLaOfpmPQA7X2t5AX6tIPbog==
+  version "3.15.1"
+  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.15.1.tgz#24bc95028f361cdaaa84745b06a109c4486773c0"
+  integrity sha512-S99WuO3HlhO3XN41EtYUNl9zzXjoJx7QvmipxsJVxtCBT0YHEFy+iOJhjSvrmV12nYhWpZaM8lPHkJm0yUMbag==
   dependencies:
     argparse "^1.0.7"
     esprima "^4.0.0"
