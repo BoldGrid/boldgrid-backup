@@ -642,17 +642,20 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @return bool True if the entry does not exist or was deleted successfully.
 	 */
 	public function entry_delete( $entry ) {
-		if ( ! $this->entry_exists( $entry ) ) {
-			return true;
-		}
-
 		$all_entries = $this->get_all();
+
+		// get_all() returns false when crontab cannot be read (PHP 8+ array_search TypeError).
+		if ( ! is_array( $all_entries ) ) {
+			return false;
+		}
 
 		$key = array_search( $entry, $all_entries, true );
 
-		if ( false !== $key ) {
-			unset( $all_entries[ $key ] );
+		if ( false === $key ) {
+			return true;
 		}
+
+		unset( $all_entries[ $key ] );
 
 		$all_entries     = implode( "\n", $all_entries );
 		$crontab_written = ( new \Boldgrid\Backup\Admin\Cron\Crontab() )->write_crontab( $all_entries );

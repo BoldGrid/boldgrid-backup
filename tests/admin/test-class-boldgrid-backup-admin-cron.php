@@ -1105,4 +1105,45 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 		);
 		$this->assertNotEquals( $old_secret, $this->core->cron->get_cron_secret() );
 	}
+
+	/**
+	 * entry_delete must not TypeError when get_all() returns false.
+	 *
+	 * @since 1.17.5
+	 */
+	public function test_entry_delete_handles_get_all_false() {
+		$cron = $this->getMockBuilder( Boldgrid_Backup_Admin_Cron::class )
+			->setConstructorArgs( array( $this->core ) )
+			->onlyMethods( array( 'get_all' ) )
+			->getMock();
+
+		$cron->method( 'get_all' )->willReturn( false );
+
+		$this->assertFalse(
+			$cron->entry_delete( '# Total Upkeep Test Entry (You can delete this line).' ),
+			'Unread crontab must fail the delete without a TypeError.'
+		);
+	}
+
+	/**
+	 * entry_delete is a no-op success when the entry is already absent.
+	 *
+	 * @since 1.17.5
+	 */
+	public function test_entry_delete_missing_entry_returns_true() {
+		$cron = $this->getMockBuilder( Boldgrid_Backup_Admin_Cron::class )
+			->setConstructorArgs( array( $this->core ) )
+			->onlyMethods( array( 'get_all' ) )
+			->getMock();
+
+		$cron->method( 'get_all' )->willReturn(
+			array(
+				'# unrelated crontab line',
+			)
+		);
+
+		$this->assertTrue(
+			$cron->entry_delete( '# Total Upkeep Test Entry (You can delete this line).' )
+		);
+	}
 }
