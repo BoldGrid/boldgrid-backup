@@ -68,6 +68,14 @@ If the test core is missing files (e.g. `wp-includes/theme.php`), restore the Wo
 
 MockBuilder: use `setMethods()` (not `onlyMethods()` / `addMethods()`). Travis PHP 7.4 runs PHPUnit 7; PHP 8.5 runs 9.6 — see [`.cursor/skills/phpunit-total-upkeep/SKILL.md`](.cursor/skills/phpunit-total-upkeep/SKILL.md) and [`.cursor/rules/phpunit-mock-api.mdc`](.cursor/rules/phpunit-mock-api.mdc).
 
+## Cursor Cloud specific instructions
+
+Cloud Agent environments ship the toolchain in the base image (PHP 7.4 + `mbstring`/`xml`/`mysql`/`curl`/`zip`/`gd`/`bcmath`/`gmp`, Composer, MySQL 8, Subversion). The `install` step refreshes `composer install -o` / `yarn install` and scaffolds the WordPress test suite; the `start` step brings MySQL up on each boot.
+
+- MySQL is launched by the environment `start` step, not by your shell. If a DB connection fails, run `sudo service mysql start` (and `sudo chmod 755 /var/run/mysqld` so the socket is reachable as the `ubuntu` user).
+- The WordPress test library and core live at `$HOME/wordpress-tests-lib` and `$HOME/wordpress`; the suite connects as `root` (empty password) to the `wordpress_test` database. Run tests with the standard command: `WP_TESTS_DIR="$HOME/wordpress-tests-lib" XDEBUG_MODE=off ./vendor/bin/phpunit --no-coverage`.
+- Keep the test DB host as `localhost` (Unix socket), not `127.0.0.1`. `Test_Boldgrid_Backup_Admin_Db_Import::test_fix_view_statements` asserts a `root@localhost` view DEFINER, so a TCP `127.0.0.1` connection makes that test fail.
+
 ## Contribution process
 
 - All changes must be submitted via pull requests.
