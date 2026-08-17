@@ -1,5 +1,7 @@
 # Total Upkeep #
 
+<!-- Note: this repository is being tested with Cursor cloud agents. -->
+
 [![Build Status](https://travis-ci.org/BoldGrid/boldgrid-backup.svg?branch=master)](https://travis-ci.org/BoldGrid/boldgrid-backup)
 
 
