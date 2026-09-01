@@ -261,12 +261,11 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 						__( 'Permission denied. Unable to restore the following file: %1$s', 'boldgrid-backup' ),
 						$full_path
 					);
-					return false;
 				}
 			}
 		}
 
-		return true;
+		return empty( $this->errors );
 	}
 
 	/**
