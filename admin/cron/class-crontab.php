@@ -136,6 +136,10 @@ class Crontab {
 		// Remove temp crontab file.
 		$this->core->wp_filesystem->delete( $temp_crontab_path, false, 'f' );
 
+		if ( $this->core->cron ) {
+			$this->core->cron->clear_crontab_cache();
+		}
+
 		return (bool) $success;
 	}
 }
