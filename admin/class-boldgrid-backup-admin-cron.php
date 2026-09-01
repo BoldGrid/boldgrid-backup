@@ -85,6 +85,14 @@ class Boldgrid_Backup_Admin_Cron {
 	public $crontab_version = '1.6.4';
 
 	/**
+	 * Cached raw crontab from get_all(), or false when the last read failed.
+	 *
+	 * @since 1.17.5
+	 * @var string|false|null
+	 */
+	private $crontab_cache = null;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.2
@@ -500,6 +508,10 @@ class Boldgrid_Backup_Admin_Cron {
 
 		$crontab = $this->get_all( true );
 
+		if ( false === $crontab ) {
+			return false;
+		}
+
 		$crontab .= "\n" . $entry . "\n";
 
 		$crontab_written = ( new \Boldgrid\Backup\Admin\Cron\Crontab() )->write_crontab( $crontab );
@@ -765,14 +777,25 @@ class Boldgrid_Backup_Admin_Cron {
 		 *
 		 * As of 1.6.5, we'll first try the latter option.
 		 */
+		if ( null !== $this->crontab_cache ) {
+			if ( false === $this->crontab_cache ) {
+				return false;
+			}
+
+			return $raw ? $this->crontab_cache : explode( "\n", $this->crontab_cache );
+		}
+
 		if ( $this->core->backup_dir->can_exec_write() ) {
 			$crontab_file_path = $this->core->backup_dir->get_path_to( 'crontab' );
 
-			// Write crontab to temp file.
 			$command = sprintf( 'crontab -l > %1$s', $crontab_file_path );
 			$this->core->execute_command( $command, $success );
 
-			// Read the crontab from temp file.
+			if ( ! $this->core->wp_filesystem->exists( $crontab_file_path ) ) {
+				$this->crontab_cache = false;
+				return false;
+			}
+
 			$crontab = $this->core->wp_filesystem->get_contents( $crontab_file_path );
 			$success = false !== $crontab;
 
@@ -783,10 +806,22 @@ class Boldgrid_Backup_Admin_Cron {
 		}
 
 		if ( ! $success ) {
+			$this->crontab_cache = false;
 			return false;
 		}
 
+		$this->crontab_cache = $crontab;
+
 		return $raw ? $crontab : explode( "\n", $crontab );
+	}
+
+	/**
+	 * Drop the per-request crontab read cache after a write.
+	 *
+	 * @since 1.17.5
+	 */
+	public function clear_crontab_cache() {
+		$this->crontab_cache = null;
 	}
 
 	/**
@@ -1127,6 +1162,14 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @var int
 	 */
 	const SECRETS_ROTATING_TIMEOUT = 300;
+
+	/**
+	 * Site option key for a one-shot crontab-format upgrade attempt.
+	 *
+	 * @since 1.17.5
+	 * @var string
+	 */
+	const CRONTAB_UPGRADE_ATTEMPTED_OPTION = 'boldgrid_backup_crontab_upgrade_attempted';
 
 	/**
 	 * Get the cron secret used to validate unauthenticated crontab jobs.
@@ -1561,6 +1604,10 @@ class Boldgrid_Backup_Admin_Cron {
 	/**
 	 * Upgrade crontab entries, if not already upgraded.
 	 *
+	 * Cheap no-op when crontab_version already matches. Availability probes and
+	 * crontab-to-file reads run only when an upgrade is still needed, and a failed
+	 * attempt is gated so admin_init cannot stall on every request.
+	 *
 	 * @since 1.6.1-rc.1
 	 *
 	 * @see BoldGrid_Backup_Admin_Settings::get_settings()
@@ -1569,52 +1616,61 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @return bool Returns TRUE only if an upgrade was performed.
 	 */
 	public function upgrade_crontab_entries() {
-		$upgraded = false;
 		$settings = $this->core->settings->get_settings( true );
 
-		// Match auto-rollback / rotation: fall back when settings never saved a scheduler.
-		$scheduler = $this->core->scheduler->get();
-
-		if ( 'cron' !== $scheduler || ! $this->core->scheduler->is_available( $scheduler ) ) {
+		if ( ! empty( $settings['crontab_version'] ) &&
+			$this->crontab_version === $settings['crontab_version'] ) {
 			return false;
 		}
 
-		if ( empty( $settings['crontab_version'] ) ||
-			$this->crontab_version !== $settings['crontab_version'] ) {
-			// Delete and recreate the crontab entries.
-			$upgraded = $this->add_all_crons( $settings );
+		$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : $this->core->scheduler->get();
 
-			/*
-			 * add_all_crons clears all BoldGrid crontab entries and only re-adds
-			 * backup/jobs/site-check. Pending rollback restore crons and active
-			 * direct-transfer crons must be re-added afterward — matching activation
-			 * and secret rotation. When the schedule is empty, add_all_crons may
-			 * return false without persisting crontab_version; without this follow-up
-			 * those jobs would be dropped again on every admin_init.
+		if ( 'cron' !== $scheduler ) {
+			return false;
+		}
+
+		if ( $this->crontab_version === get_site_option( self::CRONTAB_UPGRADE_ATTEMPTED_OPTION ) ) {
+			return false;
+		}
+
+		update_site_option( self::CRONTAB_UPGRADE_ATTEMPTED_OPTION, $this->crontab_version );
+
+		if ( ! $this->core->scheduler->is_available( $scheduler ) ) {
+			return false;
+		}
+
+		$upgraded = $this->add_all_crons( $settings );
+
+		/*
+		 * add_all_crons clears all BoldGrid crontab entries and only re-adds
+		 * backup/jobs/site-check. Pending rollback restore crons and active
+		 * direct-transfer crons must be re-added afterward — matching activation
+		 * and secret rotation. When the schedule is empty, add_all_crons may
+		 * return false without persisting crontab_version; without this follow-up
+		 * those jobs would be dropped again on every admin_init.
+		 */
+		$archives = $this->core->get_archive_list();
+		if ( get_site_option( 'boldgrid_backup_pending_rollback' ) && ! empty( $archives ) ) {
+			$this->add_restore_cron();
+		}
+
+		if ( $this->has_active_direct_transfer() ) {
+			$this->entry_delete_contains( 'direct-transfer.php' );
+			$this->schedule_direct_transfer();
+		}
+
+		if ( $upgraded ) {
+			/**
+			 * Action when the crontab entry upgrade is successfully completed.
+			 *
+			 * @since 1.6.1-rc.1
+			 *
+			 * @param string The new crontab entry version.
 			 */
-			$archives = $this->core->get_archive_list();
-			if ( get_site_option( 'boldgrid_backup_pending_rollback' ) && ! empty( $archives ) ) {
-				$this->add_restore_cron();
-			}
-
-			if ( $this->has_active_direct_transfer() ) {
-				$this->entry_delete_contains( 'direct-transfer.php' );
-				$this->schedule_direct_transfer();
-			}
-
-			if ( $upgraded ) {
-				/**
-				 * Action when the crontab entry upgrade is successfully completed.
-				 *
-				 * @since 1.6.1-rc.1
-				 *
-				 * @param string The new crontab entry version.
-				 */
-				do_action(
-					'boldgrid_backup_upgrade_crontab_entries_complete',
-					$this->crontab_version
-				);
-			}
+			do_action(
+				'boldgrid_backup_upgrade_crontab_entries_complete',
+				$this->crontab_version
+			);
 		}
 
 		return $upgraded;
