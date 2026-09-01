@@ -13,8 +13,12 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// Abort if not being ran from the command line.
-if ( ! isset( $_SERVER['argv'], $_SERVER['argc'] ) || ! $_SERVER['argc'] ) { // WPCS: input var ok; sanitization ok.
+// Abort unless this is a command-line invocation with arguments.
+if (
+	! in_array( PHP_SAPI, array( 'cli', 'phpdbg' ), true ) ||
+	! isset( $_SERVER['argv'], $_SERVER['argc'] ) ||
+	! (int) $_SERVER['argc']
+) { // WPCS: input var ok; sanitization ok.
 	die( 'Error: No parameters were passed.  A "siteurl" and "id" are required.' . PHP_EOL ); // WPCS: XSS ok.
 }
 
@@ -42,7 +46,7 @@ foreach ( $required_arguments as $required_argument ) {
 }
 
 if ( $error ) {
-	die( $error ); // WPCS: XSS ok.
+	die( htmlspecialchars( $error, ENT_QUOTES, 'UTF-8' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- WordPress is not loaded; htmlspecialchars() escapes CLI output.
 }
 
 // Make an ajax call to run jobs, and report status.
@@ -60,4 +64,4 @@ if ( false !== $result ) {
 	$message = 'Error: Could not reach URL address "' . $url . '".';
 }
 
-die( $message ); // WPCS: XSS ok.
+die( htmlspecialchars( $message, ENT_QUOTES, 'UTF-8' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- WordPress is not loaded; htmlspecialchars() escapes CLI output.

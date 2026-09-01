@@ -19,6 +19,7 @@ defined( 'WPINC' ) || die;
 $nav             = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
 $scheduler       = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/scheduler.php';
 $compressor      = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/compressor.php';
+$backup_logs     = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/backup-logs.php';
 $folders_include = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/folders.php';
 $db              = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/db.php';
 $auto_backup     = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/auto-backup.php';
@@ -57,7 +58,7 @@ $sections = [
 		[
 			'id'      => 'section_process',
 			'title'   => __( 'Backup Process', 'boldgrid-backup' ),
-			'content' => $compressor,
+			'content' => $compressor . $backup_logs,
 		],
 		[
 			'id'      => 'connect_key',
@@ -131,7 +132,7 @@ if ( empty( $settings ) ) {
  */
 wp_nonce_field( 'boldgrid_backup_settings', 'bgbkup_settings_nonce' );
 
-	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+	echo $nav; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Nav markup built by the plugin from escaped parts.
 
 	require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
 
@@ -167,7 +168,7 @@ $show_section = ! empty( $_REQUEST['section'] ) ? sanitize_key( $_REQUEST['secti
 
 <form id='bgb-settings-form' method='post'>
 <?php
-	echo $col_container; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+	echo $col_container; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup built by the plugin from escaped parts.
 	wp_nonce_field( 'boldgrid-backup-settings', 'settings_auth' );
 ?>
 	<input type="hidden" name="save_time" value="<?php echo esc_attr( time() ); ?>" />

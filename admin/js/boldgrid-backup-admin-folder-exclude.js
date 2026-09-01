@@ -171,7 +171,7 @@ BoldGrid.FolderExclude = function( $ ) {
 	 * @summary Process any key downs.
 	 *
 	 * The preview area's pagination has in input box where you can specify a
-	 * page to jump to. When you enter a number and hit enter, it the browser is
+	 * page to jump to. When you enter a number and hit enter, the browser is
 	 * actually clicking the preview button (which we don't want it to do). This
 	 * seems like a stange approach to take, but what we're doing in this
 	 * function is listening to all key downs on the page. If you're not in the
@@ -181,10 +181,12 @@ BoldGrid.FolderExclude = function( $ ) {
 	 * @since 1.6.0
 	 */
 	self.onKeyDown = function( e ) {
-		var isCurrentPage = $( e.target ).hasClass( 'current-page' );
+		var isCurrentPage = $( e.target ).hasClass( 'current-page' ),
+			page;
 
 		if ( isCurrentPage && 13 === e.keyCode ) {
-			self.onSubmitPagination();
+			page = $( e.target ).val();
+			self.onSubmitPagination( page );
 			e.preventDefault();
 			return false;
 		}
@@ -196,9 +198,11 @@ BoldGrid.FolderExclude = function( $ ) {
 	 * @summary Handle pagination.
 	 *
 	 * @since 1.6.0
+	 *
+	 * @param int page The page of results to render.
 	 */
-	self.onSubmitPagination = function() {
-		var page = parseInt( $excludeFoldersPreview.find( '.current-page' ).val() ),
+	self.onSubmitPagination = function( page ) {
+		var page = parseInt( page ),
 			totalPages = parseInt( $container.find( '.total-pages' ).html() );
 
 		page = 1 > page || page > totalPages ? 1 : page;
@@ -221,6 +225,13 @@ BoldGrid.FolderExclude = function( $ ) {
 	 * @todo Possibly move this toward a template system. For now, it works.
 	 *
 	 * @param int page The page of results to render.
+	 *                 The way this method was initially written, you could pass in a page number or
+	 *                 leave it blank to show the first page. PLEASE NOTE however that this method was
+	 *                 also added onload via --- $filter.on( 'keyup', self.renderList ); --- meaning
+	 *                 that "page" could also be an event. We can use this to our advantage because on
+	 *                 the settings page the filelist filter is shown BOTH within the settings AND when
+	 *                 the user clicks "Backup Site Now", and if this method is sent an event, then
+	 *                 we can pinpoint which item specfically is being interacted with.
 	 */
 	self.renderList = function( page ) {
 		var startKey,
@@ -229,9 +240,21 @@ BoldGrid.FolderExclude = function( $ ) {
 			lastAvailableKey = exclusionList.length - 1,
 			markup = '',
 			x,
-			filterVal = $filter.val(),
+			filterVal,
 			filteredNoResults,
-			file;
+			file,
+
+			// See docblock definition of "page" var to know more about checking if this is an event.
+			isEvent = 'object' === typeof page && page.target !== undefined;
+
+		/*
+		 * The filelist preview can be filtered by typing in a search string. If this is an event, the
+		 * user is typing in text to use as a filter.
+		 *
+		 * @todo this is still buggy on the settings page, but this will do for now. Please see the
+		 * "page" var's docblock for more info.
+		 */
+		filterVal = isEvent ? $( page.target ).val() : $filter.val();
 
 		page = isNaN( page ) ? 1 : page;
 
@@ -305,15 +328,15 @@ BoldGrid.FolderExclude = function( $ ) {
 			'<span class="pagination-links">';
 
 		if ( 1 >= page ) {
-			markup += '<span class="tablenav-pages-navspan">«</span> ';
+			markup += '<span class="tablenav-pages-navspan button disabled">«</span> ';
 		} else {
-			markup += '<a class="first" href="#"><span>«</span></a> ';
+			markup += '<a class="first button" href="#"><span>«</span></a> ';
 		}
 
 		if ( 1 >= page ) {
-			markup += '<span class="tablenav-pages-navspan">‹</span> ';
+			markup += '<span class="tablenav-pages-navspan button disabled">‹</span> ';
 		} else {
-			markup += '<a class="prev" href="#"><span>‹</span></a> ';
+			markup += '<a class="prev button" href="#"><span>‹</span></a> ';
 		}
 
 		markup +=
@@ -329,15 +352,15 @@ BoldGrid.FolderExclude = function( $ ) {
 			'</span> ';
 
 		if ( page < totalPages ) {
-			markup += '<a class="next" href="#"><span>›</span></a> ';
+			markup += '<a class="next button" href="#"><span>›</span></a> ';
 		} else {
-			markup += '<span class="tablenav-pages-navspan">›</span> ';
+			markup += '<span class="tablenav-pages-navspan button disabled">›</span> ';
 		}
 
 		if ( page < totalPages ) {
-			markup += '<a class="last" href="#"><span>»</span></a> ';
+			markup += '<a class="last button" href="#"><span>»</span></a> ';
 		} else {
-			markup += '<span class="tablenav-pages-navspan">»</span> ';
+			markup += '<span class="tablenav-pages-navspan button disabled">»</span> ';
 		}
 
 		markup += '</span>';
@@ -430,7 +453,7 @@ BoldGrid.FolderExclude = function( $ ) {
 
 		$( 'body' )
 			.on( 'click', '#exclude_folders_preview .pagination-links a', self.onClickPagination )
-			.keydown( self.onKeyDown );
+			.on( 'keydown', self.onKeyDown );
 
 		$( '.folder_exclude_sample' ).on( 'click', self.onClickSample );
 

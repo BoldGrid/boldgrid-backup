@@ -48,10 +48,14 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 			$mineCountHelp.bgbuDrawAttention();
 		} );
 
+		/*
+		 * When importing an archive via url, it can be done by (1) clicking the submit button, or by
+		 * (2) having your mouse in the input box and pressing enter. This handles the latter.
+		 */
 		$urlImportSection
 			.find( 'input' )
 			.first()
-			.keypress( function( e ) {
+			.on( 'keypress', function( e ) {
 				if ( 13 === e.which ) {
 					self.urlUpload( e );
 				}
@@ -200,11 +204,15 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 	 */
 	self.urlUpload = function( e ) {
 		var jqxhr,
-			$this = $( this ),
+
+			/*
+			 * Get the target / $this. It will be a "click" if user clicked submit, and an "event" if
+			 * the user's mouse is in the text input and they hit enter.
+			 */
+			$this =
+				'object' === typeof e && e.type !== undefined && 'click' === e.type ? $( this ) : $( e.target ),
 			$spinner = $this.next(),
-			$notice = $( this )
-				.parent()
-				.find( 'div#url-import-notice' ),
+			$notice = $this.parent().find( 'div#url-import-notice' ),
 			wpnonce = $( this )
 				.parent()
 				.find( 'input#_wpnonce' )
@@ -275,14 +283,14 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 					.addClass( 'notice-error' )
 					.html( response.data.error );
 
-				$this.removeAttr( 'disabled' );
+				$this.prop( 'disabled', false );
 			} else {
 				$notice
 					.removeClass( 'notice-success' )
 					.addClass( 'notice-error' )
 					.html( lang.unknownError );
 
-				$this.removeAttr( 'disabled' );
+				$this.prop( 'disabled', false );
 			}
 		} )
 			.error( function() {
@@ -291,7 +299,7 @@ BOLDGRID.BACKUP.HOME = function( $ ) {
 					.addClass( 'notice-error' )
 					.html( lang.ajaxError + jqxhr.status + ' (' + jqxhr.statusText + ')' );
 
-				$this.removeAttr( 'disabled' );
+				$this.prop( 'disabled', false );
 			} )
 			.always( function() {
 				$notice.wrapInner( '<p></p>' ).show();

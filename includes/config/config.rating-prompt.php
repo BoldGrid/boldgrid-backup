@@ -68,7 +68,7 @@ $default_prompt = [
 					'slide'  => 'maybe_later',
 				],
 				'already_did'         => [
-					'text'  => esc_html__( 'I already did', 'boldgrid-backup' ),
+					'text'  => esc_html__( 'I already did / Permanently dismiss this notice', 'boldgrid-backup' ),
 					'slide' => 'already_did',
 				],
 			],

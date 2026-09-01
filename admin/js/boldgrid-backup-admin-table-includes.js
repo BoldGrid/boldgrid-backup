@@ -47,7 +47,7 @@ BoldGrid.TableInclude = function( $ ) {
 	 */
 	self.toggleAll = function() {
 		$includeTables.bgbuDrawAttention();
-		$includeTables.attr( 'checked', true );
+		$includeTables.prop( 'checked', true );
 		self.toggleStatus();
 
 		return false;
@@ -79,7 +79,7 @@ BoldGrid.TableInclude = function( $ ) {
 	 */
 	self.toggleNone = function() {
 		$includeTables.bgbuDrawAttention();
-		$includeTables.attr( 'checked', false );
+		$includeTables.prop( 'checked', false );
 		self.toggleStatus();
 
 		return false;

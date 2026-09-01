@@ -47,8 +47,8 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 
 require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
 
-echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+echo $nav; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Nav markup built by the plugin from escaped parts.
 
-echo $premium_box; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+echo $premium_box; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup built by the plugin from escaped parts.
 
 $dashboard->printCards();

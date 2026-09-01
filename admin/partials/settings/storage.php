@@ -101,7 +101,7 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 		<?php
 		foreach ( $storage_locations as $location ) {
 			$tr = include BOLDGRID_BACKUP_PATH . '/admin/partials/settings/storage-location.php';
-			echo $tr; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+			echo $tr; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup built by the plugin from escaped parts.
 		}
 		?>
 		</table>
@@ -112,7 +112,7 @@ $premium_box = $this->core->config->is_premium_done ? '' : sprintf(
 			<?php esc_html_e( 'Backup will not occur if no storage locations are selected.', 'boldgrid-backup' ); ?>
 		</p>
 	</div>
-	<?php echo $premium_box; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped ?>
+	<?php echo $premium_box; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup built by the plugin from escaped parts. ?>
 </div>
 
 <?php

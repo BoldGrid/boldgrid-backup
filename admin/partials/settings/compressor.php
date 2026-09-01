@@ -65,7 +65,7 @@ foreach ( range( 0, 9 ) as $level ) {
 		'<option value="%1$s" %2$s>%3$s</option>',
 		esc_attr( $level ),
 		$is_selected ? 'selected="selected"' : '',
-		$is_default ? $default_compression_level . ' ( ' . __( 'default' ) . ' )' : esc_html( $level )
+		$is_default ? $default_compression_level . ' ( ' . __( 'default', 'boldgrid-backup' ) . ' )' : esc_html( $level )
 	);
 }
 
@@ -81,7 +81,7 @@ ob_start();
 <div class="bg-box">
 	<div class="bg-box-top">
 		<?php esc_html_e( 'Compressor', 'boldgrid-backup' ); ?>
-		<span class="bgb-unbold">(<?php esc_html_e( 'Advanced', 'boldgrid-bacup' ); ?>)</span>
+		<span class="bgb-unbold">(<?php esc_html_e( 'Advanced', 'boldgrid-backup' ); ?>)</span>
 		<span class='dashicons dashicons-editor-help' data-id='compressor'></span>
 	</div>
 	<div class="bg-box-bottom">
@@ -91,7 +91,7 @@ ob_start();
 			esc_html_e( 'These are advanced settings. You do not need to configure this setting.', 'boldgrid-backup' );
 			?>
 			<span class="compression-level hidden">
-				<br/><?php echo $compression_level_info; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped ?>
+				<br/><?php echo $compression_level_info; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup built by the plugin from escaped parts. ?>
 			</span>
 		</p>
 
@@ -99,13 +99,13 @@ ob_start();
 			<tr>
 				<th><?php esc_html_e( 'Compressor', 'boldgrid-backup' ); ?>:</th>
 				<td>
-					<?php echo $select_compressor; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped ?>
+					<?php echo $select_compressor; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Select markup built by the plugin from escaped parts. ?>
 				</td>
 			</tr>
 			<tr class="compression-level hidden">
 				<th><?php esc_html_e( 'Compression Level', 'boldgrid-backup' ); ?>:</th>
 				<td>
-					<?php echo $select_compression_level; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped ?>
+					<?php echo $select_compression_level; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Select markup built by the plugin from escaped parts. ?>
 				</td>
 			</tr>
 		</table>

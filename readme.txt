@@ -1,10 +1,10 @@
 === Total Upkeep – WordPress Backup Plugin plus Restore & Migrate by BoldGrid ===
-Contributors: boldgrid, joemoto, imh_brad, rramo012, bgnicolepaschen, jamesros161
+Contributors: boldgrid, joemoto, imh_brad, rramo012, bgnicolepaschen, jamesros161, joe9663, weaponx13, jessecowens
 Tags: backup, cloud backup, database backup, restore, wordpress backup
-Requires at least: 4.4
-Tested up to: 5.5
-Requires PHP: 5.4
-Stable tag: 1.14.3
+Requires at least: 5.0
+Tested up to: 7.1
+Requires PHP: 7.4
+Stable tag: 1.17.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,9 +23,9 @@ Total Upkeep is a full 360 solution that keeps your data safe and protects your 
 * Automated and manual backups
 * Full file and database backup or customize settings based on your needs
 * Remote backups via FTP / SFTP, Amazon S3 and Google Drive (Premium)
-* Total Upkeep checks to ensure that your webserver has the necessary features to properly create backup archives, which protects the integrity of your backups
+* Total Upkeep checks to ensure that your web server has the necessary features to properly create backup archives, which protects the integrity of your backups
 * Clone, duplicate and/or migrate your site with just a few clicks
-* Site Check monitors your site for issues that could lead to site crashes, provides a toolset to restore your site even if your WordPress installation is inaccessible
+* Site Check monitors your site for issues that could lead to site crashes, provides a tool set to restore your site even if your WordPress installation is inaccessible
 * Auto rollback feature creates a backup before updates, restores your site to the last backup if an update fails
 * Create staging sites to test new plugins or themes with Total Upkeep + Cloud WordPress
 
@@ -121,7 +121,7 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 
 = Minimum Requirements =
 
-* PHP 5.4 or higher.  PHP 7.3 or higher is recommended.
+* PHP 7.4 or higher.
 * At least one of the following PHP execution functions enabled: "popen", "proc_open", "exec", "shell_exec", "passthru", or "system".
 * A Cron system with the "crontab" utility, or WP Cron.
 * A WP_Filesystem FS_METHOD being "direct".
@@ -131,6 +131,233 @@ Have a problem? First, take a look at our [Getting Started](https://www.boldgrid
 1. Activate the plugin through the Plugins menu in WordPress.
 
 == Changelog ==
+
+= 1.17.4 =
+Release Date: Jul 30, 2026
+* Security Update: Rotate stored cron and CLI cancel secrets on upgrade so previously exposed credentials are no longer valid. Thanks to Jakub Herman for responsibly reporting this issue.
+
+= 1.17.3 =
+Release Date: Jul 23, 2026
+* Security Update: Harden emergency restore metadata storage and cron restore authentication. Thanks to Jakub Herman for responsibly reporting this issue.
+* Bug Fix: Fix FTP / FTPS disconnect handling on PHP 8.
+* Bug Fix: Fix FTP remote upload status when directory listings include path prefixes.
+* Bug Fix: Fix BoldGrid Library loading when using Composer 2.
+* Bug Fix: Fix early translation loading notices on WordPress 6.7+.
+
+= 1.17.2 =
+Release Date: Mar 11, 2026
+* Security Update: Increased security for canceling a pending rollback.
+
+= 1.17.1 =
+Release Date: Apr 14, 2025
+* Bug Fix: Fix _load_textdomain_just_in_time notices [#624](https://github.com/BoldGrid/boldgrid-backup/issues/624)
+
+= 1.17.0 =
+Release Date: Mar 14, 2025
+* New Feature: Direct Transfer feature added for live beta [#611](https://github.com/BoldGrid/boldgrid-backup/pull/611)
+* Security Update: Add Compression Level validation to settings [#622](https://github.com/BoldGrid/boldgrid-backup/pull/622)
+
+= 1.16.10 =
+Release Date: Feb 26, 2025
+* Bug Fix: Prevent old backlogged jobs from running due to a previous CRON bug.
+
+= 1.16.9 =
+Release Date: Feb 25, 2025
+* Bug Fix: PHP Warning: Undefined array key “is_running” [#614](https://github.com/BoldGrid/boldgrid-backup/issues/614)
+* Bug Fix: Fix scheduled jobs not running, and add extra logging [#612](https://github.com/BoldGrid/boldgrid-backup/issues/612)
+* Security Update: Change from wp_remote_get to wp_safe_remote_get [#616](https://github.com/BoldGrid/boldgrid-backup/issues/616)
+
+= 1.16.8 =
+Release Date: Jan 15, 2025
+* Bug Fix: Schedule settings shows no options when no cron is available. [#563](https://github.com/BoldGrid/boldgrid-backup/issues/563)
+* Bug Fix: Update to Support Links [#607](https://github.com/BoldGrid/boldgrid-backup/issues/607)
+
+= 1.16.7 =
+Release Date: Nov 11, 2024
+* Bug Fix: Added validation to cron_interval input [#606](https://github.com/BoldGrid/boldgrid-backup/pull/606)
+
+= 1.16.6 =
+Release Date: Nov 7, 2024
+* Bug Fix: WP 6.7 - Function load_plugin_textdomain was called incorrectly [#603](https://github.com/BoldGrid/boldgrid-backup/issues/603)
+
+= 1.16.5 =
+Release Date: Sept 25th, 2024
+* Bug Fix: Total Upkeep Disables Buttons in AIOSEO admin pages [#598](https://github.com/BoldGrid/boldgrid-backup/issues/598)
+* Bug Fix: system_zip option no longer available [#599](https://github.com/BoldGrid/boldgrid-backup/issues/599)
+
+= 1.16.4 =
+Release Date: Aug 28th, 2024
+* Improvement: Add /wp-content/cache to default exclusion rules [#486](https://github.com/BoldGrid/boldgrid-backup/issues/486)
+
+= 1.16.3 =
+Release Date: June 14th, 2024
+* Bug Fix: Errors when setting up or using SFTP Remote storage [#593](https://github.com/BoldGrid/boldgrid-backup/issues/593)
+
+= 1.16.2 =
+Release Date: May 15th, 2024
+* Bug Fix: Fix issues with depracated notices in PHP 8.2
+* Bug Fix: Updated phpseclib to 3.0
+
+= 1.16.1 =
+Release Date: April 16th, 2024
+* Update: Add additional logging to help determine what is triggering automatic backups [$586](https://github.com/BoldGrid/boldgrid-backup/issues/586)
+
+= 1.16.0 =
+Release Date: February 26, 2024
+* New Feature: Add settings for cron interval for run-jobs.php [#584](https://github.com/BoldGrid/boldgrid-backup/issues/584)
+
+= 1.15.10 =
+
+Release date: February 7, 2024
+* Bug Fix: User on composer based sites getting errors [#546](https://github.com/BoldGrid/boldgrid-backup/issues/546)
+
+= 1.15.9 =
+* Bug Fix: Fixed security issue with bgbkup-cli being executable from the web, when it should only be executable via cli.
+
+= 1.15.8 =
+
+Release date: January 9, 2024
+* Bug Fix: Invalid regex character class in ftp setup [#576](https://github.com/BoldGrid/boldgrid-backup/issues/576)
+* Bug Fix: Rework PDO Connections for Sockets [#574](https://github.com/BoldGrid/boldgrid-backup/pull/574)
+
+= 1.15.7 =
+
+Release date: July 17, 2023
+
+* Update: Better handling when checking the WordPress installation size.
+* Update: Updated translation POT file.
+
+= 1.15.6 =
+
+Release date: March 29th, 2023
+
+* Update: Added additional logging for backups.
+* Update: Added additional info to rest call regarding compatibility.
+
+= 1.15.5 =
+
+Release date: January 26th, 2023
+
+* Bug fix: Set job status to running when run.
+
+= 1.15.4 =
+
+Release date: November 2nd, 2022
+
+* Update: Fixing tdcron dependency.
+
+= 1.15.3 =
+
+Release date: November 1st, 2022
+
+* Update: Updated dependencies.
+
+= 1.15.2 =
+
+Release date: May 27th, 2022
+
+* Update: Updated dependencies.
+
+= 1.15.1 =
+
+Release date: May 18th, 2022
+
+* Bug fix: Fixed bad rewrite rules on restorations due to cached permalink settings.
+
+= 1.15.0 =
+
+Release date: March 15th, 2022
+
+* New feature: REST API calls for backup and settings management.
+* Bug fix: posix_getpgid availability check.
+* Update: Updated dependencies.
+
+= 1.14.14 =
+
+Release date: February 24th, 2022
+
+* Update: Only show "backup in progress" notices for admins.
+* Security fix: Permissions check added to heartbeat_received for backup progress.
+
+= 1.14.13 =
+
+Release date: July 22nd, 2021
+
+* Update: Added a live log to the in progress bar.
+* Update: Added a "cancel backup" link to the in progress bar.
+* Update: Added "who / what triggered backup" to the in progress bar.
+* Update: The in progress bar can now detect when a backup process has been killed.
+
+= 1.14.12 =
+
+Release date: April 13th, 2021
+
+* Update: Improved output buffering when downloading a backup via ajax.
+* Update: Added a download log.
+* Update: Extra .git directories removed from vendor directory.
+
+= 1.14.11 =
+
+Release date: February 16th, 2021
+
+* Bug fix: Improved check for available execution functions and disabled functions.
+* Bug fix: Fixes js handling file / db backup filters on settings page.
+* Update: Changed "download backup" feature to send chunked.
+* Update: Fixed uasort usage.
+* Update: Added "Dismiss" verbiage to "Please rate us!" notice.
+
+= 1.14.10 =
+
+Release date: December 14th, 2020
+
+* Update: Added transfer log.
+* Security fix: Fixes for restore-info.json file and cli/env-info.php script.
+
+= 1.14.9 =
+
+Release date: December 8th, 2020
+
+* Bug fix: Fixed reset link for backup all tables.
+* Bug fix: Fixed pagination buttons for file exclusion tool.
+* Bug fix: Fixed several html escaping issues.
+* Bug fix: Fixed file exclusion preview filter input.
+* Bug fix: Fixed various jqmigrate warnings.
+
+= 1.14.8 =
+
+Release date: November 13th, 2020
+
+* Update: Rebuild with composer 1.
+
+= 1.14.7 =
+
+Release date: November 12th, 2020
+
+* Update: Prevent easy apache cache files in backups.
+* Bug fix: Fixed nonce errors when downloading remote archives.
+
+= 1.14.6 =
+
+Release date: October 13th, 2020
+
+* Update: Updated dependencies.
+* Update: Added additional logged and filesystem analysis log.
+* Bug fix: Fixed ftp bug.
+
+= 1.14.5 =
+
+Release date: September 22nd, 2020
+
+* Update: Optimized functionality tests.
+* Update: Optimized plugins and themes init in auto updates.
+
+= 1.14.4 =
+
+Release date: August 26th, 2020
+
+* Bug fix: Invalid nonce when one click uploading to remote storage providers.
+* Bug fix: Escaping / translation of "Remote Storage" help text on Archive Details page.
+* Update: Allow auto update notice on updates page to be permanently dismissible.
 
 = 1.14.3 =
 
@@ -142,7 +369,7 @@ Release date: August 13th, 2020
 
 Release date: July 22nd, 2020
 
-* Bug fix: Fixed array_key_exists() warings from auto-updates class.
+* Bug fix: Fixed array_key_exists() warnings from auto-updates class.
 * Bug fix: Fixed several invalid nonce errors.
 * Bug fix: Fixed markup escaping in rating prompt.
 * Bug fix: Fixed "backup site now" on archive page.
@@ -232,7 +459,7 @@ Release date: April 2nd, 2020
 
 = 1.13.2 =
 
-Release date: Februrary 21st, 2020
+Release date: February 21st, 2020
 
 * Bug fix:    Resolved activation bug during BoldGrid Inspirations deployment.
 
@@ -691,7 +918,7 @@ Release Date: September 7th, 2016
 
 Release Date: August 23rd, 2016
 
-* Bug fix: Updates via adminajax now updates the rollback timer.
+* Bug fix: Updates via admin-ajax now updates the rollback timer.
 * Misc: Updated readme.txt for Tested up to 4.6.
 
 = 1.2 =
@@ -745,5 +972,15 @@ Release Date: June 21st, 2016
 * Initial public release.
 
 == Upgrade Notice ==
+
+= 1.17.4 =
+Security update recommended for all users. Rotates stored secrets on upgrade.
+
+= 1.17.3 =
+Security update recommended for all users.
+
 = 1.12.0 =
 BoldGrid Backup has become Total Upkeep.  Different name with the same great features.
+
+= 1.14.10 =
+Updating to Total Upkeep 1.14.10 will fix possible security issues related to the restore-info.json file and cli/env-info.php script.

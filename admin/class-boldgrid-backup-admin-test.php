@@ -12,7 +12,6 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP
 
 /**
  * Class: Boldgrid_Backup_Admin_Test
@@ -74,6 +73,15 @@ class Boldgrid_Backup_Admin_Test {
 	 * @var bool
 	 */
 	private $is_crontab_available = null;
+
+	/**
+	 * A cached value of whether or not posix_getpgid() is supported.
+	 *
+	 * @since 1.14.13
+	 * @access private
+	 * @var bool
+	 */
+	private static $is_getpgid_supported;
 
 	/**
 	 * Is WP-CRON enabled?
@@ -190,7 +198,7 @@ class Boldgrid_Backup_Admin_Test {
 	 */
 	public function extensive_dir_test( $dir ) {
 		$dir             = Boldgrid_Backup_Admin_Utility::trailingslashit( $dir );
-		$random_filename = $dir . $this->test_prefix . mt_rand();
+		$random_filename = $dir . $this->test_prefix . wp_rand();
 		$txt_filename    = $random_filename . '.txt';
 		$info_filename   = $random_filename . '.rtf';
 		$str             = sprintf(
@@ -333,7 +341,7 @@ class Boldgrid_Backup_Admin_Test {
 		 * environment. When attempting to actually write to the $dir though, it
 		 * was successful.
 		 */
-		$random_filename = trailingslashit( $dir ) . mt_rand() . '.txt';
+		$random_filename = trailingslashit( $dir ) . wp_rand() . '.txt';
 		$this->core->wp_filesystem->touch( $random_filename );
 		$exists = $this->core->wp_filesystem->exists( $random_filename );
 
@@ -495,6 +503,40 @@ class Boldgrid_Backup_Admin_Test {
 	}
 
 	/**
+	 * Determine whether or not we can get our group process id.
+	 *
+	 * This is often used to determine if a backup process is still running.
+	 *
+	 * @since 1.14.13
+	 *
+	 * @link https://www.win.tue.nl/~aeb/linux/lk/lk-10.html
+	 *
+	 * @return bool
+	 */
+	public static function is_getpgid_supported() {
+		if ( ! is_null( self::$is_getpgid_supported ) ) {
+			return self::$is_getpgid_supported;
+		}
+
+		// Ensure we can get our process id.
+		$pid = getmypid();
+		if ( false === $pid ) {
+			self::$is_getpgid_supported = false;
+			return false;
+		}
+
+		// posix_getpgid() may not be available in all environments. Win 10 user running xampp for example.
+		if ( ! function_exists( 'posix_getpgid' ) ) {
+			self::$is_getpgid_supported = false;
+			return false;
+		}
+
+		self::$is_getpgid_supported = false !== posix_getpgid( $pid );
+
+		return self::$is_getpgid_supported;
+	}
+
+	/**
 	 * Determine if this is a plesk environment.
 	 *
 	 * @since 1.5.1
@@ -532,14 +574,45 @@ class Boldgrid_Backup_Admin_Test {
 	 * @return bool
 	 */
 	public function run_functionality_tests() {
+		// If we've already run the logic in this method, we can return right now.
 		if ( null !== $this->is_functional ) {
 			return $this->is_functional;
 		}
 
+		$transient = 'boldgrid_backup_is_functional';
+
+		/*
+		 * If we've already run these tests:
+		 * # If we are functional and our environment has not changed, assume everything is still functional.
+		 * # If we are not functional, or the transient is false, we'll run the tests again. We will
+		 *   assume that if false, the user is doing everything they can to get the environment functional,
+		 *   and we want to be able to return true as soon as that's done. Basically, benefits of using
+		 *   the transient will only come when the environment is functional, which is most cases.
+		 */
+		$environment = new Boldgrid_Backup_Admin_Environment();
+		if ( get_transient( $transient ) && ! $environment->has_changed() ) {
+			return true;
+		}
+
 		$available_compressors = $this->core->config->get_available_compressors();
 		$compressor            = $this->core->compressors->get();
+		$execution_functions   = Boldgrid_Backup_Admin_Cli::get_execution_functions();
 
-		if ( ! self::is_filesystem_supported() ) {
+		if ( empty( $execution_functions ) ) {
+			/*
+			 * The first test is to determine if we have any execution functions available. Some of
+			 * the other tests may require them. Before this test was added, a variety of warnings would
+			 * appear due to trying to run commands such as the following:
+			 *
+			 * # echo "This file is safe to delete." > /home/user/boldgrid_backup/safe-to-delete.txt 2>/dev/null
+			 * # crontab -l 2>/dev/null
+			 * # crontab /home/user/boldgrid_backup/crontab.1607956270.549.tmp 2>/dev/null
+			 *
+			 * Technically, we may be able to be fully functional without being able to execute commands,
+			 * but for the moment, let's say we're not funtional. Only two reports of this ever.
+			 */
+			$this->is_functional = false;
+		} elseif ( ! self::is_filesystem_supported() ) {
 			$this->is_functional = false;
 		} elseif ( ! $this->get_is_abspath_writable() ) {
 			$this->is_functional = false;
@@ -558,6 +631,9 @@ class Boldgrid_Backup_Admin_Test {
 		} else {
 			$this->is_functional = true;
 		}
+
+		// Transient expiration is up for debate. This is better than every admin page load.
+		set_transient( $transient, $this->is_functional, DAY_IN_SECONDS );
 
 		return $this->is_functional;
 	}
@@ -616,13 +692,12 @@ class Boldgrid_Backup_Admin_Test {
 	 * Get the WordPress total file size.
 	 *
 	 * @since 1.0
-	 * @access private
 	 *
 	 * @see get_filtered_filelist
 	 *
 	 * @return int|bool The total size for the WordPress file system in bytes, or FALSE on error.
 	 */
-	private function get_wp_size() {
+	public function get_wp_size() {
 		// Save time, use transients.
 		$transient = get_transient( 'boldgrid_backup_wp_size' );
 
@@ -631,7 +706,7 @@ class Boldgrid_Backup_Admin_Test {
 		}
 
 		// Avoid timeout caused when node_modules exist. Return 0 bytes.
-		if ( empty( $_GET['skip_node_modules'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		if ( empty( $_GET['skip_node_modules'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only flag that only affects which folders are measured.
 			$node_modules_found = $this->node_modules_warning();
 			if ( true === $node_modules_found ) {
 				return 0;
@@ -748,18 +823,20 @@ class Boldgrid_Backup_Admin_Test {
 		}
 
 		// Get the result.
-		$result = $wpdb->get_row( $query, ARRAY_N ); // phpcs:ignore WordPress.WP.PreparedSQL.NotPrepared
+		$result = $wpdb->get_row( $query, ARRAY_N ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 
 		// If there was an error or nothing returned, then fail.
 		if ( empty( $result ) ) {
 			return 0;
 		}
 
+		$size = (int) $result[0];
+
 		// Save some time, set transient.
-		set_transient( 'boldgrid_backup_db_size', $result[0], $this->transient_time );
+		set_transient( 'boldgrid_backup_db_size', $size, $this->transient_time );
 
 		// Return result.
-		return $result[0];
+		return $size;
 	}
 
 	/**
@@ -818,7 +895,10 @@ class Boldgrid_Backup_Admin_Test {
 	public function is_iis() {
 		return $this->is_windows() &&
 				! empty( $_SERVER['SERVER_SOFTWARE'] ) &&
-				false !== strpos( $_SERVER['SERVER_SOFTWARE'], 'IIS' );
+				false !== strpos(
+					sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) ),
+					'IIS'
+				);
 	}
 
 	/**

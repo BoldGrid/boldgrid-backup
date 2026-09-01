@@ -46,9 +46,9 @@ class Dream_Objects extends \Boldgrid\Library\Library\Ui\Card {
 
 		$this->links = '
 		<a class="video button thickbox" href=' . esc_url( $video ) . '" data-id="' . $this->id . '" title="Store Backups on DreamHost DreamObjects"><span class="dashicons dashicons-video-alt3"></span>' .
-			esc_html__( 'Learn More' ) .
+			esc_html__( 'Learn More', 'boldgrid-backup' ) .
 			'<a target="_blank" href="' . esc_url( $url ) . '">' .
-			esc_html__( 'Setup Guide' ) . '
+			esc_html__( 'Setup Guide', 'boldgrid-backup' ) . '
 			</a>';
 
 		$this->icon = '<img src="' . plugin_dir_url( __FILE__ ) . '../image/remote/dreamhost-logo.png"></img>';

@@ -23,7 +23,7 @@ class Test_Boldgrid_Backup_Admin_Crypt extends WP_UnitTestCase {
 	 *
 	 * @since 1.6.0
 	 */
-	public function setUp() {
+	public function set_up() {
 		/*
 		 * Define keys / salts for crypt.
 		 *
@@ -67,7 +67,7 @@ class Test_Boldgrid_Backup_Admin_Crypt extends WP_UnitTestCase {
 			$decrypted = Boldgrid_Backup_Admin_Crypt::crypt( $encrypted, 'd' );
 
 			// Decrypt a non-string and you'll get a string.
-			$this->assertTrue( $decrypted == $string ); // phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
+			$this->assertTrue( $decrypted == $string ); // phpcs:ignore Universal.Operators.StrictComparisons.LooseEqual
 		}
 
 		$invalids = array(

@@ -26,6 +26,6 @@ class Boldgrid_Backup_Cron_Helper {
 	 * @return bool
 	 */
 	public static function is_cli() {
-		return isset( $_SERVER['argv'], $_SERVER['argc'] ) || $_SERVER['argc']; // phpcs:ignore
+		return in_array( PHP_SAPI, array( 'cli', 'phpdbg' ), true );
 	}
 }

@@ -94,13 +94,17 @@ class Boldgrid_Backup_Admin_Notice {
 
 		$notices = get_option( $option, [] );
 
-		$notices = $this->core->in_progress->add_notice( $notices );
+		// Only admins should see "backup in progress" notices.
+		if ( Boldgrid_Backup_Admin_Utility::is_user_admin() ) {
+			$notices = $this->core->in_progress->add_notice( $notices );
+		}
 
 		if ( empty( $notices ) ) {
 			return;
 		}
 
 		foreach ( $notices as $notice ) {
+			// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped -- Notice markup is built by the plugin.
 			printf(
 				'
 				<div class="%1$s is-dismissible">
@@ -110,8 +114,9 @@ class Boldgrid_Backup_Admin_Notice {
 				/* 1 */ $notice['class'],
 				/* 2 */ $this->add_container( $notice['message'] ),
 				/* 3 */ ! empty( $notice['heading'] ) ?
-					sprintf( '<h2 class="header-notice">%1$s</h2>', $notice['heading'] ) : '' // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+					sprintf( '<h2 class="header-notice">%1$s</h2>', $notice['heading'] ) : ''
 			);
+			// phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		delete_option( $option );
@@ -130,7 +135,7 @@ class Boldgrid_Backup_Admin_Notice {
 			return;
 		}
 
-		echo $this->get_notice_markup( $class, $message ); // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+		echo $this->get_notice_markup( $class, $message ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Notice markup is built by the plugin.
 
 		$this->displayed_messages[] = $message;
 	}
@@ -140,7 +145,8 @@ class Boldgrid_Backup_Admin_Notice {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @return mixed String (html markup) of admin notice on success, false on failure.
+	 * @return mixed False on failure, an array on success. Prior to @1.14.13, we returned a string
+	 *               containing the markup of the admin notice.
 	 */
 	public function get_backup_complete() {
 		// Assume that this "backup complete!" notice is for the last backup made.
@@ -151,9 +157,7 @@ class Boldgrid_Backup_Admin_Notice {
 
 		$message = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup.php';
 
-		$markup = $this->get_notice_markup( $message['class'], $message['message'] );
-
-		return $markup;
+		return $message;
 	}
 
 	/**
@@ -236,6 +240,17 @@ class Boldgrid_Backup_Admin_Notice {
 	 * @since 1.7.0
 	 */
 	public function display_autoupdate_notice() {
+		$notice_id = 'bgbkup_autoupdate_notice';
+
+		/*
+		 * This notice is dismissible per user.
+		 *
+		 * @link https://wordpress.org/support/topic/how-do-i-remove-this-notificatio/
+		 */
+		if ( Notice::isDismissed( $notice_id ) ) {
+			return;
+		}
+
 		$auto_update_array = [
 			( apply_filters( 'allow_major_auto_core_updates', false ) ) ? 'Major' : false,
 			( apply_filters( 'allow_minor_auto_core_updates', false ) ) ? 'Minor' : false,
@@ -275,7 +290,7 @@ class Boldgrid_Backup_Admin_Notice {
 				break;
 		}
 
-		$message = sprintf(
+		$message = '<p>' . sprintf(
 			// translators: 1: HTML anchor opening tag, 2: HTML anchor closing tag, 3: Plugin title.
 			esc_html__(
 				'Auto Updates are %4$s WordPress Core Updates. This can be configured in the %1$s%3$s Settings%2$s.',
@@ -285,9 +300,9 @@ class Boldgrid_Backup_Admin_Notice {
 			'</a>',
 			BOLDGRID_BACKUP_TITLE,
 			$update_msg
-		);
+		) . '</p>';
 
-		do_action( 'boldgrid_backup_notice', $message, 'notice notice-info is-dismissible' );
+		Notice::show( $message, $notice_id, 'notice notice-info' );
 	}
 
 	/**

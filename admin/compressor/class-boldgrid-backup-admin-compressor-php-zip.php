@@ -276,6 +276,21 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 			);
 		}
 
+		/*
+		 * ZipArchive has closed archives with >65535 entries using a classic EOCD
+		 * that reports 0 entries and omits ZIP64 records. Repair those end records
+		 * so browse/restore via ZipArchive and PclZip keep working. Fail the backup
+		 * when repair cannot confirm a usable archive — a "successful" backup that
+		 * cannot be browsed or extracted is worse than a hard failure here.
+		 */
+		if ( ! Boldgrid_Backup_Admin_Zip::maybe_repair_zip64_eocd( $info['filepath'] ) ) {
+			$message = 'Unable to verify or repair ZIP64 end-of-central-directory for "' . $info['filepath'] . '".';
+			$this->core->logger->add( 'Error: ' . $message );
+			return array(
+				'error' => $message,
+			);
+		}
+
 		return true;
 	}
 
@@ -315,7 +330,7 @@ class Boldgrid_Backup_Admin_Compressor_Php_Zip extends Boldgrid_Backup_Admin_Com
 		$cannot_close_zip = __( 'When testing ZipArchive functionality, we are able to create a zip file and add files to it, but we were unable to close the zip file.<br /><strong>Please be sure the following backup directory has modify permissions</strong>:<br />%1$s', 'boldgrid-backup' );
 		$safe_to_delete   = __( 'safe-to-delete', 'boldgrid-backup' );
 		$test_zip_file    = $this->core->test->test_prefix . '-zip';
-		$test_filename    = sprintf( '%1$s%5$s%2$s-%3$s-%4$s', $backup_dir, $test_zip_file, mt_rand(), $safe_to_delete, DIRECTORY_SEPARATOR );
+		$test_filename    = sprintf( '%1$s%5$s%2$s-%3$s-%4$s', $backup_dir, $test_zip_file, wp_rand(), $safe_to_delete, DIRECTORY_SEPARATOR );
 		$zip_filepath     = $test_filename . '.zip';
 		$random_filename  = $test_filename . '.txt';
 

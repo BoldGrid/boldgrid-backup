@@ -70,13 +70,13 @@ echo '
 			</div>
 			<div id="bglib-page-content">
 				<div class="wp-header-end"></div>';
-echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+echo $nav; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Nav markup built by the plugin from escaped parts.
 
 require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
 
-echo $table; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+echo $table; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup built by the plugin from escaped parts.
 
-echo $modal; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+echo $modal; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup built by the plugin from escaped parts.
 
 /*
  * @todo Revisit the usefulness of this notice in this location. Commented out @since 1.10.1
@@ -85,7 +85,7 @@ echo $modal; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
 // Bombard the user with an ad before they've even made their first backup. I mean, don't.
 if ( ! empty( $this->archives_all->all ) ) {
-	echo $ad; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+	echo $ad; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup built by the plugin from escaped parts.
 }
 
 echo '

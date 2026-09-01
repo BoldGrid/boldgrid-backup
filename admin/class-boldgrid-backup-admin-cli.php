@@ -40,7 +40,7 @@ class Boldgrid_Backup_Admin_Cli {
 	 */
 	public static function get_execution_functions() {
 		// If the array already has elements, then return the array.
-		if ( self::$available_exec_functions ) {
+		if ( ! is_null( self::$available_exec_functions ) ) {
 			return self::$available_exec_functions;
 		}
 
@@ -51,13 +51,24 @@ class Boldgrid_Backup_Admin_Cli {
 
 		// Get the PHP disable_functions list.
 		$disabled = explode( ',', ini_get( 'disable_functions' ) );
+		array_walk( $disabled, function( &$function ) {
+			$function = trim( $function );
+		} );
 
-		// Make an array of execution functions.
+		/*
+		 * May an array of execution functions to test.
+		 * Note that the order of this array is significant.
+		 * The order is the order in which the functions will be tested,
+		 * and the first successful function will be used.
+		 * Exec and shell_exec have higher priorities because
+		 * proc_open and popen were failing on some systems.
+		 * See https://github.com/BoldGrid/boldgrid-backup/issues/599
+		 */
 		$exec_functions = array(
-			'popen',
-			'proc_open',
 			'exec',
 			'shell_exec',
+			'proc_open',
+			'popen',
 			'passthru',
 			'system',
 		);
@@ -89,6 +100,7 @@ class Boldgrid_Backup_Admin_Cli {
 	 */
 	public static function call_command( $command, &$success = false, &$return_var = 0 ) {
 		$success = false;
+		$output  = false;
 
 		// phpcs:disable WordPress.PHP.DiscouragedPHPFunctions, WordPress.WP.AlternativeFunctions
 

@@ -56,8 +56,8 @@ $sections = apply_filters( 'boldgrid_backup_tools_sections', $sections );
  */
 $col_container = apply_filters( 'Boldgrid\Library\Ui\render_col_container', $sections );
 
-echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+echo $nav; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Nav markup built by the plugin from escaped parts.
 
 require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
 
-echo $col_container; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+echo $col_container; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup built by the plugin from escaped parts.

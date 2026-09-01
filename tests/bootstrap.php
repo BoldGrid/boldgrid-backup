@@ -18,6 +18,87 @@ if ( ! $_tests_dir ) {
 
 require_once $_tests_dir . '/includes/functions.php';
 
+/*
+ * Give the suite a private temp directory.
+ *
+ * download_url() renames its download to the name given in the response's Content-Disposition
+ * header, so every account running these tests on one machine targets the same path (for
+ * example /tmp/akismet.4.0.zip). Because /tmp is sticky, the rename fails with EPERM once
+ * another user owns that file, and the resulting warning fails the test.
+ */
+if ( ! defined( 'WP_TEMP_DIR' ) ) {
+	$_bgbkup_temp_dir = rtrim( sys_get_temp_dir(), '/' ) . '/boldgrid-backup-tests-' .
+		( function_exists( 'posix_geteuid' ) ? posix_geteuid() : get_current_user() );
+
+	if ( ! is_dir( $_bgbkup_temp_dir ) ) {
+		mkdir( $_bgbkup_temp_dir, 0700, true );
+	}
+
+	define( 'WP_TEMP_DIR', $_bgbkup_temp_dir );
+}
+
+/*
+ * Never replace the crontab of the account running the tests.
+ *
+ * Scheduling paths such as add_all_crons() operate on the real system crontab, so without
+ * this any test that reaches them wipes the developer's entries and rewrites them using the
+ * test environment's siteurl (http://example.org) and secrets.
+ */
+tests_add_filter( 'boldgrid_backup_can_write_crontab', '__return_false' );
+
+/*
+ * Never write test archives into the backup directory of the site being developed against.
+ *
+ * Boldgrid_Backup_Admin_Backup_Dir::get() falls back to the account's boldgrid_backup
+ * directory, so archive, restore-info, log and compressor tests store hundreds of megabytes
+ * per run alongside a real site's backups. Point the suite at its own per-user directory
+ * instead; BGBKUP_TESTS_BACKUP_DIR overrides it.
+ */
+$_bgbkup_backup_dir = getenv( 'BGBKUP_TESTS_BACKUP_DIR' );
+if ( ! $_bgbkup_backup_dir ) {
+	$_bgbkup_home       = getenv( 'HOME' );
+	$_bgbkup_backup_dir = ( $_bgbkup_home ? $_bgbkup_home . '/tmp' : rtrim( sys_get_temp_dir(), '/' ) ) .
+		'/boldgrid-backup-tests-' .
+		( function_exists( 'posix_geteuid' ) ? posix_geteuid() : get_current_user() ) . '/backup-dir';
+}
+
+if ( ! is_dir( $_bgbkup_backup_dir ) ) {
+	mkdir( $_bgbkup_backup_dir, 0700, true );
+}
+
+$_bgbkup_backup_dir_filter = function( $settings ) use ( $_bgbkup_backup_dir ) {
+	$settings                     = is_array( $settings ) ? $settings : array();
+	$settings['backup_directory'] = $_bgbkup_backup_dir;
+
+	return $settings;
+};
+
+tests_add_filter( 'site_option_boldgrid_backup_settings', $_bgbkup_backup_dir_filter );
+
+/*
+ * Store the directory in the settings option as well.
+ *
+ * guess_and_set() used to persist this option as a side effect of falling back to the real
+ * directory, and code such as Boldgrid_Backup_Admin_Migrate_Util::get_option() queries
+ * wp_options directly, so filtering reads alone leaves it with no backup directory at all.
+ * The filter above is dropped for the write, otherwise update_site_option() compares against
+ * the filtered value, finds no change, and never creates the row.
+ */
+tests_add_filter(
+	'wp_loaded',
+	function() use ( $_bgbkup_backup_dir, $_bgbkup_backup_dir_filter ) {
+		remove_filter( 'site_option_boldgrid_backup_settings', $_bgbkup_backup_dir_filter );
+
+		$settings                     = get_site_option( 'boldgrid_backup_settings', array() );
+		$settings                     = is_array( $settings ) ? $settings : array();
+		$settings['backup_directory'] = $_bgbkup_backup_dir;
+
+		update_site_option( 'boldgrid_backup_settings', $settings );
+
+		add_filter( 'site_option_boldgrid_backup_settings', $_bgbkup_backup_dir_filter );
+	}
+);
+
 if ( ! defined( 'BOLDGRID_BACKUP_PATH' ) ) {
 	define( 'BOLDGRID_BACKUP_PATH', dirname( dirname( __FILE__ ) ) );
 }
@@ -55,6 +136,7 @@ $files = array(
 	'/admin/class-boldgrid-backup-admin-restore-helper.php',
 	'/admin/class-boldgrid-backup-admin-restore-git.php',
 	'/admin/class-boldgrid-backup-admin-filelist.php',
+	'/admin/class-boldgrid-backup-admin-filelist-analyzer.php',
 	'/admin/class-boldgrid-backup-admin-backup-dir.php',
 	'/admin/class-boldgrid-backup-admin-home-dir.php',
 	'/admin/class-boldgrid-backup-admin-compressors.php',
@@ -81,6 +163,7 @@ $files = array(
 	'/admin/class-boldgrid-backup-admin-db-import.php',
 	'/admin/class-boldgrid-backup-admin-db-get.php',
 	'/admin/class-boldgrid-backup-admin-utility.php',
+	'/admin/class-boldgrid-backup-admin-zip.php',
 	'/admin/class-boldgrid-backup-admin-folder-exclusion.php',
 	'/admin/class-boldgrid-backup-admin-core-files.php',
 	'/admin/class-boldgrid-backup-admin-in-progress.php',
@@ -96,6 +179,11 @@ $files = array(
 	'/admin/class-boldgrid-backup-admin-compressor.php',
 	'/admin/class-boldgrid-backup-admin-log.php',
 	'/admin/class-boldgrid-backup-admin-log-page.php',
+	'/admin/class-boldgrid-backup-admin-environment.php',
+	'/admin/class-boldgrid-backup-admin-nopriv.php',
+	// Tasks.
+	'/admin/class-boldgrid-backup-admin-task.php',
+	'/admin/class-boldgrid-backup-admin-task-helper.php',
 	// Compressors.
 	'/admin/compressor/class-boldgrid-backup-admin-compressor-php-zip.php',
 	'/admin/compressor/class-boldgrid-backup-admin-compressor-pcl-zip.php',
@@ -106,15 +194,35 @@ $files = array(
 	'/includes/class-boldgrid-backup-authentication.php',
 	'/includes/class-boldgrid-backup-download.php',
 	'/includes/class-boldgrid-backup-file.php',
+	'/includes/class-boldgrid-backup-archiver.php',
+	'/includes/archive/class-factory.php',
+	'/includes/archive/class-option.php',
 	'/admin/storage/class-boldgrid-backup-admin-storage-local.php',
 	// Remote storage providers.
 	'/admin/remote/class-boldgrid-backup-admin-ftp.php',
 	'/admin/remote/class-boldgrid-backup-admin-ftp-hooks.php',
 	'/admin/remote/class-boldgrid-backup-admin-ftp-page.php',
 	'/admin/remote/class-boldgrid-backup-admin-remote-settings.php',
+	// Direct Transfers
+	'/admin/class-boldgrid-backup-admin-migrate.php',
+	'/admin/migrate/class-boldgrid-backup-admin-migrate-rx-rest.php',
+	'/admin/migrate/class-boldgrid-backup-admin-migrate-tx-rest.php',
+	'/admin/migrate/class-boldgrid-backup-admin-migrate-restore.php',
+	'/admin/migrate/class-boldgrid-backup-admin-migrate-rx.php',
+	'/admin/migrate/class-boldgrid-backup-admin-migrate-tx.php',
+	'/admin/migrate/class-boldgrid-backup-admin-migrate-util.php',
 	// Vendor.
 	'/vendor/phpseclib/phpseclib/phpseclib/Net/SSH2.php',
 	'/vendor/ifsnop/mysqldump-php/src/Ifsnop/Mysqldump/Mysqldump.php',
+	/*
+	 * Yoast/PHPUnit-Polyfills, required for running the WP test suite.
+	 * Please see https://make.wordpress.org/core/2021/09/27/changes-to-the-wordpress-core-php-test-suite/
+	 *
+	 * The WP Core test suite can now run on all PHPUnit versions between PHPUnit 5.7.21 up to the latest
+	 * release (at the time of writing: PHPUnit 9.5.10), which allows for running the test suite against
+	 * all supported PHP versions using the most appropriate PHPUnit version for that PHP version.
+	 */
+	'/vendor/yoast/phpunit-polyfills/phpunitpolyfills-autoload.php',
 	// Cli.
 	'/cli/class-info.php',
 	'/cli/class-log.php',
@@ -145,3 +253,6 @@ function phpunit_error_log( $var ) {
 }
 
 require $_tests_dir . '/includes/bootstrap.php';
+
+// Our extendable Rest class. It extends WP_UnitTestCase and must come after the boostrap above.
+require_once BOLDGRID_BACKUP_PATH . '/tests/rest/class-boldgrid-backup-rest-case.php';

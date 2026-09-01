@@ -33,8 +33,8 @@ return [
 		'plugin_renamed'      => 'https://www.boldgrid.com/support/total-upkeep-backup-plugin-product-guide/what-is-total-upkeep/',
 	],
 	'lang'                 => [
-		// translators: 1: Number of seconds.
-		'est_pause' => esc_html__( 'Estimated Pause: %s seconds', 'boldgrid-backup' ),
+		// translators: 1: Number of seconds. Localized in Boldgrid_Backup_Admin::localize_configs().
+		'est_pause' => 'Estimated Pause: %s seconds',
 	],
 	'public_link_lifetime' => '1 HOUR',
 	'url_regex'            => '^https?:\/\/[a-z0-9\-\.]+(\.[a-z]{2,5})?(:[0-9]{1,5})?(\/.*)?$',
@@ -57,6 +57,8 @@ return [
 	 * This config is not needed for any premium features to work. Instead, it is holding the info
 	 * we need to help inform users about the glory that awaits them after upgrading.
 	 *
+	 * Titles are localized in Boldgrid_Backup_Admin::localize_configs() on init (WP 6.7+).
+	 *
 	 * @param array premium_remote {
 	 * 		An array of premium remote storage providers.
 	 *
@@ -67,17 +69,17 @@ return [
 	 */
 	'premium_remote'       => [
 		'google_drive' => [
-			'title'      => __( 'Google Drive', 'boldgrid-backup' ),
+			'title'      => 'Google Drive',
 			'logo_class' => 'bgbkup-gdrive-logo',
 			'key'        => 'google_drive',
 		],
 		'amazon_s3'    => [
-			'title'      => __( 'Amazon S3', 'boldgrid-backup' ),
+			'title'      => 'Amazon S3',
 			'logo_class' => 'amazon-s3-logo',
 			'key'        => 'amazon_s3',
 		],
 		'dreamobjects' => [
-			'title' => __( 'DreamObjects', 'boldgrid-backup' ),
+			'title' => 'DreamObjects',
 			'key'   => 'dreamobjects',
 		],
 	],
@@ -105,4 +107,53 @@ return [
 			'version' => '1.14.0',
 		],
 	],
+
+	/*
+	 * An array of banned files.
+	 *
+	 * @see Boldgrid_Backup_Admin_Folder_Exclusion::is_banned()
+	 */
+	'banned'               => [
+		/*
+		 * The ea-php-cli cache symlink. This one has appeared several times, and therefore is now
+		 * banned. The following description has been taken from the cPanel website:
+		 *
+		 * The first time you call one of the ea-php-cli binaries, the system creates the .ea-php-cli.cache
+		 * symlink to the PHP version that the directory requires. This symlink provides a quick
+		 * way for the system to determine the proper version of PHP and reads as broken by design.
+		 * For example, if the PHP script requires PHP 7.0, then the symlink will point to ea-php70.
+		 * cPanel creates broken symlinks by design and will recreate any removed symlinks the next
+		 * time that you run the script. You can safely ignore them.
+		 *
+		 * @link https://wordpress.org/support/topic/total-upkeep-error-creating-backup/
+		 */
+		'.ea-php-cli.cache',
+	],
+	// Labels localized in Boldgrid_Backup_Admin::localize_configs() on init (WP 6.7+).
+	'cron_intervals'       => array(
+		'*/5 * * * *'  => 'Every 5 Minutes',
+		'*/10 * * * *' => 'Every 10 Minutes',
+		'*/30 * * * *' => 'Every 30 Minutes',
+		'0 * * * *'    => 'Once Every Hour',
+	),
+	'direct_transfer'      => array(
+		'rest_api_namespace'          => 'boldgrid-backup/v1',
+		'rest_api_prefix'             => 'direct-transfer',
+		'batch_chunks'                => 10,
+		'chunk_size'                  => 50,
+		'stalled_timeout'             => 120,
+		'cron_interval'               => 60,
+		'conn_timeout'                => 600,
+		'option_names'                => array(
+			'transfers'           => 'boldgrid_backup_direct_transfers',
+			'active_tx'           => 'boldgrid_backup_active_direct_tx',
+			'file_lists'          => 'boldgrid_backup_xfer_file_lists',
+			'open_batches'        => 'boldgrid_backup_open_xfer_batches',
+			'authd_sites'         => 'boldgrid_backup_xfer_authd_sites',
+			'heartbeat'           => 'boldgrid_backup_xfer_heartbeat',
+			'cancelled_transfers' => 'boldgrid_backup_xfer_cancelled',
+			'active_transfer'     => 'boldgrid_backup_active_transfer',
+			'db_dump_status'      => 'boldgrid_backup_db_dump_status',
+		)
+	),
 ];

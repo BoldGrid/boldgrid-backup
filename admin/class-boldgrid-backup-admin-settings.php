@@ -14,7 +14,6 @@
 
 use \Boldgrid\Library\Library\Notice;
 
-// phpcs:disable WordPress.VIP
 
 /**
  * Class: Boldgrid_Backup_Admin_Settings
@@ -51,7 +50,7 @@ class Boldgrid_Backup_Admin_Settings {
 		// Save the Boldgrid_Backup_Admin_Core object as a class property.
 		$this->core = $core;
 
-		$this->is_saving_settings = isset( $_POST['save_time'] ); // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		$this->is_saving_settings = isset( $_POST['save_time'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Presence check only; the save path verifies the nonce.
 	}
 
 	/**
@@ -67,12 +66,12 @@ class Boldgrid_Backup_Admin_Settings {
 	public function get_dow_count() {
 		$count = 0;
 
-		if ( ! isset( $_POST ) || ! is_array( $_POST ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		if ( ! isset( $_POST ) || ! is_array( $_POST ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Counting submitted day-of-week keys only; the save path verifies the nonce.
 			return 0;
 		}
 
 		// Loop through each $_POST value and check if the key begins with dow_.
-		foreach ( $_POST as $k => $v ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		foreach ( $_POST as $k => $v ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Counting submitted day-of-week keys only; the save path verifies the nonce.
 			if ( substr( $k, 0, 4 ) === 'dow_' ) {
 				$count++;
 			}
@@ -114,7 +113,7 @@ class Boldgrid_Backup_Admin_Settings {
 		}
 
 		// Configure a random minute. 5:4am will fail, but 5:04am will pass.
-		$random_minute = mt_rand( 1, 59 );
+		$random_minute = wp_rand( 1, 59 );
 		$random_minute = 1 === strlen( $random_minute ) ? '0' . $random_minute : $random_minute;
 
 		// Parse settings.
@@ -146,7 +145,7 @@ class Boldgrid_Backup_Admin_Settings {
 			// Time of day.
 			$settings['schedule']['tod_h'] = (
 				! empty( $settings['schedule']['tod_h'] ) ?
-				$settings['schedule']['tod_h'] : mt_rand( 1, 5 )
+				$settings['schedule']['tod_h'] : wp_rand( 1, 5 )
 			);
 			$settings['schedule']['tod_m'] = (
 				! empty( $settings['schedule']['tod_m'] ) ?
@@ -202,7 +201,7 @@ class Boldgrid_Backup_Admin_Settings {
 			$settings['schedule']['dow_saturday']  = 0;
 
 			// Time of day.
-			$settings['schedule']['tod_h'] = mt_rand( 1, 5 );
+			$settings['schedule']['tod_h'] = wp_rand( 1, 5 );
 			$settings['schedule']['tod_m'] = $random_minute;
 			$settings['schedule']['tod_a'] = 'AM';
 
@@ -573,45 +572,47 @@ class Boldgrid_Backup_Admin_Settings {
 				}
 
 				if ( ! empty( $_POST[ $index ] ) ) {
+					$value = sanitize_text_field( wp_unslash( $_POST[ $index ] ) );
+
 					// Validate by type.
 					switch ( $type ) {
 						case 'day':
 							// Convert to integer.
-							$_POST[ $index ] = (int) $_POST[ $index ];
+							$value = (int) $value;
 
 							// If day was scheduled, then track it.
-							if ( 1 === $_POST[ $index ] ) {
-								$days_scheduled[] = date( 'w', strtotime( str_replace( 'dow_', '', $index ) ) );
+							if ( 1 === $value ) {
+								$days_scheduled[] = gmdate( 'w', strtotime( str_replace( 'dow_', '', $index ) ) );
 							}
 
 							break;
 						case 'h':
-							if ( $_POST[ $index ] < 1 || $_POST[ $index ] > 12 ) {
+							if ( $value < 1 || $value > 12 ) {
 								// Error in input.
 								$update_error = true;
 								break 2;
 							}
 
 							// Convert to integer.
-							$_POST[ $index ] = (int) $_POST[ $index ];
+							$value = (int) $value;
 
 							break;
 						case 'm':
-							if ( $_POST[ $index ] < 0 || $_POST[ $index ] > 59 ) {
+							if ( $value < 0 || $value > 59 ) {
 								// Error in input.
 								$update_error = true;
 								break 2;
 							}
 
 							// Convert to integer.
-							$_POST[ $index ] = (int) $_POST[ $index ];
+							$value = (int) $value;
 
 							// Pad left with 0.
-							$_POST[ $index ] = str_pad( $_POST[ $index ], 2, '0', STR_PAD_LEFT );
+							$value = str_pad( $value, 2, '0', STR_PAD_LEFT );
 
 							break;
 						case 'a':
-							if ( 'AM' !== $_POST[ $index ] && 'PM' !== $_POST[ $index ] ) {
+							if ( 'AM' !== $value && 'PM' !== $value ) {
 								// Error in input; unknown type.
 								$update_error = true;
 								break 2;
@@ -625,7 +626,7 @@ class Boldgrid_Backup_Admin_Settings {
 					}
 
 					// Update the setting value provided.
-					$settings['schedule'][ $index ] = $_POST[ $index ];
+					$settings['schedule'][ $index ] = $value;
 				} elseif ( 'day' === $type ) {
 					// Unassigned days.
 					$settings['schedule'][ $index ] = 0;
@@ -639,41 +640,45 @@ class Boldgrid_Backup_Admin_Settings {
 
 			// Validate input for other settings.
 			$settings['notifications']['backup'] = isset( $_POST['notify_backup'] ) &&
-				'1' === $_POST['notify_backup'] ? 1 : 0;
+				'1' === sanitize_text_field( wp_unslash( $_POST['notify_backup'] ) ) ? 1 : 0;
 
 			$settings['notifications']['restore'] = isset( $_POST['notify_restore'] ) &&
-				'1' === $_POST['notify_restore'] ? 1 : 0;
+				'1' === sanitize_text_field( wp_unslash( $_POST['notify_restore'] ) ) ? 1 : 0;
 
 			$settings['notifications']['site_check'] = isset( $_POST['notify_site_check'] ) &&
-				'1' === $_POST['notify_site_check'];
+				'1' === sanitize_text_field( wp_unslash( $_POST['notify_site_check'] ) );
 
 			$settings['auto_backup'] = ! isset( $_POST['auto_backup'] ) ||
-				'1' === $_POST['auto_backup'] ? 1 : 0;
+				'1' === sanitize_text_field( wp_unslash( $_POST['auto_backup'] ) ) ? 1 : 0;
 
 			$settings['auto_rollback'] = ! isset( $_POST['auto_rollback'] ) ||
-				'1' === $_POST['auto_rollback'] ? 1 : 0;
+				'1' === sanitize_text_field( wp_unslash( $_POST['auto_rollback'] ) ) ? 1 : 0;
 
 			$settings['site_check']['enabled'] = isset( $_POST['site_check'] ) &&
-				'1' === $_POST['site_check'];
+				'1' === sanitize_text_field( wp_unslash( $_POST['site_check'] ) );
 
-			$settings['site_check']['interval'] = isset( $_POST['site_check_interval'] ) &&
-				4 < $_POST['site_check_interval'] && 60 > $_POST['site_check_interval'] ?
-				(int) $_POST['site_check_interval'] : 15;
+			$site_check_interval = isset( $_POST['site_check_interval'] ) ?
+				absint( wp_unslash( $_POST['site_check_interval'] ) ) : 15;
+			$settings['site_check']['interval'] = 4 < $site_check_interval && 60 > $site_check_interval ?
+				$site_check_interval : 15;
 
 			$settings['site_check']['logger'] = isset( $_POST['site_check_logger'] ) &&
-				'1' === $_POST['site_check_logger'];
+				'1' === sanitize_text_field( wp_unslash( $_POST['site_check_logger'] ) );
 
 			$settings['site_check']['auto_recovery'] = isset( $_POST['auto_recovery'] ) &&
-				'1' === $_POST['auto_recovery'];
+				'1' === sanitize_text_field( wp_unslash( $_POST['auto_recovery'] ) );
 
 			// Update notification email address, if changed.
+			$notification_email = isset( $_POST['notification_email'] ) ?
+				sanitize_email( wp_unslash( $_POST['notification_email'] ) ) : '';
 			if ( isset( $settings['notification_email'] ) &&
-				sanitize_email( $_POST['notification_email'] ) !== $settings['notification_email'] ) {
-					$settings['notification_email'] = sanitize_email( $_POST['notification_email'] );
+				$notification_email !== $settings['notification_email'] ) {
+					$settings['notification_email'] = $notification_email;
 			}
 
 			// Database encryption.
-			$settings['encrypt_db'] = isset( $_POST['encrypt_db'] ) && '1' === $_POST['encrypt_db'];
+			$settings['encrypt_db'] = isset( $_POST['encrypt_db'] ) &&
+				'1' === sanitize_text_field( wp_unslash( $_POST['encrypt_db'] ) );
 
 			/*
 			 * Save compressor settings.
@@ -682,7 +687,7 @@ class Boldgrid_Backup_Admin_Settings {
 			 */
 			if ( ! empty( $_POST['compressor'] ) ) {
 				$available_compressors = $this->core->compressors->get_available();
-				$selected_compressor   = $_POST['compressor'];
+				$selected_compressor   = sanitize_key( wp_unslash( $_POST['compressor'] ) );
 				if ( in_array( $selected_compressor, $available_compressors, true ) ) {
 					$settings['compressor'] = $selected_compressor;
 				} else {
@@ -692,12 +697,27 @@ class Boldgrid_Backup_Admin_Settings {
 			}
 
 			/*
+			 * Save "backup filelist analysis" setting.
+			 *
+			 * @since 1.14.13
+			 */
+			$settings['filelist_analysis'] = ! empty( $_POST['filelist_analysis'] ) ? 1 : 0;
+
+			/*
 			 * Save Compression Level Settings.
 			 *
 			 * @since 1.14.0
 			 */
 			if ( isset( $_POST['compression_level'] ) ) {
-				$settings['compression_level'] = $_POST['compression_level'];
+				$compression_level = sanitize_text_field( wp_unslash( $_POST['compression_level'] ) );
+
+				// Validate the compression level must be a digit between 0-9.
+				if ( ! Boldgrid_Backup_Admin_Compressor_System_Zip::is_valid_compression_level( $compression_level ) ) {
+					$update_error    = true;
+					$update_errors[] = __( 'The compression level you entered is invalid. Please enter a number between 0 and 9.', 'boldgrid-backup' );
+				} else {
+					$settings['compression_level'] = $compression_level;
+				}
 			}
 
 			/*
@@ -708,7 +728,7 @@ class Boldgrid_Backup_Admin_Settings {
 			 * @since 1.5.1
 			 */
 			if ( ! empty( $_POST['extractor'] ) ) {
-				$selected_extractor = $_POST['extractor'];
+				$selected_extractor = sanitize_key( wp_unslash( $_POST['extractor'] ) );
 				if ( in_array( $selected_extractor, $available_compressors, true ) ) {
 					$settings['extractor'] = $selected_extractor;
 				} else {
@@ -727,9 +747,23 @@ class Boldgrid_Backup_Admin_Settings {
 			 */
 			$original_scheduler   = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : false;
 			$schedulers_available = $this->core->scheduler->get_available();
-			$scheduler_changed    = ! empty( $_POST['scheduler'] ) && $original_scheduler !== $_POST['scheduler'];
-			if ( $scheduler_changed && array_key_exists( $_POST['scheduler'], $schedulers_available ) ) {
-				$settings['scheduler'] = $_POST['scheduler'];
+			$selected_scheduler   = ! empty( $_POST['scheduler'] ) ?
+				sanitize_key( wp_unslash( $_POST['scheduler'] ) ) : '';
+			$scheduler_changed    = ! empty( $selected_scheduler ) && $original_scheduler !== $selected_scheduler;
+			if ( $scheduler_changed && array_key_exists( $selected_scheduler, $schedulers_available ) ) {
+				$settings['scheduler'] = $selected_scheduler;
+			}
+
+			/*
+			 * Save cron interval Settings.
+			 *
+			 * @since 1.16.0
+			 */
+			$intervals_available = $this->core->scheduler->get_intervals();
+			$cron_interval       = isset( $_POST['cron_interval'] ) ?
+				sanitize_key( wp_unslash( $_POST['cron_interval'] ) ) : '';
+			if ( array_key_exists( $cron_interval, $intervals_available ) ) {
+				$settings['cron_interval'] = $cron_interval;
 			}
 
 			/*
@@ -759,7 +793,7 @@ class Boldgrid_Backup_Admin_Settings {
 
 			// Get the storage location array from POST, then sanitize below.
 			$storage_locations_save = ! empty( $_POST['storage_location'] ) ?
-				$_POST['storage_location'] : array();
+				map_deep( (array) wp_unslash( $_POST['storage_location'] ), 'sanitize_text_field' ) : array();
 
 			// Then enable it only if submitted.  Values are not used, only key/index.
 			foreach ( $storage_locations_save as $storage_location => $storage_location_enabled ) {
@@ -801,15 +835,16 @@ class Boldgrid_Backup_Admin_Settings {
 			 * @since 1.14.0
 			 */
 			if ( ! empty( $_POST['auto_update'] ) ) {
-				$settings['auto_update'] = $this->validate_auto_update( $_POST['auto_update'] );
+				$auto_update             = map_deep( (array) wp_unslash( $_POST['auto_update'] ), 'sanitize_text_field' );
+				$settings['auto_update'] = $this->validate_auto_update( $auto_update );
 				// As of WordPress 5.5 we also have to update the option in the WordPress auto update option as well.
-				if ( isset( $_POST['auto_update']['plugins'] ) ) {
-					$this->update_autoupdate_options( $_POST['auto_update'] );
+				if ( isset( $auto_update['plugins'] ) ) {
+					$this->update_autoupdate_options( $auto_update );
 				}
 
 				// This updates the options field for themes as well.
-				if ( isset( $_POST['auto_update']['themes'] ) ) {
-					$this->update_autoupdate_options( $_POST['auto_update'], true );
+				if ( isset( $auto_update['themes'] ) ) {
+					$this->update_autoupdate_options( $auto_update, true );
 				}
 				$update_error = $settings['auto_update'] ? $update_error : true;
 			}
@@ -820,11 +855,11 @@ class Boldgrid_Backup_Admin_Settings {
 				\Boldgrid\Library\Library\Page\Connect::sanitizeSettings(
 					array(
 						'autoupdate'            => ! empty( $_POST['autoupdate'] ) ?
-							(array) $_POST['autoupdate'] : array(),
+							map_deep( (array) wp_unslash( $_POST['autoupdate'] ), 'sanitize_text_field' ) : array(),
 						'release_channel'       => ! empty( $_POST['plugin_release_channel'] ) ?
-							sanitize_key( $_POST['plugin_release_channel'] ) : 'stable',
+							sanitize_key( wp_unslash( $_POST['plugin_release_channel'] ) ) : 'stable',
 						'theme_release_channel' => ! empty( $_POST['theme_release_channel'] ) ?
-							sanitize_key( $_POST['theme_release_channel'] ) : 'stable',
+							sanitize_key( wp_unslash( $_POST['theme_release_channel'] ) ) : 'stable',
 					)
 				)
 			);
@@ -1075,7 +1110,7 @@ class Boldgrid_Backup_Admin_Settings {
 				</div>
 				<div id="bglib-page-content">
 					<div class="wp-header-end"></div>';
-		echo $modal; //phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+		echo $modal; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup built by the plugin from escaped parts.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-settings.php';
 		echo '
 				</div>

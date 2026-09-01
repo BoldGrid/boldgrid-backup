@@ -12,7 +12,6 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP
 
 /**
  * Class: Boldgrid_Backup_Admin_Archive_Details
@@ -79,7 +78,8 @@ class Boldgrid_Backup_Admin_Archive_Details {
 			'boldgrid-backup-admin-archive-details',
 			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-archive-details.js',
 			array( 'jquery' ),
-			BOLDGRID_BACKUP_VERSION
+			BOLDGRID_BACKUP_VERSION,
+			true
 		);
 		$translations = array(
 			'uploading'  => __( 'Uploading', 'boldgrid-backup' ),
@@ -93,7 +93,8 @@ class Boldgrid_Backup_Admin_Archive_Details {
 			'boldgrid-backup-admin-zip-browser',
 			plugin_dir_url( __FILE__ ) . 'js/boldgrid-backup-admin-zip-browser.js',
 			array( 'jquery' ),
-			BOLDGRID_BACKUP_VERSION
+			BOLDGRID_BACKUP_VERSION,
+			true
 		);
 		$unknown_error = __( 'An unknown error has occurred.', 'boldgrid-backup' );
 		$translations  = array(
@@ -127,7 +128,7 @@ class Boldgrid_Backup_Admin_Archive_Details {
 	 * @since 1.5.1
 	 */
 	public function render_archive() {
-		if ( ! empty( $_POST['delete_now'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		if ( ! empty( $_POST['delete_now'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified within delete_archive_file().
 			$this->core->delete_archive_file();
 		}
 
@@ -137,7 +138,7 @@ class Boldgrid_Backup_Admin_Archive_Details {
 
 		$archive_found = false;
 
-		$filename = ! empty( $_GET['filename'] ) ? sanitize_file_name( $_GET['filename'] ) : false; // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		$filename = ! empty( $_GET['filename'] ) ? sanitize_file_name( wp_unslash( $_GET['filename'] ) ) : false; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only page routing; the value is sanitized as a filename.
 		if ( ! $filename ) {
 			esc_html_e( 'No archive specified.', 'boldgrid-backup' );
 			return;
@@ -186,7 +187,7 @@ class Boldgrid_Backup_Admin_Archive_Details {
 				</div>
 				<div id="bglib-page-content">
 					<div class="wp-header-end"></div>';
-		echo $modal; //phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+		echo $modal; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup built by the plugin from escaped parts.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-archive-details.php';
 		echo '
 				</div>
@@ -201,12 +202,17 @@ class Boldgrid_Backup_Admin_Archive_Details {
 	 * methods, bgbkup_archive_details_page. This method is an easy
 	 * way to validate the nonce.
 	 *
+	 * The boldgrid_backup_remote_storage_upload nonce is also used on this page. If ever consolidating
+	 * these two nonces into one, remember backwards compatibility + premium plugin. One click Google
+	 * Drive / etc uploads uses this nonce.
+	 *
 	 * @since 1.6.0
 	 *
 	 * @see Boldgrid_Backup_Admin_Archive_Browser::authorize()
 	 */
 	public function validate_nonce() {
-		return check_ajax_referer( 'bgbkup_archive_details_page', 'security', false );
+		return check_ajax_referer( 'bgbkup_archive_details_page', 'security', false ) ||
+			check_ajax_referer( 'boldgrid_backup_remote_storage_upload', 'security', false );
 	}
 
 	/**
@@ -219,9 +225,12 @@ class Boldgrid_Backup_Admin_Archive_Details {
 			wp_send_json_error( __( 'Permission denied.', 'boldgrid-backup' ) );
 		}
 
-		$attributes = ! empty( $_POST['attributes'] ) && is_array( $_POST['attributes'] ) ? $_POST['attributes'] : []; // phpcs:ignore WordPress.CSRF.NonceVerification
-		$filename   = ! empty( $_POST['filename'] ) ? sanitize_file_name( $_POST['filename'] ) : false; // phpcs:ignore WordPress.CSRF.NonceVerification
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified by validate_nonce() above.
+		// phpcs:disable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Each attribute is sanitized in the loop below.
+		$attributes = ! empty( $_POST['attributes'] ) && is_array( $_POST['attributes'] ) ? wp_unslash( $_POST['attributes'] ) : [];
+		$filename   = ! empty( $_POST['filename'] ) ? sanitize_file_name( wp_unslash( $_POST['filename'] ) ) : false;
 		$filepath   = $this->core->backup_dir->get_path_to( $filename );
+		// phpcs:enable WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 		if ( empty( $filename ) || ! $this->core->wp_filesystem->exists( $filepath ) ) {
 			wp_send_json_error( __( 'Invalid archive filepath.', 'boldgrid-backup' ) );
@@ -230,11 +239,17 @@ class Boldgrid_Backup_Admin_Archive_Details {
 		$this->core->archive->init( $filepath );
 
 		foreach ( $attributes as $key => $value ) {
-			$this->core->archive->set_attribute( $key, stripslashes( $value ) );
+			if ( ! is_scalar( $value ) ) {
+				continue;
+			}
+
+			$this->core->archive->set_attribute( sanitize_key( $key ), sanitize_textarea_field( $value ) );
 		}
 
 		// Take action if we've updated either the backup's title or description.
-		$title_description_update = ! empty( $attributes['title'] ) || ! empty( $attributes['description'] );
+		$sanitized_title       = isset( $attributes['title'] ) ? sanitize_textarea_field( $attributes['title'] ) : '';
+		$sanitized_description = isset( $attributes['description'] ) ? sanitize_textarea_field( $attributes['description'] ) : '';
+		$title_description_update = '' !== $sanitized_title || '' !== $sanitized_description;
 
 		if ( $title_description_update && isset( $this->core->activity ) ) {
 			$this->core->activity->add( 'update_title_description', 1, $this->core->rating_prompt_config );

@@ -14,7 +14,6 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP
 
 defined( 'WPINC' ) || die;
 
@@ -22,6 +21,7 @@ defined( 'WPINC' ) || die;
 $lang = array(
 	'yes'                  => __( 'Yes', 'boldgrid-backup' ),
 	'no'                   => __( 'No', 'boldgrid-backup' ),
+	'none'                 => __( 'None', 'boldgrid-backup' ),
 	'untested'             => __( 'untested', 'boldgrid-backup' ),
 	'PASS'                 => __( 'PASS', 'boldgrid-backup' ),
 	'FAIL'                 => __( 'FAIL', 'boldgrid-backup' ),
@@ -90,6 +90,8 @@ $pcl_zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this );
 
 $filesystem_method = get_filesystem_method();
 
+$execution_functions = Boldgrid_Backup_Admin_Cli::get_execution_functions();
+
 $valid_backup_dir = $backup_dir_perms['exists'] && $backup_dir_perms['read'] && $backup_dir_perms['write'] && $backup_dir_perms['rename'] && $backup_dir_perms['delete'] && $backup_dir_perms['dirlist'];
 
 $timezone = $this->time->get_server_timezone();
@@ -123,7 +125,12 @@ $tests = array(
 	),
 	array(
 		'k' => __( 'Document root:', 'boldgrid-backup' ),
-		'v' => str_replace( '\\\\', '\\', $_SERVER['DOCUMENT_ROOT'] ),
+		'v' => isset( $_SERVER['DOCUMENT_ROOT'] ) ?
+			str_replace(
+				'\\\\',
+				'\\',
+				sanitize_text_field( wp_unslash( $_SERVER['DOCUMENT_ROOT'] ) )
+			) : '',
 	),
 	array(
 		'k' => __( 'Current user:', 'boldgrid-backup' ),
@@ -140,6 +147,10 @@ $tests = array(
 				$error_span,
 				$filesystem_method, __( 'Only "direct" filesystem supported.', 'boldgrid-backup' )
 			),
+	),
+	array(
+		'k' => __( 'Execution functions available', 'boldgrid-backup' ),
+		'v' => empty( $execution_functions ) ? sprintf( $error_span, $lang['none'], '' ) : implode( ', ', $execution_functions ),
 	),
 	array(
 		'k' => __( 'WordPress version:', 'boldgrid-backup' ),
@@ -446,13 +457,13 @@ $table .= '</table>';
 
 	<?php
 	$nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
-	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+	echo $nav; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Nav markup built by the plugin from escaped parts.
 
 	require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
 
-	echo $fail_tips; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+	echo $fail_tips; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup built by the plugin from escaped parts.
 
-	echo $table; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+	echo $table; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup built by the plugin from escaped parts.
 	?>
 
 </div>
