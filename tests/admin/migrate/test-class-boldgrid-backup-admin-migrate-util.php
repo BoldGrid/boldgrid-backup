@@ -108,6 +108,20 @@ class Test_Boldgrid_Backup_Admin_Migrate_Util extends WP_UnitTestCase {
 		$this->assertSame( 'rest_error', $result->get_error_code() );
 	}
 
+	public function test_get_site_rest_url_malformed_api_link_returns_wp_error() {
+		$util = new Boldgrid_Backup_Admin_Migrate_Util( $this->migrate_core );
+		$this->mock_site_rest_url_headers(
+			array(
+				'link' => 'rel="https://api.w.org/"',
+			)
+		);
+
+		$result = $util->get_site_rest_url( 'https://example.com' );
+
+		$this->assertInstanceOf( 'WP_Error', $result );
+		$this->assertSame( 'rest_error', $result->get_error_code() );
+	}
+
 	public function test_url_to_safe_directory_name() {
 		$sample_url        = 'https://test.boldgrid.com';
 		$expected_dir_name = 'test-boldgrid-com';

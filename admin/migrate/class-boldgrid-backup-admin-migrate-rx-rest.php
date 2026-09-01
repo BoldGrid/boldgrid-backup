@@ -395,10 +395,11 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 		    }
 		}
 
+		$wp_json_url = '';
 		if ( $wp_json_link ) {
-		    if ( preg_match( '/<([^>]+)>/', $wp_json_link, $m ) ) {
-		        $wp_json_url = $m[1];
-		    }
+			if ( preg_match( '/<([^>]+)>/', $wp_json_link, $m ) ) {
+				$wp_json_url = $m[1];
+			}
 		}
 
 		$rest_api_error_response = new WP_REST_Response( array(
@@ -409,7 +410,7 @@ class Boldgrid_Backup_Admin_Migrate_Rx_Rest {
 			),
 		), 200 );
 
-		if ( empty( $wp_json_link ) ) {
+		if ( empty( $wp_json_url ) ) {
 			return $rest_api_error_response;
 		}
 
