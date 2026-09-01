@@ -569,8 +569,8 @@ class Boldgrid_Backup_Admin_Utility {
 	 * Determine whether or not Total Upkeep is active.
 	 *
 	 * The fact that Total Upkeep is calling this method shows that it is installed and activated.
-	 * However, it we are not listed in the "active_plugins" option, then we are in the middle of
-	 * activation.
+	 * However, if we are not listed in "active_plugins" or "active_sitewide_plugins", then we are
+	 * in the middle of activation.
 	 *
 	 * Because the library may not be available until activation, this method can help us determine
 	 * whether or not we should instantiate library classes at a certain time.
@@ -580,9 +580,16 @@ class Boldgrid_Backup_Admin_Utility {
 	 * @return bool
 	 */
 	public static function is_active() {
-		$active_plugins = get_option( 'active_plugins', array() );
+		$plugin = 'boldgrid-backup/boldgrid-backup.php';
 
-		return in_array( 'boldgrid-backup/boldgrid-backup.php', $active_plugins, true );
+		$active_plugins = get_option( 'active_plugins', array() );
+		if ( in_array( $plugin, (array) $active_plugins, true ) ) {
+			return true;
+		}
+
+		$network_plugins = get_site_option( 'active_sitewide_plugins', array() );
+
+		return is_array( $network_plugins ) && isset( $network_plugins[ $plugin ] );
 	}
 
 	/**
