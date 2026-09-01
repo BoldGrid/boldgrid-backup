@@ -387,21 +387,27 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 
 		if ( $this->core->settings->is_saving_settings ) {
 			$this->$type = $this->from_post( $type );
-		} elseif ( isset( $settings['folder_exclusion_type'] ) && 'full' === $settings['folder_exclusion_type'] ) {
-			/*
-			 * If the user configured "Backup all files" as the "Files and Folders" settings, then
-			 * use the default values.
-			 */
-			$this->$type = $this->$default;
-		} elseif ( isset( $settings[ $key ] ) ) {
-			/*
-			 * Is there value for this in the settings?
-			 *
-			 * Initially, we checked to make sure $settings[$key] wasn't empty and
-			 * it was a string. Now, we'll simply see if it is set. This will allow
-			 * for the user to enter nothing in the exclude field.
-			 */
-			$this->$type = $settings[ $key ];
+		} elseif ( is_array( $settings ) ) {
+			$folder_type = isset( $settings['folder_exclusion_type'] ) ?
+				$settings['folder_exclusion_type'] : $this->default_type;
+
+			if ( 'full' === $folder_type ) {
+				/**
+				 * "Backup all files", or a stored exclude/include with no type
+				 * (pre-1.6 option shape). Use current class defaults so upgrades
+				 * pick up new globs.
+				 */
+				$this->$type = $this->$default;
+			} elseif ( isset( $settings[ $key ] ) ) {
+				/*
+				 * Is there value for this in the settings?
+				 *
+				 * Initially, we checked to make sure $settings[$key] wasn't empty and
+				 * it was a string. Now, we'll simply see if it is set. This will allow
+				 * for the user to enter nothing in the exclude field.
+				 */
+				$this->$type = $settings[ $key ];
+			}
 		} elseif ( ! $settings ) {
 			$settings = $this->core->settings->get_settings();
 			if ( ! empty( $settings[ $key ] ) && is_string( $settings[ $key ] ) ) {

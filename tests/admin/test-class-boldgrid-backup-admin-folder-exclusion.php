@@ -134,4 +134,19 @@ class Test_Boldgrid_Backup_Admin_Folder_Exclusion extends WP_UnitTestCase {
 
 		$this->assertSame( $custom, $this->folder_exclusion->from_settings( 'exclude', $settings ) );
 	}
+
+	/**
+	 * Stored exclude without folder_exclusion_type is treated as full.
+	 */
+	public function test_from_settings_missing_type_uses_new_default() {
+		$settings = array(
+			'folder_exclusion_exclude' => '.git,node_modules',
+			'folder_exclusion_include' => 'WPCORE,/wp-content',
+		);
+
+		$this->assertSame(
+			$this->folder_exclusion->default_exclude,
+			$this->folder_exclusion->from_settings( 'exclude', $settings )
+		);
+	}
 }
