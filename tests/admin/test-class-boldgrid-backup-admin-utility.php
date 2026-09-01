@@ -119,4 +119,31 @@ class Test_Boldgrid_Backup_Admin_Utility extends WP_UnitTestCase {
 		$this->assertTrue( 'Fundaay' === $option->days_of_the_week->one );
 		$this->assertTrue( 'Tuesdaay' === $option->days_of_the_week->two );
 	}
+
+	/**
+	 * Test is_active() for per-site and network activation.
+	 *
+	 * @since SINCEVERSION
+	 */
+	public function test_is_active() {
+		$plugin = 'boldgrid-backup/boldgrid-backup.php';
+
+		$saved_active  = get_option( 'active_plugins', array() );
+		$saved_network = get_site_option( 'active_sitewide_plugins', array() );
+
+		update_option( 'active_plugins', array() );
+		update_site_option( 'active_sitewide_plugins', array() );
+		$this->assertFalse( Boldgrid_Backup_Admin_Utility::is_active() );
+
+		update_option( 'active_plugins', array( $plugin ) );
+		update_site_option( 'active_sitewide_plugins', array() );
+		$this->assertTrue( Boldgrid_Backup_Admin_Utility::is_active() );
+
+		update_option( 'active_plugins', array() );
+		update_site_option( 'active_sitewide_plugins', array( $plugin => time() ) );
+		$this->assertTrue( Boldgrid_Backup_Admin_Utility::is_active() );
+
+		update_option( 'active_plugins', $saved_active );
+		update_site_option( 'active_sitewide_plugins', $saved_network );
+	}
 }
