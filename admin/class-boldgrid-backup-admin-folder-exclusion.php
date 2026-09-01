@@ -25,15 +25,15 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	 *
 	 * Used for "Backup all files" and when no custom exclude list is stored.
 	 * wp-content/cache is generated cache, not site content.
-	 * *.zip, *.gz, and *.tar skip generic archives (including other plugins'
-	 * backups). *.wpress is All-in-One WP Migration. *.tmp covers orphaned
-	 * backup temp files. Existing "full" backups pick up list changes on
-	 * upgrade; custom exclude lists are not rewritten.
+	 * *.zip, *.gz, *.tar, *.tgz, *.7z, and *.rar skip generic archives
+	 * (including other plugins' backups). *.wpress is All-in-One WP Migration.
+	 * *.tmp covers orphaned backup temp files. Existing "full" backups pick up
+	 * list changes on upgrade; custom exclude lists are not rewritten.
 	 *
 	 * @since 1.6.0
 	 * @var   string
 	 */
-	public $default_exclude = '.git,node_modules,wp-content/cache,*.zip,*.gz,*.tar,*.wpress,*.tmp';
+	public $default_exclude = '.git,node_modules,wp-content/cache,*.zip,*.gz,*.tar,*.tgz,*.7z,*.rar,*.wpress,*.tmp';
 
 	/**
 	 * The default include value.
