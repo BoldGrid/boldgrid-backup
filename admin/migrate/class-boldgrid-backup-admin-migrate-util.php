@@ -640,13 +640,22 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		    }
 		}
 		
+		$wp_json_url = '';
 		if ( $wp_json_link ) {
-		    if ( preg_match( '/<([^>]+)>/', $wp_json_link, $m ) ) {
-		        $wp_json_url = $m[1];
-		    }
+			if ( preg_match( '/<([^>]+)>/', $wp_json_link, $m ) ) {
+				$wp_json_url = $m[1];
+			}
 		}
 
-		preg_match('/<([^>]+)>/', $wp_json_link[0], $matches );
+		if ( empty( $wp_json_url ) ) {
+			return new WP_Error(
+				'rest_error',
+				__(
+					'The REST API is not properly configured on the source site. Please ensure that the REST API is properly configured.',
+					'boldgrid-backup'
+				)
+			);
+		}
 
 		return $wp_json_url;
 	}

@@ -46,6 +46,68 @@ class Test_Boldgrid_Backup_Admin_Migrate_Util extends WP_UnitTestCase {
 		$this->assertEquals( $settings['backup_directory'], $util->get_transfer_dir() );
 	}
 
+	/**
+	 * Stub wp_remote_get responses for get_site_rest_url.
+	 *
+	 * @param array $header_map Headers from getAll().
+	 */
+	private function mock_site_rest_url_headers( $header_map ) {
+		$headers = new class( $header_map ) {
+			private $all;
+
+			public function __construct( $all ) {
+				$this->all = $all;
+			}
+
+			public function getAll() {
+				return $this->all;
+			}
+		};
+
+		add_filter(
+			'pre_http_request',
+			function () use ( $headers ) {
+				return array(
+					'headers'  => $headers,
+					'body'     => '',
+					'response' => array(
+						'code'    => 200,
+						'message' => 'OK',
+					),
+					'cookies'  => array(),
+					'filename' => null,
+				);
+			}
+		);
+	}
+
+	public function test_get_site_rest_url_from_link_header() {
+		$util = new Boldgrid_Backup_Admin_Migrate_Util( $this->migrate_core );
+		$this->mock_site_rest_url_headers(
+			array(
+				'link' => '<https://example.com/wp-json/>; rel="https://api.w.org/"',
+			)
+		);
+
+		$result = $util->get_site_rest_url( 'https://example.com' );
+
+		$this->assertSame( 'https://example.com/wp-json/', $result );
+	}
+
+	public function test_get_site_rest_url_missing_api_link_returns_wp_error() {
+		$util = new Boldgrid_Backup_Admin_Migrate_Util( $this->migrate_core );
+		$this->mock_site_rest_url_headers(
+			array(
+				'link' => '<https://example.com/>; rel="preconnect"',
+			)
+		);
+
+		$result = $util->get_site_rest_url( 'https://example.com' );
+
+		$this->assertInstanceOf( 'WP_Error', $result );
+		$this->assertSame( 'rest_error', $result->get_error_code() );
+	}
+
 	public function test_url_to_safe_directory_name() {
 		$sample_url        = 'https://test.boldgrid.com';
 		$expected_dir_name = 'test-boldgrid-com';
@@ -87,6 +149,8 @@ class Test_Boldgrid_Backup_Admin_Migrate_Util extends WP_UnitTestCase {
 	}
 
 	protected function tearDown(): void {
+		remove_all_filters( 'pre_http_request' );
+
 		// Remove the original test file if it exists
 		if ( $this->test_file_path && file_exists( $this->test_file_path ) ) {
 			@unlink( $this->test_file_path );
