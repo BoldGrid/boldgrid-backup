@@ -131,6 +131,8 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 */7 * * * * php -d register_argc_argv="1" -qf "' . $this->site_c_base_path . 'cron/run-jobs.php" siteurl=https://example.com id=12345678 secret=notasecret > /dev/null 2>&1
 */8 * * * * php -d register_argc_argv="1" -qf "' . $this->site_c_base_path . 'cron/run_jobs.php" siteurl=https://example.com id=12345678 secret=notasecret > /dev/null 2>&1
 ';
+
+		delete_site_option( Boldgrid_Backup_Admin_Cron::CRONTAB_UPGRADE_ATTEMPTED_OPTION );
 	}
 
 	/**
@@ -1144,6 +1146,84 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 
 		$this->assertTrue(
 			$cron->entry_delete( '# Total Upkeep Test Entry (You can delete this line).' )
+		);
+	}
+
+	/**
+	 * Upgrade crontab entries must not probe crontab when the format version already matches.
+	 *
+	 * @since 1.17.5
+	 */
+	public function test_upgrade_crontab_entries_skips_when_version_matches() {
+		$cron = $this->getMockBuilder( Boldgrid_Backup_Admin_Cron::class )
+			->setConstructorArgs( array( $this->core ) )
+			->setMethods( array( 'add_all_crons' ) )
+			->getMock();
+
+		$cron->expects( $this->never() )->method( 'add_all_crons' );
+
+		$settings = get_site_option( 'boldgrid_backup_settings', array() );
+		if ( ! is_array( $settings ) ) {
+			$settings = array();
+		}
+		$settings['scheduler']       = 'cron';
+		$settings['crontab_version'] = $cron->crontab_version;
+		update_site_option( 'boldgrid_backup_settings', $settings );
+
+		$this->assertFalse( $cron->upgrade_crontab_entries() );
+	}
+
+	/**
+	 * A failed crontab upgrade must not rerun add_all_crons on the next admin_init.
+	 *
+	 * @since 1.17.5
+	 */
+	public function test_upgrade_crontab_entries_gates_failed_attempt() {
+		$this->core->scheduler->available = array(
+			'cron' => array(
+				'title' => 'Cron',
+			),
+		);
+
+		$cron = $this->getMockBuilder( Boldgrid_Backup_Admin_Cron::class )
+			->setConstructorArgs( array( $this->core ) )
+			->setMethods( array( 'add_all_crons' ) )
+			->getMock();
+
+		$cron->expects( $this->once() )->method( 'add_all_crons' )->willReturn( false );
+
+		$settings = get_site_option( 'boldgrid_backup_settings', array() );
+		if ( ! is_array( $settings ) ) {
+			$settings = array();
+		}
+		$settings['scheduler'] = 'cron';
+		unset( $settings['crontab_version'] );
+		update_site_option( 'boldgrid_backup_settings', $settings );
+
+		$this->assertFalse( $cron->upgrade_crontab_entries() );
+		$this->assertSame(
+			$cron->crontab_version,
+			get_site_option( Boldgrid_Backup_Admin_Cron::CRONTAB_UPGRADE_ATTEMPTED_OPTION )
+		);
+		$this->assertFalse( $cron->upgrade_crontab_entries() );
+	}
+
+	/**
+	 * Update cron must not rewrite crontab when get_all() cannot read it.
+	 *
+	 * @since 1.17.5
+	 */
+	public function test_update_cron_aborts_when_get_all_false() {
+		$cron = $this->getMockBuilder( Boldgrid_Backup_Admin_Cron::class )
+			->setConstructorArgs( array( $this->core ) )
+			->setMethods( array( 'get_all', 'entry_exists' ) )
+			->getMock();
+
+		$cron->method( 'get_all' )->willReturn( false );
+		$cron->method( 'entry_exists' )->willReturn( false );
+
+		$this->assertFalse(
+			$cron->update_cron( '# Total Upkeep Test Entry (You can delete this line).' )
 		);
 	}
 }
