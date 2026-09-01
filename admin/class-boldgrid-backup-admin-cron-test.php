@@ -109,7 +109,7 @@ class Boldgrid_Backup_Admin_Cron_Test {
 		$no = sprintf(
 			'<span class="warning">%1$s</span><br />%2$s',
 			__( 'No', 'boldgrid-backup' ),
-			__( 'Please contact your server administrator for assistance with troubleshooting.' )
+			__( 'Please contact your server administrator for assistance with troubleshooting.', 'boldgrid-backup' )
 		);
 
 		if ( $this->is_running() ) {
@@ -121,7 +121,7 @@ class Boldgrid_Backup_Admin_Cron_Test {
 			$markup       = $match_markup . $markup;
 
 			$markup .= '<p>' . __( 'Server offset', 'boldgrid-backup' ) . ': ' . $server_offset . '<br />';
-			$markup .= __( 'Cron offset' ) . ': ' . $cron_offset . '</p>';
+			$markup .= __( 'Cron offset', 'boldgrid-backup' ) . ': ' . $cron_offset . '</p>';
 
 			$markup .= sprintf( $run_test, esc_attr( __( 'Run test again', 'boldgrid-backup' ) ) );
 		}
@@ -222,6 +222,7 @@ class Boldgrid_Backup_Admin_Cron_Test {
 			);
 
 			// Add our cron. Use (int) to make sure our minutes do not have leading zero's.
+			// phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date -- Server-local time for crontab.
 			$cron_command    = (int) date( 'i', $cron_time ) . ' ' . date( 'G * * *', $cron_time ) . ' php -d register_argc_argv=1 -qf ' . $this->cron_path . ' > /dev/null 2>&1';
 			$all_crons_added = $this->core->cron->update_cron( $cron_command );
 

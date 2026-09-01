@@ -77,12 +77,12 @@ if ( ! empty( $reseller ) ) {
 		wp_kses(
 			/* translators: 1: HTML anchor for the URL address for BoldGrid Central, 2: HTML anchor close tag.. */
 			__(
-				'You can receive premium support using %1$sBoldGrid Central%2$s',
+				'Create a ticket at %1$sBoldGrid Support%2$s',
 				'boldgrid-backup'
 			),
 			$allowed_tags
 		),
-		'<a href="https://www.boldgrid.com/central/" target="_blank">',
+		'<a href="https://support.boldgrid.com/open.php" target="_blank">',
 		'</a>'
 	) . '</li>';
 } else {
@@ -94,7 +94,7 @@ if ( ! empty( $reseller ) ) {
 		'</p><p>' . $premium_button . '</p></div>';
 }
 
-echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+echo $nav; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Nav markup built by the plugin from escaped parts.
 
 require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
 ?>
@@ -152,7 +152,7 @@ printf(
 		</div>
 	</div>',
 	esc_html__( 'Premium Support', 'boldgrid-backup' ),
-	$premium_markup // phpcs:ignore WordPress.XSS.EscapeOutput
+	$premium_markup // phpcs:ignore WordPress.Security.EscapeOutput -- Markup built by the plugin from escaped parts.
 );
 ?>
 

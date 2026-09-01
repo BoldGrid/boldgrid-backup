@@ -12,7 +12,7 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP, WordPress.CSRF.NonceVerification.NoNonceVerification
+// phpcs:disable WordPress.Security.NonceVerification
 
 /**
  * Class: Boldgrid_Backup_Admin_Folder_Exclusion
@@ -26,7 +26,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	 * @since 1.6.0
 	 * @var   string
 	 */
-	public $default_exclude = '.git,node_modules,*.zip,*.gz,*.tar,*.wpress,*.tmp';
+	public $default_exclude = '.git,node_modules,wp-content/cache,*.zip,*.gz,*.tar,*.wpress,*.tmp';
 
 	/**
 	 * The default include value.
@@ -67,14 +67,6 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	 * @var   bool
 	 */
 	public $in_ajax_preview = false;
-
-	/**
-	 * Filename of our restore-info.json file.
-	 *
-	 * @since 1.14.10
-	 * @var string
-	 */
-	public $restore_info_filename;
 
 	/**
 	 * Determine the type of backup we are performing.
@@ -138,9 +130,6 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 		 */
 		$this->default_include = apply_filters( 'boldgrid_backup_default_folder_include', $this->default_include );
 		$this->default_exclude = apply_filters( 'boldgrid_backup_default_folder_exclude', $this->default_exclude );
-
-		// Set in the constructor so as to prevent excessive calls in self::allow_file.
-		$this->restore_info_filename = basename( \Boldgrid\Backup\Cli\Info::get_results_filepath() );
 	}
 
 	/**
@@ -157,8 +146,21 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 			return false;
 		}
 
-		// Do not allow the "cron/restore-info.json" file used for emergency restorations.
-		if ( $this->is_match( 'cron/' . $this->restore_info_filename, $file ) ) {
+		// Do not allow restore-info JSON used for emergency restorations (any cron/restore-info*
+		// orphan/legacy secret names). Backup dir contents are already excluded above.
+		if ( $this->is_match( 'cron/restore-info*', $file ) ) {
+			return false;
+		}
+
+		/*
+		 * Locators embed absolute backup-directory paths that are wrong after restore
+		 * to another host; exclude plugin-tree and durable wp-content copies.
+		 * Legacy verify-*.php may still exist until ensure_secure_storage() runs —
+		 * never ship those secrets inside a site backup.
+		 */
+		if ( $this->is_match( 'cli/restore-locator.php', $file )
+			|| $this->is_match( 'cli/verify-*.php', $file )
+			|| '.boldgrid-backup-locator.php' === basename( $file ) ) {
 			return false;
 		}
 
@@ -167,8 +169,10 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 		}
 
 		// Get comma-delimited lists from user input or settings.  Sanitizing is done below.
-		$include = $this->in_ajax_preview ? $_POST['include'] : $this->from_settings( 'include' );
-		$exclude = $this->in_ajax_preview ? $_POST['exclude'] : $this->from_settings( 'exclude' );
+		$include = $this->in_ajax_preview && isset( $_POST['include'] ) ?
+			sanitize_text_field( wp_unslash( $_POST['include'] ) ) : $this->from_settings( 'include' );
+		$exclude = $this->in_ajax_preview && isset( $_POST['exclude'] ) ?
+			sanitize_text_field( wp_unslash( $_POST['exclude'] ) ) : $this->from_settings( 'exclude' );
 
 		// Convert comma-delimited strings to arrays, and sanitize (also trim whitespace).
 		$includes = array_map( 'sanitize_text_field', explode( ',', $include ) );
@@ -411,7 +415,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 	 * Some files are just bad for business. Files in this list won't be backed up, and the user has
 	 * no control at this time to modify. Only files we're certain should be banned, should be.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 *
 	 * @param string $file A filepath. Not absolute, but relative to ABSPATH, such as wp-admin/css/about.css
 	 *
@@ -486,6 +490,8 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 		}
 
 		$key = 'folder_exclusion_' . $type;
+		$post_value = isset( $_POST[ $key ] ) ?
+			sanitize_text_field( wp_unslash( $_POST[ $key ] ) ) : '';
 
 		switch ( $type ) {
 			case 'include':
@@ -493,19 +499,19 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 				 * If you submit an empty "include" setting, it will be
 				 * interpreted as include all, *.
 				 */
-				$value = ! empty( $_POST[ $key ] ) ? $_POST[ $key ] : $this->default_include;
+				$value = '' !== $post_value ? $post_value : $this->default_include;
 				break;
 			case 'exclude':
 				/*
 				 * You are allowed to submit a blank "exclude" setting. It means
 				 * you do not want to exclude anything.
 				 */
-				$value = empty( $_POST[ $key ] ) ? '' : $_POST[ $key ];
+				$value = $post_value;
 				break;
 			case 'type':
-				$value = ! empty( $_POST[ $key ] ) &&
-					in_array( $_POST[ $key ], $this->valid_types, true ) ?
-					$_POST[ $key ] : $this->default_type;
+				$value = '' !== $post_value &&
+					in_array( $post_value, $this->valid_types, true ) ?
+					$post_value : $this->default_type;
 				break;
 		}
 
@@ -524,8 +530,10 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 			wp_send_json_error( __( 'Invalid nonce.', 'boldgrid-backup' ) );
 		}
 
-		$include = isset( $_POST['include'] ) ? sanitize_text_field( $_POST['include'] ) : null;
-		$exclude = isset( $_POST['exclude'] ) ? sanitize_text_field( $_POST['exclude'] ) : null;
+		$include = isset( $_POST['include'] ) ?
+			sanitize_text_field( wp_unslash( $_POST['include'] ) ) : null;
+		$exclude = isset( $_POST['exclude'] ) ?
+			sanitize_text_field( wp_unslash( $_POST['exclude'] ) ) : null;
 
 		if ( is_null( $include ) || is_null( $exclude ) ) {
 			wp_send_json_error( __( 'Invalid include / exclude values.', 'boldgrid-backup' ) );

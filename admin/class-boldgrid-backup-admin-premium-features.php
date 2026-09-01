@@ -57,7 +57,7 @@ class Boldgrid_Backup_Admin_Premium_Features {
 	 * @param string $hook Hook name.
 	 */
 	public function admin_enqueue_scripts( $hook ) {
-		if ( isset( $_REQUEST['page'] ) && 'boldgrid-backup-premium-features' === $_REQUEST['page'] ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		if ( isset( $_REQUEST['page'] ) && 'boldgrid-backup-premium-features' === $_REQUEST['page'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only page check used to decide which assets to enqueue.
 			wp_enqueue_style(
 				'boldgrid-backup-admin-premium-features',
 				plugin_dir_url( __FILE__ ) . 'css/boldgrid-backup-admin-premium.css', array(),
@@ -136,7 +136,7 @@ class Boldgrid_Backup_Admin_Premium_Features {
 				</div>
 				<div id="bglib-page-content">
 					<div class="wp-header-end"></div>';
-		echo $modal; //phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+		echo $modal; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup built by the plugin from escaped parts.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-premium.php';
 		echo '
 				</div>

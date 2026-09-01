@@ -17,6 +17,11 @@
 
 // phpcs:disable WordPress.WP.AlternativeFunctions
 
+if ( ! in_array( PHP_SAPI, array( 'cli', 'phpdbg' ), true ) ) {
+	header( 'HTTP/1.1 403 Forbidden' );
+	exit;
+}
+
 // Require Boldgrid_Backup_Url_Helper class.
 require dirname( __FILE__ ) . '/class-boldgrid-backup-url-helper.php';
 

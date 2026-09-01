@@ -86,6 +86,22 @@ class Crontab {
 	 * @return bool
 	 */
 	public function write_crontab( $crontab ) {
+		/**
+		 * Filter whether the system crontab may be replaced.
+		 *
+		 * This is the only place the plugin rewrites the crontab, so returning false here
+		 * makes every scheduling path a no-op. The test suite uses this so a run cannot
+		 * overwrite the crontab of the account running it.
+		 *
+		 * @since 1.17.4
+		 *
+		 * @param bool   $can_write Whether the crontab may be written.
+		 * @param string $crontab   The crontab contents that would be written.
+		 */
+		if ( ! apply_filters( 'boldgrid_backup_can_write_crontab', true, $crontab ) ) {
+			return false;
+		}
+
 		$backup_directory = $this->core->backup_dir->get();
 
 		if ( ! $this->core->wp_filesystem->is_writable( $backup_directory ) ) {
@@ -119,6 +135,10 @@ class Crontab {
 
 		// Remove temp crontab file.
 		$this->core->wp_filesystem->delete( $temp_crontab_path, false, 'f' );
+
+		if ( $this->core->cron ) {
+			$this->core->cron->clear_crontab_cache();
+		}
 
 		return (bool) $success;
 	}

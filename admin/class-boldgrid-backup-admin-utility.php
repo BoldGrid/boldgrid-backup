@@ -12,7 +12,6 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP
 
 /**
  * Class: Boldgrid_Backup_Admin_Utility
@@ -95,6 +94,40 @@ class Boldgrid_Backup_Admin_Utility {
 	}
 
 	/**
+	 * Database find and replace.
+	 *
+	 * Take note we also have self::option_find_replace that does a find and replace specific to option
+	 * values because they are serialized. It uses self::str_replace_recursive.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param string $table
+	 * @param string $column
+	 * @param string $find
+	 * @param string $replace
+	 */
+	public static function db_find_replace( $table, $column, $find, $replace ) {
+		global $wpdb;
+
+		// phpcs:disable WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder, WordPress.DB.PreparedSQLPlaceholders.LikeWildcardsInQuery
+		$wpdb->query(
+			$wpdb->prepare(
+				'UPDATE	`' . $wpdb->prefix . '%1$s`
+				SET		`%2$s` = REPLACE( `%3$s`, "%4$s", "%5$s" )
+				WHERE	`%6$s` LIKE "%%%7$s%%";',
+				$table,
+				$column,
+				$column,
+				$find,
+				$replace,
+				$column,
+				$wpdb->esc_like( $find )
+			)
+		);
+		// phpcs:enable
+	}
+
+	/**
 	 * Custom error handler.
 	 *
 	 * Catches everything (including warnings) and throws an excpetion.
@@ -156,7 +189,7 @@ class Boldgrid_Backup_Admin_Utility {
 			return;
 		}
 
-		throw new ErrorException( $errstr, 0, $errno, $errfile, $errline );
+		throw new ErrorException( esc_html( $errstr ), 0, absint( $errno ), esc_html( $errfile ), absint( $errline ) );
 	}
 
 	/**
@@ -321,6 +354,42 @@ class Boldgrid_Backup_Admin_Utility {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Find and replace for option values.
+	 *
+	 * Similar to self::db_find_replace. This one is special however because it ends up using
+	 * self::str_replace_recursive for the replacement mechanism.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param string $find
+	 * @param string $replace
+	 */
+	public static function option_find_replace( $find, $replace ) {
+		global $wpdb;
+
+		$matched_options = $wpdb->get_results(
+			$wpdb->prepare(
+				'SELECT	`option_name`
+				FROM	`' . $wpdb->prefix . 'options`
+				WHERE	`option_value` LIKE %s;',
+				'%' . $wpdb->esc_like( $find ) . '%'
+			),
+			ARRAY_N
+		);
+
+		if ( empty( $matched_options ) ) {
+			return;
+		}
+
+		foreach ( $matched_options as $option_name ) {
+			$option_value = get_option( $option_name[0] );
+			$option_value = self::str_replace_recursive( $find, $replace, $option_value );
+
+			update_option( $option_name[0], $option_value );
+		}
 	}
 
 	/**
@@ -500,8 +569,8 @@ class Boldgrid_Backup_Admin_Utility {
 	 * Determine whether or not Total Upkeep is active.
 	 *
 	 * The fact that Total Upkeep is calling this method shows that it is installed and activated.
-	 * However, it we are not listed in the "active_plugins" option, then we are in the middle of
-	 * activation.
+	 * However, if we are not listed in "active_plugins" or "active_sitewide_plugins", then we are
+	 * in the middle of activation.
 	 *
 	 * Because the library may not be available until activation, this method can help us determine
 	 * whether or not we should instantiate library classes at a certain time.
@@ -511,9 +580,27 @@ class Boldgrid_Backup_Admin_Utility {
 	 * @return bool
 	 */
 	public static function is_active() {
-		$active_plugins = get_option( 'active_plugins', array() );
+		$plugin = 'boldgrid-backup/boldgrid-backup.php';
 
-		return in_array( 'boldgrid-backup/boldgrid-backup.php', $active_plugins, true );
+		$active_plugins = get_option( 'active_plugins', array() );
+		if ( in_array( $plugin, (array) $active_plugins, true ) ) {
+			return true;
+		}
+
+		$network_plugins = get_site_option( 'active_sitewide_plugins', array() );
+
+		return is_array( $network_plugins ) && isset( $network_plugins[ $plugin ] );
+	}
+
+	/**
+	 * Determine whether or not the current user is an administrator.
+	 *
+	 * @since 1.14.14
+	 *
+	 * @return bool
+	 */
+	public static function is_user_admin() {
+		return current_user_can( 'update_plugins' );
 	}
 
 	/**
@@ -529,7 +616,7 @@ class Boldgrid_Backup_Admin_Utility {
 	public static function is_admin_page( $page ) {
 		global $pagenow;
 
-		return 'admin.php' === $pagenow && ! empty( $_GET['page'] ) && $page === $_GET['page']; // phpcs:ignore WordPress.CSRF.NonceVerification
+		return 'admin.php' === $pagenow && ! empty( $_GET['page'] ) && $page === $_GET['page']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only page check.
 	}
 
 	/**
@@ -713,6 +800,26 @@ class Boldgrid_Backup_Admin_Utility {
 	}
 
 	/**
+	 * A wrapper for WordPress' flush_rewrite_rules.
+	 *
+	 * Wrapper function is necessary because rewriting the .htaccess only works if the
+	 * save_mod_rewrite_rules() function exists, which only does in admin. This method ensures it's
+	 * there.
+	 *
+	 * @link https://core.trac.wordpress.org/ticket/51805
+	 *
+	 * @param bool $hard Whether to update .htaccess (hard flush) or just update rewrite_rules option
+	 *                   (soft flush).
+	 */
+	public static function flush_rewrite_rules( $hard = true ) {
+		if ( $hard && ! function_exists( 'save_mod_rewrite_rules' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/misc.php';
+		}
+
+		flush_rewrite_rules( $hard );
+	}
+
+	/**
 	 * Replace the siteurl in the WordPress database.
 	 *
 	 * @since 1.2.3
@@ -722,103 +829,96 @@ class Boldgrid_Backup_Admin_Utility {
 	 *
 	 * @static
 	 *
-	 * @param string $old_siteurl The old/restored siteurl to find and be replaced.
-	 * @param string $new_siteurl The siteurl to replace the old siteurl.
+	 * @param array $args {
+	 *      An array of arguments.
+	 *
+	 *      @type string $old_siteurl The old/restored siteurl to find and be replaced.
+	 *      @type string $siteurl     The siteurl to replace the old siteurl.
+	 *      @type bool   $flush       Whether or not to flush the rewrite rules.
+	 * }
 	 * @return bool
 	 */
-	public static function update_siteurl( $old_siteurl, $new_siteurl ) {
-		// Define filter options.
-		$filter_options = FILTER_FLAG_SCHEME_REQUIRED | FILTER_FLAG_HOST_REQUIRED;
+	public static function update_siteurl( $args = array() ) {
+		wp_parse_args( $args, array(
+			'flush' => false,
+		) );
 
-		// Validate the old siteurl.
-		if ( false === filter_var( $old_siteurl, FILTER_VALIDATE_URL, $filter_options ) ) {
+		$old_siteurl = $args['old_siteurl'];
+		$new_siteurl = $args['siteurl'];
+
+		// Validate.
+		if ( false === filter_var( $old_siteurl, FILTER_VALIDATE_URL ) ) {
+			return false;
+		}
+		if ( false === filter_var( $new_siteurl, FILTER_VALIDATE_URL ) ) {
 			return false;
 		}
 
-		// Validate the new siteurl.
-		if ( false === filter_var( $new_siteurl, FILTER_VALIDATE_URL, $filter_options ) ) {
-			return false;
-		}
-
-		// Ensure there are no trailing slashes in siteurl.
+		/*
+		 * Ensure the site url does not end in a trailing slash.
+		 *
+		 * This is best practice. IE when you manually edit your home / siteurl in the dashboard on
+		 * the Settings > General page, WordPress will automatically untrailingslahsit.
+		 */
 		$old_siteurl = untrailingslashit( $old_siteurl );
 		$new_siteurl = untrailingslashit( $new_siteurl );
 
-		// There may be a filter, so remove it.
+		/*
+		 * Find and replace option values.
+		 *
+		 * Do this before updating the "siteurl" and "home" via the update_option calls below. Otherwise,
+		 * we'll runing into:
+		 * # Old url:           domain.com
+		 * # Requested new url: domain.com/514/514
+		 * # Resulting url:     domain.com/514/514/514/514
+		 */
+		self::option_find_replace( $old_siteurl, $new_siteurl );
+
 		remove_all_filters( 'pre_update_option_siteurl' );
 
-		// Update the WP otion "siteurl".
 		update_option( 'siteurl', $new_siteurl );
+		update_option( 'home', $new_siteurl );
 
-		// Connect to the WordPress database via $wpdb.
-		global $wpdb;
-
-		// Get the database prefix (blog id 1 or 0 gets the base prefix).
-		$db_prefix = $wpdb->get_blog_prefix( 1 );
-
-		// phpcs:disable WordPress.DB.PreparedSQLPlaceholders
-
-		// Replace the URL in wp_posts.
-		$wpdb->query(
-			$wpdb->prepare(
-				'UPDATE `%1$sposts` SET `post_content` = REPLACE( `post_content`, \'%2$s\', \'%3$s\' ) WHERE `post_content` LIKE \'%%%2$s%%\';',
-				array(
-					$db_prefix,
-					$old_siteurl,
-					$new_siteurl,
-				)
-			)
+		$replacers = array(
+			// Post content.
+			array(
+				'table'   => 'posts',
+				'column'  => 'post_content',
+				'find'    => $old_siteurl,
+				'replace' => $new_siteurl,
+			),
+			// Custom urls in menus.
+			array(
+				'table'   => 'postmeta',
+				'column'  => 'meta_value',
+				'find'    => $old_siteurl,
+				'replace' => $new_siteurl,
+			),
 		);
+
+		foreach ( $replacers as $replacer ) {
+			self::db_find_replace( $replacer['table'], $replacer['column'], $replacer['find'], $replacer['replace'] );
+		}
 
 		// Check if the upload_url_path needs to be updated.
 		$upload_url_path = get_option( 'upload_url_path' );
-
 		if ( ! empty( $upload_url_path ) ) {
 			$upload_url_path = str_replace( $old_siteurl, $new_siteurl, $upload_url_path );
-
 			update_option( 'upload_url_path', $upload_url_path );
 		}
 
-		// Find old siteurl references in WP options.
-		// Match old_siteurl with and without escaped URL, for example, JSON data escapes slashes.
-		$matched_options = $wpdb->get_results(
-			$wpdb->prepare(
-				'SELECT `option_name` FROM `%1$soptions` WHERE `option_value` LIKE \'%%%2$s%%\' OR `option_value` LIKE \'%%%3$s%%\';',
-				array(
-					$db_prefix,
-					$old_siteurl,
-					addslashes( $old_siteurl ),
-				)
-			),
-			ARRAY_N
-		);
-
-		// phpcs:enable WordPress.DB.PreparedSQLPlaceholders
-
-		// If there are no matches options, then return.
-		if ( ! $matched_options ) {
-			return true;
-		}
-
-		// Replace the siteurl in matched options.
-		foreach ( $matched_options as $option_name ) {
-			$option_value = get_option( $option_name[0] );
-
-			// Replace siteurl.
-			$option_value = self::str_replace_recursive(
-				$old_siteurl,
-				$new_siteurl,
-				$option_value
-			);
-
-			// Replace siteurl escaped with slashes.
-			$option_value = self::str_replace_recursive(
-				addslashes( $old_siteurl ),
-				addslashes( $new_siteurl ),
-				$option_value
-			);
-
-			update_option( $option_name[0], $option_value );
+		/*
+		 * If requested (false by default), flush the rewrite rules.
+		 *
+		 * Why not make this a standard operation? We would except for the fact that the
+		 * Boldgrid_Backup_Admin_Restore_Helper class adds the "flush_rewrite_rules" function to the
+		 * "shutdown" hook. Does it need to be done at shutdown? Not entirely sure.
+		 *
+		 * This optional action is helpful when updating the site url outside of a restoration process,
+		 * IE a stand alone REST call to update the site url.
+		 */
+		if ( ! empty( $args['flush'] ) ) {
+			self::flush_rewrite_rules();
 		}
 
 		return true;

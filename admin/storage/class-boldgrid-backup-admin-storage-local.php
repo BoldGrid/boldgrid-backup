@@ -137,7 +137,7 @@ class Boldgrid_Backup_Admin_Storage_Local {
 	 */
 	public function add_submenus() {
 		add_submenu_page(
-			null,
+			'boldgrid-backup-settings',
 			__( 'Web Server', 'boldgrid-backup' ),
 			__( 'Web Server', 'boldgrid-backup' ),
 			'administrator',
@@ -222,7 +222,11 @@ class Boldgrid_Backup_Admin_Storage_Local {
 			// For consistency, untrailingslashit the input backup dir, or use the default.
 			$settings['backup_directory'] = ! empty( $_POST['backup_directory'] ) ?
 				untrailingslashit(
-					str_replace( '\\\\', '\\', trim( $_POST['backup_directory'] ) )
+					str_replace(
+						'\\\\',
+						'\\',
+						trim( sanitize_text_field( wp_unslash( $_POST['backup_directory'] ) ) )
+					)
 				) : $this->core->backup_dir->get();
 
 			$this->core->backup_dir->create( $settings['backup_directory'] );

@@ -197,6 +197,16 @@ class Boldgrid_Backup_Admin_Go_Pro {
 	public function get_premium_url( $source = 'bgbkup', $url = 'https://www.boldgrid.com/update-backup' ) {
 		$url = add_query_arg( 'source', $source, $url );
 
+		/**
+		 * Allow the filtering of the premium url.
+		 *
+		 * @since SINCEVERISON
+		 *
+		 * @param string $url    The url to be filtered.
+		 * @param string $source A label (used in the url) to uniquely identify this link.
+		 */
+		$url = apply_filters( 'boldgrid_backup_premium_url', $url, $source );
+
 		return $url;
 	}
 }

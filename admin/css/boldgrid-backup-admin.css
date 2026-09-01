@@ -40,7 +40,8 @@ th .help[data-id] {
 }
 
 /* Prevent clicks on disabled links. */
-a[disabled] {
+.bgbkup-page-container a[disabled="disabled"],
+.bgbkup-page-container a[disabled="true"] {
 	pointer-events: none;
 }
 

@@ -3,7 +3,7 @@
  * File: class-boldgrid-backup-admin-filelist-analyzer.php
  *
  * @link  https://www.boldgrid.com
- * @since SINCEVERSION
+ * @since 1.14.13
  *
  * @package    Boldgrid_Backup
  * @subpackage Boldgrid_Backup/admin
@@ -15,13 +15,13 @@
 /**
  * Class: Boldgrid_Backup_Admin_Filelist
  *
- * @since SINCEVERSION
+ * @since 1.14.13
  */
 class Boldgrid_Backup_Admin_Filelist_Analyzer {
 	/**
 	 * The key used to save this setting in the Total Upkeep settings.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 * @var string
 	 */
 	public static $settings_key = 'filelist_analysis';
@@ -33,7 +33,7 @@ class Boldgrid_Backup_Admin_Filelist_Analyzer {
 	 * the unixtime in the "backup" and "backup filelist" log fies to match so you know their is a
 	 * relationship.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 * @access private
 	 * @var int
 	 */
@@ -45,7 +45,7 @@ class Boldgrid_Backup_Admin_Filelist_Analyzer {
 	 * This is passed in via the contructor. This is the same filelist that is passed to each compressor
 	 * so they know which files to backup.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 * @access private
 	 * @var array
 	 */
@@ -54,7 +54,7 @@ class Boldgrid_Backup_Admin_Filelist_Analyzer {
 	/**
 	 * Constructor.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 *
 	 * @param array $filelist
 	 * @param int   $log_time
@@ -67,7 +67,7 @@ class Boldgrid_Backup_Admin_Filelist_Analyzer {
 	/**
 	 * Whether or not the filelist analyer is enabled.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 *
 	 * @return bool
 	 */
@@ -83,7 +83,7 @@ class Boldgrid_Backup_Admin_Filelist_Analyzer {
 	 *
 	 * Do all the magic and write the log file.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 */
 	public function run() {
 		$core   = apply_filters( 'boldgrid_backup_get_core', null );

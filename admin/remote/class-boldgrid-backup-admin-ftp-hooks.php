@@ -15,7 +15,7 @@
 /*
  * AJAX callback functions in this class have their nonce verified by validate_nonce() in the Boldgrid_Backup_Admin_Archive_Details class.
  *
- * phpcs:disable WordPress.VIP, WordPress.CSRF.NonceVerification.NoNonceVerification, WordPress.Security.NonceVerification.NoNonceVerification
+ * phpcs:disable WordPress.Security.NonceVerification
  */
 
 /**
@@ -57,7 +57,7 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 		$capability = 'administrator';
 
 		add_submenu_page(
-			null,
+			'boldgrid-backup-settings',
 			__( 'FTP Settings', 'boldgrid-backup' ),
 			__( 'FTP Settings', 'boldgrid-backup' ),
 			$capability,
@@ -224,7 +224,7 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 	 * @since 1.6.0
 	 */
 	public function wp_ajax_download() {
-		$error = __( 'Unable to download backup from FTP', 'bolgrid-bakcup' );
+		$error = __( 'Unable to download backup from FTP', 'boldgrid-backup' );
 
 		$allowed_html = array(
 			'h2'     => array(),
@@ -252,7 +252,7 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 
 		// Validation, $_POST data.
 		$filename = ! empty( $_POST['filename'] ) ?
-			sanitize_file_name( $_POST['filename'] ) : false;
+			sanitize_file_name( wp_unslash( $_POST['filename'] ) ) : false;
 
 		if ( empty( $filename ) ) {
 			$this->core->notice->add_user_notice(
@@ -298,7 +298,7 @@ class Boldgrid_Backup_Admin_Ftp_Hooks {
 		}
 
 		$filename = ! empty( $_POST['filename'] ) ?
-			sanitize_file_name( $_POST['filename'] ) : false;
+			sanitize_file_name( wp_unslash( $_POST['filename'] ) ) : false;
 
 		$filepath = $this->core->backup_dir->get_path_to( $filename );
 

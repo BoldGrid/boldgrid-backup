@@ -63,6 +63,8 @@ class Boldgrid_Backup_Admin_In_Progress {
 	/**
 	 * Add a notice telling the user there's a backup in progress.
 	 *
+	 * Calls to this method should ensure user (based on role) should actually see this notice.
+	 *
 	 * @since 1.6.0
 	 *
 	 * @param  array $notices Array of notices to display.
@@ -159,7 +161,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 	/**
 	 * Get our backup's error message.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 *
 	 * @return mixed False if no error message, else error message string.
 	 */
@@ -184,7 +186,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 	/**
 	 * Get the log of the current backup in progress.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 *
 	 * @return Boldgrid_Backup_Admin_Log
 	 */
@@ -296,7 +298,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 	/**
 	 * Return how many seconds ago the backup started.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 *
 	 * @return mixed False if we cannot determine, otherwise an int to show how many seconds ago.
 	 */
@@ -312,7 +314,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 	/**
 	 * Get our backup process' pgid.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 *
 	 * @return null if not supported, otherwise value of posix_getpgid().
 	 */
@@ -334,7 +336,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 	 *
 	 * This does not return success or failure, simply that the backup process is done.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 *
 	 * @return bool
 	 */
@@ -366,7 +368,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 	 * longer a backup in progress. This means the user clicks "backup now", the page refreshes, but
 	 * they never see an in progress bar.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 *
 	 * @return bool
 	 */
@@ -395,7 +397,7 @@ class Boldgrid_Backup_Admin_In_Progress {
 	 * This method relies on getpgid support. If this method returns null, then we don't know for sure
 	 * if the backup is running or not. An alternative is to use the is_done() method.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 *
 	 * @return mixed null if support for this is not available. Otherwise, bool.
 	 */
@@ -425,6 +427,11 @@ class Boldgrid_Backup_Admin_In_Progress {
 	 * @return array
 	 */
 	public function heartbeat_received( $response, $data ) {
+		// Only admins should see the status of a backup in progress.
+		if ( ! Boldgrid_Backup_Admin_Utility::is_user_admin() ) {
+			return $response;
+		}
+
 		$key = 'boldgrid_backup_in_progress';
 
 		if ( empty( $data[ $key ] ) ) {
@@ -492,9 +499,10 @@ class Boldgrid_Backup_Admin_In_Progress {
 		 */
 		$response['log'] = esc_html( $log->get_contents() );
 
+		$response['is_running'] = self::is_running();
+
 		// If support is available, add info about whether the backup process is running.
 		if ( Boldgrid_Backup_Admin_Test::is_getpgid_supported() ) {
-			$response['is_running'] = self::is_running();
 			$log->add( 'Backup process running: ' . ( ! $response['is_running'] ? 'No' : 'Yes (pgid = ' . self::getpgid() . ')' ) );
 		}
 

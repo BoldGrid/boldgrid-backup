@@ -151,11 +151,36 @@ class Boldgrid_Backup_Admin_Db_Import {
 		}
 
 		/* phpcs:disable WordPress.DB.RestrictedClasses */
-		$db = new PDO( sprintf( 'mysql:host=%1$s;dbname=%2$s;', DB_HOST, DB_NAME ), DB_USER, DB_PASSWORD );
+		$db = new PDO( $this->get_connection_string(), DB_USER, DB_PASSWORD );
 
 		$templine = '';
 
+		/*
+		 * Tracking the import stats and exporting to a log file
+		 * will allow us to track the progress of the import either
+		 * in total upkeep, or otherwise
+		 */
+		$import_stats = array(
+			'number_of_lines' => count( $lines ),
+			'completed_lines' => 0,
+		);
+
+		// If we're in cli, get_option isn't defined, so we'll skip the logging.
+		if ( 'cli' !== php_sapi_name() ) {
+			$settings   = get_option( 'boldgrid_backup_settings', array() );
+			$backup_dir = isset( $settings['backup_directory'] ) ? $settings['backup_directory'] : '/var/www/boldgrid_backup';
+			$log_file   = $backup_dir . '/active-import.log';
+		}
+
+		if ( isset( $log_file ) ) {
+			file_put_contents( $log_file, wp_json_encode( $import_stats ) );
+		}
+
+		$line_number = 1;
+
 		foreach ( $lines as $line ) {
+			// increment the line number.
+			$line_number++;
 			// Skip comments and empty lines.
 			if ( substr( $line, 0, 2 ) === '--' || empty( $line ) ) {
 				continue;
@@ -168,6 +193,12 @@ class Boldgrid_Backup_Admin_Db_Import {
 				$affected_rows = $this->exec_import( $db, $templine );
 				if ( false === $affected_rows ) {
 					return false;
+				}
+
+				// Update the import stats only when finishing a query.
+				$import_stats['completed_lines'] = $line_number;
+				if ( isset( $log_file ) ) {
+					file_put_contents( $log_file, wp_json_encode( $import_stats ) );
 				}
 
 				$templine = '';
@@ -220,6 +251,16 @@ class Boldgrid_Backup_Admin_Db_Import {
 			if ( strpos( $line, 'DROP VIEW IF EXISTS' ) ) {
 				$has_drop_view_if_exists = true;
 			}
+
+			/*
+			 * If the export was made by TU, then
+			 * the original database name will be included in the 
+			 * beginning of the export in a comment. This is used later
+			 * to fix any view statements that may have the original database name.
+			 */
+			if ( false !== strpos( $line, '-- Host:' ) ) {
+				$old_database_name = $dbname = preg_match('/Database:\s*(\S+)/', $line, $matches) ? $matches[1] : false;
+			}
 		}
 
 		if ( false === $has_drop_view_if_exists ) {
@@ -237,6 +278,9 @@ class Boldgrid_Backup_Admin_Db_Import {
 		foreach ( $lines as $line ) {
 			if ( strpos( $line, 'DEFINER=' ) === 9 ) {
 				$fixed_lines[] = $this->fix_definer( $line );
+			// If it's a view statement, check for old db name, and replace with new.
+			} else if( 9 === strpos( $line, 'VIEW' ) && ! empty( $old_database_name ) ) {
+				$fixed_lines[] = str_replace( $old_database_name, DB_NAME, $line );
 			} else {
 				$fixed_lines[] = $line;
 			}
@@ -248,7 +292,10 @@ class Boldgrid_Backup_Admin_Db_Import {
 	/**
 	 * Fix Definer.
 	 *
-	 * Fixes the actual definer line.
+	 * Fixes the actual definer line. This used to just replace the
+	 * user, but keep the host as is. However, this caused issues when
+	 * migrating, and the host of the user was different. Now
+	 * we retrieve the current sql users details, and use that.
 	 *
 	 * @since 1.14.0
 	 *
@@ -256,21 +303,36 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * @return string The line with the DEFINER option removed.
 	 */
 	public function fix_definer( $line ) {
-		$line_fixed_definer  = '';
-		$sql_security_offset = strpos( $line, 'SQL SECURITY' );
-		$line_fixed_definer  = substr( $line, 0, 9 );
-		if ( strpos( $line, '@`%`' ) ) {
-			$line_fixed_definer .= 'DEFINER=`' . DB_USER . '`@`%` ';
-		} else {
-			$line_fixed_definer .= 'DEFINER=`' . DB_USER . '`@`' . DB_HOST . '` ';
-		}
+		global $wpdb;
 
-		if ( strpos( $line, 'SQL SECURITY' ) ) {
-			$line_fixed_definer .= subStr( $line, $sql_security_offset );
+		/*
+		 * wpdb is not defined when restoring from cli, so revert to empty string
+		 * to prevent fatal error. This should still work, since running from cli
+		 * should have the same user / host as what is already defined in the
+		 * constants.
+		 */
+		$current_user_string = $wpdb ? $wpdb->get_var( "SELECT CURRENT_USER()" ) : '';
+	
+		if ( ! empty( $current_user_string ) ) {
+			list( $current_username, $current_host ) = explode( '@', $current_user_string );
+		} else {
+			// Fallback in case the query fails.
+			$current_username = DB_USER;
+			$current_host     = strpos( $line, '@`%`' ) ? '%' : DB_HOST;
+		}
+	
+		// Determine where the "SQL SECURITY" clause begins.
+		$sql_security_offset = strpos( $line, 'SQL SECURITY' );
+	
+		// Build the new line with the correct definer using the current user's details.
+		$line_fixed_definer = substr( $line, 0, 9 ) . 'DEFINER=`' . $current_username . '`@`' . $current_host . '` ';
+	
+		if ( false !== $sql_security_offset ) {
+			$line_fixed_definer .= substr( $line, $sql_security_offset );
 		} else {
 			$line_fixed_definer .= '*/';
 		}
-
+	
 		return $line_fixed_definer;
 	}
 
@@ -296,6 +358,9 @@ class Boldgrid_Backup_Admin_Db_Import {
 	/**
 	 * Get database user privileges.
 	 *
+	 * Parses SHOW GRANTS results, preferring DB-specific grants over global ones.
+	 * This handles common setups where a user has USAGE on *.* plus ALL on the site DB.
+	 *
 	 * @since 1.14.0
 	 *
 	 * @global wpdb $wpdb The WordPress database class object.
@@ -305,20 +370,52 @@ class Boldgrid_Backup_Admin_Db_Import {
 	public function get_db_privileges() {
 		$results = $this->show_grants_query();
 
+		$db_grants     = array();
+		$global_grants = array();
+
 		foreach ( $results as $result ) {
 			$result[0]               = str_replace( '\\', '', $result[0] );
 			$is_string_db_grant      = ( false !== strpos( $result[0], 'ON `' . DB_NAME . '`' ) );
 			$is_string_all_grant     = ( false !== strpos( $result[0], 'ON *.*' ) );
 			$is_grant_all_privileges = ( false !== strpos( $result[0], 'GRANT ALL PRIVILEGES' ) );
 
-			if ( ( $is_string_db_grant || $is_string_all_grant ) && $is_grant_all_privileges ) {
+			if ( ! $is_string_db_grant && ! $is_string_all_grant ) {
+				continue;
+			}
+
+			// DB-specific ALL is definitive.
+			if ( $is_string_db_grant && $is_grant_all_privileges ) {
 				return array( 'ALL' );
 			}
-			if ( ( $is_string_db_grant ) && false === $is_grant_all_privileges ) {
-				return $this->get_grants_array( $result[0] );
+
+			// Global ALL is definitive.
+			if ( $is_string_all_grant && $is_grant_all_privileges ) {
+				return array( 'ALL' );
+			}
+
+			/*
+			 * MySQL 8 often enumerates privileges on *.* instead of "GRANT ALL PRIVILEGES".
+			 * Parse those lists; skip the default USAGE-only row.
+			 */
+			$grants = $this->get_grants_array( $result[0] );
+			if ( array( 'USAGE' ) === $grants ) {
+				continue;
+			}
+
+			// Collect grants, preferring DB-specific over global.
+			if ( $is_string_db_grant ) {
+				$db_grants = array_unique( array_merge( $db_grants, $grants ) );
+			} else {
+				$global_grants = array_unique( array_merge( $global_grants, $grants ) );
 			}
 		}
-		return array();
+
+		// Prefer DB-specific grants; fall back to global.
+		if ( ! empty( $db_grants ) ) {
+			return $db_grants;
+		}
+
+		return $global_grants;
 	}
 
 	/**
@@ -331,7 +428,7 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * @return array an array of results from the database query
 	 */
 	public function show_grants_query() {
-		$db           = new PDO( sprintf( 'mysql:host=%1$s;dbname=%2$s;', DB_HOST, DB_NAME ), DB_USER, DB_PASSWORD );
+		$db           = new PDO( $this->get_connection_string(), DB_USER, DB_PASSWORD );
 		$db_statement = $db->query( 'SHOW GRANTS' );
 		return $db_statement->fetchAll();
 	}
@@ -340,6 +437,8 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * Execute Import.
 	 *
 	 * Executes Import MySql Query.
+	 * Previously this didn't have any error handling
+	 * in the event of a PDOException. This has been added.
 	 *
 	 * @since 1.14.0
 	 *
@@ -349,7 +448,17 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * @return int Number of affected rows
 	 */
 	public function exec_import( PDO $db, $sql_line ) {
-		return $db->exec( $sql_line );
+		$affected_rows = false;
+
+		try {
+			$affected_rows = $db->exec( $sql_line );
+		} catch( PDOException $e ) {
+			$this->core->logger->add( 'SQL Import Error: ' . $e->getMessage() );
+			$this->core->logger->add( 'Line: ' . $sql_line );
+			throw $e;
+		}
+		
+		return $affected_rows;
 	}
 
 	/**
@@ -373,5 +482,74 @@ class Boldgrid_Backup_Admin_Db_Import {
 		}
 
 		return explode( ', ', $grants_string );
+	}
+
+	/**
+	 * Get our PDO DSN connection string.
+	 *
+	 * This function is copied from class-boldgrid-backup-admin-db-dump.php. It hasn't been migrated to a utility function
+	 * because these scripts are designed to be able to run without WordPress from the command line, including without the
+	 * core wpdb::parse_db_host() function.
+	 *
+	 * @since 1.15.8
+	 *
+	 * @param  string $db_host DB hostname.
+	 * @param  string $db_name DB name.
+	 * @return string
+	 */
+	public function get_connection_string( $db_host = null, $db_name = null ) {
+		$params = array();
+
+		// Configure parameters passed in.
+		$db_name = empty( $db_name ) ? DB_NAME : $db_name;
+		$db_host = empty( $db_host ) ? DB_HOST : $db_host;
+		$db_host = explode( ':', $db_host );
+
+		// Parse info and get hostname, port, and socket. Not all required. See comments below.
+		switch ( count( $db_host ) ) {
+			/*
+			 * Examples:
+			 *
+			 * # localhost
+			 * # /var/lib/mysql/mysql.sock
+			 */
+			case 1:
+				$has_socket = 'sock' === pathinfo( $db_host[0], PATHINFO_EXTENSION );
+
+				if ( $has_socket ) {
+					$params['unix_socket'] = $db_host[0];
+				} else {
+					$params['host'] = $db_host[0];
+				}
+
+				break;
+			/*
+			 * Examples:
+			 *
+			 * # localhost:/var/lib/mysql/mysql.sock
+			 * # localhost:3306
+			 */
+			case 2:
+				$has_socket = 'sock' === pathinfo( $db_host[1], PATHINFO_EXTENSION );
+				$has_port   = is_numeric( $db_host[1] );
+
+				$params['host'] = $db_host[0];
+
+				if ( $has_socket ) {
+					$params['unix_socket'] = $db_host[1];
+				} elseif ( $has_port ) {
+					$params['port'] = $db_host[1];
+				}
+
+				break;
+		}
+
+		$connection_string = 'mysql:';
+		foreach ( $params as $key => $value ) {
+			$connection_string .= $key . '=' . $value . ';';
+		}
+		$connection_string .= 'dbname=' . $db_name;
+
+		return $connection_string;
 	}
 }

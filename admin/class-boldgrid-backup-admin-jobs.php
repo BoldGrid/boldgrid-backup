@@ -59,6 +59,15 @@ class Boldgrid_Backup_Admin_Jobs {
 	public $option = 'boldgrid_backup_jobs';
 
 	/**
+	 * Logger
+	 * 
+	 * @since 1.17.0
+	 * 
+	 * @var Boldgrid_Backup_Admin_Log
+	 */
+	public $logger;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.5.2
@@ -66,7 +75,9 @@ class Boldgrid_Backup_Admin_Jobs {
 	 * @param Boldgrid_Backup_Admin_Core $core Boldgrid_Backup_Admin_Core Object.
 	 */
 	public function __construct( $core ) {
-		$this->core = $core;
+		$this->core   = $core;
+		$this->logger = new Boldgrid_Backup_Admin_Log( $core );
+		$this->logger->init( 'jobs-queue' );
 	}
 
 	/**
@@ -87,6 +98,23 @@ class Boldgrid_Backup_Admin_Jobs {
 		$this->set_jobs();
 		$this->jobs[] = $args;
 		$this->save_jobs();
+
+		$this->logger->add( 'Adding Job: ' . wp_json_encode( $args, JSON_PRETTY_PRINT ) );
+
+		/*
+		 * The cron entry is removed whenever the cron list is empty,
+		 * therefore, when adding a new job, we need to make sure
+		 * we re-add the entry to the crontab. There is no need to check
+		 * if the cron entry already exists, as that is done in the 
+		 * 'schedule_jobs' methods.
+		 */
+		$settings = $this->core->settings->get_settings();
+		$scheduler = $settings['scheduler'];
+		if ( 'cron' === $scheduler ) {
+			$this->core->cron->schedule_jobs( $settings );
+		} elseif ( 'wp-cron' === $scheduler ) {
+			$this->core->wp_cron->schedule_jobs( $settings );
+		}
 	}
 
 	/**
@@ -109,6 +137,7 @@ class Boldgrid_Backup_Admin_Jobs {
 
 		foreach ( $this->jobs as $key => $job ) {
 			if ( $key <= $delete_key ) {
+				$this->logger->add( 'Deleting Job: ' . wp_json_encode( $job, JSON_PRETTY_PRINT ) );
 				unset( $this->jobs[ $key ] );
 			}
 		}
@@ -192,6 +221,7 @@ class Boldgrid_Backup_Admin_Jobs {
 		foreach ( $this->jobs as $key => $job ) {
 
 			if ( 'boldgrid_backup_post_jobs_email' === $job['action'] ) {
+				$this->logger->add( 'Deleting Job: ' . wp_json_encode( $job, JSON_PRETTY_PRINT ) );
 				unset( $this->jobs[ $key ] );
 				break;
 			}
@@ -204,9 +234,9 @@ class Boldgrid_Backup_Admin_Jobs {
 				__( 'status', 'boldgrid-backup' ),
 				$job['status'],
 				__( 'start', 'boldgrid-backup' ),
-				date( 'Y.m.d h:i:s a', $job['start_time'] ),
+				date_i18n( 'Y.m.d h:i:s a', $job['start_time'] ),
 				__( 'end', 'boldgrid-backup' ),
-				date( 'Y.m.d h:i:s a', $job['end_time'] ),
+				date_i18n( 'Y.m.d h:i:s a', $job['end_time'] ),
 				"\t"
 			);
 			$post_jobs++;
@@ -226,6 +256,65 @@ class Boldgrid_Backup_Admin_Jobs {
 	}
 
 	/**
+	 * Fix stalled jobs.
+	 *
+	 * @since 1.15.5
+	 * 
+	 * A stalled job can be a job that has been pending for over a week. This is usually due to
+	 * a CRON bug that has since been resolved in 1.16.9. If the job is older than a week, it will
+	 * be removed.
+	 *
+	 * A stalled job can also be a job who's status has been set to "running"
+	 *  however it's been running longer than expected.
+	 *
+	 * For example, if a job is only supposed to take 1 minute, and it's been running for 3 hours, it's
+	 * stalled. Most likely the process was either killed and or had a fatal error.
+	 */
+	public function maybe_fix_stalled() {
+		$made_changes = false;
+
+		foreach ( $this->jobs as $key => &$job ) {
+			// Maybe delete old job if it's older than one week.
+			if ( preg_match('/-(\d{8})-\d{6}\.zip$/', $job['filepath'], $matches ) ) {
+				$date_str = $matches[1];
+			
+				// Create a DateTime object from the date string (format: YYYYMMDD)
+				$file_date = DateTime::createFromFormat( 'Ymd', $date_str );
+				
+				// Get the date for one week ago from now
+				$one_week_ago = new DateTime('-1 week');
+			
+				// Compare dates
+				if ( $file_date < $one_week_ago ) {
+					unset( $this->jobs[ $key ] );
+					$made_changes = true;
+					continue;
+				}
+			}
+
+			// Maybe update job if it is running, and has stalled.
+			if ( 'running' === $job['status'] ) {
+				// Determine whether or not this job is stalled.
+				$time_limit = HOUR_IN_SECONDS;
+				$duration   = time() - $job['start_time'];
+				$is_stalled = $duration > $time_limit;
+
+				if ( $is_stalled ) {
+					$job['end_time'] = time();
+					$job['status']   = 'fail';
+
+					$made_changes = true;
+				}
+			}
+		}
+
+		// If we have changes, update the option in the db.
+		if ( $made_changes ) {
+			$this->save_jobs();
+		}
+	}
+
+	/**
 	 * Run the next job in the queue.
 	 *
 	 * This is the main method of this class. When cron or wp-cron runs, it will
@@ -236,8 +325,31 @@ class Boldgrid_Backup_Admin_Jobs {
 	public function run() {
 		$this->set_jobs();
 
-		// If there are no jobs or already running, then abort.
-		if ( empty( $this->jobs ) || $this->is_running() ) {
+		/*
+		 * If there are no jobs in the job list, then delete this cron.
+		 * Please note, that this method is called by the cron itself,
+		 * so it will only delete if the cron list is empty when the cron starts.
+		 * Sometimes, the job will have completed, but not have been removed from the list yet.
+		 * In this case, the cron will not delete itself until the next scheduled cron run.
+		 *
+		 * The basic pattern is this:
+		 * 1. Automatic backup is scheduled.
+		 * 2. Automatic backup is run.
+		 * 3. While automatic backup is running, if remote storage is enabled,
+		 *    the run-jobs.php cron is added.
+		 * 4. When automatic backup is complete, the upload backup job is added to the cron list.
+		 * 5. Next time the run-jobs.php cron runs, the upload backup job is run.
+		 * 6. The next time the run-jobs.php cron runs, the upload backup job is deleted.
+		 * 7. The next time the run-jobs.php cron runs, the run-jobs.php cron is deleted.
+		 * 8. Repeat.
+		 */
+		if ( empty( $this->jobs ) ) {
+			$this->core->cron->delete_cron_entries( 'jobs' );
+			wp_die();
+		}
+
+		// If we have a job currently running, abort.
+		if ( $this->is_running() ) {
 			wp_die();
 		}
 
@@ -246,7 +358,10 @@ class Boldgrid_Backup_Admin_Jobs {
 				continue;
 			}
 
+			$this->logger->add( 'Running job: ' . wp_json_encode( $job, JSON_PRETTY_PRINT ) );
+
 			$job['start_time'] = time();
+			$job['status']     = 'running';
 			$this->save_jobs();
 
 			$status = apply_filters( $job['action'], $job['action_data'] );
@@ -285,5 +400,7 @@ class Boldgrid_Backup_Admin_Jobs {
 		}
 
 		$this->jobs = get_site_option( $this->option, array() );
+
+		$this->maybe_fix_stalled();
 	}
 }

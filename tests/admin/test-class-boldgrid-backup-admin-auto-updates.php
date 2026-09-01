@@ -13,6 +13,10 @@
 
 require_once ABSPATH . 'wp-includes/plugin.php';
 require_once ABSPATH . 'wp-admin/includes/class-wp-automatic-updater.php';
+require_once ABSPATH . 'wp-admin/includes/theme.php';
+require_once ABSPATH . 'wp-admin/includes/file.php';
+require_once ABSPATH . 'wp-admin/includes/misc.php';
+require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 require_once dirname( __FILE__ ) . '/class-license.php';
 
 /**
@@ -67,10 +71,20 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 
 		$url      = isset( $plugin_info->versions[ $version ] ) ? $plugin_info->versions[ $version ] : '';
 		$zip_file = ! empty( $url ) ? download_url( $url ) : '';
+
+		if ( is_wp_error( $zip_file ) ) {
+			$this->fail( 'Unable to download ' . $slug . ' ' . $version . ': ' . $zip_file->get_error_message() );
+		}
+
 		if ( true === is_dir( ABSPATH . 'wp-content/plugins/' . $slug ) ) {
 			$deleted = $wp_filesystem->delete( $this_plugin_dir, true );
 		}
 		$unzip = ! empty( $zip_file ) ? unzip_file( $zip_file, ABSPATH . 'wp-content/plugins/' ) : false;
+
+		if ( ! empty( $zip_file ) && file_exists( $zip_file ) ) {
+			unlink( $zip_file );
+		}
+
 		return $unzip;
 	}
 
@@ -79,7 +93,7 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 	 *
 	 * @since 1.14.0
 	 */
-	public function setUp() {
+	public function set_up() {
 		$this->default_test_settings = array(
 			'auto_update' => array(
 				'timely-updates-enabled' => '0',
@@ -99,6 +113,21 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 				),
 			),
 		);
+
+		$installed_themes = wp_get_themes();
+		$theme_slug       = 'twentytwentytwo';
+		$installed        = isset( $installed_themes[ $theme_slug ] );
+
+		if ( ! $installed ) {
+			/*
+			 * Automatic_Upgrader_Skin collects its feedback in memory. The default
+			 * WP_Upgrader_Skin echoes it through show_message(), which calls
+			 * wp_ob_end_flush_all() and tears down PHPUnit's own output buffer,
+			 * marking whichever test ran first as risky.
+			 */
+			$upgrader  = new Theme_Upgrader( new Automatic_Upgrader_Skin() );
+			$installed = $upgrader->install( "https://downloads.wordpress.org/theme/{$theme_slug}.latest-stable.zip" );
+		}
 	}
 
 	/**
@@ -188,25 +217,25 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 	 */
 	public function test_maybe_update_theme() {
 		// Test does not update if this theme hasn't been configured yet.
-		$twentytwenty_test_settings = $this->default_test_settings;
-		update_option( 'boldgrid_backup_settings', $twentytwenty_test_settings );
+		$twentytwentytwo_test_settings = $this->default_test_settings;
+		update_option( 'boldgrid_backup_settings', $twentytwentytwo_test_settings );
 		$auto_updates = new Boldgrid_backup_Admin_Auto_Updates();
-		$this->assertFalse( $auto_updates->maybe_update_theme( 'twentytwenty' ) );
+		$this->assertFalse( $auto_updates->maybe_update_theme( 'twentytwentytwo' ) );
 
 		// Test does not update if this theme has updates disabled.
-		$twentytwenty_test_settings['auto_update']['themes']['twentytwenty'] = '0';
-		update_option( 'boldgrid_backup_settings', $twentytwenty_test_settings );
+		$twentytwentytwo_test_settings['auto_update']['themes']['twentytwentytwo'] = '0';
+		update_option( 'boldgrid_backup_settings', $twentytwentytwo_test_settings );
 		$auto_updates->set_settings();
-		$this->assertFalse( $auto_updates->maybe_update_theme( 'twentytwenty' ) );
+		$this->assertFalse( $auto_updates->maybe_update_theme( 'twentytwentytwo' ) );
 
 		// Test that updates do occur if enabled.
-		$twentytwenty_test_settings['auto_update']['themes']['twentytwenty'] = '1';
-		update_option( 'boldgrid_backup_settings', $twentytwenty_test_settings );
+		$twentytwentytwo_test_settings['auto_update']['themes']['twentytwentytwo'] = '1';
+		update_option( 'boldgrid_backup_settings', $twentytwentytwo_test_settings );
 		$auto_updates->set_settings();
-		$this->assertTrue( $auto_updates->maybe_update_theme( 'twentytwenty' ) );
+		$this->assertTrue( $auto_updates->maybe_update_theme( 'twentytwentytwo' ) );
 
 		$themes = new \Boldgrid\Library\Library\Theme\Themes();
-		$theme  = $themes->getFromStylesheet( 'twentytwenty' );
+		$theme  = $themes->getFromStylesheet( 'twentytwentytwo' );
 		$theme->setUpdateData();
 		$days = $theme->updateData->days; //phpcs:ignore WordPress.NamingConventions.ValidVariableName
 
@@ -216,7 +245,7 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 			->getMock();
 		$mock_auto_updates->method( 'is_premium_done' )
 			->will( $this->returnValue( false ) );
-		$this->assertTrue( $mock_auto_updates->maybe_update_theme( 'twentytwenty' ) );
+		$this->assertTrue( $mock_auto_updates->maybe_update_theme( 'twentytwentytwo' ) );
 
 		// Test updates will occur if within the day's option with premium active.
 		$mock_auto_updates = $this->getMockBuilder( Boldgrid_backup_Admin_Auto_Updates::class )
@@ -224,14 +253,14 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 			->getMock();
 		$mock_auto_updates->method( 'is_premium_done' )
 			->will( $this->returnValue( true ) );
-		$this->assertTrue( $mock_auto_updates->maybe_update_theme( 'twentytwenty' ) );
+		$this->assertTrue( $mock_auto_updates->maybe_update_theme( 'twentytwentytwo' ) );
 
 		// Test updates will not occur if not within the day's option with premium active.
-		$twentytwenty_test_settings['auto_update']['days']                   = (int) $days + 10;
-		$twentytwenty_test_settings['auto_update']['timely-updates-enabled'] = true;
-		update_option( 'boldgrid_backup_settings', $twentytwenty_test_settings );
+		$twentytwentytwo_test_settings['auto_update']['days']                   = (int) $days + 10;
+		$twentytwentytwo_test_settings['auto_update']['timely-updates-enabled'] = true;
+		update_option( 'boldgrid_backup_settings', $twentytwentytwo_test_settings );
 		$mock_auto_updates->set_settings();
-		$this->assertFalse( $mock_auto_updates->maybe_update_theme( 'twentytwenty' ) );
+		$this->assertFalse( $mock_auto_updates->maybe_update_theme( 'twentytwentytwo' ) );
 	}
 
 	/**
@@ -265,8 +294,8 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 			->will( $this->returnValue( true ) );
 		$themes = new \Boldgrid\Library\Library\Theme\Themes();
 		foreach ( $themes->get() as $theme ) {
-			if ( 'twentytwenty' === $theme->stylesheet ) {
-				$this->assertTrue( $mock_auto_updates->auto_update_themes( true, (object) array( 'theme' => 'twentytwenty' ) ) );
+			if ( 'twentytwentytwo' === $theme->stylesheet ) {
+				$this->assertTrue( $mock_auto_updates->auto_update_themes( true, (object) array( 'theme' => 'twentytwentytwo' ) ) );
 			}
 		}
 
@@ -277,8 +306,8 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 			->will( $this->returnValue( false ) );
 		$themes = new \Boldgrid\Library\Library\Theme\Themes();
 		foreach ( $themes->get() as $theme ) {
-			if ( 'twentytwenty' === $theme->stylesheet ) {
-				$this->assertFalse( $mock_auto_updates->auto_update_themes( true, (object) array( 'theme' => 'twentytwenty' ) ) );
+			if ( 'twentytwentytwo' === $theme->stylesheet ) {
+				$this->assertFalse( $mock_auto_updates->auto_update_themes( true, (object) array( 'theme' => 'twentytwentytwo' ) ) );
 			}
 		}
 	}

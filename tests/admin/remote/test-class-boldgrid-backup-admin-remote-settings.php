@@ -20,6 +20,14 @@
 class Test_Boldgrid_Backup_Admin_Remote_Settings extends WP_UnitTestCase {
 
 	/**
+	 * Core instance.
+	 *
+	 * @since 1.7.2
+	 * @var Boldgrid_Backup_Admin_Core
+	 */
+	public $core;
+
+	/**
 	 * Initial settings.
 	 *
 	 * @since 1.7.2
@@ -46,7 +54,7 @@ class Test_Boldgrid_Backup_Admin_Remote_Settings extends WP_UnitTestCase {
 	 *
 	 * @since 1.6.0
 	 */
-	public function setUp() {
+	public function set_up() {
 		$this->core = new Boldgrid_Backup_Admin_Core();
 
 		add_filter( 'boldgrid_backup_get_core', array( $this->core, 'get_core' ) );

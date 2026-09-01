@@ -18,6 +18,11 @@
 
 use Boldgrid\Backup\Cli\Info;
 
+if ( ! in_array( PHP_SAPI, array( 'cli', 'phpdbg' ), true ) ) {
+	header( 'HTTP/1.1 403 Forbidden' );
+	exit;
+}
+
 // Track if there was an exception.  This is not the greatest idea, but works for now.
 $had_exception = false;
 

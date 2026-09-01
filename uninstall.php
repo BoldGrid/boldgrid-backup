@@ -14,12 +14,12 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 }
 
 // Delete Total Upkeep WordPress options.
-$delete_options = array(
+$boldgrid_backup_delete_options = array(
 	'boldgrid_backup_settings',
 	'boldgrid_backup_last_backup',
 	'boldgrid_backup_pending_rollback',
 );
 
-foreach ( $delete_options as $option ) {
-	delete_site_option( $option );
+foreach ( $boldgrid_backup_delete_options as $boldgrid_backup_option ) {
+	delete_site_option( $boldgrid_backup_option );
 }

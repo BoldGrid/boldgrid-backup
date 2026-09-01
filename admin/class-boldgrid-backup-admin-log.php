@@ -60,15 +60,6 @@ class Boldgrid_Backup_Admin_Log {
 	private $filepath;
 
 	/**
-	 * The last error, as per error_get_last().
-	 *
-	 * @since 1.13.5
-	 * @var array
-	 * @access private
-	 */
-	private $last_error;
-
-	/**
 	 * Constructor.
 	 *
 	 * @since 1.10.1
@@ -99,16 +90,18 @@ class Boldgrid_Backup_Admin_Log {
 		}
 
 		// Add a timestamp to the message.
-		$message = date( '[Y-m-d H:i:s e]' ) . ' ' . $message;
+		$message = gmdate( '[Y-m-d H:i:s e]' ) . ' ' . $message;
 
 		/*
 		 * Append the message to the log.
-		 *
-		 * WP_Filesystem does not have a way to append to a file, so we're rewriting the file each
-		 * time. Best route would be to fopen the file and append. This may need to be revisited.
 		 */
-		$file_content = $this->get_contents() . PHP_EOL . $message;
-		$this->core->wp_filesystem->put_contents( $this->filepath, $file_content );
+		$handle = fopen( $this->filepath, 'a+' );
+		if ( $handle ) {
+			// Append the new message with a line break at the beginning
+			fwrite( $handle, PHP_EOL . $message );
+			// Close the file handle
+			fclose( $handle );
+		}
 	}
 
 	/**
@@ -121,29 +114,27 @@ class Boldgrid_Backup_Admin_Log {
 
 		$this->add( 'WordPress Version: ' . get_bloginfo( 'version' ) );
 
-		$this->add( 'Total Upkeep version: ' . BOLDGRID_BACKUP_VERSION );
+		$version = defined( 'BOLDGRID_BACKUP_VERSION' ) ? BOLDGRID_BACKUP_VERSION : 'Unknown';
+		$this->add( 'Total Upkeep version: ' . $version );
 
 		$pgid_support = Boldgrid_Backup_Admin_Test::is_getpgid_supported();
 		$this->add( 'getpgid support: ' . ( $pgid_support ? 'Available' : 'Unavailable' ) );
 	}
 
 	/**
-	 * Add the last error to the log.
+	 * Add the last  fatal error to the log.
 	 *
-	 * The error is only added to the log if it hasn't been logged before.
+	 * The error is only added to the log if it is a fatal error
 	 *
 	 * @since 1.13.5
 	 */
 	public function add_last_error() {
 		$current_error = error_get_last();
 
-		// Only new errors are logged.
-		if ( $current_error !== $this->last_error ) {
+		// Only new fatal are logged.
+		if ( is_array( $current_error ) && 1 === $current_error['type'] ) {
 			$this->add( 'Last error: ' . print_r( $current_error, 1 ), false ); // phpcs:ignore
 		}
-
-		// This method will be called often, so keep track of errors to avoid logging duplicates.
-		$this->last_error = $current_error;
 	}
 
 
@@ -209,7 +200,7 @@ class Boldgrid_Backup_Admin_Log {
 	/**
 	 * Return the contents of the log file.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.14.13
 	 *
 	 * @return string
 	 */
@@ -269,8 +260,11 @@ class Boldgrid_Backup_Admin_Log {
 			return;
 		}
 
+		/*
+		 * Removed logging that 'pcntl_async_signals' is not available,
+		 * because it was filling up the logs on sites that don't have it available.
+		 */
 		if ( ! function_exists( 'pcntl_async_signals' ) ) {
-			$this->add( 'Cannot add signal handlers, pcntl_async_signals function does not exist.' );
 			return;
 		}
 

@@ -12,7 +12,6 @@
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
  *
- * phpcs:disable WordPress.VIP
  */
 
 /**
@@ -111,6 +110,7 @@ class Boldgrid_Backup {
 		 * Include a utility class.
 		 */
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-utility.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-zip.php';
 
 		/**
 		 * The class responsible for the configuration of the plugin.
@@ -294,11 +294,35 @@ class Boldgrid_Backup {
 
 		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-activator.php';
 
+		// REST API support.
+		require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-controller.php';
+		require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-job.php';
+		require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-setting.php';
+		require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-archive.php';
+		require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-test.php';
+		require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-siteurl.php';
+
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-usage.php';
 
 		// Logs system.
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-log.php';
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-log-page.php';
+
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-nopriv.php';
+
+		// Task system.
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-task.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-task-helper.php';
+
+		// Archiver and Restorer classes.
+		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-archiver.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-restorer.php';
+
+		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup-archive-fetcher.php';
+
+		// Archive namespace.
+		require_once BOLDGRID_BACKUP_PATH . '/includes/archive/class-factory.php';
+		require_once BOLDGRID_BACKUP_PATH . '/includes/archive/class-option.php';
 
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-plugin-notices.php';
 
@@ -309,6 +333,15 @@ class Boldgrid_Backup {
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-environment.php';
 
 		require_once BOLDGRID_BACKUP_PATH . '/cli/class-info.php';
+
+		// New Migration system.
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-migrate.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/migrate/class-boldgrid-backup-admin-migrate-rx-rest.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/migrate/class-boldgrid-backup-admin-migrate-tx-rest.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/migrate/class-boldgrid-backup-admin-migrate-restore.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/migrate/class-boldgrid-backup-admin-migrate-rx.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/migrate/class-boldgrid-backup-admin-migrate-tx.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/migrate/class-boldgrid-backup-admin-migrate-util.php';
 
 		$this->loader = new Boldgrid_Backup_Loader();
 	}
@@ -325,7 +358,8 @@ class Boldgrid_Backup {
 	private function set_locale() {
 		$plugin_i18n = new Boldgrid_Backup_I18n();
 
-		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
+		// WP 6.7+: load translations on init or later (not plugins_loaded / after_setup_theme).
+		$this->loader->add_action( 'init', $plugin_i18n, 'load_plugin_textdomain' );
 	}
 
 	/**
@@ -446,7 +480,18 @@ class Boldgrid_Backup {
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core, 'admin_enqueue_scripts' );
 
-		$this->loader->add_filter( 'plugins_loaded', $plugin_admin_core, 'init_premium' );
+		/*
+		 * Initialize Premium after free plugin hooks are registered.
+		 *
+		 * Bootstrap is deferred to init (WP 6.7+ textdomain), so plugins_loaded
+		 * has already fired by the time this runs. Call immediately when that
+		 * hook has passed; otherwise keep the historical plugins_loaded hook.
+		 */
+		if ( did_action( 'plugins_loaded' ) ) {
+			$plugin_admin_core->init_premium();
+		} else {
+			$this->loader->add_action( 'plugins_loaded', $plugin_admin_core, 'init_premium' );
+		}
 
 		$this->loader->add_action( 'boldgrid_backup_delete_local', $plugin_admin_core->local, 'delete_local' );
 
@@ -470,6 +515,19 @@ class Boldgrid_Backup {
 		$this->loader->add_action( 'admin_init', $plugin_admin_core->auto_rollback, 'enqueue_update_selectors' );
 
 		$this->loader->add_action( 'admin_init', $plugin_admin_core->cron, 'upgrade_crontab_entries' );
+
+		/*
+		 * Rotate previously exposable cron secrets once on upgrade (not admin-only).
+		 *
+		 * Call directly rather than hooking init: run_boldgrid_backup() itself is
+		 * deferred to init priority 1, so registering another init:1 callback here
+		 * would miss the current request (WP does not invoke same-priority callbacks
+		 * added while that priority is already firing). Silent upgrades never hit
+		 * the activator, so this must run on the first admin/cron/CLI/REST boot.
+		 */
+		$plugin_admin_core->cron->maybe_rotate_cron_secrets();
+
+		$this->loader->add_action( 'admin_init', $plugin_admin_core, 'ensure_secure_cli_storage', 5 );
 
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_generate_download_link', $plugin_admin_core->archive_actions, 'wp_ajax_generate_download_link' );
 
@@ -537,12 +595,14 @@ class Boldgrid_Backup {
 		$this->loader->add_filter( 'Boldgrid\Library\Notifications\DashboardWidget\getFeaturePlugin\boldgrid-backup', $plugin_admin_core->dashboard_widget, 'filter_feature', 10, 2 );
 
 		// Auto Update Actions & Filters.
-		$this->loader->add_action( 'admin_init', $plugin_admin_core->auto_updates, 'auto_update_core' );
-		$this->loader->add_action( 'wp_maybe_auto_update', $plugin_admin_core->auto_updates, 'auto_update_core' );
-		$this->loader->add_filter( 'auto_update_plugin', $plugin_admin_core->auto_updates, 'auto_update_plugins', 10, 2 );
-		$this->loader->add_filter( 'auto_update_theme', $plugin_admin_core->auto_updates, 'auto_update_themes', 10, 2 );
-		$this->loader->add_action( 'update_option_auto_update_plugins', $plugin_admin_core->auto_updates, 'wordpress_option_updated', 10, 3 );
-		$this->loader->add_action( 'update_option_auto_update_themes', $plugin_admin_core->auto_updates, 'wordpress_option_updated', 10, 3 );
+		if ( ! empty( $plugin_admin_core->auto_updates ) ) {
+			$this->loader->add_action( 'admin_init', $plugin_admin_core->auto_updates, 'auto_update_core' );
+			$this->loader->add_action( 'wp_maybe_auto_update', $plugin_admin_core->auto_updates, 'auto_update_core' );
+			$this->loader->add_filter( 'auto_update_plugin', $plugin_admin_core->auto_updates, 'auto_update_plugins', 10, 2 );
+			$this->loader->add_filter( 'auto_update_theme', $plugin_admin_core->auto_updates, 'auto_update_themes', 10, 2 );
+			$this->loader->add_action( 'update_option_auto_update_plugins', $plugin_admin_core->auto_updates, 'wordpress_option_updated', 10, 3 );
+			$this->loader->add_action( 'update_option_auto_update_themes', $plugin_admin_core->auto_updates, 'wordpress_option_updated', 10, 3 );
+		}
 
 		// This plugin's Dashboard.
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core->dashboard, 'admin_enqueue_scripts' );
@@ -550,6 +610,24 @@ class Boldgrid_Backup {
 		// Disply a notice regarding the plugin rename.
 		$this->loader->add_action( 'admin_notices', $plugin_admin_core->notice, 'plugin_renamed_notice' );
 		$this->loader->add_action( 'wp_ajax_dismissBoldgridNotice', 'Boldgrid\Library\Library\Notice', 'dismiss' );
+
+		// Register REST endpoints.
+		add_action( 'rest_api_init', function() use ( $plugin_admin_core ) {
+			$rest_job = new Boldgrid_Backup_Rest_Job( $plugin_admin_core );
+			$rest_job->register_routes();
+
+			$rest_archive = new Boldgrid_Backup_Rest_Archive( $plugin_admin_core );
+			$rest_archive->register_routes();
+
+			$rest_setting = new Boldgrid_Backup_Rest_Setting( $plugin_admin_core );
+			$rest_setting->register_routes();
+
+			$rest_test = new Boldgrid_Backup_Rest_Test( $plugin_admin_core );
+			$rest_test->register_routes();
+
+			$rest_siteurl = new Boldgrid_Backup_Rest_Siteurl( $plugin_admin_core );
+			$rest_siteurl->register_routes();
+		} );
 
 		$usage = new Boldgrid_Backup_Admin_Usage();
 
@@ -583,6 +661,15 @@ class Boldgrid_Backup {
 		$this->loader->add_filter( 'Boldgrid\Library\Plugin\Notices\admin_enqueue_scripts', $plugin_notices, 'filter' );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core, 'add_thickbox' );
+
+		/*
+		 * Things to do in a dev environment.
+		 *
+		 * @link https://make.wordpress.org/core/2020/07/24/new-wp_get_environment_type-function-in-wordpress-5-5/
+		 */
+		if ( defined( 'WP_ENVIRONMENT_TYPE' ) && 'development' === WP_ENVIRONMENT_TYPE ) {
+			$this->loader->add_action( 'admin_footer', 'Boldgrid_Backup_Rest_Utility', 'insert_nonce' );
+		}
 	}
 
 	/**

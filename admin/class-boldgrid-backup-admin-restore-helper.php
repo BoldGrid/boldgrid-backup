@@ -92,7 +92,7 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 	 * @since 1.5.1
 	 */
 	public function post_restore_htaccess() {
-		add_action( 'shutdown', 'flush_rewrite_rules' );
+		add_action( 'shutdown', '\Boldgrid_Backup_Admin_Utility::flush_rewrite_rules' );
 	}
 
 	/**
@@ -135,15 +135,11 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 			$original = ABSPATH . $file['filename'];
 			$new      = $original . '.bgb';
 
-			// Determine if the file was restored from backup.
-			$file_restored = false;
-			if ( $file['copied'] && sha1_file( $original ) !== sha1_file( $new ) ) {
-				$file_restored = true;
-			} elseif ( $file['copy'] && ! $file['copied'] && $wp_filesystem->exists( $original ) ) {
-				$file_restored = true;
-			}
+			// Determine if the file was changed during restoration.
+			$post_sha1   = sha1_file( $original );
+			$has_changed = $this->monitors_files[ $key ]['pre_sha1'] !== $post_sha1;
 
-			if ( $file_restored ) {
+			if ( $has_changed ) {
 				/**
 				 * Action to take after a specific file has been restored.
 				 *
@@ -182,6 +178,9 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 				$wp_filesystem->copy( $original, $new, true, 0644 );
 				$this->monitor_files[ $key ]['copied'] = true;
 			}
+
+			// Store sha1 to help identify if file was restored (later on).
+			$this->monitor_files[ $key ]['pre_sha1'] = sha1_file( $original );
 		}
 
 		// Only register this action when we know we're doing a restore.
@@ -198,7 +197,7 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 	 * @return bool
 	 */
 	public function prepare_restore() {
-		// phpcs:disable WordPress.CSRF.NonceVerification.NoNonceVerification,WordPress.VIP
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
 
 		if ( empty( $pending_rollback ) && empty( $_GET['archive_filename'] ) ) {
@@ -214,9 +213,9 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 		$_POST['archive_key']      = ( ! empty( $_GET['archive_key'] ) && is_numeric( $_GET['archive_key'] ) ) ?
 			(int) $_GET['archive_key'] : 0;
 		$_POST['archive_filename'] = ! empty( $pending_rollback['filepath'] ) ?
-			basename( $pending_rollback['filepath'] ) : $_GET['archive_filename'];
+			basename( $pending_rollback['filepath'] ) : sanitize_file_name( wp_unslash( $_GET['archive_filename'] ) );
 
-		// phpcs:enable WordPress.CSRF.NonceVerification.NoNonceVerification,WordPress.VIP
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 		return true;
 	}
 
@@ -330,7 +329,8 @@ class Boldgrid_Backup_Admin_Restore_Helper {
 		$message = $error->get_error_message();
 		$data    = $error->get_error_data();
 
-		if ( __( 'Could not copy file.' ) === $message ) {
+		// Match a core-translated WP_Error message from copy_dir() (default text domain).
+		if ( __( 'Could not copy file.' ) === $message ) { // phpcs:ignore WordPress.WP.I18n.MissingArgDomain -- Matches core WP_Error text.
 
 			// Take action if we are having trouble restoring .git/objects/.
 			preg_match( '/(.*\.git\/objects\/).*/', $data, $matches );

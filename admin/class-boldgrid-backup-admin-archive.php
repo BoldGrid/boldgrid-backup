@@ -107,13 +107,47 @@ class Boldgrid_Backup_Admin_Archive {
 	public $view_details_url = '';
 
 	/**
+	 * Archive id.
+	 *
+	 * The archive id is the archive's id as found in the boldgrid_backup_backups option.
+	 *
+	 * This class includes the self::set_id() method to set the actual id, but this class doesn't actually
+	 * call that method to set the id. The id is generally set within Boldgrid\Backup\Archive\Factory.
+	 *
+	 * @since SINCEVERSION
+	 * @access private
+	 * @var int
+	 *
+	 * @see Boldgrid\Backup\Archive\Option for more information about the boldgrid_backup_backups option.
+	 */
+	private $id;
+
+	/**
+	 * The archive key.
+	 *
+	 * When retrieving a list of archives, you'll get an array, and this is the archives location in
+	 * the array.
+	 *
+	 * @since SINCEVERSION
+	 * @access private
+	 * @var int
+	 *
+	 * @see self::init() To see this property initialized.
+	 */
+	private $key;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.5.3
 	 *
 	 * @param Boldgrid_Backup_Admin_Core $core Core class object.
 	 */
-	public function __construct( $core ) {
+	public function __construct( Boldgrid_Backup_Admin_Core $core = null ) {
+		if ( empty( $core ) ) {
+			$core = apply_filters( 'boldgrid_backup_get_core', null );
+		}
+
 		$this->core = $core;
 	}
 
@@ -235,6 +269,28 @@ class Boldgrid_Backup_Admin_Archive {
 	}
 
 	/**
+	 * Get the archive id.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @return int
+	 */
+	public function get_id() {
+		return $this->id;
+	}
+
+	/**
+	 * Get the archive key.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @return int
+	 */
+	public function get_key() {
+		return $this->key;
+	}
+
+	/**
 	 * Init.
 	 *
 	 * @since 1.6.0
@@ -242,7 +298,7 @@ class Boldgrid_Backup_Admin_Archive {
 	 * @param string $filepath File path.
 	 */
 	public function init( $filepath ) {
-		$filepath = strip_tags( $filepath );
+		$filepath = wp_strip_all_tags( $filepath );
 
 		if ( ! empty( $this->filepath ) && $filepath === $this->filepath ) {
 			return;
@@ -277,6 +333,10 @@ class Boldgrid_Backup_Admin_Archive {
 		$this->compressor = ! empty( $this->log['compressor'] ) ? $this->log['compressor'] : 'php_zip';
 
 		$this->view_details_url = admin_url( 'admin.php?page=boldgrid-backup-archive-details&filename=' . $this->filename );
+
+		// Set our key.
+		$details   = $this->get_by_name( $this->filename );
+		$this->key = isset( $details['key'] ) ? $details['key'] : null;
 	}
 
 	/**
@@ -483,6 +543,17 @@ class Boldgrid_Backup_Admin_Archive {
 	}
 
 	/**
+	 * Set the archive id.
+	 *
+	 * @since SINCEVERSION
+	 *
+	 * @param int $id The archive id.
+	 */
+	public function set_id( $id ) {
+		$this->id = (int) $id;
+	}
+
+	/**
 	 * Update an archive's timestamp based on the time in the log.
 	 *
 	 * For example, if the archive was created at 10am and you uploaded it to
@@ -626,8 +697,26 @@ class Boldgrid_Backup_Admin_Archive {
 	public function write_results_file( $info ) {
 		$success          = false;
 		$archive_filepath = ! empty( $info['filepath'] ) ? $info['filepath'] : null;
-		$results_filepath = \Boldgrid\Backup\Cli\Info::get_results_filepath();
-		$is_dir_writable  = $this->core->wp_filesystem->is_writable( dirname( $results_filepath ) );
+		$backup_dir       = $this->core->backup_dir->get();
+
+		if ( empty( $backup_dir ) ) {
+			return false;
+		}
+
+		// Require secure storage; do not fall back to writing restore-info under cron/.
+		$backup_dir = \Boldgrid\Backup\Cli\Info::untrailingslashit_path( (string) $backup_dir );
+		if ( ! \Boldgrid\Backup\Cli\Info::ensure_secure_storage( $backup_dir ) ) {
+			return false;
+		}
+
+		$secret = \Boldgrid\Backup\Cli\Info::get_secret();
+		if ( ! \Boldgrid\Backup\Cli\Info::is_valid_secret_format( $secret ) ) {
+			return false;
+		}
+
+		// Always write into the known backup directory — never the legacy cron/ fallback.
+		$results_filepath = \Boldgrid\Backup\Cli\Info::trailingslashit_path( $backup_dir ) . 'restore-info-' . $secret . '.json';
+		$is_dir_writable  = \Boldgrid\Backup\Cli\Info::is_directory_writable( $backup_dir );
 
 		if ( $archive_filepath && $is_dir_writable ) {
 			$results_filepath = wp_normalize_path( $results_filepath );
@@ -665,11 +754,25 @@ class Boldgrid_Backup_Admin_Archive {
 				'timestamp'   => time(),
 			);
 
-			$success = $this->core->wp_filesystem->put_contents(
+			$payload = wp_json_encode( $results );
+			$success = (bool) $this->core->wp_filesystem->put_contents(
 				$results_filepath,
-				wp_json_encode( $results ),
+				$payload,
 				0600
 			);
+
+			/*
+			 * If WP_Filesystem cannot write but the shared writability probe could,
+			 * fall back to a direct write (same approach Info uses for secrets /
+			 * migrated restore-info).
+			 */
+			if ( ! $success ) {
+				$written = @file_put_contents( $results_filepath, $payload ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+				if ( false !== $written ) {
+					@chmod( $results_filepath, 0600 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+					$success = true;
+				}
+			}
 		}
 
 		return $success;

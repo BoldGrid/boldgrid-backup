@@ -13,7 +13,7 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP,WordPress.XSS.EscapeOutput.OutputNotEscaped
+// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped
 
 require dirname( __FILE__ ) . '/admin/class-boldgrid-backup-admin-cron-log.php';
 require dirname( __FILE__ ) . '/cron/class-boldgrid-backup-cron-helper.php';

@@ -12,7 +12,6 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP
 
 /**
  * Class: Boldgrid_Backup_Admin_Config
@@ -139,7 +138,17 @@ class Boldgrid_Backup_Admin_Config {
 			$this->is_premium = $this->license->isPremium( 'boldgrid-backup' );
 		}
 
-		$this->set_lang();
+		/*
+		 * Defer translated strings until init (WP 6.7+).
+		 *
+		 * Calling esc_html__() during plugin bootstrap triggers
+		 * _load_textdomain_just_in_time too early.
+		 */
+		if ( did_action( 'init' ) ) {
+			$this->set_lang();
+		} else {
+			add_action( 'init', array( $this, 'set_lang' ) );
+		}
 	}
 
 	/**
@@ -155,20 +164,27 @@ class Boldgrid_Backup_Admin_Config {
 			return $this->home_dir;
 		}
 
+		$document_root = isset( $_SERVER['DOCUMENT_ROOT'] ) ?
+			sanitize_text_field( wp_unslash( $_SERVER['DOCUMENT_ROOT'] ) ) : '';
+
 		if ( $this->core->test->is_windows() && $this->core->test->is_plesk() ) {
 			/*
 			 * Plesk's File Manager labels C:\Inetpub\vhosts\domain.com as the
 			 * "Home directory". If we find we cannot read that directory, then
 			 * we'll use the document root as the home directory.
 			 */
-			$home_dir = dirname( $_SERVER['DOCUMENT_ROOT'] );
-			if ( ! $this->core->wp_filesystem->is_readable( $home_dir ) ) {
-				$home_dir = $_SERVER['DOCUMENT_ROOT'];
+			if ( ! empty( $document_root ) ) {
+				$home_dir = dirname( $document_root );
+				if ( ! $this->core->wp_filesystem->is_readable( $home_dir ) ) {
+					$home_dir = $document_root;
+				}
 			}
 		} elseif ( $this->core->test->is_windows() ) {
 			// Windows.
-			$home_drive = ( ! empty( $_SERVER['HOMEDRIVE'] ) ? $_SERVER['HOMEDRIVE'] : null );
-			$home_path  = ( ! empty( $_SERVER['HOMEPATH'] ) ? $_SERVER['HOMEPATH'] : null );
+			$home_drive = ! empty( $_SERVER['HOMEDRIVE'] ) ?
+				sanitize_text_field( wp_unslash( $_SERVER['HOMEDRIVE'] ) ) : null;
+			$home_path  = ! empty( $_SERVER['HOMEPATH'] ) ?
+				sanitize_text_field( wp_unslash( $_SERVER['HOMEPATH'] ) ) : null;
 
 			if ( ! ( empty( $home_drive ) || empty( $home_path ) ) ) {
 				$home_dir = $home_drive . $home_path;
@@ -186,7 +202,8 @@ class Boldgrid_Backup_Admin_Config {
 			}
 
 			if ( empty( $home_dir ) ) {
-				$home_dir = ( ! empty( $_SERVER['HOME'] ) ? $_SERVER['HOME'] : null );
+				$home_dir = ! empty( $_SERVER['HOME'] ) ?
+					sanitize_text_field( wp_unslash( $_SERVER['HOME'] ) ) : null;
 			}
 
 			// If still unknown, then try environmental variables.
@@ -276,15 +293,38 @@ class Boldgrid_Backup_Admin_Config {
 	 */
 	public function set_lang() {
 		$this->lang = array(
-			'website_size'     => esc_html__( 'Website Size:', 'boldgrid-backup' ),
-			'database_size'    => esc_html__( 'Database Size:', 'boldgrid-backup' ),
-			'of'               => esc_html__( 'of', 'boldgrid-backup' ),
-			'xmark'            => '&#10007;',
-			'update'           => esc_html__( 'Update', 'boldgrid-backup' ),
-			'updating'         => esc_html__( 'Updating...', 'boldgrid-backup' ),
-			'updated'          => esc_html__( 'Updated!', 'boldgrid-backup' ),
-			'failed_to_update' => esc_html__( 'Failed to update: ', 'boldgrid-backup' ),
-			'unknown_error'    => esc_html__( 'Unknown error.', 'boldgrid-backup' ),
+			'website_size'      => esc_html__( 'Website Size:', 'boldgrid-backup' ),
+			'database_size'     => esc_html__( 'Database Size:', 'boldgrid-backup' ),
+			'of'                => esc_html__( 'of', 'boldgrid-backup' ),
+			'xmark'             => '&#10007;',
+			'update'            => esc_html__( 'Update', 'boldgrid-backup' ),
+			'updating'          => esc_html__( 'Updating...', 'boldgrid-backup' ),
+			'updated'           => esc_html__( 'Updated!', 'boldgrid-backup' ),
+			'failed_to_update'  => esc_html__( 'Failed to update: ', 'boldgrid-backup' ),
+			'unknown_error'     => esc_html__( 'Unknown error.', 'boldgrid-backup' ),
+			'cancelling'        => esc_html__( 'Cancelling', 'boldgrid-backup' ),
+			'cancelled'         => esc_html__( 'Cancelled', 'boldgrid-backup' ),
+			'cancel'            => esc_html__( 'Cancel', 'boldgrid-backup' ),
+			'restore'           => esc_html__( 'Restore', 'boldgrid-backup' ),
+			'restoring'         => esc_html__( 'Restoring', 'boldgrid-backup' ),
+			'delete'            => esc_html__( 'Delete', 'boldgrid-backup' ),
+			'deleting'          => esc_html__( 'Deleting', 'boldgrid-backup' ),
+			'deleted'           => esc_html__( 'Deleted', 'boldgrid-backup' ),
+			'completed'         => esc_html__( 'Completed', 'boldgrid-backup' ),
+			'start_transfer'    => esc_html__( 'Start Transfer', 'boldgrid-backup' ),
+			'starting_transfer' => esc_html__( 'Starting Transfer', 'boldgrid-backup' ),
+			'transfer_started'  => esc_html__( 'Transfer Started', 'boldgrid-backup' ),
+			'authenticate'      => esc_html__( 'Authenticate', 'boldgrid-backup' ),
+			'authenticating'    => esc_html__( 'Authenticating', 'boldgrid-backup' ),
+			'activating'        => esc_html__( 'Activating', 'boldgrid-backup' ),
+			'updating'          => esc_html__( 'Updating', 'boldgrid-backup' ),
+			'installing'        => esc_html__( 'Installing', 'boldgrid-backup' ),
+			'pending'           => esc_html__( 'Pending', 'boldgrid-backup' ),
+			'delete_error'      => esc_html__( 'Delete Error. Refresh and try again.', 'boldgrid-backup' ),
+			'invalid_url'       => esc_html__( 'You must enter a valid URL', 'boldgrid-backup' ),
+			'same_site_error'   => esc_html__( 'You must enter the URL of the source site, not this site. Ex: https://source-site.com', 'boldgrid-backup' ),
+			'server_error'      => esc_html__( 'A server error has occured while trying to process your request. Additional details may be available in your logs.', 'boldgrid-backup' ),
+			'auth_error'        => esc_html__( 'An error occurred while trying to authenticate the source site. Please try again.', 'boldgrid-backup' ),
 		);
 	}
 

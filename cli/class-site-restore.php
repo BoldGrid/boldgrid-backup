@@ -13,7 +13,7 @@
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
  *
- * phpcs:disable WordPress.VIP,WordPress.XSS.EscapeOutput,WordPress.WP.AlternativeFunctions
+ * phpcs:disable WordPress.Security.EscapeOutput, WordPress.WP.AlternativeFunctions
  */
 
 namespace Boldgrid\Backup\Cli;
@@ -63,9 +63,9 @@ class Site_Restore {
 	private function set_writable_permissions() {
 		if ( class_exists( 'ZipArchive' ) ) {
 			Log::write( 'Setting file permissions.', LOG_DEBUG );
-			$zip = new \ZipArchive();
+			$zip = Info::open_backup_zip( Info::get_info()['filepath'] );
 
-			if ( $zip->open( Info::get_info()['filepath'] ) ) {
+			if ( $zip ) {
 				for ( $i = 0; $i < $zip->numFiles; $i++ ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName
 					$data = $zip->statIndex( $i );
 
@@ -73,6 +73,7 @@ class Site_Restore {
 						chmod( Info::get_info()['ABSPATH'] . $data['name'], 0644 );
 					}
 				}
+				$zip->close();
 			}
 		}
 	}
@@ -109,9 +110,10 @@ class Site_Restore {
 		if ( $wpconfig ) {
 			preg_match_all( '/define\(.+DB_(NAME|USER|PASSWORD|HOST).+\);/', $wpconfig, $matches1 );
 			foreach ( $matches1[0] as $match1 ) {
-				preg_match_all( '/\'(.+?)\'/', $match1, $matches2 );
-				if ( ! empty( $matches2[1] ) ) {
-						define( $matches2[1][0], $matches2[1][1] );
+				// Allow empty values (common for DB_PASSWORD).
+				preg_match_all( '/\'([^\']*)\'/', $match1, $matches2 );
+				if ( isset( $matches2[1][0], $matches2[1][1] ) && ! defined( $matches2[1][0] ) ) {
+					define( $matches2[1][0], $matches2[1][1] );
 				}
 			}
 		}
@@ -189,8 +191,8 @@ class Site_Restore {
 				$message = 'Attempting file restoration using PHP ZipArchive...';
 				echo $message . PHP_EOL;
 				Log::write( $message, LOG_INFO );
-				$archive = new \ZipArchive();
-				if ( true === $archive->open( $info['filepath'] ) ) {
+				$archive = Info::open_backup_zip( $info['filepath'] );
+				if ( $archive ) {
 					$success = $archive->extractTo( $info['ABSPATH'] );
 					$archive->close();
 				}
@@ -200,6 +202,7 @@ class Site_Restore {
 				$message = 'Attempting file restoration using PHP PCLZip...';
 				echo $message . PHP_EOL;
 				Log::write( $message, LOG_INFO );
+				Info::maybe_repair_backup_zip( $info['filepath'] );
 				require $info['ABSPATH'] . 'wp-admin/includes/class-pclzip.php';
 				$archive = new \PclZip( $info['filepath'] );
 				$result  = $archive->extract(
@@ -217,6 +220,7 @@ class Site_Restore {
 				$message = 'Attempting file restoration using unzip (CLI)...';
 				echo $message . PHP_EOL;
 				Log::write( $message, LOG_INFO );
+				Info::maybe_repair_backup_zip( $info['filepath'] );
 				$cmd = 'cd ' . $info['ABSPATH'] . ';unzip -oqq ' . $info['filepath'];
 				\Boldgrid_Backup_Admin_Cli::call_command(
 					$cmd,
@@ -360,7 +364,8 @@ class Site_Restore {
 	private function cancel_rollback() {
 		require_once dirname( dirname( __FILE__ ) ) . '/cron/class-boldgrid-backup-url-helper.php';
 		$url     = Info::get_info()['siteurl'] . '/wp-admin/admin-ajax.php?action=boldgrid_cli_cancel_rollback&backup_id=' .
-			Info::get_arg_value( 'backup_id' );
+			rawurlencode( (string) Info::get_arg_value( 'backup_id' ) ) .
+			'&cli_cancel_secret=' . rawurlencode( (string) Info::get_arg_value( 'cli_cancel_secret' ) );
 		$success = ( new \Boldgrid_Backup_Url_Helper() )->call_url( $url, $status, $errorno, $error );
 	}
 }
