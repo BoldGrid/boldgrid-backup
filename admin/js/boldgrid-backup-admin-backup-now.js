@@ -139,6 +139,9 @@ BOLDGRID.BACKUP.BackupNow = function( $ ) {
 		 * UI/UX changes.
 		 *
 		 * The next few lines handle disabling buttons and showing notices.
+		 *
+		 * @todo This set of code is somewhat duplicated in in-progress.js, within the start method.
+		 * If need be one day, combine into a reusable method.
 		 */
 		$this.attr( 'disabled', 'disabled' ).css( 'pointer-events', 'none' );
 

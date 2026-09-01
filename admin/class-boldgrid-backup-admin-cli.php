@@ -55,12 +55,20 @@ class Boldgrid_Backup_Admin_Cli {
 			$function = trim( $function );
 		} );
 
-		// Make an array of execution functions.
+		/*
+		 * May an array of execution functions to test.
+		 * Note that the order of this array is significant.
+		 * The order is the order in which the functions will be tested,
+		 * and the first successful function will be used.
+		 * Exec and shell_exec have higher priorities because
+		 * proc_open and popen were failing on some systems.
+		 * See https://github.com/BoldGrid/boldgrid-backup/issues/599
+		 */
 		$exec_functions = array(
-			'popen',
-			'proc_open',
 			'exec',
 			'shell_exec',
+			'proc_open',
+			'popen',
 			'passthru',
 			'system',
 		);

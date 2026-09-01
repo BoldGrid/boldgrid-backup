@@ -235,7 +235,7 @@ class Boldgrid_Backup_Admin_WP_Cron {
 
 			$action_key = key( $cron[ $action ] );
 
-			$ours[] = sprintf( '%1$s (%2$s %3$s %4$s)', $action, $cron[ $action ][ $action_key ]['schedule'], __( 'starting', 'boldgrid-backup' ), date( 'Y.m.d h:i:s a e', $time ) );
+			$ours[] = sprintf( '%1$s (%2$s %3$s %4$s)', $action, $cron[ $action ][ $action_key ]['schedule'], __( 'starting', 'boldgrid-backup' ), gmdate( 'Y.m.d h:i:s a e', $time ) );
 		}
 
 		return $ours;
@@ -349,6 +349,7 @@ class Boldgrid_Backup_Admin_WP_Cron {
 	 * @since 1.5.1
 	 */
 	public function backup() {
-		$archive_info = $this->core->archive_files( true );
+		$archiver = new Boldgrid_Backup_Archiver();
+		$archiver->run();
 	}
 }

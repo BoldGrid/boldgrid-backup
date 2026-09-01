@@ -25,7 +25,7 @@ class Test_Boldgrid_Backup_Admin_Premium_Features_Page extends WP_UnitTestCase {
 		$core,
 		$premium_page;
 
-	public function setUp() {
+	public function set_up() {
 
 		$files = array(
 			'/vendor/boldgrid/library/src/Library/Ui/Card.php',

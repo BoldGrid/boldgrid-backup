@@ -12,7 +12,7 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP, WordPress.PHP.DevelopmentFunctions
+// phpcs:disable WordPress.PHP.DevelopmentFunctions
 
 /**
  * Class: Boldgrid_Backup_Admin_Xhprof
@@ -63,7 +63,7 @@ class Boldgrid_Backup_Admin_Xhprof {
 	 */
 	private function xhprof_enable() {
 		// If the action is "heartbeat", then abort.
-		if ( ! empty( $_POST['action'] ) && 'heartbeat' === $_POST['action'] ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		if ( ! empty( $_POST['action'] ) && 'heartbeat' === $_POST['action'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only check used to decide whether to profile the request.
 			return false;
 		}
 

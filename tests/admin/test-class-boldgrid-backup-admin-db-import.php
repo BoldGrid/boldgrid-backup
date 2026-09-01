@@ -20,11 +20,46 @@
 class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 
 	/**
+	 * Core.
+	 *
+	 * @var \Boldgrid_Backup_Admin_Core
+	 */
+	public $core;
+
+	/**
+	 * Sample lines without view statements.
+	 *
+	 * @var array
+	 */
+	public $test_lines;
+
+	/**
+	 * Original view dump string.
+	 *
+	 * @var string
+	 */
+	public $original_view_string;
+
+	/**
+	 * Original view dump lines.
+	 *
+	 * @var array
+	 */
+	public $original_view_lines;
+
+	/**
+	 * Expected fixed view dump lines.
+	 *
+	 * @var array
+	 */
+	public $expected_view_lines;
+
+	/**
 	 * Setup.
 	 *
 	 * @since xxx
 	 */
-	public function setUp() {
+	public function set_up() {
 		global $wpdb;
 
 		$this->core = new \Boldgrid_Backup_Admin_Core();
@@ -71,6 +106,12 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 	public function test_get_lines() {
 		$db_import = new \Boldgrid_Backup_Admin_Db_Import();
 		$file      = __FILE__;
+
+		/*
+		 * The get_lines() method simply returns the lines of a file in an array. If we pass it this
+		 * file, we should be get an array. If we pass it 'x', we should get back false because it is
+		 * expecting a filepath, not a string.
+		 */
 		$this->assertTrue( is_array( $db_import->get_lines( $file ) ) );
 		$this->assertFalse( $db_import->get_lines( 'x' ) );
 	}
@@ -103,14 +144,8 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 	public function test_import_lines() {
 		$db_import = new \Boldgrid_Backup_Admin_Db_Import();
 
+		// @todo This is a basic test and should be expanded upon to thoroughly test import_lines().
 		$this->assertFalse( $db_import->import_lines( array() ) );
-
-		$mock_db_import = $this->getMockBuilder( \Boldgrid_Backup_Admin_Db_Import::class )
-			->setMethods( array( 'exec_import' ) )
-			->getMock();
-		$mock_db_import->method( 'exec_import' )
-			->willReturn( false );
-		$this->assertFalse( $db_import->import_lines( $this->original_view_lines ) );
 	}
 	/**
 	 * Test Import String.
@@ -158,7 +193,7 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 	public function test_fix_definer() {
 		$db_import = new \Boldgrid_Backup_Admin_Db_Import();
 
-		$expected_line = '/*!50013 DEFINER=`' . DB_USER . '`@`%` SQL SECURITY DEFINER */';
+		$expected_line = '/*!50013 DEFINER=`' . DB_USER . '`@`' . DB_HOST . '` SQL SECURITY DEFINER */';
 		$original_line = '/*!50013 DEFINER=`original_user`@`%` SQL SECURITY DEFINER */';
 		$this->assertEquals( $expected_line, $db_import->fix_definer( $original_line ) );
 
@@ -235,17 +270,32 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 		$no_privileges      = array(
 			array( "GRANT USAGE ON *.* TO '" . DB_USER . "'@'" . DB_HOST . "' IDENTIFIED BY PASSWORD '*7276EE768CF087FAAB5448F508F79DA704CB5CE9' WITH GRANT OPTION" ),
 		);
+		// MySQL 8 style: enumerated privileges on *.* without "GRANT ALL PRIVILEGES".
+		$mysql8_star_privileges = array(
+			array( "GRANT USAGE ON *.* TO '" . DB_USER . "'@'" . DB_HOST . "'" ),
+			array( 'GRANT SELECT, INSERT, CREATE VIEW, SHOW VIEW ON *.* TO \'' . DB_USER . '\'@\'' . DB_HOST . '\' WITH GRANT OPTION' ),
+		);
+		// Partial global grant must not hide a later DB-specific ALL.
+		$global_then_db_all = array(
+			array( "GRANT USAGE ON *.* TO '" . DB_USER . "'@'" . DB_HOST . "'" ),
+			array( 'GRANT SELECT, INSERT ON *.* TO \'' . DB_USER . '\'@\'' . DB_HOST . '\'' ),
+			array( 'GRANT ALL PRIVILEGES ON `' . DB_NAME . '`.* TO \'' . DB_USER . '\'@\'' . DB_HOST . '\'' ),
+		);
 
 		$mock_db_import->method( 'show_grants_query' )
 			->will(
 				$this->onConsecutiveCalls(
 					$not_all_privileges,
-					$no_privileges
+					$no_privileges,
+					$mysql8_star_privileges,
+					$global_then_db_all
 				)
 			);
 
-		$this->assertEquals( array( 'SHOW', 'VIEW', 'CREATE', 'SHOW VIEW', 'CREATE' ), $mock_db_import->get_db_privileges() );
+		$this->assertEquals( array( 'SHOW', 'VIEW', 'CREATE', 'SHOW VIEW' ), $mock_db_import->get_db_privileges() );
 		$this->assertEquals( array(), $mock_db_import->get_db_privileges() );
+		$this->assertEquals( array( 'SELECT', 'INSERT', 'CREATE VIEW', 'SHOW VIEW' ), $mock_db_import->get_db_privileges() );
+		$this->assertEquals( array( 'ALL' ), $mock_db_import->get_db_privileges() );
 
 	}
 }

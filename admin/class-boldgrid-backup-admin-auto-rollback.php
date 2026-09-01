@@ -12,7 +12,6 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP
 
 /**
  * Class: Boldgrid_Backup_Admin_Auto_Rollback
@@ -140,7 +139,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		$this->core = $core;
 
 		$this->updating_core = 'update-core.php' === $this->core->pagenow &&
-			! empty( $_GET['action'] ) && 'do-core-upgrade' === $_GET['action']; // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+			! empty( $_GET['action'] ) && 'do-core-upgrade' === $_GET['action']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only check of which core page we are on.
 
 		$this->on_update_page = in_array( $this->core->pagenow, $this->update_pages, true );
 	}
@@ -205,6 +204,9 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 
 		// Remove WP option boldgrid_backup_pending_rollback.
 		$this->core->settings->delete_rollback_option();
+
+		// Remove the one-time CLI cancel secret.
+		delete_site_option( 'boldgrid_backup_cli_cancel_secret' );
 	}
 
 	/**
@@ -332,7 +334,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		if ( ! empty( $deadline ) ) {
 			$localize_script_data = array(
 				// Include the time (in ISO 8601 format).
-				'rolloutDeadline' => date( 'c', $deadline ),
+				'rolloutDeadline' => gmdate( 'c', $deadline ),
 			);
 			wp_localize_script( $handle, 'boldgrid_backup_admin_rollback', $localize_script_data );
 		}
@@ -392,8 +394,8 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 */
 	public function notice_countdown_show() {
 		// Process GET / POST info.
-		$action      = ! empty( $_GET['action'] ) ? sanitize_key( $_GET['action'] ) : null; // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
-		$restore_now = ! empty( $_POST['restore_now'] ); // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		$action      = ! empty( $_GET['action'] ) ? sanitize_key( wp_unslash( $_GET['action'] ) ) : null; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only check used to decide whether to show a notice.
+		$restore_now = ! empty( $_POST['restore_now'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only check used to decide whether to show a notice.
 
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
 		$deadline         = ! empty( $pending_rollback['deadline'] ) ? $pending_rollback['deadline'] : null;
@@ -513,7 +515,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		}
 
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
-		$deadline         = ! empty( $pending_rollback['deadline'] ) ? sprintf( '(<em>%1$s</em>)', date( 'g:i a', $this->core->utility->time( $pending_rollback['deadline'] ) ) ) : '';
+		$deadline         = ! empty( $pending_rollback['deadline'] ) ? sprintf( '(<em>%1$s</em>)', date_i18n( 'g:i a', $pending_rollback['deadline'] ) ) : '';
 
 		$update_trigger = $this->notice_trigger_get();
 		$update_trigger = ! empty( $update_trigger ) ? sprintf( '<p>%1$s</p>', $update_trigger ) : '';
@@ -525,7 +527,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		);
 		$restore_button = $this->core->archive_actions->get_restore_button( $args['restore_filename'], $button_args );
 
-		$iso_time          = ! empty( $pending_rollback['deadline'] ) ? date( 'c', $pending_rollback['deadline'] ) : null;
+		$iso_time          = ! empty( $pending_rollback['deadline'] ) ? gmdate( 'c', $pending_rollback['deadline'] ) : null;
 		$rollback_deadline = sprintf( '<input type="hidden" id="rollback-deadline" value="%1$s" />', $iso_time );
 
 		$notice_markup = '
@@ -727,6 +729,8 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	/**
 	 * Generate markup for "You should make a backup for updating".
 	 *
+	 * It does not generate the entire markup of the notice, nor the entire contents of the notice.
+	 *
 	 * @since 1.5.3
 	 *
 	 * @return string
@@ -741,10 +745,10 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 
 		switch ( $this->core->pagenow ) {
 			case 'update-core.php':
-				$notice_text .= __( 'On this page you are able to update WordPress, Plugins, and Themes.' ) . ' ';
+				$notice_text .= __( 'On this page you are able to update WordPress, Plugins, and Themes.', 'boldgrid-backup' ) . ' ';
 				break;
 			case 'plugins.php':
-				$notice_text .= __( 'On this page you are able to update plugins.' ) . ' ';
+				$notice_text .= __( 'On this page you are able to update plugins.', 'boldgrid-backup' ) . ' ';
 				break;
 		}
 
@@ -879,9 +883,9 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		 * 1.6.0 so that we can uniquely identify this notice on the page.
 		 */
 		$backup_button = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-button.php';
-		$in_progress   = Boldgrid_Backup_Admin_In_Progress_Data::get_markup();
+		$in_progress   = Boldgrid_Backup_Admin_In_Progress::get_notice( true );
 		$notice        = $this->notice_backup_get();
-		do_action( 'boldgrid_backup_notice', $notice . $backup_button . $in_progress, 'notice notice-warning is-dismissible boldgrid-backup-protect-now' );
+		do_action( 'boldgrid_backup_notice', $notice . $backup_button . $in_progress['message'], 'notice notice-warning is-dismissible boldgrid-backup-protect-now' );
 	}
 
 	/**
@@ -930,7 +934,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 
 		// Print a hidden div with the time (in ISO 8601 format), so that JavaScript can read it.
 		?>
-		<div class="hidden" id="rollback-deadline"><?php echo esc_html( date( 'c', $deadline ) ); ?></div>
+		<div class="hidden" id="rollback-deadline"><?php echo esc_html( gmdate( 'c', $deadline ) ); ?></div>
 		<?php
 	}
 
@@ -1032,7 +1036,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		 * update-core.php?action=do-theme-upgrade
 		 * Then there's no need to show a message.
 		 */
-		if ( ! empty( $_GET['action'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		if ( ! empty( $_GET['action'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only check used to decide whether to show a notice.
 			return;
 		}
 
@@ -1083,6 +1087,10 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 *
 	 * Prior to @1.5.3 this method was in the core class.
 	 *
+	 * Usage example includes customizer: on load an ajax call (action:boldgrid_backup_deadline) is made
+	 * and this method handles it. If a deadline is returned, the deadline is put in the notice and
+	 * more actions occur.
+	 *
 	 * @since 1.2.1
 	 */
 	public function wp_ajax_get_deadline() {
@@ -1100,7 +1108,7 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		}
 
 		// Convert the deadline to ISO time (in ISO 8601 format).
-		wp_die( esc_html( date( 'c', $deadline ) ) );
+		wp_die( esc_html( gmdate( 'c', $deadline ) ) );
 	}
 
 	/**
@@ -1132,9 +1140,15 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	 *
 	 * This will return either the "get protected" or "you are protected" notice.
 	 *
+	 * Example usage in the customzer: When accessing the "change theme" section, an ajax call is made
+	 * (action:boldgrid_backup_get_protect_notice) and this method handles it. We return an entire notice
+	 * and customizer.js will add it to the page.
+	 *
 	 * @since 1.6.0
 	 */
 	public function wp_ajax_get_protect_notice() {
+		$response = array();
+
 		if ( ! current_user_can( 'update_plugins' ) || ! $this->core->test->run_functionality_tests() ) {
 			wp_send_json_error();
 		}
@@ -1142,17 +1156,19 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 		$pending_rollback = get_site_option( 'boldgrid_backup_pending_rollback' );
 		if ( ! empty( $pending_rollback ) ) {
 			// You're protected, go ahead and update.
-			$message = $this->notice_activated_get();
-			$notice  = sprintf( '<div class="%1$s">%2$s</div>', $message['class'], $message['html'] );
+			$message            = $this->notice_activated_get();
+			$response['notice'] = sprintf( '<div class="%1$s">%2$s</div>', $message['class'], $message['html'] );
 		} else {
 			// You're not protected, make a backup first.
-			$notice        = $this->notice_backup_get();
-			$backup_button = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-button.php';
-			$in_progress   = Boldgrid_Backup_Admin_In_Progress_Data::get_markup();
-			$notice        = '<div class="notice notice-warning is-dismissible boldgrid-backup-protect-now">' . $notice . $backup_button . $in_progress . '</div>';
+			$notice             = $this->notice_backup_get();
+			$backup_button      = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-backup-button.php';
+			$in_progress        = Boldgrid_Backup_Admin_In_Progress::get_notice( true );
+			$response['notice'] = '<div class="notice notice-warning is-dismissible boldgrid-backup-protect-now">' . $notice . $backup_button . $in_progress['message'] . '</div>';
 		}
 
-		wp_send_json_success( $notice );
+		$response['is_done'] = Boldgrid_Backup_Admin_In_Progress::is_done();
+
+		wp_send_json_success( $response );
 	}
 
 	/**
@@ -1180,16 +1196,23 @@ class Boldgrid_Backup_Admin_Auto_Rollback {
 	/**
 	 * Callback function for canceling a pending rollback from the cli process.
 	 *
-	 * This admin-ajax call is unprovileged, so that the CLI script can make the call.
-	 * The only validation that we use is the backup identifier.
-	 * Nobody will be trying to cancel rollbacks (with a 15-minute window) anyways.
+	 * This admin-ajax call is unprivileged, so that the CLI script can make the call.
+	 * Validation requires both the backup identifier and a one-time random secret that
+	 * was generated when the restore cron job was scheduled.
 	 *
 	 * @since 1.10.7
 	 */
 	public function wp_ajax_cli_cancel() {
-		$backup_id_match = ! empty( $_GET['backup_id'] ) && $this->core->get_backup_identifier() === sanitize_key( $_GET['backup_id'] ); // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Request is authenticated below by comparing a shared secret.
+		$backup_id_match = ! empty( $_GET['backup_id'] ) && $this->core->get_backup_identifier() === sanitize_key( wp_unslash( $_GET['backup_id'] ) );
 
-		if ( $backup_id_match ) {
+		$stored_secret  = get_site_option( 'boldgrid_backup_cli_cancel_secret', '' );
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Request is authenticated by comparing a shared secret.
+		$secret_match = ! empty( $stored_secret ) && ! empty( $_GET['cli_cancel_secret'] ) &&
+			hash_equals( $stored_secret, sanitize_text_field( wp_unslash( $_GET['cli_cancel_secret'] ) ) );
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+		if ( $backup_id_match && $secret_match ) {
 			$this->cancel();
 			wp_send_json_success( __( 'Rollback canceled', 'boldgrid-backup' ) );
 		} else {

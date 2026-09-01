@@ -280,9 +280,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 		 */
 		$filenames = array();
 
-		$zip = new PclZip( $filepath );
-
-		$list = $zip->listContent();
+		$list = $this->list_content( $filepath );
 		if ( empty( $list ) ) {
 			return $contents;
 		}
@@ -336,6 +334,10 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 		}
 
 		$file_contents = $this->get_file( $filepath, $file );
+		if ( empty( $file_contents ) ) {
+			$this->errors[] = __( 'Unable to extract single file from archive.', 'boldgrid-backup' );
+			return false;
+		}
 
 		// Make sure the file's dir exists, write the file, and adjust the timestamp.
 		$file_abspath = ABSPATH . $file;
@@ -381,30 +383,39 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 			return false;
 		}
 
-		$zip = new PclZip( $filepath );
+		$file_contents = $this->get_file_via_zip_archive( $filepath, $file );
 
-		$list = $zip->listContent();
-		if ( empty( $list ) ) {
-			return false;
-		}
+		if ( false === $file_contents ) {
+			require_once ABSPATH . '/wp-admin/includes/class-pclzip.php';
 
-		$file_index = false;
-
-		foreach ( $list as $index => $filedata ) {
-			if ( $file === $filedata['filename'] ) {
-				$file_index = $index;
+			$zip  = new PclZip( $filepath );
+			$list = $zip->listContent();
+			if ( empty( $list ) ) {
+				return false;
 			}
+
+			$file_index = false;
+
+			foreach ( $list as $index => $filedata ) {
+				if ( $file === $filedata['filename'] ) {
+					$file_index = $index;
+				}
+			}
+
+			/*
+			 * We use to check if(! $file_index) however sometimes the file we want
+			 * is at the 0 index.
+			 */
+			if ( false === $file_index ) {
+				return false;
+			}
+
+			$file_contents = $zip->extractByIndex( $file_index, PCLZIP_OPT_EXTRACT_AS_STRING );
 		}
 
-		/*
-		 * We use to check if(! $file_index) however sometimes the file we want
-		 * is at the 0 index.
-		 */
-		if ( false === $file_index ) {
+		if ( empty( $file_contents[0] ) ) {
 			return false;
 		}
-
-		$file_contents = $zip->extractByIndex( $file_index, PCLZIP_OPT_EXTRACT_AS_STRING );
 
 		/*
 		 * Ensure the mtime is UTC.
@@ -433,9 +444,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 	public function get_sqls( $filepath ) {
 		$sqls = array();
 
-		$zip = new PclZip( $filepath );
-
-		$list = $zip->listContent();
+		$list = $this->list_content( $filepath );
 
 		if ( empty( $list ) ) {
 			return $sqls;
@@ -458,6 +467,112 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 		}
 
 		return $sqls;
+	}
+
+	/**
+	 * List archive contents, falling back when PclZip trusts a broken EOCD.
+	 *
+	 * PclZip uses the classic EOCD entry count. Archives missing ZIP64 metadata
+	 * can report 0 entries even when the central directory is intact, which made
+	 * the Backup Browser show "Empty directory" and hide database dumps.
+	 *
+	 * After a ZIP64 repair, classic EOCD entry fields are 0xFFFF; PclZip treats
+	 * that as a literal count and truncates the listing — prefer ZipArchive.
+	 *
+	 * @since 1.17.3
+	 *
+	 * @param  string $filepath Archive path.
+	 * @return array
+	 */
+	protected function list_content( $filepath ) {
+		Boldgrid_Backup_Admin_Zip::maybe_repair_zip64_eocd( $filepath );
+
+		$zip_archive = Boldgrid_Backup_Admin_Zip::open_zip_archive( $filepath );
+		if ( $zip_archive ) {
+			$list = array();
+			for ( $i = 0; $i < $zip_archive->numFiles; $i++ ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+				$stat = $zip_archive->statIndex( $i );
+				if ( empty( $stat['name'] ) || '.' === $stat['name'] || './' === $stat['name'] ) {
+					continue;
+				}
+				$is_folder = '/' === substr( $stat['name'], -1 );
+				if ( ! $is_folder && method_exists( $zip_archive, 'getExternalAttributesIndex' ) ) {
+					$opsys = 0;
+					$attr  = 0;
+					if ( $zip_archive->getExternalAttributesIndex( $i, $opsys, $attr ) ) {
+						$is_folder = (bool) ( $attr & 0x10 );
+					}
+				}
+				$list[] = array(
+					'filename'        => $stat['name'],
+					'stored_filename' => $stat['name'],
+					'size'            => $stat['size'],
+					'compressed_size' => $stat['comp_size'],
+					'mtime'           => $stat['mtime'],
+					'comment'         => '',
+					'folder'          => $is_folder,
+					'index'           => $i,
+					'status'          => 'ok',
+					'crc'             => $stat['crc'],
+				);
+			}
+			$zip_archive->close();
+			if ( ! empty( $list ) ) {
+				return $list;
+			}
+		}
+
+		require_once ABSPATH . '/wp-admin/includes/class-pclzip.php';
+
+		$zip  = new PclZip( $filepath );
+		$list = $zip->listContent();
+		if ( ! empty( $list ) && count( $list ) < 0xffff ) {
+			return $list;
+		}
+
+		return Boldgrid_Backup_Admin_Zip::list_central_directory( $filepath );
+	}
+
+	/**
+	 * Extract one file using ZipArchive (after repairing ZIP64 EOCD if needed).
+	 *
+	 * @since 1.17.3
+	 *
+	 * @param  string $filepath Archive path.
+	 * @param  string $file     Path inside the archive.
+	 * @return array|false
+	 */
+	protected function get_file_via_zip_archive( $filepath, $file ) {
+		Boldgrid_Backup_Admin_Zip::maybe_repair_zip64_eocd( $filepath );
+
+		$zip = Boldgrid_Backup_Admin_Zip::open_zip_archive( $filepath );
+		if ( ! $zip ) {
+			return false;
+		}
+
+		$content = $zip->getFromName( $file );
+		$stat    = $zip->statName( $file );
+		$zip->close();
+
+		if ( false === $content || empty( $stat ) ) {
+			return false;
+		}
+
+		return array(
+			array(
+				'filename'        => $stat['name'],
+				'stored_filename' => $stat['name'],
+				'size'            => $stat['size'],
+				'compressed_size' => $stat['comp_size'],
+				'mtime'           => $stat['mtime'],
+				'comment'         => '',
+				'folder'          => false,
+				'index'           => $stat['index'],
+				'status'          => 'ok',
+				'crc'             => $stat['crc'],
+				'content'         => $content,
+			),
+		);
 	}
 
 	/**
@@ -494,7 +609,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 			$php_zip_set = $this->core->compressors->set_php_zip();
 
 			if ( $php_zip_set ) {
-				$messages[] = __( 'We have changed your compressor from PclZip to ZipArchive. Please try to create a backup again.' );
+				$messages[] = __( 'We have changed your compressor from PclZip to ZipArchive. Please try to create a backup again.', 'boldgrid-backup' );
 			}
 		}
 
@@ -529,7 +644,7 @@ class Boldgrid_Backup_Admin_Compressor_Pcl_Zip extends Boldgrid_Backup_Admin_Com
 			'%1$s%5$s%2$s-%3$s-%4$s',
 			$backup_dir,
 			$test_zip_file,
-			mt_rand(),
+			wp_rand(),
 			$safe_to_delete,
 			DIRECTORY_SEPARATOR
 		);

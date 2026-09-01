@@ -13,7 +13,7 @@ WordPress backup and restoration with update protection.
 
 ### Minimum Requirements ###
 
-* PHP 5.4 or higher
+* PHP 7.4 or higher
 * At least one of the following PHP execution functions enabled: "popen", "proc_open", "exec", "shell_exec", "passthru", or "system".
 * A Cron system with the "crontab" utility, or WP Cron.
 * A WP_Filesystem FS_METHOD being "direct".

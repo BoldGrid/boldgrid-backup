@@ -38,7 +38,7 @@ class Remote_Storage extends \Boldgrid\Library\Library\Ui\Feature {
 				wp_kses(
 					sprintf(
 						// translators: 1 An opening span tag, A list of remote backup storage locations (csv), its closing span tag.
-						__( 'Backups saved to: %1$s%2$s%3$s', 'boldgrid-bakcup' ),
+						__( 'Backups saved to: %1$s%2$s%3$s', 'boldgrid-backup' ),
 						'<span class="bglib-feature-value">',
 						esc_html( implode( ', ', $storage_locations ) ),
 						'</span>'

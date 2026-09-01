@@ -17,6 +17,7 @@
 defined( 'WPINC' ) || die;
 
 $schedulers_available = $this->core->scheduler->get_available();
+$intervals_available  = $this->core->scheduler->get_intervals();
 $schedulers_count     = count( $schedulers_available );
 $scheduler            = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : false;
 $scheduler_options    = '';
@@ -45,6 +46,29 @@ foreach ( $schedulers_available as $key => $scheduler_data ) {
 
 $scheduler_select = sprintf( '<select name="scheduler" id="scheduler">%1$s</select>', $scheduler_options );
 
+$selected_interval = ! empty( $settings['cron_interval'] ) ? $settings['cron_interval'] : '*/10 * * * *';
+
+$cron_interval_options = '';
+
+foreach ( $intervals_available as $key => $interval ) {
+	$cron_interval_options .= sprintf(
+		'<option value="%1$s" %3$s>%2$s</option>',
+		$key,
+		$interval,
+		$key === $selected_interval ? 'selected="selected"' : ''
+	);
+}
+
+$cron_interval_select = sprintf( '<select name="cron_interval" id="cron_interval">%1$s</select>', $cron_interval_options );
+
+if ( 0 === $schedulers_count ) {
+	$scheduler_select = '';
+	$wp_cron_warning  = sprintf(
+		'<p class="no-cron-notice"><span class="dashicons dashicons-warning yellow"></span> %1$s</p>',
+		__( 'There are currently no cron systems available on your server. Scheduled backups will not occur.', 'boldgrid-backup' )
+	);
+}
+
 return sprintf(
 	'
 	<div class="bg-box">
@@ -54,10 +78,12 @@ return sprintf(
 		<div class="bg-box-bottom">
 			%2$s
 			%3$s
+			%5$s
 		</div>
 	</div>',
 	__( 'Scheduler', 'boldgrid-backup' ),
 	$scheduler_select,
 	$wp_cron_warning,
-	__( 'Advanced', 'boldgrid-backup' )
+	__( 'Advanced', 'boldgrid-backup' ),
+	$cron_interval_select
 );

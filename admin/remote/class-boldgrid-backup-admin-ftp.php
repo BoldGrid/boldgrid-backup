@@ -12,7 +12,6 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP
 
 /**
  * Class: Boldgrid_Backup_Admin_Ftp
@@ -41,6 +40,14 @@ class Boldgrid_Backup_Admin_Ftp {
 		'ftpes' => 21,
 		'sftp'  => 22,
 	];
+
+	/**
+	 * Port
+	 *
+	 * @since 1.6.0
+	 * @var   string
+	 */
+	public $port;
 
 	/**
 	 * Default type.
@@ -238,6 +245,14 @@ class Boldgrid_Backup_Admin_Ftp {
 	private $reconnected = false;
 
 	/**
+	 * Page class.
+	 *
+	 * @since 1.6.0
+	 * @var   Boldgrid_Backup_Admin_Ftp_Page
+	 */
+	public $page;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.6.0
@@ -279,7 +294,7 @@ class Boldgrid_Backup_Admin_Ftp {
 				$this->connection = ftp_ssl_connect( $this->host, $this->port, $this->timeout );
 				break;
 			case 'sftp':
-				$this->connection = new phpseclib\Net\SFTP( $this->host, $this->port );
+				$this->connection = new phpseclib3\Net\SFTP( $this->host, $this->port );
 				break;
 			default:
 				break;
@@ -340,11 +355,40 @@ class Boldgrid_Backup_Admin_Ftp {
 	 * @since 1.6.0
 	 */
 	public function disconnect() {
-		if ( ( 'ftp' === $this->type || 'ftpes' === $this->type ) && is_resource( $this->connection ) ) {
-			ftp_close( $this->connection );
+		if ( ( 'ftp' === $this->type || 'ftpes' === $this->type ) && $this->is_ftp_connection( $this->connection ) ) {
+			/*
+			 * Pure-FTPd often closes FTPS without TLS close_notify. ftp_close() still
+			 * tears the handle down correctly, but PHP/OpenSSL may emit:
+			 * "SSL_read on shutdown: error:0A000126:SSL routines::unexpected eof while reading"
+			 * Suppress that known-benign warning (same approach as W3 Total Cache's FTP CDN).
+			 */
+			// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			@ftp_close( $this->connection );
 			$this->connection = null;
 			$this->logged_in  = false;
 		}
+	}
+
+	/**
+	 * Whether a value is an open PHP FTP/FTPES connection handle.
+	 *
+	 * PHP 7 returns a resource; PHP 8.0+ returns an FTP\Connection object.
+	 * Without this check, disconnect() never calls ftp_close() on PHP 8+, and
+	 * request shutdown then emits:
+	 * "SSL_read on shutdown: error:0A000126:SSL routines::unexpected eof while reading"
+	 * when the FTPS peer closes without a TLS close_notify (common with Pure-FTPd).
+	 *
+	 * @since 1.17.3
+	 *
+	 * @param mixed $connection Connection handle.
+	 * @return bool
+	 */
+	protected function is_ftp_connection( $connection ) {
+		if ( is_resource( $connection ) ) {
+			return true;
+		}
+
+		return is_object( $connection ) && $connection instanceof \FTP\Connection;
 	}
 
 	/**
@@ -539,14 +583,14 @@ class Boldgrid_Backup_Admin_Ftp {
 			],
 		];
 
-		// phpcs:disable WordPress.CSRF.NonceVerification.NoNonceVerification, WordPress.Security.NonceVerification.NoNonceVerification
+		// phpcs:disable WordPress.Security.NonceVerification -- Nonce is verified by the callers in Boldgrid_Backup_Admin_Ftp_Page.
 
 		foreach ( $values as $value ) {
 			$key      = $value['key'];
 			$callback = ! empty( $value['callback'] ) ? $value['callback'] : null;
 
 			if ( ! empty( $_POST[ $key ] ) ) {
-				$data[ $key ] = $_POST[ $key ];
+				$data[ $key ] = sanitize_text_field( wp_unslash( $_POST[ $key ] ) );
 			} elseif ( ! empty( $settings['remote'][ $this->key ][ $key ] ) ) {
 				$data[ $key ] = $settings['remote'][ $this->key ][ $key ];
 			} else {
@@ -559,7 +603,7 @@ class Boldgrid_Backup_Admin_Ftp {
 			}
 		}
 
-		// phpcs:enable WordPress.CSRF.NonceVerification.NoNonceVerification, WordPress.Security.NonceVerification.NoNonceVerification
+		// phpcs:enable WordPress.Security.NonceVerification
 
 		return $data;
 	}
@@ -709,16 +753,27 @@ class Boldgrid_Backup_Admin_Ftp {
 		 * Some ftp servers respond with slightly different formats. In some scenarious on a Windows
 		 * FTP server, the folders will be prepended with a "./" (See comment in this method's
 		 * docblock). Before returning the data, remove "./" from the beginning of all items.
+		 *
+		 * Pure-FTPd (and some others) return ftp_nlist( $dir ) entries as "dir/file.zip" rather
+		 * than "file.zip". Strip the requested directory prefix so callers can match basenames.
 		 */
-		$fix_windows = function( $item ) {
+		$fix_nlist_path = function( $item ) use ( $raw, $dir ) {
 			if ( './' === substr( $item, 0, 2 ) ) {
 				$item = substr( $item, 2 );
 			}
+
+			if ( ! $raw && '.' !== $dir && '' !== $dir ) {
+				$prefix = rtrim( $dir, '/' ) . '/';
+				if ( 0 === strpos( $item, $prefix ) ) {
+					$item = substr( $item, strlen( $prefix ) );
+				}
+			}
+
 			return $item;
 		};
 
 		if ( ( 'ftp' === $this->type || 'ftpes' === $this->type ) && is_array( $contents ) ) {
-			$contents = array_map( $fix_windows, $contents );
+			$contents = array_map( $fix_nlist_path, $contents );
 		}
 
 		return $contents;
@@ -885,7 +940,7 @@ class Boldgrid_Backup_Admin_Ftp {
 				$connection = @ftp_ssl_connect( $host, $port, $this->timeout ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
 				break;
 			case 'sftp':
-				$connection = @new phpseclib\Net\SFTP( $host, $port, $this->timeout ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
+				$connection = @new phpseclib3\Net\SFTP( $host, $port, $this->timeout ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
 				break;
 			default:
 				break;
@@ -937,7 +992,8 @@ class Boldgrid_Backup_Admin_Ftp {
 						}
 						$ftp_listing_success = is_array( ftp_nlist( $connection, '.' ) );
 					}
-					ftp_close( $connection );
+					// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+					@ftp_close( $connection );
 					break;
 				case 'sftp':
 					$logged_in = $connection->login( $user, $pass );
@@ -1086,7 +1142,18 @@ class Boldgrid_Backup_Admin_Ftp {
 	public function is_uploaded( $filepath ) {
 		$contents = $this->get_contents( false, $this->get_folder_name() );
 
-		return ! is_array( $contents ) ? false : in_array( basename( $filepath ), $contents, true );
+		if ( ! is_array( $contents ) ) {
+			return false;
+		}
+
+		/*
+		 * Compare basenames so directory-prefixed nlist entries (e.g. Pure-FTPd
+		 * "folder/archive.zip") still match the local archive filename.
+		 */
+		$filename = basename( $filepath );
+		$names    = array_map( 'basename', $contents );
+
+		return in_array( $filename, $names, true );
 	}
 
 	/**
@@ -1151,7 +1218,7 @@ class Boldgrid_Backup_Admin_Ftp {
 				 * Not 100% accurate however. In testing, when setting a remote file's timestamp to
 				 * 11am UTC, that remote server convereted the UTC time to local time.
 				 */
-				$cmd = 'MFMT ' . date( 'YmdHis', $timestamp ) . ' ' . $remote_file;
+				$cmd = 'MFMT ' . gmdate( 'YmdHis', $timestamp ) . ' ' . $remote_file;
 				ftp_raw( $this->connection, $cmd );
 				break;
 			case 'sftp':

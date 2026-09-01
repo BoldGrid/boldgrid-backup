@@ -19,17 +19,22 @@
  * @see \Boldgrid\Backup\Cli\Site_Restore::run()
  * @see \Boldgrid\Backup\Cli\Log::write()
  *
- * phpcs:disable WordPress.VIP,WordPress.XSS.EscapeOutput
+ * phpcs:disable WordPress.Security.EscapeOutput
  */
 
 namespace Boldgrid\Backup\Cli;
 
-$php_min_version = '5.4';
+$php_min_version = '7.4';
 
 if ( version_compare( PHP_VERSION, $php_min_version, '<' ) ) {
 	echo 'Error: Incompatible PHP version "' . PHP_VERSION . '".  This utility requires "' .
 		$php_min_version . '" or higher.' . PHP_EOL;
 	exit( 1 );
+}
+
+// Permit command-line SAPIs only; "cli-server" is a web server.
+if ( ! in_array( PHP_SAPI, array( 'cli', 'phpdbg' ), true ) ) {
+	throw new \Exception( 'This script must be run from the command line.' );
 }
 
 require __DIR__ . '/class-info.php';

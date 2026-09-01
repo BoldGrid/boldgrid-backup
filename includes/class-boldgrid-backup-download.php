@@ -50,7 +50,7 @@ class Boldgrid_Backup_Download {
 	 * @uses $_GET['t'] Token.
 	 */
 	public function public_download() {
-		$token         = ! empty( $_GET['t'] ) ? sanitize_key( $_GET['t'] ) : null; // phpcs:ignore WordPress.CSRF.NonceVerification
+		$token         = ! empty( $_GET['t'] ) ? sanitize_key( wp_unslash( $_GET['t'] ) ) : null; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public download link authenticated by the token itself.
 		$token_details = Boldgrid_Backup_Authentication::get_token_details( $token );
 
 		if ( $token_details['is_valid'] ) {
@@ -62,6 +62,7 @@ class Boldgrid_Backup_Download {
 			}
 		}
 
-		wp_redirect( get_site_url(), 404 );
+		wp_safe_redirect( get_site_url(), 404 );
+		exit;
 	}
 }

@@ -12,7 +12,6 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP
 
 /**
  * Class: Boldgrid_Backup_Admin_Cron
@@ -36,6 +35,14 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @var   string
 	 */
 	public $run_jobs = 'cron/run-jobs.php';
+
+	/**
+	 * Path to direct-transfer.php
+	 * 
+	 * @since 1.17.0
+	 * @var string
+	 */
+	public $direct_transfer = 'cron/direct-transfer.php';
 
 	/**
 	 * Path to the bgbkup-cli script.
@@ -196,20 +203,32 @@ class Boldgrid_Backup_Admin_Cron {
 	public function add_all_crons( array $settings ) {
 		$success = false;
 
-		$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : null;
+		/*
+		 * Prefer the saved setting, then the same fallback as scheduler->get() /
+		 * auto-rollback. Using only settings['scheduler'] would no-op when the key
+		 * was never saved even though system cron is the effective scheduler.
+		 */
+		$scheduler = ! empty( $settings['scheduler'] ) ? $settings['scheduler'] : $this->core->scheduler->get();
 		$schedule  = ! empty( $settings['schedule'] ) ? $settings['schedule'] : null;
 
 		if ( 'cron' === $scheduler && $this->core->scheduler->is_available( $scheduler ) ) {
 			$this->core->scheduler->clear_all_schedules();
 
+			$scheduled = false;
 			if ( ! empty( $schedule ) ) {
 				$scheduled = $this->add_cron_entry( $settings );
 			}
 
-			$jobs_scheduled = $this->schedule_jobs();
+			$jobs_scheduled = $this->schedule_jobs( $settings );
 			$site_check     = $this->schedule_site_check( $settings );
 
-			$success = $scheduled && $jobs_scheduled;
+			/*
+			 * An empty schedule is success when jobs were written: there is no backup
+			 * entry to add. Requiring $scheduled here left crontab_version unset, so
+			 * upgrade_crontab_entries cleared restore/direct-transfer jobs on every
+			 * admin_init for sites with no backup schedule.
+			 */
+			$success = ( empty( $schedule ) || $scheduled ) && $jobs_scheduled;
 
 			if ( $success ) {
 				$settings['crontab_version'] = $this->crontab_version;
@@ -312,20 +331,98 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @see BoldGrid_Backup_Admin_Core::get_backup_identifier()
 	 * @see BoldGrid_Backup_Admin_Cron::get_cron_secret()
 	 *
+	 * @param  array $settings Settings.
+	 *
 	 * @return bool Success.
 	 */
-	public function schedule_jobs() {
-		$entry = sprintf(
-			'*/5 * * * * %6$s "%1$s/%2$s" siteurl=%3$s id=%4$s secret=%5$s > /dev/null 2>&1',
+	public function schedule_jobs( $settings ) {
+		$cron_interval = isset( $settings['cron_interval'] ) ? $settings['cron_interval'] : '*/10 * * * *';
+		$entry         = sprintf(
+			'%7$s %6$s "%1$s/%2$s" siteurl=%3$s id=%4$s secret=%5$s > /dev/null 2>&1',
 			dirname( dirname( __FILE__ ) ),
 			$this->run_jobs,
 			get_site_url(),
 			$this->core->get_backup_identifier(),
 			$this->get_cron_secret(),
-			$this->cron_command
+			$this->cron_command,
+			$cron_interval
 		);
 
 		return $this->update_cron( $entry );
+	}
+
+	/**
+	 * Schedule Direct Transfer Cron.
+	 * 
+	 * This method will be run after starting a new
+	 * direct transfer job.
+	 * 
+	 * @since 1.17.0
+	 */
+	public function schedule_direct_transfer() {
+		$cron_interval = '*/1 * * * *';
+		$entry         = sprintf(
+			'%7$s %6$s "%1$s/%2$s" siteurl=%3$s id=%4$s secret=%5$s > /dev/null 2>&1',
+			dirname( dirname( __FILE__ ) ),
+			$this->direct_transfer,
+			get_site_url(),
+			$this->core->get_backup_identifier(),
+			$this->get_cron_secret(),
+			$this->cron_command,
+			$cron_interval
+		);
+
+		return $this->update_cron( $entry );
+	}
+
+	/**
+	 * Check if there is an active direct transfer in progress.
+	 *
+	 * Direct transfers can be active on either the receiving side (active_transfer)
+	 * or the sending side (active_tx). This checks both.
+	 *
+	 * @since 1.17.4
+	 *
+	 * @return bool True if an active direct transfer exists.
+	 */
+	public function has_active_direct_transfer() {
+		$config       = ! empty( $this->core->configs['direct_transfer'] ) ? $this->core->configs['direct_transfer'] : array();
+		$option_names = ! empty( $config['option_names'] ) ? $config['option_names'] : array();
+
+		$active_rx = ! empty( $option_names['active_transfer'] )
+			? get_option( $option_names['active_transfer'], false )
+			: false;
+
+		$active_tx = ! empty( $option_names['active_tx'] )
+			? get_option( $option_names['active_tx'], false )
+			: false;
+
+		if ( empty( $active_rx ) && empty( $active_tx ) ) {
+			return false;
+		}
+
+		$transfers_option = ! empty( $option_names['transfers'] ) ? $option_names['transfers'] : '';
+		$transfers        = '' !== $transfers_option ? get_option( $transfers_option, array() ) : array();
+
+		/*
+		 * Migrate writes "canceled"; some call sites historically checked "cancelled".
+		 * Treat both (and other terminal statuses) as inactive. Missing status is treated
+		 * as active so a corrupted option cannot drop an in-progress transfer cron.
+		 */
+		$inactive_statuses = array( 'completed', 'restore-completed', 'failed', 'canceled', 'cancelled' );
+
+		if ( ! empty( $active_rx ) && isset( $transfers[ $active_rx ] ) && is_array( $transfers[ $active_rx ] ) ) {
+			$status = isset( $transfers[ $active_rx ]['status'] ) ? $transfers[ $active_rx ]['status'] : '';
+			if ( ! in_array( $status, $inactive_statuses, true ) ) {
+				return true;
+			}
+		}
+
+		if ( ! empty( $active_tx ) ) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -347,7 +444,7 @@ class Boldgrid_Backup_Admin_Cron {
 			$settings = $this->core->settings->get_settings();
 		}
 
-		if ( ! $settings['site_check']['enabled'] ) {
+		if ( empty( $settings['site_check']['enabled'] ) ) {
 			return false;
 		}
 
@@ -545,17 +642,20 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @return bool True if the entry does not exist or was deleted successfully.
 	 */
 	public function entry_delete( $entry ) {
-		if ( ! $this->entry_exists( $entry ) ) {
-			return true;
-		}
-
 		$all_entries = $this->get_all();
+
+		// get_all() returns false when crontab cannot be read (PHP 8+ array_search TypeError).
+		if ( ! is_array( $all_entries ) ) {
+			return false;
+		}
 
 		$key = array_search( $entry, $all_entries, true );
 
-		if ( false !== $key ) {
-			unset( $all_entries[ $key ] );
+		if ( false === $key ) {
+			return true;
 		}
+
+		unset( $all_entries[ $key ] );
 
 		$all_entries     = implode( "\n", $all_entries );
 		$crontab_written = ( new \Boldgrid\Backup\Admin\Cron\Crontab() )->write_crontab( $all_entries );
@@ -741,7 +841,12 @@ class Boldgrid_Backup_Admin_Cron {
 		$settings  = $this->core->settings->get_settings();
 		$backup_id = $this->core->get_backup_identifier();
 
+		// Generate and store a one-time random secret for the CLI cancel endpoint.
+		$cli_cancel_secret = wp_generate_password( 32, false );
+		update_site_option( 'boldgrid_backup_cli_cancel_secret', $cli_cancel_secret );
+
 		$entry_parts = [
+			// phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date -- Server-local time for crontab.
 			date( $time['minute'] . ' ' . $time['hour'], $time['deadline'] ) . ' * * ' . date( 'w' ),
 			$this->cron_command,
 			'"' . dirname( dirname( __FILE__ ) ) . '/cli/bgbkup-cli.php"',
@@ -758,6 +863,7 @@ class Boldgrid_Backup_Admin_Cron {
 			'mode=restore restore',
 			'notify email=' . $settings['notification_email'],
 			'backup_id=' . $backup_id,
+			'cli_cancel_secret=' . $cli_cancel_secret,
 			'zip=' . $this->core->archive->filepath,
 		];
 
@@ -818,7 +924,9 @@ class Boldgrid_Backup_Admin_Cron {
 		// Convert from 24H to 12H time format.
 		$unix_time = strtotime( $schedule['tod_h'] . ':' . $schedule['tod_m'] );
 
+		// phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date -- Server-local time for crontab.
 		$schedule['tod_h'] = intval( date( 'g', $unix_time ) );
+		// phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date -- Server-local time for crontab.
 		$schedule['tod_a'] = date( 'A', $unix_time );
 
 		// Days of the week.
@@ -878,7 +986,7 @@ class Boldgrid_Backup_Admin_Cron {
 			printf(
 				// translators: 1: Archive mode ("backup" or "restore").
 				esc_html__( 'Error: Invalid mode "%s".', 'boldgrid-backup' ),
-				$archive_info['mode'] // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+				esc_html( $archive_info['mode'] )
 			);
 			wp_die();
 		}
@@ -903,20 +1011,20 @@ class Boldgrid_Backup_Admin_Cron {
 			// Error.
 			printf(
 				esc_html__( 'There was an error $s backup archive file.', 'boldgrid-backup' ),
-				$action_name // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+				esc_html( $action_name )
 			) . PHP_EOL;
 
 			printf(
 				// translators: 1: Error message.
 				esc_html__( 'Error: %s', 'boldgrid-backup' ),
-				$archive_info['error'] // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+				esc_html( $archive_info['error'] )
 			) . PHP_EOL;
 
 			if ( isset( $archive_info['error_message'] ) ) {
 				printf(
 					// translators: 1: Error message.
 					esc_html__( 'Error Message: %s', 'boldgrid-backup' ),
-					$archive_info['error_message'] // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+					esc_html( $archive_info['error_message'] )
 				);
 			}
 
@@ -932,7 +1040,7 @@ class Boldgrid_Backup_Admin_Cron {
 				printf(
 					// translators: 1: File path.
 					esc_html__( 'File Path: %s', 'boldgrid-backup' ),
-					$archive_info['filepath'] // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+					esc_html( $archive_info['filepath'] )
 				) . PHP_EOL;
 			}
 
@@ -940,7 +1048,7 @@ class Boldgrid_Backup_Admin_Cron {
 				printf(
 					// translators: 1: File size.
 					esc_html__( 'File Size: %s', 'boldgrid-backup' ),
-					Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['filesize'] ) // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+					esc_html( Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['filesize'] ) )
 				) . PHP_EOL;
 			}
 
@@ -948,7 +1056,7 @@ class Boldgrid_Backup_Admin_Cron {
 				printf(
 					// translators: 1: Total backup size.
 					esc_html__( 'Total size: %s', 'boldgrid-backup' ),
-					Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] ) // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+					esc_html( Boldgrid_Backup_Admin_Utility::bytes_to_human( $archive_info['total_size'] ) )
 				) . PHP_EOL;
 			}
 
@@ -956,7 +1064,7 @@ class Boldgrid_Backup_Admin_Cron {
 				printf(
 					// translators: 1: Compressor name.
 					esc_html__( 'Compressor: %s', 'boldgrid-backup' ),
-					$archive_info['compressor'] // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+					esc_html( $archive_info['compressor'] )
 				) . PHP_EOL;
 			}
 
@@ -964,7 +1072,7 @@ class Boldgrid_Backup_Admin_Cron {
 			if ( isset( $archive_info['db_duration'] ) ) {
 				printf(
 					esc_html( $this->core->configs['lang']['est_pause'] ),
-					$archive_info['db_duration'] // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+					esc_html( $archive_info['db_duration'] )
 				) . PHP_EOL;
 			}
 
@@ -972,7 +1080,7 @@ class Boldgrid_Backup_Admin_Cron {
 				printf(
 					// translators: 1: Backup duration.
 					esc_html__( 'Duration: %s seconds', 'boldgrid-backup' ),
-					$archive_info['duration'] // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+					esc_html( $archive_info['duration'] )
 				) . PHP_EOL;
 			}
 		} else {
@@ -983,10 +1091,42 @@ class Boldgrid_Backup_Admin_Cron {
 					'There was an unknown error %s a backup archive file.',
 					'boldgrid-backup'
 				),
-				$action_name // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+				esc_html( $action_name )
 			) . PHP_EOL;
 		}
 	}
+
+	/**
+	 * Site option key for the one-time secrets rotation gate.
+	 *
+	 * @since 1.17.4
+	 * @var string
+	 */
+	const SECRETS_ROTATED_OPTION = 'boldgrid_backup_secrets_rotated';
+
+	/**
+	 * Plugin version that introduced one-time cron/CLI secret rotation.
+	 *
+	 * @since 1.17.4
+	 * @var string
+	 */
+	const SECRETS_ROTATED_VERSION = '1.17.4';
+
+	/**
+	 * Site option key used to claim an in-progress secrets rotation.
+	 *
+	 * @since 1.17.4
+	 * @var string
+	 */
+	const SECRETS_ROTATING_OPTION = 'boldgrid_backup_secrets_rotating';
+
+	/**
+	 * Seconds after which an abandoned rotation claim may be taken over.
+	 *
+	 * @since 1.17.4
+	 * @var int
+	 */
+	const SECRETS_ROTATING_TIMEOUT = 300;
 
 	/**
 	 * Get the cron secret used to validate unauthenticated crontab jobs.
@@ -1014,6 +1154,381 @@ class Boldgrid_Backup_Admin_Cron {
 	}
 
 	/**
+	 * One-time rotation of previously exposable cron / CLI cancel secrets.
+	 *
+	 * Sites that ran 1.14.10–1.17.2 may have had cron_secret published at a predictable
+	 * URL. 1.17.3 stopped the leak but left any already-stored secret valid. On upgrade
+	 * to 1.17.4 this method clears those secrets once, mints a fresh cron_secret, and
+	 * rewrites crontab / restore-info that still embedded the old value.
+	 *
+	 * The one-shot gate is written immediately after remint so a later crontab rewrite
+	 * failure cannot cause another rotation on the next request. Crontab / restore-info
+	 * updates are best-effort; a failed rewrite can be repaired by re-saving settings or
+	 * reactivating the plugin (activation always calls add_all_crons). Concurrent
+	 * requests are serialized by a claim, since two remints would leave crontab and
+	 * settings holding different secrets. Abandoned-claim takeover remints even when
+	 * settings already lost the old secret, and refreshes restore-info without requiring
+	 * that prior value.
+	 *
+	 * @since 1.17.4
+	 *
+	 * @see Boldgrid_Backup_Admin_Cron::claim_secrets_rotation()
+	 * @see Boldgrid_Backup_Admin_Cron::get_cron_secret()
+	 * @see Boldgrid_Backup_Admin_Cron::add_all_crons()
+	 * @see Boldgrid_Backup_Admin_Cron::add_restore_cron()
+	 *
+	 * @return bool True when rotation ran (or was a no-op that set the gate); false if already done.
+	 */
+	public function maybe_rotate_cron_secrets() {
+		if ( self::SECRETS_ROTATED_VERSION === get_site_option( self::SECRETS_ROTATED_OPTION ) ) {
+			return false;
+		}
+
+		$claim_result = $this->claim_secrets_rotation();
+		if ( false === $claim_result ) {
+			return false;
+		}
+
+		/*
+		 * When taking over an abandoned claim, the failed request may have already
+		 * deleted cron_secret and cli_cancel_secret before dying. In that case
+		 * $old_secret would be empty and we would skip remint/rewrite, leaving
+		 * crontab broken. Force a full rotation on takeover to ensure recovery.
+		 */
+		$is_takeover = 'takeover' === $claim_result;
+
+		$settings   = $this->core->settings->get_settings( true );
+		$old_secret = ! empty( $settings['cron_secret'] ) ? (string) $settings['cron_secret'] : '';
+		$new_secret = '';
+		$rotating   = '' !== $old_secret || $is_takeover;
+
+		if ( '' !== $old_secret ) {
+			unset( $settings['cron_secret'] );
+			$this->cron_secret = null;
+			update_site_option( 'boldgrid_backup_settings', $settings );
+		}
+
+		$had_cancel_secret = ! empty( get_site_option( 'boldgrid_backup_cli_cancel_secret' ) );
+		delete_site_option( 'boldgrid_backup_cli_cancel_secret' );
+
+		if ( $rotating ) {
+			$new_secret = $this->get_cron_secret();
+		}
+
+		/*
+		 * Persist the gate before crontab/restore-info rewrites. Remint already
+		 * invalidated the harvested secret; failing to set the gate here would
+		 * treat the fresh secret as "old" on the next init and rotate forever.
+		 */
+		update_site_option( self::SECRETS_ROTATED_OPTION, self::SECRETS_ROTATED_VERSION );
+
+		$settings = $this->core->settings->get_settings( true );
+		/*
+		 * Use scheduler->get() so a missing settings['scheduler'] still resolves via the
+		 * same fallback as auto-rollback. Reading the raw key left pending rollbacks
+		 * without a cancel re-issue and skipped crontab rewrite after remint.
+		 */
+		$scheduler = $this->core->scheduler->get();
+
+		if ( $rotating && 'cron' === $scheduler && $this->core->scheduler->is_available( 'cron' ) ) {
+			$this->add_all_crons( $settings );
+		}
+
+		/*
+		 * Direct transfer always uses system crontab with an embedded cron_secret, even when
+		 * the configured backup scheduler is wp-cron. add_all_crons (system-cron path) clears
+		 * that entry and never recreates it; the wp-cron path never touches it, so the old
+		 * secret would keep working against settings that no longer accept it. Delete then
+		 * reschedule so only the new secret remains.
+		 */
+		if ( $rotating && $this->has_active_direct_transfer() ) {
+			$this->entry_delete_contains( 'direct-transfer.php' );
+			$this->schedule_direct_transfer();
+		}
+
+		/*
+		 * A pending rollback's restore cron embeds cli_cancel_secret, which was just
+		 * deleted. Re-issue so the emailed cancel link keeps working; a site can hold a
+		 * cancel secret without ever having stored a cron_secret, so this cannot be
+		 * limited to the rotation path. On takeover, always re-issue since the
+		 * failed request may have already deleted cli_cancel_secret.
+		 */
+		$archives = $this->core->get_archive_list();
+		if ( ( $rotating || $had_cancel_secret || $is_takeover ) && get_site_option( 'boldgrid_backup_pending_rollback' ) && ! empty( $archives ) ) {
+			switch ( $scheduler ) {
+				case 'cron':
+					$this->add_restore_cron();
+					break;
+				case 'wp-cron':
+					$this->core->wp_cron->add_restore_cron();
+					break;
+			}
+		}
+
+		/*
+		 * Normal rotation knows the harvested secret from settings. On takeover the prior
+		 * request may already have deleted it, so refresh with an empty $old_secret to rewrite
+		 * any restore-info still holding a different value.
+		 */
+		if ( '' !== $new_secret && ( '' !== $old_secret || $is_takeover ) ) {
+			$this->refresh_restore_info_cron_secret( $old_secret, $new_secret );
+		}
+
+		delete_site_option( self::SECRETS_ROTATING_OPTION );
+
+		return true;
+	}
+
+	/**
+	 * Claim the one-time rotation so concurrent requests do not both remint.
+	 *
+	 * Two requests can pass the gate check before either persists it, which would remint
+	 * twice and leave crontab and settings holding different secrets. add_site_option()
+	 * only reports success for the request that inserts the row, so it serializes the
+	 * common case. A claim older than SECRETS_ROTATING_TIMEOUT is assumed abandoned by a
+	 * request that died mid-rotation and may be taken over, otherwise a fatal during
+	 * rotation would block the upgrade permanently.
+	 *
+	 * @since 1.17.4
+	 *
+	 * @return string|false 'fresh' when this request is the first claimer, 'takeover' when
+	 *                      claiming an abandoned rotation, false when another request owns it.
+	 */
+	private function claim_secrets_rotation() {
+		if ( add_site_option( self::SECRETS_ROTATING_OPTION, time() ) ) {
+			return 'fresh';
+		}
+
+		$claimed_at = (int) get_site_option( self::SECRETS_ROTATING_OPTION );
+
+		if ( $claimed_at && ( time() - $claimed_at ) < self::SECRETS_ROTATING_TIMEOUT ) {
+			return false;
+		}
+
+		/*
+		 * Delete the stale claim and re-add atomically. add_site_option() only succeeds
+		 * for the first inserter, so concurrent takeover attempts are serialized the
+		 * same way fresh claims are. If another request wins the race, fall back to
+		 * waiting for it to complete.
+		 */
+		delete_site_option( self::SECRETS_ROTATING_OPTION );
+
+		if ( ! add_site_option( self::SECRETS_ROTATING_OPTION, time() ) ) {
+			return false;
+		}
+
+		return 'takeover';
+	}
+
+	/**
+	 * Rewrite cron_secret inside the secure restore-info JSON after rotation.
+	 *
+	 * Emergency CLI restore builds its admin-ajax call from this file. Leaving the
+	 * old secret would either fail is_valid_call() or (worse) leave a harvested value
+	 * as the only copy trusted by the CLI path. Secure storage is always scanned; the
+	 * legacy plugin cron/ directory is rewritten only when it is still the live metadata
+	 * (no secure storage), and otherwise has its retired copies deleted.
+	 *
+	 * When $old_secret is empty (abandoned-claim takeover), any file whose cron_secret
+	 * is not already $new_secret is rewritten, since settings no longer hold the prior
+	 * value to match against.
+	 *
+	 * @since 1.17.4
+	 *
+	 * @param string $old_secret Prior cron secret, or empty to rewrite any non-matching file.
+	 * @param string $new_secret Fresh cron secret.
+	 * @return bool True when a restore-info file was updated.
+	 */
+	public function refresh_restore_info_cron_secret( $old_secret, $new_secret ) {
+		$old_secret = (string) $old_secret;
+		$new_secret = (string) $new_secret;
+
+		if ( '' === $new_secret || ( '' !== $old_secret && hash_equals( $old_secret, $new_secret ) ) ) {
+			return false;
+		}
+
+		require_once BOLDGRID_BACKUP_PATH . '/cli/class-info.php';
+
+		$paths      = array();
+		$backup_dir = $this->core->backup_dir->get();
+
+		if ( ! empty( $backup_dir ) ) {
+			$backup_dir = \Boldgrid\Backup\Cli\Info::untrailingslashit_path( (string) $backup_dir );
+
+			$cli_secret = \Boldgrid\Backup\Cli\Info::get_secret();
+			if ( \Boldgrid\Backup\Cli\Info::is_valid_secret_format( $cli_secret ) ) {
+				$paths[] = $backup_dir . '/restore-info-' . $cli_secret . '.json';
+			}
+
+			// Also scan for any restore-info-*.json in the backup directory (orphan names).
+			$paths = array_merge( $paths, $this->get_restore_info_paths( $backup_dir ) );
+		}
+
+		/*
+		 * The CLI only reads the legacy plugin-tree copy when secure storage is
+		 * unavailable, and the plugin tree is not a guaranteed-private location. Rewrite
+		 * it only while it is the live metadata; otherwise the CLI cannot reach it, so
+		 * delete it instead of storing a fresh secret there.
+		 */
+		$legacy_paths = $this->get_restore_info_paths( BOLDGRID_BACKUP_PATH . '/cron' );
+
+		if ( \Boldgrid\Backup\Cli\Info::get_secure_storage_dir() ) {
+			$this->delete_stale_restore_info( $legacy_paths, $old_secret, $new_secret );
+		} else {
+			$paths = array_merge( $paths, $legacy_paths );
+		}
+
+		$paths   = array_unique( $paths );
+		$updated = false;
+
+		foreach ( $paths as $path ) {
+			$data = $this->read_restore_info( $path );
+			if ( null === $data || empty( $data['cron_secret'] ) ) {
+				continue;
+			}
+
+			$file_secret = (string) $data['cron_secret'];
+
+			if ( '' !== $old_secret ) {
+				if ( ! hash_equals( $file_secret, $old_secret ) ) {
+					continue;
+				}
+			} elseif ( hash_equals( $file_secret, $new_secret ) ) {
+				continue;
+			}
+
+			$data['cron_secret'] = $new_secret;
+
+			if ( ! empty( $data['restore_cmd'] ) && is_string( $data['restore_cmd'] ) ) {
+				$data['restore_cmd'] = str_replace(
+					'secret=' . $file_secret,
+					'secret=' . $new_secret,
+					$data['restore_cmd']
+				);
+			}
+
+			$payload = wp_json_encode( $data );
+			if ( false === $payload ) {
+				continue;
+			}
+
+			$written = false;
+			if ( ! empty( $this->core->wp_filesystem ) ) {
+				$written = (bool) $this->core->wp_filesystem->put_contents( $path, $payload, 0600 );
+			}
+
+			if ( ! $written ) {
+				$bytes = @file_put_contents( $path, $payload ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+				if ( false !== $bytes ) {
+					@chmod( $path, 0600 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.file_system_operations_chmod
+					$written = true;
+				}
+			}
+
+			if ( $written ) {
+				$updated = true;
+			}
+		}
+
+		return $updated;
+	}
+
+	/**
+	 * Read and decode a restore-info JSON file.
+	 *
+	 * @since 1.17.4
+	 *
+	 * @param  string $path Absolute path to a restore-info file.
+	 * @return array|null Decoded data, or null when unreadable / not JSON.
+	 */
+	private function read_restore_info( $path ) {
+		if ( ! is_readable( $path ) ) {
+			return null;
+		}
+
+		$contents = file_get_contents( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		if ( false === $contents ) {
+			return null;
+		}
+
+		$data = json_decode( $contents, true );
+
+		return is_array( $data ) ? $data : null;
+	}
+
+	/**
+	 * Delete restore-info copies that still hold a rotated-out cron secret.
+	 *
+	 * Used for copies the CLI can no longer reach, so the retired secret does not linger
+	 * on disk. Files holding any other secret are left alone, unless $old_secret is empty
+	 * (takeover recovery) in which case any file whose cron_secret is not $new_secret is
+	 * removed.
+	 *
+	 * @since 1.17.4
+	 *
+	 * @param  array  $paths      Restore-info paths to consider.
+	 * @param  string $old_secret Rotated-out cron secret, or empty for takeover recovery.
+	 * @param  string $new_secret Fresh cron secret (used when $old_secret is empty).
+	 * @return int Number of files deleted.
+	 */
+	private function delete_stale_restore_info( array $paths, $old_secret, $new_secret = '' ) {
+		$deleted    = 0;
+		$old_secret = (string) $old_secret;
+		$new_secret = (string) $new_secret;
+
+		foreach ( $paths as $path ) {
+			$data = $this->read_restore_info( $path );
+			if ( null === $data || empty( $data['cron_secret'] ) ) {
+				continue;
+			}
+
+			$file_secret = (string) $data['cron_secret'];
+
+			if ( '' !== $old_secret ) {
+				if ( ! hash_equals( $file_secret, $old_secret ) ) {
+					continue;
+				}
+			} elseif ( '' === $new_secret || hash_equals( $file_secret, $new_secret ) ) {
+				continue;
+			}
+
+			if ( @unlink( $path ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
+				++$deleted;
+			}
+		}
+
+		return $deleted;
+	}
+
+	/**
+	 * List restore-info-*.json files in a directory.
+	 *
+	 * @since 1.17.4
+	 *
+	 * @param  string $dir Directory to scan.
+	 * @return array Absolute paths, empty when the directory is unreadable.
+	 */
+	private function get_restore_info_paths( $dir ) {
+		$dir   = \Boldgrid\Backup\Cli\Info::untrailingslashit_path( (string) $dir );
+		$paths = array();
+
+		if ( '' === $dir || ! is_dir( $dir ) ) {
+			return $paths;
+		}
+
+		$listing = @scandir( $dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		if ( empty( $listing ) ) {
+			return $paths;
+		}
+
+		foreach ( preg_grep( '/^restore-info-.*\.json$/', $listing ) as $file ) {
+			$paths[] = $dir . '/' . $file;
+		}
+
+		return $paths;
+	}
+
+	/**
 	 * Validate an unauthenticated wp_ajax_nopriv_ call by backup id and cron secret.
 	 *
 	 * @since 1.6.1-rc.1
@@ -1028,14 +1543,17 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @return bool
 	 */
 	public function is_valid_call() {
-		// phpcs:disable WordPress.CSRF.NonceVerification.NoNonceVerification
-		$backup_id_match = ! empty( $_GET['id'] ) &&
-			$this->core->get_backup_identifier() === sanitize_key( $_GET['id'] );
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Request is authenticated below by comparing a shared secret.
+		$provided_id     = isset( $_GET['id'] ) ? sanitize_key( wp_unslash( $_GET['id'] ) ) : '';
+		$provided_secret = isset( $_GET['secret'] ) ?
+			sanitize_text_field( wp_unslash( $_GET['secret'] ) ) : '';
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
-		$cron_secret_match = ! empty( $_GET['secret'] ) &&
-			$this->get_cron_secret() === $_GET['secret'];
+		$backup_id_match = '' !== $provided_id &&
+			hash_equals( (string) $this->core->get_backup_identifier(), $provided_id );
 
-		// phpcs:enable WordPress.CSRF.NonceVerification.NoNonceVerification
+		$cron_secret_match = is_string( $provided_secret ) && '' !== $provided_secret &&
+			hash_equals( (string) $this->get_cron_secret(), $provided_secret );
 
 		return current_user_can( 'update_plugins' ) || ( $backup_id_match && $cron_secret_match );
 	}
@@ -1054,19 +1572,44 @@ class Boldgrid_Backup_Admin_Cron {
 		$upgraded = false;
 		$settings = $this->core->settings->get_settings( true );
 
+		// Match auto-rollback / rotation: fall back when settings never saved a scheduler.
+		$scheduler = $this->core->scheduler->get();
+
+		if ( 'cron' !== $scheduler || ! $this->core->scheduler->is_available( $scheduler ) ) {
+			return false;
+		}
+
 		if ( empty( $settings['crontab_version'] ) ||
 			$this->crontab_version !== $settings['crontab_version'] ) {
-				// Delete and recreate the crontab entries.
-				$upgraded = $this->add_all_crons( $settings );
+			// Delete and recreate the crontab entries.
+			$upgraded = $this->add_all_crons( $settings );
+
+			/*
+			 * add_all_crons clears all BoldGrid crontab entries and only re-adds
+			 * backup/jobs/site-check. Pending rollback restore crons and active
+			 * direct-transfer crons must be re-added afterward — matching activation
+			 * and secret rotation. When the schedule is empty, add_all_crons may
+			 * return false without persisting crontab_version; without this follow-up
+			 * those jobs would be dropped again on every admin_init.
+			 */
+			$archives = $this->core->get_archive_list();
+			if ( get_site_option( 'boldgrid_backup_pending_rollback' ) && ! empty( $archives ) ) {
+				$this->add_restore_cron();
+			}
+
+			if ( $this->has_active_direct_transfer() ) {
+				$this->entry_delete_contains( 'direct-transfer.php' );
+				$this->schedule_direct_transfer();
+			}
 
 			if ( $upgraded ) {
 				/**
-					 * Action when the crontab entry upgrade is successfully completed.
-					 *
-					 * @since 1.6.1-rc.1
-					 *
-					 * @param string The new crontab entry version.
-					 */
+				 * Action when the crontab entry upgrade is successfully completed.
+				 *
+				 * @since 1.6.1-rc.1
+				 *
+				 * @param string The new crontab entry version.
+				 */
 				do_action(
 					'boldgrid_backup_upgrade_crontab_entries_complete',
 					$this->crontab_version
@@ -1080,7 +1623,10 @@ class Boldgrid_Backup_Admin_Cron {
 	/**
 	 * Hook into "wp_ajax_nopriv_boldgrid_backup_run_backup" and generate backup.
 	 *
-	 * @since 1.6.1-rc.1
+	 * A scheduled backup (via cron) will call a url which ultimately triggers this method to be ran
+	 * to backup the site.
+	 *
+	 * @since 1.6.1
 	 *
 	 * @see Boldgrid_Backup_Admin_Cron::is_valid_call()
 	 *
@@ -1091,9 +1637,10 @@ class Boldgrid_Backup_Admin_Cron {
 			wp_die( esc_html__( 'Error: Invalid request.', 'boldgrid-backup' ) );
 		}
 
-		$archive_info = $this->core->archive_files( true );
+		$archiver = new Boldgrid_Backup_Archiver();
+		$archiver->run();
 
-		return $archive_info;
+		return $archiver->get_info();
 	}
 
 	/**
@@ -1106,16 +1653,49 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @return array An array of archive file information.
 	 */
 	public function restore() {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Request is authenticated by is_valid_call() below.
+		$task_id = ! empty( $_POST['task_id'] ) ? sanitize_key( wp_unslash( $_POST['task_id'] ) ) : null;
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
+
 		if ( ! $this->is_valid_call() ) {
 			wp_die( esc_html__( 'Error: Invalid request.', 'boldgrid-backup' ) );
 		}
 
-		$archive_info = array(
-			'error' => __( 'Could not perform restoration from cron job.', 'boldgrid-backup' ),
-		);
+		// A default error to return if restoration is not started in conditionals below.
+		$archive_info = [
+			'error' => __( 'Unknown error attempting restore.', 'boldgrid-backup' ),
+		];
 
-		if ( $this->core->restore_helper->prepare_restore() ) {
-			$archive_info = $this->core->restore_archive_file();
+		/*
+		 * Restore an archive.
+		 *
+		 * As of @SINCEVERSION, archives can be restored via REST. If we have a task, we're handling
+		 * a REST restore. Otherwise, we're handling a standard restore request.
+		 */
+		if ( ! empty( $task_id ) ) {
+			$task       = new Boldgrid_Backup_Admin_Task();
+			$task_found = $task->init_by_id( $task_id );
+			$restorer   = new Boldgrid_Backup_Restorer();
+
+			if ( ! $task_found ) {
+				$archive_info = [
+					'error' => __( 'Resore error: Unable to instantiate task.', 'boldgrid-backup' ),
+				];
+			} elseif ( false !== $task->get_data( 'url' ) ) {
+				$restorer->run_by_url( $task->get_data( 'url' ) );
+				$archive_info = $restorer->get_info();
+			} elseif ( false !== $task->get_data( 'backup_id' ) ) {
+				$restorer->run_by_id( $task->get_data( 'backup_id' ) );
+				$archive_info = $restorer->get_info();
+			} else {
+				$archive_info = [
+					'error' => __( 'Restore error: Missing url / id.', 'boldgrid-backup' ),
+				];
+			}
+		} else {
+			if ( $this->core->restore_helper->prepare_restore() ) {
+				$archive_info = $this->core->restore_archive_file();
+			}
 		}
 
 		return $archive_info;

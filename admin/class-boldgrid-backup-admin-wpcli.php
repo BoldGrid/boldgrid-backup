@@ -12,7 +12,7 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.XSS.EscapeOutput.OutputNotEscaped
+// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped
 
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
@@ -225,6 +225,7 @@ class Boldgrid_Backup_Admin_Wpcli {
 
 		$settings = self::$core->settings->get_settings();
 
+		// phpcs:disable WordPress.DateTime.RestrictedFunctions.date_date -- strtotime() parses in server-local timezone.
 		$settings['schedule'] = [
 			'dow_sunday'    => in_array( '0', $days, true ) ? 1 : 0,
 			'dow_monday'    => in_array( '1', $days, true ) ? 1 : 0,
@@ -237,6 +238,7 @@ class Boldgrid_Backup_Admin_Wpcli {
 			'tod_m'         => date( 'i', $time ),
 			'tod_a'         => date( 'A', $time ),
 		];
+		// phpcs:enable WordPress.DateTime.RestrictedFunctions.date_date
 
 		$settings = self::$core->settings->update_cron( $settings );
 
