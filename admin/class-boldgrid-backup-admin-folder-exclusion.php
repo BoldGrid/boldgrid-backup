@@ -392,7 +392,7 @@ class Boldgrid_Backup_Admin_Folder_Exclusion {
 			 * If the user configured "Backup all files" as the "Files and Folders" settings, then
 			 * use the default values.
 			 */
-			$this->$default;
+			$this->$type = $this->$default;
 		} elseif ( isset( $settings[ $key ] ) ) {
 			/*
 			 * Is there value for this in the settings?
