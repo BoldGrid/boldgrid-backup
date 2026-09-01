@@ -235,7 +235,7 @@ class Boldgrid_Backup_Admin_WP_Cron {
 
 			$action_key = key( $cron[ $action ] );
 
-			$ours[] = sprintf( '%1$s (%2$s %3$s %4$s)', $action, $cron[ $action ][ $action_key ]['schedule'], __( 'starting', 'boldgrid-backup' ), date( 'Y.m.d h:i:s a e', $time ) );
+			$ours[] = sprintf( '%1$s (%2$s %3$s %4$s)', $action, $cron[ $action ][ $action_key ]['schedule'], __( 'starting', 'boldgrid-backup' ), gmdate( 'Y.m.d h:i:s a e', $time ) );
 		}
 
 		return $ours;

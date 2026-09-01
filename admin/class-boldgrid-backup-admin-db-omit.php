@@ -12,7 +12,6 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP
 
 /**
  * Class: Boldgrid_Backup_Admin_Db_Omit
@@ -190,8 +189,10 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	public function get_from_post() {
 		$exclude_tables = array();
 
-		$include_tables = ! empty( $_POST['include_tables'] ) ? // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
-			array_map( 'sanitize_text_field', $_POST['include_tables'] ) : array();
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce is verified by the settings save path that calls this method.
+		$include_tables = ! empty( $_POST['include_tables'] ) ?
+			array_map( 'sanitize_text_field', wp_unslash( (array) $_POST['include_tables'] ) ) : array();
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 		$all_tables = $this->core->db_get->prefixed();
 
@@ -219,8 +220,10 @@ class Boldgrid_Backup_Admin_Db_Omit {
 	public function get_post_type() {
 		$key = 'table_inclusion_type';
 
-		return ! empty( $_POST[ $key ] ) && in_array( $_POST[ $key ], $this->valid_types, true ) ? // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
-			sanitize_key( $_POST[ $key ] ) : null;
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce is verified by the settings save path that calls this method.
+		return ! empty( $_POST[ $key ] ) && in_array( $_POST[ $key ], $this->valid_types, true ) ?
+			sanitize_key( wp_unslash( $_POST[ $key ] ) ) : null;
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 	}
 
 	/**

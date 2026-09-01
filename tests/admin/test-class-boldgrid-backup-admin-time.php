@@ -19,6 +19,14 @@
  */
 class Test_Boldgrid_Backup_Admin_Time extends WP_UnitTestCase {
 	/**
+	 * Core instance.
+	 *
+	 * @since 1.6.0
+	 * @var Boldgrid_Backup_Admin_Core
+	 */
+	public $core;
+
+	/**
 	 * Setup.
 	 *
 	 * @since 1.6.0

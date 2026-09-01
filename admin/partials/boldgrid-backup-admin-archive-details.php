@@ -466,8 +466,8 @@ $page = sprintf(
 	/* 4 */ $main_meta_box,
 	/* 5 */ $remote_meta_box
 );
-echo $pre_page; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+echo $pre_page; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup built by the plugin from escaped parts.
 
 require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
 
-echo $page; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+echo $page; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup built by the plugin from escaped parts.

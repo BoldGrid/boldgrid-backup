@@ -11,7 +11,6 @@
  * @version    $Id$
  * @author     BoldGrid <support@boldgrid.com>
  *
- * phpcs:disable WordPress.VIP
  */
 
 /**
@@ -687,8 +686,8 @@ class Boldgrid_Backup_Admin_Core {
 
 		$this->pagenow = $pagenow;
 
-		// Instantiate Configs Array
-		$this->configs = Boldgrid_Backup_Admin::get_configs();
+		// Instantiate Configs Array (by reference so init localization applies).
+		$this->configs =& Boldgrid_Backup_Admin::get_configs_ref();
 
 		// Instantiate Boldgrid_Backup_Admin_Settings.
 		$this->settings = new Boldgrid_Backup_Admin_Settings( $this );
@@ -810,7 +809,17 @@ class Boldgrid_Backup_Admin_Core {
 		// Ensure there is a backup identifier.
 		$this->get_backup_identifier();
 
-		$this->set_lang();
+		/*
+		 * Defer translated strings until init (WP 6.7+).
+		 *
+		 * Calling esc_html__() during plugin bootstrap triggers
+		 * _load_textdomain_just_in_time too early.
+		 */
+		if ( did_action( 'init' ) && ! doing_action( 'init' ) ) {
+			$this->set_lang();
+		} else {
+			add_action( 'init', array( $this, 'set_lang' ) );
+		}
 
 		// Log system.
 		$this->logger   = new Boldgrid_Backup_Admin_Log( $this );
@@ -832,6 +841,26 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Instantiate the new Boldgrid_Backup_Admin_Migrate class.
 		$this->migrate = new Boldgrid_Backup_Admin_Migrate( $this );
+
+		// Migrate CLI secret / restore-info out of the web-served plugin directory when possible.
+		$this->ensure_secure_cli_storage();
+	}
+
+	/**
+	 * Ensure CLI secret and restore-info are stored outside the web-served plugin directory.
+	 *
+	 * @since 1.17.3
+	 *
+	 * @see \Boldgrid\Backup\Cli\Info::ensure_secure_storage()
+	 */
+	public function ensure_secure_cli_storage() {
+		$backup_dir = $this->backup_dir->get();
+		if ( empty( $backup_dir ) ) {
+			return;
+		}
+
+		require_once BOLDGRID_BACKUP_PATH . '/cli/class-info.php';
+		\Boldgrid\Backup\Cli\Info::ensure_secure_storage( $backup_dir );
 	}
 
 	/**
@@ -869,7 +898,7 @@ class Boldgrid_Backup_Admin_Core {
 			$random_string = '';
 
 			for ( $i = 0; $i <= 32; $i ++ ) {
-				$random_string .= chr( mt_rand( 40, 126 ) );
+				$random_string .= chr( wp_rand( 40, 126 ) );
 			}
 
 			$backup_identifier = hash( 'crc32', $random_string );
@@ -1011,7 +1040,7 @@ class Boldgrid_Backup_Admin_Core {
 		$lang = [
 			'backup_archive'  => esc_html__( 'Backup Archives', 'boldgrid-backup' ),
 			'boldgrid_backup' => BOLDGRID_BACKUP_TITLE,
-			'get_premium'     => esc_html__( 'Get Premium', 'boldgrid-bacukp' ),
+			'get_premium'     => esc_html__( 'Get Premium', 'boldgrid-backup' ),
 			'preflight_check' => esc_html__( 'Preflight Check', 'boldgrid-backup' ),
 			'settings'        => esc_html__( 'Settings', 'boldgrid-backup' ),
 			'tools'           => esc_html__( 'Tools', 'boldgrid-backup' ),
@@ -1250,7 +1279,7 @@ class Boldgrid_Backup_Admin_Core {
 		if ( ! $this->test->run_functionality_tests() ) {
 			// Display an error notice.
 			$this->notice->functionality_fail_notice();
-			return [ 'error' => esc_html__( 'Unable to create backup, functionality test failed.', 'boldgrid_backup' ) ];
+			return [ 'error' => esc_html__( 'Unable to create backup, functionality test failed.', 'boldgrid-backup' ) ];
 		}
 
 		// Get the backup directory path.
@@ -1271,7 +1300,7 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Create a file path for the dump file.
-		$db_dump_filepath = $backup_directory . DIRECTORY_SEPARATOR . DB_NAME . '.' . date( 'Ymd-His' ) . '.sql';
+		$db_dump_filepath = $backup_directory . DIRECTORY_SEPARATOR . DB_NAME . '.' . gmdate( 'Ymd-His' ) . '.sql';
 
 		// Save the file path.
 		$this->db_dump_filepath = $db_dump_filepath;
@@ -1641,7 +1670,7 @@ class Boldgrid_Backup_Admin_Core {
 			'boldgrid-backup-%1$s-%2$s-%3$s',
 			$site_id,
 			$backup_identifier,
-			date( 'Ymd-His' )
+			gmdate( 'Ymd-His' )
 		);
 		$filename = sanitize_file_name( $filename );
 
@@ -1729,7 +1758,7 @@ class Boldgrid_Backup_Admin_Core {
 		// Check if functional.
 		if ( ! $this->test->run_functionality_tests() ) {
 			// Display an error notice, if not already on the test page.
-			if ( ! isset( $_GET['page'] ) || 'boldgrid-backup-test' !== $_GET['page'] ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+			if ( ! isset( $_GET['page'] ) || 'boldgrid-backup-test' !== $_GET['page'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only page check used to decide whether to show a notice.
 				// Display an error notice.
 				$this->notice->functionality_fail_notice();
 			}
@@ -1757,8 +1786,8 @@ class Boldgrid_Backup_Admin_Core {
 			'folder_include'    => $this->folder_exclusion->from_settings( 'include' ),
 			'folder_exclude'    => $this->folder_exclusion->from_settings( 'exclude' ),
 			'table_exclude'     => $this->db_omit->get_excluded_tables(),
-			'title'             => ! empty( $_POST['backup_title'] ) ? stripslashes( $_POST['backup_title'] ) : null, // phpcs:ignore WordPress.CSRF.NonceVerification,WordPress.Arrays.ArrayDeclarationSpacing.ArrayItemNoNewLine
-			'description'       => ! empty( $_POST['backup_description'] ) ? stripslashes( $_POST['backup_description'] ) : null, // phpcs:ignore WordPress.CSRF.NonceVerification,WordPress.Arrays.ArrayDeclarationSpacing.ArrayItemNoNewLine
+			'title'             => ! empty( $_POST['backup_title'] ) ? sanitize_text_field( wp_unslash( $_POST['backup_title'] ) ) : null, // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Arrays.ArrayDeclarationSpacing.ArrayItemNoNewLine -- Nonce verified by the calling ajax handler.
+			'description'       => ! empty( $_POST['backup_description'] ) ? sanitize_textarea_field( wp_unslash( $_POST['backup_description'] ) ) : null, // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Arrays.ArrayDeclarationSpacing.ArrayItemNoNewLine -- Nonce verified by the calling ajax handler.
 			// Information used for the emergency restoration process.
 			'ABSPATH'           => ABSPATH,
 			'backup_id'         => $this->get_backup_identifier(),
@@ -1781,7 +1810,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Determine how this backup was triggered.
 		if ( $this->pre_auto_update ) {
-			$info['trigger'] = esc_html__( 'Auto update', 'boldgrid-bakcup' );
+			$info['trigger'] = esc_html__( 'Auto update', 'boldgrid-backup' );
 		} elseif ( $this->doing_ajax && is_user_logged_in() ) {
 			$current_user    = wp_get_current_user();
 			$info['trigger'] = $current_user->user_login . ' (' . $current_user->user_email . ')';
@@ -2015,6 +2044,29 @@ class Boldgrid_Backup_Admin_Core {
 		$info['db_duration'] = number_format( ( $db_time_stop - $time_start ), 2, '.', '' );
 		$info['db_filename'] = basename( $this->db_dump_filepath );
 
+		// If not a dry-run test, update the last backup option and enforce retention.
+		if ( ! $dryrun ) {
+			// Update WP option for "boldgrid_backup_last_backup".
+			update_site_option( 'boldgrid_backup_last_backup', time() );
+
+			// Enforce retention setting.
+			$this->enforce_retention();
+		}
+
+		// Actions to take if we're creating a full site backup.
+		$restore_info_error = '';
+		if ( ! $dryrun && $this->archiver_utility->is_full_backup() ) {
+			$restore_info_written = $this->archive->write_results_file( $info );
+			if ( ! $restore_info_written ) {
+				$restore_info_error = __(
+					'Backup archive created, but failed to write restore-info. Emergency CLI restore may not work until a successful write.',
+					'boldgrid-backup'
+				);
+				$info['restore_info_error'] = $restore_info_error;
+				$this->logger->add( 'Warning: ' . $restore_info_error );
+			}
+		}
+
 		/**
 		 * Actions to take after a backup has been created.
 		 *
@@ -2044,6 +2096,7 @@ class Boldgrid_Backup_Admin_Core {
 		 *     @type int    $duration     57.08
 		 *     @type int    $db_duration  0.35
 		 *     @type bool   $mail_success
+		 *     @type string $restore_info_error (optional) Error message if restore-info failed to write.
 		 * }
 		 */
 		do_action( 'boldgrid_backup_post_archive_files', $info );
@@ -2068,36 +2121,39 @@ class Boldgrid_Backup_Admin_Core {
 			$this->logger->add( 'Sending of email complete! Status: ' . $info['mail_success'] );
 		}
 
-		// If not a dry-run test, update the last backup option and enforce retention.
+		/*
+		 * Persist latest backup after restore-info and email so the option matches the returned
+		 * $info (including restore_info_error and mail_success). Writing earlier caused
+		 * Test_Boldgrid_Backup_Admin_Core::test_archive_files to fail strict equality.
+		 */
 		if ( ! $dryrun ) {
-			// Update WP option for "boldgrid_backup_last_backup".
-			update_site_option( 'boldgrid_backup_last_backup', time() );
-
 			$this->archive_log->write( $info );
-
-			// Enforce retention setting.
-			$this->enforce_retention();
-
 			update_option( 'boldgrid_backup_latest_backup', $info );
-		}
-
-		// Actions to take if we're creating a full site backup.
-		if ( ! $dryrun && $this->archiver_utility->is_full_backup() ) {
-			$this->archive->write_results_file( $info );
 		}
 
 		if ( isset( $this->activity ) ) {
 			$this->activity->add( 'any_backup_created', 1, $this->rating_prompt_config );
 		}
 
-		$this->logger->add( 'Backup complete!' );
+		if ( $restore_info_error ) {
+			$this->logger->add( 'Backup finished with restore-info errors.' );
+		} else {
+			$this->logger->add( 'Backup complete!' );
+		}
 		$this->logger->add_memory();
 
 		$this->archiving_files = false;
 
+		/*
+		 * Archive itself succeeded; surface restore-info write failures in status so
+		 * manual backups are not reported as fully healthy when emergency metadata is missing.
+		 */
 		Boldgrid_Backup_Admin_In_Progress_Data::set_args( array(
-			'status'  => esc_html__( 'Backup complete!', 'boldgrid-backup' ),
-			'success' => true,
+			'status'        => $restore_info_error
+				? $restore_info_error
+				: esc_html__( 'Backup complete!', 'boldgrid-backup' ),
+			'success'       => empty( $restore_info_error ),
+			'process_error' => $restore_info_error ? $restore_info_error : null,
 		) );
 
 		// Return the array of archive information.
@@ -2183,7 +2239,7 @@ class Boldgrid_Backup_Admin_Core {
 					'filepath'    => $backup_directory . '/' . $fileinfo['name'],
 					'filename'    => $fileinfo['name'],
 					'filedate'    => get_date_from_gmt(
-						date( 'Y-m-d H:i:s', $fileinfo['lastmodunix'] ), 'n/j/Y g:i A'
+						gmdate( 'Y-m-d H:i:s', $fileinfo['lastmodunix'] ), 'n/j/Y g:i A'
 					),
 					'filesize'    => $fileinfo['size'],
 					'lastmodunix' => $fileinfo['lastmodunix'],
@@ -2238,7 +2294,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Validate archive_filename.
 		if ( ! empty( $_POST['archive_filename'] ) ) {
-			$archive_filename = sanitize_file_name( $_POST['archive_filename'] );
+			$archive_filename = sanitize_file_name( wp_unslash( $_POST['archive_filename'] ) );
 		} else {
 			// Fail with a notice.
 			do_action(
@@ -2435,10 +2491,10 @@ class Boldgrid_Backup_Admin_Core {
 		 *
 		 * Refer to check_ajax_referer usage below to help protect ajax requests.
 		 */
-		$is_post_restore = isset( $_POST['action'] ) && 'boldgrid_backup_restore_archive' === $_POST['action']; // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		$is_post_restore = isset( $_POST['action'] ) && 'boldgrid_backup_restore_archive' === $_POST['action']; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Routing check only; see check_ajax_referer usage below.
 
 		// If a restoration was not requested, then abort.
-		if ( empty( $_POST['restore_now'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		if ( empty( $_POST['restore_now'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Routing check only; see check_ajax_referer usage below.
 			$error_message = esc_html__( 'Invalid restore_now value.', 'boldgrid-backup' );
 			$this->logger->add( $error_message );
 			return [ 'error' => $error_message ];
@@ -2465,7 +2521,7 @@ class Boldgrid_Backup_Admin_Core {
 		$archive_key = false;
 		if ( isset( $args['archive_key'] ) ) {
 			$archive_key = (int) $args['archive_key'];
-		} elseif ( isset( $_POST['archive_key'] ) && is_numeric( $_POST['archive_key'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		} elseif ( isset( $_POST['archive_key'] ) && is_numeric( $_POST['archive_key'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified via check_ajax_referer above.
 			$archive_key = (int) $_POST['archive_key'];
 		} else {
 			$error_message = esc_html__( 'Invalid key for the selected archive file.', 'boldgrid-backup' );
@@ -2481,8 +2537,8 @@ class Boldgrid_Backup_Admin_Core {
 		$archive_filename = false;
 		if ( ! empty( $args['archive_filename'] ) ) {
 			$archive_filename = sanitize_file_name( $args['archive_filename'] );
-		} elseif ( ! empty( $_POST['archive_filename'] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
-			$archive_filename = sanitize_file_name( $_POST['archive_filename'] );
+		} elseif ( ! empty( $_POST['archive_filename'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified via check_ajax_referer above.
+			$archive_filename = sanitize_file_name( wp_unslash( $_POST['archive_filename'] ) );
 		} else {
 			$error_message = esc_html__( 'Invalid filename for the selected archive file.', 'boldgrid-backup' );
 			$this->logger->add( $error_message );
@@ -2781,14 +2837,20 @@ class Boldgrid_Backup_Admin_Core {
 		 * If there were any errors encountered during the backup, save them to the In Progress data.
 		 *
 		 * A "process error" is when the archive_files() method successfully returns info, and it includes
-		 * an error.
+		 * an error — or when it returns false.
 		 */
-		if ( ! empty( $archive_info['error'] ) ) {
+		if ( false === $archive_info ) {
+			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'process_error', __( 'Backup failed.', 'boldgrid-backup' ) );
+			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'success', false );
+		} elseif ( is_array( $archive_info ) && ! empty( $archive_info['error'] ) ) {
 			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'process_error', $archive_info['error'] );
+			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'success', false );
+		} elseif ( is_array( $archive_info ) && ! empty( $archive_info['restore_info_error'] ) ) {
+			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'process_error', $archive_info['restore_info_error'] );
 			Boldgrid_Backup_Admin_In_Progress_Data::set_arg( 'success', false );
 		}
 
-		if ( $this->is_archiving_update_protection ) {
+		if ( $this->is_archiving_update_protection && is_array( $archive_info ) ) {
 			update_site_option( 'boldgrid_backup_pending_rollback', $archive_info );
 		}
 
@@ -2841,7 +2903,7 @@ class Boldgrid_Backup_Admin_Core {
 
 		// Validate download_filename.
 		if ( ! empty( $_POST['download_filename'] ) ) {
-			$download_filename = sanitize_file_name( $_POST['download_filename'] );
+			$download_filename = sanitize_file_name( wp_unslash( $_POST['download_filename'] ) );
 		} else {
 			$error = __( 'INVALID DOWNLOAD FILENAME', 'boldgrid-backup' );
 			echo esc_html( $error );
@@ -3004,7 +3066,7 @@ class Boldgrid_Backup_Admin_Core {
 				</div>
 				<div id="bglib-page-content">
 					<div class="wp-header-end"></div>';
-		echo $modal; //phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+		echo $modal; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup built by the plugin from escaped parts.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-test.php';
 		echo '
 				</div>
@@ -3026,7 +3088,7 @@ class Boldgrid_Backup_Admin_Core {
 	 * @since  1.9.2
 	 */
 	public function set_doing_cron() {
-		$this->doing_cron = ( defined( 'DOING_CRON' ) && DOING_CRON ) || isset( $_GET['doing_wp_cron'] ); // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		$this->doing_cron = ( defined( 'DOING_CRON' ) && DOING_CRON ) || isset( $_GET['doing_wp_cron'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Cron requests carry no nonce; presence check only.
 	}
 
 	/**
@@ -3149,13 +3211,13 @@ class Boldgrid_Backup_Admin_Core {
 			$message = [
 				'message' => esc_html__( 'The selected archive file has been successfully restored.', 'boldgrid-backup' ),
 				'class'   => 'notice notice-success is-dismissible',
-				'header'  => BOLDGRID_BACKUP_TITLE . ' - ' . esc_html__( 'Restoration complete' ),
+				'header'  => BOLDGRID_BACKUP_TITLE . ' - ' . esc_html__( 'Restoration complete', 'boldgrid-backup' ),
 			];
 		} else {
 			$message = [
-				'message' => ! empty( $archive_info['error'] ) ? $archive_info['error'] : esc_html__( 'Unknown error when attempting to restore archive.', 'bolcgrid-backup' ),
+				'message' => ! empty( $archive_info['error'] ) ? $archive_info['error'] : esc_html__( 'Unknown error when attempting to restore archive.', 'boldgrid-backup' ),
 				'class'   => 'notice notice-error is-dismissible',
-				'header'  => BOLDGRID_BACKUP_TITLE . ' - ' . esc_html__( 'Restoration failed' ),
+				'header'  => BOLDGRID_BACKUP_TITLE . ' - ' . esc_html__( 'Restoration failed', 'boldgrid-backup' ),
 			];
 		}
 		$this->notice->add_user_notice( $message['message'], $message['class'], $message['header'] );

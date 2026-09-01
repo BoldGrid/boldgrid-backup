@@ -298,7 +298,7 @@ class Boldgrid_Backup_Admin_Archive {
 	 * @param string $filepath File path.
 	 */
 	public function init( $filepath ) {
-		$filepath = strip_tags( $filepath );
+		$filepath = wp_strip_all_tags( $filepath );
 
 		if ( ! empty( $this->filepath ) && $filepath === $this->filepath ) {
 			return;
@@ -697,8 +697,26 @@ class Boldgrid_Backup_Admin_Archive {
 	public function write_results_file( $info ) {
 		$success          = false;
 		$archive_filepath = ! empty( $info['filepath'] ) ? $info['filepath'] : null;
-		$results_filepath = \Boldgrid\Backup\Cli\Info::get_results_filepath();
-		$is_dir_writable  = $this->core->wp_filesystem->is_writable( dirname( $results_filepath ) );
+		$backup_dir       = $this->core->backup_dir->get();
+
+		if ( empty( $backup_dir ) ) {
+			return false;
+		}
+
+		// Require secure storage; do not fall back to writing restore-info under cron/.
+		$backup_dir = \Boldgrid\Backup\Cli\Info::untrailingslashit_path( (string) $backup_dir );
+		if ( ! \Boldgrid\Backup\Cli\Info::ensure_secure_storage( $backup_dir ) ) {
+			return false;
+		}
+
+		$secret = \Boldgrid\Backup\Cli\Info::get_secret();
+		if ( ! \Boldgrid\Backup\Cli\Info::is_valid_secret_format( $secret ) ) {
+			return false;
+		}
+
+		// Always write into the known backup directory — never the legacy cron/ fallback.
+		$results_filepath = \Boldgrid\Backup\Cli\Info::trailingslashit_path( $backup_dir ) . 'restore-info-' . $secret . '.json';
+		$is_dir_writable  = \Boldgrid\Backup\Cli\Info::is_directory_writable( $backup_dir );
 
 		if ( $archive_filepath && $is_dir_writable ) {
 			$results_filepath = wp_normalize_path( $results_filepath );
@@ -736,11 +754,25 @@ class Boldgrid_Backup_Admin_Archive {
 				'timestamp'   => time(),
 			);
 
-			$success = $this->core->wp_filesystem->put_contents(
+			$payload = wp_json_encode( $results );
+			$success = (bool) $this->core->wp_filesystem->put_contents(
 				$results_filepath,
-				wp_json_encode( $results ),
+				$payload,
 				0600
 			);
+
+			/*
+			 * If WP_Filesystem cannot write but the shared writability probe could,
+			 * fall back to a direct write (same approach Info uses for secrets /
+			 * migrated restore-info).
+			 */
+			if ( ! $success ) {
+				$written = @file_put_contents( $results_filepath, $payload ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+				if ( false !== $written ) {
+					@chmod( $results_filepath, 0600 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+					$success = true;
+				}
+			}
 		}
 
 		return $success;

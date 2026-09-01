@@ -110,7 +110,7 @@ class Boldgrid_Backup_Admin_Dashboard {
 				</div>
 				<div id="bglib-page-content">
 					<div class="wp-header-end"></div>';
-		echo $modal; //phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+		echo $modal; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup built by the plugin from escaped parts.
 		include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-dashboard.php';
 		echo '
 				</div>

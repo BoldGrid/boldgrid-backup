@@ -10,7 +10,6 @@
  * @copyright  BoldGrid.com
  * @author     BoldGrid.com <wpb@boldgrid.com>
  *
- * phpcs:disable WordPress.VIP
  */
 
 /**
@@ -339,7 +338,8 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 				 * advantage of the App_Data folder is that, any file you place
 				 * there won't be downloadable.
 				 */
-				$app_data = $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'App_Data';
+				$document_root = sanitize_text_field( wp_unslash( $_SERVER['DOCUMENT_ROOT'] ) );
+				$app_data      = $document_root . DIRECTORY_SEPARATOR . 'App_Data';
 				$dirs[]   = str_replace( '\\\\', '\\', $app_data );
 			}
 		}
@@ -377,7 +377,7 @@ class Boldgrid_Backup_Admin_Backup_Dir {
 		$chars  = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
 		for ( $i = 0; $i < 12; $i++ ) {
-			$suffix .= $chars[ mt_rand( 0, strlen( $chars ) - 1 ) ];
+			$suffix .= $chars[ wp_rand( 0, strlen( $chars ) - 1 ) ];
 		}
 
 		return $suffix;

@@ -276,7 +276,7 @@ class Boldgrid_Backup_Admin_Archive_Actions {
 	 */
 	public function wp_ajax_generate_download_link() {
 		$archive_filename = ! empty( $_POST['archive_filename'] ) ?
-			sanitize_file_name( $_POST['archive_filename'] ) : null;
+			sanitize_file_name( wp_unslash( $_POST['archive_filename'] ) ) : null;
 
 		if ( check_admin_referer( 'boldgrid_backup_download_link', 'archive_auth' ) &&
 			current_user_can( 'update_plugins' ) && $archive_filename ) {

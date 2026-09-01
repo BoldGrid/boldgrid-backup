@@ -128,13 +128,13 @@ class Boldgrid_Backup_Admin_Task {
 		return [
 			'id'           => $this->id,
 			'type'         => $this->type,
-			'created_at'   => empty( $this->date_format ) ? $this->created_at : date( $this->date_format, $this->created_at ),
+			'created_at'   => empty( $this->date_format ) ? $this->created_at : date_i18n( $this->date_format, $this->created_at ),
 			'started_at'   => empty( $this->started_at ) ?
 				null :
-				( empty( $this->date_format ) ? $this->started_at : date( $this->date_format, $this->started_at ) ),
+				( empty( $this->date_format ) ? $this->started_at : date_i18n( $this->date_format, $this->started_at ) ),
 			'completed_at' => empty( $this->completed_at ) ?
 				null :
-				( empty( $this->date_format ) ? $this->completed_at : date( $this->date_format, $this->completed_at ) ),
+				( empty( $this->date_format ) ? $this->completed_at : date_i18n( $this->date_format, $this->completed_at ) ),
 			'status'       => $this->get_status(),
 			'data'         => $this->data,
 		];

@@ -1,0 +1,165 @@
+<?xml version="1.0"?>
+<ruleset name="BoldGrid Backup / Total Upkeep">
+	<description>
+		Coding standards for Total Upkeep (boldgrid-backup), aligned with the
+		Plugin Check / WordPress.org review sniffs this project tracks.
+	</description>
+
+	<!-- Scan the plugin root; exclude third-party and generated trees. -->
+	<file>.</file>
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
+	<exclude-pattern>*/languages/*</exclude-pattern>
+	<exclude-pattern>*/tests/*</exclude-pattern>
+
+	<arg name="extensions" value="php"/>
+	<arg value="sp"/>
+	<arg name="colors"/>
+	<arg name="parallel" value="8"/>
+
+	<config name="minimum_wp_version" value="5.0"/>
+	<config name="testVersion" value="7.4-"/>
+	<config name="text_domain" value="boldgrid-backup"/>
+
+	<!--
+		Plugin Check–relevant sniffs only. The full WordPress standard also
+		enforces style rules (Yoda, array syntax, etc.) that are out of scope
+		for this cleanup and would drown real findings.
+	-->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="boldgrid_backup"/>
+				<element value="Boldgrid_Backup"/>
+				<element value="BOLDGRID_BACKUP"/>
+				<element value="bgbkup"/>
+			</property>
+		</properties>
+	</rule>
+	<rule ref="WordPress.Security"/>
+	<rule ref="WordPress.WP.I18n"/>
+	<rule ref="WordPress.WP.AlternativeFunctions"/>
+	<rule ref="WordPress.WP.EnqueuedResourceParameters"/>
+	<rule ref="WordPress.DateTime.RestrictedFunctions"/>
+	<rule ref="WordPress.DB.DirectDatabaseQuery"/>
+	<rule ref="WordPress.DB.PreparedSQL"/>
+	<rule ref="WordPress.PHP.DevelopmentFunctions"/>
+	<rule ref="Squiz.PHP.DiscouragedFunctions"/>
+	<rule ref="Generic.PHP.ForbiddenFunctions">
+		<properties>
+			<property name="forbiddenFunctions" type="array">
+				<element key="passthru" value="null"/>
+				<element key="proc_open" value="null"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!--
+		Partials under admin/partials/ are include'd from inside class methods, so
+		variables there are method-scoped, not globals. They also consume variables
+		set by the caller. Renaming them would be a large, breakage-prone diff
+		with no real benefit.
+	-->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound">
+		<exclude-pattern>*/admin/partials/*</exclude-pattern>
+		<!-- Entry / config scripts run as standalone PHP files, not as WP globals. -->
+		<exclude-pattern>*/cli/*</exclude-pattern>
+		<exclude-pattern>*/cron/*</exclude-pattern>
+		<exclude-pattern>*/includes/config/*</exclude-pattern>
+		<exclude-pattern>*/boldgrid-backup.php</exclude-pattern>
+		<exclude-pattern>*/boldgrid-backup-cron.php</exclude-pattern>
+	</rule>
+
+	<!--
+		Bootstrap callbacks (activate_boldgrid_backup, etc.) follow the standard
+		WP plugin boilerplate and already contain the plugin slug; renaming them
+		would break activation hooks. cli/wp-test.php helpers are CLI-only.
+	-->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound">
+		<exclude-pattern>*/boldgrid-backup.php</exclude-pattern>
+		<exclude-pattern>*/cli/wp-test.php</exclude-pattern>
+	</rule>
+
+	<!--
+		These findings are WordPress core / PHP identifiers the plugin consumes,
+		not symbols it declares (e.g. allow_major_auto_core_updates, STDERR).
+	-->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound">
+		<severity>0</severity>
+	</rule>
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound">
+		<severity>0</severity>
+	</rule>
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.VariableConstantNameFound">
+		<severity>0</severity>
+	</rule>
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound">
+		<severity>0</severity>
+	</rule>
+
+	<!--
+		Backup/restore work needs direct filesystem, process, and HTTP primitives.
+		Scoped to the paths that perform archive streaming, out-of-WordPress
+		restore, logging, and migration — not disabled globally.
+	-->
+	<rule ref="WordPress.WP.AlternativeFunctions">
+		<exclude-pattern>*/admin/compressor/*</exclude-pattern>
+		<exclude-pattern>*/admin/migrate/*</exclude-pattern>
+		<exclude-pattern>*/cli/*</exclude-pattern>
+		<exclude-pattern>*/cron/*</exclude-pattern>
+		<exclude-pattern>*/boldgrid-backup-cron.php</exclude-pattern>
+		<exclude-pattern>*/boldgrid-backup.php</exclude-pattern>
+		<exclude-pattern>*/includes/class-boldgrid-backup-file.php</exclude-pattern>
+		<exclude-pattern>*/admin/class-boldgrid-backup-admin-log.php</exclude-pattern>
+		<exclude-pattern>*/admin/class-boldgrid-backup-admin-archive.php</exclude-pattern>
+		<exclude-pattern>*/admin/class-boldgrid-backup-admin-zip.php</exclude-pattern>
+		<exclude-pattern>*/admin/class-boldgrid-backup-admin-db-import.php</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.PHP.DiscouragedPHPFunctions">
+		<exclude-pattern>*/admin/compressor/*</exclude-pattern>
+		<exclude-pattern>*/admin/migrate/*</exclude-pattern>
+		<exclude-pattern>*/cli/*</exclude-pattern>
+		<exclude-pattern>*/cron/*</exclude-pattern>
+		<exclude-pattern>*/boldgrid-backup-cron.php</exclude-pattern>
+	</rule>
+	<rule ref="Squiz.PHP.DiscouragedFunctions">
+		<exclude-pattern>*/admin/compressor/*</exclude-pattern>
+		<exclude-pattern>*/admin/migrate/*</exclude-pattern>
+		<exclude-pattern>*/cli/*</exclude-pattern>
+		<exclude-pattern>*/cron/*</exclude-pattern>
+		<exclude-pattern>*/boldgrid-backup-cron.php</exclude-pattern>
+		<!-- XHProf / migrate debug logging is intentional in those modules. -->
+		<exclude-pattern>*/admin/class-boldgrid-backup-admin-xhprof.php</exclude-pattern>
+		<exclude-pattern>*/admin/class-boldgrid-backup-admin-migrate.php</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.PHP.DevelopmentFunctions.error_log_error_log">
+		<exclude-pattern>*/admin/migrate/*</exclude-pattern>
+		<exclude-pattern>*/admin/class-boldgrid-backup-admin-migrate.php</exclude-pattern>
+		<exclude-pattern>*/admin/class-boldgrid-backup-admin-xhprof.php</exclude-pattern>
+	</rule>
+	<rule ref="Generic.PHP.ForbiddenFunctions">
+		<exclude-pattern>*/admin/compressor/*</exclude-pattern>
+		<exclude-pattern>*/admin/class-boldgrid-backup-admin-cli.php</exclude-pattern>
+		<exclude-pattern>*/cli/*</exclude-pattern>
+		<exclude-pattern>*/cron/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.DB.DirectDatabaseQuery">
+		<exclude-pattern>*/admin/compressor/*</exclude-pattern>
+		<exclude-pattern>*/admin/migrate/*</exclude-pattern>
+		<exclude-pattern>*/cli/*</exclude-pattern>
+		<exclude-pattern>*/cron/*</exclude-pattern>
+		<exclude-pattern>*/admin/class-boldgrid-backup-admin-db-*.php</exclude-pattern>
+		<exclude-pattern>*/admin/class-boldgrid-backup-admin-test.php</exclude-pattern>
+		<exclude-pattern>*/admin/class-boldgrid-backup-admin-utility.php</exclude-pattern>
+	</rule>
+
+	<!--
+		CLI / cron entry points are designed to run outside WordPress and already
+		guard with argv checks (or equivalent). ABSPATH guards would break
+		restore-outside-WordPress. Plugin Check's missing_direct_file_access_protection
+		is not a WPCS sniff; documented here for operators of that tool.
+		Affected: cli/bgbkup-cli.php, cli/env-info.php, cli/wp-test.php,
+		cli/restore-locator.php, cron/direct-transfer.php, cron/run-jobs.php,
+		cron/cron-test.php, cron/cli-support.php, boldgrid-backup-cron.php.
+	-->
+</ruleset>

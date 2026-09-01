@@ -99,7 +99,7 @@ class Boldgrid_Backup_Admin_Jobs {
 		$this->jobs[] = $args;
 		$this->save_jobs();
 
-		$this->logger->add( 'Adding Job: ' . json_encode( $args, JSON_PRETTY_PRINT ) );
+		$this->logger->add( 'Adding Job: ' . wp_json_encode( $args, JSON_PRETTY_PRINT ) );
 
 		/*
 		 * The cron entry is removed whenever the cron list is empty,
@@ -137,7 +137,7 @@ class Boldgrid_Backup_Admin_Jobs {
 
 		foreach ( $this->jobs as $key => $job ) {
 			if ( $key <= $delete_key ) {
-				$this->logger->add( 'Deleting Job: ' . json_encode( $job, JSON_PRETTY_PRINT ) );
+				$this->logger->add( 'Deleting Job: ' . wp_json_encode( $job, JSON_PRETTY_PRINT ) );
 				unset( $this->jobs[ $key ] );
 			}
 		}
@@ -221,7 +221,7 @@ class Boldgrid_Backup_Admin_Jobs {
 		foreach ( $this->jobs as $key => $job ) {
 
 			if ( 'boldgrid_backup_post_jobs_email' === $job['action'] ) {
-				$this->logger->add( 'Deleting Job: ' . json_encode( $job, JSON_PRETTY_PRINT ) );
+				$this->logger->add( 'Deleting Job: ' . wp_json_encode( $job, JSON_PRETTY_PRINT ) );
 				unset( $this->jobs[ $key ] );
 				break;
 			}
@@ -234,9 +234,9 @@ class Boldgrid_Backup_Admin_Jobs {
 				__( 'status', 'boldgrid-backup' ),
 				$job['status'],
 				__( 'start', 'boldgrid-backup' ),
-				date( 'Y.m.d h:i:s a', $job['start_time'] ),
+				date_i18n( 'Y.m.d h:i:s a', $job['start_time'] ),
 				__( 'end', 'boldgrid-backup' ),
-				date( 'Y.m.d h:i:s a', $job['end_time'] ),
+				date_i18n( 'Y.m.d h:i:s a', $job['end_time'] ),
 				"\t"
 			);
 			$post_jobs++;
@@ -358,7 +358,7 @@ class Boldgrid_Backup_Admin_Jobs {
 				continue;
 			}
 
-			$this->logger->add( 'Running job: ' . json_encode( $job, JSON_PRETTY_PRINT ) );
+			$this->logger->add( 'Running job: ' . wp_json_encode( $job, JSON_PRETTY_PRINT ) );
 
 			$job['start_time'] = time();
 			$job['status']     = 'running';

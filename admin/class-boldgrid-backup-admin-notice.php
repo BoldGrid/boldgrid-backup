@@ -104,6 +104,7 @@ class Boldgrid_Backup_Admin_Notice {
 		}
 
 		foreach ( $notices as $notice ) {
+			// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped -- Notice markup is built by the plugin.
 			printf(
 				'
 				<div class="%1$s is-dismissible">
@@ -113,8 +114,9 @@ class Boldgrid_Backup_Admin_Notice {
 				/* 1 */ $notice['class'],
 				/* 2 */ $this->add_container( $notice['message'] ),
 				/* 3 */ ! empty( $notice['heading'] ) ?
-					sprintf( '<h2 class="header-notice">%1$s</h2>', $notice['heading'] ) : '' // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+					sprintf( '<h2 class="header-notice">%1$s</h2>', $notice['heading'] ) : ''
 			);
+			// phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		delete_option( $option );
@@ -133,7 +135,7 @@ class Boldgrid_Backup_Admin_Notice {
 			return;
 		}
 
-		echo $this->get_notice_markup( $class, $message ); // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+		echo $this->get_notice_markup( $class, $message ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Notice markup is built by the plugin.
 
 		$this->displayed_messages[] = $message;
 	}

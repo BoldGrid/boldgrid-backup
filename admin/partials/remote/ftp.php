@@ -17,6 +17,8 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
+defined( 'WPINC' ) || die;
+
 $selected       = 'selected="selected"';
 $ftp_selected   = 'ftp' === $data['type'] ? $selected : '';
 $ftpes_selected = 'ftpes' === $data['type'] ? $selected : '';
@@ -103,7 +105,7 @@ $auto_selected    = empty( $active_selected ) && empty( $passive_selected ) ? $s
 	</table>
 	<p>
 	<?php
-	echo $this->core->lang['icon_warning']; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+	echo $this->core->lang['icon_warning']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Static icon markup defined by the plugin.
 	esc_html_e(
 		'With automated FTP your credentials must be stored here in your WordPress. They will be encrypted in the database and this protects them significantly, but they could be decrypted in the unlikely event of a compromise. We recommended you use a separate FTP user and password specifically for backups.',
 		'boldgrid-backup'

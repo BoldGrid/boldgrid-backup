@@ -14,7 +14,6 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP
 
 defined( 'WPINC' ) || die;
 
@@ -126,7 +125,12 @@ $tests = array(
 	),
 	array(
 		'k' => __( 'Document root:', 'boldgrid-backup' ),
-		'v' => str_replace( '\\\\', '\\', $_SERVER['DOCUMENT_ROOT'] ),
+		'v' => isset( $_SERVER['DOCUMENT_ROOT'] ) ?
+			str_replace(
+				'\\\\',
+				'\\',
+				sanitize_text_field( wp_unslash( $_SERVER['DOCUMENT_ROOT'] ) )
+			) : '',
 	),
 	array(
 		'k' => __( 'Current user:', 'boldgrid-backup' ),
@@ -453,13 +457,13 @@ $table .= '</table>';
 
 	<?php
 	$nav = include BOLDGRID_BACKUP_PATH . '/admin/partials/boldgrid-backup-admin-nav.php';
-	echo $nav; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+	echo $nav; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Nav markup built by the plugin from escaped parts.
 
 	require BOLDGRID_BACKUP_PATH . '/admin/partials/archives/add-new.php';
 
-	echo $fail_tips; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+	echo $fail_tips; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup built by the plugin from escaped parts.
 
-	echo $table; // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+	echo $table; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup built by the plugin from escaped parts.
 	?>
 
 </div>

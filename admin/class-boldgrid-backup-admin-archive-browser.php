@@ -15,7 +15,7 @@
 /*
  * AJAX callback functions in this class have their nonce verified by authorize() in this class.
  *
- * phpcs:disable WordPress.VIP, WordPress.CSRF.NonceVerification.NoNonceVerification, WordPress.Security.NonceVerification.NoNonceVerification
+ * phpcs:disable WordPress.Security.NonceVerification
  */
 
 /**
@@ -209,7 +209,8 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 
 		$this->authorize();
 
-		$filename = ! empty( $_POST['filename'] ) ? sanitize_file_name( $_POST['filename'] ) : false;
+		$filename = ! empty( $_POST['filename'] ) ?
+			sanitize_file_name( wp_unslash( $_POST['filename'] ) ) : false;
 		$filepath = $this->core->backup_dir->get_path_to( $filename );
 		if ( empty( $filename ) || ! $this->core->wp_filesystem->exists( $filepath ) ) {
 			wp_send_json_error( $error . ' ' . __( 'Invalid archive filename.', 'boldgrid-backup' ) );
@@ -229,7 +230,8 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 			basename( $this->core->archive->log_filepath ),
 		);
 
-		$dir = ! empty( $_POST['dir'] ) ? trim( strip_tags( $_POST['dir'] ) ) : null;
+		$dir = ! empty( $_POST['dir'] ) ?
+			sanitize_text_field( wp_unslash( $_POST['dir'] ) ) : null;
 
 		$zip = new Boldgrid_Backup_Admin_Compressor_Pcl_Zip( $this->core );
 
@@ -283,9 +285,11 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 	public function wp_ajax_file_actions() {
 		$this->authorize();
 
-		$filename = ! empty( $_POST['filename'] ) ? sanitize_file_name( $_POST['filename'] ) : false;
+		$filename = ! empty( $_POST['filename'] ) ?
+			sanitize_file_name( wp_unslash( $_POST['filename'] ) ) : false;
 		$filepath = $this->core->backup_dir->get_path_to( $filename );
-		$file     = ! empty( $_POST['file'] ) ? trim( strip_tags( $_POST['file'] ) ) : false;
+		$file     = ! empty( $_POST['file'] ) ?
+			sanitize_text_field( wp_unslash( $_POST['file'] ) ) : false;
 		if ( empty( $filepath ) || empty( $file ) ) {
 			wp_send_json_error( __( 'Invalid file / filepath.', 'boldgrid-backup' ) );
 		}
@@ -321,9 +325,11 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 	public function wp_ajax_restore_db() {
 		$this->authorize();
 
-		$filename = ! empty( $_POST['filename'] ) ? sanitize_file_name( $_POST['filename'] ) : false;
+		$filename = ! empty( $_POST['filename'] ) ?
+			sanitize_file_name( wp_unslash( $_POST['filename'] ) ) : false;
 		$filepath = $this->core->backup_dir->get_path_to( $filename );
-		$file     = ! empty( $_POST['file'] ) ? trim( strip_tags( $_POST['file'] ) ) : false;
+		$file     = ! empty( $_POST['file'] ) ?
+			sanitize_text_field( wp_unslash( $_POST['file'] ) ) : false;
 		if ( empty( $filepath ) || empty( $file ) ) {
 			wp_send_json_error( __( 'Invalid file / filepath.', 'boldgrid-backup' ) );
 		}
@@ -359,9 +365,11 @@ class Boldgrid_Backup_Admin_Archive_Browser {
 	public function wp_ajax_view_db() {
 		$this->authorize();
 
-		$filename = ! empty( $_POST['filename'] ) ? sanitize_file_name( $_POST['filename'] ) : false;
+		$filename = ! empty( $_POST['filename'] ) ?
+			sanitize_file_name( wp_unslash( $_POST['filename'] ) ) : false;
 		$filepath = $this->core->backup_dir->get_path_to( $filename );
-		$file     = ! empty( $_POST['file'] ) ? trim( strip_tags( $_POST['file'] ) ) : false;
+		$file     = ! empty( $_POST['file'] ) ?
+			sanitize_text_field( wp_unslash( $_POST['file'] ) ) : false;
 		if ( empty( $filename ) || empty( $filepath ) || empty( $file ) ) {
 			wp_send_json_error( __( 'Invalid file / filepath.', 'boldgrid-backup' ) );
 		}

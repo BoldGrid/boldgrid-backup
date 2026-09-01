@@ -90,7 +90,7 @@ class Boldgrid_Backup_Admin_Log {
 		}
 
 		// Add a timestamp to the message.
-		$message = date( '[Y-m-d H:i:s e]' ) . ' ' . $message;
+		$message = gmdate( '[Y-m-d H:i:s e]' ) . ' ' . $message;
 
 		/*
 		 * Append the message to the log.

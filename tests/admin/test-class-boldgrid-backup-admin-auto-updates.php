@@ -71,10 +71,20 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 
 		$url      = isset( $plugin_info->versions[ $version ] ) ? $plugin_info->versions[ $version ] : '';
 		$zip_file = ! empty( $url ) ? download_url( $url ) : '';
+
+		if ( is_wp_error( $zip_file ) ) {
+			$this->fail( 'Unable to download ' . $slug . ' ' . $version . ': ' . $zip_file->get_error_message() );
+		}
+
 		if ( true === is_dir( ABSPATH . 'wp-content/plugins/' . $slug ) ) {
 			$deleted = $wp_filesystem->delete( $this_plugin_dir, true );
 		}
 		$unzip = ! empty( $zip_file ) ? unzip_file( $zip_file, ABSPATH . 'wp-content/plugins/' ) : false;
+
+		if ( ! empty( $zip_file ) && file_exists( $zip_file ) ) {
+			unlink( $zip_file );
+		}
+
 		return $unzip;
 	}
 
@@ -105,12 +115,18 @@ class Test_Boldgrid_Backup_Admin_Auto_Updates extends WP_UnitTestCase {
 		);
 
 		$installed_themes = wp_get_themes();
-		$theme_slug       = 'twentytwentytwo'; // Replace with your desired theme slug
-		$installed        = isset( $installed_themes[$theme_slug] );
+		$theme_slug       = 'twentytwentytwo';
+		$installed        = isset( $installed_themes[ $theme_slug ] );
 
 		if ( ! $installed ) {
-			$upgrader  = new Theme_Upgrader();
-			$installed = $upgrader->install("https://downloads.wordpress.org/theme/{$theme_slug}.latest-stable.zip");
+			/*
+			 * Automatic_Upgrader_Skin collects its feedback in memory. The default
+			 * WP_Upgrader_Skin echoes it through show_message(), which calls
+			 * wp_ob_end_flush_all() and tears down PHPUnit's own output buffer,
+			 * marking whichever test ran first as risky.
+			 */
+			$upgrader  = new Theme_Upgrader( new Automatic_Upgrader_Skin() );
+			$installed = $upgrader->install( "https://downloads.wordpress.org/theme/{$theme_slug}.latest-stable.zip" );
 		}
 	}
 

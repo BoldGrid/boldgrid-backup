@@ -121,7 +121,10 @@ class Boldgrid_Backup_Admin_Archiver_Cancel {
 	 * @return bool True on success.
 	 */
 	public static function is_valid_nonce() {
-		return false !== wp_verify_nonce( $_REQUEST['cancel_auth'], 'bgbkup_cancel_backup' );
+		$nonce = isset( $_REQUEST['cancel_auth'] ) ?
+			sanitize_text_field( wp_unslash( $_REQUEST['cancel_auth'] ) ) : '';
+
+		return false !== wp_verify_nonce( $nonce, 'bgbkup_cancel_backup' );
 	}
 
 	/**

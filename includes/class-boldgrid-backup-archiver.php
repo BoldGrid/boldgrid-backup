@@ -63,7 +63,61 @@ class Boldgrid_Backup_Archiver {
 	 * @since SINCEVERSION
 	 */
 	public function complete() {
-		$this->core->logger->add( 'Backup complete!' );
+		/*
+		 * archive_files() can return:
+		 * - false: hard failure (e.g. backup directory not writable)
+		 * - array with 'error' key: various failure conditions
+		 * - valid info array: success (may contain 'restore_info_error' for partial success)
+		 */
+		$is_failure = false === $this->info || ( is_array( $this->info ) && ! empty( $this->info['error'] ) );
+
+		if ( $is_failure ) {
+			$error_message = false === $this->info
+				? __( 'Backup failed.', 'boldgrid-backup' )
+				: $this->info['error'];
+
+			$this->core->logger->add( 'Error: ' . $error_message );
+			$this->task->update_data( 'error', $error_message );
+			$this->task->update_data( 'success', false );
+			Boldgrid_Backup_Admin_In_Progress_Data::set_args(
+				array(
+					'status'        => $error_message,
+					'success'       => false,
+					'process_error' => $error_message,
+				)
+			);
+			$this->core->logger->add( 'Backup failed.' );
+			$this->core->logger->add_memory();
+			$this->task->end();
+			return;
+		}
+
+		$restore_info_error = ! empty( $this->info['restore_info_error'] )
+			? $this->info['restore_info_error']
+			: '';
+
+		/*
+		 * Cron / Archiver backups must not report unqualified success when emergency
+		 * restore metadata failed to write. Persist the error on the task and keep
+		 * In Progress marked unsuccessful.
+		 */
+		if ( $restore_info_error ) {
+			$this->core->logger->add( 'Warning: ' . $restore_info_error );
+			$this->task->update_data( 'restore_info_error', $restore_info_error );
+			$this->task->update_data( 'success', false );
+			Boldgrid_Backup_Admin_In_Progress_Data::set_args(
+				array(
+					'status'        => $restore_info_error,
+					'success'       => false,
+					'process_error' => $restore_info_error,
+				)
+			);
+			$this->core->logger->add( 'Backup finished with restore-info errors.' );
+		} else {
+			$this->task->update_data( 'success', true );
+			$this->core->logger->add( 'Backup complete!' );
+		}
+
 		$this->core->logger->add_memory();
 
 		$this->task->end();

@@ -1,0 +1,22 @@
+---
+description: PHPUnit MockBuilder APIs must stay compatible with Travis PHPUnit 7 (PHP 7.4) and 9.6 (PHP 8.5)
+globs: tests/**/*.php
+alwaysApply: false
+---
+
+# PHPUnit MockBuilder (dual PHPUnit versions)
+
+Travis: PHP 7.4 → locked **PHPUnit 7**; PHP 8.5 → **PHPUnit 9.6**.
+
+When mocking with `getMockBuilder()`:
+
+```php
+// GOOD — works on PHPUnit 7 and 9.6
+->setMethods( array( 'get_all' ) )
+
+// BAD — PHPUnit 8+ only; fatals on the 7.4 Travis job
+->onlyMethods( array( 'get_all' ) )
+->addMethods( array( 'get_all' ) )
+```
+
+Match existing suite usage in `tests/admin/test-class-boldgrid-backup-admin-auto-updates.php` and `tests/admin/test-class-boldgrid-backup-admin-db-import.php`.

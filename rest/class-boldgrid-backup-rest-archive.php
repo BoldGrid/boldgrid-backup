@@ -223,7 +223,7 @@ class Boldgrid_Backup_Rest_Archive extends Boldgrid_Backup_Rest_Controller {
 				'description'   => $archive->get_attribute( 'description' ),
 				'url'           => $url['download_url'],
 				'filename'      => $backup['filename'],
-				'creation_date' => date( 'c', $archive->timestamp ),
+				'creation_date' => gmdate( 'c', $archive->timestamp ),
 			];
 		}
 

@@ -16,7 +16,7 @@
  *          Plugin Name: Total Upkeep
  *          Plugin URI: https://www.boldgrid.com/boldgrid-backup/
  *          Description: Automated backups, remote backup to Amazon S3 and Google Drive, stop website crashes before they happen and more. Total Upkeep is the backup solution you need.
- *          Version: 1.17.1
+ *          Version: 1.17.4
  *          Author: BoldGrid
  *          Author URI: https://www.boldgrid.com/
  *          License: GPL-2.0+
@@ -109,16 +109,70 @@ function load_boldgrid_backup() {
 	// Include the autoloader to set plugin options and create instance.
 	$loader = require plugin_dir_path( __FILE__ ) . 'vendor/autoload.php';
 
+	/*
+	 * Register BoldGrid Library version before Load (Composer 2 installed.json format).
+	 *
+	 * Library Version.php only understands Composer 1's flat installed.json. Composer 2 wraps
+	 * packages under a "packages" key (and adds non-package keys like "dev"), so version
+	 * detection returns null, Load never registers the PSR-4 path, and classes such as
+	 * Boldgrid\Library\Library\Ui\Card are missing.
+	 */
+	$plugin_file = plugin_basename( __FILE__ );
+	\Boldgrid\Library\Util\Option::init();
+	$libraries = \Boldgrid\Library\Util\Option::get( 'library' );
+	if ( empty( $libraries[ $plugin_file ] ) ) {
+		$installed_file = plugin_dir_path( __FILE__ ) . 'vendor/composer/installed.json';
+		if ( is_readable( $installed_file ) ) {
+			$installed = json_decode( file_get_contents( $installed_file ), true ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			if ( is_array( $installed ) ) {
+				$packages = isset( $installed['packages'] ) ? $installed['packages'] : $installed;
+				foreach ( $packages as $package ) {
+					if (
+						! empty( $package['name'] ) &&
+						'boldgrid/library' === $package['name'] &&
+						! empty( $package['version_normalized'] )
+					) {
+						\Boldgrid\Library\Util\Option::set( $plugin_file, $package['version_normalized'] );
+						break;
+					}
+				}
+			}
+		}
+	}
+
 	// Load Library.
 	$load = new Boldgrid\Library\Util\Load(
 		array(
 			'type'            => 'plugin',
-			'file'            => plugin_basename( __FILE__ ),
+			'file'            => $plugin_file,
 			'loader'          => $loader,
 			'keyValidate'     => true,
 			'licenseActivate' => false,
 		)
 	);
+
+	/*
+	 * Drop Library's activation register callback.
+	 *
+	 * It re-reads Composer 1-only installed.json, stores a null version, and emits PHP warnings.
+	 * Version is already registered above for Composer 2.
+	 */
+	$activate_hook = 'activate_' . $plugin_file;
+	global $wp_filter;
+	if ( isset( $wp_filter[ $activate_hook ] ) ) {
+		foreach ( $wp_filter[ $activate_hook ]->callbacks as $priority => $callbacks ) {
+			foreach ( $callbacks as $callback ) {
+				if (
+					is_array( $callback['function'] ) &&
+					isset( $callback['function'][0], $callback['function'][1] ) &&
+					$callback['function'][0] instanceof \Boldgrid\Library\Util\Registration\Plugin &&
+					'register' === $callback['function'][1]
+				) {
+					remove_action( $activate_hook, $callback['function'], $priority );
+				}
+			}
+		}
+	}
 
 	// Make sure we have necessary library files.
 	if ( ! $support->run_library_tests() ) {
@@ -141,23 +195,60 @@ function load_boldgrid_backup() {
  * The initial loading of this plugin is done below.
  *
  * Run the plugin only if on a wp-admin page or when DOING_CRON.
+ *
+ * Instantiation is deferred to init so constructors that call translation
+ * functions do not trigger WP 6.7+ just-in-time textdomain notices.
  */
 if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) || defined( 'WP_CLI' ) && WP_CLI || Boldgrid_Backup_Rest_Utility::is_rest() ) {
 	// If we could not load boldgrid_backup (missing system requirements), abort.
 	if ( load_boldgrid_backup() ) {
 		require_once BOLDGRID_BACKUP_PATH . '/includes/class-boldgrid-backup.php';
-		run_boldgrid_backup();
+		if ( did_action( 'init' ) && ! doing_action( 'init' ) ) {
+			run_boldgrid_backup();
+		} else {
+			add_action( 'init', 'run_boldgrid_backup', 1 );
+		}
 	}
 }
 
 /*
- * Fix added as of 1.14.10.
+ * Legacy migration for pre-1.14.10 restore-info.json (kept for old installs).
+ *
+ * Only run when we have a stable secret source (locator or legacy verify file),
+ * otherwise front-end requests can generate a one-off in-memory secret that drifts
+ * on retry and orphans the renamed file. Admin/cron paths call ensure_secure_storage()
+ * which handles migration properly.
  *
  * @todo This fix can be removed in the future.
  */
 $oldname = BOLDGRID_BACKUP_PATH . '/cron/restore-info.json';
 if ( file_exists( $oldname ) ) {
-	require_once 'cli/class-info.php';
-	$newname = BOLDGRID_BACKUP_PATH . '/cron/' . basename( \Boldgrid\Backup\Cli\Info::get_results_filepath() );
-	rename( $oldname, $newname );
+	require_once BOLDGRID_BACKUP_PATH . '/cli/class-info.php';
+	$has_stable_secret = \Boldgrid\Backup\Cli\Info::read_secret_from_storage()
+		|| \Boldgrid\Backup\Cli\Info::get_legacy_verify_secret();
+	if ( $has_stable_secret ) {
+		$results_path = \Boldgrid\Backup\Cli\Info::get_results_filepath();
+		$new_basename = $results_path ? basename( $results_path ) : '';
+		// Only rename onto a valid secret-named file; never restore-info-.json.
+		if ( $new_basename && preg_match( '/^restore-info-[0-9a-f]{32}\.json$/', $new_basename ) ) {
+			// Use the full resolved path (backup dir when a locator exists; else legacy cron/).
+			$newname = $results_path;
+			if ( ! file_exists( $newname ) ) {
+				$moved = @rename( $oldname, $newname ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+				/*
+				 * rename() can fail across filesystems (plugin tree vs backup volume).
+				 * Fall back to copy + unlink so the file still lands where CLI looks.
+				 */
+				if ( ! $moved && @copy( $oldname, $newname ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+					@unlink( $oldname ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+					$moved = true;
+				}
+				if ( $moved ) {
+					@chmod( $newname, 0600 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+				}
+			} elseif ( file_exists( $oldname ) ) {
+				unlink( $oldname );
+			}
+		}
+	}
 }

@@ -12,7 +12,6 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP
 
 /**
  * Class: Boldgrid_Backup_Admin_Config
@@ -139,7 +138,17 @@ class Boldgrid_Backup_Admin_Config {
 			$this->is_premium = $this->license->isPremium( 'boldgrid-backup' );
 		}
 
-		$this->set_lang();
+		/*
+		 * Defer translated strings until init (WP 6.7+).
+		 *
+		 * Calling esc_html__() during plugin bootstrap triggers
+		 * _load_textdomain_just_in_time too early.
+		 */
+		if ( did_action( 'init' ) ) {
+			$this->set_lang();
+		} else {
+			add_action( 'init', array( $this, 'set_lang' ) );
+		}
 	}
 
 	/**
@@ -155,20 +164,27 @@ class Boldgrid_Backup_Admin_Config {
 			return $this->home_dir;
 		}
 
+		$document_root = isset( $_SERVER['DOCUMENT_ROOT'] ) ?
+			sanitize_text_field( wp_unslash( $_SERVER['DOCUMENT_ROOT'] ) ) : '';
+
 		if ( $this->core->test->is_windows() && $this->core->test->is_plesk() ) {
 			/*
 			 * Plesk's File Manager labels C:\Inetpub\vhosts\domain.com as the
 			 * "Home directory". If we find we cannot read that directory, then
 			 * we'll use the document root as the home directory.
 			 */
-			$home_dir = dirname( $_SERVER['DOCUMENT_ROOT'] );
-			if ( ! $this->core->wp_filesystem->is_readable( $home_dir ) ) {
-				$home_dir = $_SERVER['DOCUMENT_ROOT'];
+			if ( ! empty( $document_root ) ) {
+				$home_dir = dirname( $document_root );
+				if ( ! $this->core->wp_filesystem->is_readable( $home_dir ) ) {
+					$home_dir = $document_root;
+				}
 			}
 		} elseif ( $this->core->test->is_windows() ) {
 			// Windows.
-			$home_drive = ( ! empty( $_SERVER['HOMEDRIVE'] ) ? $_SERVER['HOMEDRIVE'] : null );
-			$home_path  = ( ! empty( $_SERVER['HOMEPATH'] ) ? $_SERVER['HOMEPATH'] : null );
+			$home_drive = ! empty( $_SERVER['HOMEDRIVE'] ) ?
+				sanitize_text_field( wp_unslash( $_SERVER['HOMEDRIVE'] ) ) : null;
+			$home_path  = ! empty( $_SERVER['HOMEPATH'] ) ?
+				sanitize_text_field( wp_unslash( $_SERVER['HOMEPATH'] ) ) : null;
 
 			if ( ! ( empty( $home_drive ) || empty( $home_path ) ) ) {
 				$home_dir = $home_drive . $home_path;
@@ -186,7 +202,8 @@ class Boldgrid_Backup_Admin_Config {
 			}
 
 			if ( empty( $home_dir ) ) {
-				$home_dir = ( ! empty( $_SERVER['HOME'] ) ? $_SERVER['HOME'] : null );
+				$home_dir = ! empty( $_SERVER['HOME'] ) ?
+					sanitize_text_field( wp_unslash( $_SERVER['HOME'] ) ) : null;
 			}
 
 			// If still unknown, then try environmental variables.

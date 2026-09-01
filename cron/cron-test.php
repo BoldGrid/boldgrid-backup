@@ -23,6 +23,7 @@ if ( ! $cron_helper->is_cli() ) {
 	die();
 }
 
+// phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date -- Server-local time for crontab.
 $minute = date( 'i', time() );
 $config = __DIR__ . '/cron-test.config';
 $result = __DIR__ . '/cron-test.result';
@@ -43,6 +44,7 @@ if ( empty( $configs ) ) {
  * log the results.
  */
 foreach ( $configs as $config ) {
+	// phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date -- Server-local time for crontab.
 	$config_minute = date( 'i', $config['time'] );
 
 	if ( $minute === $config_minute ) {

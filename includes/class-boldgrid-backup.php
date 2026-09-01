@@ -12,7 +12,6 @@
  * @copyright  BoldGrid
  * @author     BoldGrid <support@boldgrid.com>
  *
- * phpcs:disable WordPress.VIP
  */
 
 /**
@@ -67,30 +66,9 @@ class Boldgrid_Backup {
 		$this->plugin_name = 'boldgrid-backup';
 		$this->version     = ( defined( 'BOLDGRID_BACKUP_VERSION' ) ? BOLDGRID_BACKUP_VERSION : '' );
 
-		add_filter( 'doing_it_wrong_trigger_error', array( $this, 'disable_jit_notices' ), 10, 3 );
-
 		$this->load_dependencies();
 		$this->set_locale();
 		$this->define_admin_hooks();
-	}
-
-	/**
-	 * Disable Just In Time notices.
-	 *
-	 * @since 1.17.1
-	 *
-	 * @param bool   $doing_it_wrong Whether to trigger the error for _doing_it_wrong.
-	 * @param string $function_name The function that was called.
-	 * @param string $message The message that was passed to _doing_it_wrong.
-	 *
-	 * @return bool $doing_it_wrong Whether to trigger the error for _doing_it_wrong.
-	 */
-	public function disable_jit_notices( $doing_it_wrong, $function_name, $message ) {
-		// if the function is _load_textdomain_just_in_time, return false to prevent the error.
-		if ( '_load_textdomain_just_in_time' === $function_name && false !== strpos( $message, 'boldgrid-backup' ) ) {
-			return false;
-		}
-		return $doing_it_wrong;
 	}
 
 	/**
@@ -132,6 +110,7 @@ class Boldgrid_Backup {
 		 * Include a utility class.
 		 */
 		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-utility.php';
+		require_once BOLDGRID_BACKUP_PATH . '/admin/class-boldgrid-backup-admin-zip.php';
 
 		/**
 		 * The class responsible for the configuration of the plugin.
@@ -379,7 +358,8 @@ class Boldgrid_Backup {
 	private function set_locale() {
 		$plugin_i18n = new Boldgrid_Backup_I18n();
 
-		$this->loader->add_action( 'after_setup_theme', $plugin_i18n, 'load_plugin_textdomain' );
+		// WP 6.7+: load translations on init or later (not plugins_loaded / after_setup_theme).
+		$this->loader->add_action( 'init', $plugin_i18n, 'load_plugin_textdomain' );
 	}
 
 	/**
@@ -500,7 +480,18 @@ class Boldgrid_Backup {
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_core, 'admin_enqueue_scripts' );
 
-		$this->loader->add_filter( 'plugins_loaded', $plugin_admin_core, 'init_premium' );
+		/*
+		 * Initialize Premium after free plugin hooks are registered.
+		 *
+		 * Bootstrap is deferred to init (WP 6.7+ textdomain), so plugins_loaded
+		 * has already fired by the time this runs. Call immediately when that
+		 * hook has passed; otherwise keep the historical plugins_loaded hook.
+		 */
+		if ( did_action( 'plugins_loaded' ) ) {
+			$plugin_admin_core->init_premium();
+		} else {
+			$this->loader->add_action( 'plugins_loaded', $plugin_admin_core, 'init_premium' );
+		}
 
 		$this->loader->add_action( 'boldgrid_backup_delete_local', $plugin_admin_core->local, 'delete_local' );
 
@@ -524,6 +515,19 @@ class Boldgrid_Backup {
 		$this->loader->add_action( 'admin_init', $plugin_admin_core->auto_rollback, 'enqueue_update_selectors' );
 
 		$this->loader->add_action( 'admin_init', $plugin_admin_core->cron, 'upgrade_crontab_entries' );
+
+		/*
+		 * Rotate previously exposable cron secrets once on upgrade (not admin-only).
+		 *
+		 * Call directly rather than hooking init: run_boldgrid_backup() itself is
+		 * deferred to init priority 1, so registering another init:1 callback here
+		 * would miss the current request (WP does not invoke same-priority callbacks
+		 * added while that priority is already firing). Silent upgrades never hit
+		 * the activator, so this must run on the first admin/cron/CLI/REST boot.
+		 */
+		$plugin_admin_core->cron->maybe_rotate_cron_secrets();
+
+		$this->loader->add_action( 'admin_init', $plugin_admin_core, 'ensure_secure_cli_storage', 5 );
 
 		$this->loader->add_action( 'wp_ajax_boldgrid_backup_generate_download_link', $plugin_admin_core->archive_actions, 'wp_ajax_generate_download_link' );
 

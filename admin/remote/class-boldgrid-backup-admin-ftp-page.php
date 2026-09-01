@@ -12,7 +12,6 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP
 
 /**
  * Class: Boldgrid_Backup_Admin_Ftp_Page
@@ -113,7 +112,7 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 		// Post data, used by default or when updating settings.
 		$post_data = $this->core->ftp->get_from_post();
 
-		$action = ! empty( $_POST['action'] ) ? sanitize_key( $_POST['action'] ) : null; // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification, WordPress.Security.NonceVerification.NoNonceVerification
+		$action = ! empty( $_POST['action'] ) ? sanitize_key( wp_unslash( $_POST['action'] ) ) : null; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified per action below.
 
 		switch ( $action ) {
 			case 'save':
@@ -144,6 +143,8 @@ class Boldgrid_Backup_Admin_Ftp_Page {
 	 */
 	public function settings_delete() {
 		$ftp = $this->core->ftp;
+
+		check_admin_referer( 'bgb-settings-ftp', 'ftp_auth' );
 
 		if ( ! current_user_can( 'update_plugins' ) ) {
 			return false;

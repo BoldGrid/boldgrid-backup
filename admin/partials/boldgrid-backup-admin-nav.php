@@ -14,7 +14,6 @@
  * @author     BoldGrid <support@boldgrid.com>
  */
 
-// phpcs:disable WordPress.VIP
 
 defined( 'WPINC' ) || die;
 
@@ -22,7 +21,7 @@ $core = apply_filters( 'boldgrid_backup_get_core', null );
 
 $active = 'nav-tab-active';
 
-// phpcs:disable WordPress.CSRF.NonceVerification.NoNonceVerification
+// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Read-only page checks used to mark the active nav tab.
 $navs = [
 	[
 		'title' => __( 'Dashboard', 'boldgrid-backup' ),
@@ -66,7 +65,7 @@ $navs = [
 		'count' => $core->plugin->getPageBySlug( 'boldgrid-backup-premium-features' )->getUnreadMarkup(),
 	],
 ];
-// phpcs:enable WordPress.CSRF.NonceVerification.NoNonceVerification
+// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 /**
  * Allow the update of our nav menu items.
