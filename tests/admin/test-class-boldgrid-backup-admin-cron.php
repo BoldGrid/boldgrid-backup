@@ -1293,6 +1293,92 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Preflight names the reader that get_all() uses, not the retired file redirect.
+	 *
+	 * @since 1.17.5
+	 */
+	public function test_crontab_read_method_description_matches_reader() {
+		$cron      = new Boldgrid_Backup_Admin_Cron( $this->core );
+		$label     = $cron->crontab_read_method_description();
+		$available = Boldgrid_Backup_Admin_Cli::get_execution_functions();
+
+		if ( in_array( 'proc_open', $available, true ) ) {
+			$this->assertStringContainsString( 'proc_open', $label );
+		}
+
+		foreach ( array( 'exec', 'popen', 'passthru', 'system', 'shell_exec' ) as $function ) {
+			if ( in_array( $function, $available, true ) ) {
+				$this->assertStringContainsString( $function, $label );
+			}
+		}
+
+		if ( ! $available ) {
+			$this->assertStringContainsString( 'cannot be read', $label );
+		}
+
+		$partial = file_get_contents( dirname( __DIR__, 2 ) . '/admin/partials/boldgrid-backup-admin-test.php' );
+		$this->assertStringContainsString( 'crontab_read_method_description()', $partial );
+		$this->assertStringNotContainsString( 'Crontab output to file', $partial );
+	}
+
+	/**
+	 * Another reader runs only when proc_open and exec never started.
+	 *
+	 * @since 1.17.5
+	 */
+	public function test_more_crontab_readers_run_only_when_proc_and_exec_do_not_start() {
+		$cron   = new Boldgrid_Backup_Admin_Cron( $this->core );
+		$method = new ReflectionMethod( Boldgrid_Backup_Admin_Cron::class, 'crontab_should_try_more_readers' );
+
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
+
+		$listing = array(
+			'ok'       => true,
+			'contents' => "* * * * * date >> heartbeat.log\n",
+		);
+		$unopened = array(
+			'ok'          => false,
+			'contents'    => '',
+			'proc_failed' => true,
+		);
+
+		$this->assertFalse( $method->invoke( $cron, $listing, null ) );
+		$this->assertFalse( $method->invoke( $cron, $unopened, $listing ) );
+		$this->assertTrue( $method->invoke( $cron, $unopened, null ) );
+		$this->assertTrue( $method->invoke( $cron, null, null ) );
+	}
+
+	/**
+	 * shell_exec has no exit code, so empty output is not an empty crontab.
+	 *
+	 * @since 1.17.5
+	 */
+	public function test_interpret_shell_crontab_rejects_unproven_empty_output() {
+		$cron   = new Boldgrid_Backup_Admin_Cron( $this->core );
+		$method = new ReflectionMethod( Boldgrid_Backup_Admin_Cron::class, 'interpret_shell_crontab' );
+
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
+
+		$empty = $method->invoke( $cron, '' );
+		$this->assertFalse( $empty['ok'] );
+
+		$missing = $method->invoke( $cron, "no crontab for example\n" );
+		$this->assertTrue( $missing['ok'] );
+		$this->assertSame( '', $missing['contents'] );
+
+		$failed = $method->invoke( $cron, 'sh: crontab: command not found' );
+		$this->assertFalse( $failed['ok'] );
+
+		$listed = $method->invoke( $cron, "MAILTO=\"\"\n* * * * * date >> heartbeat.log\n" );
+		$this->assertTrue( $listed['ok'] );
+		$this->assertStringContainsString( 'heartbeat.log', $listed['contents'] );
+	}
+
+	/**
 	 * Adding a Total Upkeep line must keep unrelated crontab lines.
 	 *
 	 * @since 1.17.5

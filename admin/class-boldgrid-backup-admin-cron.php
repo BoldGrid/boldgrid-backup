@@ -779,12 +779,53 @@ class Boldgrid_Backup_Admin_Cron {
 	}
 
 	/**
+	 * Describe how this request reads crontab -l.
+	 *
+	 * Preflight used to guess from whether the backup directory was writable.
+	 * The reader uses proc_open when that process starts. Otherwise it tries
+	 * the same execution functions as Boldgrid_Backup_Admin_Cli, in an order
+	 * that keeps an exit code whenever one is available.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @return string
+	 */
+	public function crontab_read_method_description() {
+		$fallbacks = $this->crontab_read_fallbacks();
+		$fallback  = implode( ', ', $fallbacks );
+
+		if ( $this->execution_function_available( 'proc_open' ) && $fallbacks ) {
+			return sprintf(
+				/* translators: %s: comma-separated PHP functions such as exec, popen, shell_exec. */
+				__( 'Crontab read via proc_open, with %s if the process does not start.', 'boldgrid-backup' ),
+				$fallback
+			);
+		}
+
+		if ( $this->execution_function_available( 'proc_open' ) ) {
+			return __( 'Crontab read via proc_open.', 'boldgrid-backup' );
+		}
+
+		if ( $fallbacks ) {
+			return sprintf(
+				/* translators: %s: comma-separated PHP functions such as exec, popen, shell_exec. */
+				__( 'Crontab read via %s.', 'boldgrid-backup' ),
+				$fallback
+			);
+		}
+
+		return __( 'Crontab cannot be read; no PHP execution function is available.', 'boldgrid-backup' );
+	}
+
+	/**
 	 * Read the system crontab without rewriting it.
 	 *
 	 * proc_open keeps stdout and stderr apart and reads the full listing. When
-	 * proc_open cannot start a process, fall back to exec. The older
-	 * "crontab -l > file" path treated an empty file as a successful empty
-	 * crontab even when the command failed, and the next write erased every job.
+	 * that process does not start, try exec and the other functions from
+	 * Boldgrid_Backup_Admin_Cli::get_execution_functions(). A crontab -l that
+	 * ran and failed is kept. The older "crontab -l > file" path treated an
+	 * empty file as a successful empty crontab even when the command failed,
+	 * and the next write erased every job.
 	 *
 	 * @since 1.17.5
 	 *
@@ -793,16 +834,97 @@ class Boldgrid_Backup_Admin_Cron {
 	private function read_system_crontab() {
 		$proc_result = null;
 
-		if ( function_exists( 'proc_open' ) ) {
+		if ( $this->execution_function_available( 'proc_open' ) ) {
 			$proc_result = $this->read_system_crontab_proc();
 		}
 
 		$exec_result = null;
-		if ( $this->crontab_proc_needs_exec_fallback( $proc_result ) && function_exists( 'exec' ) ) {
+		if ( $this->crontab_proc_needs_exec_fallback( $proc_result ) && $this->execution_function_available( 'exec' ) ) {
 			$exec_result = $this->read_system_crontab_exec();
 		}
 
-		return $this->select_crontab_read( $proc_result, $exec_result );
+		$selected = $this->select_crontab_read( $proc_result, $exec_result );
+
+		if ( ! $this->crontab_should_try_more_readers( $proc_result, $exec_result ) ) {
+			return $selected;
+		}
+
+		foreach ( array( 'popen', 'passthru', 'system', 'shell_exec' ) as $function ) {
+			if ( ! $this->execution_function_available( $function ) ) {
+				continue;
+			}
+
+			$result = $this->read_system_crontab_via( $function );
+
+			if ( is_array( $result ) ) {
+				return $result;
+			}
+		}
+
+		return $selected;
+	}
+
+	/**
+	 * Whether proc_open and exec both failed to start, so another reader may run.
+	 *
+	 * A crontab -l that ran is final, including a failed one. Only a missing
+	 * process, or a function that is not available, is a reason to continue.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param array|null $proc_result proc_open result, or null when it was not called.
+	 * @param array|null $exec_result exec result, or null when it was not called.
+	 * @return bool
+	 */
+	private function crontab_should_try_more_readers( $proc_result, $exec_result ) {
+		$proc_started = is_array( $proc_result ) && empty( $proc_result['proc_failed'] );
+
+		if ( $proc_started || is_array( $exec_result ) ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Execution functions to try after proc_open does not start.
+	 *
+	 * shell_exec is last because it has no exit code. An empty result from it
+	 * is not treated as an empty crontab.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @return string[]
+	 */
+	private function crontab_read_fallbacks() {
+		$available = array();
+
+		foreach ( array( 'exec', 'popen', 'passthru', 'system', 'shell_exec' ) as $function ) {
+			if ( $this->execution_function_available( $function ) ) {
+				$available[] = $function;
+			}
+		}
+
+		return $available;
+	}
+
+	/**
+	 * Whether this PHP build may call an execution function.
+	 *
+	 * function_exists() is false for disable_functions. The CLI list also
+	 * refuses every function while safe_mode is on.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string $function Function name.
+	 * @return bool
+	 */
+	private function execution_function_available( $function ) {
+		if ( ! function_exists( $function ) ) {
+			return false;
+		}
+
+		return in_array( $function, Boldgrid_Backup_Admin_Cli::get_execution_functions(), true );
 	}
 
 	/**
@@ -912,6 +1034,203 @@ class Boldgrid_Backup_Admin_Cron {
 		}
 
 		return $this->interpret_crontab_list( $code, '', $text );
+	}
+
+	/**
+	 * Read crontab -l with a fallback that is not proc_open or exec.
+	 *
+	 * Null means the function did not start, so the caller may try the next one.
+	 * An array means the command ran and the result is final.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string $function popen, passthru, system, or shell_exec.
+	 * @return array{ok:bool,contents:string}|null
+	 */
+	private function read_system_crontab_via( $function ) {
+		switch ( $function ) {
+			case 'popen':
+				return $this->read_system_crontab_popen();
+			case 'passthru':
+				return $this->read_system_crontab_buffered( 'passthru' );
+			case 'system':
+				return $this->read_system_crontab_buffered( 'system' );
+			case 'shell_exec':
+				return $this->interpret_shell_crontab( $this->shell_exec_crontab() );
+			default:
+				return null;
+		}
+	}
+
+	/**
+	 * Read crontab -l with popen. The full stream is kept, unlike a short fread.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @return array{ok:bool,contents:string}|null
+	 */
+	private function read_system_crontab_popen() {
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.system_calls_popen
+		$handle = popen( 'crontab -l 2>&1', 'r' );
+
+		if ( ! is_resource( $handle ) ) {
+			return null;
+		}
+
+		$output = stream_get_contents( $handle );
+		$code   = pclose( $handle );
+
+		if ( ! is_string( $output ) || -1 === (int) $code ) {
+			return null;
+		}
+
+		return $this->interpret_crontab_list( $code, $output, '' );
+	}
+
+	/**
+	 * Read crontab -l with passthru or system, which report an exit code.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string $function passthru or system.
+	 * @return array{ok:bool,contents:string}|null
+	 */
+	private function read_system_crontab_buffered( $function ) {
+		if ( ! ob_start() ) {
+			return null;
+		}
+
+		$code = 1;
+
+		if ( 'passthru' === $function ) {
+			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.system_calls_passthru
+			passthru( 'crontab -l 2>&1', $code );
+		} else {
+			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.system_calls_system
+			system( 'crontab -l 2>&1', $code );
+		}
+
+		$output = ob_get_clean();
+
+		if ( ! is_string( $output ) ) {
+			$output = '';
+		}
+
+		return $this->interpret_crontab_list( $code, $output, '' );
+	}
+
+	/**
+	 * Run crontab -l with shell_exec.
+	 *
+	 * shell_exec has no exit code. The caller must not treat empty output as
+	 * an empty crontab.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @return string|null
+	 */
+	private function shell_exec_crontab() {
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.system_calls_shell_exec
+		$output = shell_exec( 'crontab -l 2>&1' );
+
+		return is_string( $output ) ? $output : null;
+	}
+
+	/**
+	 * Interpret shell_exec output that has no exit code.
+	 *
+	 * Empty output is a failure. A real empty crontab cannot be told apart
+	 * from a command that produced nothing, and writing that result would
+	 * erase jobs.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string|null $output Combined stdout and stderr.
+	 * @return array{ok:bool,contents:string}
+	 */
+	private function interpret_shell_crontab( $output ) {
+		if ( ! is_string( $output ) || '' === trim( $output ) ) {
+			return array(
+				'ok'       => false,
+				'contents' => '',
+			);
+		}
+
+		if ( preg_match( '/no crontab for /i', $output ) ) {
+			return array(
+				'ok'       => true,
+				'contents' => '',
+			);
+		}
+
+		if ( ! $this->output_looks_like_crontab( $output ) ) {
+			return array(
+				'ok'       => false,
+				'contents' => '',
+			);
+		}
+
+		return array(
+			'ok'       => true,
+			'contents' => $output,
+		);
+	}
+
+	/**
+	 * Whether every non-empty line can be written back as crontab text.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string $output Command output.
+	 * @return bool
+	 */
+	private function output_looks_like_crontab( $output ) {
+		$lines    = preg_split( "/\r\n|\n|\r/", $output );
+		$saw_line = false;
+
+		if ( ! is_array( $lines ) ) {
+			return false;
+		}
+
+		foreach ( $lines as $line ) {
+			if ( '' === trim( $line ) ) {
+				continue;
+			}
+
+			$saw_line = true;
+
+			if ( ! $this->line_looks_like_crontab( $line ) ) {
+				return false;
+			}
+		}
+
+		return $saw_line;
+	}
+
+	/**
+	 * Whether one line is a comment, an assignment, or a schedule.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string $line One crontab line.
+	 * @return bool
+	 */
+	private function line_looks_like_crontab( $line ) {
+		$line = trim( $line );
+
+		if ( 0 === strpos( $line, '#' ) ) {
+			return true;
+		}
+
+		if ( preg_match( '/^[A-Za-z_][A-Za-z0-9_]*\s*=/', $line ) ) {
+			return true;
+		}
+
+		if ( preg_match( '/^@(reboot|yearly|annually|monthly|weekly|daily|hourly|midnight)\s+\S/', $line ) ) {
+			return true;
+		}
+
+		return (bool) preg_match( '/^(\S+\s+){5}\S/', $line );
 	}
 
 	/**
