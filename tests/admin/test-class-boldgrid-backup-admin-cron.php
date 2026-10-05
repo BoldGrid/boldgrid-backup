@@ -1248,6 +1248,51 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A proc_open that cannot start falls back to exec. A crontab -l that ran does not.
+	 *
+	 * @since 1.17.5
+	 */
+	public function test_select_crontab_read_falls_back_only_when_proc_open_fails() {
+		$cron   = new Boldgrid_Backup_Admin_Cron( $this->core );
+		$method = new ReflectionMethod( Boldgrid_Backup_Admin_Cron::class, 'select_crontab_read' );
+
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
+
+		$listing = array(
+			'ok'       => true,
+			'contents' => "* * * * * date >> heartbeat.log\n",
+		);
+		$failed  = array(
+			'ok'       => false,
+			'contents' => '',
+		);
+		$unopened = array(
+			'ok'          => false,
+			'contents'    => '',
+			'proc_failed' => true,
+		);
+		$exec = array(
+			'ok'       => true,
+			'contents' => "MAILTO=\"\"\n",
+		);
+
+		$kept = $method->invoke( $cron, $listing, $exec );
+		$this->assertSame( $listing, $kept );
+
+		$ran = $method->invoke( $cron, $failed, $exec );
+		$this->assertSame( $failed, $ran );
+
+		$fallback = $method->invoke( $cron, $unopened, $exec );
+		$this->assertSame( $exec, $fallback );
+
+		$neither = $method->invoke( $cron, $unopened, null );
+		$this->assertFalse( $neither['ok'] );
+		$this->assertArrayNotHasKey( 'proc_failed', $neither );
+	}
+
+	/**
 	 * Adding a Total Upkeep line must keep unrelated crontab lines.
 	 *
 	 * @since 1.17.5

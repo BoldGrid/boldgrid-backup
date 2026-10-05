@@ -781,8 +781,9 @@ class Boldgrid_Backup_Admin_Cron {
 	/**
 	 * Read the system crontab without rewriting it.
 	 *
-	 * proc_open keeps stdout and stderr apart and reads the full listing. The
-	 * older "crontab -l > file" path treated an empty file as a successful empty
+	 * proc_open keeps stdout and stderr apart and reads the full listing. When
+	 * proc_open cannot start a process, fall back to exec. The older
+	 * "crontab -l > file" path treated an empty file as a successful empty
 	 * crontab even when the command failed, and the next write erased every job.
 	 *
 	 * @since 1.17.5
@@ -790,12 +791,59 @@ class Boldgrid_Backup_Admin_Cron {
 	 * @return array{ok:bool,contents:string}
 	 */
 	private function read_system_crontab() {
+		$proc_result = null;
+
 		if ( function_exists( 'proc_open' ) ) {
-			return $this->read_system_crontab_proc();
+			$proc_result = $this->read_system_crontab_proc();
 		}
 
-		if ( function_exists( 'exec' ) ) {
-			return $this->read_system_crontab_exec();
+		$exec_result = null;
+		if ( $this->crontab_proc_needs_exec_fallback( $proc_result ) && function_exists( 'exec' ) ) {
+			$exec_result = $this->read_system_crontab_exec();
+		}
+
+		return $this->select_crontab_read( $proc_result, $exec_result );
+	}
+
+	/**
+	 * Whether proc_open did not start, so exec should be tried.
+	 *
+	 * A crontab -l that ran and failed is not a proc_open failure. Only a
+	 * missing process handle is.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param array|null $proc_result Result from read_system_crontab_proc(), if it was called.
+	 * @return bool
+	 */
+	private function crontab_proc_needs_exec_fallback( $proc_result ) {
+		if ( ! is_array( $proc_result ) ) {
+			return true;
+		}
+
+		return ! empty( $proc_result['proc_failed'] );
+	}
+
+	/**
+	 * Choose the crontab listing, preferring a proc_open result that actually started.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param array|null $proc_result proc_open result, or null when proc_open was not called.
+	 * @param array|null $exec_result exec result, or null when exec was not called.
+	 * @return array{ok:bool,contents:string}
+	 */
+	private function select_crontab_read( $proc_result, $exec_result ) {
+		if ( is_array( $proc_result ) && empty( $proc_result['proc_failed'] ) ) {
+			unset( $proc_result['proc_failed'] );
+
+			return $proc_result;
+		}
+
+		if ( is_array( $exec_result ) ) {
+			unset( $exec_result['proc_failed'] );
+
+			return $exec_result;
 		}
 
 		return array(
@@ -824,8 +872,9 @@ class Boldgrid_Backup_Admin_Cron {
 
 		if ( ! is_resource( $process ) ) {
 			return array(
-				'ok'       => false,
-				'contents' => '',
+				'ok'          => false,
+				'contents'    => '',
+				'proc_failed' => true,
 			);
 		}
 
