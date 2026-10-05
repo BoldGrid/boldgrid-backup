@@ -328,7 +328,7 @@ $tests[] = array(
 
 $tests[] = array(
 	'k' => __( 'Method used to read cron:', 'boldgrid-backup' ),
-	'v' => $this->backup_dir->can_exec_write() ? __( 'Crontab output to file.', 'boldgrid-backup' ) : __( 'Crontab read via exec function.', 'boldgrid-backup' ),
+	'v' => $this->cron->crontab_read_method_description(),
 );
 
 $tests[] = array(
