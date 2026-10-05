@@ -740,6 +740,132 @@ class Boldgrid_Backup_Admin_Cron {
 	}
 
 	/**
+	 * Decide whether a crontab -l result is safe to rewrite from.
+	 *
+	 * Exit 0 is a real listing, including an empty file. "no crontab for …" is an
+	 * account that has never had a crontab, so the first job may be added. Any
+	 * other failure must not be treated as an empty crontab: writers would then
+	 * replace the account crontab with only the new line.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param int    $exit_code Exit status from crontab -l.
+	 * @param string $stdout    Standard output.
+	 * @param string $stderr    Standard error.
+	 * @return array{ok:bool,contents:string}
+	 */
+	public function interpret_crontab_list( $exit_code, $stdout, $stderr ) {
+		$stdout = is_string( $stdout ) ? $stdout : '';
+		$stderr = is_string( $stderr ) ? $stderr : '';
+
+		if ( 0 === (int) $exit_code ) {
+			return array(
+				'ok'       => true,
+				'contents' => $stdout,
+			);
+		}
+
+		if ( preg_match( '/no crontab for /i', $stderr . "\n" . $stdout ) ) {
+			return array(
+				'ok'       => true,
+				'contents' => '',
+			);
+		}
+
+		return array(
+			'ok'       => false,
+			'contents' => '',
+		);
+	}
+
+	/**
+	 * Read the system crontab without rewriting it.
+	 *
+	 * proc_open keeps stdout and stderr apart and reads the full listing. The
+	 * older "crontab -l > file" path treated an empty file as a successful empty
+	 * crontab even when the command failed, and the next write erased every job.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @return array{ok:bool,contents:string}
+	 */
+	private function read_system_crontab() {
+		if ( function_exists( 'proc_open' ) ) {
+			return $this->read_system_crontab_proc();
+		}
+
+		if ( function_exists( 'exec' ) ) {
+			return $this->read_system_crontab_exec();
+		}
+
+		return array(
+			'ok'       => false,
+			'contents' => '',
+		);
+	}
+
+	/**
+	 * Read crontab -l with proc_open.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @return array{ok:bool,contents:string}
+	 */
+	private function read_system_crontab_proc() {
+		$descriptors = array(
+			0 => array( 'pipe', 'r' ),
+			1 => array( 'pipe', 'w' ),
+			2 => array( 'pipe', 'w' ),
+		);
+		$pipes       = array();
+
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.system_calls_proc_open
+		$process = proc_open( array( 'crontab', '-l' ), $descriptors, $pipes );
+
+		if ( ! is_resource( $process ) ) {
+			return array(
+				'ok'       => false,
+				'contents' => '',
+			);
+		}
+
+		fclose( $pipes[0] );
+
+		$stdout = stream_get_contents( $pipes[1] );
+		fclose( $pipes[1] );
+
+		$stderr = stream_get_contents( $pipes[2] );
+		fclose( $pipes[2] );
+
+		$code = proc_close( $process );
+
+		return $this->interpret_crontab_list( $code, $stdout, $stderr );
+	}
+
+	/**
+	 * Read crontab -l with exec when proc_open is unavailable.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @return array{ok:bool,contents:string}
+	 */
+	private function read_system_crontab_exec() {
+		$lines = array();
+		$code  = 1;
+
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.system_calls_exec
+		exec( 'crontab -l 2>&1', $lines, $code );
+
+		$text = implode( "\n", $lines );
+
+		if ( 0 === (int) $code ) {
+			return $this->interpret_crontab_list( 0, $text, '' );
+		}
+
+		return $this->interpret_crontab_list( $code, '', $text );
+	}
+
+	/**
 	 * Get all entries in cron.
 	 *
 	 * Prior to 1.13.9, the Boldgrid\Backup\Admin\Cron\Crontab class had a read_crontab() method that
@@ -768,15 +894,6 @@ class Boldgrid_Backup_Admin_Cron {
 			return false;
 		}
 
-		/*
-		 * Attempt to read the crontab.
-		 *
-		 * Historically, we just read the output of "crontab -l". In certain scenarious, this does
-		 * not return the full output of the command. Another solution would be to output that command
-		 * to a file, and then read the file.
-		 *
-		 * As of 1.6.5, we'll first try the latter option.
-		 */
 		if ( null !== $this->crontab_cache ) {
 			if ( false === $this->crontab_cache ) {
 				return false;
@@ -785,30 +902,18 @@ class Boldgrid_Backup_Admin_Cron {
 			return $raw ? $this->crontab_cache : explode( "\n", $this->crontab_cache );
 		}
 
-		if ( $this->core->backup_dir->can_exec_write() ) {
-			$crontab_file_path = $this->core->backup_dir->get_path_to( 'crontab' );
+		/*
+		 * A failed crontab -l must not be cached as an empty listing. Writers append
+		 * to that listing and replace the account crontab.
+		 */
+		$read = $this->read_system_crontab();
 
-			$command = sprintf( 'crontab -l > %1$s', $crontab_file_path );
-			$this->core->execute_command( $command, $success );
-
-			if ( ! $this->core->wp_filesystem->exists( $crontab_file_path ) ) {
-				$this->crontab_cache = false;
-				return false;
-			}
-
-			$crontab = $this->core->wp_filesystem->get_contents( $crontab_file_path );
-			$success = false !== $crontab;
-
-			$this->core->wp_filesystem->delete( $crontab_file_path );
-		} else {
-			$command = 'crontab -l';
-			$crontab = $this->core->execute_command( $command, $success );
-		}
-
-		if ( ! $success ) {
+		if ( empty( $read['ok'] ) ) {
 			$this->crontab_cache = false;
 			return false;
 		}
+
+		$crontab = $read['contents'];
 
 		$this->crontab_cache = $crontab;
 

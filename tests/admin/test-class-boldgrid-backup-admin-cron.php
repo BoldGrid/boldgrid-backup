@@ -1226,4 +1226,58 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 			$cron->update_cron( '# Total Upkeep Test Entry (You can delete this line).' )
 		);
 	}
+
+	/**
+	 * A failed crontab -l is not an empty crontab.
+	 *
+	 * @since 1.17.5
+	 */
+	public function test_interpret_crontab_list_rejects_failed_read() {
+		$cron = new Boldgrid_Backup_Admin_Cron( $this->core );
+
+		$failed = $cron->interpret_crontab_list( 1, '', '' );
+		$this->assertFalse( $failed['ok'] );
+
+		$missing = $cron->interpret_crontab_list( 1, '', 'no crontab for example' );
+		$this->assertTrue( $missing['ok'] );
+		$this->assertSame( '', $missing['contents'] );
+
+		$listed = $cron->interpret_crontab_list( 0, "* * * * * date >> heartbeat.log\n", '' );
+		$this->assertTrue( $listed['ok'] );
+		$this->assertStringContainsString( 'heartbeat.log', $listed['contents'] );
+	}
+
+	/**
+	 * Adding a Total Upkeep line must keep unrelated crontab lines.
+	 *
+	 * @since 1.17.5
+	 */
+	public function test_update_cron_preserves_unrelated_lines() {
+		$existing = "MAILTO=\"\"\n* * * * * date >> heartbeat.log\n";
+		$entry    = '# Total Upkeep Test Entry 1 (You can delete this line).';
+
+		$cron = $this->getMockBuilder( Boldgrid_Backup_Admin_Cron::class )
+			->setConstructorArgs( array( $this->core ) )
+			->setMethods( array( 'get_all', 'entry_exists' ) )
+			->getMock();
+
+		$cron->method( 'entry_exists' )->willReturn( false );
+		$cron->method( 'get_all' )->willReturn( $existing );
+
+		$written  = null;
+		$callback = static function ( $can, $crontab ) use ( &$written ) {
+			$written = $crontab;
+			return false;
+		};
+
+		add_filter( 'boldgrid_backup_can_write_crontab', $callback, 20, 2 );
+
+		$cron->update_cron( $entry );
+
+		remove_filter( 'boldgrid_backup_can_write_crontab', $callback, 20 );
+
+		$this->assertTrue( is_string( $written ) );
+		$this->assertStringContainsString( 'heartbeat.log', $written );
+		$this->assertStringContainsString( 'Test Entry 1', $written );
+	}
 }
