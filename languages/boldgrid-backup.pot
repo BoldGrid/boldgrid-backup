@@ -3160,16 +3160,24 @@ msgstr ""
 msgid "Cron jobs:"
 msgstr ""
 
-#: admin/partials/boldgrid-backup-admin-test.php:326
+#: admin/partials/boldgrid-backup-admin-test.php:330
 msgid "Method used to read cron:"
 msgstr ""
 
-#: admin/partials/boldgrid-backup-admin-test.php:327
-msgid "Crontab output to file."
+#: admin/class-boldgrid-backup-admin-cron.php:800
+msgid "Crontab read via proc_open, with %s if the process does not start."
 msgstr ""
 
-#: admin/partials/boldgrid-backup-admin-test.php:327
-msgid "Crontab read via exec function."
+#: admin/class-boldgrid-backup-admin-cron.php:806
+msgid "Crontab read via proc_open."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-cron.php:812
+msgid "Crontab read via %s."
+msgstr ""
+
+#: admin/class-boldgrid-backup-admin-cron.php:817
+msgid "Crontab cannot be read; no PHP execution function is available."
 msgstr ""
 
 #: admin/partials/boldgrid-backup-admin-test.php:331

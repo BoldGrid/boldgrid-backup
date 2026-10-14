@@ -1226,4 +1226,189 @@ class Test_Boldgrid_Backup_Admin_Cron extends WP_UnitTestCase {
 			$cron->update_cron( '# Total Upkeep Test Entry (You can delete this line).' )
 		);
 	}
+
+	/**
+	 * A failed crontab -l is not an empty crontab.
+	 *
+	 * @since 1.17.5
+	 */
+	public function test_interpret_crontab_list_rejects_failed_read() {
+		$cron = new Boldgrid_Backup_Admin_Cron( $this->core );
+
+		$failed = $cron->interpret_crontab_list( 1, '', '' );
+		$this->assertFalse( $failed['ok'] );
+
+		$missing = $cron->interpret_crontab_list( 1, '', 'no crontab for example' );
+		$this->assertTrue( $missing['ok'] );
+		$this->assertSame( '', $missing['contents'] );
+
+		$listed = $cron->interpret_crontab_list( 0, "* * * * * date >> heartbeat.log\n", '' );
+		$this->assertTrue( $listed['ok'] );
+		$this->assertStringContainsString( 'heartbeat.log', $listed['contents'] );
+	}
+
+	/**
+	 * A proc_open that cannot start falls back to exec. A crontab -l that ran does not.
+	 *
+	 * @since 1.17.5
+	 */
+	public function test_select_crontab_read_falls_back_only_when_proc_open_fails() {
+		$cron   = new Boldgrid_Backup_Admin_Cron( $this->core );
+		$method = new ReflectionMethod( Boldgrid_Backup_Admin_Cron::class, 'select_crontab_read' );
+
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
+
+		$listing = array(
+			'ok'       => true,
+			'contents' => "* * * * * date >> heartbeat.log\n",
+		);
+		$failed  = array(
+			'ok'       => false,
+			'contents' => '',
+		);
+		$unopened = array(
+			'ok'          => false,
+			'contents'    => '',
+			'proc_failed' => true,
+		);
+		$exec = array(
+			'ok'       => true,
+			'contents' => "MAILTO=\"\"\n",
+		);
+
+		$kept = $method->invoke( $cron, $listing, $exec );
+		$this->assertSame( $listing, $kept );
+
+		$ran = $method->invoke( $cron, $failed, $exec );
+		$this->assertSame( $failed, $ran );
+
+		$fallback = $method->invoke( $cron, $unopened, $exec );
+		$this->assertSame( $exec, $fallback );
+
+		$neither = $method->invoke( $cron, $unopened, null );
+		$this->assertFalse( $neither['ok'] );
+		$this->assertArrayNotHasKey( 'proc_failed', $neither );
+	}
+
+	/**
+	 * Preflight names the reader that get_all() uses, not the retired file redirect.
+	 *
+	 * @since 1.17.5
+	 */
+	public function test_crontab_read_method_description_matches_reader() {
+		$cron      = new Boldgrid_Backup_Admin_Cron( $this->core );
+		$label     = $cron->crontab_read_method_description();
+		$available = Boldgrid_Backup_Admin_Cli::get_execution_functions();
+
+		if ( in_array( 'proc_open', $available, true ) ) {
+			$this->assertStringContainsString( 'proc_open', $label );
+		}
+
+		foreach ( array( 'exec', 'popen', 'passthru', 'system', 'shell_exec' ) as $function ) {
+			if ( in_array( $function, $available, true ) ) {
+				$this->assertStringContainsString( $function, $label );
+			}
+		}
+
+		if ( ! $available ) {
+			$this->assertStringContainsString( 'cannot be read', $label );
+		}
+
+		$partial = file_get_contents( dirname( __DIR__, 2 ) . '/admin/partials/boldgrid-backup-admin-test.php' );
+		$this->assertStringContainsString( 'crontab_read_method_description()', $partial );
+		$this->assertStringNotContainsString( 'Crontab output to file', $partial );
+	}
+
+	/**
+	 * Another reader runs only when proc_open and exec never started.
+	 *
+	 * @since 1.17.5
+	 */
+	public function test_more_crontab_readers_run_only_when_proc_and_exec_do_not_start() {
+		$cron   = new Boldgrid_Backup_Admin_Cron( $this->core );
+		$method = new ReflectionMethod( Boldgrid_Backup_Admin_Cron::class, 'crontab_should_try_more_readers' );
+
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
+
+		$listing = array(
+			'ok'       => true,
+			'contents' => "* * * * * date >> heartbeat.log\n",
+		);
+		$unopened = array(
+			'ok'          => false,
+			'contents'    => '',
+			'proc_failed' => true,
+		);
+
+		$this->assertFalse( $method->invoke( $cron, $listing, null ) );
+		$this->assertFalse( $method->invoke( $cron, $unopened, $listing ) );
+		$this->assertTrue( $method->invoke( $cron, $unopened, null ) );
+		$this->assertTrue( $method->invoke( $cron, null, null ) );
+	}
+
+	/**
+	 * shell_exec has no exit code, so empty output is not an empty crontab.
+	 *
+	 * @since 1.17.5
+	 */
+	public function test_interpret_shell_crontab_rejects_unproven_empty_output() {
+		$cron   = new Boldgrid_Backup_Admin_Cron( $this->core );
+		$method = new ReflectionMethod( Boldgrid_Backup_Admin_Cron::class, 'interpret_shell_crontab' );
+
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
+
+		$empty = $method->invoke( $cron, '' );
+		$this->assertFalse( $empty['ok'] );
+
+		$missing = $method->invoke( $cron, "no crontab for example\n" );
+		$this->assertTrue( $missing['ok'] );
+		$this->assertSame( '', $missing['contents'] );
+
+		$failed = $method->invoke( $cron, 'sh: crontab: command not found' );
+		$this->assertFalse( $failed['ok'] );
+
+		$listed = $method->invoke( $cron, "MAILTO=\"\"\n* * * * * date >> heartbeat.log\n" );
+		$this->assertTrue( $listed['ok'] );
+		$this->assertStringContainsString( 'heartbeat.log', $listed['contents'] );
+	}
+
+	/**
+	 * Adding a Total Upkeep line must keep unrelated crontab lines.
+	 *
+	 * @since 1.17.5
+	 */
+	public function test_update_cron_preserves_unrelated_lines() {
+		$existing = "MAILTO=\"\"\n* * * * * date >> heartbeat.log\n";
+		$entry    = '# Total Upkeep Test Entry 1 (You can delete this line).';
+
+		$cron = $this->getMockBuilder( Boldgrid_Backup_Admin_Cron::class )
+			->setConstructorArgs( array( $this->core ) )
+			->setMethods( array( 'get_all', 'entry_exists' ) )
+			->getMock();
+
+		$cron->method( 'entry_exists' )->willReturn( false );
+		$cron->method( 'get_all' )->willReturn( $existing );
+
+		$written  = null;
+		$callback = static function ( $can, $crontab ) use ( &$written ) {
+			$written = $crontab;
+			return false;
+		};
+
+		add_filter( 'boldgrid_backup_can_write_crontab', $callback, 20, 2 );
+
+		$cron->update_cron( $entry );
+
+		remove_filter( 'boldgrid_backup_can_write_crontab', $callback, 20 );
+
+		$this->assertTrue( is_string( $written ) );
+		$this->assertStringContainsString( 'heartbeat.log', $written );
+		$this->assertStringContainsString( 'Test Entry 1', $written );
+	}
 }

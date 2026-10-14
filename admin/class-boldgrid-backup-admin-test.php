@@ -424,15 +424,12 @@ class Boldgrid_Backup_Admin_Test {
 			return $this->is_crontab_available;
 		}
 
-		$test_entry = '# ' . BOLDGRID_BACKUP_TITLE . ' Test Entry ' . time() . ' (You can delete this line).';
-
 		/*
-		 * To determine if crontab is available, we will BOTH write and remove
-		 * a test entry from the crontab.
+		 * Availability is whether crontab -l can be read. Do not write a probe
+		 * line: a failed read used to look like an empty crontab, and installing
+		 * the probe then replaced every other job on the account.
 		 */
-		$entry_added                = $this->core->cron->update_cron( $test_entry );
-		$entry_deleted              = $this->core->cron->entry_delete( $test_entry );
-		$this->is_crontab_available = $entry_added && $entry_deleted;
+		$this->is_crontab_available = false !== $this->core->cron->get_all( true );
 
 		return $this->is_crontab_available;
 	}
