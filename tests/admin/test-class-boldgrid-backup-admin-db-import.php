@@ -317,7 +317,6 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 			 * @param string $statement SQL statement.
 			 * @return int|false
 			 */
-			#[\ReturnTypeWillChange]
 			public function exec( $statement ) {
 				unset( $statement );
 				throw new PDOException( 'bgbkup sample sql failure' );
