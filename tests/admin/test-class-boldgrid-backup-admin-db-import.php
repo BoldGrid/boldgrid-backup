@@ -298,4 +298,66 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 		$this->assertEquals( array( 'ALL' ), $mock_db_import->get_db_privileges() );
 
 	}
+
+	/**
+	 * A PDO failure with no core logger returns false and keeps the SQL error text.
+	 */
+	public function test_exec_import_pdo_exception_without_core_returns_false() {
+		$importer = new \Boldgrid_Backup_Admin_Db_Import();
+		$sql      = 'SELECT 1;';
+		$pdo      = new class() extends PDO {
+			/**
+			 * Skip a real database connection.
+			 */
+			public function __construct() {}
+
+			/**
+			 * Fail the statement.
+			 *
+			 * @param string $statement SQL statement.
+			 * @return int|false
+			 */
+			public function exec( $statement ) {
+				unset( $statement );
+				throw new PDOException( 'bgbkup sample sql failure' );
+			}
+		};
+
+		$result = $importer->exec_import( $pdo, $sql );
+
+		$this->assertFalse( $result );
+		$this->assertStringContainsString( 'bgbkup sample sql failure', implode( "\n", $importer->errors ) );
+	}
+
+	/**
+	 * import_lines() returns false when a statement fails, instead of fatalling.
+	 */
+	public function test_import_lines_returns_false_when_statement_fails() {
+		$importer = new \Boldgrid_Backup_Admin_Db_Import();
+		$lines    = array( "SELECT 1 FROM bgbkup_missing_table;\n" );
+
+		$this->assertFalse( $importer->import_lines( $lines ) );
+	}
+
+	/**
+	 * import() of a failed statement stays false.
+	 *
+	 * Callers treat a non-empty array as success. A failed statement must stay false.
+	 */
+	public function test_import_failed_statement_returns_false() {
+		$importer = new \Boldgrid_Backup_Admin_Db_Import();
+		$file     = wp_tempnam( 'bgbkup-import-' );
+		$this->assertNotEmpty( $file );
+		file_put_contents( $file, "SELECT 1 FROM bgbkup_missing_table;\n" );
+
+		try {
+			$result = $importer->import( $file );
+		} finally {
+			if ( file_exists( $file ) ) {
+				unlink( $file );
+			}
+		}
+
+		$this->assertSame( false, $result );
+	}
 }
