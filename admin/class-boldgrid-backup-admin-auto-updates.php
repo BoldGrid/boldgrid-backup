@@ -53,14 +53,31 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	public $core;
 
 	/**
+	 * Auto Update Log.
+	 *
+	 * @since 1.14.0
+	 * @var string
+	 */
+	public $auto_update_log;
+
+	/**
+	 * Core Save Settings.
+	 *
+	 * @since 1.14.0
+	 * @var bool
+	 */
+	public $core_save_settings = false;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.14.0
 	 */
 	public function __construct() {
-		$this->set_settings();
-
 		add_filter( 'automatic_updater_disabled', '__return_false' );
+		$this->core = apply_filters( 'boldgrid_backup_get_core', null );
+
+		$this->set_settings();
 	}
 
 	/**
@@ -86,24 +103,63 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 * @param string $option Name of option being updated.
 	 */
 	public function wordpress_option_updated( $old_value, $new_value, $option ) {
-		// Determines if this is being fired for a theme or plugin update
-		$update_type = 'auto_update_plugins' === $option ? 'plugins' : 'themes';
-		$core        = apply_filters( 'boldgrid_backup_get_core', null );
-		$settings    = $core->settings->get_settings();
+		// Determines if this is being fired for a theme or plugin update.
+		$this->auto_update_log = new Boldgrid_Backup_Admin_Log( $this->core );
+		$this->auto_update_log->init( 'auto-update.log' );
+		$update_type    = 'auto_update_plugins' === $option ? 'plugins' : 'themes';
+		$this->settings = $this->core->settings->get_settings();
+		$wpcs           = isset( $this->settings['auto_update']['wpcore'] ) ? $this->settings['auto_update']['wpcore'] : [];
+
+		// Log the Core auto update settings only once.
+		if ( false === $this->core_save_settings ) {
+			$this->auto_update_log->add( '--------------------------------------------------' );
+			$this->auto_update_log->add( 'WP Core auto update settings' );
+
+			if ( ! empty( $wpcs['all'] ) ) {
+				$this->auto_update_log->add( 'WP Core Updates are set to auto update all.' );
+			}
+			$dev = ( ! empty( $wpcs['dev'] ) ) ? 'true' : 'false';
+			$this->auto_update_log->add( 'Setting WP Core Dev Updates to ' . $dev . '.' );
+			$major = ( ! empty( $wpcs['major'] ) ) ? 'true' : 'false';
+			$this->auto_update_log->add( 'Setting WP Core Major Updates to ' . $major . '.' );
+			$minor = ( ! empty( $wpcs['minor'] ) ) ? 'true' : 'false';
+			$this->auto_update_log->add( 'Setting WP Core Minor Updates to ' . $minor . '.' );
+			$translation = ( ! empty( $wpcs['translation'] ) ) ? 'true' : 'false';
+			$this->auto_update_log->add( 'Setting WP Core Translation Updates to ' . $translation . '.' );
+			$this->auto_update_log->add( '--------------------------------------------------' );
+
+			$this->core_save_settings = true;
+		}
 
 		// The plugins / themes listed in $new_value will only be those that have auto updates enabled.
 		$enabled_offers = $new_value;
-		foreach ( $settings['auto_update'][ $update_type ] as $offer => $enabled ) {
+
+		$this->auto_update_log->add( 'WP ' . $update_type . ' auto update settings.' );
+
+		foreach ( $this->settings['auto_update'][ $update_type ] as $offer => $enabled ) {
 			// Do not modify the 'default' setting. This is used to define the default for new themes / plugins.
 			if ( 'default' === $offer ) {
 				continue;
 			}
+
+			if ( 'plugins' === $update_type ) {
+				$item_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $offer );
+				$item_name = $item_data['Name'];
+			} else {
+				$item_name = $offer;
+			}
+
+			// Log the plugin / theme auto update settings.
+			$this->auto_update_log->add( 'Setting ' . $update_type . ' ' . $item_name . ' to ' . ( in_array( $offer, $enabled_offers, true ) ? 'enabled' : 'disabled' ) . '.' );
+
 			// If the theme / plugin is found in the $enabled_offers array, enable in our settings, otherwise disable.
-			$settings['auto_update'][ $update_type ][ $offer ] = in_array( $offer, $enabled_offers, true ) ? '1' : '0';
+			$this->settings['auto_update'][ $update_type ][ $offer ] = in_array( $offer, $enabled_offers, true ) ? '1' : '0';
 		}
 
+		$this->auto_update_log->add( '--------------------------------------------------' );
+
 		// Save the settings.
-		$core->settings->save( $settings );
+		$this->core->settings->save( $this->settings );
 	}
 
 	/**
@@ -112,8 +168,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 	 * @since 1.14.0
 	 */
 	public function set_settings() {
-		$core           = apply_filters( 'boldgrid_backup_get_core', null );
-		$this->settings = $core->settings->get_setting( 'auto_update' );
+		$this->settings = $this->core->settings->get_setting( 'auto_update' );
 	}
 
 	/**
@@ -214,6 +269,7 @@ class Boldgrid_Backup_Admin_Auto_Updates {
 				$plugins[] = $plugin->getSlug();
 			}
 		}
+
 		if ( in_array( $item->slug, $plugins, true ) ) {
 			// Always update plugins in this array.
 			return true;
