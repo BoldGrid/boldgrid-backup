@@ -51,6 +51,7 @@ if ( ! defined( 'BOLDGRID_BACKUP_TITLE' ) ) {
 }
 
 require_once BOLDGRID_BACKUP_PATH . '/rest/class-boldgrid-backup-rest-utility.php';
+require_once BOLDGRID_BACKUP_PATH . '/includes/reseller-option.php';
 
 /**
  * The code that runs during plugin activation.
