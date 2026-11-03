@@ -810,11 +810,12 @@ class Boldgrid_Backup_Admin_Core {
 		$this->get_backup_identifier();
 
 		/*
-		 * Defer translated strings until init (WP 6.7+).
-		 *
-		 * Calling esc_html__() during plugin bootstrap triggers
-		 * _load_textdomain_just_in_time too early.
+		 * Premium reads icon markup during plugins_loaded, before init.
+		 * Those values are not translated. Translated strings stay on init
+		 * so WordPress 6.7 does not warn about early translation loading.
 		 */
+		$this->set_icon_markup();
+
 		if ( did_action( 'init' ) && ! doing_action( 'init' ) ) {
 			$this->set_lang();
 		} else {
@@ -3089,6 +3090,22 @@ class Boldgrid_Backup_Admin_Core {
 	 */
 	public function set_doing_cron() {
 		$this->doing_cron = ( defined( 'DOING_CRON' ) && DOING_CRON ) || isset( $_GET['doing_wp_cron'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Cron requests carry no nonce; presence check only.
+	}
+
+	/**
+	 * Set icon markup that other plugins may read before init.
+	 *
+	 * These values contain no translated text. set_lang() replaces the
+	 * whole lang array on init and includes the same keys.
+	 *
+	 * @since 1.17.5
+	 */
+	public function set_icon_markup() {
+		$this->lang = array(
+			'checkmark'    => '&#10003;',
+			'icon_success' => '<span class="dashicons dashicons-yes green"></span> ',
+			'icon_warning' => '<span class="dashicons dashicons-warning yellow"></span> ',
+		);
 	}
 
 	/**
