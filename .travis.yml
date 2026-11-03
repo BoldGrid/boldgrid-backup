@@ -60,6 +60,7 @@ install:
       yarn install
       composer install --no-interaction --prefer-dist -o
     else
+      composer config preferred-install source
       composer install --no-interaction --prefer-source -o
       yarn install
     fi
@@ -67,7 +68,7 @@ install:
   - |
     if [[ "${TRAVIS_PHP_VERSION:0:3}" != "7.4" ]]; then
       composer config --unset platform.php
-      composer require --dev 'phpunit/phpunit:^9.6.33' --no-interaction --with-all-dependencies -W
+      composer require --dev 'phpunit/phpunit:^9.6.33' --no-interaction --prefer-source --with-all-dependencies -W
     fi
   - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
 
