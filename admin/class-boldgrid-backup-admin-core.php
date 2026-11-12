@@ -1403,12 +1403,20 @@ class Boldgrid_Backup_Admin_Core {
 		}
 
 		// Import the dump file.
-		$importer = new Boldgrid_Backup_Admin_Db_Import();
+		$importer = new Boldgrid_Backup_Admin_Db_Import( $this );
 		$status   = $importer->import( $db_dump_filepath );
 
-		if ( ! empty( $status['error'] ) ) {
-			$this->db_restore_error = $status['error'];
-			do_action( 'boldgrid_backup_notice', $status['error'], 'notice notice-error is-dismissible' );
+		$error = '';
+		if ( false === $status ) {
+			$error = ! empty( $importer->errors ) ? (string) end( $importer->errors ) : __( 'Database import failed.', 'boldgrid-backup' );
+		} elseif ( is_array( $status ) && ! empty( $status['error'] ) ) {
+			$error = $status['error'];
+		}
+
+		if ( '' !== $error ) {
+			$error                  = esc_html( $error );
+			$this->db_restore_error = $error;
+			do_action( 'boldgrid_backup_notice', $error, 'notice notice-error is-dismissible' );
 			return false;
 		}
 

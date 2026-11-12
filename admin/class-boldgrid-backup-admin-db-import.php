@@ -445,17 +445,23 @@ class Boldgrid_Backup_Admin_Db_Import {
 	 * @param PDO    $db The PDO Object.
 	 * @param string $sql_line The line of sql to execute.
 	 *
-	 * @return int Number of affected rows
+	 * @return int|false Number of affected rows, or false when the statement fails.
 	 */
 	public function exec_import( PDO $db, $sql_line ) {
 		$affected_rows = false;
 
 		try {
 			$affected_rows = $db->exec( $sql_line );
-		} catch( PDOException $e ) {
-			$this->core->logger->add( 'SQL Import Error: ' . $e->getMessage() );
-			$this->core->logger->add( 'Line: ' . $sql_line );
-			throw $e;
+		} catch ( PDOException $e ) {
+			$message        = 'SQL Import Error: ' . $e->getMessage();
+			$this->errors[] = $message;
+
+			if ( is_object( $this->core ) && is_object( $this->core->logger ) ) {
+				$this->core->logger->add( $message );
+				$this->core->logger->add( 'Line: ' . $sql_line );
+			}
+
+			return false;
 		}
 		
 		return $affected_rows;
