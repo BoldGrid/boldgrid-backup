@@ -157,5 +157,4 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: boldgrid-backup.zip
-          # Actions reserves the secret name GITHUB_TOKEN.
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ github.token }}

@@ -68,7 +68,7 @@ WP_TESTS_DIR="${WP_TESTS_DIR:-$HOME/wordpress-tests-lib}" XDEBUG_MODE=off \
 
 Standalone CLI / unit scripts that do not bootstrap WordPress may run with plain `php` and need no `WP_TESTS_DIR`.
 
-GitHub Actions (`.github/workflows/ci.yml`) runs the PHP 7.4 and PHP 8.5 test jobs on pull requests and on pushes to `master`. A tag push on BoldGrid/boldgrid-backup publishes after those jobs pass. The WordPress.org step reads Actions secrets `WP_USERNAME` and `WP_PASSWORD`. The GitHub release step reads `GH_TOKEN`. `.github/workflows/security-checks.yml` runs Semgrep, Conftest settings fixtures, and the `Boldgrid_Backup` security PHPCS ruleset on pull requests and pushes to `master`. That ruleset is separate from `phpcs.xml.dist`.
+GitHub Actions (`.github/workflows/ci.yml`) runs the PHP 7.4 and PHP 8.5 test jobs on pull requests and on pushes to `master`. A tag push on BoldGrid/boldgrid-backup publishes after those jobs pass. The WordPress.org step reads Actions secrets `WP_USERNAME` and `WP_PASSWORD`. The GitHub release step uses the built-in `github.token`. `.github/workflows/security-checks.yml` runs Semgrep, Conftest settings fixtures, and the `Boldgrid_Backup` security PHPCS ruleset on pull requests and pushes to `master`. That ruleset is separate from `phpcs.xml.dist`.
 
 ## Architecture
 
