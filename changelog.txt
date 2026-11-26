@@ -1,5 +1,5 @@
 = 1.17.5 =
-Release Date: Nov 12, 2026
+Release Date: Nov 25, 2026
 * Improvement: Direct Transfer hardens staging path and database prefix handling. Thanks to Murad Akhmedov and Raphael P. Cigana for responsibly reporting these issues.
 * Bug Fix: Direct Transfer no longer fails when the source response includes more than one Link header.
 * Bug Fix: A crontab availability check no longer replaces unrelated cron jobs.
