@@ -1,0 +1,161 @@
+name: CI
+
+# Replaces Travis CI (.travis.yml removed). PHP 7.4 and 8.5 test jobs match the
+# former matrix. Tag publishing runs only for the public plugin repository.
+on:
+  pull_request:
+  push:
+    branches: [master]
+    tags: ['*']
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref_type != 'tag' }}
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  test:
+    name: PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['7.4', '8.5']
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: wordpress_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install SVN (WordPress test library bootstrap)
+        run: sudo apt-get update -q && sudo apt-get install -y subversion
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, xml, mysql, mysqli, curl, zip
+          tools: composer:v2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: yarn
+
+      - name: Resolve latest WordPress version
+        id: wp
+        run: |
+          latest="$(php -r 'echo json_decode(file_get_contents("http://api.wordpress.org/core/version-check/1.7/"), true)["offers"][0]["version"] ?? "";')"
+          if [ -z "$latest" ]; then
+            echo 'Could not resolve latest WordPress version' >&2
+            exit 1
+          fi
+          echo "version=${latest}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            /tmp/wordpress
+            /tmp/wordpress-tests-lib
+          key: ${{ runner.os }}-wp-tests-${{ steps.wp.outputs.version }}
+
+      - name: Install dependencies
+        run: |
+          yarn install --frozen-lockfile
+          composer install --no-interaction --prefer-dist -o --no-progress
+
+      - name: Install PHPUnit 9.6 on PHP 8.5
+        if: matrix.php != '7.4'
+        run: |
+          composer config --unset platform.php
+          composer require --dev 'phpunit/phpunit:^9.6.33' --no-interaction --prefer-dist --with-all-dependencies -W --no-progress
+
+      - name: Install WordPress test library
+        run: bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1 latest true
+
+      - name: PHP syntax lint
+        run: |
+          # ci/ holds method fragments that are not standalone PHP files.
+          while IFS= read -r -d '' file; do
+            php -lf "$file" >/dev/null || exit 1
+          done < <(find . \( -path ./vendor -o -path ./node_modules -o -path ./ci \) -prune -o -name '*.php' -print0)
+
+      - name: PHPUnit
+        run: |
+          if [ "${{ matrix.php }}" = "7.4" ]; then
+            vendor/bin/phpunit --debug --verbose
+          else
+            # PHPUnit 9 on PHP 8.5 prints deprecation traces that exceed the log limit.
+            php -d display_errors=1 -d error_reporting=22527 vendor/bin/phpunit
+          fi
+
+      - name: JavaScript lint
+        run: yarn run js-lint
+
+      - name: Production Composer install
+        run: composer install --no-dev --no-interaction --prefer-dist -o --no-progress
+
+  release:
+    name: Publish tag
+    needs: test
+    if: github.repository == 'BoldGrid/boldgrid-backup' && github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      actions: write
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Install SVN (WordPress.org tag sync)
+        run: sudo apt-get update -q && sudo apt-get install -y subversion
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          extensions: mbstring, xml, curl, zip
+          tools: composer:v2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: yarn
+
+      - name: Install dependencies
+        run: |
+          yarn install --frozen-lockfile
+          composer install --no-dev --no-interaction --prefer-dist -o --no-progress
+
+      - name: Build WordPress.org tag and zip
+        run: chmod +x ./bin/release.sh && ./bin/release.sh
+        env:
+          TERM: xterm
+          WP_SVN_REPO: https://plugins.svn.wordpress.org/boldgrid-backup
+          # wordpress-tag-sync reads these names. Create them as Actions secrets
+          # on the public plugin repository before the first tag publish.
+          WP_USERNAME: ${{ secrets.WP_USERNAME }}
+          WP_PASSWORD: ${{ secrets.WP_PASSWORD }}
+
+      - name: Attach zip to the GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: boldgrid-backup.zip
+          # Actions reserves the secret name GITHUB_TOKEN.
+          token: ${{ secrets.GH_TOKEN }}

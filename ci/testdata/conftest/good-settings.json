@@ -1,0 +1,5 @@
+{
+  "backup_directory": "/home/backups/site",
+  "retention_count": 5,
+  "notification_email": "admin@example.com"
+}

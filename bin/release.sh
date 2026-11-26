@@ -7,14 +7,13 @@
 # wordpress-tag-sync removes some of these again in its SVN staging tree;
 # removals here also cover items that tag-sync does not know about.
 echo "Removing development-only files from release tree."
-rm -rf .claude .cursor .github tests
+rm -rf .claude .cursor .github tests ci phpcs-rules policies rules
 rm -f \
 	.distignore \
 	.eslintignore \
 	.eslintrc.js \
 	.phpunit.result.cache \
 	.prettierrc \
-	.travis.yml \
 	AGENTS.md \
 	CLAUDE.md \
 	phpcs.xml.dist \
@@ -43,6 +42,6 @@ rm -f \
 	yarn-error.log
 rm -rf logs* reports/ build/ .vscode .project .settings .buildpath
 
-# Create a tag in the Wordpress.org SVN repo when after your build succeeds via Travis.
+# Create a tag in the WordPress.org SVN repo after the GitHub Actions release job succeeds.
 # https://github.com/BoldGrid/wordpress-tag-sync
 chmod +x ./node_modules/@boldgrid/wordpress-tag-sync/release.sh && ./node_modules/@boldgrid/wordpress-tag-sync/release.sh;

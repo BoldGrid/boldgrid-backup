@@ -252,12 +252,20 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 	 *
 	 * @param string $transfer_id Transfer ID
 	 * @param string $dest_url    Destination URL
-	 * @return void
+	 * @return bool False when the status file location cannot be resolved.
 	 */
 	public function create_dump_status_file( $transfer_id, $dest_url ) {
 		require_once ABSPATH . 'wp-admin/includes/class-wp-debug-data.php';
-		$dest_dir       = $this->migrate_core->util->url_to_safe_directory_name( $dest_url );
-		$dump_dir       = $this->migrate_core->util->get_transfer_dir() . '/' . $dest_dir . '/' . $transfer_id;
+		$transfer_id = $this->migrate_core->util->sanitize_transfer_id( $transfer_id );
+		if ( '' === $transfer_id ) {
+			return false;
+		}
+
+		$dump_dir = $this->migrate_core->util->get_transfer_site_dir( $dest_url, $transfer_id );
+		if ( false === $dump_dir ) {
+			return false;
+		}
+
 		$db_size        = WP_Debug_Data::get_database_size();
 		$db_dump_file   = $dump_dir . '/db-' . DB_NAME . '-export-' . gmdate('Y-m-d-H-i-s');
 		$response       = json_encode( array(
@@ -275,6 +283,8 @@ class Boldgrid_Backup_Admin_Migrate_Tx {
 			'db_dump_file'   => $db_dump_file,
 			'db_status_file' => $dump_dir . '/db-dump-status.json',
 		) );
+
+		return true;
 	}
 
 	/**

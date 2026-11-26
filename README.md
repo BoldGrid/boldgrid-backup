@@ -1,6 +1,6 @@
 # Total Upkeep #
 
-[![Build Status](https://travis-ci.org/BoldGrid/boldgrid-backup.svg?branch=master)](https://travis-ci.org/BoldGrid/boldgrid-backup)
+[![Build Status](https://github.com/BoldGrid/boldgrid-backup/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/BoldGrid/boldgrid-backup/actions/workflows/ci.yml)
 
 
 Total Upkeep provides WordPress backup and restoration with update protection.
@@ -30,3 +30,5 @@ Before you can use the development version of this plugin you must install the d
 yarn
 composer install -o
 ```
+
+GitHub Actions (`.github/workflows/ci.yml`) runs PHP syntax lint, PHPUnit, and JavaScript lint on PHP 7.4 and PHP 8.5 for pull requests and pushes to `master`. PHP 7.4 uses the locked PHPUnit 7; PHP 8.5 uses PHPUnit 9.6. A tag push on BoldGrid/boldgrid-backup publishes the WordPress.org tag and the GitHub release zip after both jobs pass. The WordPress.org step reads Actions secrets `WP_USERNAME` and `WP_PASSWORD`. The GitHub release step reads `GH_TOKEN`. `.github/workflows/security-checks.yml` runs Semgrep, Conftest settings fixtures, and the `Boldgrid_Backup` security PHPCS ruleset on pull requests and pushes to `master`. That ruleset is separate from `phpcs.xml.dist`.

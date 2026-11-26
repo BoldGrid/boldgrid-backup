@@ -32,13 +32,16 @@ Run from the plugin root after `composer install` and `yarn` as needed.
 | PHPCS (project ruleset) | `phpcs` (or `./vendor/bin/phpcs` if on PATH via Composer) — uses [`phpcs.xml.dist`](phpcs.xml.dist) |
 | PHPCS one file | `phpcs path/to/file.php` |
 | Auto-fix (careful) | `phpcbf path/to/file.php` |
-| PHP syntax lint | `find . -name vendor -prune -o -name node_modules -prune -o -name '*.php' -exec php -lf {} \;` |
+| PHP syntax lint | `while IFS= read -r -d '' file; do php -lf "$file" >/dev/null || exit 1; done < <(find . \( -path ./vendor -o -path ./node_modules -o -path ./ci \) -prune -o -name '*.php' -print0)` |
 | PHPUnit (full) | `WP_TESTS_DIR="${WP_TESTS_DIR:-$HOME/wordpress-tests-lib}" XDEBUG_MODE=off ./vendor/bin/phpunit --debug --no-coverage` |
 | PHPUnit + coverage | same, omit `--no-coverage` and enable Xdebug as appropriate |
 | Single test file | append `tests/admin/test-class-….php` (or other path under `tests/`) |
 | JS lint | `yarn run js-lint` / `yarn run js-lint-fix` |
+| Security PHPCS | `./vendor/bin/phpcs --standard=phpcs-rules/Boldgrid_Backup/ruleset.xml --runtime-set installed_paths "$PWD/phpcs-rules"` |
 
 See also Cursor commands under [`.cursor/commands/`](.cursor/commands/).
+
+GitHub Actions (`.github/workflows/ci.yml`) runs the PHP 7.4 and PHP 8.5 test jobs on pull requests and on pushes to `master`. A tag push on BoldGrid/boldgrid-backup publishes after those jobs pass. The WordPress.org step reads Actions secrets `WP_USERNAME` and `WP_PASSWORD`. The GitHub release step reads `GH_TOKEN`. `.github/workflows/security-checks.yml` runs Semgrep (`rules/boldgrid-backup-semgrep.yml`), Conftest settings fixtures (`policies/boldgrid-backup`), and the `Boldgrid_Backup` security PHPCS ruleset on pull requests and pushes to `master`. That ruleset is separate from `phpcs.xml.dist`. Tag publishing stays in `ci.yml`.
 
 Set `WP_TESTS_DIR` to your account WordPress tests library (commonly `$HOME/wordpress-tests-lib`). Pair it with a matching WordPress core tree (commonly `$HOME/wordpress`). Do not rely on the bootstrap fallback of `/tmp/wordpress-tests-lib` on shared hosts.
 
@@ -66,7 +69,7 @@ Set `WP_TESTS_DIR` to your account WordPress tests library (commonly `$HOME/word
 
 If the test core is missing files (e.g. `wp-includes/theme.php`), restore the WordPress test install before trusting archive/restore failures — those tests can leave the tree damaged. When re-downloading core or the tests lib, stage archives under the account cross-project scratch dir (`$HOME/tmp/`) — never system `/tmp/`.
 
-MockBuilder: use `setMethods()` (not `onlyMethods()` / `addMethods()`). Travis PHP 7.4 runs PHPUnit 7; PHP 8.5 runs 9.6 — see [`.cursor/skills/phpunit-total-upkeep/SKILL.md`](.cursor/skills/phpunit-total-upkeep/SKILL.md) and [`.cursor/rules/phpunit-mock-api.mdc`](.cursor/rules/phpunit-mock-api.mdc).
+MockBuilder: use `setMethods()` (not `onlyMethods()` / `addMethods()`). GitHub Actions runs PHPUnit 7 on PHP 7.4 and PHPUnit 9.6 on PHP 8.5 — see [`.cursor/skills/phpunit-total-upkeep/SKILL.md`](.cursor/skills/phpunit-total-upkeep/SKILL.md) and [`.cursor/rules/phpunit-mock-api.mdc`](.cursor/rules/phpunit-mock-api.mdc).
 
 ## Contribution process
 

@@ -123,7 +123,7 @@ class Test_Boldgrid_Backup_Admin_Utility extends WP_UnitTestCase {
 	/**
 	 * Test is_active() for per-site and network activation.
 	 *
-	 * @since SINCEVERSION
+	 * @since 1.17.5
 	 */
 	public function test_is_active() {
 		$plugin = 'boldgrid-backup/boldgrid-backup.php';

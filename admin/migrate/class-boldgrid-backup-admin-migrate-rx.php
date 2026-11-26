@@ -540,6 +540,15 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			$this->util->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', json_decode( $response['db_dump_info'], true ) );
 			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'dumping-db-tables' );
 			$this->check_dump_status( $transfer );
+		} else {
+			$message = is_array( $response ) && ! empty( $response['error'] ) && is_string( $response['error'] ) ? $response['error'] : 'No dump information returned';
+			$this->migrate_core->log->add( 'Error starting database dump: ' . $message );
+			$this->util->update_transfer_prop(
+				$transfer['transfer_id'],
+				'failed_message',
+				'Error starting database dump: ' . $message
+			);
+			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'failed' );
 		}
 	}
 
@@ -770,10 +779,6 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			? ( json_decode( $file_list['small'], true ) ?: array() )
 			: ( json_decode( $file_list['large'], true ) ?: array() );
 
-		$transfer_dir = $this->util->get_transfer_dir();
-		$source_dir   = $this->util->url_to_safe_directory_name( $transfer['source_site_url'] );
-		$transfer_dir = $transfer_dir . '/' . $source_dir . '/' . $transfer_id . '/';
-
 		$total_file_count      = count( $files );
 		$completed_count       = 0;
 		$md5_failed_files      = array();
@@ -799,9 +804,20 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			}
 		}
 
+		$staging_dir = $this->util->get_transfer_staging_dir( $transfer );
+		if ( ! $staging_dir ) {
+			$message = __( 'The transfer directory could not be opened.', 'boldgrid-backup' );
+			$this->util->update_transfer_prop( $transfer_id, 'status', 'failed' );
+			$this->util->update_transfer_prop( $transfer_id, 'failed_message', $message );
+			return array(
+				'error'   => true,
+				'message' => $message,
+			);
+		}
+
 		foreach ( $files as $file ) {
-			$rcvd_file = $transfer_dir . $file['path'];
-			if ( ! file_exists( $rcvd_file ) ) {
+			$rcvd_file = $this->util->transfer_file_path( $staging_dir, isset( $file['path'] ) ? $file['path'] : '' );
+			if ( false === $rcvd_file || ! file_exists( $rcvd_file ) ) {
 				$files_not_received[] = $file;
 			}
 		}
@@ -940,6 +956,10 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		
 		$verification_data = $this->verify_files( $transfer_id, true );
 
+		if ( ! empty( $verification_data['error'] ) || ! isset( $verification_data['missing_files'] ) ) {
+			return;
+		}
+
 		// Remove any files that are not marked as 'transferred'.
 		$missing_files = array();
 		$pending_files = array();
@@ -1013,6 +1033,11 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	public function process_small_files_rx( $transfer_id ) {
 		// Reset execution time limit
 		set_time_limit( max( ini_get( 'max_execution_time' ), $this->migrate_core->configs['cron_interval'] ) );
+
+		if ( $this->transfer_is_stopped( $transfer_id ) ) {
+			return;
+		}
+
 		$transfer   = $this->util->get_transfer_from_id( $transfer_id );
 		$file_lists = $this->util->get_option( $this->lists_option_name, array() );
 
@@ -1118,7 +1143,15 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		// Reset execution time limit
 		set_time_limit( max( ini_get( 'max_execution_time' ), $this->migrate_core->configs['cron_interval'] ) );
 
+		if ( $this->transfer_is_stopped( $transfer_id ) ) {
+			return;
+		}
+
 		$this->split_large_files( $transfer_id );
+
+		if ( $this->transfer_is_stopped( $transfer_id ) ) {
+			return;
+		}
 
 		$transfer = $this->util->get_transfer_from_id( $transfer_id );
 
@@ -1138,6 +1171,9 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		} );
 
 		foreach ( $split_files as $index => $split_file ) {
+			if ( $this->transfer_is_stopped( $transfer_id ) ) {
+				return;
+			}
 			$this->util->update_file_status( $transfer_id, 'large', $split_file['path'], 'transferring' );
 			$this->process_large_file_rx( $transfer, $split_file );
 		}
@@ -1443,14 +1479,29 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * @return void
 	 */
 	public function process_large_file_rx( $transfer, $split_file ) {
-		// Use php curl init to retrieve the file parts
-		$output_file = $this->util->get_transfer_dir() .
-			'/' . $this->util->url_to_safe_directory_name( $transfer['source_site_url'] ) .
-			'/' . $transfer['transfer_id'] .
-			'/' . $split_file['path'];
+		if ( $this->transfer_is_stopped( $transfer['transfer_id'] ) ) {
+			return;
+		}
 
-		$this->util->create_dirpath( $output_file );
+		$staging_dir = $this->util->get_transfer_staging_dir( $transfer );
+		$output_file = $this->util->prepare_transfer_file(
+			$staging_dir,
+			isset( $split_file['path'] ) ? $split_file['path'] : ''
+		);
+
+		if ( false === $output_file ) {
+			$this->reject_transfer_path( $transfer['transfer_id'] );
+			$this->util->update_file_status( $transfer['transfer_id'], 'large', isset( $split_file['path'] ) ? $split_file['path'] : '', 'failed' );
+			return;
+		}
+
 		$handle = fopen( $output_file, 'wb' );
+		if ( false === $handle ) {
+			$this->util->update_file_status( $transfer['transfer_id'], 'large', $split_file['path'], 'failed' );
+			return;
+		}
+
+		$errors = array();
 
 		foreach( $split_file['parts'] as $file_part ) {
 			if ( $this->transfer_is_canceled( $transfer['transfer_id'] ) ) {
@@ -1568,17 +1619,17 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			return 'canceled';
 		}
 
-		$backup_dir  = $this->util->get_transfer_dir();
-		$source_dir  = $this->util->url_to_safe_directory_name( $transfer['source_site_url'] );
-		$backup_dir  = trailingslashit( $backup_dir );
+		if ( 'failed' === $transfer['status'] ) {
+			return 'failed';
+		}
+
 		$transfer_id = $transfer['transfer_id'];
+		$staging_dir = $this->util->get_transfer_staging_dir( $transfer );
+		$rcvd_file   = $this->util->prepare_transfer_file( $staging_dir, $file_path );
 
-		$rcvd_file = $backup_dir . $source_dir . '/' . $transfer_id . '/' . $file_path;
-
-		if ( ! $this->util->create_dirpath( $rcvd_file ) ) {
-			$status = 'pending';
-			$this->migrate_core->log->add( 'There was an error creating the directory path for the file: ' . $rcvd_file );
-			return $status;
+		if ( false === $rcvd_file ) {
+			$this->reject_transfer_path( $transfer_id );
+			return 'failed';
 		}
 
 		$file_contents = base64_decode( $file_data['file'] );
@@ -1653,7 +1704,17 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			return $response;
 		}
 
-		$db_dump_file = $db_file_dir . basename( $file_path );
+		$db_dump_file = $this->util->prepare_transfer_file(
+			untrailingslashit( $db_file_dir ),
+			wp_basename( str_replace( '\\', '/', (string) $file_path ) )
+		);
+
+		if ( false === $db_dump_file ) {
+			$db_dump_info['split_files'][ $part_number ]['status'] = 'failed';
+			$this->util->update_transfer_prop( $transfer['transfer_id'], 'db_dump_info', $db_dump_info );
+			$this->reject_transfer_path( $transfer['transfer_id'] );
+			return new WP_Error( 'boldgrid_transfer_rx_db_path', __( 'Database dump path was rejected.', 'boldgrid-backup' ) );
+		}
 
 		if ( ! isset( $response['file'] ) ) {
 			$db_dump_info['split_files'][ $part_number ]['status'] = 'failed';
@@ -1692,18 +1753,16 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		$db_dump_info = $transfer['db_dump_info'];
 
-		$transfer_dir = $this->util->get_transfer_dir();
-		$source_dir   = $this->util->url_to_safe_directory_name( $transfer['source_site_url'] );
-		$transfer_dir = trailingslashit( $transfer_dir );
+		$db_file_dir = $this->util->get_transfer_staging_dir( $transfer );
+		if ( ! $db_file_dir ) {
+			return $this->fail_database_directory( $transfer['transfer_id'] );
+		}
 
-		$db_file_dir = $transfer_dir . $source_dir . '/' . $transfer_id . '/';
-
-		$path_created = $this->util->create_dirpath( $db_file_dir . 'db.sql', 0755 );
+		$path_created = $this->util->prepare_transfer_file( $db_file_dir, 'db.sql' );
+		$db_file_dir  = trailingslashit( $db_file_dir );
 
 		if ( ! $path_created ) {
-			$this->migrate_core->log->add( 'There was an error creating the directory path for the database dump' );
-			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'pending-db-tx' );
-			return new WP_Error( 'boldgrid_transfer_rx_db_dir_error', __( 'There was an error creating the directory path for the database dump.', 'boldgrid-backup' ) );
+			return $this->fail_database_directory( $transfer['transfer_id'] );
 		}
 
 		$db_files = is_array( $db_dump_info['split_files'] ) ?
@@ -1745,7 +1804,14 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 
 		if ( count( $completed_files ) > 1 ) {
 			$db_file_name   = $db_dump_info['file'];
-			$merged_db_file = $transfer_dir . $source_dir . '/' . $transfer['transfer_id'] . '/' . basename( $db_file_name );
+			$merged_db_file = $this->util->prepare_transfer_file(
+				untrailingslashit( $db_file_dir ),
+				wp_basename( str_replace( '\\', '/', (string) $db_file_name ) )
+			);
+			if ( false === $merged_db_file ) {
+				$this->reject_transfer_path( $transfer['transfer_id'] );
+				return new WP_Error( 'boldgrid_transfer_rx_db_path', __( 'Database dump path was rejected.', 'boldgrid-backup' ) );
+			}
 			$merged_db_file = $this->merge_db_files( $completed_files, $merged_db_file );
 
 			if ( is_wp_error( $merged_db_file ) ) {
@@ -1758,8 +1824,8 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 			$db_dump_file = $completed_files['part-0']['path'];
 		}
 
-		if ( ! file_exists( $db_dump_file ) ) {
-			$this->migrate_core->log->add( 'The database dump file was not properly received: ' . $db_dump_file );
+		if ( empty( $db_dump_file ) || ! $this->util->existing_path_is_inside( $db_file_dir, $db_dump_file ) || ! file_exists( $db_dump_file ) ) {
+			$this->migrate_core->log->add( 'The database dump file was not properly received.' );
 			$this->util->update_transfer_prop( $transfer['transfer_id'], 'status', 'pending-db-dump' );
 			return new WP_Error( 'boldgrid_transfer_rx_db_file_not_received', __( 'The database dump file was not properly received.', 'boldgrid-backup' ) );
 		}
@@ -1861,15 +1927,29 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 	 * @return void
 	 */
 	public function merge_db_files( $db_files, $output_file ) {
+		$output_dir = dirname( $output_file );
+		$prepared   = $this->util->prepare_transfer_file( $output_dir, wp_basename( $output_file ) );
+		if ( ! is_dir( $output_dir ) || false === $prepared || wp_normalize_path( $prepared ) !== wp_normalize_path( $output_file ) ) {
+			return new WP_Error( 'boldgrid_transfer_rx_db_merge', __( 'Database dump could not be merged.', 'boldgrid-backup' ) );
+		}
+
+		foreach ( $db_files as $db_file ) {
+			if ( empty( $db_file['path'] ) || ! $this->util->existing_path_is_inside( $output_dir, $db_file['path'] ) ) {
+				return new WP_Error( 'boldgrid_transfer_rx_db_merge', __( 'Database dump could not be merged.', 'boldgrid-backup' ) );
+			}
+		}
+
 		$out_handle = fopen( $output_file, 'wb' );
 		if ( ! $out_handle ) {
-			// handle error opening output file
+			return new WP_Error( 'boldgrid_transfer_rx_db_merge', __( 'Database dump could not be merged.', 'boldgrid-backup' ) );
 		}
 
 		foreach ( $db_files as $db_file ) {
 			$in_handle = fopen( $db_file['path'], 'rb' );
 			if ( ! $in_handle ) {
-				// handle error opening input file
+				fclose( $out_handle );
+				wp_delete_file( $output_file );
+				return new WP_Error( 'boldgrid_transfer_rx_db_merge', __( 'Database dump could not be merged.', 'boldgrid-backup' ) );
 			}
 
 			while ( ! feof( $in_handle ) ) {
@@ -1887,5 +1967,61 @@ class Boldgrid_Backup_Admin_Migrate_Rx {
 		}
 
 		return $output_file;
+	}
+
+	/**
+	 * Whether a transfer has already stopped receiving files.
+	 *
+	 * Reads the stored status. A copy passed into a file loop can still say
+	 * the transfer is active after an earlier file marked it failed.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string $transfer_id Transfer ID.
+	 * @return bool
+	 */
+	private function transfer_is_stopped( $transfer_id ) {
+		$status = $this->util->get_transfer_prop( $transfer_id, 'status', '' );
+		return 'canceled' === $status || 'failed' === $status;
+	}
+
+	/**
+	 * Mark a transfer failed when the database directory cannot be used.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string $transfer_id Transfer id.
+	 * @return WP_Error
+	 */
+	private function fail_database_directory( $transfer_id ) {
+		$this->migrate_core->log->add( 'There was an error creating the directory path for the database dump' );
+		$this->util->update_transfer_prop( $transfer_id, 'status', 'failed' );
+		$this->util->update_transfer_prop(
+			$transfer_id,
+			'failed_message',
+			__( 'There was an error creating the directory path for the database dump.', 'boldgrid-backup' )
+		);
+
+		return new WP_Error(
+			'boldgrid_transfer_rx_db_dir_error',
+			__( 'There was an error creating the directory path for the database dump.', 'boldgrid-backup' )
+		);
+	}
+
+	/**
+	 * Stop a transfer whose file path cannot be kept in its staging directory.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string $transfer_id Transfer ID.
+	 */
+	private function reject_transfer_path( $transfer_id ) {
+		$this->migrate_core->log->add( 'Rejected a file path outside the transfer directory.' );
+		$this->util->update_transfer_prop( $transfer_id, 'status', 'failed' );
+		$this->util->update_transfer_prop(
+			$transfer_id,
+			'failed_message',
+			__( 'A file path was rejected.', 'boldgrid-backup' )
+		);
 	}
 }

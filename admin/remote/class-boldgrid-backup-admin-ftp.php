@@ -200,6 +200,18 @@ class Boldgrid_Backup_Admin_Ftp {
 	private $connection = null;
 
 	/**
+	 * Whether the last ftp_connect() / ftp_ssl_connect() attempt failed.
+	 *
+	 * Those functions return false and also emit E_WARNING when DNS lookup fails.
+	 * empty( false ) is true, so a later connect() in the same request (log_in()
+	 * after get_contents()) would try again and warn a second time.
+	 *
+	 * @since 1.17.5
+	 * @var bool
+	 */
+	private $connection_failed = false;
+
+	/**
 	 * The core class object.
 	 *
 	 * @since 1.6.0
@@ -276,7 +288,7 @@ class Boldgrid_Backup_Admin_Ftp {
 	 * @since 1.6.0
 	 */
 	public function connect() {
-		if ( ! empty( $this->connection ) ) {
+		if ( ! empty( $this->connection ) || $this->connection_failed ) {
 			return;
 		}
 
@@ -286,12 +298,22 @@ class Boldgrid_Backup_Admin_Ftp {
 			return;
 		}
 
+		/**
+		 * ftp_connect() / ftp_ssl_connect() emit E_WARNING when getaddrinfo fails.
+		 * On PHP 8 that warning still reaches Query Monitor when a custom error
+		 * handler is active. Skip the socket call when the host does not resolve.
+		 */
+		if ( ( 'ftp' === $this->type || 'ftpes' === $this->type ) && ! $this->host_resolves( $this->host ) ) {
+			$this->mark_connection_failed();
+			return;
+		}
+
 		switch ( $this->type ) {
 			case 'ftp':
-				$this->connection = ftp_connect( $this->host, $this->port, $this->timeout );
+				$this->connection = $this->open_ftp( $this->host, $this->port, false );
 				break;
 			case 'ftpes':
-				$this->connection = ftp_ssl_connect( $this->host, $this->port, $this->timeout );
+				$this->connection = $this->open_ftp( $this->host, $this->port, true );
 				break;
 			case 'sftp':
 				$this->connection = new phpseclib3\Net\SFTP( $this->host, $this->port );
@@ -299,6 +321,107 @@ class Boldgrid_Backup_Admin_Ftp {
 			default:
 				break;
 		}
+
+		if ( ( 'ftp' === $this->type || 'ftpes' === $this->type ) && ! $this->is_ftp_connection( $this->connection ) ) {
+			$this->mark_connection_failed();
+		}
+	}
+
+	/**
+	 * Whether a host is an IP or the system resolver has an address for it.
+	 *
+	 * socket_addrinfo_lookup() follows getaddrinfo() for both address families,
+	 * including hosts-file entries that have no DNS record, and it does not warn
+	 * when the name is missing. Without that lookup, return true so open_ftp()
+	 * resolves the name instead of rejecting an IPv6 hosts-file entry.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string $host Hostname or IP.
+	 * @return bool
+	 */
+	private function host_resolves( $host ) {
+		if ( false !== filter_var( $host, FILTER_VALIDATE_IP ) ) {
+			return true;
+		}
+
+		if ( function_exists( 'socket_addrinfo_lookup' ) && defined( 'SOCK_STREAM' ) ) {
+			$records = socket_addrinfo_lookup(
+				$host,
+				null,
+				[
+					'ai_socktype' => SOCK_STREAM,
+				]
+			);
+
+			return ! empty( $records );
+		}
+
+		return true;
+	}
+
+	/**
+	 * Open an FTP or FTPES connection without leaking resolver warnings.
+	 *
+	 * A silenced ftp_connect() still notifies a custom error handler. Swallow
+	 * that warning for this call so Query Monitor does not report getaddrinfo
+	 * failures, while the connector itself resolves IPv4 and IPv6 names.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string $host   Hostname or IP.
+	 * @param int    $port   Port number.
+	 * @param bool   $secure True for FTPES.
+	 * @return mixed Connection handle, or false.
+	 */
+	private function open_ftp( $host, $port, $secure ) {
+		if ( $secure && ! function_exists( 'ftp_ssl_connect' ) ) {
+			return false;
+		}
+
+		if ( ! $secure && ! function_exists( 'ftp_connect' ) ) {
+			return false;
+		}
+
+		$connection = false;
+
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler -- Contains getaddrinfo warnings for this call only.
+		set_error_handler(
+			static function () {
+				return true;
+			}
+		);
+
+		try {
+			if ( $secure ) {
+				$connection = ftp_ssl_connect( $host, $port, $this->timeout );
+			} else {
+				$connection = ftp_connect( $host, $port, $this->timeout );
+			}
+		} finally {
+			restore_error_handler();
+		}
+
+		return $connection;
+	}
+
+	/**
+	 * Record one failed FTP/FTPES connect and do not try again this request.
+	 *
+	 * @since 1.17.5
+	 */
+	private function mark_connection_failed() {
+		$this->connection        = null;
+		$this->connection_failed = true;
+		$this->errors[]          = sprintf(
+			// translators: 1: Hostname, 2: Port number.
+			__(
+				'Unable to connect to %1$s over port %2$u.',
+				'boldgrid-backup'
+			),
+			$this->host,
+			$this->port
+		);
 	}
 
 	/**
@@ -725,7 +848,9 @@ class Boldgrid_Backup_Admin_Ftp {
 		$this->connect();
 		$this->log_in();
 		if ( ! $this->logged_in ) {
-			$this->errors[] = __( 'Unable to log in to FTP server.', 'boldgrid-backup' );
+			if ( ! $this->connection_failed ) {
+				$this->errors[] = __( 'Unable to log in to FTP server.', 'boldgrid-backup' );
+			}
 			return [];
 		}
 
@@ -932,12 +1057,25 @@ class Boldgrid_Backup_Admin_Ftp {
 			return false;
 		}
 
+		if ( ( 'ftp' === $type || 'ftpes' === $type ) && ! $this->host_resolves( $host ) ) {
+			$this->errors[] = sprintf(
+				// translators: 1: Hostname, 2: Port number.
+				__(
+					'Unable to connect to %1$s over port %2$u.',
+					'boldgrid-backup'
+				),
+				$host,
+				$port
+			);
+			return false;
+		}
+
 		switch ( $type ) {
 			case 'ftp':
-				$connection = @ftp_connect( $host, $port, $this->timeout ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
+				$connection = $this->open_ftp( $host, $port, false );
 				break;
 			case 'ftpes':
-				$connection = @ftp_ssl_connect( $host, $port, $this->timeout ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
+				$connection = $this->open_ftp( $host, $port, true );
 				break;
 			case 'sftp':
 				$connection = @new phpseclib3\Net\SFTP( $host, $port, $this->timeout ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
@@ -1104,6 +1242,7 @@ class Boldgrid_Backup_Admin_Ftp {
 		$this->retention_count = null;
 		$this->type            = $this->default_type;
 		$this->ftp_mode        = $this->default_ftp_mode;
+		$this->connection_failed = false;
 	}
 
 	/**
@@ -1193,6 +1332,11 @@ class Boldgrid_Backup_Admin_Ftp {
 		$logger->add( 'Logging in...' );
 		$this->log_in();
 		if ( ! $this->logged_in ) {
+			if ( $this->connection_failed ) {
+				$logger->add( 'Unable to connect to ftp server.' );
+				return false;
+			}
+
 			$error          = __( 'Unable to log in to ftp server.', 'boldgrid-backup' );
 			$this->errors[] = $error;
 			$logger->add( $error );

@@ -103,13 +103,18 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	public function authenticate_request( $request ) {
 		$params = $request->get_params();
 
-		if ( ! isset( $params['user'] ) && ! isset( $params['pass'] ) ) {
+		if ( empty( $params['user'] ) || empty( $params['pass'] ) || ! is_string( $params['user'] ) || ! is_string( $params['pass'] ) ) {
+			return false;
+		}
+
+		$password = base64_decode( $params['pass'] );
+		if ( false === $password || '' === $password ) {
 			return false;
 		}
 
 		$creds = array(
 			'user_login'    => $params['user'],
-			'user_password' => base64_decode( $params['pass'] ),
+			'user_password' => $password,
 			'remember'      => false,
 		);
 
@@ -121,7 +126,7 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 
 		wp_set_current_user( $user->ID );
 
-		if ( ! current_user_can( 'administrator' ) ) {
+		if ( ! $this->migrate_core->util->user_can_direct_transfer() ) {
 			return false;
 		}
 
@@ -226,6 +231,15 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 		$db_path     = $params['db_path'];
 		$max_size    = min( $this->migrate_core->util->get_max_upload_size(), $params['max_size'] );
 
+		if ( ! $this->migrate_core->util->path_belongs_to_transfer( $db_path, $transfer_id ) ) {
+			return new WP_REST_Response(
+				array(
+					'success' => false,
+					'error'   => 'File not found',
+				)
+			);
+		}
+
 		update_option( $this->active_tx_option_name, array(
 			'transfer_id' => $transfer_id,
 			'status'      => 'pending-db-split',
@@ -255,13 +269,27 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	public function delete_transfer_files( $request ) {
 		$params = $request->get_params();
 
-		$transfer_id = $params['transfer_id'];
+		$transfer_id = $this->migrate_core->util->sanitize_transfer_id( $params['transfer_id'] );
 		$dest_url    = $params['dest_url'];
 
-		$dest_dir = $this->migrate_core->util->url_to_safe_directory_name( $dest_url );
+		if ( '' === $transfer_id ) {
+			return new WP_REST_Response(
+				array(
+					'success' => false,
+				)
+			);
+		}
 
-		$transfer_dir   = $this->migrate_core->util->get_transfer_dir() . '/' . $dest_dir . '/' . $transfer_id;
-		$temp_files_dir = $this->migrate_core->util->get_transfer_dir() . '/temp-file-chunks/' . '/' . $transfer_id;
+		$transfer_dir   = $this->migrate_core->util->get_transfer_site_dir( $dest_url, $transfer_id );
+		$temp_files_dir = $this->migrate_core->util->get_transfer_chunk_dir( $transfer_id );
+
+		if ( false === $transfer_dir || false === $temp_files_dir ) {
+			return new WP_REST_Response(
+				array(
+					'success' => false,
+				)
+			);
+		}
 
 		$this->migrate_core->log->add( 'Deleting Transfer files: ' . $transfer_dir );
 
@@ -306,12 +334,17 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 		$transfer_id    = $request_params['transfer_id'];
 		$dest_url       = $request_params['dest_url'];
 
+		if ( ! $this->migrate_core->tx->create_dump_status_file( $transfer_id, $dest_url ) ) {
+			return new WP_REST_Response( array(
+				'success' => false,
+				'error'   => 'Unable to create the database dump status file',
+			) );
+		}
+
 		update_option( $this->active_tx_option_name, array(
 			'transfer_id' => $transfer_id,
 			'status'      => 'pending-db-dump',
 		) );
-
-		$db_dump_file = $this->migrate_core->tx->create_dump_status_file( $transfer_id, $dest_url );
 
 		$scheduled = $this->migrate_core->backup_core->cron->schedule_direct_transfer();
 
@@ -359,10 +392,17 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 */
 	public function check_dump_status( $request ) {
 		$params      = $request->get_params();
-		$transfer_id = $params['transfer_id'];
+		$transfer_id = $this->migrate_core->util->sanitize_transfer_id( $params['transfer_id'] );
 		$dest_url    = $params['dest_url'];
-		$dest_dir	 = $this->migrate_core->util->url_to_safe_directory_name( $dest_url );
-		$dump_dir    = $this->migrate_core->util->get_transfer_dir() . '/' . $dest_dir . '/' . $transfer_id;
+		$dump_dir    = $this->migrate_core->util->get_transfer_site_dir( $dest_url, $transfer_id );
+
+		if ( false === $dump_dir ) {
+			return new WP_REST_Response( array(
+				'success' => false,
+				'error'   => 'Status file not found',
+			) );
+		}
+
 		$status_file = $dump_dir . '/db-dump-status.json';
 
 		$this->migrate_core->log->add( 'Checking dump status from file ' . $status_file );
@@ -421,9 +461,21 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	public function delete_large_file_parts( $request ) {
 		$params = $request->get_params();
 
-		$transfer_id = $params['transfer_id'];
+		$transfer_id = isset( $params['transfer_id'] ) ? $params['transfer_id'] : '';
+		$file_parts  = isset( $params['file_parts'] ) && is_array( $params['file_parts'] ) ? $params['file_parts'] : array();
 
-		foreach( $params['file_parts'] as $file_part ) {
+		foreach ( $file_parts as $file_part ) {
+			if ( ! $this->migrate_core->util->path_belongs_to_transfer( $file_part, $transfer_id ) ) {
+				return new WP_REST_Response(
+					array(
+						'success' => false,
+						'error'   => 'File not found',
+					)
+				);
+			}
+		}
+
+		foreach ( $file_parts as $file_part ) {
 			if ( file_exists( $file_part ) ) {
 				wp_delete_file( $file_part );
 			}
@@ -445,10 +497,10 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	public function retrieve_large_file_part( $request ) {
 		$params = $request->get_params();
 
-		$transfer_id = $params['transfer_id'];
-		$part_path   = $params['file_part'];
+		$transfer_id = isset( $params['transfer_id'] ) ? $params['transfer_id'] : '';
+		$part_path   = isset( $params['file_part'] ) ? $params['file_part'] : '';
 
-		if ( ! file_exists( $part_path ) ) {
+		if ( ! $this->migrate_core->util->path_belongs_to_transfer( $part_path, $transfer_id ) ) {
 			$this->migrate_core->log->add( 'Large File part not found: ' . $part_path );
 			return new WP_REST_Response( array(
 				'success' => false,
@@ -495,6 +547,10 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 			$relative_path = $file['path'];
 			$file_path     = ABSPATH . $relative_path;
 
+			if ( ! $this->migrate_core->util->path_is_inside_directory( $file_path, ABSPATH ) ) {
+				continue;
+			}
+
 			$file['md5'] = md5_file( $file_path );
 
 			$file[ 'parts' ]  = $this->migrate_core->util->split_large_file( $transfer_id, $file_path, $relative_path, $max_upload_size, 'splitting-large-files' );
@@ -537,14 +593,18 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 		$memory_requirement = 0;
 
 		foreach ( $files as $file ) {
-			$memory_requirement += filesize( ABSPATH . $file ) * 2;
+			$file_path = ABSPATH . $file;
+			if ( ! $this->migrate_core->util->path_is_inside_directory( $file_path, ABSPATH ) ) {
+				continue;
+			}
+			$memory_requirement += filesize( $file_path ) * 2;
 		}
 
 		Boldgrid_Backup_Admin_Utility::bump_memory_limit( intval( $memory_requirement ) * 3 );
 
 		foreach ( $files as $file ) {
 			$file_path = ABSPATH . $file;
-			if ( ! file_exists( $file_path ) ) {
+			if ( ! $this->migrate_core->util->path_is_inside_directory( $file_path, ABSPATH ) ) {
 				continue;
 			}
 			$files_data[$file] = array(
@@ -573,9 +633,10 @@ class Boldgrid_Backup_Admin_Migrate_Tx_Rest {
 	 */
 	public function get_db_dump( $request ) {
 		$request_params = $request->get_params();
-		$file_name      = $request_params['file_path'];
+		$file_name      = isset( $request_params['file_path'] ) ? $request_params['file_path'] : '';
+		$transfer_id    = isset( $request_params['transfer_id'] ) ? $request_params['transfer_id'] : '';
 		$db_path        = urldecode( $file_name );
-		if ( ! file_exists( $db_path ) ) {
+		if ( ! $this->migrate_core->util->path_belongs_to_transfer( $db_path, $transfer_id ) ) {
 			return new WP_REST_Response( array(
 				'success' => false,
 				'error'   => 'File not found',

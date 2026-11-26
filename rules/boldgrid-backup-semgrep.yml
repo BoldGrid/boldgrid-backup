@@ -1,0 +1,60 @@
+rules:
+  - id: bgbkup-db-prefix-identifier
+    message: is_valid_db_prefix() must keep the letter, digit, and underscore pattern.
+    languages: [php]
+    severity: ERROR
+    patterns:
+      - pattern: |
+          function is_valid_db_prefix(...) {
+            ...
+          }
+      - pattern-not-regex: '\[A-Za-z0-9_\]'
+    paths:
+      include:
+        - /admin/migrate/class-boldgrid-backup-admin-migrate-util.php
+        - /ci/testdata/semgrep/**
+
+  - id: bgbkup-db-prefix-not-widened
+    message: is_valid_db_prefix() must not add characters to the identifier pattern.
+    languages: [php]
+    severity: ERROR
+    patterns:
+      - pattern: |
+          function is_valid_db_prefix(...) {
+            ...
+          }
+      - pattern-regex: '\[A-Za-z0-9_[^\]]'
+    paths:
+      include:
+        - /admin/migrate/class-boldgrid-backup-admin-migrate-util.php
+        - /ci/testdata/semgrep/**
+
+  - id: bgbkup-relative-path-rejects-parent
+    message: safe_relative_parts() must reject a parent-directory segment.
+    languages: [php]
+    severity: ERROR
+    patterns:
+      - pattern: |
+          function safe_relative_parts(...) {
+            ...
+          }
+      - pattern-not-regex: "'\\.\\.'"
+    paths:
+      include:
+        - /admin/migrate/class-boldgrid-backup-admin-migrate-util.php
+        - /ci/testdata/semgrep/**
+
+  - id: bgbkup-prefix-assignment-single-quoted
+    message: update_table_prefix() must write a single-quoted $table_prefix assignment.
+    languages: [php]
+    severity: ERROR
+    patterns:
+      - pattern: |
+          function update_table_prefix(...) {
+            ...
+          }
+      - pattern-not-regex: "\\$table_prefix = \\\\'"
+    paths:
+      include:
+        - /admin/migrate/class-boldgrid-backup-admin-migrate-restore.php
+        - /ci/testdata/semgrep/**

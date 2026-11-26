@@ -1,0 +1,78 @@
+name: Security checks
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep:1.173.0
+    steps:
+      - uses: actions/checkout@v5
+      - name: Semgrep Total Upkeep rules
+        run: |
+          semgrep --config rules/boldgrid-backup-semgrep.yml --error \
+            --exclude=vendor --exclude=node_modules --exclude=tests --exclude=ci \
+            --exclude=phpcs-rules
+          # Bad fixtures must fail (findings are expected; silence report noise).
+          if semgrep --config rules/boldgrid-backup-semgrep.yml --error \
+              ci/testdata/semgrep/bad >/dev/null 2>&1; then
+            echo "expected findings in bad fixtures" >&2
+            exit 1
+          fi
+          echo "OK: bad semgrep fixtures flagged"
+          semgrep --config rules/boldgrid-backup-semgrep.yml --error ci/testdata/semgrep/good
+
+  conftest:
+    runs-on: ubuntu-latest
+    container:
+      image: openpolicyagent/conftest:v0.69.0
+    steps:
+      - uses: actions/checkout@v5
+      - name: Conftest backup settings policies
+        run: |
+          conftest test --policy policies/boldgrid-backup ci/testdata/conftest/good-settings.json
+          conftest test --policy policies/boldgrid-backup ci/testdata/conftest/good-minimal.json
+          for f in bad-backup-parent.json bad-backup-number.json bad-backup-array.json bad-retention.json bad-email-newline.json bad-email-number.json; do
+            if conftest test --policy policies/boldgrid-backup "ci/testdata/conftest/$f" >/dev/null 2>&1; then
+              echo "expected deny for $f" >&2
+              exit 1
+            fi
+            echo "OK: denied $f"
+          done
+
+  phpcs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+      - name: Install PHP deps
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: PHPCS Total Upkeep security sniffs
+        run: |
+          # Bad fixtures must fail (findings are expected; silence report noise).
+          if vendor/bin/phpcs --standard=phpcs-rules/Boldgrid_Backup/ruleset.xml \
+              --runtime-set installed_paths "$PWD/phpcs-rules" \
+              ci/testdata/phpcs/bad >/dev/null 2>&1; then
+            echo "expected findings in bad fixtures" >&2
+            exit 1
+          fi
+          echo "OK: bad phpcs fixtures flagged"
+          vendor/bin/phpcs --standard=phpcs-rules/Boldgrid_Backup/ruleset.xml \
+            --runtime-set installed_paths "$PWD/phpcs-rules" \
+            ci/testdata/phpcs/good
+          echo "== phpcs Total Upkeep security sniffs on production sources =="
+          vendor/bin/phpcs --standard=phpcs-rules/Boldgrid_Backup/ruleset.xml \
+            --runtime-set installed_paths "$PWD/phpcs-rules" \
+            --extensions=php \
+            --ignore=vendor/*,node_modules/*,tests/*,ci/*,phpcs-rules/*,.cursor/* \
+            .

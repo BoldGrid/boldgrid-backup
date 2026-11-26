@@ -43,10 +43,19 @@ The project ruleset is Plugin Check–aligned (security, i18n, prefixes, restric
 
 ```bash
 phpcs --report=summary
-find . -name vendor -prune -o -name node_modules -prune -o -name '*.php' -exec php -lf {} \;
+while IFS= read -r -d '' file; do php -lf "$file" >/dev/null || exit 1; done < <(find . \( -path ./vendor -o -path ./node_modules -o -path ./ci \) -prune -o -name '*.php' -print0)
 # If behavior changed, run PHPUnit (see phpunit-total-upkeep skill)
 ```
 
 ## Scratch
 
 Write intermediate reports under `.cursor/working/` (gitignored), e.g. `ENG7-4668-phpcs-source.txt`. Cross-project probes go under `$HOME/tmp/` — never system `/tmp/`.
+
+## Security regression ruleset
+
+`.github/workflows/security-checks.yml` runs `phpcs-rules/Boldgrid_Backup/ruleset.xml`, not this project ruleset. Local command:
+
+```bash
+./vendor/bin/phpcs --standard=phpcs-rules/Boldgrid_Backup/ruleset.xml \
+  --runtime-set installed_paths "$PWD/phpcs-rules"
+```

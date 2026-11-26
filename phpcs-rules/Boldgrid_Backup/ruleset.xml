@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<ruleset name="Boldgrid_Backup-Security">
+	<description>Total Upkeep security regression sniffs.</description>
+	<rule ref="Boldgrid_Backup.Security.RequireDbPrefixIdentifier"/>
+	<rule ref="Boldgrid_Backup.Security.RequireParentSegmentReject"/>
+	<rule ref="Boldgrid_Backup.Security.RequireSingleQuotedPrefix"/>
+</ruleset>

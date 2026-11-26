@@ -84,9 +84,17 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 	 */
 	public function restore_site( $transfer, $transfer_id ) {
 		$migrate_start_time = microtime( true );
-		$transfer_dir       = $this->util->get_transfer_dir();
-		$source_dir         = $this->util->url_to_safe_directory_name( $transfer['source_site_url'] );
-		$transfer_dir       = $transfer_dir . '/' . $source_dir . '/' . $transfer_id . '/';
+		$transfer_dir       = $this->util->get_transfer_staging_dir( $transfer );
+		if ( ! $transfer_dir ) {
+			$this->util->update_transfer_prop( $transfer_id, 'status', 'failed' );
+			$this->util->update_transfer_prop(
+				$transfer_id,
+				'failed_message',
+				esc_html__( 'The transfer directory could not be opened.', 'boldgrid-backup' )
+			);
+			return false;
+		}
+		$transfer_dir = trailingslashit( $transfer_dir );
 
 		$this->migrate_core->log->add( 'Starting restoration for transfer ID ' . $transfer_id );
 		$this->util->update_transfer_prop( $transfer_id, 'status', 'restoring' );
@@ -110,7 +118,18 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 		$files = $this->util->get_files_in_dir( $transfer_dir );
 
 		// 3. Separate the database dump file from the files.
-		$db_file = $this->seperate_db_from_files( $files, $transfer['db_dump_info']['file'] );
+		$db_dump_name = isset( $transfer['db_dump_info']['file'] ) ? $transfer['db_dump_info']['file'] : '';
+		$db_file      = $this->seperate_db_from_files( $files, $db_dump_name );
+		if ( empty( $db_file['path'] ) ) {
+			$this->migrate_core->log->add( 'Failed to restore Database.' );
+			$this->util->update_transfer_prop( $transfer_id, 'status', 'failed' );
+			$this->util->update_transfer_prop(
+				$transfer_id,
+				'failed_message',
+				esc_html__( 'Failed to restore database.', 'boldgrid-backup' )
+			);
+			return false;
+		}
 
 		// 4. Copy the files from the transfer directory to the site's root directory.
 		if ( ! $this->copy_files( $files, $transfer_id, $transfer_dir ) ) {
@@ -334,14 +353,18 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 			)
 		);
 		foreach( $files as $file ) {
-			$relative_path  = str_replace( $transfer_dir, '', $file['path'] );
-			$dest_file_path = ABSPATH . $relative_path;
-			$this->util->create_dirpath( $dest_file_path );
-			if ( file_exists( $file['path'] ) ) {
-				copy( $file['path'], $dest_file_path );
-			} else {
-				$this->migrate_core->log->add( 'File does not exist: ' . $file['path'] );
-				$failed_copies[] = $file['path'];
+			$source_path    = $this->util->resolve_listed_path( isset( $file['path'] ) ? $file['path'] : '' );
+			$dest_file_path = false;
+			if ( $source_path && $this->util->existing_path_is_inside( $transfer_dir, $source_path ) ) {
+				$source_real    = wp_normalize_path( realpath( $source_path ) );
+				$transfer_real  = wp_normalize_path( realpath( $transfer_dir ) );
+				$relative_path  = ltrim( substr( $source_real, strlen( $transfer_real ) ), '/' );
+				$dest_file_path = $this->util->prepare_transfer_file( untrailingslashit( ABSPATH ), $relative_path );
+			}
+
+			if ( false === $dest_file_path || ! copy( $source_path, $dest_file_path ) ) {
+				$this->migrate_core->log->add( 'File could not be copied.' );
+				$failed_copies[] = $source_path;
 			}
 
 			$count++;
@@ -361,6 +384,12 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 
 		if ( ! empty( $failed_copies ) ) {
 			$this->migrate_core->log->add( 'Failed to copy the following files: ' . json_encode( $failed_copies, JSON_PRETTY_PRINT ) );
+			$this->util->update_transfer_prop( $transfer_id, 'status', 'failed' );
+			$this->util->update_transfer_prop(
+				$transfer_id,
+				'failed_message',
+				esc_html__( 'Failed to copy files.', 'boldgrid-backup' )
+			);
 			return false;
 		}
 
@@ -392,10 +421,9 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 
 		$site_url = $transfer['source_site_url'];
 
-		$this->migrate_core->log->add( 'Restoring the WordPress database from the dump file: ' . $db_dump_filepath );
-
-		// Check input.
-		if ( empty( $db_dump_filepath ) ) {
+		$staging_dir      = $this->util->get_transfer_staging_dir( $transfer );
+		$db_dump_filepath = $this->util->resolve_listed_path( $db_dump_filepath );
+		if ( empty( $db_dump_filepath ) || ! $this->util->existing_path_is_inside( $staging_dir, $db_dump_filepath ) ) {
 			// Display an error notice.
 			do_action(
 				'boldgrid_backup_notice',
@@ -407,6 +435,8 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 
 			return false;
 		}
+
+		$this->migrate_core->log->add( 'Restoring the WordPress database from the dump file.' );
 
 		// Connect to the WordPress Filesystem API.
 		global $wp_filesystem;
@@ -421,6 +451,23 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 			'db_prefix'
 		);
 
+		if ( ! is_string( $new_db_prefix ) ) {
+			$this->migrate_core->log->add( 'Database prefix was not read.' );
+			return false;
+		}
+
+		global $wpdb;
+
+		$old_db_prefix = $wpdb->get_blog_prefix();
+
+		/*
+		 * Confirm a changed prefix can be stored before importing.
+		 * A rejected prefix must leave the destination database unchanged.
+		 */
+		if ( $new_db_prefix !== $old_db_prefix && ! $this->prefix_change_is_writable( $new_db_prefix ) ) {
+			return false;
+		}
+
 		// Import the dump file.
 		$memory_limit_bumped = Boldgrid_Backup_Admin_Utility::bump_memory_limit( filesize( $db_dump_filepath ) * 10 );
 		$this->migrate_core->log->add( 'Memory limit bumped: ' . json_encode( $memory_limit_bumped ) );
@@ -429,27 +476,29 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 
 		$this->migrate_core->log->add( 'Database import status: ' . json_encode( $status ) );
 
-		$this->migrate_core->log->add( 'New database prefix: ' . json_encode( $new_db_prefix ) );
-
 		// If the import failed, return false.
 		if ( ! $status ) {
 			$this->migrate_core->log->add( 'Failed to import the database dump file.' );
 			return false;
 		}
 
-		// Connect to the WordPress database via $wpdb.
-		global $wpdb;
+		if ( $new_db_prefix !== $old_db_prefix ) {
+			/*
+			 * Write wp-config.php first. Switching $wpdb before that write
+			 * succeeds would store a failure on the imported tables, and the
+			 * next request would still read the destination record.
+			 */
+			if ( ! $this->update_table_prefix( $new_db_prefix ) ) {
+				$this->migrate_core->log->add( 'Database prefix was not updated.' );
+				return false;
+			}
 
-		$old_db_prefix = $wpdb->get_blog_prefix();
-
-		// Set the database prefix, if supplied/changed.
-		if ( ! empty( $new_db_prefix ) && $new_db_prefix !== $old_db_prefix ) {
-
-			// Set the database table prefix.
-			$wpdb->set_prefix( $new_db_prefix );
-			$this->update_table_prefix( $new_db_prefix );
-		} else {
-			$new_db_prefix = $old_db_prefix;
+			$prefix_set = $wpdb->set_prefix( $new_db_prefix );
+			if ( is_wp_error( $prefix_set ) ) {
+				$this->update_table_prefix( $old_db_prefix );
+				$this->migrate_core->log->add( 'Database prefix was not updated.' );
+				return false;
+			}
 		}
 
 		// Clear the WordPress cache.
@@ -568,20 +617,314 @@ class Boldgrid_Backup_Admin_Migrate_Restore {
 	 * 
 	 * @since 1.17.0
 	 */
-	public function update_table_prefix( $new_db_prefix ) {
+	public function update_table_prefix( $new_db_prefix, $wp_config_path = '' ) {
+		if ( ! $this->util->is_valid_db_prefix( $new_db_prefix ) ) {
+			return false;
+		}
+
+		if ( '' === $wp_config_path ) {
+			$wp_config_path = ABSPATH . 'wp-config.php';
+		}
+
+		$wp_config = file_get_contents( $wp_config_path );
+		if ( ! is_string( $wp_config ) ) {
+			return false;
+		}
+
+		$span = $this->table_prefix_assignment_span( $wp_config );
+		if ( false === $span ) {
+			return false;
+		}
+
+		$escaped     = str_replace( array( '\\', "'" ), array( '\\\\', "\\'" ), $new_db_prefix );
+		$replacement = '$table_prefix = \'' . $escaped . '\';';
+		$updated     = substr( $wp_config, 0, $span['start'] ) . $replacement . substr( $wp_config, $span['end'] );
+
+		$verified = $this->table_prefix_assignment_span( $updated );
+		if ( false === $verified ) {
+			return false;
+		}
+
+		$assignment = substr( $updated, $verified['start'], $verified['end'] - $verified['start'] );
+		if ( $assignment !== $replacement ) {
+			return false;
+		}
+
+		$result = file_put_contents( $wp_config_path, $updated );
+
+		return false !== $result;
+	}
+
+	/**
+	 * Whether a changed prefix can be written before the database is imported.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string $new_db_prefix Prefix from the source site.
+	 * @return bool
+	 */
+	private function prefix_change_is_writable( $new_db_prefix ) {
+		if ( ! $this->util->is_valid_db_prefix( $new_db_prefix ) ) {
+			$this->migrate_core->log->add( 'Rejected database prefix.' );
+			return false;
+		}
+
 		$wp_config_path = ABSPATH . 'wp-config.php';
-		$wp_config      = file_get_contents( $wp_config_path );
+		$wp_config      = is_readable( $wp_config_path ) ? file_get_contents( $wp_config_path ) : false;
+		$can_write      = is_string( $wp_config ) && is_writable( $wp_config_path );
+		if ( ! $can_write || false === $this->table_prefix_assignment_span( $wp_config ) ) {
+			$this->migrate_core->log->add( 'Database prefix was not updated.' );
+			return false;
+		}
 
-		// Regex to capture something like:
-		// $table_prefix  = 'wp_';
-		// We want to replace only the part between the quotes.
-		$pattern     = '/(\$table_prefix\s*=\s*[\'"])([^\'"]+)([\'"]\s*;)/';
-		$replacement = '${1}' . $new_db_prefix . '${3}';
+		return true;
+	}
 
-		$wp_config = preg_replace( $pattern, $replacement, $wp_config );
-		
-		$result = file_put_contents( $wp_config_path, $wp_config );
+	/**
+	 * Byte span of the only quoted $table_prefix assignment.
+	 *
+	 * Every executable write counts, including a computed value and a
+	 * $GLOBALS['table_prefix'] write. A later write would stay in force,
+	 * so the file is left unchanged unless there is exactly one quoted
+	 * $table_prefix assignment.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string $wp_config File contents.
+	 * @return array|false Start and end offsets, or false.
+	 */
+	private function table_prefix_assignment_span( $wp_config ) {
+		$tokens = token_get_all( $wp_config );
+		$count  = count( $tokens );
+		$offset = 0;
+		$spans  = array();
+		$writes = 0;
 
-		return $result ? true : false;
+		for ( $i = 0; $i < $count; $i++ ) {
+			$token = $tokens[ $i ];
+			$text  = is_array( $token ) ? $token[1] : $token;
+
+			$target_end = $this->prefix_write_target_end( $tokens, $i );
+			if ( false !== $target_end && $this->token_is_prefix_write( $tokens, $target_end ) ) {
+				$writes++;
+				if ( $target_end === $i ) {
+					$end = $this->quoted_prefix_assignment_end( $tokens, $i, $offset );
+					if ( is_int( $end ) ) {
+						$spans[] = array(
+							'start' => $offset,
+							'end'   => $end,
+						);
+					}
+				}
+			}
+
+			$offset += strlen( $text );
+		}
+
+		if ( 1 !== $writes || 1 !== count( $spans ) ) {
+			return false;
+		}
+
+		return $spans[0];
+	}
+
+	/**
+	 * Last token of a $table_prefix or $GLOBALS['table_prefix'] target.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param array $tokens Tokens from token_get_all().
+	 * @param int   $index  Index of a variable token.
+	 * @return int|false
+	 */
+	private function prefix_write_target_end( $tokens, $index ) {
+		$token = $tokens[ $index ];
+		if ( ! is_array( $token ) || T_VARIABLE !== $token[0] ) {
+			return false;
+		}
+
+		if ( '$table_prefix' === $token[1] ) {
+			return $index;
+		}
+
+		if ( '$GLOBALS' !== $token[1] ) {
+			return false;
+		}
+
+		$open = $this->next_code_token_index( $tokens, $index );
+		if ( ! $this->token_is_char( $tokens, $open, '[' ) ) {
+			return false;
+		}
+
+		$key = $this->next_code_token_index( $tokens, $open );
+		if ( ! $this->token_is_prefix_key( $tokens, $key ) ) {
+			return false;
+		}
+
+		$close = $this->next_code_token_index( $tokens, $key );
+		if ( ! $this->token_is_char( $tokens, $close, ']' ) ) {
+			return false;
+		}
+
+		return $close;
+	}
+
+	/**
+	 * Whether the token is the table_prefix array key.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param array $tokens Tokens from token_get_all().
+	 * @param int   $index  Token index.
+	 * @return bool
+	 */
+	private function token_is_prefix_key( $tokens, $index ) {
+		if ( ! isset( $tokens[ $index ] ) || ! is_array( $tokens[ $index ] ) ) {
+			return false;
+		}
+
+		if ( T_CONSTANT_ENCAPSED_STRING !== $tokens[ $index ][0] ) {
+			return false;
+		}
+
+		return 'table_prefix' === substr( $tokens[ $index ][1], 1, -1 );
+	}
+
+	/**
+	 * Whether the token is one character.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param array  $tokens Tokens from token_get_all().
+	 * @param int    $index  Token index.
+	 * @param string $char   Expected character.
+	 * @return bool
+	 */
+	private function token_is_char( $tokens, $index, $char ) {
+		return isset( $tokens[ $index ] ) && $char === $tokens[ $index ];
+	}
+
+	/**
+	 * Next token that is not whitespace or a comment.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param array $tokens Tokens from token_get_all().
+	 * @param int   $index  Current token index.
+	 * @return int
+	 */
+	private function next_code_token_index( $tokens, $index ) {
+		$count = count( $tokens );
+		$next  = $index + 1;
+		$skip  = array( T_WHITESPACE, T_COMMENT, T_DOC_COMMENT );
+
+		while ( $next < $count && is_array( $tokens[ $next ] ) && in_array( $tokens[ $next ][0], $skip, true ) ) {
+			$next++;
+		}
+
+		return $next;
+	}
+
+	/**
+	 * Whether the next code token writes to the variable.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param array $tokens Tokens from token_get_all().
+	 * @param int   $index  Last token of the prefix target.
+	 * @return bool
+	 */
+	private function token_is_prefix_write( $tokens, $index ) {
+		$count = count( $tokens );
+		$next  = $this->next_code_token_index( $tokens, $index );
+
+		if ( $next >= $count ) {
+			return false;
+		}
+
+		$token = $tokens[ $next ];
+		if ( '=' === $token ) {
+			return true;
+		}
+
+		if ( ! is_array( $token ) ) {
+			return false;
+		}
+
+		$writes = array(
+			T_PLUS_EQUAL,
+			T_MINUS_EQUAL,
+			T_MUL_EQUAL,
+			T_DIV_EQUAL,
+			T_CONCAT_EQUAL,
+			T_MOD_EQUAL,
+			T_AND_EQUAL,
+			T_OR_EQUAL,
+			T_XOR_EQUAL,
+			T_SL_EQUAL,
+			T_SR_EQUAL,
+			T_POW_EQUAL,
+			T_COALESCE_EQUAL,
+		);
+
+		return in_array( $token[0], $writes, true );
+	}
+
+	/**
+	 * Offset just after a quoted assignment that starts at a variable token.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param array $tokens Tokens from token_get_all().
+	 * @param int   $index  Index of the $table_prefix variable.
+	 * @param int   $offset Byte offset of that variable.
+	 * @return int|false
+	 */
+	private function quoted_prefix_assignment_end( $tokens, $index, $offset ) {
+		$count  = count( $tokens );
+		$cursor = $offset + strlen( $tokens[ $index ][1] );
+		$index++;
+
+		$index = $this->skip_token_whitespace( $tokens, $index, $cursor );
+		if ( $index >= $count || '=' !== $tokens[ $index ] ) {
+			return false;
+		}
+		$cursor++;
+		$index++;
+
+		$index = $this->skip_token_whitespace( $tokens, $index, $cursor );
+		if ( $index >= $count || ! is_array( $tokens[ $index ] ) || T_CONSTANT_ENCAPSED_STRING !== $tokens[ $index ][0] ) {
+			return false;
+		}
+		$cursor += strlen( $tokens[ $index ][1] );
+		$index++;
+
+		$index = $this->skip_token_whitespace( $tokens, $index, $cursor );
+		if ( $index >= $count || ';' !== $tokens[ $index ] ) {
+			return false;
+		}
+
+		return $cursor + 1;
+	}
+
+	/**
+	 * Advance past whitespace tokens.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param array $tokens Tokens from token_get_all().
+	 * @param int   $index  Current token index.
+	 * @param int   $cursor Byte offset, passed by reference.
+	 * @return int Next token index.
+	 */
+	private function skip_token_whitespace( $tokens, $index, &$cursor ) {
+		$count = count( $tokens );
+
+		while ( $index < $count && is_array( $tokens[ $index ] ) && T_WHITESPACE === $tokens[ $index ][0] ) {
+			$cursor += strlen( $tokens[ $index ][1] );
+			$index++;
+		}
+
+		return $index;
 	}
 }

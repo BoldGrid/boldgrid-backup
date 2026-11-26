@@ -49,7 +49,7 @@ Config: [`phpunit.xml`](../../../phpunit.xml). Bootstrap: [`tests/bootstrap.php`
 
 ## MockBuilder API (PHPUnit 7 + 9)
 
-Travis runs **PHPUnit 7** on PHP 7.4 (locked via `composer.json` / `platform.php`) and **PHPUnit 9.6** on PHP 8.5. Mock helpers must work on both.
+GitHub Actions runs **PHPUnit 7** on PHP 7.4 (locked via `composer.json` / `platform.php`) and **PHPUnit 9.6** on PHP 8.5. Mock helpers must work on both.
 
 - Use `setMethods( array( '…' ) )` — present in PHPUnit 7 and still works on 9.6.
 - Do **not** use `onlyMethods()` / `addMethods()` — those are PHPUnit 8+ and fatal on the 7.4 job (`Call to undefined method …::onlyMethods()`).

@@ -291,6 +291,107 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	}
 
 	/**
+	 * Whether the current user may run a direct transfer.
+	 *
+	 * On a network, only a super admin with manage_network may proceed. On a
+	 * single site, the user must have manage_options. The administrator role
+	 * name is not a capability and is not accepted.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @return bool
+	 */
+	public function user_can_direct_transfer() {
+		if ( is_multisite() ) {
+			return is_super_admin() && current_user_can( 'manage_network' );
+		}
+
+		return current_user_can( 'manage_options' );
+	}
+
+	/**
+	 * Reduce a transfer id to letters and digits.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string $transfer_id Raw transfer id.
+	 * @return string
+	 */
+	public function sanitize_transfer_id( $transfer_id ) {
+		return preg_replace( '/[^A-Za-z0-9]/', '', (string) $transfer_id );
+	}
+
+	/**
+	 * Whether a path is a real file inside this transfer's directory.
+	 *
+	 * The resolved path must stay under the backup directory. The transfer id
+	 * must be the directory a transfer actually writes: {destination}/{id}/…
+	 * or temp-file-chunks/{id}/…. An id at any other depth does not match.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string $path        Candidate file path.
+	 * @param string $transfer_id Transfer id that owns the file.
+	 * @return bool
+	 */
+	public function path_belongs_to_transfer( $path, $transfer_id ) {
+		$transfer_id = $this->sanitize_transfer_id( $transfer_id );
+		if ( '' === $transfer_id || ! is_string( $path ) || '' === $path ) {
+			return false;
+		}
+
+		$base = $this->get_transfer_base_dir();
+		if ( false === $base ) {
+			return false;
+		}
+
+		$real_base = realpath( $base );
+		$real_path = realpath( $path );
+		if ( false === $real_base || false === $real_path || ! is_file( $real_path ) ) {
+			return false;
+		}
+
+		$real_base = wp_normalize_path( $real_base );
+		$real_path = wp_normalize_path( $real_path );
+		$prefix    = trailingslashit( $real_base );
+
+		if ( 0 !== strpos( $real_path, $prefix ) ) {
+			return false;
+		}
+
+		$relative = ltrim( substr( $real_path, strlen( $real_base ) ), '/' );
+		$segments = explode( '/', $relative );
+
+		return isset( $segments[1], $segments[2] ) && $transfer_id === $segments[1];
+	}
+
+	/**
+	 * Whether a real file stays inside a directory.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string $path      Candidate file path.
+	 * @param string $directory Directory that must contain the file.
+	 * @return bool
+	 */
+	public function path_is_inside_directory( $path, $directory ) {
+		if ( ! is_string( $path ) || '' === $path || ! is_string( $directory ) || '' === $directory ) {
+			return false;
+		}
+
+		$real_base = realpath( $directory );
+		$real_path = realpath( $path );
+		if ( false === $real_base || false === $real_path || ! is_file( $real_path ) ) {
+			return false;
+		}
+
+		$real_base = wp_normalize_path( $real_base );
+		$real_path = wp_normalize_path( $real_path );
+
+		return 0 === strpos( $real_path, trailingslashit( $real_base ) );
+	}
+
+	/**
 	 * URL to Safe Directory Name
 	 * 
 	 * Given a URL, this function will return a safe directory name
@@ -397,14 +498,22 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 	 * @return array of file paths to the chunks
 	 */
 	public function split_large_file( $transfer_id, $file_path, $relative_path, $max_upload_size, $status ) {
-		$transfer_dir = $this->get_transfer_dir();
-		$chunk_size   = max( 1, (int) floor( $max_upload_size / 10 ) );
+		$transfer_id = $this->sanitize_transfer_id( $transfer_id );
+		if ( '' === $transfer_id ) {
+			return array();
+		}
+
+		$chunk_dir = $this->get_transfer_chunk_dir( $transfer_id );
+		if ( false === $chunk_dir ) {
+			return array();
+		}
+
+		$chunk_size = max( 1, (int) floor( $max_upload_size / 10 ) );
 
 		// determine how many chunks based on chunk size and file size
 		$file_size   = filesize( $file_path );
 		$chunk_count = (int) ceil( $file_size / $chunk_size );
 
-		$chunk_dir = $transfer_dir . '/temp-file-chunks/' . $transfer_id;
 		$this->create_dirpath( $chunk_dir . '/' . $relative_path );
 
 		$chunk_paths = array();
@@ -1614,5 +1723,389 @@ class Boldgrid_Backup_Admin_Migrate_Util {
 		}
 		// Less than 1 hour
 		return date_i18n( 'i:s', mktime( 0, 0, $seconds ) );
+	}
+
+	/**
+	 * Staging directory for one transfer.
+	 *
+	 * Built from the backup directory, the source host, and the transfer id.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param array $transfer Transfer data.
+	 * @return string|false Absolute directory, or false when a segment is unusable.
+	 */
+	public function get_transfer_staging_dir( $transfer ) {
+		if ( empty( $transfer['source_site_url'] ) || empty( $transfer['transfer_id'] ) ) {
+			return false;
+		}
+
+		return $this->get_transfer_site_dir( $transfer['source_site_url'], $transfer['transfer_id'] );
+	}
+
+	/**
+	 * Directory for one transfer with one remote site.
+	 *
+	 * Built from the backup directory, the remote site host, and the transfer id.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string $site_url    Remote site URL.
+	 * @param string $transfer_id Transfer id.
+	 * @return string|false Absolute directory, or false when a segment is unusable.
+	 */
+	public function get_transfer_site_dir( $site_url, $transfer_id ) {
+		$site_dir    = $this->url_to_safe_directory_name( (string) $site_url );
+		$transfer_id = (string) $transfer_id;
+
+		if ( ! $this->is_single_path_segment( $site_dir ) || ! $this->is_single_path_segment( $transfer_id ) ) {
+			return false;
+		}
+
+		$backup_dir = $this->get_transfer_base_dir();
+		if ( false === $backup_dir ) {
+			return false;
+		}
+
+		return $backup_dir . '/' . $site_dir . '/' . $transfer_id;
+	}
+
+	/**
+	 * Directory holding large file chunks for one transfer.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string $transfer_id Transfer id.
+	 * @return string|false Absolute directory, or false when a segment is unusable.
+	 */
+	public function get_transfer_chunk_dir( $transfer_id ) {
+		$transfer_id = (string) $transfer_id;
+		if ( ! $this->is_single_path_segment( $transfer_id ) ) {
+			return false;
+		}
+
+		$backup_dir = $this->get_transfer_base_dir();
+		if ( false === $backup_dir ) {
+			return false;
+		}
+
+		return $backup_dir . '/temp-file-chunks/' . $transfer_id;
+	}
+
+	/**
+	 * Backup directory as an absolute path for transfer files.
+	 *
+	 * A relative setting resolves under ABSPATH.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @return string|false Absolute directory, or false when the setting is unusable.
+	 */
+	public function get_transfer_base_dir() {
+		$backup_dir = wp_normalize_path( untrailingslashit( (string) $this->get_transfer_dir() ) );
+		if ( $this->path_has_parent_segment( $backup_dir ) ) {
+			return false;
+		}
+		if ( '' !== $backup_dir && ! $this->is_absolute_path( $backup_dir ) ) {
+			$parts = $this->safe_relative_parts( $backup_dir );
+			if ( false === $parts ) {
+				return false;
+			}
+			$backup_dir = wp_normalize_path( untrailingslashit( ABSPATH ) ) . '/' . implode( '/', $parts );
+		}
+		if ( '' === $backup_dir || ! $this->is_absolute_path( $backup_dir ) ) {
+			return false;
+		}
+
+		return $backup_dir;
+	}
+
+	/**
+	 * Whether a database prefix can be stored as a PHP string literal.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param mixed $prefix Prefix from the source site.
+	 * @return bool
+	 */
+	public function is_valid_db_prefix( $prefix ) {
+		return is_string( $prefix ) && 1 === preg_match( '/\A[A-Za-z0-9_]+\z/', $prefix );
+	}
+
+	/**
+	 * Whether an existing path is the directory or a file inside it.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string $directory Directory.
+	 * @param string $path      Existing path.
+	 * @return bool
+	 */
+	public function existing_path_is_inside( $directory, $path ) {
+		$directory_real = realpath( $directory );
+		$path_real      = realpath( $path );
+
+		if ( false === $directory_real || false === $path_real || is_link( $path ) ) {
+			return false;
+		}
+
+		$directory_real = wp_normalize_path( $directory_real );
+		$path_real      = wp_normalize_path( $path_real );
+
+		return $path_real === $directory_real || 0 === strpos( $path_real, $directory_real . '/' );
+	}
+
+	/**
+	 * Absolute path for an entry from get_files_in_dir().
+	 *
+	 * That listing stores an absolute path when the file is outside ABSPATH,
+	 * and an ABSPATH-relative path when it is inside.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string $path Listed path.
+	 * @return string|false
+	 */
+	public function resolve_listed_path( $path ) {
+		if ( ! is_string( $path ) || '' === $path || false !== strpos( $path, "\0" ) ) {
+			return false;
+		}
+
+		$normalized = wp_normalize_path( $path );
+		if ( $this->is_absolute_path( $normalized ) ) {
+			return $normalized;
+		}
+
+		return wp_normalize_path( trailingslashit( ABSPATH ) . ltrim( $normalized, '/' ) );
+	}
+
+	/**
+	 * Resolve a relative file path inside a staging directory without creating it.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string $staging_dir   Existing staging directory.
+	 * @param string $relative_path Relative file path.
+	 * @return string|false Absolute path, or false when it is not inside staging.
+	 */
+	public function transfer_file_path( $staging_dir, $relative_path ) {
+		$parts = $this->safe_relative_parts( $relative_path );
+		if ( false === $parts || ! is_string( $staging_dir ) || '' === $staging_dir ) {
+			return false;
+		}
+
+		$staging_real = realpath( $staging_dir );
+		if ( false === $staging_real ) {
+			return false;
+		}
+
+		$staging_real = wp_normalize_path( $staging_real );
+		$candidate    = $staging_real . '/' . implode( '/', $parts );
+
+		if ( is_link( $candidate ) || ! $this->candidate_stays_inside( $staging_real, $candidate ) ) {
+			return false;
+		}
+
+		return $candidate;
+	}
+
+	/**
+	 * Create parent directories and return a file path inside staging.
+	 *
+	 * Directories are created one level at a time. A link, or a resolved path
+	 * that leaves the staging directory, stops the walk before any write.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string $staging_dir   Staging directory.
+	 * @param string $relative_path Relative file path.
+	 * @return string|false Absolute file path, or false when the path is rejected.
+	 */
+	public function prepare_transfer_file( $staging_dir, $relative_path ) {
+		$parts = $this->safe_relative_parts( $relative_path );
+		if ( false === $parts || ! is_string( $staging_dir ) || '' === $staging_dir ) {
+			return false;
+		}
+
+		$staging_dir = wp_normalize_path( untrailingslashit( $staging_dir ) );
+		if ( ! $this->is_absolute_path( $staging_dir ) || ! wp_mkdir_p( $staging_dir ) ) {
+			return false;
+		}
+
+		$staging_real = realpath( $staging_dir );
+		if ( false === $staging_real ) {
+			return false;
+		}
+
+		$staging_real = wp_normalize_path( $staging_real );
+		$current      = $staging_real;
+		$dir_parts    = $parts;
+		$filename     = array_pop( $dir_parts );
+
+		foreach ( $dir_parts as $part ) {
+			$next = $current . '/' . $part;
+			if ( is_link( $next ) ) {
+				return false;
+			}
+			if ( ! is_dir( $next ) && ! mkdir( $next, 0755 ) && ! is_dir( $next ) ) {
+				return false;
+			}
+
+			$next_real = realpath( $next );
+			if ( false === $next_real ) {
+				return false;
+			}
+
+			$next_real = wp_normalize_path( $next_real );
+			if ( 0 !== strpos( $next_real, $staging_real . '/' ) ) {
+				return false;
+			}
+
+			$current = $next_real;
+		}
+
+		$candidate = $current . '/' . $filename;
+		if ( is_link( $candidate ) || ! $this->candidate_stays_inside( $staging_real, $candidate ) ) {
+			return false;
+		}
+
+		return $candidate;
+	}
+
+	/**
+	 * Relative path segments that cannot leave a base directory.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string $relative_path Relative path.
+	 * @return string[]|false
+	 */
+	private function safe_relative_parts( $relative_path ) {
+		if ( ! is_string( $relative_path ) || '' === $relative_path || false !== strpos( $relative_path, "\0" ) ) {
+			return false;
+		}
+
+		$relative_path = wp_normalize_path( $relative_path );
+		if ( $this->is_absolute_path( $relative_path ) ) {
+			return false;
+		}
+
+		$safe = array();
+		foreach ( explode( '/', $relative_path ) as $part ) {
+			if ( '' === $part || '.' === $part ) {
+				continue;
+			}
+			if ( '..' === $part ) {
+				return false;
+			}
+			$safe[] = $part;
+		}
+
+		if ( empty( $safe ) ) {
+			return false;
+		}
+
+		return $safe;
+	}
+
+	/**
+	 * Whether a path is a single directory segment.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string $segment Path segment.
+	 * @return bool
+	 */
+	private function is_single_path_segment( $segment ) {
+		if ( ! is_string( $segment ) || '' === $segment ) {
+			return false;
+		}
+
+		if ( false !== strpos( $segment, "\0" ) || false !== strpos( $segment, '/' ) || false !== strpos( $segment, '\\' ) ) {
+			return false;
+		}
+
+		return '.' !== $segment && '..' !== $segment;
+	}
+
+	/**
+	 * Whether any segment is a parent-directory reference.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string $path Path.
+	 * @return bool
+	 */
+	private function path_has_parent_segment( $path ) {
+		foreach ( explode( '/', wp_normalize_path( (string) $path ) ) as $part ) {
+			if ( '..' === $part ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Whether a normalized path is absolute.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string $path Path.
+	 * @return bool
+	 */
+	private function is_absolute_path( $path ) {
+		if ( ! is_string( $path ) || '' === $path ) {
+			return false;
+		}
+
+		if ( '/' === $path[0] ) {
+			return true;
+		}
+
+		return 1 === preg_match( '/^[A-Za-z]:\//', $path );
+	}
+
+	/**
+	 * Whether the nearest existing ancestor of a candidate stays inside staging.
+	 *
+	 * The file itself may not exist yet, so the check walks up to the first
+	 * existing path and compares that real path with the staging directory.
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string $staging_real Absolute real staging directory.
+	 * @param string $candidate    Candidate file path.
+	 * @return bool
+	 */
+	private function candidate_stays_inside( $staging_real, $candidate ) {
+		$staging_real = wp_normalize_path( $staging_real );
+		$candidate    = wp_normalize_path( $candidate );
+
+		if ( 0 !== strpos( $candidate, $staging_real . '/' ) ) {
+			return false;
+		}
+
+		$ancestor = $candidate;
+		while ( ! file_exists( $ancestor ) && ! is_link( $ancestor ) ) {
+			$parent = dirname( $ancestor );
+			if ( $parent === $ancestor ) {
+				return false;
+			}
+			$ancestor = $parent;
+		}
+
+		if ( is_link( $ancestor ) ) {
+			return false;
+		}
+
+		$ancestor_real = realpath( $ancestor );
+		if ( false === $ancestor_real ) {
+			return false;
+		}
+
+		$ancestor_real = wp_normalize_path( $ancestor_real );
+
+		return $ancestor_real === $staging_real || 0 === strpos( $ancestor_real, $staging_real . '/' );
 	}
 }

@@ -8,10 +8,13 @@
 /.eslintrc.js
 /.github/
 /.prettierrc
-/.travis.yml
 /AGENTS.md
 /CLAUDE.md
 /bin/
+/ci/
+/phpcs-rules/
+/policies/
+/rules/
 /phpcs.xml.dist
 /phpunit.xml
 /tests/

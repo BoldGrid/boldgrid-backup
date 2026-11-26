@@ -60,8 +60,6 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 	 * @since xxx
 	 */
 	public function set_up() {
-		global $wpdb;
-
 		$this->core = new \Boldgrid_Backup_Admin_Core();
 
 		$this->test_lines = array(
@@ -79,12 +77,37 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 			'/*!50001 VIEW `test_view` AS select `wp_options`.`option_id` AS `option_id`,`wp_options`.`option_name` AS `option_name`,`wp_options`.`option_value` AS `option_value`,`wp_options`.`autoload` AS `autoload` from `wp_options` */;',
 		);
 
+		list( $definer_user, $definer_host ) = $this->expected_definer_account( $this->original_view_lines[2] );
+
 		$this->expected_view_lines = array(
 			'/*!50001 DROP VIEW IF EXISTS `test_view`*/;',
 			'/*!50001 CREATE ALGORITHM=UNDEFINED */',
-			'/*!50013 DEFINER=`' . DB_USER . '`@`localhost` SQL SECURITY DEFINER */',
+			'/*!50013 DEFINER=`' . $definer_user . '`@`' . $definer_host . '` SQL SECURITY DEFINER */',
 			'/*!50001 VIEW `test_view` AS select `wp_options`.`option_id` AS `option_id`,`wp_options`.`option_name` AS `option_name`,`wp_options`.`option_value` AS `option_value`,`wp_options`.`autoload` AS `autoload` from `wp_options` */;',
 		);
+	}
+
+	/**
+	 * Account fix_definer() writes for a dump line.
+	 *
+	 * The importer copies CURRENT_USER(). That host is not DB_HOST when the
+	 * test database is reached over TCP.
+	 *
+	 * @param string $line Dump line passed to fix_definer().
+	 * @return string[] Username and host.
+	 */
+	private function expected_definer_account( $line ) {
+		global $wpdb;
+
+		$current_user_string = $wpdb ? $wpdb->get_var( 'SELECT CURRENT_USER()' ) : '';
+
+		if ( ! empty( $current_user_string ) ) {
+			return explode( '@', $current_user_string );
+		}
+
+		$current_host = strpos( $line, '@`%`' ) ? '%' : DB_HOST;
+
+		return array( DB_USER, $current_host );
 	}
 
 	/**
@@ -171,10 +194,10 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 		$db_import = new \Boldgrid_Backup_Admin_Db_Import();
 
 		$fixed_lines = $db_import->fix_view_statements( $this->original_view_lines );
-		$this->assertEquals( $fixed_lines, $this->expected_view_lines );
+		$this->assertEquals( $this->expected_view_lines, $fixed_lines );
 
 		$unchanged_lines = $db_import->fix_view_statements( $this->test_lines );
-		$this->assertEquals( $unchanged_lines, $this->test_lines );
+		$this->assertEquals( $this->test_lines, $unchanged_lines );
 
 		$mock_db_import = $this->getMockBuilder( \Boldgrid_Backup_Admin_Db_Import::class )
 					->setMethods( array( 'has_db_privileges' ) )
@@ -193,16 +216,19 @@ class Test_Boldgrid_Backup_Admin_Db_Import extends \WP_UnitTestCase {
 	public function test_fix_definer() {
 		$db_import = new \Boldgrid_Backup_Admin_Db_Import();
 
-		$expected_line = '/*!50013 DEFINER=`' . DB_USER . '`@`' . DB_HOST . '` SQL SECURITY DEFINER */';
 		$original_line = '/*!50013 DEFINER=`original_user`@`%` SQL SECURITY DEFINER */';
+		list( $definer_user, $definer_host ) = $this->expected_definer_account( $original_line );
+		$expected_line = '/*!50013 DEFINER=`' . $definer_user . '`@`' . $definer_host . '` SQL SECURITY DEFINER */';
 		$this->assertEquals( $expected_line, $db_import->fix_definer( $original_line ) );
 
-		$expected_line = '/*!50013 DEFINER=`' . DB_USER . '`@`' . DB_HOST . '` SQL SECURITY DEFINER */';
 		$original_line = '/*!50013 DEFINER=`original_user`@`' . DB_HOST . '` SQL SECURITY DEFINER */';
+		list( $definer_user, $definer_host ) = $this->expected_definer_account( $original_line );
+		$expected_line = '/*!50013 DEFINER=`' . $definer_user . '`@`' . $definer_host . '` SQL SECURITY DEFINER */';
 		$this->assertEquals( $expected_line, $db_import->fix_definer( $original_line ) );
 
-		$expected_line = '/*!50013 DEFINER=`' . DB_USER . '`@`' . DB_HOST . '` */';
 		$original_line = '/*!50013 DEFINER=`original_user`@`' . DB_HOST . '` */';
+		list( $definer_user, $definer_host ) = $this->expected_definer_account( $original_line );
+		$expected_line = '/*!50013 DEFINER=`' . $definer_user . '`@`' . $definer_host . '` */';
 		$this->assertEquals( $expected_line, $db_import->fix_definer( $original_line ) );
 	}
 

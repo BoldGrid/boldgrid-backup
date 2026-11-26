@@ -122,6 +122,100 @@ class Test_Boldgrid_Backup_Admin_Migrate_Util extends WP_UnitTestCase {
 		$this->assertSame( 'rest_error', $result->get_error_code() );
 	}
 
+	public function test_direct_transfer_rejects_subscriber() {
+		$user_id = self::factory()->user->create( array( 'role' => 'subscriber' ) );
+		wp_set_current_user( $user_id );
+
+		$util = new Boldgrid_Backup_Admin_Migrate_Util( $this->migrate_core );
+		$this->assertFalse( $util->user_can_direct_transfer() );
+	}
+
+	public function test_direct_transfer_multisite_requires_super_admin() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite capability check.' );
+		}
+
+		$user_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $user_id );
+
+		$util = new Boldgrid_Backup_Admin_Migrate_Util( $this->migrate_core );
+		$this->assertFalse( $util->user_can_direct_transfer() );
+
+		grant_super_admin( $user_id );
+		$this->assertTrue( $util->user_can_direct_transfer() );
+		revoke_super_admin( $user_id );
+	}
+
+	public function test_direct_transfer_allows_site_administrator() {
+		if ( is_multisite() ) {
+			$this->markTestSkipped( 'Single-site capability check.' );
+		}
+
+		$user_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $user_id );
+
+		$util = new Boldgrid_Backup_Admin_Migrate_Util( $this->migrate_core );
+		$this->assertTrue( $util->user_can_direct_transfer() );
+	}
+
+	public function test_path_belongs_to_transfer() {
+		$transfer_id    = 'abc123';
+		$saved_settings = get_option( 'boldgrid_backup_settings' );
+		$base           = wp_tempnam( 'bgbkup-transfer' );
+		unlink( $base );
+		mkdir( $base, 0700, true );
+
+		$owned = $base . '/example-com/' . $transfer_id . '/dump.sql';
+		mkdir( dirname( $owned ), 0700, true );
+		file_put_contents( $owned, 'dump' );
+
+		$chunk = $base . '/temp-file-chunks/' . $transfer_id . '/wp-content/file.txt.part-0';
+		mkdir( dirname( $chunk ), 0700, true );
+		file_put_contents( $chunk, 'chunk' );
+
+		$other = $base . '/example-com/other/dump.sql';
+		mkdir( dirname( $other ), 0700, true );
+		file_put_contents( $other, 'other' );
+
+		$shallow = $base . '/' . $transfer_id . '/dump.sql';
+		mkdir( dirname( $shallow ), 0700, true );
+		file_put_contents( $shallow, 'shallow' );
+
+		$deep = $base . '/example-com/nested/' . $transfer_id . '/dump.sql';
+		mkdir( dirname( $deep ), 0700, true );
+		file_put_contents( $deep, 'deep' );
+
+		$named_file = $base . '/other-dest/' . $transfer_id;
+		mkdir( dirname( $named_file ), 0700, true );
+		file_put_contents( $named_file, 'name' );
+
+		update_option(
+			'boldgrid_backup_settings',
+			array(
+				'backup_directory' => $base,
+			)
+		);
+
+		$util = new Boldgrid_Backup_Admin_Migrate_Util( $this->migrate_core );
+
+		$outside = dirname( $base ) . '/outside.sql';
+		file_put_contents( $outside, 'nope' );
+
+		$this->assertTrue( $util->path_belongs_to_transfer( $owned, $transfer_id ) );
+		$this->assertTrue( $util->path_belongs_to_transfer( $chunk, $transfer_id ) );
+		$this->assertFalse( $util->path_belongs_to_transfer( $other, $transfer_id ) );
+		$this->assertFalse( $util->path_belongs_to_transfer( $owned, '../' ) );
+		$this->assertFalse( $util->path_belongs_to_transfer( $outside, $transfer_id ) );
+		$this->assertFalse( $util->path_belongs_to_transfer( dirname( $owned ), $transfer_id ) );
+		$this->assertFalse( $util->path_belongs_to_transfer( $shallow, $transfer_id ) );
+		$this->assertFalse( $util->path_belongs_to_transfer( $deep, $transfer_id ) );
+		$this->assertFalse( $util->path_belongs_to_transfer( $named_file, $transfer_id ) );
+
+		unlink( $outside );
+		$this->remove_tree( $base );
+		update_option( 'boldgrid_backup_settings', $saved_settings );
+	}
+
 	public function test_url_to_safe_directory_name() {
 		$sample_url        = 'https://test.boldgrid.com';
 		$expected_dir_name = 'test-boldgrid-com';
@@ -160,6 +254,70 @@ class Test_Boldgrid_Backup_Admin_Migrate_Util extends WP_UnitTestCase {
 
 		// Assert
 		$this->assertCount( 6, $this->chunk_paths ); // This should be split into 6 chunks. 5 full and 1 partial.
+	}
+
+	public function test_split_large_file_keeps_chunks_under_sanitized_id() {
+		$saved_settings = get_option( 'boldgrid_backup_settings' );
+		$base           = wp_tempnam( 'bgbkup-chunks' );
+		unlink( $base );
+		mkdir( $base, 0700, true );
+
+		update_option(
+			'boldgrid_backup_settings',
+			array(
+				'backup_directory' => $base,
+			)
+		);
+
+		$source = $base . '/source.txt';
+		file_put_contents( $source, 'hello world' );
+
+		$util   = new Boldgrid_Backup_Admin_Migrate_Util( $this->migrate_core );
+		$raw_id = 'abc123/../../outside';
+		$paths  = $util->split_large_file( $raw_id, $source, 'wp-content/source.txt', 100, 'splitting-large-files' );
+
+		$expected_dir = wp_normalize_path( $base . '/temp-file-chunks/abc123outside' );
+		$this->assertNotEmpty( $paths );
+		foreach ( $paths as $path ) {
+			$real = realpath( $path );
+			$this->assertNotFalse( $real );
+			$this->assertStringStartsWith( trailingslashit( $expected_dir ), wp_normalize_path( $real ) );
+		}
+		$this->assertFalse( is_dir( $base . '/outside' ) );
+		$this->assertFalse( is_dir( $base . '/temp-file-chunks/outside' ) );
+		$this->assertFalse( is_dir( dirname( $base ) . '/outside' ) );
+
+		$empty = $util->split_large_file( '../', $source, 'wp-content/source.txt', 100, 'splitting-large-files' );
+		$this->assertSame( array(), $empty );
+
+		$this->remove_tree( $base );
+		update_option( 'boldgrid_backup_settings', $saved_settings );
+	}
+
+	/**
+	 * Remove a temporary directory tree created by a test.
+	 *
+	 * @param string $dir Directory to remove.
+	 */
+	private function remove_tree( $dir ) {
+		if ( ! is_dir( $dir ) ) {
+			return;
+		}
+
+		$items = new RecursiveIteratorIterator(
+			new RecursiveDirectoryIterator( $dir, FilesystemIterator::SKIP_DOTS ),
+			RecursiveIteratorIterator::CHILD_FIRST
+		);
+
+		foreach ( $items as $item ) {
+			if ( $item->isDir() ) {
+				rmdir( $item->getPathname() );
+			} else {
+				unlink( $item->getPathname() );
+			}
+		}
+
+		rmdir( $dir );
 	}
 
 	protected function tearDown(): void {
